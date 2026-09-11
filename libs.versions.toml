@@ -1,0 +1,32 @@
+# Mirrors Binge's catalog for the versions the carved-out design system needs, so the carve is a
+# code move rather than a toolchain negotiation. Kept deliberately small: entries are added when
+# the move needs them, not in anticipation of it.
+#
+# This catalog is load-bearing in a way the other repositories' are not. A consumer pulls this in
+# with `includeBuild`, so these versions have to agree with theirs — a Compose or AGP disagreement
+# is not a problem in this repository, it is a problem in whoever included it.
+#
+# The `kotlin` entry is here only for the Compose compiler plugin, which AGP 9 requires separately
+# once `buildFeatures { compose = true }` is on and which is versioned with Kotlin rather than AGP.
+# The `org.jetbrains.kotlin.android` plugin is NOT declared: AGP 9 has built-in Kotlin support and
+# rejects it. Binge's catalog has the same pair for the same reason, and these two must agree.
+[versions]
+agp = "9.3.2"
+kotlin = "2.4.10"
+composeBom = "2026.08.00"
+coreKtx = "1.19.0"
+junit = "4.13.2"
+ktlint = "14.2.0"
+
+[libraries]
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
