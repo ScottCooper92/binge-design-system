@@ -39,6 +39,30 @@ promise to keep. Maven Central stays available later, when the surface has settl
 The catalog at the root is load-bearing for the same reason: a consumer includes this build, so a
 Compose or AGP disagreement here is a disagreement in *their* build.
 
+In the consumer, once as a submodule:
+
+```bash
+git submodule add https://github.com/ScottCooper92/binge-design-system.git design-system
+```
+
+and in its `settings.gradle.kts`:
+
+```kotlin
+includeBuild("design-system") {
+    dependencySubstitution {
+        substitute(module("com.binge:designsystem")).using(project(":designsystem"))
+    }
+}
+```
+
+Then depend on it as `implementation("com.binge:designsystem")`. The substitution is what lets the
+consumer name a coordinate rather than a path, so moving to a published artifact later is a change
+to `settings.gradle.kts` and nothing else.
+
+A submodule pins a commit, so a consumer updates deliberately — `git submodule update --remote` —
+rather than being moved by whatever landed here today. That is the property that makes source-level
+sharing survivable across three repositories.
+
 ## Licence
 
 See [LICENSE](LICENSE).
