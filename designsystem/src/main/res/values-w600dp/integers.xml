@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- >=600dp available width (medium): three poster columns. -->
+    <integer name="media_grid_columns">3</integer>
+    <!-- >=600dp available width (medium): two search-result columns. -->
+    <integer name="search_result_columns">2</integer>
+</resources>

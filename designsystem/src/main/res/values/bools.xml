@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Discover is a tablet-only nav destination (smallest-width >=600dp, both orientations).
+         Independent of the rail/bar tier bools above: phones never show Discover as a tab. -->
+    <bool name="binge_nav_show_discover">false</bool>
+    <!-- Expanded-width layout gate (>=840dp): drives the cinematic detail header and other
+         side-pane affordances. Defaults (compact / portrait): off, so phones keep the single column. -->
+    <bool name="binge_layout_expanded">false</bool>
+    <!-- Landscape (wide-but-short) gate: drives layouts that place side by side what portrait stacks
+         (e.g. the onboarding watch-type choices). Default (portrait): off. -->
+    <bool name="binge_landscape">false</bool>
+    <!-- Two-pane (list + detail side by side) gate: true on a landscape tablet (smallest-width
+         >=600dp AND landscape, via values-sw600dp-land) OR a window that's both >=840dp wide and
+         >=600dp tall (via values-w840dp-h600dp), which is what an unfolded foldable resolves to in
+         portrait. A wide landscape phone (sw~411dp) still stays off on height. Distinct from
+         binge_layout_expanded (width-only, both orientations) which over-triggered on portrait
+         tablets. Default: off. -->
+    <bool name="binge_layout_two_pane">false</bool>
+</resources>

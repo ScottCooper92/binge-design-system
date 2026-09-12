@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape (both phone and tablet): stack the watch-type choices as a row, not a column. -->
+    <bool name="binge_landscape">true</bool>
+</resources>

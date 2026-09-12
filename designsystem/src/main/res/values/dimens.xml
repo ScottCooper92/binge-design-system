@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing scale (4dp base grid) -->
+    <dimen name="padding_xxs">2dp</dimen>
+    <dimen name="padding_xs">4dp</dimen>
+    <dimen name="padding_s">8dp</dimen>
+    <dimen name="padding_sm">12dp</dimen>
+    <dimen name="padding_m">16dp</dimen>
+    <dimen name="padding_l">24dp</dimen>
+    <!-- Media card -->
+    <dimen name="card_width">144dp</dimen>
+    <!-- Carousels (MediaCarousel + CarouselSkeleton) -->
+    <dimen name="section_header_padding_v">12dp</dimen>
+    <!-- Carousel end tile (Discover more / See all) -->
+    <dimen name="see_all_tile_width">120dp</dimen>
+    <dimen name="see_all_tile_corner">18dp</dimen>
+    <dimen name="see_all_tile_icon_circle">38dp</dimen>
+    <dimen name="see_all_tile_icon">18dp</dimen>
+    <dimen name="see_all_tile_dash_on">6dp</dimen>
+    <dimen name="see_all_tile_dash_off">4dp</dimen>
+    <!-- Carousel skeleton -->
+    <dimen name="skeleton_header_width">120dp</dimen>
+    <dimen name="skeleton_header_height">18dp</dimen>
+    <!-- The horizontal margin between a screen's content and the window edge — section headers,
+         poster-rail contentPadding, the discover-entry tile, detail sections, the search headline.
+         Grows with available width (values-w600dp / values-w840dp) so on tablets/foldables the
+         content clears the bezel while the rails still bleed to the edge. Phone default matches
+         padding_m, which is deliberately NOT this token: padding_m is spacing *inside* a component
+         and must stay 16dp at every width, or components inflate on a tablet. -->
+    <dimen name="screen_content_inset">16dp</dimen>
+    <!-- Grid-listing screen header (back button + big headline) -->
+    <dimen name="grid_header_title_padding_h">20dp</dimen>
+    <dimen name="grid_header_title_padding_bottom">18dp</dimen>
+    <dimen name="state_icon_container_size">96dp</dimen>
+    <!-- Image placeholder icon -->
+    <dimen name="placeholder_icon_size">32dp</dimen>
+    <!-- Detail components (DetailHero, CastSection, InfoRow) -->
+    <dimen name="detail_hero_height">480dp</dimen>
+    <!-- DetailOverlayTopBar: scroll band over which the bar crossfades transparent → opaque as the hero clears. -->
+    <dimen name="detail_overlay_bar_fade_band">112dp</dimen>
+    <dimen name="detail_hero_text_bottom_padding">20dp</dimen>
+    <!-- Info / KeyValue row (label left + value right, baseline-aligned) -->
+    <dimen name="info_row_label_min_width">110dp</dimen>
+    <dimen name="info_row_gap">10dp</dimen>
+    <dimen name="info_row_spacing_v">6dp</dimen>
+    <!-- The single reading-column width for the whole app. Full-width scrolling screens (settings,
+         lists, forms) cap + centre content here via `CenteredContent`; detail screens cap their reading
+         column here too (the rails start-align to it but bleed past); Search caps its field/results here.
+         Wider screens centre the column with gutters; a no-op on phones. -->
+    <dimen name="content_max_width">640dp</dimen>
+    <!-- Watch-provider tile grid (onboarding services step + account settings) -->
+    <dimen name="provider_grid_spacing">12dp</dimen>
+    <dimen name="provider_tile_border">2.5dp</dimen>
+    <!-- Provider tile resting + lifted shadow (smaller than the choice panels'
+         12dp because tiles are ~84dp vs panels ~240dp+). -->
+    <dimen name="provider_tile_elevation">1dp</dimen>
+    <dimen name="provider_tile_elevation_selected">6dp</dimen>
+    <dimen name="provider_tile_check_badge_size">20dp</dimen>
+    <dimen name="provider_tile_check_inset">5dp</dimen>
+    <dimen name="provider_tile_check_icon">13dp</dimen>
+    <!-- Selected-services summary (shared by onboarding + account watch providers) -->
+    <dimen name="services_summary_logo">24dp</dimen>
+    <!-- Fixed min height for the summary slot so the empty-hint and the lead+logos
+         states are the same height and the grid above doesn't shift. -->
+    <dimen name="services_summary_min_height">48dp</dimen>
+    <!-- Generic hairline thickness for borders and dividers -->
+    <dimen name="hairline_thickness">1dp</dimen>
+    <!-- Explicit zero for no-padding / no-border / collapsed cases -->
+    <dimen name="zero">0dp</dimen>
+    <!-- Material minimum touch target (selectable rows, tappable bars) -->
+    <dimen name="min_touch_target">48dp</dimen>
+    <!-- Stroke width for small inline circular progress spinners -->
+    <dimen name="progress_stroke_width">2dp</dimen>
+    <dimen name="icon_size_l">20dp</dimen>
+    <!-- Filter chips -->
+    <dimen name="chip_spacing">8dp</dimen>
+    <!-- The fade below a filter pager's pinned chips. Content scrolls *under* the chips, so rows
+         dissolve into the background over this distance instead of sliding out from a hard edge. -->
+    <dimen name="filter_pager_scrim_height">24dp</dimen>
+    <!-- Filled / tonal buttons (detail action row, CTAs) -->
+    <dimen name="button_filled_height">52dp</dimen>
+    <dimen name="button_filled_padding_h">22dp</dimen>
+    <dimen name="button_filled_icon_size">20dp</dimen>
+    <dimen name="button_filled_icon_spacing">8dp</dimen>
+    <dimen name="button_tonal_size">52dp</dimen>
+    <dimen name="top_bar_icon_size">48dp</dimen>
+    <!-- Target start inset the medium bar's title ramps to as it collapses, so the collapsed single-line title clears the circular nav container; the expanded large title stays at 0 on the 16dp content margin. -->
+    <dimen name="medium_top_bar_collapsed_title_inset">8dp</dimen>
+    <dimen name="detail_action_row_spacing">10dp</dimen>
+    <dimen name="detail_action_button_size">48dp</dimen>
+    <!--
+      Floor for either pane when a two-pane split snaps to a foldable's hinge (#819). A fold near the
+      window edge would otherwise hand one side a sliver; below this the split ignores the hinge and
+      keeps its default width, which is what every non-foldable window does anyway.
+    -->
+    <dimen name="two_pane_min_width">280dp</dimen>
+    <!--
+      Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it
+      (#819). Below this the crease is close enough to the bottom edge that honouring it would leave a
+      sheet too short to use, so it is ignored and the sheet keeps its own height.
+    -->
+    <dimen name="fold_safe_bottom_min_height">200dp</dimen>
+    <dimen name="account_stat_padding_h">10dp</dimen>
+    <dimen name="account_stat_padding_v">14dp</dimen>
+    <!-- Search hub (Idle / Discover) -->
+    <dimen name="search_bar_height">52dp</dimen>
+    <dimen name="search_bar_padding_end">6dp</dimen>
+    <dimen name="search_bar_icon_size">22dp</dimen>
+    <dimen name="search_bar_icon_spacing">10dp</dimen>
+    <!-- 48dp matches Material's minimum tap target; the visible icon stays at
+         search_bar_icon_size and is centred in the box. -->
+    <dimen name="search_bar_trailing_size">48dp</dimen>
+    <dimen name="trending_pill_padding_h">14dp</dimen>
+    <dimen name="trending_pill_padding_v">8dp</dimen>
+    <!-- The history glyph a suggestion pill shows in place of a rank; sized to the labelSmall rank it
+         replaces so the two leading treatments occupy the same slot. -->
+    <dimen name="trending_pill_icon">14dp</dimen>
+    <!-- Search results list (horizontal cards: poster on left + text on right) -->
+    <dimen name="list_row_padding">10dp</dimen>
+    <dimen name="list_row_gap">14dp</dimen>
+    <dimen name="list_row_poster_width">72dp</dimen>
+    <dimen name="list_row_poster_corner">14dp</dimen>
+    <dimen name="list_row_spacing">10dp</dimen>
+    <dimen name="list_row_skeleton_height">128dp</dimen>
+    <!-- Discover screen + filter sheet -->
+    <dimen name="discover_entry_icon_size">44dp</dimen>
+    <dimen name="discover_entry_icon_glyph">22dp</dimen>
+    <dimen name="discover_quickclear_chip_padding_start">14dp</dimen>
+    <dimen name="discover_quickclear_chip_padding_end">12dp</dimen>
+    <dimen name="discover_quickclear_chip_padding_v">8dp</dimen>
+    <dimen name="discover_quickclear_chip_gap">6dp</dimen>
+    <dimen name="discover_quickclear_chip_close_size">18dp</dimen>
+    <dimen name="discover_quickclear_chip_close_icon">12dp</dimen>
+    <!-- Top corner radius for ModalBottomSheet wrappers (see BingeBottomSheet) -->
+    <dimen name="bottom_sheet_corner">28dp</dimen>
+    <!-- Modal side sheet (see BingeModalSideSheet): end-anchored panel width + leading corner radius -->
+    <dimen name="side_sheet_width">340dp</dimen>
+    <dimen name="side_sheet_corner">28dp</dimen>
+    <dimen name="discover_filter_chip_padding_h">14dp</dimen>
+    <dimen name="discover_filter_chip_padding_v">8dp</dimen>
+    <dimen name="discover_filter_chip_icon">14dp</dimen>
+    <dimen name="discover_filter_chip_gap">6dp</dimen>
+    <!-- BingeTag — tinted category/type/role tag (corner = BingeShapes.Tag; h-pad/icon-gap reuse the padding ramp) -->
+    <dimen name="tag_padding_v">3dp</dimen>
+    <dimen name="tag_icon_size">13dp</dimen>
+    <!-- BingeSnackbar — the floating pill (horizontal inset reuses padding_m) -->
+    <dimen name="snackbar_elevation">6dp</dimen>
+    <!-- Small vertical inset so the action button's own touch-target padding sums to a balanced pill height. -->
+    <dimen name="snackbar_padding_vertical">6dp</dimen>
+</resources>

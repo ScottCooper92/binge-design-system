@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cd_navigate_back">Volver</string>
+    <string name="cd_filter_state_included">Incluido</string>
+    <string name="cd_filter_state_excluded">Excluido</string>
+    <string name="cd_filter_state_neutral">Sin definir</string>
+    <string name="media_type_movie">Película</string>
+    <string name="media_type_tv">Serie</string>
+    <string name="gallery_see_all">Ver todo</string>
+    <string name="detail_show_more">Ver más</string>
+    <string name="detail_show_less">Ver menos</string>
+    <string name="create_list_title">Nueva lista</string>
+    <string name="create_list_name_label">Nombre</string>
+    <string name="create_list_cancel">Cancelar</string>
+    <string name="create_list_confirm">Crear</string>
+    <string name="action_see_all_in_section">Ver todo en %1$s</string>
+    <string name="action_more">Ver todo</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="cd_clear_query">Borrar búsqueda</string>
+    <string name="cd_remove_filter">Quitar filtro</string>
+    <string name="text_entry_cancel">Cancelar</string>
+    <string name="text_entry_expand">Ampliar a pantalla completa</string>
+    <string name="text_entry_collapse">Contraer</string>
+    <string name="binge_snackbar_dismiss">Descartar</string>
+</resources>

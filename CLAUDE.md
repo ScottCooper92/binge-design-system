@@ -8,8 +8,10 @@ Conventions for this repository. The agent workflows in `.github/workflows/` rea
 The design system shared by Binge and the companion apps. Read `README.md` for why it exists and
 what belongs in it.
 
-Status is pre-alpha. The carve from Binge has not happened — what is here is the build, the bots and
-a placeholder.
+Status is pre-alpha. The first slice of the carve from Binge is here: the theme, the preview and
+screenshot scaffolding, and every component that names none of Binge's types, with their catalog
+samples, unit tests and screenshot baselines. Binge still holds the components that do name its
+types, and its wiring of this build is a separate Binge PR.
 
 ## The one rule everything else serves
 
@@ -42,15 +44,28 @@ agree with the consumers'.
   parameter is usually the better shape here, because the consumer owns the words.
 - A component takes a `Modifier` parameter, defaulted, and applies it to its outermost node.
 - Previews are `@Preview`-annotated and render without a network or an injected dependency.
+- Every component has a `…Sample()` in `catalog/` and a `@PreviewTest` frame that renders it, and a
+  new visual variant gets its frame in the same PR. The catalog sample is the one public fixture for
+  a component, so the screenshot test renders the sample rather than hand-rolling the same state.
+- A `@Preview(name = …)` token is short, lowercase and space-free: it is baked into the baseline's
+  filename, and a long one breaks out of Windows' path limit under a worktree.
 
 ## Gates
 
-CI runs `./gradlew build`, which is the Kotlin compile, the unit tests, `ktlintCheck` and Android
-lint — the ktlint plugin and AGP both wire themselves into `check`, and `build` depends on it.
+CI runs `./gradlew build validateDebugScreenshotTest`. `build` is the Kotlin compile, the unit
+tests, `ktlintCheck` and Android lint — the ktlint plugin and AGP both wire themselves into `check`,
+and `build` depends on it. The screenshot task is named on top because the screenshot plugin does
+not hook `check`.
 
-That is the whole gate. There is no screenshot suite, no coverage floor and no custom convention
-task in this repository yet, so do not look for one and do not report a finding as though one had
-caught it.
+**The screenshot suite is the gate that matters most here.** A component's visible contract is how
+it renders, and `validateDebugScreenshotTest` compares every `@PreviewTest` frame against the PNG
+committed under `src/screenshotTestDebug/reference/`. When a change is meant to alter a frame,
+re-record with `./gradlew updateDebugScreenshotTest`, look at the regenerated PNGs, and commit them
+in the same commit as the code. Committing that output is the only way to accept a change; there is
+no override flag.
+
+There is no coverage floor and no custom convention task in this repository, so do not look for one
+and do not report a finding as though one had caught it.
 
 **Never silence a gate instead of fixing it.** No ktlint baseline, no `ktlint-disable`, no
 `lint-baseline.xml`, no `abortOnError = false`. A baseline here is a finding suppressed in two
