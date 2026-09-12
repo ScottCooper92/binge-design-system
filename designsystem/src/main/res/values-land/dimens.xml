@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape (short window): cap the detail backdrop so it doesn't dominate the viewport.
+         The full-bleed 480dp value (values/dimens.xml) is for compact portrait; landscape gets a
+         300dp band. -->
+    <dimen name="detail_hero_height">300dp</dimen>
+</resources>

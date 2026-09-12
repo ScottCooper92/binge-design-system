@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Wide AND tall enough for two panes. values-sw600dp-land asks for landscape because of #818,
+         where a 998x448dp landscape phone had the width for two panes and nowhere to put them —
+         orientation standing in for height, which excluded the unfolded foldable (~852x883dp) as
+         collateral. h600dp says it directly: the phone still misses on 448dp, the Fold no longer
+         does. A portrait tablet wider than 840dp (a 12"-class ~1024dp one) newly matches too, and
+         should — the gate is the window's shape, not the hardware's. values-sw600dp-land is left
+         alone, so nothing that resolves two panes today stops. -->
+    <bool name="binge_layout_two_pane">true</bool>
+</resources>

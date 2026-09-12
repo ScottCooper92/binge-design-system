@@ -14,19 +14,48 @@
 agp = "9.3.2"
 kotlin = "2.4.10"
 composeBom = "2026.08.00"
+# material3 is pinned ahead of the BOM, as Binge pins it: the expressive theme reads APIs the BOM's
+# stable line does not have yet.
+material3 = "1.5.0-alpha27"
+materialColorUtilities = "0.1.2"
+coil = "3.6.1"
+androidxWindow = "1.5.0"
 coreKtx = "1.19.0"
-junit = "4.13.2"
+kotlinxCoroutines = "1.11.0"
+junit5 = "6.1.3"
+junit4 = "4.13.2"
+robolectric = "4.16.1"
 ktlint = "14.2.0"
+screenshot = "0.0.1-alpha15"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-window = { module = "androidx.window:window", version.ref = "androidxWindow" }
+androidx-window-testing = { module = "androidx.window:window-testing", version.ref = "androidxWindow" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
 compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-junit = { module = "junit:junit", version.ref = "junit" }
+compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+material-color-utilities = { module = "me.tatarka.google.material:material-color-utilities", version.ref = "materialColorUtilities" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5" }
+junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit5" }
+junit4 = { module = "junit:junit", version.ref = "junit4" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+screenshot-validation-api = { module = "com.android.tools.screenshot:screenshot-validation-api", version.ref = "screenshot" }
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }
+android-junit5 = { id = "de.mannodermaus.android-junit5", version = "2.0.1" }

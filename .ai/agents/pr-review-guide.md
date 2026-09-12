@@ -60,9 +60,11 @@ Defer to documented intent. A trade-off the author flagged and explained is not 
 
 ## 5. Do not report a finding as though a gate caught it
 
-There is no screenshot suite here, no coverage floor and no custom convention task. Do not write
-that one failed, and do not ask for one to be added as a condition of merging — that is an issue, if
-it is anything.
+The gates are `./gradlew build` and `validateDebugScreenshotTest`. There is no coverage floor and no
+custom convention task. Do not write that one failed, and do not ask for one to be added as a
+condition of merging — that is an issue, if it is anything. A screenshot failure is a real finding
+only when the diff image shows a change the PR did not intend; a frame the PR meant to change wants
+its re-recorded baseline in the same commit, not a comment.
 
 ## 6. Follow-ups
 

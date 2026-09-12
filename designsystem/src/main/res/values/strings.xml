@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="cd_navigate_back">Back</string>
+    <string name="cd_filter_state_included">Included</string>
+    <string name="cd_filter_state_excluded">Excluded</string>
+    <string name="cd_filter_state_neutral">Not set</string>
+    <!-- Shared media-type + filter labels, reused across feature modules (DesR.string.*). -->
+    <string name="media_type_movie">Movie</string>
+    <string name="media_type_tv">TV</string>
+    <string name="gallery_see_all">See all</string>
+    <string name="detail_show_more">Show more</string>
+    <string name="detail_show_less">Show less</string>
+    <string name="create_list_title">New list</string>
+    <string name="create_list_name_label">Name</string>
+    <string name="create_list_cancel">Cancel</string>
+    <string name="create_list_confirm">Create</string>
+    <!-- Spoken label for a section header's "See all" button; %1$s is the section title. -->
+    <string name="action_see_all_in_section">See all in %1$s</string>
+    <string name="action_more">See all</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="cd_clear_query">Clear search</string>
+    <string name="cd_remove_filter">Remove filter</string>
+    <string name="text_entry_cancel">Cancel</string>
+    <string name="text_entry_character_count" translatable="false">%1$d / %2$d</string>
+    <string name="text_entry_expand">Expand to full screen</string>
+    <string name="text_entry_collapse">Collapse</string>
+    <string name="binge_snackbar_dismiss">Dismiss</string>
+</resources>

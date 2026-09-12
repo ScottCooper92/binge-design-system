@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Past the 1100dp search cap (landscape tablet, desktop-class window): a third result column
+         finally has the width to be worth having. -->
+    <integer name="search_result_columns">3</integer>
+</resources>

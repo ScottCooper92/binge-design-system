@@ -1,0 +1,110 @@
+package com.binge.designsystem.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.R
+import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.theme.BingeTheme
+
+@Composable
+fun ExpressiveIconButton(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    tint: Color = LocalContentColor.current,
+    tone: IconButtonTone = IconButtonTone.Default,
+    size: Dp = dimensionResource(R.dimen.button_tonal_size),
+) {
+    val background = when (tone) {
+        IconButtonTone.Default -> Color.Transparent
+        IconButtonTone.Tonal -> MaterialTheme.colorScheme.surfaceContainerHigh
+        IconButtonTone.Accent -> MaterialTheme.colorScheme.secondaryContainer
+        IconButtonTone.Glass -> BingeTheme.colors.scrim.copy(alpha = 0.4f)
+    }
+    val containerModifier = if (tone == IconButtonTone.Default) {
+        modifier
+    } else {
+        modifier.size(size).clip(BingeShapes.Pill).background(background)
+    }
+    IconButton(
+        onClick = onClick,
+        modifier = containerModifier,
+        enabled = enabled,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = tint,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewExpressiveIconButton() {
+    BingeExpressiveTheme {
+        ExpressiveIconButton(
+            onClick = {},
+            icon = Icons.Filled.Favorite,
+            contentDescription = "Favourite",
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewExpressiveIconButtonTonal() {
+    BingeExpressiveTheme {
+        ExpressiveIconButton(
+            onClick = {},
+            icon = Icons.Filled.Favorite,
+            contentDescription = "Favourite",
+            tone = IconButtonTone.Tonal,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewExpressiveIconButtonAccent() {
+    BingeExpressiveTheme {
+        ExpressiveIconButton(
+            onClick = {},
+            icon = Icons.Filled.Favorite,
+            contentDescription = "Favourite",
+            tone = IconButtonTone.Accent,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewExpressiveIconButtonGlass() {
+    BingeExpressiveTheme {
+        ExpressiveIconButton(
+            onClick = {},
+            icon = Icons.Filled.Favorite,
+            contentDescription = "Favourite",
+            tone = IconButtonTone.Glass,
+            tint = BingeTheme.colors.onScrim,
+        )
+    }
+}

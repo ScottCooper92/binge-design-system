@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape tablet / unfolded foldable (smallest-width >=600dp AND landscape): show the
+         Account two-pane. This bucket is the AND of the sw600dp and orientation qualifiers, so a
+         portrait tablet/foldable (no land) and a wide landscape phone (sw~411dp, no sw600dp) both
+         miss it and keep the single column. -->
+    <bool name="binge_layout_two_pane">true</bool>
+</resources>

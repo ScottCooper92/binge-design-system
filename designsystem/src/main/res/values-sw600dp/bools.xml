@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tablets (smallest-width >=600dp, both orientations) show Discover as a nav destination. -->
+    <bool name="binge_nav_show_discover">true</bool>
+</resources>
