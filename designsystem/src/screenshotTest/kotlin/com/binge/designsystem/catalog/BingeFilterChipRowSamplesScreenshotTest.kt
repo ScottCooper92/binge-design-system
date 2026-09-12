@@ -5,8 +5,8 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
 /**
- * Screenshot coverage for the filter-chip-row catalog sample — renders the shared
- * [BingeFilterChipRowSample] (#745, #749).
+ * Screenshot coverage for the filter-chip-row catalog samples — renders the shared
+ * [BingeFilterChipRowSample] and [BingeFilterChipPagerSample] (#745, #749).
  */
 class BingeFilterChipRowSamplesScreenshotTest {
     @PreviewTest
@@ -14,5 +14,12 @@ class BingeFilterChipRowSamplesScreenshotTest {
     @Composable
     fun Row() {
         BingeFilterChipRowSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Pager() {
+        BingeFilterChipPagerSample()
     }
 }

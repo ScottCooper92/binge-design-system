@@ -77,6 +77,8 @@
     <!-- The fade below a filter pager's pinned chips. Content scrolls *under* the chips, so rows
          dissolve into the background over this distance instead of sliding out from a hard edge. -->
     <dimen name="filter_pager_scrim_height">24dp</dimen>
+    <!-- Bounds the catalog sample for BingeFilterChipPager, which is otherwise fillMaxSize. -->
+    <dimen name="catalog_filter_chip_pager_height">240dp</dimen>
     <!-- Filled / tonal buttons (detail action row, CTAs) -->
     <dimen name="button_filled_height">52dp</dimen>
     <dimen name="button_filled_padding_h">22dp</dimen>
