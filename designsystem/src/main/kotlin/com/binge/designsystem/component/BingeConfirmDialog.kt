@@ -68,7 +68,7 @@ fun BingeConfirmDialog(
  * visible content directly — the modal [AlertDialog] window itself does not capture in previews.
  */
 @Composable
-internal fun BingeConfirmDialogContent(
+fun BingeConfirmDialogContent(
     title: String,
     message: String,
     confirmLabel: String,
