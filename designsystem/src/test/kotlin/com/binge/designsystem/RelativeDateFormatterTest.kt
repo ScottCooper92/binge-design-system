@@ -22,9 +22,10 @@ class RelativeDateFormatterTest {
         assertNull(formatRelativeOrAbsolute(null, now = NOW))
     }
 
+    /** The relative span is `DateUtils`' own copy in the device locale; the locale parameter does not reach it. */
     @Test
     fun `a recent instant reads as a relative span`() {
-        val label = formatRelativeOrAbsolute(NOW - 6 * DAY, now = NOW, locale = Locale.UK, zone = ZoneOffset.UTC)
+        val label = formatRelativeOrAbsolute(NOW - 6 * DAY, now = NOW)
         assertTrue("was '$label'", label.orEmpty().endsWith("ago"))
     }
 

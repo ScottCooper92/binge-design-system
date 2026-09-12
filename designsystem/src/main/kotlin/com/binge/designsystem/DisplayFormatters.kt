@@ -66,8 +66,9 @@ fun badgeCountLabel(count: Int): String = if (count > MAX_BADGE_COUNT) "$MAX_BAD
  * A conversational date for [timeMillis]: a relative span ("just now", "6 days ago", "3 weeks ago")
  * for recent instants, falling back to the absolute long date ("12 June 2026") once it ages past the
  * relative window or sits in the future. `null` when [timeMillis] is `null` so callers can drop the
- * line entirely. [now] is a parameter so previews and screenshot tests pass a fixed instant — a span
- * derived from the wall clock would drift daily and break the committed baselines.
+ * line entirely. [now] is a parameter so frames pass a fixed instant rather than the drifting clock.
+ * [locale] and [zone] govern the absolute date only: the relative span is the platform's own
+ * `DateUtils` copy, which always follows the device locale.
  */
 fun formatRelativeOrAbsolute(
     timeMillis: Long?,
