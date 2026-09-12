@@ -8,17 +8,21 @@ Conventions for this repository. The agent workflows in `.github/workflows/` rea
 The design system shared by Binge and the companion apps. Read `README.md` for why it exists and
 what belongs in it.
 
-Status is pre-alpha. The first slice of the carve from Binge is here: the theme, the preview and
-screenshot scaffolding, and every component that names none of Binge's types, with their catalog
-samples, unit tests and screenshot baselines. Binge still holds the components that do name its
-types, and its wiring of this build is a separate Binge PR.
+Status is pre-alpha, and consumed by both Binge and binge-seerr. Two slices of the carve from
+Binge are here: the theme, the preview and screenshot scaffolding and every component that named
+none of Binge's types, then the display formatters (`DisplayFormatters.kt`) and the components
+they unlocked — the nav shell, the poster card and carousel, the hero, the chips, the skeletons.
+Binge still holds the components that name its media-item model, its error model or the
+integration contract.
 
 ## The one rule everything else serves
 
 **A component here may not know what Binge's data looks like.**
 
 No TMDB types, no account model, no navigation routes, no provider names. A component takes what it
-renders as parameters and gives back callbacks. If it needs to name one of Binge's concepts to do
+renders as parameters and gives back callbacks. The display formatting a component applies to a
+plain value — a score to one decimal, a count to `1.5k`, a name to its initials — lives here too, in
+`DisplayFormatters.kt`, so that every app rendering the component formats it the same way. If it needs to name one of Binge's concepts to do
 its job, it is not a shared component and it stays in Binge.
 
 The test is not "does it compile here" — almost anything can be made to. It is whether a companion

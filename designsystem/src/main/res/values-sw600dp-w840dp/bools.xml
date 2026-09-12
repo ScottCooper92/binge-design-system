@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Genuine expanded window (tablet landscape / unfolded foldable): the bespoke custom rail.
+         Gated on BOTH smallest-width >=600dp AND available-width >=840dp (folder qualifiers AND),
+         so a wide landscape phone (w>=840dp but sw~411dp) does NOT get it — it gets the floating
+         bar instead. This bucket is more specific than values-w840dp, so it wins for this one
+         name; no other resource resolution changes. -->
+    <bool name="binge_nav_rail_expanded">true</bool>
+</resources>

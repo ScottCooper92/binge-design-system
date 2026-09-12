@@ -2,4 +2,7 @@
 <resources>
     <!-- Tablets (smallest-width >=600dp, both orientations) show Discover as a nav destination. -->
     <bool name="binge_nav_show_discover">true</bool>
+    <!-- Tablets are tall enough for the full cinematic hero even in landscape; sw600dp ranks above
+         the values-land orientation bucket, so this wins back the uncapped height there. -->
+    <bool name="binge_hero_height_compact">false</bool>
 </resources>

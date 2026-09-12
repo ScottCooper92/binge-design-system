@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tablets (smallest-width >=600dp) are tall enough for the cinematic hero to breathe:
+         lift it to the taller standard value. The expanded/"tall" treatment is the tablet default
+         (see issue #770); landscape phones never reach this bucket and keep the computed compact cap. -->
+    <dimen name="hero_height">446dp</dimen>
+    <!-- The cast row scales with the same width that earns the taller hero: an 80dp face sized for a
+         phone reads as a row of thumbnails on a tablet, where the carousel has width to spare and the
+         faces are what the section is for. Width moves with the avatar so the name and character keep
+         their measure, and the detail skeleton's plates follow it. -->
+    <dimen name="cast_avatar_size">112dp</dimen>
+    <dimen name="cast_card_width">128dp</dimen>
+</resources>

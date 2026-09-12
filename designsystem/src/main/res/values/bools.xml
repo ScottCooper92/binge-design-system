@@ -16,4 +16,11 @@
          binge_layout_expanded (width-only, both orientations) which over-triggered on portrait
          tablets. Default: off. -->
     <bool name="binge_layout_two_pane">false</bool>
+    <!-- Adaptive nav shell tier selection (see BingeNavSuiteShell): the expanded window keeps the
+         bespoke side rail, every other bucket gets the floating bar. Default: not expanded. -->
+    <bool name="binge_nav_rail_expanded">false</bool>
+    <!-- Hub HeroCarousel height tier (see HeroCarousel). Default (portrait phone / tall window):
+         the full hero_height. Short windows (landscape phone) flip this true and the hero height is
+         computed off the window height so the first content rail always peeks below the fold. -->
+    <bool name="binge_hero_height_compact">false</bool>
 </resources>
