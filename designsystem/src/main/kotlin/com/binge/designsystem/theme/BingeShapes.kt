@@ -22,6 +22,12 @@ object BingeShapes {
     val Tag = RoundedCornerShape(6.dp)
     val AccountCard = RoundedCornerShape(26.dp)
 
+    /** A [com.binge.designsystem.component.ListRow] poster: tighter than [Medium], a thumbnail beside text rather than a card. */
+    val ListRowPoster = RoundedCornerShape(14.dp)
+
+    /** The profile poster heading a person's detail page, and its skeleton: rounder than [MediaCard], the header's one surface. */
+    val ProfilePoster = RoundedCornerShape(24.dp)
+
     /**
      * tv-material's list-row corner, spelled explicitly because `ListItemDefaults.shape()` returns a
      * `ListItemShape` bundle, not a `Shape` — so a non-`ListItem` (the nav rail) can't reference it,
