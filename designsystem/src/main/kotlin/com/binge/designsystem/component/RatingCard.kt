@@ -66,6 +66,10 @@ fun RatingCard(
     // The "Rate this …" eyebrow; defaults to the movie/show wording from [isTv]. Callers on other
     // surfaces (e.g. an episode screen) can pass a more specific label.
     @StringRes promptLabel: Int = if (isTv) R.string.rating_card_prompt_label_tv else R.string.rating_card_prompt_label_movie,
+    // The reviews-footer subtitle, with and without a community average; both name the app by
+    // default, so a caller whose brand isn't Binge must override them.
+    @StringRes reviewsSubtitle: Int = R.string.rating_card_reviews_subtitle,
+    @StringRes reviewsSubtitleNoAverage: Int = R.string.rating_card_reviews_subtitle_no_average,
 ) {
     val showFooter = reviewCount > 0
     if (!isSignedIn && !showFooter) return
@@ -111,6 +115,8 @@ fun RatingCard(
             ReviewsFooter(
                 reviewCount = reviewCount,
                 averageReviewRating = averageReviewRating,
+                subtitle = reviewsSubtitle,
+                subtitleNoAverage = reviewsSubtitleNoAverage,
                 contentColor = contentColor,
                 onClick = onReviewsClick,
             )
@@ -247,6 +253,8 @@ private fun RatedBody(
 private fun ReviewsFooter(
     reviewCount: Int,
     averageReviewRating: Float?,
+    @StringRes subtitle: Int,
+    @StringRes subtitleNoAverage: Int,
     contentColor: Color,
     onClick: () -> Unit,
 ) {
@@ -283,9 +291,9 @@ private fun ReviewsFooter(
             Text(
                 text =
                     if (averageReviewRating != null) {
-                        stringResource(R.string.rating_card_reviews_subtitle, averageReviewRating.formatRating())
+                        stringResource(subtitle, averageReviewRating.formatRating())
                     } else {
-                        stringResource(R.string.rating_card_reviews_subtitle_no_average)
+                        stringResource(subtitleNoAverage)
                     },
                 style = MaterialTheme.typography.bodySmall,
                 color = contentColor.copy(alpha = 0.66f),
