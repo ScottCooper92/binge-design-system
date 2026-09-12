@@ -58,10 +58,14 @@ class DisplayFormattersTest {
         assertEquals(expected, input.toInitials())
     }
 
-    @Test
-    fun `toInitials returns the explicit fallback when nothing can be derived`() {
-        assertEquals("?", "".toInitials(fallback = "?"))
-        assertEquals("?", "._-".toInitials(fallback = "?"))
+    @ParameterizedTest
+    @CsvSource("'', AB, AB", "' ', ?, ?", "John Doe, XX, JD")
+    fun `toInitials honours an explicit fallback only when no initials derive`(
+        input: String,
+        fallback: String,
+        expected: String,
+    ) {
+        assertEquals(expected, input.toInitials(fallback = fallback))
     }
 
     @ParameterizedTest
@@ -82,6 +86,8 @@ class DisplayFormattersTest {
                 Arguments.of("john_doe", "JD"),
                 Arguments.of("john-doe", "JD"),
                 Arguments.of("  john   doe  ", "JD"),
+                Arguments.of("", ""),
+                Arguments.of("...", ".."),
             )
     }
 }
