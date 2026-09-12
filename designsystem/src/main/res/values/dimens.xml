@@ -258,6 +258,11 @@
     <!-- Larger avatar for the square, vertically-stacked profile card in the expanded two-pane. -->
     <dimen name="account_avatar_size_large">88dp</dimen>
     <dimen name="account_group_label_detail_spacing">2dp</dimen>
+    <!-- SettingsGroup: each row's inset and the tinted icon box with its glyph. -->
+    <dimen name="settings_group_row_padding_h">16dp</dimen>
+    <dimen name="settings_group_row_padding_v">14dp</dimen>
+    <dimen name="settings_group_icon_size">38dp</dimen>
+    <dimen name="settings_group_icon_glyph">20dp</dimen>
     <!-- Catalog samples — bounded height for full-screen samples (state/gate screens, skeletons) so a
          fillMaxSize surface has a height to fill inside the wrap-content screenshot canvas. -->
     <dimen name="catalog_screen_preview_height">640dp</dimen>
