@@ -8,12 +8,13 @@ Conventions for this repository. The agent workflows in `.github/workflows/` rea
 The design system shared by Binge and the companion apps. Read `README.md` for why it exists and
 what belongs in it.
 
-Status is pre-alpha, and consumed by both Binge and binge-seerr. Two slices of the carve from
+Status is pre-alpha, and consumed by both Binge and binge-seerr. Three slices of the carve from
 Binge are here: the theme, the preview and screenshot scaffolding and every component that named
-none of Binge's types, then the display formatters (`DisplayFormatters.kt`) and the components
-they unlocked — the nav shell, the poster card and carousel, the hero, the chips, the skeletons.
-Binge still holds the components that name its media-item model, its error model or the
-integration contract.
+none of Binge's types; the display formatters (`DisplayFormatters.kt`) and the components they
+unlocked — the nav shell, the poster card and carousel, the hero, the chips, the skeletons; and the
+settings group with the relative-date formatter, for the companion's own settings screens. Binge
+still holds the components that name its media-item model, its error model or the integration
+contract.
 
 ## The one rule everything else serves
 

@@ -1,7 +1,12 @@
 package com.binge.designsystem
 
+import android.text.format.DateUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Locale
 
 /**
@@ -12,6 +17,9 @@ import java.util.Locale
 private const val VOTE_COUNT_THOUSAND = 1_000
 private const val VOTE_COUNT_STEP = 1_000.0
 private const val MAX_BADGE_COUNT = 99
+
+/** Instants within this window of "now" read as a relative span ("6 days ago"); older ones as an absolute date. */
+private const val RELATIVE_DATE_WINDOW_MILLIS = 30L * 24 * 60 * 60 * 1000
 
 /**
  * Abbreviated units for [formatVoteCount] in ascending order, each [VOTE_COUNT_STEP]× the previous.
@@ -53,3 +61,29 @@ fun String.toInitials(fallback: String = take(2).uppercase()): String =
 
 /** Caps a badge count at "99+" so the pill stays compact. Shared by nav, tab and row badges. */
 fun badgeCountLabel(count: Int): String = if (count > MAX_BADGE_COUNT) "$MAX_BADGE_COUNT+" else count.toString()
+
+/**
+ * A conversational date for [timeMillis]: a relative span ("just now", "6 days ago", "3 weeks ago")
+ * for recent instants, falling back to the absolute long date ("12 June 2026") once it ages past the
+ * relative window or sits in the future. `null` when [timeMillis] is `null` so callers can drop the
+ * line entirely. [now] is a parameter so previews and screenshot tests pass a fixed instant — a span
+ * derived from the wall clock would drift daily and break the committed baselines.
+ */
+fun formatRelativeOrAbsolute(
+    timeMillis: Long?,
+    now: Long = System.currentTimeMillis(),
+    locale: Locale = Locale.getDefault(),
+    zone: ZoneId = ZoneId.systemDefault(),
+): String? {
+    if (timeMillis == null) return null
+    val age = now - timeMillis
+    return if (age in 0..RELATIVE_DATE_WINDOW_MILLIS) {
+        DateUtils.getRelativeTimeSpanString(timeMillis, now, DateUtils.MINUTE_IN_MILLIS).toString()
+    } else {
+        Instant
+            .ofEpochMilli(timeMillis)
+            .atZone(zone)
+            .toLocalDate()
+            .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale))
+    }
+}
