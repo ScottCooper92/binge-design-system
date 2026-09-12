@@ -93,6 +93,8 @@ dependencies {
     api(libs.compose.ui)
     api(libs.compose.material3)
     api(libs.compose.material.icons)
+    // The nav shell is a NavigationSuiteScaffold; consumers compose its items, so the types are api.
+    api(libs.compose.material3.adaptive.navigation.suite)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.text.google.fonts)
     implementation(libs.androidx.core.ktx)

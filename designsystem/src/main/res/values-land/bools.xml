@@ -2,4 +2,7 @@
 <resources>
     <!-- Landscape (both phone and tablet): stack the watch-type choices as a row, not a column. -->
     <bool name="binge_landscape">true</bool>
+    <!-- Landscape phone is wide-but-short: cap the hub hero off the window height (values-sw600dp
+         overrides this back to false for tablets, which are tall enough; sw ranks above orientation). -->
+    <bool name="binge_hero_height_compact">true</bool>
 </resources>

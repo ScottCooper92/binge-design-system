@@ -3,4 +3,6 @@
     <!-- Expanded width (>=840dp): wider hub inset so headers/blocks don't run to the bezel on a
          tablet/foldable; the poster rails still bleed. See values/dimens.xml. -->
     <dimen name="screen_content_inset">32dp</dimen>
+    <!-- Larger person-detail profile poster on a tablet/foldable so the centred header isn't sparse. -->
+    <dimen name="person_profile_poster_width">180dp</dimen>
 </resources>

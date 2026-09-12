@@ -25,4 +25,43 @@
     <string name="text_entry_expand">Expand to full screen</string>
     <string name="text_entry_collapse">Collapse</string>
     <string name="binge_snackbar_dismiss">Dismiss</string>
+    <!-- Names a hero slide-picker dot for a screen reader. The framework supplies "tab N of M,
+         selected" from the tab role and its group; this supplies only the destination. -->
+    <string name="cd_hero_slide">Show %1$s</string>
+    <!-- Hub HeroCarousel: trending pill. -->
+    <string name="hero_trending_today">#%1$d trending today</string>
+    <!-- Hub HeroCarousel: meta row. Runtime as hours+minutes, and a TV season count. -->
+    <string name="hero_meta_runtime">%1$dh %2$dm</string>
+    <plurals name="hero_meta_seasons">
+        <item quantity="one">%1$d season</item>
+        <item quantity="other">%1$d seasons</item>
+    </plurals>
+    <!-- TalkBack content/state descriptions for shared design-system controls. -->
+    <string name="cd_rating_out_of_ten">Rating: %1$s out of 10</string>
+    <string name="cd_rate_out_of_ten">Rate %1$s out of 10</string>
+    <plurals name="detail_stat_votes">
+        <item quantity="one">%1$s vote</item>
+        <item quantity="other">%1$s votes</item>
+    </plurals>
+    <!-- Rating card -->
+    <string name="rating_card_prompt_label_movie">Rate this movie</string>
+    <string name="rating_card_prompt_label_tv">Rate this show</string>
+    <string name="rating_card_prompt_question">How was it?</string>
+    <string name="rating_card_prompt_hint">Tap a star to rate — tap again or long-press for a half</string>
+    <string name="rating_card_your_rating">Your rating</string>
+    <string name="rating_card_score_suffix">/10</string>
+    <string name="rating_card_change">Change rating</string>
+    <string name="rating_card_change_title">Change your rating</string>
+    <string name="rating_card_remove">Remove rating</string>
+    <string name="rating_card_reviews_subtitle">Avg %1$s/10 · What other Binge users thought</string>
+    <string name="rating_card_reviews_subtitle_no_average">What other Binge users thought</string>
+    <plurals name="rating_card_reviews_title">
+        <item quantity="one">Read %1$d community review</item>
+        <item quantity="other">Read %1$d community reviews</item>
+    </plurals>
+    <string name="episode_row_overline">EP %1$02d</string>
+    <!-- Divides two halves of a list row's meta line ("★ 8.2 · 1977"). Drawn only when both
+         halves are present, so it is a standalone glyph rather than part of either label. -->
+    <string name="list_row_meta_separator" translatable="false">·</string>
+    <string name="detail_rating">Rating</string>
 </resources>

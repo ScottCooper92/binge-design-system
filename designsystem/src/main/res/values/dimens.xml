@@ -77,6 +77,8 @@
     <!-- The fade below a filter pager's pinned chips. Content scrolls *under* the chips, so rows
          dissolve into the background over this distance instead of sliding out from a hard edge. -->
     <dimen name="filter_pager_scrim_height">24dp</dimen>
+    <!-- Bounds the catalog sample for BingeFilterChipPager, which is otherwise fillMaxSize. -->
+    <dimen name="catalog_filter_chip_pager_height">240dp</dimen>
     <!-- Filled / tonal buttons (detail action row, CTAs) -->
     <dimen name="button_filled_height">52dp</dimen>
     <dimen name="button_filled_padding_h">22dp</dimen>
@@ -147,4 +149,140 @@
     <dimen name="snackbar_elevation">6dp</dimen>
     <!-- Small vertical inset so the action button's own touch-target padding sums to a balanced pill height. -->
     <dimen name="snackbar_padding_vertical">6dp</dimen>
+    <dimen name="card_height">216dp</dimen>
+    <dimen name="card_elevation">1dp</dimen> <!-- Subtle 1dp lift for cards. -->
+    <dimen name="card_title_padding_h">8dp</dimen>
+    <dimen name="card_title_padding_v">6dp</dimen>
+    <dimen name="card_rating_padding">8dp</dimen>
+    <!-- Optional top-end contextual action on a poster card (Library mark-watched / remove). The 40dp
+         box is the real tap target; the glyph sits smaller inside its scrim-backed circle. -->
+    <dimen name="card_action_button_size">40dp</dimen>
+    <dimen name="card_action_icon_size">20dp</dimen>
+    <dimen name="card_action_inset">6dp</dimen>
+    <dimen name="card_badge_inset">6dp</dimen>
+    <!-- Portrait-phone / tall-window hero height (unchanged). values-sw600dp lifts it to the
+         taller cinematic value on tablets; the landscape-phone cap is computed off the window
+         height in code (min(60% window, hero_height_compact_cap)) so the first rail always peeks. -->
+    <dimen name="hero_height">420dp</dimen>
+    <dimen name="hero_height_compact_cap">300dp</dimen>
+    <dimen name="hero_metadata_end_padding">72dp</dimen>
+    <dimen name="hero_indicator_spacing">6dp</dimen>
+    <dimen name="hero_indicator_size_selected">22dp</dimen>
+    <dimen name="hero_indicator_size_unselected">6dp</dimen>
+    <dimen name="hero_indicator_height">6dp</dimen>
+    <!-- Cinematic hero: left-anchored copy column + glass trending pill + glass nav arrows. -->
+    <dimen name="hero_copy_max_width">440dp</dimen>
+    <dimen name="hero_copy_start_padding">28dp</dimen>
+    <dimen name="hero_copy_bottom_padding">28dp</dimen>
+    <dimen name="hero_pill_padding_h">11dp</dimen>
+    <dimen name="hero_pill_padding_v">5dp</dimen>
+    <dimen name="hero_pill_icon_size">14dp</dimen>
+    <dimen name="hero_pill_gap">6dp</dimen>
+    <dimen name="hero_tagline_top_spacing">6dp</dimen>
+    <dimen name="hero_meta_gap">10dp</dimen>
+    <dimen name="hero_meta_star_size">16dp</dimen>
+    <dimen name="hero_meta_dot_size">3dp</dimen>
+    <dimen name="hero_dots_bottom_padding">22dp</dimen>
+    <!-- Horizontal drag distance past which a swipe advances the hero to the next/prev title. -->
+    <dimen name="hero_drag_threshold">60dp</dimen>
+    <!-- FilterChipRowSkeleton's pill: the chip's own height, so the pill plus BingeFilterChipRow's vertical
+         content padding is the band the resolved page puts above its grid (the gallery's and the library's
+         first tile is reserved where it lands, not a chip row too high). -->
+    <dimen name="skeleton_filter_chip_height">44dp</dimen>
+    <dimen name="skeleton_filter_chip_width">88dp</dimen>
+    <!-- Detail screen skeleton -->
+    <dimen name="detail_skeleton_text_height">12dp</dimen>
+    <dimen name="detail_skeleton_value_width">140dp</dimen>
+    <!-- The plate standing in for the episode page's rating card: the unrated card's own body height, so
+         the overview below it is reserved where it lands rather than where an action row would put it.
+         The rated card is 4dp taller (a score and stars in place of the prompt's three lines); the unrated
+         height is the one reserved, because that is the page an unrated episode loads into. -->
+    <dimen name="detail_skeleton_rating_card_height">96dp</dimen>
+    <!-- Hub screens layout rhythm -->
+    <dimen name="hub_content_spacing">24dp</dimen>
+    <!-- Rating chip -->
+    <dimen name="rating_chip_padding_h">8dp</dimen>
+    <dimen name="rating_chip_padding_v">4dp</dimen>
+    <dimen name="rating_chip_star_size">12dp</dimen>
+    <dimen name="rating_chip_star_spacing">3dp</dimen>
+    <dimen name="rating_chip_padding_h_md">10dp</dimen>
+    <dimen name="rating_chip_padding_v_md">5dp</dimen>
+    <dimen name="rating_chip_star_size_md">14dp</dimen>
+    <dimen name="rating_chip_padding_h_lg">12dp</dimen>
+    <dimen name="rating_chip_padding_v_lg">6dp</dimen>
+    <dimen name="rating_chip_star_size_lg">16dp</dimen>
+    <!-- Star rating + rating card + reviews -->
+    <dimen name="star_rating_spacing">3dp</dimen>
+    <dimen name="star_rating_size_display">16dp</dimen>
+    <dimen name="star_rating_size_interactive">28dp</dimen>
+    <dimen name="rating_card_padding">18dp</dimen>
+    <dimen name="rating_card_content_spacing">14dp</dimen>
+    <dimen name="rating_card_edit_button">40dp</dimen>
+    <dimen name="rating_card_footer_padding">14dp</dimen>
+    <dimen name="rating_card_footer_icon">28dp</dimen>
+    <dimen name="avatar_size_sm">24dp</dimen>
+    <!-- BingeInitialsAvatar sample sizes for the catalog screenshot test -->
+    <dimen name="avatar_size_md">44dp</dimen>
+    <dimen name="avatar_size_lg">72dp</dimen>
+    <!-- DetailStatRow -->
+    <dimen name="detail_stat_icon_size">20dp</dimen>
+    <dimen name="detail_stat_divider_height">40dp</dimen>
+    <!-- DetailMetaBlock -->
+    <dimen name="detail_meta_icon_size">16dp</dimen>
+    <dimen name="detail_cast_avatar_label_spacing">4dp</dimen>
+    <dimen name="detail_meta_spacing">8dp</dimen>
+    <!-- Cinematic detail header (expanded width): immersive backdrop + inline poster + copy column. -->
+    <dimen name="detail_cinematic_header_height">460dp</dimen>
+    <dimen name="detail_cinematic_header_padding">40dp</dimen>
+    <dimen name="detail_cinematic_header_bottom_padding">32dp</dimen>
+    <dimen name="detail_cinematic_poster_width">196dp</dimen>
+    <dimen name="detail_cinematic_poster_copy_spacing">28dp</dimen>
+    <dimen name="detail_cinematic_copy_spacing">16dp</dimen>
+    <dimen name="cast_card_width">96dp</dimen>
+    <dimen name="cast_avatar_size">80dp</dimen>
+    <!-- Person detail profile section -->
+    <dimen name="person_profile_poster_width">140dp</dimen>
+    <dimen name="person_profile_poster_corner">24dp</dimen>
+    <dimen name="person_profile_gap">16dp</dimen>
+    <dimen name="person_profile_padding_h">20dp</dimen>
+    <dimen name="person_profile_padding_top">8dp</dimen>
+    <!-- Clears the floating glass back/share control row (top_bar_icon_size + 2*padding_s) so the
+         bounded profile body isn't occluded by it; applied on top of the consumed status-bar inset. -->
+    <dimen name="person_profile_top_bar_offset">64dp</dimen>
+    <!-- Episode list row: the backdrop still's width (the rest of the chrome comes from ListRow). -->
+    <dimen name="episode_row_still_width">132dp</dimen>
+    <dimen name="icon_size_m">18dp</dimen>
+    <dimen name="chip_padding_h">18dp</dimen>
+    <dimen name="chip_padding_v">12dp</dimen>
+    <dimen name="account_card_padding">18dp</dimen>
+    <dimen name="account_card_spacing">14dp</dimen>
+    <dimen name="account_avatar_size">64dp</dimen>
+    <!-- Larger avatar for the square, vertically-stacked profile card in the expanded two-pane. -->
+    <dimen name="account_avatar_size_large">88dp</dimen>
+    <dimen name="account_group_label_detail_spacing">2dp</dimen>
+    <!-- Catalog samples — bounded height for full-screen samples (state/gate screens, skeletons) so a
+         fillMaxSize surface has a height to fill inside the wrap-content screenshot canvas. -->
+    <dimen name="catalog_screen_preview_height">640dp</dimen>
+    <!-- Avatar diameter for the account item in the bottom bar / floating bar (matches the icon box). -->
+    <dimen name="nav_item_avatar_size">26dp</dimen>
+    <!-- Bespoke expanded rail (tablet / unfolded foldable). M3's collapsed rail width, kept rather than
+         widened for scrim runway: the rail overlays content, but this width is still the inset every
+         non-bleeding surface clears by, and that is space the content wants more than the glass does. -->
+    <dimen name="nav_custom_rail_width">96dp</dimen>
+    <!-- Larger account avatar for the wide custom rail (the bottom bar's 26dp reads undersized here). -->
+    <dimen name="nav_rail_account_avatar_size">40dp</dimen>
+    <!-- Floating nav prototype (M3 expressive FloatingToolbar used as the primary nav). The container's
+         own size, shape and screen offset come from FloatingToolbarDefaults; these are the per-item
+         insets, which the toolbar has no opinion about because it expects icon buttons, not tabs. -->
+    <dimen name="nav_floating_item_padding_h">12dp</dimen>
+    <dimen name="nav_floating_item_padding_v">6dp</dimen>
+    <dimen name="nav_floating_item_gap">2dp</dimen>
+    <!-- Label-primary items: wider than the stacked ones because the pill hugs a single text line,
+         and the icon sits beside the label rather than above it. -->
+    <dimen name="nav_floating_text_item_padding_h">16dp</dimen>
+    <dimen name="nav_floating_text_item_padding_v">10dp</dimen>
+    <dimen name="nav_floating_text_item_gap">8dp</dimen>
+    <!-- Lifts the pill off the content it overlays. FloatingToolbarDefaults' own elevation assumes a
+         plain surface underneath; this bar sits over poster art, where a shadow is what separates it. -->
+    <dimen name="nav_floating_shadow_elevation">6dp</dimen>
 </resources>
