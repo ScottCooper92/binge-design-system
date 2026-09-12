@@ -6,7 +6,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -43,7 +43,7 @@ class SettingsGroupSemanticsTest {
     }
 
     @Test
-    fun `a clickable row is a button and a non-clickable one is not`() {
+    fun `a clickable row takes its tap and a non-clickable one is a disabled button`() {
         var clicked = false
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
@@ -57,7 +57,9 @@ class SettingsGroupSemanticsTest {
             }
         }
         composeTestRule.onNode(hasText("Watchlist")).assertHasClickAction().performClick()
-        composeTestRule.onNode(hasText("Version")).assertHasNoClickAction()
+        // combinedClickable(enabled = false) keeps the role and reports the row disabled, which is
+        // what a screen reader should say about a row that only shows a value.
+        composeTestRule.onNode(hasText("Version")).assertIsNotEnabled()
         assertTrue(clicked)
     }
 }
