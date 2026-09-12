@@ -28,6 +28,15 @@ object BingeShapes {
     /** The profile poster heading a person's detail page, and its skeleton: rounder than [MediaCard], the header's one surface. */
     val ProfilePoster = RoundedCornerShape(24.dp)
 
+    /** A full-bleed hero surface — a signed-out prompt, an onboarding hero — rounder than any card so it reads as a stage. */
+    val Hero = RoundedCornerShape(28.dp)
+
+    /** A card that stacks rows (an onboarding points list): between [MediaCard] and [AccountCard], so it sits with both. */
+    val ListCard = RoundedCornerShape(22.dp)
+
+    /** A bar in a small chart (a rating distribution): the [Tag] radius, kept separate so a chart never moves with the tags. */
+    val ChartBar = RoundedCornerShape(6.dp)
+
     /**
      * tv-material's list-row corner, spelled explicitly because `ListItemDefaults.shape()` returns a
      * `ListItemShape` bundle, not a `Shape` — so a non-`ListItem` (the nav rail) can't reference it,
