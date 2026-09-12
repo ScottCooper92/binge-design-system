@@ -121,7 +121,6 @@
     <dimen name="list_row_padding">10dp</dimen>
     <dimen name="list_row_gap">14dp</dimen>
     <dimen name="list_row_poster_width">72dp</dimen>
-    <dimen name="list_row_poster_corner">14dp</dimen>
     <dimen name="list_row_spacing">10dp</dimen>
     <dimen name="list_row_skeleton_height">128dp</dimen>
     <!-- Discover screen + filter sheet -->
@@ -242,7 +241,6 @@
     <dimen name="cast_avatar_size">80dp</dimen>
     <!-- Person detail profile section -->
     <dimen name="person_profile_poster_width">140dp</dimen>
-    <dimen name="person_profile_poster_corner">24dp</dimen>
     <dimen name="person_profile_gap">16dp</dimen>
     <dimen name="person_profile_padding_h">20dp</dimen>
     <dimen name="person_profile_padding_top">8dp</dimen>
