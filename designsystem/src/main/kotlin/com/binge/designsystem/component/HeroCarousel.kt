@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -132,6 +133,11 @@ fun HeroCarousel(
 
     val dragThreshold = dimensionResource(R.dimen.hero_drag_threshold)
     val dragThresholdPx = with(LocalDensity.current) { dragThreshold.toPx() }
+    // The gesture-detector coroutine below is keyed only on `count` and so outlives many
+    // recompositions; read `current` through rememberUpdatedState, or a swipe after the first would
+    // compute the new page against the stale value it captured when the coroutine first launched —
+    // the same #1282 failure BingeFilterChipPager's pager-settle effect guards against.
+    val latestCurrent by rememberUpdatedState(current)
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -142,7 +148,11 @@ fun HeroCarousel(
                     onDragStart = { dragging = true },
                     onDragEnd = {
                         if (count > 1 && totalDrag.absoluteValue > dragThresholdPx) {
-                            index = if (totalDrag < 0) (current + 1) % count else (current - 1 + count) % count
+                            index = if (totalDrag < 0) {
+                                (latestCurrent + 1) % count
+                            } else {
+                                (latestCurrent - 1 + count) % count
+                            }
                         }
                         totalDrag = 0f
                         dragging = false
