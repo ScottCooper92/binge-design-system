@@ -19,6 +19,13 @@ first slice moved the 111 files that passed that test as they stood; the second 
 formatting the components render — a score, a vote count, a name's initials, a badge count — in
 here, which is where it belongs, and the 40 components that only ever named Binge through those.
 
+The television layer is a module of its own, `designsystem-tv`, because Material 3 and tv-material
+must not be mixed: they ship separate `MaterialTheme` trees, and the wrong import compiles cleanly
+and renders subtly wrong. It carries the TV foundation that names none of Binge's types — the theme,
+the focus units, the rail shell, the button, the card row and the message plate — and
+`checkTvMaterialSeparation` holds the line. Binge's TV media card, media row and immersive backdrop
+take its media-item model and stay there, as its error plate does.
+
 What stays in Binge is everything that names a TMDB type, an account, a navigation route, or
 Binge's error model, and everything that renders one of those. The line now runs through the
 media-item model (the hub and poster carousels take Binge's `MediaItemUi`, which carries a TMDB
@@ -38,6 +45,14 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── modifier/    skeleton shimmer, selection lift
 ├── layout/      layout anchors
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
+
+designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
+├── theme/       the tv-material theme, projected from the same tokens
+├── focus/       the focus groups, the indicator, arrival and scroll units
+├── nav/         the navigation rail shell
+├── component/   the button, the card row, the section title, the message plate, the initials avatar
+├── catalog/     the TV samples
+└── preview/     @TvPreviews and the TV screenshot theme
 ```
 
 Every dp lives in `src/main/res/values/dimens.xml` (with the width and orientation qualifiers next to
