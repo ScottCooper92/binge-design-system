@@ -19,8 +19,10 @@ import androidx.compose.material3.ColorScheme as M3ColorScheme
  * `surfaceContainerHigh`, TV `surfaceVariant` ← M3 `surfaceContainer` — keeping the phone ramp's *intent* (a
  * card reads as lifted) across a library with fewer slots. tv-material also renames `outline`/`outlineVariant`
  * to `border`/`borderVariant`.
+ *
+ * Public, like [DarkColorScheme], so a consumer's contrast tests can measure its own components on these grounds.
  */
-internal val BingeTvColorScheme: ColorScheme = DarkColorScheme.toTvColorScheme()
+val BingeTvColorScheme: ColorScheme = DarkColorScheme.toTvColorScheme()
 
 private fun M3ColorScheme.toTvColorScheme(): ColorScheme =
     darkColorScheme(
