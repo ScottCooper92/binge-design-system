@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -89,6 +90,41 @@ internal fun filterChipRowPadding(): PaddingValues {
 }
 
 /**
+ * A [PagerState] for [pageCount] pages kept in two-way sync with a selection the caller owns: an
+ * external change to [selectedIndex] animates the pager, and a settled swipe reports the new page
+ * through [onSelectedIndexChange].
+ *
+ * [BingeFilterChipPager] is this plus the chips and the overlay, and is what a screen should reach
+ * for. This is exposed for the screen that cannot use it — one whose header must stay composed while
+ * its body swaps between a pager and something else, and so has to assemble the overlay itself.
+ */
+@Composable
+fun rememberFilterPagerState(
+    selectedIndex: Int,
+    onSelectedIndexChange: (Int) -> Unit,
+    pageCount: Int,
+): PagerState {
+    val pagerState = rememberPagerState(
+        initialPage = selectedIndex.coerceIn(0, (pageCount - 1).coerceAtLeast(0)),
+    ) { pageCount }
+    // A chip tap (or any external selection change) animates the pager to that page.
+    LaunchedEffect(selectedIndex) {
+        if (selectedIndex != pagerState.currentPage) pagerState.animateScrollToPage(selectedIndex)
+    }
+    // A settled swipe reports the new page back up. The collect lambda outlives its composition (the
+    // effect is keyed only on pagerState), so read selectedIndex + callback through rememberUpdatedState;
+    // a value frozen at first composition would drop a swipe *back* to the original page (#1282).
+    val latestSelectedIndex by rememberUpdatedState(selectedIndex)
+    val latestOnSelectedIndexChange by rememberUpdatedState(onSelectedIndexChange)
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.collect { page ->
+            if (page != latestSelectedIndex) latestOnSelectedIndexChange(page)
+        }
+    }
+    return pagerState
+}
+
+/**
  * [BingeFilterChipRow] wired to a [HorizontalPager], so tapping a chip and swiping a page stay in
  * sync — both move the selection. The caller owns the selection ([selectedIndex] /
  * [onSelectedIndexChange], typically ViewModel state) and supplies each page's content by index.
@@ -116,23 +152,11 @@ fun BingeFilterChipPager(
     scrimFraction: Float = 0f,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
-    val pagerState = rememberPagerState(
-        initialPage = selectedIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0)),
-    ) { items.size }
-    // A chip tap (or any external selection change) animates the pager to that page.
-    LaunchedEffect(selectedIndex) {
-        if (selectedIndex != pagerState.currentPage) pagerState.animateScrollToPage(selectedIndex)
-    }
-    // A settled swipe reports the new page back up. The collect lambda outlives its composition (the
-    // effect is keyed only on pagerState), so read selectedIndex + callback through rememberUpdatedState;
-    // a value frozen at first composition would drop a swipe *back* to the original page (#1282).
-    val latestSelectedIndex by rememberUpdatedState(selectedIndex)
-    val latestOnSelectedIndexChange by rememberUpdatedState(onSelectedIndexChange)
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }.collect { page ->
-            if (page != latestSelectedIndex) latestOnSelectedIndexChange(page)
-        }
-    }
+    val pagerState = rememberFilterPagerState(
+        selectedIndex = selectedIndex,
+        onSelectedIndexChange = onSelectedIndexChange,
+        pageCount = items.size,
+    )
     OverlaidHeaderContent(
         modifier = modifier,
         headerBackground = headerBackground,
