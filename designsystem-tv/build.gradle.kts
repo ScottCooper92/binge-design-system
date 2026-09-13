@@ -78,7 +78,7 @@ tasks.withType<Test>().configureEach {
  */
 val tvMaterialSeparationAllowlist = setOf("designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/theme/BingeTvTokens.kt")
 
-val checkTvMaterialSeparation by tasks.registering {
+val checkTvMaterialSeparation = tasks.register("checkTvMaterialSeparation") {
     group = "verification"
     description = "Checks that Material 3 and tv-material stay on their own sides of the TV seam."
     val root = rootProject.layout.projectDirectory.asFile
