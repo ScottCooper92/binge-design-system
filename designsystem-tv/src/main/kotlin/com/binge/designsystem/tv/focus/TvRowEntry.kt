@@ -40,8 +40,9 @@ import androidx.compose.ui.focus.focusRequester
  * the screen. A caller that must steer entry across containers — the hub, entered from the nav rail rather than
  * by scrolling — passes [rememberTvRowEntry]'s `overrideIndex` instead.
  *
- * Three lines of wiring, all required (a requester on a not-yet-laid-out node throws, so seeding is not
- * optional): put `tvEntryFocusGroup(entryFocus)` on the container, seed its `initialFirstVisibleItemIndex` to
+ * Three lines of wiring, all required (a requester with no attached node does not throw — it warns and returns
+ * `false`, so the request lands nowhere and entry falls through to geometry, and seeding is what stops that):
+ * put `tvEntryFocusGroup(entryFocus)` on the container, seed its `initialFirstVisibleItemIndex` to
  * [entryIndex] so the remembered cell is composed before entry arrives, and hang [entryModifier] on each cell.
  * Report focus **gains** through [rememberFocused]; do not clear on blur, since the memory must outlive the blur
  * that nulls the ring.
