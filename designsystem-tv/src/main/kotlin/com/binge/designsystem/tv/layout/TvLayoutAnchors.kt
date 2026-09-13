@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.testTag
  * just the offset.
  *
  * This is the same trade the TV surface already makes for focus: focus is a *parameter* so a focused state is
- * screenshot-testable (see `docs/android-tv-architecture.md`). Here a layout anchor is a tag so a reserved
+ * screenshot-testable (see `docs/tv-foundation.md`). Here a layout anchor is a tag so a reserved
  * geometry is unit-testable. Both put a small, named affordance in production to make an invariant checkable
  * rather than reviewable.
  */

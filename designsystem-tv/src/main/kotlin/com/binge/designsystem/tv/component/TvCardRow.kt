@@ -39,12 +39,12 @@ private const val TRAILING_KEY = "tv-card-row-trailing"
  *
  * Entering the row for the **first** time lands on its first cell — never the trailing see-all tile (#1500),
  * which is not in [items] and so never carries the entry requester. Returning lands on the cell **last
- * focused**. Both come from the shared `rememberTvRowEntry` contract (used by [TvMediaRow] too — see its KDoc
- * for how the memory survives the `LazyColumn` scroll-out disposal).
+ * focused**. Both come from the shared [rememberTvRowEntry] contract — see [TvRowEntry] for how the memory survives
+ * the `LazyColumn` scroll-out disposal.
  *
- * Where [TvMediaRow] is the poster row for [com.binge.core.designsystem.MediaItemUi], this generalises to the
- * detail page's other cell shapes (cast circles, season posters, stills), which are not media items and
- * hand-rolled their own rows before.
+ * Where a host app's own poster row is bound to its media-item model, this is generic over the cell: the
+ * detail page's cast circles, season posters and stills are not media items, and hand-rolled their own rows
+ * before.
  *
  * The [cell] slot receives the item, whether it is focused, an `onFocusChanged`, and a `cellModifier` (fixed
  * width plus, for the first cell, the entry requester) to apply to its **focusable** element. [trailing] is an
@@ -52,8 +52,8 @@ private const val TRAILING_KEY = "tv-card-row-trailing"
  * its own section chrome passes none.
  *
  * Every cell must be focusable: the row's horizontal scroll is driven entirely by cell focus, so inert cells
- * would strand anything past the panel edge. A read-out of non-focusable tiles wants a wrapping layout instead
- * (see [TvDetailProvidersSection]).
+ * would strand anything past the panel edge. A read-out of non-focusable tiles wants a wrapping layout
+ * instead.
  */
 @Composable
 fun <T> TvCardRow(
@@ -63,15 +63,17 @@ fun <T> TvCardRow(
     modifier: Modifier = Modifier,
     heading: String? = null,
     // A target the caller aims focus at to land it inside the row; the entry group resolves the request into the
-    // remembered (or first) cell. The row never fires it (ADR §4), and it rides the LazyRow rather than a cell
+    // remembered (or first) cell. The row never fires it - a destination does not request focus, see
+    // docs/tv-foundation.md - and it rides the LazyRow rather than a cell
     // because a cell is disposed when it scrolls out.
     entryFocusRequester: FocusRequester? = null,
-    // Reports each focus gain with the cell's key — the hook [TvDetailPage] sections chain their anchor
+    // Reports each focus gain with the cell's key — the hook a detail page's sections chain their anchor
     // reporter into, so a sideways move inside the row re-asserts the page's rest position.
     onCellFocused: ((Any) -> Unit)? = null,
     // Seeds the ring onto one cell for a screenshot; production passes null. A static baseline runs no coroutines and
     // dispatches no focus events, so without it every consumer of this row (episode cards, guest cast, gallery strips) had
-    // its most-used focus state uncoverable rather than merely uncovered (#1705). Same seed as TvButton/TvTabRow (ADR §4).
+    // its most-used focus state uncoverable rather than merely uncovered. Same seed as TvButton, and the same
+    // reason: focus is a parameter, see docs/tv-foundation.md.
     initiallyFocusedKey: Any? = null,
     trailing: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit) -> Unit)? = null,
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit,

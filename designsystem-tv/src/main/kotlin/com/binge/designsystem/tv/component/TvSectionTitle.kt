@@ -15,7 +15,7 @@ import com.binge.designsystem.tv.R as TvR
  * carousel/section heading resolves to, so titles can't drift to different sizes (#1496).
  *
  * The inset is the row family's pair — start gutter, end overscan — so a title sits above the first card of
- * the [TvMediaRow] / [TvCardRow] it heads rather than nudged out of line.
+ * the [TvCardRow] it heads rather than nudged out of line.
  */
 @Composable
 fun TvSectionTitle(text: String, modifier: Modifier = Modifier) {

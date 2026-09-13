@@ -23,10 +23,9 @@ import androidx.compose.ui.focus.focusRequester
  *    or the requester binds to nothing (violated: #1610, #1730).
  * 4. Staleness is resolved against the current data — a too-large remembered index coerces in (violated: #1757).
  *
- * Three surfaces keep their **own** memory rather than this seam, and correctly so — the divergence is the audit's
- * finding, not debt: [com.binge.core.designsystem.tv.component.TvGridPane]'s poster grid needs paged-`Items`
- * staleness plus a backdrop cell (`TvGridFocusMemory`); the immersive hub steers entry across many rows at once (a
- * `SnapshotStateMap`); the account stat tiles return from a child screen by type, not by index. Each holds the
+ * Three surfaces in the host app keep their **own** memory rather than this seam, and correctly so: a paged
+ * poster grid needs `Items` staleness plus a backdrop cell; an immersive hub steers entry across many rows at
+ * once; a screen returning from a child by item *type* rather than by index cannot use an index. Each holds the
  * four invariants above in its own type, so its own memory test is the same contract by another shape.
  *
  * **The memory must stay separate from whatever draws the ring.** A ring key is nulled on blur so a container

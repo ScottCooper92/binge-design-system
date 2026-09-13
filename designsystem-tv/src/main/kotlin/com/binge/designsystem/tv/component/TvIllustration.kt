@@ -18,7 +18,8 @@ import com.binge.designsystem.tv.R as TvR
  * A single glyph presented as **art**: amber on a circular `surfaceVariant` plate.
  *
  * The TV settings pane established this treatment for the illustration above a setting's name, and it is what
- * makes a lone icon read as an illustration rather than as a disabled control — §8's accent is doing the work.
+ * makes a lone icon read as an illustration rather than as a disabled control — the accent model's accent is
+ * doing the work.
  * `TvMessagePlate` now draws its empty/failure art the same way (#1728), so the two live here as one component
  * rather than as two copies of a circle and an icon that would drift.
  *

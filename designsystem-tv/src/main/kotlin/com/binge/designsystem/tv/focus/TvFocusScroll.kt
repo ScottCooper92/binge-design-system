@@ -15,19 +15,20 @@ private val LocalInheritedBringIntoViewSpec = compositionLocalOf<BringIntoViewSp
  * Confines a scrollable to the *minimum* bring-into-view scroll: an already-visible child is left exactly where
  * it is, and only a fully off-screen one is scrolled to. So a sideways or downward focus move between children
  * that are already on screen requests **no** scroll — focus is colour, not geometry
- * (`docs/android-tv-architecture.md` §8).
+ * (`docs/tv-foundation.md` > The accent model).
  *
  * **Wrap the scrollable itself** — the `LazyColumn`, `LazyRow` or grid this governs. Wrapping content *inside*
  * one of its items does nothing: `LocalBringIntoViewSpec` is read by the scrollable's own node, so a provider in
- * a descendant item sits below the reader and is never seen ([TvImmersiveHub] and [TvGridPane] wrap the container).
+ * a descendant item sits below the reader and is never seen — wrap the container, as the host app's immersive
+ * hub and poster grid do.
  *
  * Without it, a leanback device parks each newly focused child at a fraction of the viewport, so the list
  * re-pivots even on a wholly-visible child; where a screen also pins itself to the top, pin and pivot fight and
  * the band jumps on every press.
  *
  * The scope reaches **every** scrollable inside [content], including a row nested in the wrapped list. A row that
- * wants the ambient feel back for its own scrolling calls [TvInheritedFocusScroll] — [TvMediaRow] and
- * [TvCardRow] already do, so the horizontal card runs keep the default parking while the column they sit in
+ * wants the ambient feel back for its own scrolling calls [TvInheritedFocusScroll] — [TvCardRow] and the
+ * host app's poster row already do, so the horizontal card runs keep the default parking while the column they sit in
  * holds still.
  */
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,7 +48,7 @@ fun TvStableFocusScroll(content: @Composable () -> Unit) {
  *
  * This is the half of the contract the immersive hub established: the vertical list must not re-pivot as focus
  * crosses its rows, but each row's own horizontal scroll should still park a focused card the way every other
- * carousel does. Baked into [TvMediaRow] and [TvCardRow] so a screen gets both halves by drawing an ordinary row.
+ * carousel does. Baked into [TvCardRow] so a screen gets both halves by drawing an ordinary row.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

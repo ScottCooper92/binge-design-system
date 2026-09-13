@@ -29,7 +29,8 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * The **border** focus treatment — an amber outline in a gap — for elements whose own content a fill would cover
- * (a poster, a provider logo, anything image-bearing); text/icons take [tvFocusFill] instead. See §8.
+ * (a poster, a provider logo, anything image-bearing); text/icons take [tvFocusFill] instead. See
+ * `docs/tv-foundation.md` > The accent model.
  *
  * **Nothing scales** — focus is colour, never geometry: a growing element pushes its outline into its neighbour
  * (on the ~424dp onboarding watch-type cards 16dp apart, an 8% lift overlapped them), and dropping the scale
@@ -50,7 +51,7 @@ import com.binge.designsystem.tv.R as TvR
  * plain border.
  *
  * [restingColor] draws the same outline in a second colour while *un*focused; `Unspecified` (nothing drawn)
- * everywhere but the hub hero. §8 rule 2 keeps the accent out of resting states (a resting outline may be any
+ * everywhere but an immersive hero. Rule 2 of the accent model keeps the accent out of resting states (a resting outline may be any
  * colour except amber; the hero's is white). Same geometry as the focused ring, not a `border`, so focus is a
  * pure colour change with no pixel shift.
  *
@@ -79,7 +80,8 @@ fun Modifier.tvFocusIndicator(
 
 /**
  * The **fill** focus treatment — a solid amber surface behind the element — and the default way focus
- * reads on TV (§8). Google TV's rail fills white with black content; this is that, in Binge's amber.
+ * reads on TV (`docs/tv-foundation.md` > The accent model). Google TV's rail fills white with black
+ * content; this is that, in the theme's accent.
  *
  * Pass [fillColor] to keep a control's own role when focused: a destructive action fills `error`, so
  * it stays dangerous exactly when the user is about to press it. The caller is responsible for the
