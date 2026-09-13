@@ -36,3 +36,4 @@ dependencyResolutionManagement {
 rootProject.name = "binge-design-system"
 
 include(":designsystem")
+include(":designsystem-tv")
