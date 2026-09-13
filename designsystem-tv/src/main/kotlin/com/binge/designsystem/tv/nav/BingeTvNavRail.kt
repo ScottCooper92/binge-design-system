@@ -61,7 +61,8 @@ private const val RAIL_SCRIM_HOLD_FRACTION = 0.72f
 /**
  * The 10-foot navigation rail: a D-pad focusable left sidebar that **expands on focus** to reveal labels,
  * collapsing to an icon strip when the content takes focus. Container and items are ours rather than
- * tv-material's `NavigationDrawer`, whose item styling isn't §8's model and whose layout puts the rail *beside*
+ * tv-material's `NavigationDrawer`, whose item styling isn't this module's accent model and whose layout puts
+ * the rail *beside*
  * the content (the resize this avoids); only expand-on-focus was worth borrowing.
  *
  * Because focus **is** selection here, the current destination needs one state treatment: a solid amber fill
@@ -85,7 +86,7 @@ private const val RAIL_SCRIM_HOLD_FRACTION = 0.72f
  *
  * Three slots: [header] pinned top (account avatar), [items] the destination body, [footer] pinned bottom
  * (Settings). [expanded] is normally `null` (*follow focus*); a preview passes `true`/`false` to pin the state
- * without a real focus event (focus-as-parameter, ADR §4).
+ * without a real focus event (focus-as-parameter — see `docs/tv-foundation.md`).
  *
  * [artworkBehind] pins the glass/solid fill the same way, and for the same reason. Production leaves it `null`
  * and the rail follows [TvRailArtworkPresence], which a backdrop reports into from a `DisposableEffect` — and
@@ -98,8 +99,8 @@ private const val RAIL_SCRIM_HOLD_FRACTION = 0.72f
  * Back moves the depth). Left at its default the rail never re-hands focus — the old behaviour.
  *
  * [railFocusRequester] lets an owner drive focus *into* the rail — the shell's Back handler uses it to land focus
- * on the selected item when Back is pressed with focus in the content (step 1 of the TV Back hierarchy in
- * [com.cooper.binge.app.tv.TvAppShell]). It *is* the rail's own selected-item requester (the one
+ * on the selected item when Back is pressed with focus in the content (step 1 of the host app's TV Back
+ * hierarchy). It *is* the rail's own selected-item requester (the one
  * `tvSelectionTarget` pins to the selection), so it lands on the current destination's row — the same node and
  * path the startup fallback uses. Default `null` keeps a private requester.
  *
@@ -140,7 +141,8 @@ fun BingeTvNavRail(
     var contentHasFocus by remember { mutableStateOf(false) }
 
     // Focus starts in the content, not the rail — requesting it on mount opened the app rail-focused over the start destination.
-    // The content `focusGroup` delegates to its first child (ADR §4 handoff), retried per frame since a cold-start destination is a
+    // The content `focusGroup` delegates to its first child (the startup hand-off in `docs/tv-foundation.md`),
+    // retried per frame since a cold-start destination is a
     // target-less placeholder (Shield-verified); it yields to a user already in the rail, and the fallback covers a nothing-focusable one.
     LaunchedEffect(Unit) {
         offerFocusToContent(

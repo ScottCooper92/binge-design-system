@@ -53,6 +53,9 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── component/   the button, the card row, the section title, the message plate, the initials avatar
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme
+
+docs/
+└── tv-foundation.md   why focus is a parameter, and the accent model the TV components share
 ```
 
 Every dp lives in `src/main/res/values/dimens.xml` (with the width and orientation qualifiers next to

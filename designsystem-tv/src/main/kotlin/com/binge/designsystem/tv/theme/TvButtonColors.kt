@@ -9,7 +9,7 @@ import androidx.tv.material3.MaterialTheme
  * The role a TV control surface plays, which fixes its resting colours via [tvButtonColors].
  *
  * [Destructive] marks an irreversible action (sign out): a red-tinted container and red border at rest, and —
- * because §8 makes the *fill* the focus channel while the hue stays the role — a solid **red** fill when
+ * because the accent model makes the *fill* the focus channel while the hue stays the role — a solid **red** fill when
  * focused, where every other style fills amber. A dangerous action is at its most dangerous the instant before
  * OK, which is precisely when it is focused.
  */
@@ -37,7 +37,7 @@ data class TvButtonColors(
 )
 
 /**
- * The TV accent model in one place — see `docs/android-tv-architecture.md` §8.
+ * The TV accent model in one place — see `docs/tv-foundation.md`.
  *
  * **On a button, amber means focus and nothing else.** No control carries the accent at rest; a focused
  * one fills solid amber with dark content. That is tv-material's own behaviour, and it keeps the accent

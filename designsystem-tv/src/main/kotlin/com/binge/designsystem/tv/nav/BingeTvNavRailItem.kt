@@ -88,7 +88,7 @@ internal fun RailItem(
  * fill). A dim-amber fill on top would give the collapsed strip the filled pill ruled out above and be a third
  * mark for a state already marked. There is no `Resting`/`Current` ambiguity to resolve: because the rail
  * selects on focus (#1316), "current" and "focused" never disagree while the rail has focus, so [current] as
- * one flag is honest rather than overloaded. §8 records this.
+ * one flag is honest rather than overloaded. `docs/tv-foundation.md` records this.
  */
 @Composable
 internal fun RailItemSurface(

@@ -84,7 +84,8 @@ fun TvArrivalFocusEffect(arrival: TvArrivalFocus, enabled: Boolean = true) {
 
 /**
  * Place first focus on an overlay one frame after it mounts — the sanctioned effect for a modal/gate/step that
- * pulls focus on open (the ADR's paragraph-4 exception), replacing the bare `LaunchedEffect { requestFocus() }`
+ * pulls focus on open (the overlay case in `docs/tv-foundation.md`, the one thing allowed to), replacing the
+ * bare `LaunchedEffect { requestFocus() }`
  * five overlays open-coded.
  *
  * The frame wait is [restoreTvOverlayFocus]'s and is load-bearing: an overlay mounted mid-transition (a dialog
