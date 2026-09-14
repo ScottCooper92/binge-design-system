@@ -58,3 +58,34 @@ fun SettingsGroupTintedSample() {
         )
     }
 }
+
+/**
+ * A group standing in as a navigation list beside a detail pane: the open row carries the selected
+ * wash, the rest do not. The wash is the only difference — the row keeps its chevron and its badge.
+ */
+@Composable
+fun SettingsGroupSelectedSample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = "Manage",
+            rows = listOf(
+                SettingsRow(
+                    icon = Icons.Filled.Inbox,
+                    iconTint = BingeSentiment.Caution.accent(),
+                    label = "Requests",
+                    detail = "Approve, decline & track",
+                    badgeCount = 3,
+                    badgeTint = BingeSentiment.Caution.accent(),
+                    selected = true,
+                ),
+                SettingsRow(
+                    icon = Icons.Filled.People,
+                    iconTint = BingeSentiment.Info.accent(),
+                    label = "Users",
+                    detail = "Roles, quotas & permissions",
+                ),
+                SettingsRow(icon = Icons.Filled.Settings, label = "Settings", detail = "Server & connection"),
+            ),
+        )
+    }
+}

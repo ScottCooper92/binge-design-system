@@ -19,4 +19,11 @@ class SettingsGroupSamplesScreenshotTest {
     fun tinted() {
         SettingsGroupTintedSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun selected() {
+        SettingsGroupSelectedSample()
+    }
 }
