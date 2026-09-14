@@ -25,6 +25,12 @@ data class SettingsRow(
     val badgeCount: Int? = null,
     /** With [badgeCount], renders the count as a tonal pill in this colour instead of the default badge. */
     val badgeTint: Color? = null,
+    /**
+     * Marks the row as the one currently open, for a group used as a navigation list beside a
+     * detail pane. It is a wash and a semantics flag, not a substitute for the chevron: the row
+     * still opens the same thing when tapped.
+     */
+    val selected: Boolean = false,
     val clickable: Boolean = true,
     val trailingContent: (@Composable () -> Unit)? = null,
     val onClick: () -> Unit = {},

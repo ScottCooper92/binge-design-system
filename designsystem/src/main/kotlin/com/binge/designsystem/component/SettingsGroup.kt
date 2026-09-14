@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
@@ -84,6 +85,9 @@ private fun SettingsRowView(row: SettingsRow, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .semantics { selected = row.selected }
+            // The wash sits outside the click, so the ripple draws over it rather than under it.
+            .background(if (row.selected) MaterialTheme.colorScheme.primary.tonalContainer() else Color.Transparent)
             .combinedClickable(
                 enabled = row.clickable,
                 role = Role.Button,
