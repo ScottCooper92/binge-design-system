@@ -5,8 +5,9 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
 /**
- * Screenshot coverage for the filter-chip catalog sample — renders the shared
- * [BingeFilterChipFamilySample], the component's one public fixture (#745, #749).
+ * Screenshot coverage for the filter-chip catalog samples — renders the shared
+ * [BingeFilterChipFamilySample] and [BingeFilterChipDisabledSample], the component's public
+ * fixtures (#745, #749).
  */
 class BingeFilterChipSamplesScreenshotTest {
     @PreviewTest
@@ -14,5 +15,12 @@ class BingeFilterChipSamplesScreenshotTest {
     @Composable
     fun Family() {
         BingeFilterChipFamilySample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Disabled() {
+        BingeFilterChipDisabledSample()
     }
 }
