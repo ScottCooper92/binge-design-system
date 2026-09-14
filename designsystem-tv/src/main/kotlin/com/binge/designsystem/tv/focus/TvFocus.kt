@@ -298,7 +298,7 @@ suspend fun restoreTvOverlayFocus(target: FocusRequester): Boolean {
  * `TvTabRow` and the TV Lists column all do. There an unrouted entry is not cosmetic: the geometric search picks
  * whatever child sits nearest the beam, and arriving there *is* a selection change (the rail recorded it first —
  * "merely opening the menu navigated the user somewhere they hadn't asked to go"; since re-fixed on the tab row
- * the lists column). This exists to stop the rediscovery.
+ * and the lists column). This exists to stop the rediscovery.
  *
  * Not [tvFocusGroup]: `focusRestorer` has nothing saved until the group has held focus once, the first-entry
  * case that breaks — and it is less correct even afterwards, since when focus is the commit the selected child
