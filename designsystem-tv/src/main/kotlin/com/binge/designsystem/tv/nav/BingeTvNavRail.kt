@@ -51,6 +51,9 @@ private const val RAIL_SCRIM_ALPHA = 0.94f
 /**
  * Held through [RAIL_SCRIM_HOLD_FRACTION] of the rail's width, then falling to clear at its right edge.
  *
+ * The *collapsed* strip's width, and only that: the stops are fractions, so the same ramp stretched over the
+ * expanded panel ends its hold 38dp inside where the labels end. An expanded rail is solid instead.
+ *
  * The *right* edge whatever the layout direction, deliberately: the shell's directional keys are physical — a
  * side sheet that mirrors to the other edge is still dismissed by LEFT — so paint that mirrored on its own
  * would disagree with the contract the D-pad keeps. The two move together.
@@ -78,11 +81,11 @@ private const val RAIL_SCRIM_HOLD_FRACTION = 0.72f
  * resizing (what `NavigationDrawer` does, and what this used to do) reflows the screen every time focus enters
  * the rail. Content is therefore **full-bleed by default**: backdrops and lazy rows reach the panel edge and
  * pass under the rail, and what must stay clear of it pads by [LocalTvContentInset] (the collapsed width)
- * instead of the pane being structurally inset. The rail paints a scrim, not an opaque fill — but only over
- * real artwork: it fades between a solid panel and glass in step with the backdrop's own crossfade
+ * instead of the pane being structurally inset. The resting strip paints a scrim, not an opaque fill — but only
+ * over real artwork: it fades between a solid panel and glass in step with the backdrop's own crossfade
  * ([TvRailArtworkPresence]), because a rail left translucent over the hub's hero↔backdrop transition reads as
- * the rail itself flickering. Fixed-width in both states rather than content-sized, since the items fill its
- * width.
+ * the rail itself flickering. An expanded rail is solid whatever is behind it. Fixed-width in both states
+ * rather than content-sized, since the items fill its width.
  *
  * Three slots: [header] pinned top (account avatar), [items] the destination body, [footer] pinned bottom
  * (Settings). [expanded] is normally `null` (*follow focus*); a preview passes `true`/`false` to pin the state
@@ -183,6 +186,15 @@ fun BingeTvNavRail(
 
     val artwork = remember { TvRailArtworkPresence() }
     val glass by railGlassFraction(artworkBehind ?: artwork.isPresent)
+    // Glass is for the resting strip; expanding is a deliberate ask to read a menu. Two causes, two specs — the
+    // artwork keeps its crossfade, the expansion rides the width's own spring — so neither resolves after the
+    // other has settled, and either one saying "solid" wins.
+    val collapsedFraction by animateFloatAsState(
+        targetValue = if (isExpanded) 0f else 1f,
+        animationSpec = if (LocalReduceMotion.current) snap() else spring(),
+        label = "tvNavRailExpandedSolid",
+    )
+    val fillGlass = glass * collapsedFraction
 
     // The shell paints the theme background so the two halves of the screen agree. When only the rail strip
     // painted one, a destination that drew no background showed the window's black beside the rail's #0E0E0F —
@@ -220,15 +232,15 @@ fun BingeTvNavRail(
             modifier = Modifier
                 .width(railWidth)
                 .fillMaxHeight()
-                // A scrim rather than an opaque fill — but only where there is artwork to see through to. `glass` rides from 0
-                // (solid panel, as when the hero is up or the screen is flat) to 1 (near-solid under the glyphs, falling away at the
-                // outer edge) with the backdrop's crossfade, so the rail is never translucent over nothing — the backdrop's scrim idiom.
+                // A scrim rather than an opaque fill — but only over artwork, and only while collapsed. `fillGlass` rides
+                // from 0 (solid panel, as when the hero is up, the screen is flat, or the rail is open) to 1 (near-solid
+                // under the glyphs, falling away at the outer edge), so the rail is never translucent over nothing.
                 .background(
                     startHorizontalGradient(
-                        0f to MaterialTheme.colorScheme.background.copy(alpha = lerp(1f, RAIL_SCRIM_ALPHA, glass)),
+                        0f to MaterialTheme.colorScheme.background.copy(alpha = lerp(1f, RAIL_SCRIM_ALPHA, fillGlass)),
                         RAIL_SCRIM_HOLD_FRACTION to
-                            MaterialTheme.colorScheme.background.copy(alpha = lerp(1f, RAIL_SCRIM_HOLD_ALPHA, glass)),
-                        1f to MaterialTheme.colorScheme.background.copy(alpha = lerp(1f, 0f, glass)),
+                            MaterialTheme.colorScheme.background.copy(alpha = lerp(1f, RAIL_SCRIM_HOLD_ALPHA, fillGlass)),
+                        1f to MaterialTheme.colorScheme.background.copy(alpha = lerp(1f, 0f, fillGlass)),
                     ),
                 ).selectableGroup()
                 // hasFocus, not isFocused: this observes the focus *group*, so the rail stays open while

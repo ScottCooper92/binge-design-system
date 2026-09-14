@@ -56,6 +56,9 @@ import com.binge.designsystem.tv.R as TvR
  * sample that has a focused appearance, so the lit state is captured without a focus request.
  */
 
+/** Enough bands that the rail's ramp is legible against them, and an odd count so neither colour ends both edges. */
+private const val SAMPLE_ARTWORK_BANDS = 9
+
 /** The button across its roles and both focus states, through the stateless surface. */
 @Composable
 fun TvButtonSample() {
@@ -175,9 +178,18 @@ fun TvFocusIndicatorSample() {
     }
 }
 
-/** The rail shell with a header, destinations and a footer; [expanded] pins which resting shape renders. */
+/**
+ * The rail shell with a header, destinations and a footer; [expanded] pins which resting shape renders.
+ *
+ * [artworkBehind] pins the other half of the rail's fill, and puts something behind it worth seeing through
+ * to — without both, a frame cannot tell a scrim from a solid panel.
+ */
 @Composable
-fun TvNavRailSample(expanded: Boolean, selectedKey: String = "movies") {
+fun TvNavRailSample(
+    expanded: Boolean,
+    selectedKey: String = "movies",
+    artworkBehind: Boolean = false,
+) {
     BingeTvNavRail(
         header = NavRailSampleHeader,
         items = NavRailSampleItems,
@@ -185,7 +197,8 @@ fun TvNavRailSample(expanded: Boolean, selectedKey: String = "movies") {
         selectedKey = selectedKey,
         onSelect = {},
         expanded = expanded,
-        content = { NavRailSampleContent() },
+        artworkBehind = artworkBehind,
+        content = { NavRailSampleContent(artworkBehind = artworkBehind) },
     )
 }
 
@@ -219,16 +232,47 @@ val NavRailSampleItems: List<TvNavRailItem> =
 val NavRailSampleFooter: TvNavRailItem = TvNavRailItem(key = "settings", label = "Settings", icon = Icons.Filled.Settings)
 
 @Composable
-private fun NavRailSampleContent() {
+private fun NavRailSampleContent(artworkBehind: Boolean = false) {
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(dimensionResource(TvR.dimen.tv_overscan_horizontal)),
+                .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = "Content", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (artworkBehind) NavRailSampleArtwork()
+        Box(
+            modifier = Modifier.fillMaxSize().padding(dimensionResource(TvR.dimen.tv_overscan_horizontal)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "Content",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/**
+ * A stand-in for a backdrop: full-bleed bands that run under the rail, so a frame can read how much of them
+ * the fill lets through. Bands rather than a picture — this repository's frames render with no network, and a
+ * flat colour behind the rail cannot tell a third of a fill from all of it.
+ */
+@Composable
+private fun NavRailSampleArtwork() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        repeat(SAMPLE_ARTWORK_BANDS) { index ->
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .background(
+                            if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+            )
+        }
     }
 }
 
