@@ -23,7 +23,7 @@ import com.binge.designsystem.theme.BingeShapes
  * Not `provider_grid_columns`, which is keyed to the **screen** width: onboarding's services step
  * renders this grid inside a half-width pane in landscape, so a screen-derived 6 or 8 would size its
  * tiles against a measure they do not have. The one caller whose grid really is full-width — Account's
- * watch-provider settings — passes the resource in (#2006).
+ * watch-provider settings — passes the resource in.
  */
 private const val DEFAULT_GRID_COLUMNS = 4
 
@@ -70,7 +70,7 @@ fun WatchProviderGrid(
  * Public because the grid is not the only shape this row appears in: Account's watch-provider settings
  * need a `LazyColumn` for the 50-70 tiles a region like the US produces, so they emit these rows as items
  * rather than composing [WatchProviderGrid]. That screen used to carry its own copy, and the pair drifting
- * is what #2006 was — the spacing, the weight, the trailing spacers and the anchor below all have to agree
+ * is what made this shared — the spacing, the weight, the trailing spacers and the anchor below all have to agree
  * between the two, which they now do by construction rather than by review.
  *
  * [isFirstRow] puts the anchor `WatchProviderGridSkeleton`'s first plate carries on this row's first tile —
@@ -114,7 +114,7 @@ fun WatchProviderGridRow(
  * [columns] has to be whatever the grid that replaces this one will use. Account's provider settings
  * build their own grid from `provider_grid_columns` rather than reusing [WatchProviderGrid] — they need
  * a `LazyColumn` for the 50-70 tiles a region like the US produces — and this reserved a flat four
- * against their six or eight (#2006).
+ * against their six or eight.
  */
 @Composable
 fun WatchProviderGridSkeleton(modifier: Modifier = Modifier, columns: Int = DEFAULT_GRID_COLUMNS) {

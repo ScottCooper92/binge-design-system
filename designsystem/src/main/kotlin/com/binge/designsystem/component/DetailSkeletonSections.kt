@@ -47,7 +47,7 @@ private const val SKELETON_CAST_SUBLABEL_FRACTION = 0.6f
  * It mirrors the real cell's structure — the same weight, the same vertical inset, the same icon size, the
  * same gaps, and a bar per text line at that line's own height ([lineHeightOf]) — rather than approximating
  * it with two short bars. Two bars left the row 54dp shorter than the row it replaced, so the action row and
- * everything below it jumped down the moment a page resolved (#1598).
+ * everything below it jumped down the moment a page resolved.
  */
 
 @Composable
@@ -89,7 +89,7 @@ internal fun SkeletonStatRow(modifier: Modifier = Modifier) {
  *
  * The episode page has no play/request controls, so the media pages' [SkeletonActionRow] promised buttons
  * that never arrive and left the overview below it reserved at the wrong height — the phone counterpart of
- * the television's `actionCount = 0` correction (#1598).
+ * the television's `actionCount = 0` correction.
  */
 @Composable
 internal fun SkeletonRatingCard(modifier: Modifier = Modifier) {
@@ -113,7 +113,7 @@ fun SkeletonActionRow(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // The primary plate is the height of the filled button it replaces, not the icon buttons beside it:
-        // that button is the tallest thing in the row, so it is what sets the row's height (#1598).
+        // that button is the tallest thing in the row, so it is what sets the row's height.
         SkeletonPlate(
             Modifier
                 .weight(1f)
@@ -159,11 +159,11 @@ internal fun SkeletonOverview(horizontalPadding: Dp, modifier: Modifier = Modifi
 /**
  * Three info rows standing in for the details block — director, release date, studios, status.
  *
- * Three is an average, not a measurement, and this band is the one place the skeleton cannot keep the #1598
- * promise exactly: [InfoRow] renders nothing when its value is blank, so a real page shows anywhere from two
- * rows to six and no fixed height matches them all. Reserving an average beats reserving nothing, which is
- * what stood here before and left the cast rail arriving 124dp adrift. What it costs the geometry check is
- * recorded on [com.binge.designsystem.layout.LayoutAnchors.Detail.CAST].
+ * Three is an average, not a measurement, and this band is the one place the skeleton cannot keep the
+ * reserve-what-resolves promise exactly: [InfoRow] renders nothing when its value is blank, so a real page
+ * shows anywhere from two rows to six and no fixed height matches them all. Reserving an average beats
+ * reserving nothing, which is what stood here before and left the cast rail arriving 124dp adrift. What it
+ * costs the geometry check is recorded on [com.binge.designsystem.layout.LayoutAnchors.Detail.CAST].
  *
  * The label bar takes `info_row_label_min_width` and the gap `info_row_gap`, so the two columns line up with
  * the real rows rather than merely occupying the same band.

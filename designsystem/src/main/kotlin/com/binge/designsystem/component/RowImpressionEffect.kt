@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  *
  * Detection has to live here because `layoutInfo` is the only place layout is visible, but the
  * *decision* to log does not: this reports what it saw and the ViewModel decides what that means, so
- * `core/designsystem` stays analytics-free (#2269).
+ * `core/designsystem` stays analytics-free.
  *
  * "Reached the viewport" is any part of the row, not a visible fraction. A rail the user scrolled to
  * the edge of and turned back from is one they saw, and a fraction threshold would need a second

@@ -39,7 +39,7 @@ fun ListRowSkeleton(modifier: Modifier = Modifier) {
  * the standard row spacing, so it stands in for the loaded [LazyColumn] directly.
  *
  * [header] is the plate for a leading item the resolved list puts *inside* its own column — the list detail
- * screen's name-and-count block. Without it the first row arrived 128dp below where it was reserved (#1598).
+ * screen's name-and-count block. Without it the first row arrived 128dp below where it was reserved.
  * A subtitle that sits *above* the column instead (the Lists screen's) is the caller's own to place, since
  * this column's content padding would otherwise be applied on the wrong side of it.
  */
@@ -59,7 +59,7 @@ fun ListRowSkeletonColumn(
         if (header != null) item { header() }
         items(count) { index ->
             // The first plate carries the anchor the resolved list's first row carries: the column fills the
-            // screen, so anchoring it would pass whatever the rows did (#1598).
+            // screen, so anchoring it would pass whatever the rows did.
             ListRowSkeleton(
                 modifier = Modifier.layoutAnchorIf(index == 0, LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)),
             )

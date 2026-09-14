@@ -26,7 +26,7 @@ val LocalReduceMotion = staticCompositionLocalOf { false }
 fun BingeExpressiveTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Default to Binge's fixed brand palette; Material You wallpaper colour is an opt-in setting
-    // (the app root passes the user's choice). See issue #546.
+    // (the app root passes the user's choice).
     dynamicColor: Boolean = false,
     reduceMotion: Boolean = systemReduceMotion(),
     content: @Composable () -> Unit,
@@ -60,7 +60,7 @@ fun BingeExpressiveTheme(
  *
  * Public because `BingeTvTheme` needs to read it too: while it was private the TV theme couldn't, so
  * its `reduceMotion` defaulted to `false` and every gate built against `LocalReduceMotion` silently
- * did nothing on a television (#1337).
+ * did nothing on a television.
  */
 @Composable
 fun systemReduceMotion(): Boolean {

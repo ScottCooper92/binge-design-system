@@ -35,7 +35,7 @@ private const val MAX_STARS = 5
  *
  * Each interactive star is a button naming the value it sets, with its half a long-press away, so every
  * value on the scale is reachable without the gesture — the whole rating control published a label and
- * no action at all until #2195, leaving a primary action of the app impossible with a screen reader.
+ * no action at all until this, leaving a primary action of the app impossible with a screen reader.
  */
 @Composable
 fun StarRating(

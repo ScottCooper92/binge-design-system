@@ -26,7 +26,7 @@ private const val SHIMMER_HIGHLIGHT_ALPHA = 0.35f
 /**
  * Paints the receiver's own bounds as a shimmering loading placeholder when [visible], masking wrapped
  * children; a no-op passthrough otherwise. A Loading state renders its *real* content with
- * `Modifier.skeleton(isLoading)`, so the skeleton is the layout and can't drift from it (#1053).
+ * `Modifier.skeleton(isLoading)`, so the skeleton is the layout and can't drift from it.
  *
  * A `surfaceVariant` base with a lighter highlight sweeping across; the sweep freezes at a fixed offset
  * under [LocalReduceMotion] so screenshot baselines stay deterministic. [shape] clips the placeholder,

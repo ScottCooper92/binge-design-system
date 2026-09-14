@@ -14,7 +14,7 @@ import com.binge.designsystem.component.MediaTypeTagType
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Shared public-sample convention — the worked example (#745, epic #738).
+ * Shared public-sample convention — the worked example.
  *
  * Without it a component's preview drifts across two places: a `private` inline `@Preview` (IDE
  * only) and a `screenshotTest @PreviewTest @Preview` (CI only). This `…Samples` layer gives the

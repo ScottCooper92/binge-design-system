@@ -49,7 +49,7 @@ private const val CINEMATIC_EYEBROW_ALPHA = 0.85f
 /**
  * Immersive expanded-width detail header: full-bleed backdrop gradient-blended into the background,
  * and an inline poster beside a copy column (eyebrow → title → [tagline] → [actions]). Sizes to its
- * container width so it composes correctly in a side pane (#767); the height is the fixed cinematic
+ * container width so it composes correctly in a side pane; the height is the fixed cinematic
  * header height. The expanded counterpart to [DetailHero]; the single-column detail keeps using
  * [DetailHero].
  *

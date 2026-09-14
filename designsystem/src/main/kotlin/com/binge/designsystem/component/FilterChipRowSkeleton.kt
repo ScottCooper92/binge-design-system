@@ -26,7 +26,7 @@ private const val SKELETON_CHIP_COUNT = 3
  *
  * Both screens that pair a chip row with a grid — the gallery and the library — shipped skeletons that drew
  * only the grid. The row is 56dp, so on both the first tile arrived that far below where it was reserved and
- * the whole grid shunted down on resolve (#1598). This is the plate that reserves it, shared so the two
+ * the whole grid shunted down on resolve. This is the plate that reserves it, shared so the two
  * cannot drift apart again.
  *
  * The pill's height is a dimen rather than a derived value because a chip is a composed component with its

@@ -121,7 +121,7 @@ private fun <T> rememberSeparatingFold(orientation: FoldingFeature.Orientation, 
  *
  * It is [PaddingValues] rather than a single `Dp` because a row's two horizontal insets are not
  * necessarily equal: `Scaffold` derives its padding from `safeDrawing`, and a display cutout or
- * gesture handle inset lands on one edge only in landscape (#2280). A symmetric parameter cannot
+ * gesture handle inset lands on one edge only in landscape. A symmetric parameter cannot
  * express that, and silently reading one edge for both is how a hinge alignment drifts.
  */
 @Composable

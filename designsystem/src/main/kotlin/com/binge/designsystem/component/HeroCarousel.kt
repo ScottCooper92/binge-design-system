@@ -136,7 +136,7 @@ fun HeroCarousel(
     // The gesture-detector coroutine below is keyed only on `count` and so outlives many
     // recompositions; read `current` through rememberUpdatedState, or a swipe after the first would
     // compute the new page against the stale value it captured when the coroutine first launched —
-    // the same #1282 failure BingeFilterChipPager's pager-settle effect guards against.
+    // the same failure BingeFilterChipPager's pager-settle effect guards against.
     val latestCurrent by rememberUpdatedState(current)
     Box(
         modifier = modifier
@@ -207,7 +207,7 @@ private fun BoxScope.HeroBackdrop(
             SubcomposeAsyncImage(
                 model = item.imageUrl,
                 // The button above carries the name; the backdrop is decoration inside it. A slotted
-                // SubcomposeAsyncImage keeps its own description off the merged node anyway (#2322).
+                // SubcomposeAsyncImage keeps its own description off the merged node anyway.
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
@@ -220,7 +220,7 @@ private fun BoxScope.HeroBackdrop(
 }
 
 /**
- * The slide picker, drawn as dots and announced as what it actually is: a tab strip (#2327).
+ * The slide picker, drawn as dots and announced as what it actually is: a tab strip.
  *
  * `Role.Tab` inside a [selectableGroup] rather than five `Role.Button`s, because the position and the
  * current slide then come from the framework's collection info instead of a hand-written string — and
@@ -229,7 +229,7 @@ private fun BoxScope.HeroBackdrop(
  *
  * Each dot is named for the title it goes to. The backdrop's own description cannot stand in: it names
  * the featured *title* including its trending rank, which is the item rather than the carousel's
- * position, and the two coincide only because the hub happens to feed the hero a ranked list (#2322).
+ * position, and the two coincide only because the hub happens to feed the hero a ranked list.
  */
 @Composable
 private fun BoxScope.HeroDots(

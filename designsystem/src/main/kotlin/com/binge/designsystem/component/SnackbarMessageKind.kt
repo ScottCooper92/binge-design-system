@@ -7,7 +7,7 @@ import androidx.compose.material3.SnackbarResult
 /**
  * The kind of message a snackbar carries, which determines how long it stays on screen. Every
  * snackbar in the app picks a kind so its [SnackbarDuration] is a deliberate, type-driven choice
- * rather than the accidental Compose default — see issue #459.
+ * rather than the accidental Compose default.
  */
 enum class SnackbarMessageKind {
     /** A "done" acknowledgement (favourited, added to list, requested, rating saved, …). */

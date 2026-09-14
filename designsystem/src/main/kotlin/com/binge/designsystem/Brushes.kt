@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.LayoutDirection
  * language, shipped RTL strings or not.
  *
  * Variadic rather than three fixed stops, which is what this took while the phone was its only caller: the
- * TV scrims it gained in #2108 ramp over five, and an arity that fits some callers and not others is how a
+ * TV scrims it later gained ramp over five, and an arity that fits some callers and not others is how a
  * second, absolute copy gets written for the ones it does not fit.
  */
 @Composable
