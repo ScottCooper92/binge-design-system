@@ -30,6 +30,12 @@ android {
     buildFeatures { compose = true }
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
+    testOptions {
+        // The focus tests drive Robolectric on the JVM against composables built out of dimensionResource,
+        // so they need the merged Android resources on the unit-test classpath.
+        unitTests.isIncludeAndroidResources = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -142,6 +148,16 @@ dependencies {
     screenshotTestImplementation(libs.compose.ui.tooling)
     screenshotTestImplementation(libs.screenshot.validation.api)
 
+    // JUnit 5 for the plain tests; the vintage engine runs the JUnit4-style Robolectric tests on the same
+    // platform, exactly as :designsystem arranges it. The focus units are the reason this module needs the
+    // Compose test stack at all: their contracts are about where focus lands, which is only observable by
+    // driving a real composition (Binge#2514).
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit4)
+    testRuntimeOnly(libs.junit.vintage.engine)
+    testImplementation(libs.robolectric)
+    testImplementation(composeBom)
+    testImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.test.manifest)
 }
