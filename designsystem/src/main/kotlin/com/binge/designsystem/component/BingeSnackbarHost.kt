@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -48,11 +49,9 @@ internal fun BingeSnackbar(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_m),
-                top = dimensionResource(R.dimen.snackbar_padding_vertical),
-                bottom = dimensionResource(R.dimen.snackbar_padding_vertical),
-            ),
+            modifier = Modifier
+                .heightIn(min = dimensionResource(R.dimen.snackbar_min_height))
+                .padding(start = dimensionResource(R.dimen.padding_m)),
         ) {
             Text(
                 text = message,
@@ -63,6 +62,7 @@ internal fun BingeSnackbar(
                 // doesn't run into the rounded corner.
                 modifier = Modifier
                     .weight(1f)
+                    .padding(vertical = dimensionResource(R.dimen.snackbar_padding_vertical))
                     .then(
                         if (hasTrailing) {
                             Modifier
