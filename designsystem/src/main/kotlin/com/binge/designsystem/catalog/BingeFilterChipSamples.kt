@@ -32,3 +32,17 @@ fun BingeFilterChipFamilySample() {
         }
     }
 }
+
+/**
+ * The chip while its form is saving: selected and unselected both dim, and neither takes a tap.
+ * Its own cell, because a chip that swallows a tap silently looks the same as one that took it.
+ */
+@Composable
+fun BingeFilterChipDisabledSample() {
+    ScreenshotTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            BingeFilterChip(label = "All", selected = true, onClick = {}, count = 142, enabled = false)
+            BingeFilterChip(label = "Action", selected = false, onClick = {}, enabled = false)
+        }
+    }
+}

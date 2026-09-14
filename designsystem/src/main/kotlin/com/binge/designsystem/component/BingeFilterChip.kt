@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,11 +33,17 @@ import com.binge.designsystem.theme.BingeShapes
 /** Darkens the count sub-pill on a selected (primary-filled) chip so it reads against the accent. */
 private const val FILTER_CHIP_COUNT_SCRIM_ALPHA = 0.22f
 
+/** Material 3's disabled opacity, applied to the whole chip so its fill, border and text dim together. */
+private const val FILTER_CHIP_DISABLED_ALPHA = 0.38f
+
 /**
  * The app's filter chip: a pill that fills with the primary accent when [selected] and is outlined
  * otherwise. An optional [leadingIcon] (vector) or [leadingPainter] (drawable, e.g. a brand glyph)
  * sits before the [label], and an optional [count] trails it as a tonal sub-pill (e.g. a filter's
  * result total). Used standalone and as the cell of [BingeFilterChipRow].
+ *
+ * A chip that is not [enabled] takes no taps and dims, which is what a form saving asks for: a
+ * chip that silently swallows a tap looks the same as one that took it.
  */
 @Composable
 fun BingeFilterChip(
@@ -47,12 +54,14 @@ fun BingeFilterChip(
     leadingIcon: ImageVector? = null,
     leadingPainter: Painter? = null,
     count: Int? = null,
+    enabled: Boolean = true,
 ) {
     val scheme = MaterialTheme.colorScheme
     val foreground = if (selected) scheme.onPrimary else scheme.onSurfaceVariant
     val isSelected = selected
     Row(
         modifier = modifier
+            .alpha(if (enabled) 1f else FILTER_CHIP_DISABLED_ALPHA)
             .clip(BingeShapes.Pill)
             .background(if (selected) scheme.primary else scheme.surfaceContainerLow)
             .then(
@@ -61,7 +70,7 @@ fun BingeFilterChip(
                 } else {
                     Modifier.border(dimensionResource(R.dimen.hairline_thickness), scheme.outlineVariant, BingeShapes.Pill)
                 },
-            ).clickable(onClick = onClick, role = Role.Button)
+            ).clickable(enabled = enabled, onClick = onClick, role = Role.Button)
             .semantics { this.selected = isSelected }
             .padding(
                 horizontal = dimensionResource(R.dimen.chip_padding_h),
