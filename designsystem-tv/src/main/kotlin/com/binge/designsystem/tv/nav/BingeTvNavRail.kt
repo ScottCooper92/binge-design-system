@@ -53,7 +53,7 @@ private const val RAIL_SCRIM_ALPHA = 0.94f
  *
  * The *right* edge whatever the layout direction, deliberately: the shell's directional keys are physical — a
  * side sheet that mirrors to the other edge is still dismissed by LEFT — so paint that mirrored on its own
- * would disagree with the contract the D-pad keeps. Both move together, in #2108.
+ * would disagree with the contract the D-pad keeps. The two move together.
  */
 private const val RAIL_SCRIM_HOLD_ALPHA = 0.86f
 private const val RAIL_SCRIM_HOLD_FRACTION = 0.72f
@@ -287,7 +287,7 @@ private fun contentHandoffInFlight(
     var inFlight by remember { mutableStateOf(false) }
     var lastDepth by remember { mutableIntStateOf(contentDepth) }
     // Read inside a withTimeoutOrNull that waits on focus, so the effect outlives the lambda it
-    // captured — a recomposition during the handoff supplies a new one (#2305).
+    // captured — a recomposition during the handoff supplies a new one.
     val currentContentHasFocus by rememberUpdatedState(contentHasFocus)
     LaunchedEffect(contentDepth) {
         if (contentDepth == lastDepth) return@LaunchedEffect

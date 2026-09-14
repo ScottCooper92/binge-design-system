@@ -22,7 +22,7 @@ import com.binge.designsystem.theme.systemReduceMotion
  * [LocalBingeColors] and [LocalReduceMotion] are re-provided here because they are plain token
  * CompositionLocals rather than Material 3 types — they carry across the seam unchanged.
  *
- * [reduceMotion] defaults to the system setting rather than `false`: that old default was the whole of #1337,
+ * [reduceMotion] defaults to the system setting rather than `false`: that old default was the whole of a motion-sickness bug,
  * where no call site passed anything so `LocalReduceMotion` was permanently `false` on a TV and every gate
  * against it was dead code that read as working. Reading the setting here keeps a call site from having to
  * remember; a screenshot theme still overrides it to pin the reduced branch.

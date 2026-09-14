@@ -16,16 +16,15 @@ import androidx.compose.ui.focus.FocusRequester
  *
  * That four-step latch was copy-pasted thirteen times across twelve screens, near character-for-character. It
  * exists because acting inline loses the disposal race — an inline `restoreTvOverlayFocus` fires while the
- * focus-trapped overlay is still composed and is swallowed, the "focus falls to the rail" class (#1382, #1385,
- * #1442, #1455/#1468, #1609, #1674). Thirteen copies was thirteen places to forget a teardown path (#1609
- * missed the third of three) or leave a latch armed to fire a stale request later (#1468). This is that latch,
- * once.
+ * focus-trapped overlay is still composed and is swallowed, the "focus falls to the rail" class. Thirteen
+ * copies was thirteen places to forget a teardown path — one fix missed the third of three — or to leave a
+ * latch armed to fire a stale request later. This is that latch, once.
  *
  * Call [TvOverlayCloser.close] from every dismissal path — the `BackHandler`, the sheet `onDismiss`, a
  * navigate-away. It is idempotent within one close (a second [TvOverlayCloser.close] mid-flight is a no-op) and
  * re-armable across opens (the latch resets so the next open closes too).
  *
- * All thirteen close latches restore unconditionally; `TvDiscoverScreen`'s content-pane guard (#1611) belongs to
+ * All thirteen close latches restore unconditionally; `TvDiscoverScreen`'s content-pane guard belongs to
  * its separate `awaitingRequery` re-focus (a load-gated re-request after a filter change), not to the close, so
  * there is no `shouldRestore` parameter here.
  *
@@ -41,7 +40,7 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
         currentOnClose()
         restoreTvOverlayFocus(restoreTo)
         // Reset so the overlay can be opened and closed again — an un-reset latch stays armed and either never
-        // re-fires (a stuck close) or fires a stale request on a later recomposition (#1468).
+        // re-fires (a stuck close) or fires a stale request on a later recomposition.
         closing = false
     }
     // Stable identity so a `BackHandler`/`onDismiss` holding [TvOverlayCloser.close] is not re-armed every

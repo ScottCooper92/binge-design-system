@@ -11,7 +11,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
  * `TvSettingsRoute` is in-pane when selected from the rail's Settings item, but an overlay when pushed from
  * the Account screen — so only the host can say which, not the content. Boards read it to choose their
  * overscan: in-pane the rail already offsets the start edge, but an overlay is panel-edge-to-panel-edge and
- * must carry overscan itself (#1657, a regression from the #1654 overlay host).
+ * must carry overscan itself — a regression the overlay host introduced.
  *
  * A screen that is *always* overlay-hosted (Watch providers) passes its board `hostedAsOverlay = true`
  * explicitly, so its screenshot renders the real state without the host present; a dual-hosted board omits

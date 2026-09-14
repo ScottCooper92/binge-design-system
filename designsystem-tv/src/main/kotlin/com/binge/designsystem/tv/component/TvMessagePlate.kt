@@ -24,9 +24,9 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [headline] is optional because an *empty* state is often a single sentence and inventing a headline over it
  * would be writing copy to satisfy a signature. A **failure** always has one — a failure plate derives it from
- * the error's kind and never omits it — so the headline stays mandatory where it carries meaning (#1699).
+ * the error's kind and never omits it — so the headline stays mandatory where it carries meaning.
  *
- * [icon] is the art above the copy (#1728). Optional and null by default, so a caller with nothing meaningful
+ * [icon] is the art above the copy. Optional and null by default, so a caller with nothing meaningful
  * to draw renders exactly what it did before rather than a shrug glyph. The phone's `EmptyScreen` has always
  * carried one and `TvSettingsPane` already proves the idiom reads at ten feet; this is the same argument in the
  * one anatomy every TV empty and failure state goes through.

@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.LayoutDirection
  * The D-pad key that travels toward the layout's **start** edge — physical ← under LTR, → under RTL.
  *
  * Compose's containers mirror on their own (alignments, `Row` order, `start`/`end` padding), but a key
- * handler written against [Key.DirectionLeft] does not. That split is the #2108 defect: the side sheet's
+ * handler written against [Key.DirectionLeft] does not. That split is the defect this exists to stop: the side sheet's
  * panel is `end`-aligned, so under RTL it renders on the left while ← — now the key pointing *into* it —
  * still dismissed it. A panel moved to the other side of the screen, and the button that closed it did not.
  *

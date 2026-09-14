@@ -54,12 +54,12 @@ data class TvButtonColors(
  * - A **disabled** control never takes the focus fill. It stays focusable so ↓ isn't a dead end, but a
  *   filled disabled button would promise a press that does nothing.
  *
- * ## A disabled control is an outline, and it must not depend on what it sits on (#1397)
+ * ## A disabled control is an outline, and it must not depend on what it sits on
  *
  * Disabled used to be `container = colors.surface` with `border = Color.Transparent`. That reads as a pill on
  * the *component's* own preview background — and as **bare text** on any panel, because TV panels are backed by
  * `colors.surface` too, so the container composited to nothing and there was no outline underneath it. The
- * control stopped reading as a control at all. Found in #1392's baselines, where the same button appears as a
+ * control stopped reading as a control at all. Found in the baselines, where the same button appears as a
  * filled pill in one frame and as centred text in the next.
  *
  * So disabled is now `container = Color.Transparent` with a **dimmed border**: the shape is drawn rather than
@@ -87,7 +87,7 @@ fun tvButtonColors(
         container = when {
             focusFilled -> if (destructive) colors.error else colors.primary
             // Transparent, not `surface` — a disabled control is drawn as an outline so its shape cannot be
-            // erased by a panel that happens to use the same token. See the KDoc for what that cost (#1397).
+            // erased by a panel that happens to use the same token. See the KDoc for what that cost.
             !enabled -> Color.Transparent
             destructiveAtRest -> colors.error.copy(alpha = DESTRUCTIVE_CONTAINER_ALPHA)
             // The neutral fill that marks the primary. Nothing else rests filled in neutral, so "filled" never
@@ -104,7 +104,7 @@ fun tvButtonColors(
         border = when {
             focusFilled || filledAtRest -> Color.Transparent
             // The disabled control's only visible edge, so it is dimmed rather than removed — this is the line
-            // that keeps a disabled button a button on a surface-backed panel (#1397).
+            // that keeps a disabled button a button on a surface-backed panel.
             !enabled -> colors.border.copy(alpha = DISABLED_BORDER_ALPHA)
             destructiveAtRest -> colors.error
             else -> colors.border

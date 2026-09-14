@@ -98,7 +98,7 @@ internal fun ColumnScope.RailItemsRegion(
     }
 
     // Account pins top in both states, inside the overscan-safe area — one of the two rows a TV that overscans
-    // could otherwise crop (#1852).
+    // could otherwise crop.
     Column(modifier = Modifier.padding(start = hPad, top = overscanV, end = hPad), verticalArrangement = gap) {
         header?.let { item(it) }
     }

@@ -14,14 +14,15 @@ import androidx.compose.ui.focus.focusRequester
  * The remembered-entry-cell focus contract shared by the detail and hub rows (`TvCardRow`, `TvMediaRow`), the TV
  * detail/gallery/cast grids and search: returning to a container lands on the cell that last held focus, and a
  * fresh one opens on its first — never a geometric pick, never a trailing see-all tile (outside the item list, so
- * it never carries the requester). This is **the** TV focus-memory contract (#1820); its four invariants, each
- * the fix for a class re-broken per surface, are pinned once in `TvRowEntryContractTest`:
+ * it never carries the requester). This is **the** TV focus-memory contract. Each of its four
+ * invariants below has been broken in practice, on one surface or another, which is why they are pinned once in
+ * `TvRowEntryContractTest`:
  *
- * 1. The memory rides [rememberSaveable], keyed by a stable cell key — not composition (violated: #1574).
- * 2. It is **separate from the ring key**, which a blur nulls (violated: #1574 collapsed the two).
+ * 1. The memory rides [rememberSaveable], keyed by a stable cell key — not composition.
+ * 2. It is **separate from the ring key**, which a blur nulls; collapsing the two loses it on every blur.
  * 3. The lazy container is **seeded** to [entryIndex] so the remembered cell is composed before entry arrives,
- *    or the requester binds to nothing (violated: #1610, #1730).
- * 4. Staleness is resolved against the current data — a too-large remembered index coerces in (violated: #1757).
+ *    or the requester binds to nothing.
+ * 4. Staleness is resolved against the current data — a too-large remembered index coerces in.
  *
  * Three surfaces in the host app keep their **own** memory rather than this seam, and correctly so: a paged
  * poster grid needs `Items` staleness plus a backdrop cell; an immersive hub steers entry across many rows at
@@ -69,7 +70,7 @@ class TvRowEntry internal constructor(
  * as its `queryKey`). Leave it null and the memory persists for the composition's life; pass it and a change
  * recreates the remembered index, so a new result set enters at the top (or at [overrideIndex]) rather than
  * restoring focus into an unrelated set. The reset rides `rememberSaveable(resetKey)`, so it survives disposal
- * within a key but starts fresh across one — the search rows' per-query reset (#1587).
+ * within a key but starts fresh across one — the search rows' per-query reset.
  */
 @Composable
 fun rememberTvRowEntry(

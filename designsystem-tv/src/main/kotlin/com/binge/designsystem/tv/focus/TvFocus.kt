@@ -39,7 +39,7 @@ import com.binge.designsystem.tv.R as TvR
  * That 5.5dp is `tv_focus_ring_offset` + half of `tv_focus_ring_width`, not their sum: [focusRing] inflates the
  * outline by the offset and `Stroke` is **centred** on the path it strokes, so half the 3dp width falls inside
  * the 4dp gap and half outside it. Measured, not derived — a 200dp probe renders the band from 2.5dp to 5.5dp
- * out, centred on 4.0dp, 3.0dp thick (#2134). The reservations around the app state 7dp; that over-reserves by
+ * out, centred on 4.0dp, 3.0dp thick. The reservations around the app state 7dp; that over-reserves by
  * 1.5dp and is kept deliberately, each for its own reason recorded at the token.
  *
  * Focus is a **parameter, not a runtime state**, so a focused appearance is previewable/screenshot-testable by
@@ -158,8 +158,8 @@ fun Modifier.tvFocusTarget(onFocusChanged: (Boolean) -> Unit): Modifier =
  * too, which on a D-pad turns ↓ into a dead end rather than landing on a control that isn't ready yet.
  * So disabled falls back to a bare `focusable()`.
  *
- * **There is no long-press.** One existed as an "accelerator" into the library's action sheet (#1427)
- * and #1498 removed both it and its last caller: a hold is an invisible affordance on a remote (#1262),
+ * **There is no long-press.** One existed as an "accelerator" into the library's action sheet
+ * and was removed along with its last caller: a hold is an invisible affordance on a remote,
  * so an action reachable only that way is an action most users never find. Anything worth doing to a
  * card belongs on a visible surface — on the collections that had it, OK now opens the sheet itself.
  */
@@ -192,7 +192,7 @@ fun Modifier.tvFocusGroup(): Modifier = this.focusRestorer().focusGroup()
  *
  * For **click-to-open** surfaces where arriving selects nothing (a media row, a grid, the immersive hub, a
  * settings pane). A lazy container's default entry lands on whatever child sits nearest the beam, which for a
- * row still scrolled from a previous browse is its *last* cell (#1500's episodes row landing on the see-all
+ * row still scrolled from a previous browse is its *last* cell (an episodes row landing on the see-all
  * tile). Routing entry to [entry] lands it where it should every time.
  *
  * Not [tvFocusGroup] (`focusRestorer().focusGroup()`, the one reached for by name): a restorer has nothing saved
@@ -275,7 +275,7 @@ private fun FocusRequester.tryRequestFocus(): Boolean = runCatching { requestFoc
  *
  * **Offered, not fired once, because one frame is reliably too early**: the outgoing surface stays composed and
  * focus-trapped for its whole exit transition, and a trap *cancels* a request from outside it, so a single shot
- * into that window cannot succeed however well timed (#2517). Stopping on the grant rather than on a caller
+ * into that window cannot succeed however well timed. Stopping on the grant rather than on a caller
  * predicate means it cannot fight a user who got there first. Bounded in wall-clock as well as frames.
  *
  * @return whether focus was granted within the budget; `false` means the target never attached.
@@ -298,7 +298,7 @@ suspend fun restoreTvOverlayFocus(target: FocusRequester): Boolean {
  * `TvTabRow` and the TV Lists column all do. There an unrouted entry is not cosmetic: the geometric search picks
  * whatever child sits nearest the beam, and arriving there *is* a selection change (the rail recorded it first —
  * "merely opening the menu navigated the user somewhere they hadn't asked to go"; since re-fixed on the tab row
- * #1395 and the lists column). This exists to stop the rediscovery.
+ * the lists column). This exists to stop the rediscovery.
  *
  * Not [tvFocusGroup]: `focusRestorer` has nothing saved until the group has held focus once, the first-entry
  * case that breaks — and it is less correct even afterwards, since when focus is the commit the selected child
