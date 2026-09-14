@@ -79,6 +79,23 @@ class TvSamplesScreenshotTest {
     @Composable
     fun navRailCollapsedLastSelected() = Frame { TvNavRailSample(expanded = false, selectedKey = "lists") }
 
+    /**
+     * The glass half of the fill, which no other frame reaches: production reports artwork from a
+     * `DisposableEffect`, and effects do not run in a preview, so every frame above renders at a solid panel.
+     *
+     * Expanded is solid over artwork too — the ramp was tuned for the 72dp strip, and stretched over 220dp its
+     * hold ends inside the labels. These two are what say which state gets which.
+     */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun navRailExpandedOverArtwork() = Frame { TvNavRailSample(expanded = true, artworkBehind = true) }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun navRailCollapsedOverArtwork() = Frame { TvNavRailSample(expanded = false, artworkBehind = true) }
+
     @PreviewTest
     @TvPreviews
     @Composable
