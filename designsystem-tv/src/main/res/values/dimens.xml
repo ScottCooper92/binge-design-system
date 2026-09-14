@@ -28,6 +28,9 @@
     <!-- Card row -->
     <dimen name="tv_media_row_header_gap">10dp</dimen>
     <dimen name="tv_media_row_card_gap">12dp</dimen>
+    <!-- Selected tick -->
+    <dimen name="tv_selected_tick_size">24dp</dimen>
+    <dimen name="tv_selected_tick_glyph_size">16dp</dimen>
     <!-- Message plate and illustration -->
     <dimen name="tv_message_plate_max_width">520dp</dimen>
     <dimen name="tv_illustration_plate">128dp</dimen>

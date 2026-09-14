@@ -16,6 +16,8 @@ kotlin = "2.4.10"
 composeBom = "2026.08.00"
 # tv-material ships its own MaterialTheme tree; the version agrees with Binge's.
 tvMaterial = "1.1.0"
+# Only the TV QR code reads it: a symbol drawn from booleans stays crisp at panel size.
+qrcodegen = "1.8.0"
 # material3 is pinned ahead of the BOM, as Binge pins it: the expressive theme reads APIs the BOM's
 # stable line does not have yet.
 material3 = "1.5.0-alpha27"
@@ -45,6 +47,7 @@ compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fo
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 tv-material = { module = "androidx.tv:tv-material", version.ref = "tvMaterial" }
+qrcodegen = { module = "io.nayuki:qrcodegen", version.ref = "qrcodegen" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 material-color-utilities = { module = "me.tatarka.google.material:material-color-utilities", version.ref = "materialColorUtilities" }
