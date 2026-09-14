@@ -83,11 +83,11 @@ internal fun RailItem(
  * label is shown per [showLabel], separate from [expanded]: while the rail is animating open it is held back
  * until the panel is wide enough to hold the label, so the label pops in rather than un-clipping left-to-right.
  *
- * **The rail deliberately does not adopt `TvRowEmphasis` (#1331 decision 4):** its two tiers already express a
+ * **The rail deliberately does not adopt `TvRowEmphasis`:** its two tiers already express a
  * current-but-unfocused treatment as fill-versus-tint (expanded → full amber fill; collapsed → amber icon, no
  * fill). A dim-amber fill on top would give the collapsed strip the filled pill ruled out above and be a third
  * mark for a state already marked. There is no `Resting`/`Current` ambiguity to resolve: because the rail
- * selects on focus (#1316), "current" and "focused" never disagree while the rail has focus, so [current] as
+ * selects on focus, "current" and "focused" never disagree while the rail has focus, so [current] as
  * one flag is honest rather than overloaded. `docs/tv-foundation.md` records this.
  */
 @Composable

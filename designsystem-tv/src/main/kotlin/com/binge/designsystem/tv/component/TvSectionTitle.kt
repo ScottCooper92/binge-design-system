@@ -12,7 +12,7 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * The one in-content section title for TV, at [MaterialTheme.typography.titleLarge] — the single source every
- * carousel/section heading resolves to, so titles can't drift to different sizes (#1496).
+ * carousel/section heading resolves to, so titles can't drift to different sizes.
  *
  * The inset is the row family's pair — start gutter, end overscan — so a title sits above the first card of
  * the [TvCardRow] it heads rather than nudged out of line.

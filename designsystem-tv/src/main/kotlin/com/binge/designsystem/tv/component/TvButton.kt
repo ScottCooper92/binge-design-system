@@ -33,7 +33,7 @@ import com.binge.designsystem.tv.R as TvR
  * [TvButtonStyle.Destructive], so danger survives being focused).
  *
  * A disabled button stays focusable but inert — a D-pad control that refuses focus reads as broken, not
- * "not ready". It is drawn as an outline, not filled (#1397): a `colors.surface` fill composites to nothing
+ * "not ready". It is drawn as an outline, not filled: a `colors.surface` fill composites to nothing
  * on a panel, whereas a transparent container with a dimmed border keeps its shape on any background.
  *
  * [initiallyFocused] seeds the focus flag so a screenshot can show the focused state (a baseline runs no

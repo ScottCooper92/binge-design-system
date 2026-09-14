@@ -7,10 +7,9 @@ import androidx.compose.ui.platform.testTag
  * Names the points a TV screen's **loading** and **resolved** trees must agree on.
  *
  * A skeleton exists to reserve the geometry the real content fills, so that resolving is a fill rather than a
- * relayout (#1598). Nothing enforced that: the two are separate composable trees that happened to agree only
+ * relayout. Nothing enforced that: the two are separate composable trees that happened to agree only
  * because someone checked. They drifted anyway — the show's skeleton promised a row of cast circles where its
- * seasons row of 2:3 posters lands (#1704), and episode detail never migrated off a single flat plate at all
- * (#1705).
+ * seasons row of 2:3 posters lands, and episode detail never migrated off a single flat plate at all.
  *
  * An anchor is the handle that makes the agreement *assertable*: both trees tag the same point with the same
  * string, and `assertSkeletonReservesGeometry` (testFixtures) measures whether it moves across the resolve.

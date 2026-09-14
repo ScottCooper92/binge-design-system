@@ -37,7 +37,7 @@ private const val TRAILING_KEY = "tv-card-row-trailing"
  * `tvFocusGroup`, the helper reached for by name, is a restorer that silently does not do it (see its KDoc), so
  * hand-rolled rows kept getting it wrong. This wrapper owns all three plus per-cell focus tracking.
  *
- * Entering the row for the **first** time lands on its first cell — never the trailing see-all tile (#1500),
+ * Entering the row for the **first** time lands on its first cell — never the trailing see-all tile,
  * which is not in [items] and so never carries the entry requester. Returning lands on the cell **last
  * focused**. Both come from the shared [rememberTvRowEntry] contract — see [TvRowEntry] for how the memory survives
  * the `LazyColumn` scroll-out disposal.

@@ -13,7 +13,7 @@ import androidx.compose.ui.focus.FocusRequester
 /**
  * Re-claims focus after **this press** swaps the focused subtree out from under itself — sign-in mints a confirm
  * button, confirm/sign-out swaps in the other signed state, Back rebuilds the home destination. Compose's
- * focus-recovery search otherwise lands on the nav rail (#1380/#1383/#1442); the fix each time was the same
+ * focus-recovery search otherwise lands on the nav rail; the fix each time was the same
  * arm-a-latch-then-refocus dance, hand-copied across two files.
  *
  * The latch is **armed by the action**, not by mount or by the state change itself. That is load-bearing: a
@@ -65,8 +65,8 @@ fun rememberTvSwapFocus(requester: FocusRequester): TvSwapFocus = remember(reque
  * [key], so a caller that gates on a recomposition label (the shell's `currentKey == homeKey`) passes that key
  * to re-evaluate when it changes rather than on a `withFrameNanos` alone.
  *
- * The frame wait is [restoreTvOverlayFocus]'s and is load-bearing for the same measured reason (#1380/#1383/
- * #1442): the press disposes the focused node and swaps a new subtree in, so a synchronous request fires before
+ * The frame wait is [restoreTvOverlayFocus]'s and is load-bearing for the same measured reason:
+ * the press disposes the focused node and swaps a new subtree in, so a synchronous request fires before
  * the replacement control is laid out and is lost. Waiting one frame lets the swap land before the request.
  *
  * `runCatching` because the replacement may still be un-composed at the requesting frame (a reload racing the

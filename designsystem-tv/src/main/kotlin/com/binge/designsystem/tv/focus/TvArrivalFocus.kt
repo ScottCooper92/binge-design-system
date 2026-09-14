@@ -70,7 +70,7 @@ fun Modifier.tvArrivalTarget(arrival: TvArrivalFocus): Modifier = this.focusRequ
  *
  * [enabled] replaces the ad-hoc data guards screens open-coded (`episodes.isNotEmpty()`, `hasProviders`): the
  * effect is keyed on [enabled], so it re-offers when [enabled] flips false→true. A surface whose target has no
- * node until its content resolves (an empty season that later fills, #1705 finding 3) then still gets its offer
+ * node until its content resolves (an empty season that later fills) then still gets its offer
  * once the content arrives, instead of a `LaunchedEffect(Unit)` guard that runs once against nothing and never
  * retries.
  */

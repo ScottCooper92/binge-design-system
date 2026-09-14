@@ -37,7 +37,7 @@ const val TV_PREVIEW_HEIGHT_DP = 540
  * the *other* canvas in by hand is not: an inner [TvScreenshotThemeOnBlack] only covers this canvas where
  * it fills, so use [TvPreviewsOnBlack] rather than nesting the two.
  *
- * #1253 extends this harness; foundation components use it as-is.
+ * A screen-level harness extends this one; foundation components use it as-is.
  */
 @PreviewWrapper(TvScreenshotThemeWrapper::class)
 @Preview(
@@ -53,7 +53,7 @@ annotation class TvPreviews
  *
  * Two annotations rather than one baked default because the canvas is a test, not a backdrop: a screen
  * that paints its own base renders identically either way, so a baseline that moves between them names a
- * screen relying on the harness to paint for it (#1721). Baking one canvas everywhere would make that
+ * screen relying on the harness to paint for it. Baking one canvas everywhere would make that
  * question unaskable for every frame that takes the annotation; keeping the pair keeps it one token away.
  *
  * So: a screen root goes here, a component goes on [TvPreviews], and a screen you are auditing moves from
@@ -79,7 +79,7 @@ annotation class TvPreviewsOnBlack
  *
  * That painted canvas is also a **blind spot**, which is why [TvScreenshotThemeOnBlack] exists: it makes
  * every frame render on `background` whether or not the composable under test paints anything, so a screen
- * that forgets its own base still looks right here while shipping on the window's black (#1721). Component
+ * that forgets its own base still looks right here while shipping on the window's black. Component
  * frames want this readable canvas; a **screen-root** frame should use the other one.
  */
 @Composable
@@ -93,7 +93,7 @@ fun TvScreenshotTheme(modifier: Modifier = Modifier, content: @Composable () -> 
  * `app/src/main/res/values/themes.xml` sets `android:windowBackground` to `@android:color/black`, while
  * `background` is #0E0E0F — so a screen that fails to paint its own base ships on black and renders on
  * #0E0E0F in every baseline. The two are close enough to read the same by eye and different enough that
- * the frame is not the truth (#1721).
+ * the frame is not the truth.
  *
  * Using this, a screen that paints its base renders **identically** — the fill covers the canvas either
  * way — so adopting it is safe, and any baseline that *does* move is a screen that was relying on the
