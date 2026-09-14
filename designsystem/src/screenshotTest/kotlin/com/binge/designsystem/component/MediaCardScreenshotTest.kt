@@ -12,7 +12,7 @@ import com.binge.designsystem.catalog.MediaCardUnratedSample
 
 /**
  * Atomic poster card — colour axis only. Renders the shared public `catalog` samples, the card's one
- * public fixture (#745). The samples bound their own card width, so no `widthDp` is needed here.
+ * public fixture. The samples bound their own card width, so no `widthDp` is needed here.
  */
 class MediaCardScreenshotTest {
     @PreviewTest
@@ -33,7 +33,7 @@ class MediaCardScreenshotTest {
 
     /**
      * The placeholder beside the card it stands in for: it has to reserve the two-line title band as well as
-     * the poster, or every grid row below the first drops when the cards arrive (#2096).
+     * the poster, or every grid row below the first drops when the cards arrive.
      */
     @PreviewTest
     @Preview(name = "skeleton", uiMode = UI_MODE_NIGHT_NO)

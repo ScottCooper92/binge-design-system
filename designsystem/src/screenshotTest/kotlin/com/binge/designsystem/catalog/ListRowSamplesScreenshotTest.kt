@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the [ListRow] primitive catalog samples — renders the shared samples, the
- * primitive's one public fixture (#745, #751).
+ * primitive's one public fixture.
  */
 class ListRowSamplesScreenshotTest {
     @PreviewTest

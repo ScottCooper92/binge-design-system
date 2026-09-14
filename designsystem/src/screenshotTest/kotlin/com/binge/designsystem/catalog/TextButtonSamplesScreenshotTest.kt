@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the [BingeTextButton] catalog samples — renders the shared samples, the
- * component's one public fixture (#745).
+ * component's one public fixture.
  */
 class TextButtonSamplesScreenshotTest {
     @PreviewTest

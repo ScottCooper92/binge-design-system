@@ -34,7 +34,7 @@ private val takesLongClick = SemanticsMatcher.keyIsDefined(SemanticsActions.OnLo
  * `detectTapGestures`, which publishes nothing to the accessibility tree — five stars contributing no
  * name, no role and no action, under a row whose only semantics was a static description of the
  * current value. Rating a title is a primary action of the app, and it was impossible with TalkBack or
- * Switch Access and unreachable by focus (#2195; WCAG 4.1.2 and 2.1.1).
+ * Switch Access and unreachable by focus (WCAG 4.1.2 and 2.1.1).
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)

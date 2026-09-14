@@ -29,7 +29,7 @@ private const val LIST = "list"
 private val ROWS = List(30) { "row $it" }
 
 /**
- * The depth detector reports **once, on leave**, with the deepest index the visit reached (#2269).
+ * The depth detector reports **once, on leave**, with the deepest index the visit reached.
  *
  * Worth a test rather than trusting the `snapshotFlow`: a detector that reported per scroll frame, or
  * reported the *current* index instead of the deepest, would look identical from the call site and be

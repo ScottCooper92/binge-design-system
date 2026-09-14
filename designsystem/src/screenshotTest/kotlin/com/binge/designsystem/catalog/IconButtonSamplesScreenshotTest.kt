@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the [ExpressiveIconButton] catalog samples — renders the shared samples,
- * the component's one public fixture (#745).
+ * the component's one public fixture.
  */
 class IconButtonSamplesScreenshotTest {
     @PreviewTest

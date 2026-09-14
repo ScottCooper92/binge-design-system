@@ -26,7 +26,7 @@ private const val LIST = "list"
 private val ROWS = listOf("hero", "from_watchlist", "on_your_services", "popular", "upcoming")
 
 /**
- * The impression detector reports rows by key as they reach the viewport (#2269).
+ * The impression detector reports rows by key as they reach the viewport.
  *
  * Worth a test rather than trusting the `snapshotFlow`: a detector that reported nothing, or reported
  * every row on first composition regardless of the viewport, would both look identical from the call

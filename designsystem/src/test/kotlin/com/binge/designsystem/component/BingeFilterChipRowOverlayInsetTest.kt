@@ -20,7 +20,7 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 /**
- * The chip row clears an overlaying expanded nav rail (#2030).
+ * The chip row clears an overlaying expanded nav rail.
  *
  * On a tablet or unfolded foldable the rail overlays content rather than reserving width beside it, so
  * every screen under the shell opts out of the covered strip individually. Search's field above the
@@ -54,7 +54,7 @@ class BingeFilterChipRowOverlayInsetTest {
 
     /**
      * Resolved rather than hardcoded: `screen_content_inset` ramps with width (16 / 24 / 32dp) and this
-     * class runs at `w840dp`, so a literal would pin the phone value on a canvas that never uses it (#2085).
+     * class runs at `w840dp`, so a literal would pin the phone value on a canvas that never uses it.
      */
     private fun edgePadding(): Dp {
         val resources = RuntimeEnvironment.getApplication().resources

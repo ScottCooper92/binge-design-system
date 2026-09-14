@@ -17,12 +17,12 @@ import com.binge.designsystem.preview.ScreenshotTheme
  * **`phone-land` is a header-band cell, not full coverage.** At 411dp of height the compact hero
  * (`detail_hero_height`, 300dp under `values-land`) and the stat row fill the viewport, and a preview
  * captures scroll offset zero, so anything the shapes differ by *below* the header is off-frame. Making
- * the skeleton scroll (#2043) fixed the device-side fault — that content was unreachable, and the last
+ * the skeleton scroll fixed the device-side fault — that content was unreachable, and the last
  * band was squashed into the leftover height rather than merely cut off — but a scrolled frame is not
  * something a `@Preview` can ask for.
  *
  * What it does separate is the header band itself. 891dp of width is `isExpandedLayout()`, so `Loading`
- * takes the cinematic header here and the two episode shapes take the compact hero (#2032); before that
+ * takes the cinematic header here and the two episode shapes take the compact hero; before that
  * gate all three were byte-identical. `LoadingEpisode` and `LoadingEpisodeSignedOut` remain identical to
  * each other in this cell, and correctly so — they differ only by the rating card, which is below the
  * fold. The `phone` and `phone-light` cells are what separate those two.
@@ -55,7 +55,7 @@ class DetailScreenSkeletonScreenshotTest {
         }
     }
 
-    /** The signed-out episode page: no rating card between the stat row and the overview (#1991). */
+    /** The signed-out episode page: no rating card between the stat row and the overview. */
     @PreviewTest
     @ScreenStatePreview
     @Composable

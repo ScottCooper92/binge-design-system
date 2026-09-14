@@ -25,8 +25,7 @@ import org.robolectric.annotation.Config
 private const val LAST = "last"
 
 /**
- * The non-lazy impression detector, for the `Column(verticalScroll)` bodies the detail screens use
- * (#2269).
+ * The non-lazy impression detector, for the `Column(verticalScroll)` bodies the detail screens use.
  *
  * The whole reason this shape exists is that `ScrollState` exposes no `layoutInfo`, so there is nothing
  * to assert against but real layout — which makes this one of the few places where a test that renders

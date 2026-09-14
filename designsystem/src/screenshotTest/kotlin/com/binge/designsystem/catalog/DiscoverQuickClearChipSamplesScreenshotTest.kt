@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the quick-clear-chip catalog sample — renders the shared
- * [DiscoverQuickClearChipSample] (both tones) (#745, #749).
+ * [DiscoverQuickClearChipSample] (both tones).
  */
 class DiscoverQuickClearChipSamplesScreenshotTest {
     @PreviewTest

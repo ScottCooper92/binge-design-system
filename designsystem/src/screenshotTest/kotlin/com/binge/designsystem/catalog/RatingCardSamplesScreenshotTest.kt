@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
-/** Screenshot coverage for the [RatingCard][com.binge.designsystem.component.RatingCard] catalog samples (#750). */
+/** Screenshot coverage for the [RatingCard][com.binge.designsystem.component.RatingCard] catalog samples. */
 class RatingCardSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews

@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the rating-chip catalog samples — renders the shared [RatingChipToneSample]
- * and [RatingChipSizeSample] (#745, #749).
+ * and [RatingChipSizeSample].
  */
 class RatingChipSamplesScreenshotTest {
     @PreviewTest

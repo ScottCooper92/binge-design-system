@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the trending-search-chip catalog sample — renders the shared
- * [TrendingSearchChipSample] (#745, #749).
+ * [TrendingSearchChipSample].
  */
 class TrendingSearchChipSamplesScreenshotTest {
     @PreviewTest

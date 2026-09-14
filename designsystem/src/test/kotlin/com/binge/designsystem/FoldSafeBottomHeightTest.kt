@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 /**
- * The tabletop height cap (#819).
+ * The tabletop height cap.
  *
  * The first test is the load-bearing one, for the same reason it is in [TwoPaneSplitTest]: every
  * phone, tablet and flat-open foldable reports no separating horizontal fold, so if null ever stopped
