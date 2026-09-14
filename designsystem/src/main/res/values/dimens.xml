@@ -146,8 +146,12 @@
     <dimen name="tag_icon_size">13dp</dimen>
     <!-- BingeSnackbar — the floating pill (horizontal inset reuses padding_m) -->
     <dimen name="snackbar_elevation">6dp</dimen>
-    <!-- Small vertical inset so the action button's own touch-target padding sums to a balanced pill height. -->
-    <dimen name="snackbar_padding_vertical">6dp</dimen>
+    <!-- M3's snackbar height: 48dp at one line, 68dp at two. The min holds the first, and the text's
+         own vertical inset (14dp each side, over a 20dp bodyMedium line) reaches both. It sits on the
+         text rather than the row so a trailing 48dp icon button governs its own height instead of
+         stacking on top of the inset. -->
+    <dimen name="snackbar_min_height">48dp</dimen>
+    <dimen name="snackbar_padding_vertical">14dp</dimen>
     <dimen name="card_height">216dp</dimen>
     <dimen name="card_elevation">1dp</dimen> <!-- Subtle 1dp lift for cards. -->
     <dimen name="card_title_padding_h">8dp</dimen>

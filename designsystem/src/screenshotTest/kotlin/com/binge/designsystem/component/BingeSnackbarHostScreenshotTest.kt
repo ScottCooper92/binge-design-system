@@ -28,6 +28,25 @@ class BingeSnackbarHostScreenshotTest {
         }
     }
 
+    /**
+     * Two lines, the most [SNACKBAR_MAX_LINES] allows. The text's own vertical inset is what carries
+     * the pill past its 48dp minimum to M3's 68dp here, so this is the frame that holds that number.
+     */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TwoLineMessage() {
+        ScreenshotTheme {
+            BingeSnackbar(
+                message = "Couldn't add that to your watchlist because your session has expired. Sign in again.",
+                actionLabel = null,
+                onActionClick = {},
+                showDismissAction = false,
+                onDismiss = {},
+            )
+        }
+    }
+
     @PreviewTest
     @ComponentPreviews
     @Composable
