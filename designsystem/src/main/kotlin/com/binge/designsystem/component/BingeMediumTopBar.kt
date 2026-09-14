@@ -99,7 +99,7 @@ fun BingeMediumTopBar(
             },
             // Only an explicit container overrides M3's medium-bar defaults. Routing an unspecified one
             // through bingeTopBarColors would restyle every existing caller: it resolves to `background`
-            // and flattens the scrolled state, which is #2033's decision for BingeTopBar, not this bar's.
+            // and flattens the scrolled state, which is BingeTopBar's decision to make, not this bar's.
             colors =
                 if (containerColor.isSpecified) {
                     TopAppBarDefaults.mediumTopAppBarColors(

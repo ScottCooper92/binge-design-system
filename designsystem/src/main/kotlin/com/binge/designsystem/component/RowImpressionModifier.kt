@@ -9,7 +9,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
  *
  * The detail screens need their own shape because their body is `Column(Modifier.verticalScroll(…))`,
  * a `ScrollState` with **no `layoutInfo` at all**: there is no list of visible items to read, so the
- * only thing that knows whether a rail is on screen is the rail's own placement (#2269).
+ * only thing that knows whether a rail is on screen is the rail's own placement.
  *
  * Visibility is `boundsInWindow()` being non-empty, which is the intersection of this node with every
  * clip above it — so a rail scrolled out of the column measures empty even though it is still composed

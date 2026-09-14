@@ -26,7 +26,7 @@ import com.binge.designsystem.rememberFoldSafeBottomHeight
  * host drives this from its own expanded state and remains responsible for an explicit close
  * affordance while locked.
  *
- * In the tabletop posture the sheet caps itself at the crease (#819), so it lands wholly in the flat
+ * In the tabletop posture the sheet caps itself at the crease, so it lands wholly in the flat
  * bottom half and no row is bent across the hinge. Every other window reports no separating
  * horizontal fold and the cap is absent, so nothing else in the app changes height.
  */

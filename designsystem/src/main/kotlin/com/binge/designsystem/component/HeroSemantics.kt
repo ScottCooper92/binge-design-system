@@ -12,7 +12,7 @@ private const val SPOKEN_SEPARATOR = ", "
  *
  * The hero's copy renders in [HeroCopyOverlay], a *sibling* of the clickable backdrop rather than a
  * descendant, so nothing merges into the button on its own: the hub's primary call to action announced
- * as an unlabelled button (#2322). The image inside it cannot supply the name either — a
+ * as an unlabelled button. The image inside it cannot supply the name either — a
  * `SubcomposeAsyncImage` given `loading`/`error` slots keeps its `contentDescription` off the merged
  * node, which is the same shape [MediaCard] has and why that card names itself through its caption.
  *

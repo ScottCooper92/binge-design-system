@@ -28,7 +28,7 @@ private const val OVERVIEW_COLLAPSED_LINES = 3
  * [initiallyOverflowing] seeds that toggle's visibility. Left to itself the component only learns it
  * overflowed from `onTextLayout`, which fires after the frame the preview screenshot lane captures —
  * so the collapsed-with-toggle appearance, the component's only interactive state, was unrenderable
- * there and no baseline held it (#2291). Seeding it makes the state a parameter, the same move that
+ * there and no baseline held it. Seeding it makes the state a parameter, the same move that
  * makes TV focus screenshot-testable. Preview and test use only: at runtime the layout pass reports
  * the truth, and passing `true` for copy that does not overflow would draw a toggle that expands
  * nothing.
@@ -39,7 +39,7 @@ fun ExpandableOverview(
     modifier: Modifier = Modifier,
     initiallyOverflowing: Boolean = false,
     // Reported on expand only: collapsing again answers no question the expand has not already
-    // answered (#2272). Defaulted, so the five callers that report nothing compose unchanged.
+    // answered. Defaulted, so the five callers that report nothing compose unchanged.
     onExpand: () -> Unit = {},
 ) {
     var expanded by rememberSaveable(text) { mutableStateOf(false) }

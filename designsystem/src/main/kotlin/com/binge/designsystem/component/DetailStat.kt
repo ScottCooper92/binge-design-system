@@ -19,8 +19,7 @@ data class DetailStat(
  * about how many people rated it.
  *
  * Here rather than in each detail feature because the movie and TV screens built it identically,
- * off the same two designsystem resources, differing only in which model they read the count from
- * (#1230).
+ * off the same two designsystem resources, differing only in which model they read the count from.
  */
 @Composable
 fun ratingSubLabel(voteCount: Int): String =

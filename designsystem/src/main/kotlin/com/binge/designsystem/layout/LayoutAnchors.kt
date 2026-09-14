@@ -7,10 +7,10 @@ import androidx.compose.ui.platform.testTag
  * Names the points a phone screen's **loading** and **resolved** trees must agree on.
  *
  * A skeleton exists to reserve the geometry the real content fills, so that resolving is a fill rather than a
- * relayout (#1598). Nothing enforced that on either surface: a skeleton and its content are separate
+ * relayout. Nothing enforced that on either surface: a skeleton and its content are separate
  * composable trees that agree only because someone checked. The television's drifted anyway — the show's
- * skeleton promised a row of cast circles where its seasons row lands (#1704), episode detail never migrated
- * off a flat plate (#1705) — and the anchors that caught it are
+ * skeleton promised a row of cast circles where its seasons row lands, episode detail never migrated
+ * off a flat plate — and the anchors that caught it are
  * [com.binge.designsystem.tv.layout.TvLayoutAnchors]. This is that object's phone counterpart, measured
  * by the same harness (`assertSkeletonReservesGeometry`, testFixtures).
  *

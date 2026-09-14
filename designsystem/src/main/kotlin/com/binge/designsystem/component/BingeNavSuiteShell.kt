@@ -77,7 +77,7 @@ enum class BingeNavPresentation {
  *
  * Stateless — the caller supplies [items], [selectedKey], and [onSelect], and renders routed UI in
  * [content]. The nav is always shown: full-screen details live on a root back stack *above* this
- * shell (#1213), so there's no `showNavigation` flag and no `movableContentOf`.
+ * shell, so there's no `showNavigation` flag and no `movableContentOf`.
  */
 @Composable
 fun BingeNavSuiteShell(

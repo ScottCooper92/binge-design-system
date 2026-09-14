@@ -20,7 +20,7 @@ private class DeepestIndex {
  * Tracks how far down a [LazyListState] list a visit got, and reports it **once, on leave**.
  *
  * Detection lives here for the same reason [RowImpressionEffect]'s does — `layoutInfo` is the only
- * place layout is visible — while what the number means stays with the caller's ViewModel (#2269).
+ * place layout is visible — while what the number means stays with the caller's ViewModel.
  *
  * Reporting on dispose rather than as the depth grows is the whole design. One event per threshold
  * crossed is the same event under a name that makes it uncountable: a visit reaching row 12 would emit

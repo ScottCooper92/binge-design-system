@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
  * tree render identically and can be removed as they are touched.
  *
  * Keep preview `name`s compact/space-free (e.g. `phone-land`): the plugin bakes the name into each
- * reference filename, and long paths blow past Windows' 260-char MAX_PATH in worktree temp dirs (#298).
+ * reference filename, and long paths blow past Windows' 260-char MAX_PATH in worktree temp dirs.
  */
 
 /** Standard phone — the de-facto Pixel-class width the wrap-content previews render at. */

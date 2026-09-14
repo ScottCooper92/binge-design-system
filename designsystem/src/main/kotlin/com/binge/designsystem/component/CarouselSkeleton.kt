@@ -60,7 +60,7 @@ fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CAR
         ) {
             items(numCards) {
                 // MediaCardSkeleton, not a bare poster plate: the row resolves to MediaCards, whose two-line
-                // title sits 46dp below the poster and moved every rail after this one when unreserved (#2107).
+                // title sits 46dp below the poster and moved every rail after this one when unreserved.
                 MediaCardSkeleton(Modifier.width(dimensionResource(R.dimen.card_width)))
             }
         }
@@ -105,7 +105,7 @@ fun HubScreenSkeleton(modifier: Modifier = Modifier) {
 
 /**
  * Placeholder for [DiscoverEntryRow], built on the same [ListRow] chrome rather than a hand-copied
- * clip/padding/gap — so the plate cannot drift from the row it stands in for (#1224).
+ * clip/padding/gap — so the plate cannot drift from the row it stands in for.
  */
 @Composable
 private fun DiscoverEntryRowSkeleton(modifier: Modifier = Modifier) {

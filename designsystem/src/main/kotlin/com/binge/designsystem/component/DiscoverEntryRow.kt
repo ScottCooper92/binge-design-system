@@ -33,7 +33,7 @@ import com.binge.designsystem.theme.titleMediumEmphasis
  * carrying a tinted discover glyph, a title/subtitle pair and a chevron.
  *
  * It is a Row, not a Card or a Tile (CLAUDE.md › Component taxonomy), and takes its chrome from
- * [ListRow] rather than re-rolling it (#1224). The gradient is the one thing the primitive's flat
+ * [ListRow] rather than re-rolling it. The gradient is the one thing the primitive's flat
  * `containerColor` cannot express, so it arrives through `containerBrush`; the corner is the shape
  * scale's `large`, not a bespoke radius.
  *

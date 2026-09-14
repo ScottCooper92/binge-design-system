@@ -11,7 +11,7 @@ private val BingeGold = Color(0xFFFFE082)
 
 /**
  * Tertiary accent — teal, amber's complement, so the scheme has a contrasting second hue rather
- * than the single amber family (issue #546). Light tone reads on white; dark tone on dark surfaces.
+ * than the single amber family. Light tone reads on white; dark tone on dark surfaces.
  */
 private val BingeTeal = Color(0xFF00796B)
 private val BingeTealLight = Color(0xFF4DB6AC)

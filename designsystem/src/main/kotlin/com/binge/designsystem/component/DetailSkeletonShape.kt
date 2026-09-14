@@ -5,7 +5,7 @@ package com.binge.designsystem.component
  *
  * The four detail screens share one placeholder, but they do not share one shape, and a skeleton drawn for
  * the wrong one is worse than none: it reserves space the arriving page does not want, so resolving is a
- * relayout (#1598). The shape is one enum rather than the television's two orthogonal parameters
+ * relayout. The shape is one enum rather than the television's two orthogonal parameters
  * (`TvDetailSkeletonHero` × `TvDetailSkeletonPeek`) because on the phone the differences are not
  * orthogonal — the person page differs in its header, in having no stat row, and in what follows, all at
  * once — so a parameter matrix would spell out combinations no screen has.
@@ -26,7 +26,7 @@ enum class DetailSkeletonShape {
     /**
      * Episode detail, signed out: hero → stats → overview, with nothing between. TMDB requires a session to
      * rate, so `EpisodeRatingCard` renders nothing at all for a signed-out user — not even its own leading
-     * spacer — and [Episode]'s plate would promise a card that page never fills (#1991). Which of the two the
+     * spacer — and [Episode]'s plate would promise a card that page never fills. Which of the two the
      * screen picks is a question about the *viewer*, not the episode, so it is answered from session state
      * rather than from the content being loaded.
      */

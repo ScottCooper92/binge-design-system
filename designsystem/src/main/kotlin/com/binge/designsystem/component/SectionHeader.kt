@@ -56,7 +56,7 @@ fun SectionHeader(
             )
             // Floored at the touch target, not just any height: M3 already expands the "More" TextButton to it, so
             // without the floor the same header renders 16dp shorter with no trailing action — adjacent rails on different
-            // rhythms, and no one height a skeleton could reserve for both (#2111). The carousel and detail skeletons reserve it.
+            // rhythms, and no one height a skeleton could reserve for both. The carousel and detail skeletons reserve it.
             .heightIn(min = dimensionResource(R.dimen.min_touch_target)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

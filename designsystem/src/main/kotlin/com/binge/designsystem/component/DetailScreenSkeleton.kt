@@ -35,7 +35,7 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * lands where the content does. Only that shape: the episode page has no cinematic variant —
  * `EpisodeHeaderBand` renders `DetailHero` at every width — so an `expanded`-only branch reserved the 460dp
  * `detail_cinematic_header_height` against the 480dp hero the page draws, and every band anchored below
- * `HERO` inherited the miss. #2032.
+ * `HERO` inherited the miss.
  *
  * Landing where the content does is a claim about **both** axes. Every resolved detail page caps its
  * reading column at `content_max_width` and centres it from a `BoxWithConstraints` of its own, so this
@@ -52,7 +52,7 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * height-limited split pane) simply never composited anything below the stat row: the three `phone-land`
  * baselines for Media, Episode and EpisodeSignedOut were byte-identical, despite the shapes differing
  * materially exactly there. That is a real device state, not only a screenshot artefact — the placeholder
- * had no way to reach the rest of itself. #2043.
+ * had no way to reach the rest of itself.
  */
 @Composable
 fun DetailScreenSkeleton(modifier: Modifier = Modifier, shape: DetailSkeletonShape = DetailSkeletonShape.Media) {
@@ -150,9 +150,9 @@ fun DetailScreenSkeleton(modifier: Modifier = Modifier, shape: DetailSkeletonSha
  * `PersonDetailContent` renders `BiographySection` only `if (state.person.biography.isNotBlank())` — and a
  * blank biography is not the exception: sampling TMDB, 27% of a popular film's top-billed cast have none,
  * 56% of its full cast, and 77% of its crew. Reserving 78dp of overview plates for it collapsed the page on
- * resolve for most of the people a user can actually tap through to (#1990).
+ * resolve for most of the people a user can actually tap through to.
  *
- * That leaves this shape reserving only what every person page has, which is the rule PR #1983 stated for
+ * That leaves this shape reserving only what every person page has, which is the rule already followed for
  * the gallery strip, the known-for rail and the external links — biography just was not held to it. The
  * cost is that a person who *does* have one gets no placeholder below the profile block; that grows the
  * page downward under a header that stays put, rather than yanking it up.

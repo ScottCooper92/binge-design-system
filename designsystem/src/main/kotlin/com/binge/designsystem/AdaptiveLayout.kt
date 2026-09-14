@@ -32,10 +32,10 @@ fun isLandscape(): Boolean = booleanResource(R.bool.binge_landscape)
  * Lists and Account.
  *
  * Two buckets resolve it, and the second exists because the first asks for the wrong thing.
- * `values-sw600dp-land` is the original: a landscape tablet. Its `land` came from #818, where a
+ * `values-sw600dp-land` is the original: a landscape tablet. Its `land` came from the case where a
  * 998x448dp landscape phone had the width for two panes and nowhere to put them — so orientation
  * was standing in for *height*, and it excluded the unfolded foldable, which is expanded and
- * portrait (~852x883dp), as collateral (#2395). `values-w840dp-h600dp` says it directly: >=840dp
+ * portrait (~852x883dp), as collateral. `values-w840dp-h600dp` says it directly: >=840dp
  * wide, Material's expanded-width breakpoint, and >=600dp tall. The landscape phone still misses
  * on its 448dp of height; the Fold no longer does.
  *

@@ -83,7 +83,7 @@ fun MediaCard(
                 scaleY = scale
             }.clickable(
                 // `detectTapGestures` is a gesture detector and `semantics { onClick }` an accessibility action;
-                // neither makes a focus target, so nothing navigating by focus could reach a poster (#2199). `clickable`
+                // neither makes a focus target, so nothing navigating by focus could reach a poster. `clickable`
                 // supplies focusability, and the interaction source hands the scale above the press signal it once read from the detector.
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
@@ -151,7 +151,8 @@ private fun MediaCardTitle(title: String) {
  *
  * The band is the point. A cell that reserved the poster alone measured 46dp short of the card replacing
  * it, and a grid's first cell keeps its corner whatever its height — so the check that compares positions
- * passed while every row below the first dropped on resolve (#2096, the shape #2079 found next door).
+ * passed while every row below the first dropped on resolve — the same shape found next door in the
+ * carousel skeleton.
  */
 @Composable
 fun MediaCardSkeleton(modifier: Modifier = Modifier) {

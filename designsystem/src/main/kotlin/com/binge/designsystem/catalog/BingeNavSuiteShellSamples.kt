@@ -132,7 +132,7 @@ fun BingeNavSuiteShellTabletRailOverArtworkSample() {
  * ramp mirrors with the panel. The rail moves to the physical right edge on its own (the shell's
  * `Alignment.TopStart` and the rail's `WindowInsetsSides.Start` padding are both direction-aware), so
  * an absolute left-to-right gradient would leave the near-solid stop on the side facing the content
- * and the fade under the glyphs. #2022.
+ * and the fade under the glyphs.
  */
 @Composable
 fun BingeNavSuiteShellTabletRailOverArtworkRtlSample() {
