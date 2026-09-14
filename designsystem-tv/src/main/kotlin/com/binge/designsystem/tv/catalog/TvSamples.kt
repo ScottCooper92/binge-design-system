@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,8 +34,16 @@ import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvButtonSurface
 import com.binge.designsystem.tv.component.TvCardRow
+import com.binge.designsystem.tv.component.TvExcludedMark
 import com.binge.designsystem.tv.component.TvMessagePlate
+import com.binge.designsystem.tv.component.TvQrCode
+import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvSectionTitle
+import com.binge.designsystem.tv.component.TvSelectedTick
+import com.binge.designsystem.tv.component.TvSelectedTickBadge
+import com.binge.designsystem.tv.component.TvVerticalDivider
+import com.binge.designsystem.tv.component.containerColor
+import com.binge.designsystem.tv.component.contentColor
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.BingeTvNavRail
 import com.binge.designsystem.tv.nav.TvNavRailItem
@@ -254,5 +263,86 @@ private fun FocusSampleTile(label: String, isFocused: Boolean) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = label, style = MaterialTheme.typography.titleMedium)
         }
+    }
+}
+
+/** The divider between two side-by-side panes, at the height its caller gives it. */
+@Composable
+fun TvVerticalDividerSample() {
+    Row(
+        modifier = Modifier.height(dimensionResource(DesR.dimen.card_height)).padding(dimensionResource(DesR.dimen.padding_l)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+    ) {
+        PaneSampleColumn("List")
+        TvVerticalDivider()
+        PaneSampleColumn("Detail")
+    }
+}
+
+/** All three emphases side by side: the pair is only judgeable against each other and the resting row. */
+@Composable
+fun TvRowEmphasisSample() {
+    Column(
+        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+    ) {
+        EmphasisSampleRow("Resting", TvRowEmphasis.Resting)
+        EmphasisSampleRow("Current, focus in the other pane", TvRowEmphasis.Current)
+        EmphasisSampleRow("Focused", TvRowEmphasis.Focused)
+    }
+}
+
+/** The three selection marks, including the badge that carries its own disc for use over artwork. */
+@Composable
+fun TvSelectedTickSample() {
+    Row(
+        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TvSelectedTick(tint = MaterialTheme.colorScheme.primary)
+        TvExcludedMark(tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        TvSelectedTickBadge()
+    }
+}
+
+/** A symbol at the size a panel shows it. The plate is white by specification, not by theme. */
+@Composable
+fun TvQrCodeSample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvQrCode(
+            content = "https://example.com/link?code=BINGE-1234",
+            contentDescription = "Scan to finish signing in",
+            modifier = Modifier.size(dimensionResource(DesR.dimen.card_height)),
+        )
+    }
+}
+
+@Composable
+private fun PaneSampleColumn(label: String) {
+    Box(
+        modifier = Modifier.width(dimensionResource(DesR.dimen.card_width)).fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = label, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+@Composable
+private fun EmphasisSampleRow(label: String, emphasis: TvRowEmphasis) {
+    Box(
+        modifier =
+            Modifier
+                .width(dimensionResource(TvR.dimen.tv_message_plate_max_width))
+                .background(
+                    emphasis.containerColor(resting = MaterialTheme.colorScheme.surface),
+                    BingeShapes.TvListItem,
+                ).padding(dimensionResource(DesR.dimen.padding_m)),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleSmall,
+            color = emphasis.contentColor(resting = MaterialTheme.colorScheme.onSurface),
+        )
     }
 }

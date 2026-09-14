@@ -47,6 +47,26 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun verticalDivider() = Frame { TvVerticalDividerSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun rowEmphasis() = Frame { TvRowEmphasisSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun selectedTick() = Frame { TvSelectedTickSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun qrCode() = Frame { TvQrCodeSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun navRailExpanded() = Frame { TvNavRailSample(expanded = true) }
 
     @PreviewTest
