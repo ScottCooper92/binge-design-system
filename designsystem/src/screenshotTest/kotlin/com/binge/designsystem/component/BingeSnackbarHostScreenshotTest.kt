@@ -6,8 +6,9 @@ import com.binge.designsystem.preview.ComponentPreviews
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * The dark snackbar pill across its three forms — message-only, with an accent action, and with a
- * trailing dismiss icon — on the light + dark colour axis.
+ * The snackbar pill's dimensional cases on the light + dark colour axis: one line and two, each with
+ * a trailing control and without one. The catalog samples carry the public one-line fixtures, so what
+ * is here is the heights — 48dp where the button governs, 68dp where the message does.
  *
  * Targets the stateless [BingeSnackbar] directly: an M3 [androidx.compose.material3.SnackbarHost]
  * is empty at frame 0, so [BingeSnackbarHost] itself would screenshot blank.
