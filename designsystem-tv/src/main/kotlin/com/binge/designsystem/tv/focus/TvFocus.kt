@@ -241,10 +241,12 @@ fun Modifier.tvExitFocusGroup(): Modifier =
  * frame/time budget the shell's drill-down handoff uses.
  */
 suspend fun offerTvArrivalFocus(target: FocusRequester, taken: () -> Boolean) {
-    val deadline = SystemClock.uptimeMillis() + ARRIVAL_TIMEOUT_MS
-    repeat(ARRIVAL_FRAMES) {
+    val deadline = SystemClock.uptimeMillis() + FOCUS_OFFER_TIMEOUT_MS
+    repeat(FOCUS_OFFER_FRAMES) {
         if (taken() || SystemClock.uptimeMillis() > deadline) return
-        runCatching { target.requestFocus() }
+        // Deliberately not stopping on the granted request: [taken] is the caller's own "my subtree holds it"
+        // and is strictly better informed, because a grant can still be reassigned within the same frame.
+        target.tryRequestFocus()
         withFrameNanos { }
     }
 }
@@ -254,18 +256,39 @@ suspend fun offerTvArrivalFocus(target: FocusRequester, taken: () -> Boolean) {
  * nav package's callers: a frame count to ride "retry when the content changes", a time cap so a
  * static destination cannot keep the loop alive past its window.
  */
-private const val ARRIVAL_FRAMES = 600
-private const val ARRIVAL_TIMEOUT_MS = 3_000L
+private const val FOCUS_OFFER_FRAMES = 600
+private const val FOCUS_OFFER_TIMEOUT_MS = 3_000L
 
 /**
- * Restore focus to [target] one frame after an overlay's nodes are disposed — the close half of every
- * sheet/panel round trip. An inline request on the close is swallowed by the still-composed,
- * focus-trapped overlay (the `TvDiscoverScreen` ordering), so the one-frame wait is load-bearing: it
- * lets the disposal land before the request. Six screens re-derived these two lines before this.
+ * Requests focus and answers whether it was granted, without letting a sentinel requester throw.
+ *
+ * `requestFocus()` returns `false` for a requester with no attached node — it prints a warning and does **not**
+ * throw (`FocusRequester.findFocusTarget`, Compose UI 1.12); only [FocusRequester.Default] and
+ * [FocusRequester.Cancel] `check`. So the `runCatching` that wrapped every call site here was discarding a
+ * *result*, not catching an exception, and every one of those discards was a retry thrown away.
  */
-suspend fun restoreTvOverlayFocus(target: FocusRequester) {
+private fun FocusRequester.tryRequestFocus(): Boolean = runCatching { requestFocus() }.getOrDefault(false)
+
+/**
+ * Offer focus back to [target] until it is granted — the close half of every sheet/panel round trip, and the
+ * return half of an overlay pop.
+ *
+ * **Offered, not fired once, because one frame is reliably too early**: the outgoing surface stays composed and
+ * focus-trapped for its whole exit transition, and a trap *cancels* a request from outside it, so a single shot
+ * into that window cannot succeed however well timed (#2517). Stopping on the grant rather than on a caller
+ * predicate means it cannot fight a user who got there first. Bounded in wall-clock as well as frames.
+ *
+ * @return whether focus was granted within the budget; `false` means the target never attached.
+ */
+suspend fun restoreTvOverlayFocus(target: FocusRequester): Boolean {
     withFrameNanos { }
-    runCatching { target.requestFocus() }
+    val deadline = SystemClock.uptimeMillis() + FOCUS_OFFER_TIMEOUT_MS
+    repeat(FOCUS_OFFER_FRAMES) {
+        if (target.tryRequestFocus()) return true
+        if (SystemClock.uptimeMillis() > deadline) return false
+        withFrameNanos { }
+    }
+    return false
 }
 
 /**
