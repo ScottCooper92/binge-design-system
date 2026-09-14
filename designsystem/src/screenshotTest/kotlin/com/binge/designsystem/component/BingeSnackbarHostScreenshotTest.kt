@@ -49,7 +49,7 @@ class BingeSnackbarHostScreenshotTest {
     }
 
     /**
-     * Two lines *and* a trailing control — the combination nothing had rendered (#24). The message
+     * Two lines *and* a trailing control — the combination nothing had rendered. The message
      * carries the pill to 68dp while the button keeps its own 48dp, so this is the frame that shows
      * what `CenterVertically` does with the two of them.
      */
