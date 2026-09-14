@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
 import androidx.window.testing.layout.FoldingFeature as posedFold
 
 /**
- * That [BingeBottomSheet] really shrinks in the tabletop posture (#819).
+ * That [BingeBottomSheet] really shrinks in the tabletop posture.
  *
  * The arithmetic is [com.binge.designsystem.FoldSafeBottomHeightTest]'s; what is unproven
  * without rendering is the wiring — `ModalBottomSheet` composes the caller's `Modifier` alongside its

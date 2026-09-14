@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the include/exclude-chip catalog sample — renders the shared
- * [IncludeExcludeChipStatesSample] (all three states) (#745, #749).
+ * [IncludeExcludeChipStatesSample] (all three states).
  */
 class IncludeExcludeChipSamplesScreenshotTest {
     @PreviewTest

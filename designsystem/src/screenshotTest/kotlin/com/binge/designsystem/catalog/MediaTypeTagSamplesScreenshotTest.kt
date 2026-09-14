@@ -5,8 +5,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
 /**
- * Screenshot coverage for the media-type-tag catalog sample — renders the shared [MediaTypeTagSample]
- * (#745, #749).
+ * Screenshot coverage for the media-type-tag catalog sample — renders the shared [MediaTypeTagSample].
  */
 class MediaTypeTagSamplesScreenshotTest {
     @PreviewTest

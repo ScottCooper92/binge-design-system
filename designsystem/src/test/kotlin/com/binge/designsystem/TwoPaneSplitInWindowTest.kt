@@ -12,7 +12,7 @@ private val DEFAULT_GAP = 16.dp
 private val MIN_PANE = 200.dp
 
 /**
- * Translating a window-reported hinge into an inset row's own coordinate space (#2280).
+ * Translating a window-reported hinge into an inset row's own coordinate space.
  *
  * [TwoPaneSplitTest] covers where the boundary goes once both are in the same space; this covers
  * getting them into the same space, which is where the two edges of an asymmetric inset can be

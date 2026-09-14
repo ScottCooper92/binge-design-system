@@ -5,8 +5,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
 /**
- * Screenshot coverage for the code-badge catalog sample — renders the shared [BingeCodeBadgeSample]
- * (#745, #749).
+ * Screenshot coverage for the code-badge catalog sample — renders the shared [BingeCodeBadgeSample].
  */
 class BingeCodeBadgeSamplesScreenshotTest {
     @PreviewTest

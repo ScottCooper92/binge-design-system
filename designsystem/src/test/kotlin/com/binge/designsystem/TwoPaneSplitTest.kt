@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 /**
- * The hinge-aware two-pane split (#819).
+ * The hinge-aware two-pane split.
  *
  * The first test is the load-bearing one: every phone, tablet and flat-open foldable reports no
  * separating fold, so if that case ever stopped returning the defaults this feature would silently

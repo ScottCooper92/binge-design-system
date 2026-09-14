@@ -12,7 +12,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
  *
  * [LongCollapsed] seeds `initiallyOverflowing`, without which the toggle it is named for never
  * reached the frame: overflow is only reported by `onTextLayout`, one composition too late for the
- * preview lane to capture (#2291).
+ * preview lane to capture.
  */
 class ExpandableOverviewScreenshotTest {
     @PreviewTest

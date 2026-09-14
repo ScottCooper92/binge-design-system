@@ -11,7 +11,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 /**
  * Primary filled button — enabled and disabled across the colour axis. The `Loading` state renders
  * the shared public [FilledButtonLoadingSample] that the catalog's `CatalogButtonLoading` preview
- * also calls, so the two share one source (#745); the enabled/disabled states stay inline as they
+ * also calls, so the two share one source; the enabled/disabled states stay inline as they
  * carry no catalog entry.
  */
 class BingeFilledButtonScreenshotTest {

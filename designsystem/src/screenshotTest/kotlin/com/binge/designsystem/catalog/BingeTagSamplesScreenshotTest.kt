@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the tag catalog samples — renders the shared [BingeTagNeutralSample] and
- * [BingeTagTintedSample] (#745, #749).
+ * [BingeTagTintedSample].
  */
 class BingeTagSamplesScreenshotTest {
     @PreviewTest

@@ -7,7 +7,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 /**
  * Screenshot coverage for the filter-chip catalog samples — renders the shared
  * [BingeFilterChipFamilySample] and [BingeFilterChipDisabledSample], the component's public
- * fixtures (#745, #749).
+ * fixtures.
  */
 class BingeFilterChipSamplesScreenshotTest {
     @PreviewTest

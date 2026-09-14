@@ -20,12 +20,12 @@ class HeroCarouselSamplesScreenshotTest {
     }
 
     /**
-     * The regression guard for `HeroScrims`' direction-aware side ramp (#2022). The copy it darkens is
+     * The regression guard for `HeroScrims`' direction-aware side ramp. The copy it darkens is
      * `Alignment.BottomStart` and mirrors, so an absolute `Brush.horizontalGradient` would leave the
      * dense end of the vignette on the side the copy just left. One cell rather than the full
      * `@ComponentPreviews` matrix: the fault is a mirrored ramp, which every cell would show identically
      * — and it shows over the flat placeholder, since `validateDebugScreenshotTest` diffs pixels
-     * exactly. #2065.
+     * exactly.
      */
     @PreviewTest
     @Preview(name = "rtl", widthDp = HERO_RTL_PREVIEW_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)

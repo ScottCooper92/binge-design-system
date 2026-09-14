@@ -5,7 +5,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
 /**
- * Screenshot coverage for the containers / chrome catalog samples (#752). Each renders the shared
+ * Screenshot coverage for the containers / chrome catalog samples. Each renders the shared
  * `…Sample()`, the component's one public fixture. See the convention KDoc on [MediaCardRatedSample].
  */
 class BingeSheetFooterSamplesScreenshotTest {

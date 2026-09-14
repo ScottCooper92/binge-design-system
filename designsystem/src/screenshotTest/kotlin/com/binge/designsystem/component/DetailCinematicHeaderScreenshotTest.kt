@@ -18,11 +18,11 @@ private const val CINEMATIC_PREVIEW_WIDTH_DP = 900
  * column. Rendered at an expanded (~900dp) canvas because the component is for the side-pane / tablet
  * detail; the phone-only shared multipreviews don't reach that width.
  *
- * The RTL cell is the regression guard for `CinematicSideScrim`'s direction-aware ramp (#2022): the
+ * The RTL cell is the regression guard for `CinematicSideScrim`'s direction-aware ramp: the
  * scrim is start-anchored, so an absolute `Brush.horizontalGradient` would put its dense end under the
  * end of the backdrop instead of behind the poster and copy. Nothing here needs artwork for that to
  * bite — `validateDebugScreenshotTest` diffs pixels exactly, so the ramp reverses visibly over the flat
- * placeholder too. #2065.
+ * placeholder too.
  */
 class DetailCinematicHeaderScreenshotTest {
     @PreviewTest

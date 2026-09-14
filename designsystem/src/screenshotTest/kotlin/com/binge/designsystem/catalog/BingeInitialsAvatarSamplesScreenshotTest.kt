@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
-/** Screenshot coverage for the [BingeInitialsAvatar][com.binge.designsystem.component.BingeInitialsAvatar] catalog sample (#750). */
+/** Screenshot coverage for the [BingeInitialsAvatar][com.binge.designsystem.component.BingeInitialsAvatar] catalog sample. */
 class BingeInitialsAvatarSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews

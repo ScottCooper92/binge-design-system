@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 private const val PAGE_TAG = "pager-page"
 
 /**
- * Regression guard for #1436's stale-capture fix in [BingeFilterChipPager] (#1458).
+ * Regression guard for the stale-capture fix in [BingeFilterChipPager].
  *
  * The settled-swipe effect is keyed only on the pager state, so its `collect` lambda outlives its
  * launching composition. Before the fix it compared each settled page against the `selectedIndex`

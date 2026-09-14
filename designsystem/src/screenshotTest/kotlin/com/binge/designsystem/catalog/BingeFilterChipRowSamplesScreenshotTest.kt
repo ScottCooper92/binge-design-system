@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the filter-chip-row catalog samples — renders the shared
- * [BingeFilterChipRowSample] and [BingeFilterChipPagerSample] (#745, #749).
+ * [BingeFilterChipRowSample] and [BingeFilterChipPagerSample].
  */
 class BingeFilterChipRowSamplesScreenshotTest {
     @PreviewTest

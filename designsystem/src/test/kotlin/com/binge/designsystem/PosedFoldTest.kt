@@ -22,7 +22,7 @@ import androidx.window.testing.layout.FoldingFeature as posedFold
  * `androidx.window:window-testing` publishes a `WindowLayoutInfo` through the same
  * `WindowInfoTracker` the production code subscribes to, which is what makes the folded branch
  * reachable from the JVM at all — [VerticalHingeTest] covers only the null answer every non-foldable
- * window gives. It is not the device pass #819 asks for: this proves the filter, the axis and the
+ * window gives. It is not the device pass still owed: this proves the filter, the axis and the
  * pixel-to-dp conversion, not that real hardware reports the bounds assumed here.
  *
  * Every test asserts a hinge is *seen* before asserting one is absent. The publisher's flow does not

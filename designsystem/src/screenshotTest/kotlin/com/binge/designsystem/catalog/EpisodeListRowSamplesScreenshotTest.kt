@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
-/** Screenshot coverage for the [EpisodeListRow] catalog samples (#751). */
+/** Screenshot coverage for the [EpisodeListRow] catalog samples. */
 class EpisodeListRowSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
