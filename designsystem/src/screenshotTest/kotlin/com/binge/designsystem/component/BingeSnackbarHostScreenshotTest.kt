@@ -47,6 +47,42 @@ class BingeSnackbarHostScreenshotTest {
         }
     }
 
+    /**
+     * Two lines *and* a trailing control — the combination nothing had rendered (#24). The message
+     * carries the pill to 68dp while the button keeps its own 48dp, so this is the frame that shows
+     * what `CenterVertically` does with the two of them.
+     */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TwoLineWithAction() {
+        ScreenshotTheme {
+            BingeSnackbar(
+                message = "Couldn't add that to your watchlist because your session has expired. Sign in again.",
+                actionLabel = "Sign in",
+                onActionClick = {},
+                showDismissAction = false,
+                onDismiss = {},
+            )
+        }
+    }
+
+    /** And the same against the dismiss icon, whose 48dp target is squarer than the text button's. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TwoLineWithDismiss() {
+        ScreenshotTheme {
+            BingeSnackbar(
+                message = "Couldn't add that to your watchlist because your session has expired. Sign in again.",
+                actionLabel = null,
+                onActionClick = {},
+                showDismissAction = true,
+                onDismiss = {},
+            )
+        }
+    }
+
     @PreviewTest
     @ComponentPreviews
     @Composable
