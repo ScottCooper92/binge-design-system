@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.tv.material3.ColorScheme
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.DarkBingeColors
 import com.binge.designsystem.theme.LocalBingeColors
@@ -22,19 +23,27 @@ import com.binge.designsystem.theme.systemReduceMotion
  * [LocalBingeColors] and [LocalReduceMotion] are re-provided here because they are plain token
  * CompositionLocals rather than Material 3 types — they carry across the seam unchanged.
  *
+ * [colorScheme] defaults to Binge's. An app with its own brand passes
+ * `itsDarkScheme.toTvColorScheme()`, so its TV surface takes the same accent its phone screens do —
+ * the focus fills and rings are drawn from `primary`, so nothing else has to be threaded through.
+ *
  * [reduceMotion] defaults to the system setting rather than `false`: that old default was the whole of a motion-sickness bug,
  * where no call site passed anything so `LocalReduceMotion` was permanently `false` on a TV and every gate
  * against it was dead code that read as working. Reading the setting here keeps a call site from having to
  * remember; a screenshot theme still overrides it to pin the reduced branch.
  */
 @Composable
-fun BingeTvTheme(reduceMotion: Boolean = systemReduceMotion(), content: @Composable () -> Unit) {
+fun BingeTvTheme(
+    reduceMotion: Boolean = systemReduceMotion(),
+    colorScheme: ColorScheme = BingeTvColorScheme,
+    content: @Composable () -> Unit,
+) {
     CompositionLocalProvider(
         LocalBingeColors provides DarkBingeColors,
         LocalReduceMotion provides reduceMotion,
     ) {
         MaterialTheme(
-            colorScheme = BingeTvColorScheme,
+            colorScheme = colorScheme,
             shapes = BingeTvShapes,
             typography = BingeTvTypography,
             content = content,

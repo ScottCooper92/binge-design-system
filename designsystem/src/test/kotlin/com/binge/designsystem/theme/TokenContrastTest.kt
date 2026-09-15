@@ -75,13 +75,34 @@ class TokenContrastTest {
     @TestFactory
     fun `every token pair clears its WCAG threshold in light and dark`(): List<DynamicTest> =
         (pairsFor("light", LightBingeColors, LightColorScheme) + pairsFor("dark", DarkBingeColors, DarkColorScheme))
-            .map { p ->
-                DynamicTest.dynamicTest(p.name) {
-                    val ratio = contrast(p.fg, p.bg)
-                    assertTrue(
-                        ratio >= p.min,
-                        "${p.name}: contrast ${"%.2f".format(ratio)}:1 is below the ${p.min}:1 minimum",
-                    )
-                }
-            }
+            .map(::asTest)
+
+    /**
+     * A scheme that is not Binge's, held to the same thresholds.
+     *
+     * [BingeBrand] lets an app render the shared components in its own accent, and this is what says
+     * the harness measures a scheme rather than Binge's constants: the pairs come from whatever
+     * scheme is handed in. An indigo stands in for a consumer's brand because it is the case that
+     * bites — the hue an app picks off its own icon is usually too dark to be `primary`, and the
+     * lighter step of it that clears 4.5:1 is the one it has to ship.
+     */
+    @TestFactory
+    fun `a consumer's own scheme is held to the same thresholds`(): List<DynamicTest> =
+        (
+            pairsFor("consumer light", LightBingeColors, consumerLight) +
+                pairsFor("consumer dark", DarkBingeColors, consumerDark)
+        ).map(::asTest)
+
+    private val consumerLight = LightColorScheme.copy(primary = Color(0xFF4F46E5), onPrimary = Color.White)
+
+    private val consumerDark = DarkColorScheme.copy(primary = Color(0xFF818CF8), onPrimary = Color(0xFF1E1B4B))
+
+    private fun asTest(p: Pair): DynamicTest =
+        DynamicTest.dynamicTest(p.name) {
+            val ratio = contrast(p.fg, p.bg)
+            assertTrue(
+                ratio >= p.min,
+                "${p.name}: contrast ${"%.2f".format(ratio)}:1 is below the ${p.min}:1 minimum",
+            )
+        }
 }
