@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
@@ -119,17 +117,10 @@ private fun ConfirmActions(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BingeOutlinedButton(label = dismissLabel, onClick = onDismiss)
-        val containerColor: Color =
-            if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-        val contentColor: Color =
-            if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary
         BingeFilledButton(
             label = confirmLabel,
             onClick = onConfirm,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = containerColor,
-                contentColor = contentColor,
-            ),
+            destructive = destructive,
         )
     }
 }
