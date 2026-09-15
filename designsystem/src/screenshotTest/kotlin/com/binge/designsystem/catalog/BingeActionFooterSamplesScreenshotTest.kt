@@ -8,12 +8,12 @@ import com.binge.designsystem.preview.ComponentPreviews
  * Screenshot coverage for the containers / chrome catalog samples. Each renders the shared
  * `…Sample()`, the component's one public fixture. See the convention KDoc on [MediaCardRatedSample].
  */
-class BingeSheetFooterSamplesScreenshotTest {
+class BingeActionFooterSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun Footer() {
-        BingeSheetFooterSample()
+        BingeActionFooterSample()
     }
 
     /** The band's absence is the thing under test, so it needs its own frame beside [Footer]. */
@@ -21,6 +21,6 @@ class BingeSheetFooterSamplesScreenshotTest {
     @ComponentPreviews
     @Composable
     fun FooterOnPage() {
-        BingeSheetFooterOnPageSample()
+        BingeActionFooterOnPageSample()
     }
 }
