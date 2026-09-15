@@ -59,3 +59,20 @@ fun OutlinedButtonDestructiveSample() {
         }
     }
 }
+
+/**
+ * The same pair on the filled button, where the tone moves the container rather than the label.
+ * Framed separately from the outlined pair because a filled error button is the louder of the two
+ * and the one a caller is most likely to reach for by passing colours by hand.
+ */
+@Composable
+fun FilledButtonDestructiveSample() {
+    ScreenshotTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            BingeFilledButton(label = "Keep", onClick = {})
+            BingeFilledButton(label = "Delete files", onClick = {}, destructive = true)
+        }
+    }
+}

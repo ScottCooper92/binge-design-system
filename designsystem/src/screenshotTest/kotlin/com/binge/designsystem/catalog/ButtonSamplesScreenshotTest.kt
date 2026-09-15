@@ -23,4 +23,11 @@ class ButtonSamplesScreenshotTest {
     fun Destructive() {
         OutlinedButtonDestructiveSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun DestructiveFilled() {
+        FilledButtonDestructiveSample()
+    }
 }
