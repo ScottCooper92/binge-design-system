@@ -7,9 +7,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
@@ -45,12 +49,7 @@ fun BingeBottomSheet(
         onDismissRequest = onDismissRequest,
         // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
         modifier = foldSafeHeight?.let { modifier.heightIn(max = it) } ?: modifier,
-        sheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = skipPartiallyExpanded,
-            // Material3 1.4.0 has no `sheetGesturesEnabled` flag, so vetoing every value change
-            // away from Expanded is what pins the locked sheet against drag-to-dismiss/collapse.
-            confirmValueChange = { target -> gesturesEnabled || target == SheetValue.Expanded },
-        ),
+        sheetState = rememberLockableSheetState(skipPartiallyExpanded, gesturesEnabled),
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         contentColor = MaterialTheme.colorScheme.onSurface,
         shape = RoundedCornerShape(
@@ -65,5 +64,30 @@ fun BingeBottomSheet(
             shouldDismissOnClickOutside = dismissOnClickOutside,
         ),
         content = content,
+    )
+}
+
+/**
+ * A [SheetState] whose lock can be toggled without the sheet moving.
+ *
+ * Material 3 still has no `sheetGesturesEnabled` flag, so vetoing every value change away from
+ * `Expanded` is what pins a locked sheet against drag-to-dismiss and partial collapse. The catch is
+ * where that veto goes: `rememberSheetState` passes `confirmValueChange` as a `rememberSaveable`
+ * **input key** (confirmed in material3 1.5.0-alpha27's bytecode), so a lambda that captures
+ * `gesturesEnabled` gets a new identity when the flag flips, the key changes, the saved state is
+ * discarded, and a fresh `SheetState` is built at its initial value — `Hidden`. The sheet then
+ * animates back up. The veto meant to pin the sheet was what unpinned it, once per lock.
+ *
+ * So the lambda is created once and reads the flag through [rememberUpdatedState] instead. Same
+ * rule, stable identity.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gesturesEnabled: Boolean): SheetState {
+    val locked by rememberUpdatedState(!gesturesEnabled)
+    val confirmValueChange = remember { { target: SheetValue -> !locked || target == SheetValue.Expanded } }
+    return rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded,
+        confirmValueChange = confirmValueChange,
     )
 }
