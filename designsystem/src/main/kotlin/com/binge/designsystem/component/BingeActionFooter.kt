@@ -15,12 +15,12 @@ import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 /**
- * A primary full-width CTA pinned below a surface's content, in a band of that surface's own colour.
+ * A primary full-width CTA pinned below its host's content, in a band of the host's own colour.
  *
- * Written for [androidx.compose.material3.ModalBottomSheet], and now used on a page too, where both
- * defaults have to be overridden: [containerColor] to `Color.Transparent` so the host's surface shows
- * through instead of a lighter band with a hard edge, and [bottomPadding] to zero where the host has
- * already inset its own content.
+ * The defaults are a [androidx.compose.material3.ModalBottomSheet]'s, which is what it was written
+ * for: [containerColor] matches the sheet's container so the band is invisible against it. A page
+ * overrides both — `Color.Transparent` so its own surface shows through rather than a lighter band
+ * with a hard edge, and [bottomPadding] to zero where its scaffold has already inset the content.
  *
  * [bottomPadding] is spacing, not a safe area. A sheet's own `contentWindowInsets` already applies
  * `safeDrawing` around its content — `BottomSheet` calls `windowInsetsPadding` with it — so this
@@ -28,7 +28,7 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * twice. The KDoc used to say safe-area, which is what made a page stack three bottom paddings.
  */
 @Composable
-fun BingeSheetFooter(
+fun BingeActionFooter(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -57,8 +57,8 @@ fun BingeSheetFooter(
 
 @Preview(showBackground = true)
 @Composable
-private fun PreviewBingeSheetFooter() {
+private fun PreviewBingeActionFooter() {
     BingeExpressiveTheme {
-        BingeSheetFooter(label = "Show results", onClick = {})
+        BingeActionFooter(label = "Show results", onClick = {})
     }
 }
