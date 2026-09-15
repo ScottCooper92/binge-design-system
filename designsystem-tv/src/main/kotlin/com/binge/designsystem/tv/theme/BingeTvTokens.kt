@@ -24,7 +24,11 @@ import androidx.compose.material3.ColorScheme as M3ColorScheme
  */
 val BingeTvColorScheme: ColorScheme = DarkColorScheme.toTvColorScheme()
 
-private fun M3ColorScheme.toTvColorScheme(): ColorScheme =
+/**
+ * The projection [BingeTvColorScheme] is built with, public so an app with its own brand can build
+ * its TV scheme the same way rather than re-deciding which slots move.
+ */
+fun M3ColorScheme.toTvColorScheme(): ColorScheme =
     darkColorScheme(
         primary = primary,
         onPrimary = onPrimary,
