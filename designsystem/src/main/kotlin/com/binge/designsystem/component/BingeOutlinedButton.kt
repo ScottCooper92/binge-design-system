@@ -17,7 +17,14 @@ import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
-/** Outlined counterpart of [BingeFilledButton], sharing its loading contract. */
+/**
+ * Outlined counterpart of [BingeFilledButton], sharing its loading contract.
+ *
+ * [destructive] names what a caller otherwise says by passing an error [contentColor]: this control
+ * commits or opens something irreversible. Naming it keeps the colour in one place, and keeps the
+ * next destructive button from quietly defaulting to `primary` — which is how a repository ends up
+ * with an error-toned confirmation behind a neutral trigger.
+ */
 @Composable
 fun BingeOutlinedButton(
     label: String,
@@ -25,7 +32,8 @@ fun BingeOutlinedButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     loading: Boolean = false,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
+    destructive: Boolean = false,
+    contentColor: Color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
 ) {
     OutlinedButton(
         // Swallow taps while loading so the in-flight action can't be re-triggered,
