@@ -43,3 +43,19 @@ fun FilledButtonLoadingSample() {
         )
     }
 }
+
+/**
+ * A destructive outlined button beside an ordinary one. The pair is the sample: the tone only means
+ * anything against the button it is not.
+ */
+@Composable
+fun OutlinedButtonDestructiveSample() {
+    ScreenshotTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            BingeOutlinedButton(label = "Keep", onClick = {})
+            BingeOutlinedButton(label = "Delete files", onClick = {}, destructive = true)
+        }
+    }
+}

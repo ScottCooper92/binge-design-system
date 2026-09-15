@@ -1,6 +1,5 @@
 package com.binge.designsystem.catalog
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -24,14 +23,14 @@ fun TextButtonDisabledSample() {
     }
 }
 
-/** Error-tone text button — a destructive action recoloured via `contentColor`. */
+/** A destructive text button, which is the error tone named rather than passed as a colour. */
 @Composable
 fun TextButtonErrorSample() {
     ScreenshotTheme {
         BingeTextButton(
             label = "Cancel request",
             onClick = {},
-            contentColor = MaterialTheme.colorScheme.error,
+            destructive = true,
         )
     }
 }

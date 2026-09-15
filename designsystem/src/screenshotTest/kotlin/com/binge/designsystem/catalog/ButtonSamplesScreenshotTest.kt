@@ -16,4 +16,11 @@ class ButtonSamplesScreenshotTest {
     fun Family() {
         ButtonFamilySample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Destructive() {
+        OutlinedButtonDestructiveSample()
+    }
 }
