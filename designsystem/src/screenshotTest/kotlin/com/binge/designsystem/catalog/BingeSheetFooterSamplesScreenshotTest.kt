@@ -15,4 +15,12 @@ class BingeSheetFooterSamplesScreenshotTest {
     fun Footer() {
         BingeSheetFooterSample()
     }
+
+    /** The band's absence is the thing under test, so it needs its own frame beside [Footer]. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun FooterOnPage() {
+        BingeSheetFooterOnPageSample()
+    }
 }
