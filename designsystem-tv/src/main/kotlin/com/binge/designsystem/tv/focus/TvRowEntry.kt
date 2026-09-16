@@ -13,8 +13,9 @@ import androidx.compose.ui.focus.focusRequester
 /**
  * The remembered-entry-cell focus contract shared by the detail and hub rows (`TvCardRow`, `TvMediaRow`), the TV
  * detail/gallery/cast grids and search: returning to a container lands on the cell that last held focus, and a
- * fresh one opens on its first — never a geometric pick, never a trailing see-all tile (outside the item list, so
- * it never carries the requester). This is **the** TV focus-memory contract. Each of its four
+ * fresh one opens on its first — never a geometric pick. A container may fold a trailing tile (a see-all, say)
+ * into its own entry-index space, in which case that tile is a cell like any other and can carry the requester;
+ * `TvCardRow`'s trailing tile does. This is **the** TV focus-memory contract. Each of its four
  * invariants below has been broken in practice, on one surface or another, which is why they are pinned once in
  * `TvRowEntryContractTest`:
  *
