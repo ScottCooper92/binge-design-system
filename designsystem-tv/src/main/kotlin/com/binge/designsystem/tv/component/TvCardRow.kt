@@ -78,6 +78,11 @@ fun <T> TvCardRow(
     // its most-used focus state uncoverable rather than merely uncovered. Same seed as TvButton, and the same
     // reason: focus is a parameter, see docs/tv-foundation.md.
     initiallyFocusedKey: Any? = null,
+    // Steers entry from outside the row's own self-memory — the same override rememberTvRowEntry takes, for a
+    // caller that knows better than the row's last blur where entry belongs (a gallery strip returning from the
+    // viewer to the image it was left on, which may not be the cell that was last focused before the push).
+    // Null in production elsewhere: everything else trusts the row's own memory.
+    overrideIndex: Int? = null,
     trailing: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit)? = null,
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit,
 ) {
@@ -88,7 +93,7 @@ fun <T> TvCardRow(
     val trailingIndex = items.size
     // The cell entry returns to — the shared remembered-cell contract (survives blur and the LazyColumn
     // scroll-out disposal). Seed the row state to it so it is laid out before entry arrives.
-    val entry = rememberTvRowEntry(if (trailing != null) trailingIndex + 1 else trailingIndex)
+    val entry = rememberTvRowEntry(if (trailing != null) trailingIndex + 1 else trailingIndex, overrideIndex = overrideIndex)
     val rowState = rememberLazyListState(initialFirstVisibleItemIndex = entry.entryIndex)
     // Start is the in-pane content gutter (inset + gutter under the overlay rail), end the panel's overscan.
     // The row is full panel width, so cells scrolled off the front pass *under* the rail rather than clipping
