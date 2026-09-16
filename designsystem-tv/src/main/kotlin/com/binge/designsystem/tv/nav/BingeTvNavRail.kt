@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +33,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,7 @@ import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
 import com.binge.designsystem.tv.focus.tvSelectionFocusGroup
+import com.binge.designsystem.tv.focus.tvStartDirectionKey
 import kotlinx.coroutines.withTimeoutOrNull
 import com.binge.designsystem.tv.R as TvR
 
@@ -113,9 +119,14 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
  * bookkeeping. Read-only mirror; the rail steers its own expansion off the internal flag.
  *
  * [contentFocusRequester], when supplied, *is* the requester aimed at the content [focusGroup] — the same node
- * the rail's own startup handoff targets. The shell holds it so it can restore focus to the content group after
- * a full-screen overlay pops (`restoreTvOverlayFocus`), landing the user back on the browse pane rather than the
- * rail. Default `null` keeps a private requester, exactly as [railFocusRequester] does for the rail side.
+ * the rail's own startup handoff and [overlayEpoch]'s handoff both target. Default `null` keeps a private
+ * requester, exactly as [railFocusRequester] does for the rail side.
+ *
+ * [overlayEpoch] is bumped by an owner each time a full-screen overlay closes (a shell hoisted above the entry
+ * an overlay disposes, #2519) — a third depth-style signal alongside [contentDepth], read the same way: any
+ * change means the pane just came back fresh, focus-dead, and needs the same sequenced offer the push side
+ * gets, not a one-shot request into an entry the incoming skeleton hasn't grown yet. Left at its default the
+ * rail never re-hands focus after a pop — the old behaviour.
  */
 @Composable
 fun BingeTvNavRail(
@@ -134,6 +145,7 @@ fun BingeTvNavRail(
     // path replay needs a canonical scroll position at arrival (`TvDpadReachability` assumes one).
     itemsScrollState: ScrollState = rememberScrollState(),
     artworkBehind: Boolean? = null,
+    overlayEpoch: Int = 0,
     content: @Composable () -> Unit,
 ) {
     // The rail's entry point: whichever item is selected. Used for the three ways focus arrives here — the ←
@@ -143,6 +155,12 @@ fun BingeTvNavRail(
     val contentFocus = contentFocusRequester ?: remember { FocusRequester() }
     var railHasFocus by remember { mutableStateOf(false) }
     var contentHasFocus by remember { mutableStateOf(false) }
+    // Set by `onPreviewKeyEvent` below on every key, true only for the one that moves toward the rail — so
+    // [userMovedToRail] is true exactly while the rail holds focus *because of* that press, and false the
+    // instant either condition lifts: focus leaving the rail, or a later key overwriting this with `false`.
+    var lastKeyWasStartDirectionKey by remember { mutableStateOf(false) }
+    val userMovedToRail by remember { derivedStateOf { railHasFocus && lastKeyWasStartDirectionKey } }
+    val startDirectionKey = tvStartDirectionKey()
 
     // Focus starts in the content, not the rail — requesting it on mount opened the app rail-focused over the start destination.
     // The content `focusGroup` delegates to its first child (the startup hand-off in `docs/tv-foundation.md`),
@@ -151,7 +169,7 @@ fun BingeTvNavRail(
     LaunchedEffect(Unit) {
         offerFocusToContent(
             contentFocus = contentFocus,
-            yieldToRail = { railHasFocus },
+            yieldToRail = { userMovedToRail },
             taken = { contentHasFocus },
         )
         if (!contentHasFocus && !railHasFocus) runCatching { railEntry.requestFocus() }
@@ -161,7 +179,13 @@ fun BingeTvNavRail(
         contentDepth = contentDepth,
         contentFocus = contentFocus,
         contentHasFocus = { contentHasFocus },
-    )
+    ) ||
+        overlayCloseHandoffInFlight(
+            overlayEpoch = overlayEpoch,
+            contentFocus = contentFocus,
+            contentHasFocus = { contentHasFocus },
+            userMovedToRail = { userMovedToRail },
+        )
 
     // Not expanded mid-handoff: Compose parks focus in the rail from the moment the activated control is disposed until
     // the handoff takes focus back — up to two seconds on a cold query — so following `railHasFocus` alone opened the rail
@@ -199,7 +223,13 @@ fun BingeTvNavRail(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            // An ancestor of whichever side (content or rail) currently holds focus, so it sees a directional
+            // key regardless of where it starts. Not consumed — the search it precedes still has to run.
+            .onPreviewKeyEvent { event ->
+                if (event.type == KeyEventType.KeyDown) lastKeyWasStartDirectionKey = event.key == startDirectionKey
+                false
+            },
     ) {
         Box(
             modifier = Modifier
@@ -320,6 +350,47 @@ private fun contentHandoffInFlight(
                         frames = CONTENT_HANDOFF_FRAMES,
                     )
                 }
+            }
+        } finally {
+            inFlight = false
+        }
+    }
+    return inFlight
+}
+
+/**
+ * Hands focus back to the content after a full-screen overlay closes, and reports whether that is in flight —
+ * [overlayEpoch]'s counterpart to [contentHandoffInFlight] (#2519).
+ *
+ * No [awaitContentFocusLost] here: unlike a drill-down, the pane this returns to is a *fresh* mount — nothing in
+ * it has ever held focus, so there is nothing to wait on losing. What it shares with the drill-down case is the
+ * destination itself: the pane an overlay closes onto is exactly as target-less until its first item lands, so
+ * the offer needs the same generous, retried budget rather than the startup loop's one-shot-per-frame allowance.
+ *
+ * Skipping `overlayEpoch == 0` matters for the same reason [contentHandoffInFlight] skips its first run: zero is
+ * "no overlay has closed yet," so a mount that never followed a pop must not run this at all.
+ */
+@Composable
+private fun overlayCloseHandoffInFlight(
+    overlayEpoch: Int,
+    contentFocus: FocusRequester,
+    contentHasFocus: () -> Boolean,
+    userMovedToRail: () -> Boolean,
+): Boolean {
+    var inFlight by remember { mutableStateOf(false) }
+    val currentContentHasFocus by rememberUpdatedState(contentHasFocus)
+    val currentUserMovedToRail by rememberUpdatedState(userMovedToRail)
+    LaunchedEffect(overlayEpoch) {
+        if (overlayEpoch == 0) return@LaunchedEffect
+        inFlight = true
+        try {
+            withTimeoutOrNull(CONTENT_HANDOFF_TIMEOUT_MS) {
+                offerFocusToContent(
+                    contentFocus = contentFocus,
+                    yieldToRail = currentUserMovedToRail,
+                    taken = currentContentHasFocus,
+                    frames = CONTENT_HANDOFF_FRAMES,
+                )
             }
         } finally {
             inFlight = false
