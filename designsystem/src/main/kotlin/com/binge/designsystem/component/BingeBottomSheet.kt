@@ -33,6 +33,13 @@ import com.binge.designsystem.rememberFoldSafeBottomHeight
  * In the tabletop posture the sheet caps itself at the crease, so it lands wholly in the flat
  * bottom half and no row is bent across the hinge. Every other window reports no separating
  * horizontal fold and the cap is absent, so nothing else in the app changes height.
+ *
+ * No `contentWindowInsets` is passed, so this takes [ModalBottomSheet]'s default —
+ * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — which already includes
+ * the IME (confirmed from `material3:1.5.0-alpha27` bytecode; issue #35). Adding `imePadding()` on
+ * top would double-inset. A field that jumps the sheet on focus needs a scrollable ancestor in its
+ * own content instead, so the `bringIntoView` request has somewhere local to land — see
+ * [TextEntrySurface], whose own KDoc names this sheet as its intended host.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
