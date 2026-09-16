@@ -84,6 +84,18 @@ class TvSamplesScreenshotTest {
     @Composable
     fun navRailCollapsedLastSelected() = Frame { TvNavRailSample(expanded = false, selectedKey = "lists") }
 
+    /** A companion's pending-attention count on a rail destination (#2510) — the collapsed icon's corner. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun navRailCollapsedBadge() = Frame { TvNavRailSample(expanded = false, badgedItemKey = "watchlist") }
+
+    /** The same badge with the rail open, beside the label rather than alone on the icon. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun navRailExpandedBadge() = Frame { TvNavRailSample(expanded = true, badgedItemKey = "watchlist") }
+
     /**
      * The glass half of the fill, which no other frame reaches: production reports artwork from a
      * `DisposableEffect`, and effects do not run in a preview, so every frame above renders at a solid panel.

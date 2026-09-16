@@ -1,9 +1,13 @@
 package com.binge.designsystem.tv.nav
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.focus.tvClickable
@@ -128,20 +133,56 @@ internal fun RailItemSurface(
         // animating width the icon slides left as the rail closes. Pinned to the start, only the label animates.
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_nav_rail_icon_label_gap)),
     ) {
-        val avatarName = item.displayName
-        if (avatarName != null) {
-            BingeTvInitialsAvatar(
-                name = avatarName,
-                avatarUrl = item.avatarUrl,
-                size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
-            )
-        } else {
-            Icon(imageVector = item.icon, contentDescription = null, tint = contentColor)
+        Box {
+            val avatarName = item.displayName
+            if (avatarName != null) {
+                BingeTvInitialsAvatar(
+                    name = avatarName,
+                    avatarUrl = item.avatarUrl,
+                    size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
+                )
+            } else {
+                Icon(imageVector = item.icon, contentDescription = null, tint = contentColor)
+            }
+            val badge = item.badge
+            if (badge is NavSuiteBadge.Label) {
+                RailItemBadge(
+                    text = badge.text,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(
+                            x = dimensionResource(TvR.dimen.tv_nav_rail_badge_offset),
+                            y = -dimensionResource(TvR.dimen.tv_nav_rail_badge_offset),
+                        ),
+                )
+            }
         }
         if (showLabel) {
             // Ellipsised rather than wrapped or measured: the rail's width is fixed, so a long label
             // truncates instead of deciding how much of the screen the sidebar takes.
             Text(text = item.label, color = contentColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
+    }
+}
+
+/**
+ * The rail's [NavSuiteBadge.Label] treatment: a fixed-colour pill (never the item's amber accent, which a
+ * badge must stay legible against in either state) overlaid on the icon or avatar's corner. Sized by content
+ * rather than pinned to a circle, so a two-digit count doesn't clip the way [tv_nav_rail_badge_size] alone
+ * would.
+ */
+@Composable
+private fun RailItemBadge(text: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .defaultMinSize(
+                minWidth = dimensionResource(TvR.dimen.tv_nav_rail_badge_size),
+                minHeight = dimensionResource(TvR.dimen.tv_nav_rail_badge_size),
+            ).clip(BingeShapes.Pill)
+            .background(MaterialTheme.colorScheme.error)
+            .padding(horizontal = dimensionResource(TvR.dimen.tv_nav_rail_badge_padding_h)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = text, color = MaterialTheme.colorScheme.onError, style = MaterialTheme.typography.labelSmall)
     }
 }

@@ -32,6 +32,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvButton
@@ -216,17 +217,26 @@ fun TvFocusIndicatorSample() {
  * The rail shell with a header, destinations and a footer; [expanded] pins which resting shape renders.
  *
  * [artworkBehind] pins the other half of the rail's fill, and puts something behind it worth seeing through
- * to — without both, a frame cannot tell a scrim from a solid panel.
+ * to — without both, a frame cannot tell a scrim from a solid panel. [badgedItemKey], when set, gives that
+ * item's [NavSuiteBadge.Label] a sample count — a companion's pending-attention badge on the rail.
  */
 @Composable
 fun TvNavRailSample(
     expanded: Boolean,
     selectedKey: String = "movies",
     artworkBehind: Boolean = false,
+    badgedItemKey: String? = null,
 ) {
+    val items = if (badgedItemKey == null) {
+        NavRailSampleItems
+    } else {
+        NavRailSampleItems.map {
+            if (it.key == badgedItemKey) it.copy(badge = NavSuiteBadge.Label("3")) else it
+        }
+    }
     BingeTvNavRail(
         header = NavRailSampleHeader,
-        items = NavRailSampleItems,
+        items = items,
         footer = NavRailSampleFooter,
         selectedKey = selectedKey,
         onSelect = {},
