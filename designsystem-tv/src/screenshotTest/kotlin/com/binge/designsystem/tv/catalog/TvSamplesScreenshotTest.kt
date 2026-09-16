@@ -89,7 +89,7 @@ class TvSamplesScreenshotTest {
      * `DisposableEffect`, and effects do not run in a preview, so every frame above renders at a solid panel.
      *
      * Both states show it: the ramp's hold is anchored in dp ([com.binge.designsystem.tv.nav.BingeTvNavRail]'s
-     * `RAIL_SCRIM_FALLOFF`), not a fraction of width, so it reaches past the icon collapsed and past the label
+     * `tv_nav_rail_scrim_falloff`), not a fraction of width, so it reaches past the icon collapsed and past the label
      * band expanded rather than forcing the panel solid while open.
      */
     @PreviewTest
