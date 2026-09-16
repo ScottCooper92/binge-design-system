@@ -53,9 +53,21 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * baselines for Media, Episode and EpisodeSignedOut were byte-identical, despite the shapes differing
  * materially exactly there. That is a real device state, not only a screenshot artefact — the placeholder
  * had no way to reach the rest of itself.
+ *
+ * @param personReadingWidth [DetailSkeletonShape.Person]'s own reading-column cap, read instead of
+ * `content_max_width` for that shape only — see the parameter's own doc.
  */
 @Composable
-fun DetailScreenSkeleton(modifier: Modifier = Modifier, shape: DetailSkeletonShape = DetailSkeletonShape.Media) {
+fun DetailScreenSkeleton(
+    modifier: Modifier = Modifier,
+    shape: DetailSkeletonShape = DetailSkeletonShape.Media,
+    // The person page's own reading-column cap, distinct from the media pages' `content_max_width`: their
+    // shared 640dp is a deliberate cap on an overview's line length, while the person page's profile block
+    // has no such reason to stay narrow, so a caller may widen it (Binge's `person_content_max_width`)
+    // without touching the width every other shape still reads. Defaults to `content_max_width` so a
+    // caller that doesn't care — every current `@Preview` here — is unaffected.
+    personReadingWidth: Dp = dimensionResource(R.dimen.content_max_width),
+) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         // The same measure MovieDetailContent, TvDetailContent, EpisodeDetailScreen and PersonDetailScreen
         // each compute for themselves — see this function's KDoc for why the skeleton has to as well.
@@ -64,8 +76,9 @@ fun DetailScreenSkeleton(modifier: Modifier = Modifier, shape: DetailSkeletonSha
         if (shape == DetailSkeletonShape.Person) {
             // The person page floors its reading inset at the profile's own padding rather than at zero, so
             // below the cap it sits 20dp in where a media page sits 16dp — see `PersonDetailScreen`.
+            val personCentredInset = (maxWidth - personReadingWidth) / 2
             PersonSkeleton(
-                readingInset = centredInset.coerceAtLeast(dimensionResource(R.dimen.person_profile_padding_h)),
+                readingInset = personCentredInset.coerceAtLeast(dimensionResource(R.dimen.person_profile_padding_h)),
             )
             return@BoxWithConstraints
         }
