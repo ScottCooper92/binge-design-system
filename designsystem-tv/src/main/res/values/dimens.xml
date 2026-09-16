@@ -25,6 +25,11 @@
     <dimen name="tv_button_icon">22dp</dimen>
     <dimen name="tv_button_icon_gap">10dp</dimen>
     <dimen name="tv_button_border_width">1dp</dimen>
+    <!-- Icon button: diameter matches tv_button_height so it aligns with a TvButton in the same row; the
+         horizontal padding is exactly (diameter - tv_button_icon) / 2, so the icon alone fills the circle
+         with no slack at rest. -->
+    <dimen name="tv_icon_button_diameter">52dp</dimen>
+    <dimen name="tv_icon_button_padding_horizontal">15dp</dimen>
     <!-- Card row -->
     <dimen name="tv_media_row_header_gap">10dp</dimen>
     <dimen name="tv_media_row_card_gap">12dp</dimen>
