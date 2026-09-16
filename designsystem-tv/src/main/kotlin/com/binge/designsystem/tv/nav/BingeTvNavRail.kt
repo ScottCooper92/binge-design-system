@@ -52,21 +52,13 @@ import com.binge.designsystem.tv.R as TvR
 private const val RAIL_SCRIM_ALPHA = 0.70f
 
 /**
- * Held until [RAIL_SCRIM_FALLOFF] from the rail's right edge, then falling to clear there.
+ * Held until `tv_nav_rail_scrim_falloff` from the rail's right edge, then falling to clear there.
  *
  * The *right* edge whatever the layout direction, deliberately: the shell's directional keys are physical — a
  * side sheet that mirrors to the other edge is still dismissed by LEFT — so paint that mirrored on its own
  * would disagree with the contract the D-pad keeps. The two move together.
  */
 private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
-
-/**
- * The ramp's falloff band, held constant in dp so it does not stretch with the rail's width — a fraction of
- * width tuned for the 72dp collapsed strip would end its hold 38dp inside where the expanded labels end.
- * Collapsed the hold reaches 52dp, past the icon's 24–48dp; expanded it reaches 200dp, past the labels'
- * 62–196dp, with the remaining band padding.
- */
-private val RAIL_SCRIM_FALLOFF = 20.dp
 
 /**
  * The 10-foot navigation rail: a D-pad focusable left sidebar that **expands on focus** to reveal labels,
@@ -91,9 +83,9 @@ private val RAIL_SCRIM_FALLOFF = 20.dp
  * instead of the pane being structurally inset. The rail paints a scrim, not an opaque fill — but only over
  * real artwork: it fades between a solid panel and glass in step with the backdrop's own crossfade
  * ([TvRailArtworkPresence]), because a rail left translucent over the hub's hero↔backdrop transition reads as
- * the rail itself flickering. The hold band is anchored in dp ([RAIL_SCRIM_FALLOFF]), not a fraction of width,
- * so it reaches the label band expanded exactly as it reaches the icon collapsed — expanded and collapsed read
- * as the same glass, just wider. Fixed-width in both states rather than content-sized, since the items fill
+ * the rail itself flickering. The hold band is anchored in dp (`tv_nav_rail_scrim_falloff`), not a fraction of
+ * width, so it reaches the label band expanded exactly as it reaches the icon collapsed — expanded and collapsed
+ * read as the same glass, just wider. Fixed-width in both states rather than content-sized, since the items fill
  * its width.
  *
  * Three slots: [header] pinned top (account avatar), [items] the destination body, [footer] pinned bottom
@@ -195,10 +187,11 @@ fun BingeTvNavRail(
 
     val artwork = remember { TvRailArtworkPresence() }
     val glass by railGlassFraction(artworkBehind ?: artwork.isPresent)
-    // railWidth is already animated (below), so this stays a constant 20dp band throughout the expansion
-    // rather than stretching with it. The coerceIn guards a spring overshoot below RAIL_SCRIM_FALLOFF, not an
-    // expected case.
-    val holdFraction = (1f - RAIL_SCRIM_FALLOFF / railWidth).coerceIn(0f, 1f)
+    val scrimFalloff = dimensionResource(TvR.dimen.tv_nav_rail_scrim_falloff)
+    // railWidth is already animated (below), so this stays a constant scrimFalloff band throughout the
+    // expansion rather than stretching with it. The coerceIn guards a spring overshoot below scrimFalloff, not
+    // an expected case.
+    val holdFraction = (1f - scrimFalloff / railWidth).coerceIn(0f, 1f)
 
     // The shell paints the theme background so the two halves of the screen agree. When only the rail strip
     // painted one, a destination that drew no background showed the window's black beside the rail's #0E0E0F —
