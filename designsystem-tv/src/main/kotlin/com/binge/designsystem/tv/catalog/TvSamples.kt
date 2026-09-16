@@ -164,7 +164,7 @@ fun TvCardRowSample() {
             items = (1..4).toList(),
             key = { it },
             cellWidth = cellWidth,
-            trailing = { _, _ -> SamplePlate(label = "More", modifier = Modifier.width(cellWidth)) },
+            trailing = { _, _, cellModifier -> SamplePlate(label = "More", modifier = cellModifier.width(cellWidth)) },
         ) { index, _, _, cellModifier ->
             SamplePlate(label = "Season $index", modifier = cellModifier)
         }

@@ -22,6 +22,7 @@
     <dimen name="tv_nav_rail_badge_size">16dp</dimen>
     <dimen name="tv_nav_rail_badge_padding_h">4dp</dimen>
     <dimen name="tv_nav_rail_badge_offset">4dp</dimen>
+    <dimen name="tv_nav_rail_scrim_falloff">20dp</dimen>
     <!-- Button -->
     <dimen name="tv_button_height">52dp</dimen>
     <dimen name="tv_button_padding_horizontal">28dp</dimen>

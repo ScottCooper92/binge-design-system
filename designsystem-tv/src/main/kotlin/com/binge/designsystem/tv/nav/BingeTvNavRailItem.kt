@@ -108,9 +108,13 @@ internal fun RailItemSurface(
     // flips to onPrimary to stay legible on it.
     val current = selected || isFocused
     val filled = current && expanded
+    // onSurface, not onSurfaceVariant: the resting glass fill (RAIL_SCRIM_ALPHA/RAIL_SCRIM_HOLD_ALPHA in
+    // BingeTvNavRail) sits low enough over bright artwork that onSurfaceVariant fails the 3:1 icon bar. The
+    // cost is the resting row's own hierarchy — carried afterwards by the current row's primary and the
+    // focused row's tvFocusFill.
     val contentColor = tvFocusContentColor(
         isFocused = filled,
-        resting = if (current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+        resting = if (current) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
     )
     // [BingeShapes.TvListItem], shared with the filter panel's rows on purpose: the rail and those rows are the
     // app's two vertical 10-foot lists, so a corner difference would read as inconsistency. The token makes
