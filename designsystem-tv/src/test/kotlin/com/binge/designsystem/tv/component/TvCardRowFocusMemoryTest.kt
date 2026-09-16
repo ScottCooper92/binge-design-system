@@ -107,6 +107,47 @@ class TvCardRowFocusMemoryTest {
         composeTestRule.onNodeWithTag("cell0").assertIsFocused()
     }
 
+    /**
+     * [overrideIndex] steers a fresh row's entry regardless of its own self-memory — a gallery strip
+     * returning from the viewer to an image that was never the cell last focused before the push.
+     */
+    @Test
+    fun `overrideIndex steers entry onto a specific cell`() {
+        val entryRequester = FocusRequester()
+        composeTestRule.setContent {
+            BingeTvTheme {
+                Row {
+                    RailStandIn()
+                    CardRowWithTrailing(entryRequester, overrideIndex = 1)
+                }
+            }
+        }
+
+        composeTestRule.runOnUiThread { runCatching { entryRequester.requestFocus() } }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("cell1").assertIsFocused()
+    }
+
+    /** The same override, aimed at the trailing slot rather than a card — the "not in the strip" case. */
+    @Test
+    fun `overrideIndex pointing past the last card steers entry onto the trailing tile`() {
+        val entryRequester = FocusRequester()
+        composeTestRule.setContent {
+            BingeTvTheme {
+                Row {
+                    RailStandIn()
+                    CardRowWithTrailing(entryRequester, overrideIndex = CELL_COUNT)
+                }
+            }
+        }
+
+        composeTestRule.runOnUiThread { runCatching { entryRequester.requestFocus() } }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(TRAILING).assertIsFocused()
+    }
+
     /** The stand-in the entry requester moves focus away from — the rail every row-hosting screen sits beside. */
     @Composable
     private fun RailStandIn() {
@@ -115,12 +156,13 @@ class TvCardRowFocusMemoryTest {
 
     /** Three cards plus a trailing see-all tile, wired exactly as a real caller (e.g. `TvDetailCastRow`) would. */
     @Composable
-    private fun CardRowWithTrailing(entryRequester: FocusRequester) {
+    private fun CardRowWithTrailing(entryRequester: FocusRequester, overrideIndex: Int? = null) {
         TvCardRow(
             items = (0 until CELL_COUNT).toList(),
             key = { it },
             cellWidth = CELL_WIDTH_DP.dp,
             entryFocusRequester = entryRequester,
+            overrideIndex = overrideIndex,
             trailing = { _, onFocusChanged, cellModifier ->
                 Box(
                     Modifier
