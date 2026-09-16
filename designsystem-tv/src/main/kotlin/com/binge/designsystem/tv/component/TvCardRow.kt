@@ -37,10 +37,12 @@ private const val TRAILING_KEY = "tv-card-row-trailing"
  * `tvFocusGroup`, the helper reached for by name, is a restorer that silently does not do it (see its KDoc), so
  * hand-rolled rows kept getting it wrong. This wrapper owns all three plus per-cell focus tracking.
  *
- * Entering the row for the **first** time lands on its first cell — never the trailing see-all tile,
- * which is not in [items] and so never carries the entry requester. Returning lands on the cell **last
- * focused**. Both come from the shared [rememberTvRowEntry] contract — see [TvRowEntry] for how the memory survives
- * the `LazyColumn` scroll-out disposal.
+ * Entering the row for the **first** time lands on its first cell — never [trailing], the optional see-all
+ * tile. Returning lands on the cell **last focused**, and that includes [trailing] itself: it occupies the
+ * entry's last slot (index `items.size`) exactly like any other cell, so a drill-down opened from it and
+ * then backed out of resolves entry back onto the tile rather than redirecting to the last card. Both come
+ * from the shared [rememberTvRowEntry] contract — see [TvRowEntry] for how the memory survives the
+ * `LazyColumn` scroll-out disposal.
  *
  * Where a host app's own poster row is bound to its media-item model, this is generic over the cell: the
  * detail page's cast circles, season posters and stills are not media items, and hand-rolled their own rows
@@ -48,8 +50,9 @@ private const val TRAILING_KEY = "tv-card-row-trailing"
  *
  * The [cell] slot receives the item, whether it is focused, an `onFocusChanged`, and a `cellModifier` (fixed
  * width plus, for the first cell, the entry requester) to apply to its **focusable** element. [trailing] is an
- * optional see-all tile, keyed apart so it tracks focus like any other cell. [heading] is optional — a row under
- * its own section chrome passes none.
+ * optional see-all tile, keyed apart so it tracks focus like any other cell, and takes the same shape of
+ * `cellModifier` (the entry requester when the tile is the remembered cell) to apply to its own focusable
+ * element. [heading] is optional — a row under its own section chrome passes none.
  *
  * Every cell must be focusable: the row's horizontal scroll is driven entirely by cell focus, so inert cells
  * would strand anything past the panel edge. A read-out of non-focusable tiles wants a wrapping layout
@@ -75,15 +78,17 @@ fun <T> TvCardRow(
     // its most-used focus state uncoverable rather than merely uncovered. Same seed as TvButton, and the same
     // reason: focus is a parameter, see docs/tv-foundation.md.
     initiallyFocusedKey: Any? = null,
-    trailing: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit) -> Unit)? = null,
+    trailing: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit)? = null,
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit,
 ) {
     if (items.isEmpty()) return
     // Which cell draws the ring — one hoisted key, nulled on blur, so a row that has lost focus keeps none lit.
     var focusedKey by remember { mutableStateOf(initiallyFocusedKey) }
+    // The trailing tile, when present, occupies the entry's last slot so it is remembered like any other cell.
+    val trailingIndex = items.size
     // The cell entry returns to — the shared remembered-cell contract (survives blur and the LazyColumn
     // scroll-out disposal). Seed the row state to it so it is laid out before entry arrives.
-    val entry = rememberTvRowEntry(items.size)
+    val entry = rememberTvRowEntry(if (trailing != null) trailingIndex + 1 else trailingIndex)
     val rowState = rememberLazyListState(initialFirstVisibleItemIndex = entry.entryIndex)
     // Start is the in-pane content gutter (inset + gutter under the overlay rail), end the panel's overscan.
     // The row is full panel width, so cells scrolled off the front pass *under* the rail rather than clipping
@@ -135,8 +140,12 @@ fun <T> TvCardRow(
                             focusedKey == TRAILING_KEY,
                             { focused ->
                                 focusedKey = focusedKey.trackFocus(focused, TRAILING_KEY)
-                                if (focused) onCellFocused?.invoke(TRAILING_KEY)
+                                if (focused) {
+                                    entry.rememberFocused(trailingIndex)
+                                    onCellFocused?.invoke(TRAILING_KEY)
+                                }
                             },
+                            entry.entryModifier(trailingIndex),
                         )
                     }
                 }
