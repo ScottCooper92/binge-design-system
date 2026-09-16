@@ -20,6 +20,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="cd_clear_query">Clear search</string>
     <string name="cd_remove_filter">Remove filter</string>
+    <string name="cd_settings_row_external">Opens in browser</string>
     <string name="text_entry_cancel">Cancel</string>
     <string name="text_entry_character_count" translatable="false">%1$d / %2$d</string>
     <string name="text_entry_expand">Expand to full screen</string>

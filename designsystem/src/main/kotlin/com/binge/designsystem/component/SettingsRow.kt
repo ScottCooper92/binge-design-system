@@ -6,6 +6,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 
+/** Where a [SettingsRow] takes the user, and so which trailing glyph promises the right thing. */
+enum class SettingsRowDestination {
+    /** Pushes a screen inside the app, or opens a sheet; Back returns here. The chevron. */
+    InApp,
+
+    /** Leaves the app — a browser, another app. The row says so before it's tapped, not after. */
+    External,
+}
+
 /** One row of a [SettingsGroup]: an icon in a tinted box, a label with an optional detail line, and a trailing slot. */
 @Immutable
 data class SettingsRow(
@@ -32,6 +41,8 @@ data class SettingsRow(
      */
     val selected: Boolean = false,
     val clickable: Boolean = true,
+    /** Only read when [trailingContent] is null — a caller supplying its own trailing slot owns this too. */
+    val destination: SettingsRowDestination = SettingsRowDestination.InApp,
     val trailingContent: (@Composable () -> Unit)? = null,
     val onClick: () -> Unit = {},
     val onLongClick: (() -> Unit)? = null,

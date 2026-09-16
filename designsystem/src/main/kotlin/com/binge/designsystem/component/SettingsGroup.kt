@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.Badge
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -25,10 +26,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
 import com.binge.designsystem.theme.BingeShapes
@@ -82,10 +85,18 @@ fun SettingsGroup(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SettingsRowView(row: SettingsRow, modifier: Modifier = Modifier) {
+    val external = row.clickable && row.trailingContent == null && row.destination == SettingsRowDestination.External
+    val externalDescription = stringResource(R.string.cd_settings_row_external)
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .semantics { selected = row.selected }
+            .semantics {
+                selected = row.selected
+                // Appended to the row's own merged node rather than a contentDescription on the trailing
+                // icon, so a screen reader announces one node ("Watchlist, Opens in browser, Button")
+                // instead of reading the icon as a second stop.
+                if (external) stateDescription = externalDescription
+            }
             // The wash sits outside the click, so the ripple draws over it rather than under it.
             .background(if (row.selected) MaterialTheme.colorScheme.primary.tonalContainer() else Color.Transparent)
             .combinedClickable(
@@ -136,6 +147,13 @@ private fun SettingsRowView(row: SettingsRow, modifier: Modifier = Modifier) {
             }
             when {
                 row.trailingContent != null -> row.trailingContent.invoke()
+                external -> {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 row.clickable -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

@@ -26,4 +26,11 @@ class SettingsGroupSamplesScreenshotTest {
     fun selected() {
         SettingsGroupSelectedSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun external() {
+        SettingsGroupExternalSample()
+    }
 }

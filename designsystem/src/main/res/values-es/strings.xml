@@ -18,6 +18,7 @@
     <string name="action_cancel">Cancelar</string>
     <string name="cd_clear_query">Borrar búsqueda</string>
     <string name="cd_remove_filter">Quitar filtro</string>
+    <string name="cd_settings_row_external">Se abre en el navegador</string>
     <string name="text_entry_cancel">Cancelar</string>
     <string name="text_entry_expand">Ampliar a pantalla completa</string>
     <string name="text_entry_collapse">Contraer</string>
