@@ -88,8 +88,9 @@ class TvSamplesScreenshotTest {
      * The glass half of the fill, which no other frame reaches: production reports artwork from a
      * `DisposableEffect`, and effects do not run in a preview, so every frame above renders at a solid panel.
      *
-     * Expanded is solid over artwork too — the ramp was tuned for the 72dp strip, and stretched over 220dp its
-     * hold ends inside the labels. These two are what say which state gets which.
+     * Both states show it: the ramp's hold is anchored in dp ([com.binge.designsystem.tv.nav.BingeTvNavRail]'s
+     * `tv_nav_rail_scrim_falloff`), not a fraction of width, so it reaches past the icon collapsed and past the label
+     * band expanded rather than forcing the panel solid while open.
      */
     @PreviewTest
     @TvPreviews

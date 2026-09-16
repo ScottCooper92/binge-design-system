@@ -19,6 +19,7 @@
     <dimen name="tv_nav_rail_item_gap">8dp</dimen>
     <dimen name="tv_nav_rail_icon_label_gap">14dp</dimen>
     <dimen name="tv_nav_rail_avatar_size">32dp</dimen>
+    <dimen name="tv_nav_rail_scrim_falloff">20dp</dimen>
     <!-- Button -->
     <dimen name="tv_button_height">52dp</dimen>
     <dimen name="tv_button_padding_horizontal">28dp</dimen>
