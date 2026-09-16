@@ -58,3 +58,21 @@ fun RatingCardSignedOutSample() {
         )
     }
 }
+
+/** [RatingCard.rateable] false — a title TMDB won't yet accept a rating for, stars non-interactive. */
+@Composable
+fun RatingCardNotYetRateableSample() {
+    ScreenshotTheme {
+        RatingCard(
+            userRating = null,
+            isTv = false,
+            isSignedIn = true,
+            rateable = false,
+            reviewCount = 0,
+            averageReviewRating = null,
+            onRate = {},
+            onRemoveRating = {},
+            onReviewsClick = {},
+        )
+    }
+}

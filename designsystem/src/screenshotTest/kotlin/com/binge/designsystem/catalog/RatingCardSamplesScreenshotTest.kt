@@ -26,4 +26,11 @@ class RatingCardSamplesScreenshotTest {
     fun SignedOut() {
         RatingCardSignedOutSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun NotYetRateable() {
+        RatingCardNotYetRateableSample()
+    }
 }

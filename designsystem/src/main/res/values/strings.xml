@@ -48,6 +48,8 @@
     <string name="rating_card_prompt_label_tv">Rate this show</string>
     <string name="rating_card_prompt_question">How was it?</string>
     <string name="rating_card_prompt_hint">Tap a star to rate — tap again or long-press for a half</string>
+    <string name="rating_card_prompt_question_pending">Not out yet</string>
+    <string name="rating_card_prompt_hint_pending">You\'ll be able to rate it once it\'s released</string>
     <string name="rating_card_your_rating">Your rating</string>
     <string name="rating_card_score_suffix">/10</string>
     <string name="rating_card_change">Change rating</string>

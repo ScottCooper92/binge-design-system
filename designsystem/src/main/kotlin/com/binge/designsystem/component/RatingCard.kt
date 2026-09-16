@@ -51,6 +51,12 @@ import com.binge.designsystem.theme.labelLargeEmphasis
  * When [isSignedIn] is `false` the rate body is hidden entirely (TMDB requires a session
  * to submit ratings); the card collapses to just the reviews footer, or renders nothing
  * if there are also no reviews to link to.
+ *
+ * [rateable] is for an already-rateable-in-principle title TMDB will still refuse — most
+ * commonly one that hasn't released yet. It only affects the unrated body: the stars render
+ * non-interactive and the prompt swaps to [notYetRateableQuestion]/[notYetRateableHint]. A
+ * caller decides rateability from its own data (a release date, an air date); this component
+ * has no opinion on what makes a title unrateable, only on how to show it.
  */
 @Composable
 fun RatingCard(
@@ -63,9 +69,12 @@ fun RatingCard(
     onRemoveRating: () -> Unit,
     onReviewsClick: () -> Unit,
     modifier: Modifier = Modifier,
+    rateable: Boolean = true,
     // The "Rate this …" eyebrow; defaults to the movie/show wording from [isTv]. Callers on other
     // surfaces (e.g. an episode screen) can pass a more specific label.
     @StringRes promptLabel: Int = if (isTv) R.string.rating_card_prompt_label_tv else R.string.rating_card_prompt_label_movie,
+    @StringRes notYetRateableQuestion: Int = R.string.rating_card_prompt_question_pending,
+    @StringRes notYetRateableHint: Int = R.string.rating_card_prompt_hint_pending,
     // The reviews-footer subtitle, with and without a community average; both name the app by
     // default, so a caller whose brand isn't Binge must override them.
     @StringRes reviewsSubtitle: Int = R.string.rating_card_reviews_subtitle,
@@ -104,7 +113,13 @@ fun RatingCard(
                     onRemoveRating = onRemoveRating,
                 )
             } else {
-                UnratedBody(promptLabel = promptLabel, onRate = onRate)
+                UnratedBody(
+                    promptLabel = promptLabel,
+                    rateable = rateable,
+                    notYetRateableQuestion = notYetRateableQuestion,
+                    notYetRateableHint = notYetRateableHint,
+                    onRate = onRate,
+                )
             }
         }
 
@@ -127,6 +142,9 @@ fun RatingCard(
 @Composable
 private fun UnratedBody(
     @StringRes promptLabel: Int,
+    rateable: Boolean,
+    @StringRes notYetRateableQuestion: Int,
+    @StringRes notYetRateableHint: Int,
     onRate: (Float) -> Unit,
 ) {
     Row(
@@ -141,12 +159,12 @@ private fun UnratedBody(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = stringResource(R.string.rating_card_prompt_question),
+                text = stringResource(if (rateable) R.string.rating_card_prompt_question else notYetRateableQuestion),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = stringResource(R.string.rating_card_prompt_hint),
+                text = stringResource(if (rateable) R.string.rating_card_prompt_hint else notYetRateableHint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -154,8 +172,8 @@ private fun UnratedBody(
         StarRating(
             rating = 0f,
             starSize = dimensionResource(R.dimen.star_rating_size_interactive),
-            interactive = true,
-            onRatingChange = onRate,
+            interactive = rateable,
+            onRatingChange = if (rateable) onRate else null,
         )
     }
 }
@@ -351,6 +369,24 @@ private fun PreviewRatingCardSignedOutWithReviews() {
             isSignedIn = false,
             reviewCount = 12,
             averageReviewRating = 7.2f,
+            onRate = {},
+            onRemoveRating = {},
+            onReviewsClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewRatingCardNotYetRateable() {
+    BingeExpressiveTheme {
+        RatingCard(
+            userRating = null,
+            isTv = false,
+            isSignedIn = true,
+            rateable = false,
+            reviewCount = 0,
+            averageReviewRating = null,
             onRate = {},
             onRemoveRating = {},
             onReviewsClick = {},
