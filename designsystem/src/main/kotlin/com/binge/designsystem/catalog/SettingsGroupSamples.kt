@@ -4,10 +4,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.SettingsGroup
 import com.binge.designsystem.component.SettingsRow
+import com.binge.designsystem.component.SettingsRowDestination
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
 import com.binge.designsystem.theme.accent
@@ -85,6 +87,27 @@ fun SettingsGroupSelectedSample() {
                     detail = "Roles, quotas & permissions",
                 ),
                 SettingsRow(icon = Icons.Filled.Settings, label = "Settings", detail = "Server & connection"),
+            ),
+        )
+    }
+}
+
+/**
+ * A row that leaves the app carries ↗ instead of the chevron (#51) — shown beside an ordinary
+ * in-app row so the two read as distinct promises at a glance.
+ */
+@Composable
+fun SettingsGroupExternalSample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = "About",
+            rows = listOf(
+                SettingsRow(icon = Icons.Filled.Settings, label = "Preferences"),
+                SettingsRow(
+                    icon = Icons.Filled.Policy,
+                    label = "Privacy policy",
+                    destination = SettingsRowDestination.External,
+                ),
             ),
         )
     }

@@ -20,6 +20,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 private val isHeading = SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
+private val hasNoStateDescription = SemanticsMatcher.keyNotDefined(SemanticsProperties.StateDescription)
 
 /** A screen reader jumps group to group by the title, and a row's tap is the row's, not the group's. */
 @RunWith(RobolectricTestRunner::class)
@@ -61,5 +62,28 @@ class SettingsGroupSemanticsTest {
         // what a screen reader should say about a row that only shows a value.
         composeTestRule.onNode(hasText("Version")).assertIsNotEnabled()
         assertTrue(clicked)
+    }
+
+    @Test
+    fun `an external row announces that it opens in browser`() {
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist"),
+                        SettingsRow(
+                            icon = Icons.Filled.Bookmark,
+                            label = "Privacy policy",
+                            destination = SettingsRowDestination.External,
+                        ),
+                    ),
+                )
+            }
+        }
+        composeTestRule.onNode(hasText("Watchlist")).assert(hasNoStateDescription)
+        composeTestRule
+            .onNode(hasText("Privacy policy"))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Opens in browser"))
     }
 }
