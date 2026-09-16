@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.component.BingeSheetFooter
+import com.binge.designsystem.component.BingeActionFooter
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
@@ -18,22 +18,22 @@ import com.binge.designsystem.preview.ScreenshotTheme
  * modal wrapper.
  */
 @Composable
-fun BingeSheetFooterSample() {
+fun BingeActionFooterSample() {
     ScreenshotTheme {
-        BingeSheetFooter(label = "Show results", onClick = {})
+        BingeActionFooter(label = "Show results", onClick = {})
     }
 }
 
 /**
  * The same footer on a page rather than a sheet: no band of its own, and no bottom spacing where the
- * host's scaffold has already inset. Paired with [BingeSheetFooterSample] because the two together
+ * host's scaffold has already inset. Paired with [BingeActionFooterSample] because the two together
  * are what make the container parameter's job legible — one shows the band, the other its absence.
  */
 @Composable
-fun BingeSheetFooterOnPageSample() {
+fun BingeActionFooterOnPageSample() {
     ScreenshotTheme {
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-            BingeSheetFooter(
+            BingeActionFooter(
                 label = "Save",
                 onClick = {},
                 containerColor = Color.Transparent,
