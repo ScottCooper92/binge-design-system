@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Settings
@@ -35,6 +38,7 @@ import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvButtonSurface
 import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.component.TvExcludedMark
+import com.binge.designsystem.tv.component.TvIconButtonSurface
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.component.TvQrCode
 import com.binge.designsystem.tv.component.TvRowEmphasis
@@ -109,6 +113,36 @@ fun TvButtonOnPanelSample() {
         ) {
             TvButtonSurface("I've approved it", TvButtonStyle.Primary, enabled = true, isFocused = false)
             TvButtonSurface("Settings", TvButtonStyle.Secondary, enabled = true, isFocused = false)
+        }
+    }
+}
+
+/**
+ * The icon button at rest, revealed on focus and disabled, across its roles — the same coverage
+ * [TvButtonSample] gives [TvButton]. The middle column of each row is the revealed frame: the surface
+ * growing from a circle into a labelled pill.
+ */
+@Composable
+fun TvIconButtonSample() {
+    Column(
+        modifier = Modifier.padding(dimensionResource(TvR.dimen.tv_overscan_horizontal)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TvIconButtonSurface(Icons.Filled.Add, "Add to list", TvButtonStyle.Secondary, enabled = true, isFocused = false)
+            TvIconButtonSurface(Icons.Filled.Add, "Add to list", TvButtonStyle.Secondary, enabled = true, isFocused = true)
+            TvIconButtonSurface(Icons.Filled.PlayArrow, "Play", TvButtonStyle.Primary, enabled = true, isFocused = false)
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TvIconButtonSurface(Icons.Filled.Delete, "Remove", TvButtonStyle.Destructive, enabled = true, isFocused = false)
+            TvIconButtonSurface(Icons.Filled.Delete, "Remove", TvButtonStyle.Destructive, enabled = true, isFocused = true)
+            TvIconButtonSurface(Icons.Filled.Bookmark, "Watchlist", TvButtonStyle.Secondary, enabled = false, isFocused = false)
         }
     }
 }

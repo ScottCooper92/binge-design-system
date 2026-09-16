@@ -22,6 +22,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun iconButton() = Frame { TvIconButtonSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun sectionTitle() = Frame { TvSectionTitleSample() }
 
     @PreviewTest
