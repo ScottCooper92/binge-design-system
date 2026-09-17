@@ -211,6 +211,44 @@ class BingeTvNavRailFocusTest {
         composeTestRule.onNodeWithTag(NEW).assertIsFocused()
     }
 
+    /**
+     * The stale-flag case #55 names: a real ← earlier in the session sets `lastKeyWasStartDirectionKey`, but
+     * both times focus subsequently moves — off the rail, then back onto it — happen with no key event at all
+     * (a bare `requestFocus()`, exactly how the handoffs themselves move focus, and how a pointer/touch
+     * selection would too). Without the reset, that stale `true` survives the rail losing focus and is
+     * misread on the *later*, unrelated arrival as the user having just pressed ← again. Fault injection: with
+     * the `onFocusChanged` reset in [BingeTvNavRail] removed, this fails — the parked rail reads
+     * `userMovedToRail == true` from the old press and [overlayCloseHandoffInFlight] wrongly yields to it,
+     * leaving `OLD` stuck unfocused.
+     */
+    @Test
+    fun `lastKeyWasStartDirectionKey does not outlive the rail-focus session it was set during`() {
+        val fixture = fixture(initialContent = ContentSlot.OLD)
+        pumpFrames()
+        composeTestRule.onNodeWithTag(OLD).assertIsFocused()
+
+        // A real <- moves focus onto the rail — lastKeyWasStartDirectionKey is genuinely true here.
+        composeTestRule.onNodeWithTag(OLD).performKeyInput { pressKey(Key.DirectionLeft) }
+        pumpFrames()
+        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsFocused()
+
+        // Focus leaves the rail with no further key event.
+        composeTestRule.onNodeWithTag(OLD).requestFocus()
+        composeTestRule.onNodeWithTag(OLD).assertIsFocused()
+
+        // The rail regains focus again, also with no key event — modelling Compose's own disposal-triggered
+        // recovery park (class KDoc), not a second real press.
+        composeTestRule.onNodeWithText(RAIL_ITEM).requestFocus()
+        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsFocused()
+
+        fixture.overlayEpoch = 1
+        pumpFrames()
+        composeTestRule.waitForIdle()
+
+        // Without the reset this stays on the rail; the fix must take content back instead.
+        composeTestRule.onNodeWithTag(OLD).assertIsFocused()
+    }
+
     private fun pumpFrames(frames: Int = PUMP_FRAMES) {
         repeat(frames) { composeTestRule.mainClock.advanceTimeByFrame() }
     }
