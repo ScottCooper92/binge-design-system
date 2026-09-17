@@ -4,6 +4,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
 
+private val HERO_RADIUS = 28.dp
+
 object BingeShapes {
     val MediaCard = RoundedCornerShape(20.dp)
 
@@ -29,7 +31,15 @@ object BingeShapes {
     val ProfilePoster = RoundedCornerShape(24.dp)
 
     /** A full-bleed hero surface — a signed-out prompt, an onboarding hero — rounder than any card so it reads as a stage. */
-    val Hero = RoundedCornerShape(28.dp)
+    val Hero = RoundedCornerShape(HERO_RADIUS)
+
+    /**
+     * [Hero]'s radius on the top corners only, for a surface whose bottom edge must stay square —
+     * [com.binge.designsystem.component.BingeBottomSheet]'s chrome (the real sheet's bottom sits
+     * off-screen, and a resting-chrome preview of it renders only to content height, so a fully
+     * rounded shape would show rounded bottom corners a real sheet never does).
+     */
+    val HeroTop = RoundedCornerShape(topStart = HERO_RADIUS, topEnd = HERO_RADIUS)
 
     /** A card that stacks rows (an onboarding points list): between [MediaCard] and [AccountCard], so it sits with both. */
     val ListCard = RoundedCornerShape(22.dp)

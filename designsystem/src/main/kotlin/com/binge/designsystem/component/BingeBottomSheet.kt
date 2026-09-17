@@ -2,7 +2,6 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -15,9 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
-import com.binge.designsystem.R
 import com.binge.designsystem.rememberFoldSafeBottomHeight
+import com.binge.designsystem.theme.BingeShapes
 
 /**
  * Wraps [ModalBottomSheet] with the binge defaults: surfaceContainerHigh container,
@@ -59,10 +57,7 @@ fun BingeBottomSheet(
         sheetState = rememberLockableSheetState(skipPartiallyExpanded, gesturesEnabled),
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        shape = RoundedCornerShape(
-            topStart = dimensionResource(R.dimen.bottom_sheet_corner),
-            topEnd = dimensionResource(R.dimen.bottom_sheet_corner),
-        ),
+        shape = BingeShapes.HeroTop,
         // A confirm sheet suppresses only scrim-tap dismiss (so an accidental outside tap can't
         // discard an in-progress choice) while leaving back-press and drag as deliberate cancels —
         // pass dismissOnClickOutside = false with gesturesEnabled = true for that.

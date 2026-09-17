@@ -132,8 +132,6 @@
     <dimen name="discover_quickclear_chip_gap">6dp</dimen>
     <dimen name="discover_quickclear_chip_close_size">18dp</dimen>
     <dimen name="discover_quickclear_chip_close_icon">12dp</dimen>
-    <!-- Top corner radius for ModalBottomSheet wrappers (see BingeBottomSheet) -->
-    <dimen name="bottom_sheet_corner">28dp</dimen>
     <!-- Modal side sheet (see BingeModalSideSheet): end-anchored panel width + leading corner radius -->
     <dimen name="side_sheet_width">340dp</dimen>
     <dimen name="side_sheet_corner">28dp</dimen>
