@@ -3,15 +3,13 @@ package com.binge.designsystem.catalog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.dimensionResource
-import com.binge.designsystem.R
 import com.binge.designsystem.component.TextEntrySurface
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeShapes
 
 private const val SHEET_TITLE = "Add a note"
 private const val SHEET_HINT = "Write something…"
@@ -32,12 +30,8 @@ fun BingeBottomSheetSample() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        topStart = dimensionResource(R.dimen.bottom_sheet_corner),
-                        topEnd = dimensionResource(R.dimen.bottom_sheet_corner),
-                    ),
-                ).background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                .clip(BingeShapes.HeroTop)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         ) {
             TextEntrySurface(
                 title = SHEET_TITLE,
