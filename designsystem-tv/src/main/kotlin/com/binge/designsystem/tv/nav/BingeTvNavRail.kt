@@ -156,8 +156,11 @@ fun BingeTvNavRail(
     var railHasFocus by remember { mutableStateOf(false) }
     var contentHasFocus by remember { mutableStateOf(false) }
     // Set by `onPreviewKeyEvent` below on every key, true only for the one that moves toward the rail — so
-    // [userMovedToRail] is true exactly while the rail holds focus *because of* that press, and false the
-    // instant either condition lifts: focus leaving the rail, or a later key overwriting this with `false`.
+    // [userMovedToRail] is true exactly while the rail holds focus *because of* that press. A later key
+    // overwrites it directly, but focus can also leave the rail with no key at all (the handoffs below move
+    // focus with a bare `requestFocus()`, and so can a pointer/touch selection), which would otherwise strand
+    // this `true` past its own rail-focus session — reset below the moment `railHasFocus` goes `false`, so a
+    // *later*, unrelated focus arrival can never read as the press that is long gone (#55).
     var lastKeyWasStartDirectionKey by remember { mutableStateOf(false) }
     val userMovedToRail by remember { derivedStateOf { railHasFocus && lastKeyWasStartDirectionKey } }
     val startDirectionKey = tvStartDirectionKey()
@@ -276,6 +279,9 @@ fun BingeTvNavRail(
                 // any item inside it holds focus and closes the moment focus crosses into the content.
                 .onFocusChanged {
                     railHasFocus = it.hasFocus
+                    // Same write, same callback: whatever moved focus off the rail this time, the next
+                    // arrival starts from a clean slate rather than a press from a prior session (#55).
+                    if (!it.hasFocus) lastKeyWasStartDirectionKey = false
                     onRailFocusChanged(it.hasFocus)
                 }
                 // ← must land on the current destination; a plain focus group leaves it to a geometric search
