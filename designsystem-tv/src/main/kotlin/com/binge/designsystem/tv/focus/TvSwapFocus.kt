@@ -17,7 +17,8 @@ import androidx.compose.ui.focus.FocusRequester
  *
  * The latch is **armed by the action**, not by mount or by the state change itself. That is load-bearing: a
  * background state change (a stats refresh, a session poll) must reach the same "signed in" state without yanking
- * focus. Only the press that caused the swap arms the latch, so only it re-focuses, and only once. This is why
+ * focus. Only the press that caused the swap arms the latch, so only it re-focuses — once per arm, via a
+ * retry that keeps offering focus until the replacement takes it or the retry window runs out. This is why
  * neither `restoreTvOverlayFocus`/`TvOverlayArrivalFocusEffect` (unconditional on mount/key) nor
  * `TvArrivalFocusEffect` (offered every frame until taken) fit — both would fire on a background change.
  *
@@ -78,7 +79,10 @@ fun TvSwapFocusEffect(
 ) {
     LaunchedEffect(ready, key) {
         if (!swap.armed || !ready) return@LaunchedEffect
-        restoreTvOverlayFocus(swap.requester)
-        swap.disarm()
+        try {
+            restoreTvOverlayFocus(swap.requester)
+        } finally {
+            swap.disarm()
+        }
     }
 }

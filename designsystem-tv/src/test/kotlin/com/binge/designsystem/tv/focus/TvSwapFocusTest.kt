@@ -108,6 +108,49 @@ class TvSwapFocusTest {
         composeTestRule.runOnIdle { assertFalse("swap must disarm once it lands", fixture.swap.armed) }
     }
 
+    /**
+     * The retry the effect delegates to can suspend for up to [restoreTvOverlayFocus]'s own budget, so a `ready`/
+     * `key` change while it is still in flight — a second press, a back navigation, before the replacement ever
+     * attaches — cancels the coroutine mid-`restoreTvOverlayFocus`. That must still disarm; otherwise the latch
+     * is left `armed` for whichever `ready`/`key` change fires next, and that unrelated background transition
+     * steals focus exactly as the class docs promise it never does.
+     */
+    @Test
+    fun `disarms even when the retry is cancelled mid-flight`() {
+        val fixture = fixture()
+        fixture.requesterAttached = false
+        fixture.focusRail()
+
+        // Stop auto-advancing before arming, so setting `ready` doesn't run the retry to completion before this
+        // test gets a chance to cancel it mid-flight.
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.runOnUiThread { fixture.swap.arm() }
+        composeTestRule.runOnUiThread { fixture.ready = true }
+        // With auto-advance off, idling only drains synchronous composition work — it launches the effect and
+        // runs it to its first frame-bound suspension, without letting the retry run to completion.
+        composeTestRule.waitForIdle()
+        // One more frame resolves that first suspension and re-suspends mid-retry-loop, short of the replacement
+        // ever attaching.
+        composeTestRule.mainClock.advanceTimeByFrame()
+
+        // A `ready` change while the retry is still in flight cancels the coroutine before it reaches disarm().
+        composeTestRule.runOnUiThread { fixture.ready = false }
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.autoAdvance = true
+
+        composeTestRule.runOnIdle {
+            assertFalse("cancelling the in-flight retry must still disarm", fixture.swap.armed)
+        }
+
+        // An unrelated `ready` transition with no fresh arm() must not steal focus onto the replacement, even
+        // though it can now attach — that would only happen if the latch were left stuck armed.
+        fixture.requesterAttached = true
+        fixture.swapInReplacement()
+
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+        composeTestRule.onNodeWithTag(REPLACEMENT).assertIsNotFocused()
+    }
+
     private fun fixture(): Fixture {
         val fixture = Fixture()
         composeTestRule.setContent {
