@@ -32,9 +32,8 @@ object LayoutAnchors {
     /**
      * The detail screens' shared section keys.
      *
-     * These are the sections [com.binge.designsystem.component.DetailScreenSkeleton] stands in for, and
-     * so the vocabulary a detail page's loading state can promise. A page that leads with something else says
-     * so by tagging a different key.
+     * These are the sections the detail skeleton stands in for, and so the vocabulary a detail page's
+     * loading state can promise. A page that leads with something else says so by tagging a different key.
      */
     object Detail {
         /** The immersive header — compact hero, or the cinematic backdrop at an expanded width. */
@@ -52,11 +51,10 @@ object LayoutAnchors {
         /**
          * The cast rail.
          *
-         * Tagged by [com.binge.designsystem.component.DetailScreenSkeleton] but by no resolved page,
-         * so no geometry test names it. The media pages put a data-dependent details block (director,
-         * studios, collection) between the overview and the rail, and
-         * [com.binge.designsystem.component.SkeletonDetailsSection] now reserves an average three rows
-         * for it rather than the nothing that left the rail 124dp adrift.
+         * Tagged by the detail skeleton but by no resolved page, so no geometry test names it. The media
+         * pages put a data-dependent details block (director, studios, collection) between the overview
+         * and the rail, and the details-section band now reserves an average three rows for it rather
+         * than the nothing that left the rail 124dp adrift.
          *
          * An average is the most a fixed band can do — the real list runs from two rows to six — so the
          * residual is smaller but not zero, and this anchor stays unwired rather than asserting a number
