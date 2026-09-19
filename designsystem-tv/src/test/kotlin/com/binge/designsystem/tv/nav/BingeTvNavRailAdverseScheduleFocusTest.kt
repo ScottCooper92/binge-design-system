@@ -18,6 +18,7 @@ import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.tv.testing.TV_LATE_TARGET_SIBLING_TAG
 import com.binge.designsystem.tv.testing.TvLateTarget
@@ -44,6 +45,15 @@ private const val SETTLE_FRAMES = 10
  *
  * Convergence is asserted per #2521's decision 4 — the target holds focus and the rail does not — not the path
  * taken to get there.
+ *
+ * [overlayCloseHandoffInFlight] gets the same N-frames-late cases (#65): it shares [contentHandoffInFlight]'s
+ * exact retry shape (`withTimeoutOrNull([CONTENT_HANDOFF_TIMEOUT_MS])` around `offerFocusToContent(frames =
+ * [CONTENT_HANDOFF_FRAMES])`), but unlike a drill-down it never waits on a focus loss — its own KDoc — so its
+ * fixture parks focus on the rail item exactly as [BingeTvNavRailFocusTest]'s own case for it models (see that
+ * class's KDoc), rather than disposing/remounting the rail itself: #65 found that a remount races this handoff's
+ * retry against the startup offer's own against the same content [androidx.compose.ui.focus.FocusRequester] with
+ * no way to tell which one delivered focus, which is exactly what composing the rail once and bumping
+ * `overlayEpoch` as a plain state change avoids.
  *
  * [contentHandoffInFlight] gets one more case (#72): unlike the startup offer, it wraps its retry in
  * [kotlinx.coroutines.withTimeoutOrNull]([CONTENT_HANDOFF_TIMEOUT_MS]) — a real elapsed-time cap distinct from
@@ -92,6 +102,18 @@ class BingeTvNavRailAdverseScheduleFocusTest {
 
     @Test
     fun `the drill-down handoff converges on a replacement composed 60 frames late`() = assertDrillDownConverges(60)
+
+    @Test
+    fun `the overlay-close handoff converges on a target composed 0 frames late`() = assertOverlayCloseConverges(0)
+
+    @Test
+    fun `the overlay-close handoff converges on a target composed 1 frame late`() = assertOverlayCloseConverges(1)
+
+    @Test
+    fun `the overlay-close handoff converges on a target composed 10 frames late`() = assertOverlayCloseConverges(10)
+
+    @Test
+    fun `the overlay-close handoff converges on a target composed 60 frames late`() = assertOverlayCloseConverges(60)
 
     /**
      * The wall-clock deadline's own success case: 170 frames (2720ms of the shared virtual clock — see the
@@ -165,6 +187,44 @@ class BingeTvNavRailAdverseScheduleFocusTest {
     }
 
     /**
+     * [overlayCloseHandoffInFlight]'s own case (#65): the rail is parked with focus — a bare `requestFocus()`
+     * on the rail item, no key event, [BingeTvNavRailFocusTest]'s "Compose recovery park" modelling (its class
+     * KDoc) for exactly this handoff — then `overlayEpoch` bumps on the same composed rail while the content
+     * group's target composes [delayFrames] frames late, standing in for the fresh pane an overlay pop returns
+     * to. Unlike [assertDrillDownConverges] there is no prior "old" focus to sequence on and lose — the sibling
+     * is never focused before `dispose` flips — matching the handoff's own contract that it never waits on a
+     * focus loss (its KDoc). Fault-proven: this handoff's `yieldToRail` reads `userMovedToRail`, not a raw
+     * `railHasFocus`; reverting it to the raw read — #54's own regression — fails this, since the parked rail
+     * reads `railHasFocus == true` too and would keep the handoff from ever claiming the late target.
+     */
+    private fun assertOverlayCloseConverges(delayFrames: Int) {
+        var overlayEpoch by mutableIntStateOf(0)
+        var dispose by mutableStateOf(false)
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.setContent {
+            BingeTvTheme {
+                rail(contentDepth = 1, overlayEpoch = overlayEpoch) {
+                    TvLateTarget(delayFrames = delayFrames, dispose = dispose) {
+                        Box(Modifier.testTag(TARGET).size(80.dp).focusable())
+                    }
+                }
+            }
+        }
+        repeat(SETTLE_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.onNodeWithText(RAIL_ITEM).requestFocus()
+        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsFocused()
+
+        overlayEpoch = 1
+        dispose = true
+        composeTestRule.waitForIdle()
+        repeat(delayFrames + SETTLE_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(TARGET).assertIsFocused()
+        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsNotFocused()
+    }
+
+    /**
      * Same disposing-sibling setup as [assertDrillDownConverges], but [delayFrames] is chosen past
      * [CONTENT_HANDOFF_TIMEOUT_MS] rather than under it, so [contentHandoffInFlight]'s `withTimeoutOrNull`
      * cancels the retry before the replacement ever composes. The replacement still gets composed and pumped
@@ -199,7 +259,11 @@ class BingeTvNavRailAdverseScheduleFocusTest {
     }
 
     @Composable
-    private fun rail(contentDepth: Int, content: @Composable () -> Unit) {
+    private fun rail(
+        contentDepth: Int,
+        overlayEpoch: Int = 0,
+        content: @Composable () -> Unit,
+    ) {
         BingeTvNavRail(
             header = null,
             items = listOf(TvNavRailItem(key = ITEM_KEY, label = RAIL_ITEM, icon = Icons.Filled.Home)),
@@ -208,6 +272,7 @@ class BingeTvNavRailAdverseScheduleFocusTest {
             onSelect = {},
             expanded = true,
             contentDepth = contentDepth,
+            overlayEpoch = overlayEpoch,
             content = content,
         )
     }
