@@ -5,9 +5,11 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
@@ -84,6 +86,28 @@ class TvSwapFocusTest {
         composeTestRule.onNodeWithTag(REPLACEMENT).assertIsFocused()
     }
 
+    /**
+     * The replacement may take longer than one frame to compose (a reload racing the arrival) — the case a
+     * single retry cannot cover. Adverse-schedule fixture per CLAUDE.md's "Compose UI and focus tests": the
+     * replacement's own focus target attaches [LATE_ATTACH_FRAMES] frames after it mounts, standing in for that
+     * slower compose. Reverting [TvSwapFocusEffect] to its old one-shot body fails this test — the request fires
+     * into the gap before the target attaches and is never retried, so focus never lands and the swap never
+     * disarms.
+     */
+    @Test
+    fun `the swap keeps offering until the replacement's focus target attaches`() {
+        val fixture = fixture()
+        fixture.requesterAttached = false
+        fixture.focusOld()
+
+        composeTestRule.runOnIdle { fixture.swap.arm() }
+        composeTestRule.runOnIdle { fixture.ready = true }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(REPLACEMENT).assertIsFocused()
+        composeTestRule.runOnIdle { assertFalse("swap must disarm once it lands", fixture.swap.armed) }
+    }
+
     private fun fixture(): Fixture {
         val fixture = Fixture()
         composeTestRule.setContent {
@@ -96,12 +120,25 @@ class TvSwapFocusTest {
                     // the wrong reason.
                     Box(Modifier.testTag(RAIL).size(80.dp).focusable())
                     if (fixture.ready) {
+                        if (!fixture.requesterAttached) {
+                            // Stands in for a replacement whose own compose takes longer than one frame: attach
+                            // its focus target several frames after it mounts rather than on the same frame.
+                            LaunchedEffect(Unit) {
+                                repeat(LATE_ATTACH_FRAMES) { withFrameNanos { } }
+                                fixture.requesterAttached = true
+                            }
+                        }
                         Box(
                             Modifier
                                 .testTag(REPLACEMENT)
                                 .size(80.dp)
-                                .focusRequester(fixture.swap.requester)
-                                .focusable(),
+                                .then(
+                                    if (fixture.requesterAttached) {
+                                        Modifier.focusRequester(fixture.swap.requester)
+                                    } else {
+                                        Modifier
+                                    },
+                                ).focusable(),
                         )
                     } else {
                         Box(Modifier.testTag(OLD).size(80.dp).focusable())
@@ -115,6 +152,7 @@ class TvSwapFocusTest {
 
     private inner class Fixture {
         var ready by mutableStateOf(false)
+        var requesterAttached by mutableStateOf(true)
         lateinit var swap: TvSwapFocus
 
         /** Plant focus on the pre-swap control — the state a press starts from. */
@@ -133,5 +171,10 @@ class TvSwapFocusTest {
             composeTestRule.runOnIdle { ready = true }
             composeTestRule.waitForIdle()
         }
+    }
+
+    private companion object {
+        /** Comfortably past one frame, short of the loop's own multi-second budget. */
+        const val LATE_ATTACH_FRAMES = 10
     }
 }
