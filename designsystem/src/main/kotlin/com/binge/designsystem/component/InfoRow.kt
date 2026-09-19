@@ -18,6 +18,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 /**
@@ -148,7 +149,7 @@ fun InfoRowList(entries: List<InfoRowEntry>, modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.screen_content_inset)),
+                .padding(horizontal = resolvedContentInset()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.info_row_spacing_v)),
     ) {
         visible.forEach { InfoRow(label = it.label, value = it.value) }

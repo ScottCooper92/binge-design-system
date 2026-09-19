@@ -19,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -26,7 +27,7 @@ private const val SKELETON_CARD_COUNT = 6
 
 @Composable
 fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CARD_COUNT) {
-    val inset = dimensionResource(R.dimen.screen_content_inset)
+    val inset = resolvedContentInset()
     // Matches the loaded MediaCarousel: full-bleed row, first column clear of an overlaying rail.
     val startPadding = inset + navOverlayStart()
     Column(modifier = modifier.fillMaxWidth()) {

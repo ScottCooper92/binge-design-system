@@ -28,6 +28,17 @@
          padding_m, which is deliberately NOT this token: padding_m is spacing *inside* a component
          and must stay 16dp at every width, or components inflate on a tablet. -->
     <dimen name="screen_content_inset">16dp</dimen>
+    <!-- The same three-step ramp as screen_content_inset (16 / 24 / 32dp), named so
+         resolvedContentInset() (PaneContentInset.kt) can pick a band from an arbitrary pane width
+         instead of the window's — screen_content_inset itself only resolves via qualifier, which
+         answers "how wide is the window", not "how wide is this pane". -->
+    <dimen name="content_inset_compact">16dp</dimen>
+    <dimen name="content_inset_medium">24dp</dimen>
+    <dimen name="content_inset_expanded">32dp</dimen>
+    <!-- The width breakpoints the qualifier folders above are named for (w600dp / w840dp), given a
+         Kotlin-readable form for the same comparison against a pane's own width. -->
+    <dimen name="content_inset_medium_breakpoint">600dp</dimen>
+    <dimen name="content_inset_expanded_breakpoint">840dp</dimen>
     <!-- Grid-listing screen header (back button + big headline) -->
     <dimen name="grid_header_title_padding_h">20dp</dimen>
     <dimen name="grid_header_title_padding_bottom">18dp</dimen>

@@ -22,6 +22,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.OverlaidHeaderContent
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.resolvedContentInset
 
 /**
  * A horizontally-scrolling row of [BingeFilterChip]s — the selected one filled in the primary accent,
@@ -84,7 +85,7 @@ fun BingeFilterChipRow(
  */
 @Composable
 internal fun filterChipRowPadding(): PaddingValues {
-    val edge = dimensionResource(R.dimen.screen_content_inset)
+    val edge = resolvedContentInset()
     val vertical = dimensionResource(R.dimen.padding_s)
     return PaddingValues(start = edge + navOverlayStart(), top = vertical, end = edge, bottom = vertical)
 }

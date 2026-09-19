@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.labelLargeEmphasis
@@ -93,7 +94,7 @@ fun RatingCard(
     Column(
         modifier =
             modifier
-                .padding(horizontal = dimensionResource(R.dimen.screen_content_inset))
+                .padding(horizontal = resolvedContentInset())
                 .clip(shape)
                 .background(containerColor)
                 .then(

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 @Composable
@@ -31,7 +32,7 @@ fun DetailStatRow(stats: List<DetailStat>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.screen_content_inset))
+            .padding(horizontal = resolvedContentInset())
             .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,

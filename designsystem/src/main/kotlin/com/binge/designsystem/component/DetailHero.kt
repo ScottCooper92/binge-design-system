@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowInsetsControllerCompat
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
 
@@ -186,8 +187,8 @@ private fun HeroTextColumn(
     Column(
         modifier = modifier
             .padding(
-                start = dimensionResource(R.dimen.screen_content_inset),
-                end = dimensionResource(R.dimen.screen_content_inset),
+                start = resolvedContentInset(),
+                end = resolvedContentInset(),
                 bottom = dimensionResource(R.dimen.detail_hero_text_bottom_padding),
             ),
     ) {

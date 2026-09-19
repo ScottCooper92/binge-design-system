@@ -6,10 +6,9 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 /**
@@ -27,7 +26,7 @@ fun BingeTabRow(
     PrimaryScrollableTabRow(
         selectedTabIndex = selectedIndex.coerceIn(0, (tabs.size - 1).coerceAtLeast(0)),
         modifier = modifier,
-        edgePadding = dimensionResource(R.dimen.screen_content_inset),
+        edgePadding = resolvedContentInset(),
     ) {
         tabs.forEachIndexed { index, title ->
             Tab(
