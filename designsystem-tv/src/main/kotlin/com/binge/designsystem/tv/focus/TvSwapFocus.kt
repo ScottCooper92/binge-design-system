@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.focus.FocusRequester
 
 /**
@@ -18,7 +17,8 @@ import androidx.compose.ui.focus.FocusRequester
  *
  * The latch is **armed by the action**, not by mount or by the state change itself. That is load-bearing: a
  * background state change (a stats refresh, a session poll) must reach the same "signed in" state without yanking
- * focus. Only the press that caused the swap arms the latch, so only it re-focuses, and only once. This is why
+ * focus. Only the press that caused the swap arms the latch, so only it re-focuses — once per arm, via a
+ * retry that keeps offering focus until the replacement takes it or the retry window runs out. This is why
  * neither `restoreTvOverlayFocus`/`TvOverlayArrivalFocusEffect` (unconditional on mount/key) nor
  * `TvArrivalFocusEffect` (offered every frame until taken) fit — both would fire on a background change.
  *
@@ -61,16 +61,15 @@ fun rememberTvSwapFocus(): TvSwapFocus {
 fun rememberTvSwapFocus(requester: FocusRequester): TvSwapFocus = remember(requester) { TvSwapFocus(requester) }
 
 /**
- * Fire once — a frame after [ready] becomes true while [swap] is armed — then disarm. Keyed on [ready] and
- * [key], so a caller that gates on a recomposition label (the shell's `currentKey == homeKey`) passes that key
- * to re-evaluate when it changes rather than on a `withFrameNanos` alone.
+ * Offer focus to the replacement until it lands, once [ready] becomes true while [swap] is armed — then disarm.
+ * Keyed on [ready] and [key], so a caller that gates on a recomposition label (the shell's
+ * `currentKey == homeKey`) passes that key to re-evaluate when it changes rather than on a frame wait alone.
  *
- * The frame wait is [restoreTvOverlayFocus]'s and is load-bearing for the same measured reason:
- * the press disposes the focused node and swaps a new subtree in, so a synchronous request fires before
- * the replacement control is laid out and is lost. Waiting one frame lets the swap land before the request.
- *
- * `runCatching` because the replacement may still be un-composed at the requesting frame (a reload racing the
- * arrival); the ordinary handoff then still lands.
+ * Delegates to [restoreTvOverlayFocus] for the frame-wait-then-retry shape, load-bearing for the same measured
+ * reason: the press disposes the focused node and swaps a new subtree in, so a request fired before the
+ * replacement control is laid out is lost — and a single retry one frame later is not guaranteed either, since
+ * the replacement may take longer than one frame to compose (a reload racing the arrival). Offering until
+ * granted, bounded the same way [restoreTvOverlayFocus] is, is what the single mount-time request never was.
  */
 @Composable
 fun TvSwapFocusEffect(
@@ -80,8 +79,10 @@ fun TvSwapFocusEffect(
 ) {
     LaunchedEffect(ready, key) {
         if (!swap.armed || !ready) return@LaunchedEffect
-        withFrameNanos { }
-        runCatching { swap.requester.requestFocus() }
-        swap.disarm()
+        try {
+            restoreTvOverlayFocus(swap.requester)
+        } finally {
+            swap.disarm()
+        }
     }
 }
