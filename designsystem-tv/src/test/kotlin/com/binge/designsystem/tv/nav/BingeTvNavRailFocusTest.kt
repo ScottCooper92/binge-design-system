@@ -22,6 +22,7 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -178,9 +179,11 @@ class BingeTvNavRailFocusTest {
      * on a focus loss: the pane an overlay closes onto is a fresh mount that never held focus. The rail is
      * parked with focus per the class KDoc's recovery-park modelling, standing in for whatever the pop actually
      * left focus on; the handoff must still take content the moment it has something to offer, without ever
-     * having anything to wait on losing. Fault injection: reverting this handoff's `yieldToRail` from
-     * `userMovedToRail` to a raw `railHasFocus` read — the exact regression #54 names — fails this, since the
-     * parked rail reads `railHasFocus == true` too and only `userMovedToRail` tells the two states apart.
+     * having anything to wait on losing. Since #2518, "content has nothing to offer" no longer means the group is
+     * empty — [TvFocusSink] is always something, so the handoff claims *that* rather than leaving focus parked
+     * on the rail. Fault injection: reverting this handoff's `yieldToRail` from `userMovedToRail` to a raw
+     * `railHasFocus` read — the exact regression #54 names — fails this, since the parked rail reads
+     * `railHasFocus == true` too and only `userMovedToRail` tells the two states apart.
      */
     @Test
     fun `overlayCloseHandoffInFlight takes focus without waiting on a focus-loss that never happens`() {
@@ -201,8 +204,9 @@ class BingeTvNavRailFocusTest {
 
         fixture.overlayEpoch = 1
         pumpFrames()
-        // Content still has nothing to offer — the rail keeps focus, and nothing has hung waiting on a loss.
-        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsFocused()
+        // The sink is always available, so the handoff claims it rather than leaving focus parked on the rail —
+        // nothing has hung waiting on a loss.
+        composeTestRule.onNodeWithTag(TV_FOCUS_SINK_TAG).assertIsFocused()
 
         fixture.contentSlot = ContentSlot.NEW
         pumpFrames()
