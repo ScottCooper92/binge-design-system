@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.BingeIcons
 import com.binge.designsystem.R
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.titleMediumEmphasis
@@ -47,12 +48,12 @@ fun DiscoverEntryRow(
     subtitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    startPadding: Dp = dimensionResource(R.dimen.screen_content_inset) + navOverlayStart(),
+    startPadding: Dp = resolvedContentInset() + navOverlayStart(),
 ) {
     ListRow(
         modifier = modifier.padding(
             start = startPadding,
-            end = dimensionResource(R.dimen.screen_content_inset),
+            end = resolvedContentInset(),
         ),
         onClick = onClick,
         verticalAlignment = Alignment.CenterVertically,

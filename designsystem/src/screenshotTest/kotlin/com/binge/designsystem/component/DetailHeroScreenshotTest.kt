@@ -1,10 +1,18 @@
 package com.binge.designsystem.component
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.LocalPaneWidth
 import com.binge.designsystem.R
 import com.binge.designsystem.preview.ComponentPreviews
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -81,6 +89,31 @@ class DetailHeroScreenshotTest {
                     )
                 },
             )
+        }
+    }
+
+    /**
+     * A wide window (840dp, the two-pane breakpoint) with the hero rendered in a 360dp pane rather
+     * than alone. [LocalPaneWidth] set to the pane's own width is what keeps its side padding at the
+     * compact 16dp band instead of the 840dp window's 32dp — see [resolvedContentInset].
+     */
+    @PreviewTest
+    @Preview(name = "pane360", device = "spec:width=840dp,height=1180dp,orientation=portrait", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun AtPaneWidth() {
+        ScreenshotTheme {
+            CompositionLocalProvider(LocalPaneWidth provides 360.dp) {
+                Box(modifier = Modifier.width(360.dp)) {
+                    DetailHero(
+                        title = "The Dark Knight",
+                        backdropUrl = null,
+                        tagline = "Why So Serious?",
+                        metaText = "9.0 · 2008 · 2h 32m",
+                        genres = listOf("Action", "Crime", "Drama", "Thriller"),
+                        onBack = {},
+                    )
+                }
+            }
         }
     }
 }
