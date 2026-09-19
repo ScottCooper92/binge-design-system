@@ -55,16 +55,36 @@ private const val HANDOFF_HOLD_FRAMES = 3
  * disposal-triggered recovery would — `railHasFocus` true, `lastKeyWasStartDirectionKey` false — without
  * depending on a specific disposal timing this harness cannot reliably reproduce.
  *
- * **A real ← is never sent while `content` has nothing focusable.** Doing so is a genuine dead end in this
- * harness, not a production one: `performKeyInput { pressKey(Key.DirectionLeft) }` against a rail that is
- * already the leftmost focusable, with `content`'s focus group completely empty, leaves that focus group
- * unable to compose new focusable children for the rest of the test — no exception, no log, just a
- * recomposition scope that silently stops being invalidated (reproduced against several structurally
- * different `content` shapes, including one with a stable node identity whose focusability alone toggled). The
- * one real-key test below presses ← only once `content` already holds something focusable, which sidesteps it;
- * the discrimination between a genuine key and a merely-parked rail — the regression #54 itself names — is
- * carried instead by the two negative "parked rail" tests, each fault-proven directly against that regression
- * (see their own KDoc).
+ * **A real ← is never sent while the rail is already the focused, leftmost node.** #60 root-caused the freeze
+ * PR #59 hit doing exactly that: `performKeyInput { pressKey(Key.DirectionLeft) }` against an already-focused
+ * rail leaves the content focus group unable to compose new focusable children for the rest of the test — no
+ * exception, no log, just a recomposition scope that silently stops being invalidated. The trigger is not
+ * "`content` is empty" (that was this harness's own repro, not the actual precondition): it is any real
+ * directional key whose default 2D focus search exhausts the **entire composition** without finding one
+ * candidate anywhere, which is deterministic and content-independent here, because the rail is structurally
+ * this layout's leftmost region — a further ← from an already-focused rail can never find a candidate, whether
+ * `content` holds nothing, something unfocused, or something that already had focus and lost it. Confirmed
+ * directly: a second real ← pressed from the rail freezes the harness identically with `content` fully
+ * populated; an *unrelated* real key (`Key.A`) from the same parked rail does not freeze anything, so this is
+ * specific to Compose recognising the key as one its default search acts on, not to real key input in general.
+ *
+ * It is not this component's `onPreviewKeyEvent` failing to guard the search: consuming the key in *both* its
+ * `KeyDown` and `KeyUp` phases (so no modifier in this file ever reports the event unhandled) does not stop the
+ * freeze, and neither does trapping the exit with `focusProperties { onExit = { cancelFocusChange() } }` — that
+ * callback never even fires, because the search fails before it would offer a candidate to veto. Nor is it a
+ * delay: pumping 300 frames afterward, or toggling `mainClock.autoAdvance` around the press, never recovers it.
+ * There is no modifier-chain interception point between dispatch and whatever inside Compose UI's focus search
+ * corrupts the recomposer here, which is why this is a harness defect to file upstream (against
+ * `androidx.compose.ui.test`'s key dispatch on Robolectric) rather than a bug in this module's focus wiring.
+ *
+ * That also makes the exact race #54 asked for — a real ← landing on the rail *while the startup offer is still
+ * retrying* because `content` has not taken focus yet — impossible to build with a literal key press here, not
+ * merely inconvenient: "still retrying" **means** `content` has no focus yet, so the only node such a press can
+ * ever be dispatched from is the rail itself, and a further ← from the rail is always the zero-candidate search
+ * above. The two "parked rail" tests below and the one real-key test carry the discrimination #54 needs instead —
+ * the parked cases model a real press's *end state* (`requestFocus()`, no key), and the real-key test presses ←
+ * only once `content` already holds something focusable, landing safely on the rail without ever asking Compose
+ * to search from it again.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
