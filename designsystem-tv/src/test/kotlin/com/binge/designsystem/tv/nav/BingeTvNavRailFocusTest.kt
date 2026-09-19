@@ -60,16 +60,48 @@ private const val HANDOFF_HOLD_FRAMES = 3
  * disposal-triggered recovery would — `railHasFocus` true, `lastKeyWasStartDirectionKey` false — without
  * depending on a specific disposal timing this harness cannot reliably reproduce.
  *
- * **A real ← is never sent while `content` has nothing focusable.** Doing so is a genuine dead end in this
- * harness, not a production one: `performKeyInput { pressKey(Key.DirectionLeft) }` against a rail that is
- * already the leftmost focusable, with `content`'s focus group completely empty, leaves that focus group
- * unable to compose new focusable children for the rest of the test — no exception, no log, just a
- * recomposition scope that silently stops being invalidated (reproduced against several structurally
- * different `content` shapes, including one with a stable node identity whose focusability alone toggled). The
- * one real-key test below presses ← only once `content` already holds something focusable, which sidesteps it;
- * the discrimination between a genuine key and a merely-parked rail — the regression #54 itself names — is
- * carried instead by the two negative "parked rail" tests, each fault-proven directly against that regression
- * (see their own KDoc).
+ * **A real ← is never sent while `content` has nothing focusable.** Doing so used to read as a dead end in
+ * this harness — `performKeyInput { pressKey(Key.DirectionLeft) }` against a rail that is already the leftmost
+ * focusable, with `content`'s focus group completely empty, left that focus group unable to compose new
+ * focusable children for the rest of the test, no exception, no log — but #60 root-caused it, and the key press
+ * turned out to be a red herring.
+ *
+ * **The actual mechanism has nothing to do with the key, the search, or `content` being empty.** It is a
+ * property of this harness with `mainClock.autoAdvance = false`: a state write from the test thread only
+ * reliably reaches a later `mainClock.advanceTimeByFrame()` call — i.e. only reliably composes a *new*
+ * focusable child into the tree — while some coroutine in the composition is actively suspended on
+ * [withFrameNanos][androidx.compose.runtime.withFrameNanos] at the moment of that later call. Once every
+ * `LaunchedEffect` in the tree has finished, a subsequent state write is not guaranteed to be picked up by
+ * further `advanceTimeByFrame()` calls, silently. Isolated with three direct experiments, none involving
+ * `BingeTvNavRail`, a key press, or focus at all: a bare `Box` with an `if (flag) Box(testTag(...))` child never
+ * composes the tagged child no matter how many frames are pumped after the flag flips, unless a sibling
+ * `LaunchedEffect(Unit) { while (true) withFrameNanos {} }` is kept running throughout — with that effect
+ * present, the identical flip composes on the very next frame. Confirmed again against the real component: the
+ * exact "second real ←" sequence that used to be blamed on the focus search reliably freezes later composition
+ * with no other effect active, and reliably does **not** freeze it once that same no-op `LaunchedEffect` runs
+ * alongside `BingeTvNavRail` — same key, same zero-candidate search, only the presence of an active frame
+ * awaiter differs. This is a manual-clock-testing pitfall of this harness version, not an androidx defect (there
+ * is nothing to file upstream): the earlier "recomposition scope corrupted by the focus search" framing was a
+ * correlation the original repro mistook for the trigger, because a key press against an already-focused,
+ * structurally leftmost rail happens to land at the exact moment `BingeTvNavRail`'s own startup offer has
+ * *already* finished — see below for why that moment arrives almost immediately.
+ *
+ * **Why "the startup offer is still retrying" is no longer a testable window.** [offerFocusToContent]'s loop
+ * exits the instant `taken()` is true, checked *before* it ever calls `withFrameNanos` that iteration — and
+ * since [TvFocusSink] (#2518) guarantees `content`'s focus group always has *something* focusable, the offer's
+ * `LaunchedEffect` claims the sink and completes within a frame or two of mount, for every destination, loading
+ * or not (see the next test's KDoc). A real key dispatched while the offer is *provably* still active would
+ * therefore need to land inside a one-or-two-frame window in which, by construction, nothing has been focused
+ * yet for a key event to meaningfully originate from — not a harness limitation to route around, but the actual
+ * shape of the production code post-#2518. Pinning a test to that exact frame count is precisely the kind of
+ * coupling this file's frame-budget comments already warn against (`TvNavRailFocus.kt`: "these numbers can't be
+ * tuned into a fix"), so it is not built here. The one real-key test below presses ← only once `content` already
+ * holds something focusable, which needs no new composition afterward and so never depends on an active effect
+ * being present; the discrimination between a genuine key and a merely-parked rail — the regression #54 itself
+ * names — is carried instead by the two negative "parked rail" tests, each fault-proven directly against that
+ * regression (see their own KDoc). A future test that *does* need the harness to compose something new after a
+ * quiet moment should keep a coroutine on `withFrameNanos` alive across it (as `contentDepth`/`overlayEpoch`
+ * changes already do, by starting a fresh handoff effect) rather than rely on manual clock stepping alone.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
