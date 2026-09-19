@@ -36,6 +36,13 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
 
+    // Publishes the adverse-schedule focus harness (#2521) to this module's own test source set — the target
+    // arriving frames late is a property of the retry loops that live here, so the fixture belongs beside them
+    // rather than being hand-rolled per test.
+    testFixtures {
+        enable = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -160,4 +167,10 @@ dependencies {
     testImplementation(composeBom)
     testImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)
+
+    // The adverse-schedule fixture's compile surface is Compose + compose-ui-test, the same stack the focus
+    // tests it feeds already carry.
+    testFixturesImplementation(composeBom)
+    testFixturesImplementation(libs.compose.ui)
+    testFixturesImplementation(libs.compose.ui.test.junit4)
 }
