@@ -10,6 +10,8 @@
     <dimen name="tv_focus_ring_width">3dp</dimen>
     <dimen name="tv_focus_ring_offset">4dp</dimen>
     <dimen name="tv_focus_ring_bleed">12dp</dimen>
+    <!-- Focus sink (#2518): a real laid-out node, not zero-size, so it is a legitimate focus target -->
+    <dimen name="tv_focus_sink_size">1dp</dimen>
     <!-- Navigation rail -->
     <dimen name="tv_nav_rail_collapsed_width">72dp</dimen>
     <dimen name="tv_nav_rail_expanded_width">220dp</dimen>

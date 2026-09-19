@@ -46,6 +46,7 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
+import com.binge.designsystem.tv.focus.TvFocusSink
 import com.binge.designsystem.tv.focus.tvSelectionFocusGroup
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
 import kotlinx.coroutines.withTimeoutOrNull
@@ -257,6 +258,13 @@ fun BingeTvNavRail(
             ) {
                 content()
             }
+            // A sibling of the destination's own content, never inside it: the group's entry requester
+            // (`contentFocus`) then always has something to land on from frame one, rather than racing
+            // whatever the destination composes first (#2518). Gone the instant the pane reports focus —
+            // including the sink's own: re-composing it forces Compose's own recovery search rather than
+            // leaving a stale grant unable to yield to whatever the destination grows next (see the class
+            // KDoc's fault-injection note on [TvFocusSink] usage).
+            if (!contentHasFocus) TvFocusSink(leftEntry = railEntry)
         }
         Column(
             modifier = Modifier
