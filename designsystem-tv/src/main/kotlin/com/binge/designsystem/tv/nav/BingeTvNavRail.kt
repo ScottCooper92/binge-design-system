@@ -149,9 +149,9 @@ fun BingeTvNavRail(
     overlayEpoch: Int = 0,
     content: @Composable () -> Unit,
 ) {
-    // The rail's entry point: whichever item is selected. Used for the two ways focus arrives here — the ←
-    // redirect and an owner's [railFocusRequester] (which, when supplied, *is* this requester, so Back-to-rail
-    // lands on the selected item) — plus [TvFocusSink]'s own `leftEntry`, which shares the same node so ← still
+    // The rail's entry point: whichever item is selected. Used for the three ways focus arrives here — the ←
+    // redirect, an owner's [railFocusRequester] (which, when supplied, *is* this requester, so Back-to-rail
+    // lands on the selected item), and [TvFocusSink]'s own `leftEntry`, which shares the same node so ← still
     // opens the rail while the sink holds focus.
     val railEntry = railFocusRequester ?: remember { FocusRequester() }
     val contentFocus = contentFocusRequester ?: remember { FocusRequester() }
