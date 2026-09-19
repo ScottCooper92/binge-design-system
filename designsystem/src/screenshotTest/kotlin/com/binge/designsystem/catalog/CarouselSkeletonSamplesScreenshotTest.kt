@@ -11,11 +11,4 @@ class CarouselSkeletonSamplesScreenshotTest {
     fun CarouselSkeleton() {
         CarouselSkeletonSample()
     }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun HubScreen() {
-        HubScreenSkeletonSample()
-    }
 }

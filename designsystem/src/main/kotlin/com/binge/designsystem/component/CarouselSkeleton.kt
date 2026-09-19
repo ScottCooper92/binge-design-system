@@ -5,11 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
@@ -20,18 +18,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
-import com.binge.designsystem.component.ListRow
-import com.binge.designsystem.isDiscoverInNav
-import com.binge.designsystem.layout.LayoutAnchors
-import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
 private const val SKELETON_CARD_COUNT = 6
-private const val HUB_SKELETON_CAROUSEL_COUNT = 5
-private const val SKELETON_TITLE_WIDTH_FRACTION = 0.55f
-private const val SKELETON_SUBTITLE_WIDTH_FRACTION = 0.8f
 
 @Composable
 fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CARD_COUNT) {
@@ -67,74 +58,6 @@ fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CAR
     }
 }
 
-/**
- * Loading placeholder for the Movies / TV hubs. Mirrors the loaded layout order — hero, the phone-only
- * Discover entry row, then a run of carousels — so content does not reflow when it arrives.
- *
- * Each section carries the anchor its resolved counterpart carries, so the geometry this reserves is
- * asserted rather than reviewed — see [LayoutAnchors].
- */
-@Composable
-fun HubScreenSkeleton(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.hub_content_spacing)),
-    ) {
-        // An empty HeroCarousel is the hero placeholder at the same adaptive height the loaded hero uses.
-        HeroCarousel(
-            items = emptyList(),
-            onItemClick = {},
-            modifier = Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Hub.HERO)),
-        )
-        if (!isDiscoverInNav()) {
-            DiscoverEntryRowSkeleton(
-                modifier = Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Hub.DISCOVER_ENTRY)),
-            )
-        }
-        repeat(HUB_SKELETON_CAROUSEL_COUNT) { index ->
-            CarouselSkeleton(
-                modifier = if (index == 0) {
-                    Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Hub.FIRST_CAROUSEL))
-                } else {
-                    Modifier
-                },
-            )
-        }
-    }
-}
-
-/**
- * Placeholder for [DiscoverEntryRow], built on the same [ListRow] chrome rather than a hand-copied
- * clip/padding/gap — so the plate cannot drift from the row it stands in for.
- */
-@Composable
-private fun DiscoverEntryRowSkeleton(modifier: Modifier = Modifier) {
-    ListRow(
-        modifier = modifier.padding(
-            start = dimensionResource(R.dimen.screen_content_inset) + navOverlayStart(),
-            end = dimensionResource(R.dimen.screen_content_inset),
-        ),
-        verticalAlignment = Alignment.CenterVertically,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        leading = {
-            Box(
-                modifier = Modifier
-                    .size(dimensionResource(R.dimen.discover_entry_icon_size))
-                    .clip(BingeShapes.Large)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-            )
-        },
-    ) { contentModifier ->
-        Column(
-            modifier = contentModifier,
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
-        ) {
-            SkeletonBar(Modifier.fillMaxWidth(SKELETON_TITLE_WIDTH_FRACTION))
-            SkeletonBar(Modifier.fillMaxWidth(SKELETON_SUBTITLE_WIDTH_FRACTION))
-        }
-    }
-}
-
 @Composable
 private fun SkeletonBar(modifier: Modifier = Modifier) {
     Box(
@@ -150,13 +73,5 @@ private fun SkeletonBar(modifier: Modifier = Modifier) {
 private fun PreviewCarouselSkeleton() {
     BingeExpressiveTheme {
         CarouselSkeleton()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PreviewHubScreenSkeleton() {
-    BingeExpressiveTheme {
-        HubScreenSkeleton()
     }
 }

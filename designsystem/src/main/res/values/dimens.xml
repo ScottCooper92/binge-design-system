@@ -191,14 +191,6 @@
          first tile is reserved where it lands, not a chip row too high). -->
     <dimen name="skeleton_filter_chip_height">44dp</dimen>
     <dimen name="skeleton_filter_chip_width">88dp</dimen>
-    <!-- Detail screen skeleton -->
-    <dimen name="detail_skeleton_text_height">12dp</dimen>
-    <dimen name="detail_skeleton_value_width">140dp</dimen>
-    <!-- The plate standing in for the episode page's rating card: the unrated card's own body height, so
-         the overview below it is reserved where it lands rather than where an action row would put it.
-         The rated card is 4dp taller (a score and stars in place of the prompt's three lines); the unrated
-         height is the one reserved, because that is the page an unrated episode loads into. -->
-    <dimen name="detail_skeleton_rating_card_height">96dp</dimen>
     <!-- Hub screens layout rhythm -->
     <dimen name="hub_content_spacing">24dp</dimen>
     <!-- Rating chip -->
