@@ -13,9 +13,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
@@ -24,6 +27,7 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -97,18 +101,29 @@ class BingeTvNavRailFocusTest {
     }
 
     /**
-     * With content never becoming focusable and nothing else claiming focus either, the startup offer's own
-     * 120-frame budget runs out and its `railEntry.requestFocus()` fallback is what lands focus on the rail —
-     * not an incidental focus state the loop mistook for the user having gotten there.
+     * With content never becoming focusable and nothing else claiming focus either, focus is still on the rail
+     * or [TvFocusSink] well past the startup offer's 120-frame budget — there is no dead end where neither holds
+     * it. #2523 deletes the offer's own `railEntry.requestFocus()` fallback: since #2518, [TvFocusSink] claims
+     * the content group's entry before that fallback could ever run, and the two then alternate every frame
+     * indefinitely (a sink holding focus disposes itself the next frame, and Compose's own disposal-triggered
+     * recovery search — not this rail's code — lands the frame in between). Landing on the rail specifically at
+     * this one sampled frame is a coincidence of that oscillation's parity, not a deliberate fallback; see
+     * [BingeTvNavRailStartupFallbackRemovalTest] for the invariant checked across every frame instead of one.
      */
     @Test
-    fun `the startup offer falls back to the rail entry once content has nothing to offer`() {
+    fun `focus is on the rail or the sink once the startup offer's budget has run out`() {
         fixture()
 
         repeat(FOCUS_HANDOFF_FRAMES + PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsFocused()
+        val railFocused = composeTestRule.onAllNodesWithText(RAIL_ITEM).fetchSemanticsNodes().any {
+            it.config.getOrElse(SemanticsProperties.Focused) { false }
+        }
+        val sinkFocused = composeTestRule.onAllNodesWithTag(TV_FOCUS_SINK_TAG).fetchSemanticsNodes().any {
+            it.config.getOrElse(SemanticsProperties.Focused) { false }
+        }
+        assertTrue("neither the rail nor the sink held focus", railFocused || sinkFocused)
     }
 
     /**

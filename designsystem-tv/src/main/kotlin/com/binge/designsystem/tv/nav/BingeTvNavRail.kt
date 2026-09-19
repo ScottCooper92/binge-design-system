@@ -112,8 +112,8 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
  * [railFocusRequester] lets an owner drive focus *into* the rail — the shell's Back handler uses it to land focus
  * on the selected item when Back is pressed with focus in the content (step 1 of the host app's TV Back
  * hierarchy). It *is* the rail's own selected-item requester (the one
- * `tvSelectionTarget` pins to the selection), so it lands on the current destination's row — the same node and
- * path the startup fallback uses. Default `null` keeps a private requester.
+ * `tvSelectionTarget` pins to the selection), so it lands on the current destination's row — the same node the
+ * ← redirect targets. Default `null` keeps a private requester.
  *
  * [onRailFocusChanged] reports whether focus is anywhere inside the rail, so the same owner can tell the two Back
  * cases apart (focus in content vs. focus already on the rail) without duplicating the rail's `hasFocus`
@@ -150,8 +150,9 @@ fun BingeTvNavRail(
     content: @Composable () -> Unit,
 ) {
     // The rail's entry point: whichever item is selected. Used for the three ways focus arrives here — the ←
-    // redirect, the startup fallback, and an owner's [railFocusRequester] (which, when supplied, *is* this
-    // requester, so Back-to-rail lands on the selected item exactly as the fallback does).
+    // redirect, an owner's [railFocusRequester] (which, when supplied, *is* this requester, so Back-to-rail
+    // lands on the selected item), and [TvFocusSink]'s own `leftEntry`, which shares the same node so ← still
+    // opens the rail while the sink holds focus.
     val railEntry = railFocusRequester ?: remember { FocusRequester() }
     val contentFocus = contentFocusRequester ?: remember { FocusRequester() }
     var railHasFocus by remember { mutableStateOf(false) }
@@ -168,15 +169,16 @@ fun BingeTvNavRail(
 
     // Focus starts in the content, not the rail — requesting it on mount opened the app rail-focused over the start destination.
     // The content `focusGroup` delegates to its first child (the startup hand-off in `docs/tv-foundation.md`),
-    // retried per frame since a cold-start destination is a
-    // target-less placeholder (Shield-verified); it yields to a user already in the rail, and the fallback covers a nothing-focusable one.
+    // retried per frame since a cold-start destination is a target-less placeholder (Shield-verified); it
+    // yields to a user already in the rail. No rail fallback below (#2523) — [TvFocusSink] is always something
+    // to land on, so a destination with nothing focusable of its own no longer leaves this loop with nowhere
+    // to send the redirect.
     LaunchedEffect(Unit) {
         offerFocusToContent(
             contentFocus = contentFocus,
             yieldToRail = { userMovedToRail },
             taken = { contentHasFocus },
         )
-        if (!contentHasFocus && !railHasFocus) runCatching { railEntry.requestFocus() }
     }
 
     val handingOffToContent = contentHandoffInFlight(
