@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
 
 private const val SNACKBAR_MAX_LINES = 2
@@ -93,9 +94,15 @@ internal fun BingeSnackbar(
     }
 }
 
-/** Drop-in replacement for M3 `SnackbarHost` that renders [BingeSnackbar]. */
+/**
+ * Drop-in replacement for M3 `SnackbarHost` that renders [BingeSnackbar]. Its bottom offset adds
+ * [LocalNavOverlayInsets]'s bottom inset on top of the fixed gap, so it clears a floating nav bar the
+ * same way a scrollable does via `navOverlayPadding()`; composed outside a nav shell, that local
+ * defaults to zero and the offset is unchanged.
+ */
 @Composable
 fun BingeSnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {
+    val navOverlayBottom = LocalNavOverlayInsets.current.calculateBottomPadding()
     SnackbarHost(hostState, modifier) { data ->
         BingeSnackbar(
             message = data.visuals.message,
@@ -106,7 +113,7 @@ fun BingeSnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifie
             modifier = Modifier.padding(
                 start = dimensionResource(R.dimen.padding_m),
                 end = dimensionResource(R.dimen.padding_m),
-                bottom = dimensionResource(R.dimen.padding_s),
+                bottom = dimensionResource(R.dimen.padding_s) + navOverlayBottom,
             ),
         )
     }
