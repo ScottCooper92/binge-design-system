@@ -54,11 +54,26 @@ fun isTwoPaneLayout(): Boolean = booleanResource(R.bool.binge_layout_two_pane)
 fun isDiscoverInNav(): Boolean = booleanResource(R.bool.binge_nav_show_discover)
 
 /**
- * Number of columns for a poster/media grid at the current window width: 2 (compact), 3 (>=600dp),
- * 4 (>=840dp). Any width-driven media grid reads it rather than hardcoding a column count.
+ * Number of columns for a poster/media grid: 2 (compact), 3 (>=600dp), 4 (>=840dp). Any width-driven
+ * media grid reads it rather than hardcoding a column count.
+ *
+ * Resolved against [LocalPaneWidth] when the grid is one of several panes sharing the window, the
+ * same width [resolvedContentInset] reads — a detail pane on a >=840dp window is not itself 840dp
+ * wide, so the window-qualifier default (via `R.integer.media_grid_columns`) would hand it the
+ * columns sized for the whole window rather than the fraction it actually has. [LocalPaneWidth] null
+ * (a screen alone in the window) falls back to that default unchanged.
  */
 @Composable
-fun mediaGridColumns(): Int = integerResource(R.integer.media_grid_columns)
+fun mediaGridColumns(): Int {
+    val paneWidth = LocalPaneWidth.current ?: return integerResource(R.integer.media_grid_columns)
+    val mediumBreakpoint = dimensionResource(R.dimen.content_inset_medium_breakpoint)
+    val expandedBreakpoint = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
+    return when {
+        paneWidth >= expandedBreakpoint -> integerResource(R.integer.media_grid_columns_expanded)
+        paneWidth >= mediumBreakpoint -> integerResource(R.integer.media_grid_columns_medium)
+        else -> integerResource(R.integer.media_grid_columns_compact)
+    }
+}
 
 /**
  * Number of columns for the search results grid at the current window width: 1 (compact), 2 (>=600dp),
