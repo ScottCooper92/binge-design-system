@@ -56,4 +56,33 @@ class DetailCinematicHeaderScreenshotTest {
             Header()
         }
     }
+
+    /**
+     * Seeds `synopsisInitiallyOverflowing`, without which the "Show more" toggle it is named for
+     * never reaches the frame - see [ExpandableOverview]'s own `initiallyOverflowing` for why.
+     */
+    @PreviewTest
+    @Preview(name = "exp900-overflow", widthDp = CINEMATIC_PREVIEW_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun HeaderSynopsisOverflow() {
+        ScreenshotTheme {
+            DetailCinematicHeader(
+                title = "The Dark Knight",
+                genres = listOf("Action", "Crime", "Drama"),
+                synopsis = "Batman raises the stakes in his war on crime with the help of Lt. Jim " +
+                    "Gordon and District Attorney Harvey Dent, as they team up to dismantle the " +
+                    "remaining criminal organizations that plague the city streets. However, they " +
+                    "soon find themselves prey to a reign of chaos unleashed by a rising criminal " +
+                    "mastermind known to the terrified citizens of Gotham as the Joker.",
+                stats = listOf(
+                    DetailStat(Icons.Filled.Star, "9.0", "Rating"),
+                    DetailStat(Icons.Filled.Star, "2008", "Released"),
+                    DetailStat(Icons.Filled.Star, "2h 32m", "Runtime"),
+                ),
+                backdropUrl = null,
+                posterUrl = null,
+                synopsisInitiallyOverflowing = true,
+            )
+        }
+    }
 }

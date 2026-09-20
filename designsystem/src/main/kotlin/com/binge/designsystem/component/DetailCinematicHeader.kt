@@ -84,6 +84,10 @@ fun DetailCinematicHeader(
     backdropUrl: String?,
     posterUrl: String?,
     modifier: Modifier = Modifier,
+    // Seeds CinematicSynopsis's overflow state the same way ExpandableOverview's own
+    // initiallyOverflowing does, and for the same reason: onTextLayout fires a frame too late for
+    // the preview screenshot lane. Preview and test use only.
+    synopsisInitiallyOverflowing: Boolean = false,
 ) {
     val eyebrow = genres.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     Box(
@@ -112,6 +116,7 @@ fun DetailCinematicHeader(
             synopsis = synopsis,
             stats = stats,
             posterUrl = posterUrl,
+            synopsisInitiallyOverflowing = synopsisInitiallyOverflowing,
             modifier = Modifier.align(Alignment.BottomStart),
         )
     }
@@ -168,6 +173,7 @@ private fun CinematicCopyRow(
     synopsis: String?,
     stats: List<DetailStat>,
     posterUrl: String?,
+    synopsisInitiallyOverflowing: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -216,7 +222,7 @@ private fun CinematicCopyRow(
             )
             if (!synopsis.isNullOrBlank()) {
                 Spacer(Modifier.height(dimensionResource(R.dimen.detail_cinematic_copy_spacing)))
-                CinematicSynopsis(synopsis)
+                CinematicSynopsis(synopsis, initiallyOverflowing = synopsisInitiallyOverflowing)
             }
             // Absorbs whatever's left, so the facts row below always sits at the poster's bottom
             // edge instead of trailing directly under a short synopsis.
@@ -237,10 +243,15 @@ private fun CinematicCopyRow(
  * a "Show more" that opens the untruncated text in a sheet. Shown only once the clamp actually
  * cuts something, via the same `onTextLayout`/`hasVisualOverflow` check [ExpandableOverview] uses -
  * the header's fixed height rules out growing the text in place the way that component does.
+ *
+ * [initiallyOverflowing] seeds that state for the same reason [ExpandableOverview]'s own parameter
+ * of that name does: `onTextLayout` fires a frame after the one the preview screenshot lane
+ * captures, so without seeding it the "Show more" state is unrenderable there. Preview and test use
+ * only - at runtime the layout pass reports the truth.
  */
 @Composable
-private fun CinematicSynopsis(text: String) {
-    var overflows by remember(text) { mutableStateOf(false) }
+private fun CinematicSynopsis(text: String, initiallyOverflowing: Boolean = false) {
+    var overflows by remember(text, initiallyOverflowing) { mutableStateOf(initiallyOverflowing) }
     var showSheet by remember(text) { mutableStateOf(false) }
 
     Text(
@@ -249,7 +260,7 @@ private fun CinematicSynopsis(text: String) {
         color = BingeTheme.colors.onScrim.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
         maxLines = CINEMATIC_SYNOPSIS_MAX_LINES,
         overflow = TextOverflow.Ellipsis,
-        onTextLayout = { overflows = it.hasVisualOverflow },
+        onTextLayout = { if (!overflows) overflows = it.hasVisualOverflow },
     )
     if (overflows) {
         TextButton(
