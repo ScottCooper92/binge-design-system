@@ -24,6 +24,21 @@ on:
   workflow_run:
     workflows: ["CI"]
     types: [completed]
+  # The third door. `ci.yml` here declares no paths-ignore, so the "CI will never run on this
+  # PR" half of this door has nothing to open — see `unbuilt_paths` being left unset below.
+  # But the OTHER half is independent of that and does not need `unbuilt_paths` at all: a PR
+  # labelled *after* its CI already reported. `workflow_run` above only fires when a matching
+  # CI run completes, so a PR whose CI finished inside the minute between opening and labelling
+  # closed that door on "not opted in" and is never revisited without this — the called
+  # workflow's `resolve` job re-checks CI on the labelled head and reviews it exactly as the
+  # `workflow_run` trigger would have.
+  #
+  # `synchronize` is the re-arm for a PR already labelled: a later push produces a new
+  # `workflow_run` of its own, so `synchronize` mostly matters for catching a push that lands
+  # while this door's own check is mid-flight. Declared here because a reusable workflow cannot
+  # declare its own triggers.
+  pull_request:
+    types: [labeled, synchronize]
   workflow_dispatch:
     inputs:
       pr:
@@ -56,9 +71,10 @@ jobs:
       # beside `build`, so a baseline mismatch is already reported and is not the
       # reviewer's to raise.
       gated_checks: ktlint, Android lint or the screenshot baselines
-      # ci.yml here declares no paths-ignore - deliberately, since bot-review needs a
-      # successful run against the head and a skipped run is a PR that is never
-      # reviewed. So there are no CI-less PRs and the `labeled` door stays shut.
+      # unbuilt_paths deliberately left unset: ci.yml here declares no paths-ignore, so there
+      # are no CI-less PRs and that half of the labeled/synchronize door (see `on:` above) has
+      # nothing to open. The other half — a PR labelled after its CI already went green — needs
+      # no `unbuilt_paths` at all, which is why that trigger is wired regardless.
     secrets:
       REVIEWER_APP_ID: ${{ secrets.REVIEWER_APP_ID }}
       REVIEWER_APP_PRIVATE_KEY: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
