@@ -100,8 +100,12 @@ fun DetailCinematicHeader(
             contentDescription = title,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
-            loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
-            error = { ImagePlaceholder(Modifier.fillMaxSize()) },
+            // The copy column below stretches up to the poster's height, reaching well past the
+            // backdrop's vertical centre - ImagePlaceholder's default centred icon would land on
+            // top of the synopsis. Top-aligned keeps it in the band above the copy row, which the
+            // fixed header height and the row's bottom alignment guarantee stays clear of text.
+            loading = { ImagePlaceholder(Modifier.fillMaxSize(), iconAlignment = Alignment.TopCenter) },
+            error = { ImagePlaceholder(Modifier.fillMaxSize(), iconAlignment = Alignment.TopCenter) },
         )
         HeroBackdropMeshWash(
             accentStart = MaterialTheme.colorScheme.primary,
