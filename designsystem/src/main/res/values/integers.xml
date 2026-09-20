@@ -3,6 +3,13 @@
     <!-- Columns for a poster/media grid, keyed on available window width (see mediaGridColumns()).
          Compact default; values-w600dp/values-w840dp widen it. -->
     <integer name="media_grid_columns">2</integer>
+    <!-- The same three-step ramp as media_grid_columns (2 / 3 / 4), named so mediaGridColumns() can
+         apply it against a pane's own width instead of the window's when it is resolving against
+         LocalPaneWidth — media_grid_columns itself only resolves via qualifier, which answers the
+         window's width, not a pane's. -->
+    <integer name="media_grid_columns_compact">2</integer>
+    <integer name="media_grid_columns_medium">3</integer>
+    <integer name="media_grid_columns_expanded">4</integer>
     <!-- Columns for the search results grid, keyed on available window width (see searchResultColumns()).
          A search result is a ListRow, not a poster, so it wants a wider cell than media_grid_columns
          gives: one column on a phone, widening only where a row would otherwise run the full window. -->
