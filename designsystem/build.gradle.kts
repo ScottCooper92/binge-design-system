@@ -95,6 +95,9 @@ dependencies {
     api(libs.compose.material.icons)
     // The nav shell is a NavigationSuiteScaffold; consumers compose its items, so the types are api.
     api(libs.compose.material3.adaptive.navigation.suite)
+    // ListDetailSceneStrategy/BackNavigationBehavior/PaneScaffoldDirective all flow into a consumer's
+    // own scene-strategy call, so the types are api too.
+    api(libs.compose.material3.adaptive.navigation3)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.text.google.fonts)
     implementation(libs.androidx.core.ktx)
