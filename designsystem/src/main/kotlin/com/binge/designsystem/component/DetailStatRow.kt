@@ -18,6 +18,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,7 +27,16 @@ import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 @Composable
-fun DetailStatRow(stats: List<DetailStat>, modifier: Modifier = Modifier) {
+fun DetailStatRow(
+    stats: List<DetailStat>,
+    modifier: Modifier = Modifier,
+    // Defaults read the ambient surface colors, right for every current caller - all of them sit
+    // on the screen's own background. DetailCinematicHeader is the one exception: it sits on a
+    // permanently-dark photo backdrop regardless of theme, so it overrides both to onScrim tones
+    // that stay legible whichever theme is active, rather than a light theme's dark-on-dark text.
+    valueColor: Color = Color.Unspecified,
+    labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+) {
     if (stats.isEmpty()) return
 
     Row(
@@ -45,13 +55,18 @@ fun DetailStatRow(stats: List<DetailStat>, modifier: Modifier = Modifier) {
                         .padding(vertical = dimensionResource(R.dimen.detail_meta_spacing)),
                 )
             }
-            StatCell(stat = stat, modifier = Modifier.weight(1f))
+            StatCell(stat = stat, valueColor = valueColor, labelColor = labelColor, modifier = Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun StatCell(stat: DetailStat, modifier: Modifier = Modifier) {
+private fun StatCell(
+    stat: DetailStat,
+    valueColor: Color,
+    labelColor: Color,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.padding(vertical = dimensionResource(R.dimen.detail_meta_spacing)),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,12 +78,13 @@ private fun StatCell(stat: DetailStat, modifier: Modifier = Modifier) {
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(dimensionResource(R.dimen.detail_stat_icon_size)),
         )
-        Text(text = stat.value, style = MaterialTheme.typography.titleSmall, textAlign = TextAlign.Center)
         Text(
-            text = stat.label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            text = stat.value,
+            style = MaterialTheme.typography.titleSmall,
+            color = valueColor,
+            textAlign = TextAlign.Center,
         )
+        Text(text = stat.label, style = MaterialTheme.typography.labelSmall, color = labelColor)
     }
 }
 

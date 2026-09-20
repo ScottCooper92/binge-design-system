@@ -16,10 +16,10 @@ import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 @Composable
-fun ImagePlaceholder(modifier: Modifier = Modifier) {
+fun ImagePlaceholder(modifier: Modifier = Modifier, iconAlignment: Alignment = Alignment.Center) {
     Box(
         modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainerLow),
-        contentAlignment = Alignment.Center,
+        contentAlignment = iconAlignment,
     ) {
         Icon(
             imageVector = Icons.Default.Image,
