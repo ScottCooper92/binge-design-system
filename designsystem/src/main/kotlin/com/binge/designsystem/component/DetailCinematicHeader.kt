@@ -37,6 +37,8 @@ import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.component.HeroBackdropMeshWash
 import com.binge.designsystem.component.ImagePlaceholder
+import com.binge.designsystem.layout.LayoutAnchors
+import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
@@ -236,6 +238,7 @@ private fun CinematicCopyRow(
                     stats = stats,
                     valueColor = BingeTheme.colors.onScrim,
                     labelColor = BingeTheme.colors.onScrim.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
+                    modifier = Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)),
                 )
             }
         }
