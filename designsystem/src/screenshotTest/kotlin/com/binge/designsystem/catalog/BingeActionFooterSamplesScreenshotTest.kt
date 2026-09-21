@@ -23,4 +23,12 @@ class BingeActionFooterSamplesScreenshotTest {
     fun FooterOnPage() {
         BingeActionFooterOnPageSample()
     }
+
+    /** The raised, rounded `bottomBar` shape — the third container beside [Footer] and [FooterOnPage]. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun FooterElevated() {
+        BingeActionFooterElevatedSample()
+    }
 }
