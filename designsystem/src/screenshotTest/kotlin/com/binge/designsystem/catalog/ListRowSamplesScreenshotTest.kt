@@ -22,4 +22,18 @@ class ListRowSamplesScreenshotTest {
     fun header() {
         ListRowHeaderSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun anchoredShortTitle() {
+        ListRowAnchoredShortTitleSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun anchoredLongTitle() {
+        ListRowAnchoredLongTitleSample()
+    }
 }
