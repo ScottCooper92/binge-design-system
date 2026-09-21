@@ -58,6 +58,69 @@ fun ListRowPosterSample() {
     }
 }
 
+/**
+ * The bottom-anchoring pattern from [ListRow]'s doc: a short title leaves the trailing
+ * `Spacer(weight(1f))` room to push the meta line down to the poster's bottom edge.
+ */
+@Composable
+fun ListRowAnchoredShortTitleSample() {
+    ScreenshotTheme {
+        ListRow(
+            onClick = {},
+            leading = { ListRowPoster(imageUrl = null, contentDescription = null) },
+        ) { contentModifier ->
+            Column(modifier = contentModifier) {
+                Text(
+                    text = "Severance",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.weight(1f))
+                Text(
+                    text = "Requested by Alex · Today",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The same anchoring pattern with a title long enough to already reach the poster's matched
+ * height: the spacer has nothing left to give, so the title and the meta line simply stack with
+ * no overlap and no clipping.
+ */
+@Composable
+fun ListRowAnchoredLongTitleSample() {
+    ScreenshotTheme {
+        ListRow(
+            onClick = {},
+            leading = { ListRowPoster(imageUrl = null, contentDescription = null) },
+        ) { contentModifier ->
+            Column(modifier = contentModifier) {
+                Text(
+                    text = "A title so long it wraps across every single line the poster's " +
+                        "height allows, filling the whole column before the ellipsis ever " +
+                        "gets a chance to trim it down to size",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 5,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.weight(1f))
+                Text(
+                    text = "Requested by Alex · Today",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
 /** A list row whose [ListRowHeader] title wraps to its two-line cap while the trailing action stays put. */
 @Composable
 fun ListRowHeaderSample() {

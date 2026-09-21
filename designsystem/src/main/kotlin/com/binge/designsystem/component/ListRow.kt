@@ -4,10 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,10 +42,18 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * `ListRow` owns the row chrome — rounded [containerColor] surface (`surfaceContainer` by default),
  * click, padding and gaps — so callers never re-roll it; pass a [containerColor] to tint a selected
- * row, or a [containerBrush] for a row that paints a gradient instead of a flat tone. The [content] slot receives a `Modifier` carrying `weight(1f)` so the caller builds its own
- * meta column. Supply [leading] via [ListRowPoster] (or an avatar) and [trailing] for an action or
- * status element. An optional [footer] spans the full inner width below the main line (e.g. a
- * progress bar that also runs under the poster).
+ * row, or a [containerBrush] for a row that paints a gradient instead of a flat tone. The main line
+ * is measured at [IntrinsicSize.Min], so [leading] and the [content] slot match each other's height
+ * rather than each wrapping its own — the [content] slot's `Modifier` carries both `weight(1f)` and
+ * `fillMaxHeight()`, so a caller with a short top group and a line it wants read as anchored to the
+ * poster's bottom edge (a requester's name and date, say) reaches for a trailing `Spacer(weight(1f))`
+ * between the two: on a short title the spacer pushes the bottom line down to the poster's height, and
+ * on a title long enough to already exceed it the spacer simply has nothing left to give, so the two
+ * groups sit stacked with no overlap and no clipping either way. Supply [leading] via [ListRowPoster]
+ * (or an avatar) and [trailing] for an action or status element — [verticalAlignment] centers it
+ * against the row's full matched height rather than pinning it to the top beside a two-line title.
+ * An optional [footer] spans the full inner width below the main line (e.g. a progress bar that also
+ * runs under the poster).
  */
 @Composable
 fun ListRow(
@@ -79,12 +89,12 @@ fun ListRow(
             ).then(clickable)
             .padding(dimensionResource(R.dimen.list_row_padding)),
     ) {
-        Row(verticalAlignment = verticalAlignment) {
+        Row(modifier = Modifier.height(IntrinsicSize.Min), verticalAlignment = verticalAlignment) {
             if (leading != null) {
                 leading()
                 Spacer(Modifier.width(dimensionResource(R.dimen.list_row_gap)))
             }
-            content(Modifier.weight(1f))
+            content(Modifier.weight(1f).fillMaxHeight())
             if (trailing != null) {
                 Spacer(Modifier.width(trailingGap))
                 trailing()
