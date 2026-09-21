@@ -43,10 +43,8 @@ import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
 
-private const val CINEMATIC_SCRIM_TOP_ALPHA = 0.55f
 private const val CINEMATIC_SCRIM_MID_ALPHA = 0.55f
 private const val CINEMATIC_SCRIM_BOTTOM_ALPHA = 0.90f
-private const val CINEMATIC_SCRIM_CLEAR_STOP = 0.30f
 private const val CINEMATIC_SCRIM_MID_STOP = 0.62f
 private const val CINEMATIC_SCRIM_DEEP_STOP = 0.88f
 private const val CINEMATIC_SIDE_SCRIM_ALPHA = 0.80f
@@ -130,18 +128,23 @@ fun DetailCinematicHeader(
 
 @Composable
 private fun CinematicScrim() {
-    val scrim = BingeTheme.colors.scrim
-    val background = MaterialTheme.colorScheme.background
+    // Theme-following rather than the black-always default, matching DetailHero — the header runs
+    // to the same app background at its lower edge, so a black scrim landing there would read as a
+    // mismatch the moment it faded in over a light theme.
+    //
+    // Clear until the mid stop, same as DetailHero — no top wash. The pinned DetailOverlayTopBar
+    // draws no chrome here either, but its own Glass-toned icons carry their own translucent backing
+    // regardless of what's behind them, so they don't need this scrim's help for contrast.
+    val scrim = MaterialTheme.colorScheme.background
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0.00f to scrim.copy(alpha = CINEMATIC_SCRIM_TOP_ALPHA),
-                    CINEMATIC_SCRIM_CLEAR_STOP to Color.Transparent,
+                    0.00f to Color.Transparent,
                     CINEMATIC_SCRIM_MID_STOP to scrim.copy(alpha = CINEMATIC_SCRIM_MID_ALPHA),
                     CINEMATIC_SCRIM_DEEP_STOP to scrim.copy(alpha = CINEMATIC_SCRIM_BOTTOM_ALPHA),
-                    1.00f to background,
+                    1.00f to scrim,
                 ),
             ),
     )
@@ -158,7 +161,7 @@ private fun CinematicScrim() {
  */
 @Composable
 private fun CinematicSideScrim() {
-    val scrim = BingeTheme.colors.scrim
+    val scrim = MaterialTheme.colorScheme.background
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -209,7 +212,15 @@ private fun CinematicCopyRow(
             error = { ImagePlaceholder(Modifier.fillMaxSize()) },
         )
         Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
             if (!eyebrow.isNullOrBlank()) {
+                Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
                 Text(
                     text = eyebrow.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
@@ -217,15 +228,7 @@ private fun CinematicCopyRow(
                     // accent rather than onScrim.
                     color = MaterialTheme.colorScheme.primary,
                 )
-                Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
             }
-            Text(
-                text = title,
-                style = MaterialTheme.typography.displayMedium,
-                color = BingeTheme.colors.onScrim,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
             if (!synopsis.isNullOrBlank()) {
                 Spacer(Modifier.height(dimensionResource(R.dimen.detail_cinematic_copy_spacing)))
                 CinematicSynopsis(synopsis, initiallyOverflowing = synopsisInitiallyOverflowing)
@@ -236,8 +239,8 @@ private fun CinematicCopyRow(
             if (stats.isNotEmpty()) {
                 DetailStatRow(
                     stats = stats,
-                    valueColor = BingeTheme.colors.onScrim,
-                    labelColor = BingeTheme.colors.onScrim.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
+                    valueColor = MaterialTheme.colorScheme.onBackground,
+                    labelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
                     modifier = Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)),
                 )
             }
@@ -264,7 +267,7 @@ private fun CinematicSynopsis(text: String, initiallyOverflowing: Boolean = fals
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
-        color = BingeTheme.colors.onScrim.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
         maxLines = CINEMATIC_SYNOPSIS_MAX_LINES,
         overflow = TextOverflow.Ellipsis,
         onTextLayout = { if (!overflows) overflows = it.hasVisualOverflow },

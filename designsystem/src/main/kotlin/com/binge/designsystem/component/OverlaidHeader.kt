@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
+import com.binge.designsystem.theme.BingeTheme
 
 private enum class OverlaidHeaderSlot { Header, Content }
 
@@ -46,6 +47,10 @@ private enum class OverlaidHeaderSlot { Header, Content }
  * screen whose top bar is also transparent gets **one** ramp over bar and header together rather than
  * a scrim for the bar and a band for the header meeting at a seam. Ramp it with the bar's collapse —
  * at rest the content starts below the header and a resting scrim would paint the band it removes.
+ * [scrimColor] defaults to a theme-following colour (`MaterialTheme.colorScheme.background`), same as
+ * [BingeTopBar]/[BingeMediumTopBar] — every current caller overlays a plain, predictable surface.
+ * Override to [BingeTheme.colors.scrim] only for a header floating over genuinely unpredictable
+ * content, the way [DetailOverlayTopBar] does over a hero.
  */
 @Composable
 fun OverlaidHeaderContent(
@@ -53,6 +58,7 @@ fun OverlaidHeaderContent(
     modifier: Modifier = Modifier,
     headerBackground: Color = MaterialTheme.colorScheme.background,
     scrimFraction: Float = 0f,
+    scrimColor: Color = MaterialTheme.colorScheme.background,
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     val background = headerBackground
@@ -61,7 +67,7 @@ fun OverlaidHeaderContent(
         val headerPlaceables =
             subcompose(OverlaidHeaderSlot.Header) {
                 Box {
-                    TopBarScrim(scrimFraction)
+                    TopBarScrim(scrimFraction, scrimColor = scrimColor)
                     Column {
                         Column(modifier = Modifier.fillMaxWidth().background(background)) { header() }
                         Spacer(

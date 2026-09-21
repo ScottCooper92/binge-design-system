@@ -19,8 +19,15 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.theme.BingeTheme
 
+private const val GLASS_BACKGROUND_ALPHA = 0.4f
+
+/**
+ * [glassBackgroundAlpha] multiplies [IconButtonTone.Glass]'s own backing wash — full by default,
+ * dialled toward 0 by a caller whose bar brings in its own scrim as it collapses ([DetailOverlayTopBar]),
+ * so the per-icon backing hands off to that rather than stacking two washes once both are visible.
+ * Ignored by every other tone.
+ */
 @Composable
 fun ExpressiveIconButton(
     onClick: () -> Unit,
@@ -31,12 +38,13 @@ fun ExpressiveIconButton(
     tint: Color = LocalContentColor.current,
     tone: IconButtonTone = IconButtonTone.Default,
     size: Dp = dimensionResource(R.dimen.button_tonal_size),
+    glassBackgroundAlpha: Float = 1f,
 ) {
     val background = when (tone) {
-        IconButtonTone.Default -> Color.Transparent
         IconButtonTone.Tonal -> MaterialTheme.colorScheme.surfaceContainerHigh
         IconButtonTone.Accent -> MaterialTheme.colorScheme.secondaryContainer
-        IconButtonTone.Glass -> BingeTheme.colors.scrim.copy(alpha = 0.4f)
+        IconButtonTone.Glass -> MaterialTheme.colorScheme.background.copy(alpha = GLASS_BACKGROUND_ALPHA * glassBackgroundAlpha)
+        IconButtonTone.Default -> Color.Transparent
     }
     val containerModifier = if (tone == IconButtonTone.Default) {
         modifier
@@ -104,7 +112,7 @@ private fun PreviewExpressiveIconButtonGlass() {
             icon = Icons.Filled.Favorite,
             contentDescription = "Favourite",
             tone = IconButtonTone.Glass,
-            tint = BingeTheme.colors.onScrim,
+            tint = MaterialTheme.colorScheme.onBackground,
         )
     }
 }

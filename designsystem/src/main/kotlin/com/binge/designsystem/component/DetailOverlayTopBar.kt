@@ -22,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
-import com.binge.designsystem.theme.BingeTheme
 
 /**
  * Transparent overlay top bar for a [DetailHero]-backed screen. The hero draws no chrome
@@ -32,7 +31,12 @@ import com.binge.designsystem.theme.BingeTheme
  * in) only near the hero's tail, so content passes under a legible bar rather than stopping at it.
  * The ramp spans a fixed band ([R.dimen.detail_overlay_bar_fade_band], ~one bar height) ending as the
  * hero clears, tracking the hero edge rather than the whole scroll; pinned so back stays reachable at
- * any offset. The title rides the same ramp to `onScrim`, since the scrim is black in both themes.
+ * any offset. Both the scrim and the title that rides its fade follow the theme's own background/
+ * on-background pair — [HeroScrim] does too — rather than the black-always default, since this bar
+ * scrims a known hero backdrop rather than arbitrary scrolled content. Back and [actions] carry their
+ * own [ExpressiveIconButton.glassBackgroundAlpha] wash at rest, fading out over the same ramp as the
+ * bar's own scrim fades in — [actions] reads that value as its lambda argument, to pass along to icons
+ * of its own.
  *
  * Call it inside the [androidx.compose.foundation.layout.Box] / `BoxWithConstraints` that also
  * hosts the scrolling content, so it top-aligns over the same [scrollState].
@@ -50,7 +54,7 @@ fun BoxScope.DetailOverlayTopBar(
     modifier: Modifier = Modifier,
     heroHeight: Dp = dimensionResource(R.dimen.detail_hero_height),
     horizontalInset: Dp = dimensionResource(R.dimen.padding_m),
-    actions: @Composable RowScope.() -> Unit = {},
+    actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     DetailOverlayTopBar(
         title = title,
@@ -78,19 +82,22 @@ fun BoxScope.DetailOverlayTopBar(
     modifier: Modifier = Modifier,
     heroHeight: Dp = dimensionResource(R.dimen.detail_hero_height),
     horizontalInset: Dp = dimensionResource(R.dimen.padding_m),
-    actions: @Composable RowScope.() -> Unit = {},
+    actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val heroHeightPx = with(density) { heroHeight.toPx() }
     val bandPx = with(density) { dimensionResource(R.dimen.detail_overlay_bar_fade_band).toPx() }
     val fadeStart = heroHeightPx - bandPx
     val progress = ((scrollOffsetPx() - fadeStart) / bandPx).coerceIn(0f, 1f)
+    // The bar's own TopBarScrim takes over legibility as it fades in, so each icon's individual
+    // backing hands off to it rather than the two stacking.
+    val glassBackgroundAlpha = 1f - progress
     Box(
         modifier = modifier
             .align(Alignment.TopStart)
             .fillMaxWidth(),
     ) {
-        TopBarScrim(progress)
+        TopBarScrim(progress, scrimColor = MaterialTheme.colorScheme.background)
         Row(
             modifier = Modifier
                 .statusBarsPadding()
@@ -105,19 +112,20 @@ fun BoxScope.DetailOverlayTopBar(
                 onClick = onBack,
                 icon = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.cd_navigate_back),
-                tint = BingeTheme.colors.onScrim,
+                tint = MaterialTheme.colorScheme.onBackground,
                 tone = IconButtonTone.Glass,
                 size = dimensionResource(R.dimen.top_bar_icon_size),
+                glassBackgroundAlpha = glassBackgroundAlpha,
             )
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = BingeTheme.colors.onScrim.copy(alpha = progress),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = progress),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
-            actions()
+            actions(glassBackgroundAlpha)
         }
     }
 }

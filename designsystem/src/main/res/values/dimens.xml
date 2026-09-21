@@ -99,6 +99,8 @@
     <dimen name="top_bar_icon_size">48dp</dimen>
     <!-- Target start inset the medium bar's title ramps to as it collapses, so the collapsed single-line title clears the circular nav container; the expanded large title stays at 0 on the 16dp content margin. -->
     <dimen name="medium_top_bar_collapsed_title_inset">8dp</dimen>
+    <!-- Leading/trailing inset for back + actions, matching DetailOverlayTopBar's own default horizontalInset (padding_m) so a transparent bar's controls float the same distance from the edge everywhere. -->
+    <dimen name="medium_top_bar_edge_inset">16dp</dimen>
     <dimen name="detail_action_row_spacing">10dp</dimen>
     <dimen name="detail_action_button_size">48dp</dimen>
     <!--
@@ -252,6 +254,12 @@
     <!-- Clears the floating glass back/share control row (top_bar_icon_size + 2*padding_s) so the
          bounded profile body isn't occluded by it; applied on top of the consumed status-bar inset. -->
     <dimen name="person_profile_top_bar_offset">64dp</dimen>
+    <!-- DetailOverlayTopBar's heroHeight for the person page: person_profile_top_bar_offset +
+         person_profile_padding_top + the profile poster's own height (person_profile_poster_width
+         at CARD_ASPECT_RATIO), rounded. The person page has no backdrop hero — this is the shortest
+         of the five DetailOverlayTopBar callers, so the title fades in as the name scrolls off
+         rather than at the media pages' much taller default. -->
+    <dimen name="person_detail_hero_height">280dp</dimen>
     <!-- Episode list row: the backdrop still's width (the rest of the chrome comes from ListRow). -->
     <dimen name="episode_row_still_width">132dp</dimen>
     <dimen name="icon_size_m">18dp</dimen>

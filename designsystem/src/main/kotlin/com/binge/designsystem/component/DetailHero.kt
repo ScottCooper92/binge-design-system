@@ -38,14 +38,22 @@ import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
 
-private const val HERO_SCRIM_TOP_ALPHA = 0.55f
-private const val HERO_SCRIM_MID_ALPHA = 0.60f
-private const val HERO_SCRIM_BOTTOM_ALPHA = 0.90f
-private const val HERO_SCRIM_CLEAR_STOP = 0.25f
+private const val HERO_SCRIM_BOTTOM_ALPHA = 1.00f
 private const val HERO_SCRIM_MID_STOP = 0.60f
 
+/**
+ * Sets the status bar's icon appearance for a screen whose content runs under it.
+ *
+ * Defaults to following the theme — dark icons in light theme, light in dark — matching the hero
+ * scrim underneath, which now does the same ([HeroScrim]). Pass [alwaysLightIcons] for a screen whose
+ * background is black regardless of theme (the image viewer's own [BingeTheme.colors.scrim]) — icons
+ * stay light there even in light theme, since the backdrop underneath never gets any lighter.
+ *
+ * Restores to the theme-following state on dispose either way, so the screen navigated back to reads
+ * normally rather than inheriting whichever mode this one asked for.
+ */
 @Composable
-fun DarkStatusBarEffect() {
+fun DarkStatusBarEffect(alwaysLightIcons: Boolean = false) {
     val view = LocalView.current
     val isDark = isSystemInDarkTheme()
     if (!view.isInEditMode) {
@@ -54,7 +62,7 @@ fun DarkStatusBarEffect() {
                 (view.context as Activity).window,
                 view,
             )
-            controller.isAppearanceLightStatusBars = false
+            controller.isAppearanceLightStatusBars = if (alwaysLightIcons) false else !isDark
             onDispose { controller.isAppearanceLightStatusBars = !isDark }
         }
     }
@@ -95,7 +103,7 @@ fun DetailHero(
                 onClick = onBack,
                 icon = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.cd_navigate_back),
-                tint = BingeTheme.colors.onScrim,
+                tint = MaterialTheme.colorScheme.onBackground,
                 tone = IconButtonTone.Glass,
                 size = dimensionResource(R.dimen.top_bar_icon_size),
                 modifier = Modifier
@@ -161,15 +169,14 @@ fun HeroBackdrop(
 
 @Composable
 private fun HeroScrim() {
-    val scrim = BingeTheme.colors.scrim
+    val scrim = MaterialTheme.colorScheme.background
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0.00f to scrim.copy(alpha = HERO_SCRIM_TOP_ALPHA),
-                    HERO_SCRIM_CLEAR_STOP to Color.Transparent,
-                    HERO_SCRIM_MID_STOP to scrim.copy(alpha = HERO_SCRIM_MID_ALPHA),
+                    0.00f to Color.Transparent,
+                    HERO_SCRIM_MID_STOP to Color.Transparent,
                     1.00f to scrim.copy(alpha = HERO_SCRIM_BOTTOM_ALPHA),
                 ),
             ),
@@ -192,27 +199,27 @@ private fun HeroTextColumn(
                 bottom = dimensionResource(R.dimen.detail_hero_text_bottom_padding),
             ),
     ) {
-        if (!eyebrowText.isNullOrBlank()) {
-            Text(
-                text = eyebrowText.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
-        }
         Text(
             text = title,
             style = MaterialTheme.typography.displaySmall,
-            color = BingeTheme.colors.onScrim,
+            color = MaterialTheme.colorScheme.onBackground,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+        if (!eyebrowText.isNullOrBlank()) {
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+            Text(
+                text = eyebrowText.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
         if (!tagline.isNullOrBlank()) {
             Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
             Text(
                 text = tagline,
                 style = MaterialTheme.typography.bodyMedium,
-                color = BingeTheme.colors.onScrim.copy(alpha = 0.85f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f),
                 fontStyle = FontStyle.Italic,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -223,7 +230,7 @@ private fun HeroTextColumn(
             Text(
                 text = metaText,
                 style = MaterialTheme.typography.bodySmall,
-                color = BingeTheme.colors.onScrim.copy(alpha = 0.80f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.80f),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
