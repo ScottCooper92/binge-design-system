@@ -172,10 +172,10 @@ fun rememberBingeNavPresentation(): BingeNavPresentation =
 
 /**
  * The [com.binge.designsystem.LocalNavOverlayInsets] value [BingeNavSuiteShell] provides for
- * [presentation], for a caller that isn't itself a descendant of the shell — a snackbar host
- * mounted as the shell's sibling rather than beneath it, say, which needs the ambient's value at
- * its own level to provide there too. Mirrors [BingeNavFloatingBarScaffold]'s and
- * [BingeNavCustomRail]'s own computations; keep the three in sync if either changes.
+ * [presentation]. [BingeNavFloatingBarScaffold] and [BingeNavCustomRail] both call this rather than
+ * recomputing it, so it is the one formula rather than one per shell branch; a caller outside the
+ * shell entirely — a snackbar host mounted as the shell's sibling rather than beneath it, say —
+ * calls it too, to get the same ambient value at its own level.
  *
  * The one gap: [BingeNavFloatingBarScaffold] also applies an upward correction from its own
  * measured toolbar height, for a style whose content outgrows the default container. That

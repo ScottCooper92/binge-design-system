@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -89,8 +88,7 @@ internal fun BingeNavCustomRail(
     val safeStart = safeInsets.calculateStartPadding(LocalLayoutDirection.current)
     Box(Modifier.fillMaxSize()) {
         CompositionLocalProvider(
-            LocalNavOverlayInsets provides
-                PaddingValues(start = railWidth + safeStart, bottom = safeInsets.calculateBottomPadding()),
+            LocalNavOverlayInsets provides rememberNavOverlayInsets(BingeNavPresentation.CustomRail),
         ) {
             content()
         }
