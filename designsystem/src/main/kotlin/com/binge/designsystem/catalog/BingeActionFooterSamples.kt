@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeActionFooter
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeShapes
 
 /**
@@ -59,7 +60,8 @@ fun BingeActionFooterElevatedSample() {
                 label = "Add a slider",
                 onClick = {},
                 shape = BingeShapes.HeroTop,
-                tonalElevation = dimensionResource(R.dimen.snackbar_elevation),
+                shadowElevation = dimensionResource(R.dimen.snackbar_elevation),
+                horizontalPadding = resolvedContentInset(),
                 clearsNavigationBar = true,
             )
         }

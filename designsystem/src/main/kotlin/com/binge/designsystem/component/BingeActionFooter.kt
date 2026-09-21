@@ -23,7 +23,7 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * The defaults are a [androidx.compose.material3.ModalBottomSheet]'s, which is what it was written
  * for: [containerColor] matches the sheet's container so the band reads flush against it, and
- * [shape]/[tonalElevation] stay off ([RectangleShape], none) since the sheet's own chrome already
+ * [shape]/[shadowElevation] stay off ([RectangleShape], none) since the sheet's own chrome already
  * carries the rounded top corner this footer sits inside. A page overrides [containerColor] to
  * `Color.Transparent` so its own surface shows through rather than a lighter band with a hard edge,
  * and [bottomPadding] to zero where its scaffold has already inset the content — or, for a page
@@ -55,7 +55,7 @@ fun BingeActionFooter(
     loading: Boolean = false,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     shape: Shape = RectangleShape,
-    tonalElevation: Dp = dimensionResource(R.dimen.zero),
+    shadowElevation: Dp = dimensionResource(R.dimen.zero),
     bottomPadding: Dp = dimensionResource(R.dimen.padding_l),
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
     clearsNavigationBar: Boolean = false,
@@ -64,7 +64,7 @@ fun BingeActionFooter(
         modifier = modifier.fillMaxWidth(),
         color = containerColor,
         shape = shape,
-        tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation,
     ) {
         BingeFilledButton(
             label = label,
@@ -97,7 +97,7 @@ private fun PreviewBingeActionFooterElevated() {
             label = "Add a slider",
             onClick = {},
             shape = BingeShapes.HeroTop,
-            tonalElevation = dimensionResource(R.dimen.snackbar_elevation),
+            shadowElevation = dimensionResource(R.dimen.snackbar_elevation),
             horizontalPadding = resolvedContentInset(),
             clearsNavigationBar = true,
         )
