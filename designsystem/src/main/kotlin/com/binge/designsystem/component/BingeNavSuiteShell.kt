@@ -1,10 +1,16 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,6 +20,7 @@ import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
@@ -162,3 +169,35 @@ fun rememberBingeNavPresentation(): BingeNavPresentation =
     } else {
         BingeNavPresentation.FloatingBar
     }
+
+/**
+ * The [com.binge.designsystem.LocalNavOverlayInsets] value [BingeNavSuiteShell] provides for
+ * [presentation], for a caller that isn't itself a descendant of the shell — a snackbar host
+ * mounted as the shell's sibling rather than beneath it, say, which needs the ambient's value at
+ * its own level to provide there too. Mirrors [BingeNavFloatingBarScaffold]'s and
+ * [BingeNavCustomRail]'s own computations; keep the three in sync if either changes.
+ *
+ * The one gap: [BingeNavFloatingBarScaffold] also applies an upward correction from its own
+ * measured toolbar height, for a style whose content outgrows the default container. That
+ * correction is real layout state internal to that composition and isn't available here, so this
+ * returns its computed floor only — the two already agree for every style currently shipped.
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun rememberNavOverlayInsets(presentation: BingeNavPresentation): PaddingValues {
+    val safeInsets = WindowInsets.safeDrawing.asPaddingValues()
+    return when (presentation) {
+        BingeNavPresentation.BottomBar -> PaddingValues()
+        BingeNavPresentation.CustomRail ->
+            PaddingValues(
+                start = dimensionResource(R.dimen.nav_custom_rail_width) +
+                    safeInsets.calculateStartPadding(LocalLayoutDirection.current),
+                bottom = safeInsets.calculateBottomPadding(),
+            )
+        BingeNavPresentation.FloatingBar ->
+            PaddingValues(
+                bottom = FloatingToolbarDefaults.ContainerSize + FloatingToolbarDefaults.ScreenOffset +
+                    safeInsets.calculateBottomPadding(),
+            )
+    }
+}
