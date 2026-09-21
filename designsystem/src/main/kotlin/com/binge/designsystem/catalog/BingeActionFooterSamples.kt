@@ -6,9 +6,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeActionFooter
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.theme.BingeShapes
 
 /**
  * Public catalog samples for the containers / chrome group — sheets, dialogs, top bars, scaffolding.
@@ -38,6 +42,27 @@ fun BingeActionFooterOnPageSample() {
                 onClick = {},
                 containerColor = Color.Transparent,
                 bottomPadding = 0.dp,
+            )
+        }
+    }
+}
+
+/**
+ * The third shape: a page whose primary action anchors in a `bottomBar` slot outside the scaffold's
+ * own body, rather than scrolling with the content or an inline band at its end. Rounded and raised
+ * so it reads as its own surface — a Discover Sliders "Add", a Permissions page's "Save".
+ */
+@Composable
+fun BingeActionFooterElevatedSample() {
+    ScreenshotTheme {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            BingeActionFooter(
+                label = "Add a slider",
+                onClick = {},
+                shape = BingeShapes.HeroTop,
+                shadowElevation = dimensionResource(R.dimen.snackbar_elevation),
+                horizontalPadding = resolvedContentInset(),
+                clearsNavigationBar = true,
             )
         }
     }
