@@ -138,7 +138,7 @@ fun BingeMediumTopBar(
             actions = {
                 CompositionLocalProvider(
                     LocalTopBarActionTone provides iconTone,
-                    LocalTopBarActionTint provides iconTint,
+                    LocalTopBarActionTint provides if (transparent) iconTint else LocalContentColor.current,
                 ) {
                     Row(
                         modifier = Modifier.padding(end = edgeInset),
