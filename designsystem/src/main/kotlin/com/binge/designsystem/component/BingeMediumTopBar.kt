@@ -153,12 +153,12 @@ fun BingeMediumTopBar(
             // and flattens the scrolled state, which is BingeTopBar's decision to make, not this bar's.
             colors =
                 if (containerColor.isSpecified) {
-                    TopAppBarDefaults.mediumTopAppBarColors(
+                    TopAppBarDefaults.topAppBarColors(
                         containerColor = containerColor,
                         scrolledContainerColor = containerColor,
                     )
                 } else {
-                    TopAppBarDefaults.mediumTopAppBarColors()
+                    TopAppBarDefaults.topAppBarColors()
                 },
             scrollBehavior = scrollBehavior,
         )
