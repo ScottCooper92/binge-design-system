@@ -154,8 +154,8 @@ private fun CinematicScrim() {
 
 /**
  * The start-side ramp the poster and copy sit on. [CinematicScrim] runs vertically and is at its
- * clearest around 30% of the header — which is exactly where the poster's top edge and the title
- * begin, so on a bright backdrop they land on the one band that darkens nothing.
+ * clearest at the very top of the header — which is exactly where the poster's top edge and the
+ * title begin, so on a bright backdrop they land on the one band that darkens nothing.
  *
  * Horizontal rather than a deeper vertical ramp because the content it protects is start-aligned:
  * this darkens behind it and leaves the end of the backdrop — the half the image is composed
