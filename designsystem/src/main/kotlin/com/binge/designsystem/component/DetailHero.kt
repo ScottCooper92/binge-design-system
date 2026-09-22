@@ -103,7 +103,7 @@ fun DetailHero(
                 onClick = onBack,
                 icon = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.cd_navigate_back),
-                tint = MaterialTheme.colorScheme.onBackground,
+                tint = BingeTheme.colors.onScrim,
                 tone = IconButtonTone.Glass,
                 size = dimensionResource(R.dimen.top_bar_icon_size),
                 modifier = Modifier

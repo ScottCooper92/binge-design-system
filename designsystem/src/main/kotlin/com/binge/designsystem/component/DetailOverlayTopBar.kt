@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.theme.BingeTheme
 
 /**
  * Transparent overlay top bar for a [DetailHero]-backed screen. The hero draws no chrome
@@ -112,7 +113,7 @@ fun BoxScope.DetailOverlayTopBar(
                 onClick = onBack,
                 icon = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.cd_navigate_back),
-                tint = MaterialTheme.colorScheme.onBackground,
+                tint = BingeTheme.colors.onScrim,
                 tone = IconButtonTone.Glass,
                 size = dimensionResource(R.dimen.top_bar_icon_size),
                 glassBackgroundAlpha = glassBackgroundAlpha,

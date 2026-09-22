@@ -105,7 +105,7 @@ fun BingeTopBar(
                         onClick = onBack,
                         icon = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.cd_navigate_back),
-                        tint = if (transparent) scrimForegroundColor else LocalContentColor.current,
+                        tint = if (transparent) BingeTheme.colors.onScrim else LocalContentColor.current,
                         tone = iconTone,
                         size = dimensionResource(R.dimen.top_bar_icon_size),
                         glassBackgroundAlpha = glassBackgroundAlpha,
