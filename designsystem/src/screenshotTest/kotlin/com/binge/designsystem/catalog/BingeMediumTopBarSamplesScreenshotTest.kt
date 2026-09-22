@@ -11,4 +11,11 @@ class BingeMediumTopBarSamplesScreenshotTest {
     fun Standard() {
         BingeMediumTopBarSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ThemeFollowingScrim() {
+        BingeMediumTopBarThemeFollowingScrimSample()
+    }
 }
