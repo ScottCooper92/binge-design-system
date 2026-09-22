@@ -170,6 +170,13 @@ fun HeroBackdrop(
     }
 }
 
+/**
+ * The theme-following wash [HeroTextColumn] sits on — but not what keeps its text legible: this
+ * gradient is fully transparent until [HERO_SCRIM_MID_STOP], and title/tagline/meta can render well
+ * above that stop depending on how many of them a given item populates, over whatever the raw
+ * backdrop happens to be there. [HeroTextColumn]'s own text stays [BingeTheme.colors.onScrim] for
+ * that reason — the same guarantee [IconButtonTone.Glass] carries for the same reason.
+ */
 @Composable
 private fun HeroScrim() {
     // Always-black rather than theme-following: this sits directly over unpredictable backdrop

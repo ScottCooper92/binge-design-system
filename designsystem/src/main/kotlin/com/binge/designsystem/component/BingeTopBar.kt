@@ -2,6 +2,7 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,12 +19,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeTheme
 
@@ -63,6 +66,10 @@ import com.binge.designsystem.theme.BingeTheme
  * fading out over [foregroundScrimFraction] rather than [scrimFraction] — the two default to the
  * same value, exactly as on [BingeMediumTopBar]. [actions] reads the resolved value as the lambda's
  * argument, to pass along to icons of its own.
+ *
+ * [edgeInset] is the same symmetric leading/trailing inset [BingeMediumTopBar] carries, matching
+ * [DetailOverlayTopBar]'s own `horizontalInset` so a transparent bar's controls float the same
+ * distance from the edge everywhere.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +83,7 @@ fun BingeTopBar(
     foregroundScrimFraction: Float = scrimFraction,
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
+    edgeInset: Dp = dimensionResource(R.dimen.medium_top_bar_edge_inset),
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     val transparent = containerColor == Color.Transparent
@@ -101,20 +109,27 @@ fun BingeTopBar(
             modifier = modifier,
             navigationIcon = {
                 if (onBack != null) {
-                    ExpressiveIconButton(
-                        onClick = onBack,
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_navigate_back),
-                        tint = if (transparent) BingeTheme.colors.onScrim else LocalContentColor.current,
-                        tone = iconTone,
-                        size = dimensionResource(R.dimen.top_bar_icon_size),
-                        glassBackgroundAlpha = glassBackgroundAlpha,
-                    )
+                    Box(modifier = Modifier.padding(start = edgeInset)) {
+                        ExpressiveIconButton(
+                            onClick = onBack,
+                            icon = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_navigate_back),
+                            tint = if (transparent) BingeTheme.colors.onScrim else LocalContentColor.current,
+                            tone = iconTone,
+                            size = dimensionResource(R.dimen.top_bar_icon_size),
+                            glassBackgroundAlpha = glassBackgroundAlpha,
+                        )
+                    }
                 }
             },
             actions = {
                 CompositionLocalProvider(LocalTopBarActionTone provides iconTone) {
-                    actions(glassBackgroundAlpha)
+                    Row(
+                        modifier = Modifier.padding(end = edgeInset),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        actions(glassBackgroundAlpha)
+                    }
                 }
             },
             colors = bingeTopBarColors(containerColor),
