@@ -11,8 +11,8 @@
 # The `org.jetbrains.kotlin.android` plugin is NOT declared: AGP 9 has built-in Kotlin support and
 # rejects it. Binge's catalog has the same pair for the same reason, and these two must agree.
 [versions]
-agp = "9.3.2"
-kotlin = "2.4.10"
+agp = "9.4.1"
+kotlin = "2.4.20"
 composeBom = "2026.08.00"
 # tv-material ships its own MaterialTheme tree; the version agrees with Binge's.
 tvMaterial = "1.1.0"
