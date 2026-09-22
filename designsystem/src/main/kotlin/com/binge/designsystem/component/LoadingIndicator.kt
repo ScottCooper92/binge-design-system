@@ -5,6 +5,7 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
@@ -14,13 +15,16 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * loading state that routes through this composable picks it up without its own edit.
  *
  * @param modifier Modifier to apply to the indicator
+ * @param color Tint for the indicator. Defaults to the theme's primary colour; a caller drawing
+ * against a non-default background (e.g. a filled button's own foreground colour) can override it
+ * so the spinner stays legible there instead of silently taking primary regardless of context.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun BingeLoadingIndicator(modifier: Modifier = Modifier) {
+fun BingeLoadingIndicator(modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.primary) {
     LoadingIndicator(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.primary,
+        color = color,
     )
 }
 
