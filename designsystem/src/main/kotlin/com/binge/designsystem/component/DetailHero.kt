@@ -216,7 +216,7 @@ private fun HeroTextColumn(
             Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
             Text(
                 text = eyebrowText.uppercase(),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
         }
