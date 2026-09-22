@@ -43,7 +43,9 @@ import com.binge.designsystem.theme.BingeTheme
  * A transparent bar draws nothing behind itself, so [scrimFraction] puts a [TopBarScrim] behind it —
  * ramp it on the same [scrollBehavior]'s `collapsedFraction`, or the content passing under runs
  * through the title. A screen whose bar and header need *one* scrim across both (the chip-filtered
- * screens) leaves this at 0 and scrims the header instead.
+ * screens) leaves this at 0 and scrims the header instead. That scrim tapers past this bar's own
+ * bottom edge into the content scrolling under it, rather than cutting off at the bar's boundary
+ * (#94).
  *
  * [scrimColor]/[scrimForegroundColor] default to a theme-following pair
  * (`MaterialTheme.colorScheme.background`/`onBackground`), exactly as on [BingeTopBar] — every
@@ -102,7 +104,11 @@ fun BingeMediumTopBar(
     val titleStartInset =
         dimensionResource(R.dimen.medium_top_bar_collapsed_title_inset) * collapsedFraction
     Box {
-        TopBarScrim(scrimFraction, scrimColor = scrimColor)
+        TopBarScrim(
+            scrimFraction,
+            scrimColor = scrimColor,
+            tailHeight = dimensionResource(R.dimen.top_bar_scrim_tail_height),
+        )
         MediumTopAppBar(
             title = {
                 Text(
