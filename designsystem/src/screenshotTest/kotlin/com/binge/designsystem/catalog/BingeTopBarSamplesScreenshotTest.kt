@@ -18,4 +18,11 @@ class BingeTopBarSamplesScreenshotTest {
     fun Transparent() {
         BingeTopBarTransparentSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ThemeFollowingScrim() {
+        BingeTopBarThemeFollowingScrimSample()
+    }
 }

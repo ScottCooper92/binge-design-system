@@ -60,7 +60,7 @@ private const val CINEMATIC_SYNOPSIS_MAX_LINES = 4
 
 /**
  * Immersive expanded-width detail header: full-bleed backdrop gradient-blended into the background,
- * and an inline poster beside a copy column (eyebrow → title → [synopsis] → [stats]). Sizes to its
+ * and an inline poster beside a copy column (title → eyebrow → [synopsis] → [stats]). Sizes to its
  * container width so it composes correctly in a side pane; the height is the fixed cinematic header
  * height. The expanded counterpart to [DetailHero]; the single-column detail keeps using
  * [DetailHero].
