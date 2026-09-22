@@ -8,7 +8,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -88,8 +88,17 @@ fun BingeBottomSheet(
 internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gesturesEnabled: Boolean): SheetState {
     val locked by rememberUpdatedState(!gesturesEnabled)
     val confirmValueChange = remember { { target: SheetValue -> !locked || target == SheetValue.Expanded } }
-    return rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded,
+    // rememberBottomSheetState replaced the skipPartiallyExpanded flag with an explicit reachable-states
+    // set — Hidden/Expanded excludes PartiallyExpanded the same way the flag used to.
+    val enabledValues =
+        if (skipPartiallyExpanded) {
+            setOf(SheetValue.Hidden, SheetValue.Expanded)
+        } else {
+            setOf(SheetValue.Hidden, SheetValue.PartiallyExpanded, SheetValue.Expanded)
+        }
+    return rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = enabledValues,
         confirmValueChange = confirmValueChange,
     )
 }
