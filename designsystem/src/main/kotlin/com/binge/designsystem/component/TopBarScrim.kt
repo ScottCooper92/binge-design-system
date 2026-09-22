@@ -36,9 +36,13 @@ private const val TITLE_SCRIM_SWITCH_FRACTION = 0.75f
  * final taper down to fully transparent, and by default it *ends* exactly at [fraction]'s own bottom
  * edge, which squeezes that taper into a sliver of the caller's own height and can read as a hard
  * cutoff the instant scrolled content passes beneath it (#94). [tailHeight] extends the paint area
- * that same distance past the bottom, with the same four stops rescaled onto the taller area — every
- * pixel *within* the caller's own bounds renders identically either way, and only the final taper,
- * which otherwise ends at that boundary, completes gradually past it instead. Defaults to
+ * that same distance past the bottom, with the same four stops rescaled onto the taller area, so
+ * [SCRIM_MID_STOP] and [SCRIM_LATE_STOP] land at the same *absolute* position within the caller's own
+ * bounds either way. The final taper's *completion point* is not preserved, though: with a non-zero
+ * [tailHeight] it now finishes past the bottom edge instead of at it, so the alpha across roughly the
+ * last [SCRIM_LATE_STOP]-to-`1f` band of the caller's own height is measurably higher — the fade
+ * continues past the boundary rather than rushing to zero before it, which is the fix #94 is for, at
+ * the cost of that band no longer matching a zero-[tailHeight] render pixel for pixel. Defaults to
  * [R.dimen.zero]: [OverlaidHeaderContent] already runs its own separate fade band past the header, so
  * only [BingeTopBar]/[BingeMediumTopBar] — which have no such band of their own — opt in.
  *
