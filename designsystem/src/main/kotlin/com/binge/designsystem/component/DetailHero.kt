@@ -38,7 +38,10 @@ import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
 
-private const val HERO_SCRIM_BOTTOM_ALPHA = 1.00f
+private const val HERO_SCRIM_TOP_ALPHA = 0.55f
+private const val HERO_SCRIM_MID_ALPHA = 0.60f
+private const val HERO_SCRIM_BOTTOM_ALPHA = 0.90f
+private const val HERO_SCRIM_CLEAR_STOP = 0.25f
 private const val HERO_SCRIM_MID_STOP = 0.60f
 
 /**
@@ -169,14 +172,19 @@ fun HeroBackdrop(
 
 @Composable
 private fun HeroScrim() {
-    val scrim = MaterialTheme.colorScheme.background
+    // Always-black rather than theme-following: this sits directly over unpredictable backdrop
+    // imagery with no compensating scrim of its own (unlike DetailCinematicHeader's CinematicScrim,
+    // which has CinematicSideScrim to guarantee coverage where its title lands), so only a
+    // guaranteed-dark backing keeps the title/tagline/meta legible regardless of what's underneath.
+    val scrim = BingeTheme.colors.scrim
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0.00f to Color.Transparent,
-                    HERO_SCRIM_MID_STOP to Color.Transparent,
+                    0.00f to scrim.copy(alpha = HERO_SCRIM_TOP_ALPHA),
+                    HERO_SCRIM_CLEAR_STOP to Color.Transparent,
+                    HERO_SCRIM_MID_STOP to scrim.copy(alpha = HERO_SCRIM_MID_ALPHA),
                     1.00f to scrim.copy(alpha = HERO_SCRIM_BOTTOM_ALPHA),
                 ),
             ),
@@ -202,7 +210,7 @@ private fun HeroTextColumn(
         Text(
             text = title,
             style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = BingeTheme.colors.onScrim,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
@@ -219,7 +227,7 @@ private fun HeroTextColumn(
             Text(
                 text = tagline,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f),
+                color = BingeTheme.colors.onScrim.copy(alpha = 0.85f),
                 fontStyle = FontStyle.Italic,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -230,7 +238,7 @@ private fun HeroTextColumn(
             Text(
                 text = metaText,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.80f),
+                color = BingeTheme.colors.onScrim.copy(alpha = 0.80f),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )

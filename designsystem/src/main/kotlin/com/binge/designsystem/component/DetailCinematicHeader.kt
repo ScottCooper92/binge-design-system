@@ -128,13 +128,15 @@ fun DetailCinematicHeader(
 
 @Composable
 private fun CinematicScrim() {
-    // Theme-following rather than the black-always default, matching DetailHero — the header runs
-    // to the same app background at its lower edge, so a black scrim landing there would read as a
-    // mismatch the moment it faded in over a light theme.
+    // Theme-following rather than the black-always default — the header runs to the same app
+    // background at its lower edge, so a black scrim landing there would read as a mismatch the
+    // moment it faded in over a light theme. Safe here, unlike DetailHero's own HeroScrim (which
+    // stays black-always), because CinematicSideScrim gives the title real guaranteed coverage
+    // independent of this ramp's own thin band at the title's vertical position.
     //
-    // Clear until the mid stop, same as DetailHero — no top wash. The pinned DetailOverlayTopBar
-    // draws no chrome here either, but its own Glass-toned icons carry their own translucent backing
-    // regardless of what's behind them, so they don't need this scrim's help for contrast.
+    // Clear until the mid stop — no top wash. The pinned DetailOverlayTopBar draws no chrome here
+    // either, but its own Glass-toned icons carry their own translucent backing regardless of what's
+    // behind them, so they don't need this scrim's help for contrast.
     val scrim = MaterialTheme.colorScheme.background
     Box(
         modifier = Modifier
