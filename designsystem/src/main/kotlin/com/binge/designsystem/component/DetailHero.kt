@@ -45,18 +45,16 @@ private const val HERO_SCRIM_CLEAR_STOP = 0.25f
 private const val HERO_SCRIM_MID_STOP = 0.60f
 
 /**
- * Sets the status bar's icon appearance for a screen whose content runs under it.
+ * Sets the status bar to always-light icons for a screen whose content runs under it — [HeroScrim]
+ * and the image viewer's own [BingeTheme.colors.scrim] are both always-black regardless of theme, so
+ * the icons over them never need to follow the theme either; a theme-following default would go dark-
+ * on-dark in light theme against a backdrop that never actually lightens.
  *
- * Defaults to following the theme — dark icons in light theme, light in dark — matching the hero
- * scrim underneath, which now does the same ([HeroScrim]). Pass [alwaysLightIcons] for a screen whose
- * background is black regardless of theme (the image viewer's own [BingeTheme.colors.scrim]) — icons
- * stay light there even in light theme, since the backdrop underneath never gets any lighter.
- *
- * Restores to the theme-following state on dispose either way, so the screen navigated back to reads
- * normally rather than inheriting whichever mode this one asked for.
+ * Restores to the theme-following state on dispose, so the screen navigated back to reads normally
+ * rather than inheriting light icons it never asked for.
  */
 @Composable
-fun DarkStatusBarEffect(alwaysLightIcons: Boolean = false) {
+fun DarkStatusBarEffect() {
     val view = LocalView.current
     val isDark = isSystemInDarkTheme()
     if (!view.isInEditMode) {
@@ -65,7 +63,7 @@ fun DarkStatusBarEffect(alwaysLightIcons: Boolean = false) {
                 (view.context as Activity).window,
                 view,
             )
-            controller.isAppearanceLightStatusBars = if (alwaysLightIcons) false else !isDark
+            controller.isAppearanceLightStatusBars = false
             onDispose { controller.isAppearanceLightStatusBars = !isDark }
         }
     }

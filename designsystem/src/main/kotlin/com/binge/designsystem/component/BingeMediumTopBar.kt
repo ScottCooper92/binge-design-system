@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,8 +59,13 @@ import com.binge.designsystem.theme.BingeTheme
  * same value, but a caller whose own scrim comes from elsewhere (the gallery's chip-filtered header,
  * which sets [foregroundScrimFraction] alone and leaves this bar's own [TopBarScrim] off) needs the
  * icon backing to hand off to *that* scrim, not to a [scrimFraction] that never moves here. [actions]
- * reads the resolved value as the lambda's argument, to pass along to icons of its own, exactly as
- * [DetailOverlayTopBar] does.
+ * reads the resolved value as the lambda's argument, to pass along to icons of its own.
+ *
+ * Back's own tint travels the same ramp, from [BingeTheme.colors.onScrim] to [scrimForegroundColor]
+ * as [foregroundScrimFraction] goes to 1 — a tint fixed at `onScrim` has no guaranteed contrast left
+ * once the backing has faded away against a theme-following [scrimForegroundColor]; an [actions] icon
+ * supplying its own `tint` needs the same `lerp(BingeTheme.colors.onScrim, scrimForegroundColor, 1f -
+ * glassBackgroundAlpha)`, exactly as [DetailOverlayTopBar] does.
  *
  * [edgeInset] gives back and [actions] the same breathing room from both edges that
  * [DetailOverlayTopBar]'s own `horizontalInset` gives its row, rather than M3's tighter built-in
@@ -84,8 +90,11 @@ fun BingeMediumTopBar(
     val iconTone = if (transparent) IconButtonTone.Glass else IconButtonTone.Default
     val titleColor = scrimmedTitleColor(transparent, foregroundScrimFraction, scrimForegroundColor)
     // The bar's own scrim takes over legibility as it fades in, so each icon's individual backing
-    // hands off to it rather than the two stacking.
+    // hands off to it rather than the two stacking. The icon's own tint has to travel with that
+    // handoff too, or a hardcoded onScrim goes illegible once the backing (its other half of the
+    // contrast guarantee) has faded away against a theme-following scrimForegroundColor.
     val glassBackgroundAlpha = 1f - foregroundScrimFraction
+    val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
     // The expanded large title sits on its own (second) row at the 16dp content margin, with no nav
     // circle beside it; only the collapsed title animates up next to the circle. A flat inset would
     // wrongly indent the expanded title, so ramp the start padding 0 -> target as the bar collapses.
@@ -112,7 +121,7 @@ fun BingeMediumTopBar(
                             onClick = onBack,
                             icon = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.cd_navigate_back),
-                            tint = if (transparent) BingeTheme.colors.onScrim else LocalContentColor.current,
+                            tint = if (transparent) iconTint else LocalContentColor.current,
                             tone = iconTone,
                             size = dimensionResource(R.dimen.top_bar_icon_size),
                             glassBackgroundAlpha = glassBackgroundAlpha,
