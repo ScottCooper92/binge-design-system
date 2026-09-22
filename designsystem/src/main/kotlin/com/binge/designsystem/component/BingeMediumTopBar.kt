@@ -66,8 +66,8 @@ import com.binge.designsystem.theme.BingeTheme
  * Back's own tint travels the same ramp, from [BingeTheme.colors.onScrim] to [scrimForegroundColor]
  * as [foregroundScrimFraction] goes to 1 — a tint fixed at `onScrim` has no guaranteed contrast left
  * once the backing has faded away against a theme-following [scrimForegroundColor]; an [actions] icon
- * supplying its own `tint` needs the same `lerp(BingeTheme.colors.onScrim, scrimForegroundColor, 1f -
- * glassBackgroundAlpha)`, exactly as [DetailOverlayTopBar] does.
+ * supplying its own `tint` reads [LocalTopBarActionTint] rather than re-deriving that lerp, exactly
+ * as it reads [LocalTopBarActionTone] for tone.
  *
  * [edgeInset] gives back and [actions] the same breathing room from both edges that
  * [DetailOverlayTopBar]'s own `horizontalInset` gives its row, rather than M3's tighter built-in
@@ -136,7 +136,10 @@ fun BingeMediumTopBar(
                 }
             },
             actions = {
-                CompositionLocalProvider(LocalTopBarActionTone provides iconTone) {
+                CompositionLocalProvider(
+                    LocalTopBarActionTone provides iconTone,
+                    LocalTopBarActionTint provides iconTint,
+                ) {
                     Row(
                         modifier = Modifier.padding(end = edgeInset),
                         verticalAlignment = Alignment.CenterVertically,
@@ -189,7 +192,7 @@ internal fun TransparentBingeMediumTopBarSample(scrimFraction: Float = 0f) {
                 onClick = {},
                 icon = Icons.Filled.Share,
                 contentDescription = null,
-                tint = BingeTheme.colors.onScrim,
+                tint = LocalTopBarActionTint.current,
                 tone = LocalTopBarActionTone.current,
                 size = dimensionResource(R.dimen.top_bar_icon_size),
                 glassBackgroundAlpha = glassBackgroundAlpha,
