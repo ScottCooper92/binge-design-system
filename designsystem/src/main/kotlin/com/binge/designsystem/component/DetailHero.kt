@@ -44,6 +44,15 @@ private const val HERO_SCRIM_BOTTOM_ALPHA = 0.90f
 private const val HERO_SCRIM_CLEAR_STOP = 0.25f
 private const val HERO_SCRIM_MID_STOP = 0.60f
 
+/**
+ * Sets the status bar to always-light icons for a screen whose content runs under it — [HeroScrim]
+ * and the image viewer's own [BingeTheme.colors.scrim] are both always-black regardless of theme, so
+ * the icons over them never need to follow the theme either; a theme-following default would go dark-
+ * on-dark in light theme against a backdrop that never actually lightens.
+ *
+ * Restores to the theme-following state on dispose, so the screen navigated back to reads normally
+ * rather than inheriting light icons it never asked for.
+ */
 @Composable
 fun DarkStatusBarEffect() {
     val view = LocalView.current
@@ -161,6 +170,10 @@ fun HeroBackdrop(
 
 @Composable
 private fun HeroScrim() {
+    // Always-black rather than theme-following: this sits directly over unpredictable backdrop
+    // imagery with no compensating scrim of its own (unlike DetailCinematicHeader's CinematicScrim,
+    // which has CinematicSideScrim to guarantee coverage where its title lands), so only a
+    // guaranteed-dark backing keeps the title/tagline/meta legible regardless of what's underneath.
     val scrim = BingeTheme.colors.scrim
     Box(
         modifier = Modifier
@@ -192,14 +205,6 @@ private fun HeroTextColumn(
                 bottom = dimensionResource(R.dimen.detail_hero_text_bottom_padding),
             ),
     ) {
-        if (!eyebrowText.isNullOrBlank()) {
-            Text(
-                text = eyebrowText.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
-        }
         Text(
             text = title,
             style = MaterialTheme.typography.displaySmall,
@@ -207,6 +212,14 @@ private fun HeroTextColumn(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+        if (!eyebrowText.isNullOrBlank()) {
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+            Text(
+                text = eyebrowText.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
         if (!tagline.isNullOrBlank()) {
             Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
             Text(

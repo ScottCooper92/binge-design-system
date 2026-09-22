@@ -2,6 +2,7 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,12 +19,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeTheme
 
@@ -48,11 +52,30 @@ import com.binge.designsystem.theme.BingeTheme
  * through the title, exactly as on [BingeMediumTopBar]. A screen whose bar and header want *one*
  * scrim across both (Gallery) leaves this at 0 and scrims the header instead.
  *
- * The scrim tone is black in both themes, so the title has to travel with it or light theme's
- * dark-on-light title goes illegible exactly as the scrim lands — the rule [TopBarScrim]'s own KDoc
- * states. [foregroundScrimFraction] is that ramp, defaulting to the bar's own [scrimFraction].
- * Override it only where something *behind* the bar supplies the scrim instead, so the bar draws
- * none itself but its title still sits on one (the gallery's chip overlay).
+ * [scrimColor]/[scrimForegroundColor] default to a theme-following pair
+ * (`MaterialTheme.colorScheme.background`/`onBackground`) — every current caller scrims a plain,
+ * predictable surface (a grid or list on the app's own background), where that pair reads as one
+ * continuous surface rather than a scrim landing on top of it. Override to [BingeTheme.colors.scrim]/
+ * [BingeTheme.colors.onScrim] (always black/white, regardless of theme) only for a bar floating over
+ * genuinely unpredictable content — a hero image that could be any colour — where a caller needs a
+ * legibility guarantee the theme's own colours can't make. [foregroundScrimFraction] is the ramp
+ * that ties the title's colour to whichever pair is in play, defaulting to the bar's own
+ * [scrimFraction]; override it only where something *behind* the bar supplies the scrim instead, so
+ * the bar draws none itself but its title still sits on one (the gallery's chip overlay).
+ *
+ * Back and [actions] carry their own [ExpressiveIconButton.glassBackgroundAlpha] wash at rest,
+ * fading out over [foregroundScrimFraction] rather than [scrimFraction] — the two default to the
+ * same value, exactly as on [BingeMediumTopBar]. [actions] reads the resolved value as the lambda's
+ * argument, to pass along to icons of its own. Back's own tint travels the same ramp, from
+ * [BingeTheme.colors.onScrim] to [scrimForegroundColor] as [foregroundScrimFraction] goes to 1 — a
+ * tint fixed at `onScrim` has no guaranteed contrast left once the backing (its other half of the
+ * guarantee) has faded away against a theme-following [scrimForegroundColor]; an [actions] icon
+ * supplying its own `tint` needs the same `lerp(BingeTheme.colors.onScrim, scrimForegroundColor,
+ * 1f - glassBackgroundAlpha)`.
+ *
+ * [edgeInset] is the same symmetric leading/trailing inset [BingeMediumTopBar] carries, matching
+ * [DetailOverlayTopBar]'s own `horizontalInset` so a transparent bar's controls float the same
+ * distance from the edge everywhere.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,13 +87,22 @@ fun BingeTopBar(
     containerColor: Color = Color.Unspecified,
     scrimFraction: Float = 0f,
     foregroundScrimFraction: Float = scrimFraction,
-    actions: @Composable RowScope.() -> Unit = {},
+    scrimColor: Color = MaterialTheme.colorScheme.background,
+    scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
+    edgeInset: Dp = dimensionResource(R.dimen.medium_top_bar_edge_inset),
+    actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     val transparent = containerColor == Color.Transparent
     val iconTone = if (transparent) IconButtonTone.Glass else IconButtonTone.Default
-    val titleColor = scrimmedTitleColor(transparent, foregroundScrimFraction)
+    val titleColor = scrimmedTitleColor(transparent, foregroundScrimFraction, scrimForegroundColor)
+    // The bar's own scrim takes over legibility as it fades in, so each icon's individual backing
+    // hands off to it rather than the two stacking. The icon's own tint has to travel with that
+    // handoff too, or a hardcoded onScrim goes illegible once the backing (its other half of the
+    // contrast guarantee) has faded away against a theme-following scrimForegroundColor.
+    val glassBackgroundAlpha = 1f - foregroundScrimFraction
+    val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
     Box {
-        TopBarScrim(scrimFraction)
+        TopBarScrim(scrimFraction, scrimColor = scrimColor)
         TopAppBar(
             title = {
                 Text(
@@ -86,19 +118,27 @@ fun BingeTopBar(
             modifier = modifier,
             navigationIcon = {
                 if (onBack != null) {
-                    ExpressiveIconButton(
-                        onClick = onBack,
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_navigate_back),
-                        tint = if (transparent) BingeTheme.colors.onScrim else LocalContentColor.current,
-                        tone = iconTone,
-                        size = dimensionResource(R.dimen.top_bar_icon_size),
-                    )
+                    Box(modifier = Modifier.padding(start = edgeInset)) {
+                        ExpressiveIconButton(
+                            onClick = onBack,
+                            icon = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_navigate_back),
+                            tint = if (transparent) iconTint else LocalContentColor.current,
+                            tone = iconTone,
+                            size = dimensionResource(R.dimen.top_bar_icon_size),
+                            glassBackgroundAlpha = glassBackgroundAlpha,
+                        )
+                    }
                 }
             },
             actions = {
                 CompositionLocalProvider(LocalTopBarActionTone provides iconTone) {
-                    actions()
+                    Row(
+                        modifier = Modifier.padding(end = edgeInset),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        actions(glassBackgroundAlpha)
+                    }
                 }
             },
             colors = bingeTopBarColors(containerColor),
@@ -143,16 +183,18 @@ internal fun TransparentBingeTopBarSample(scrimFraction: Float = 0f) {
             onBack = {},
             containerColor = Color.Transparent,
             scrimFraction = scrimFraction,
-            actions = {
-                ExpressiveIconButton(
-                    onClick = {},
-                    icon = Icons.Filled.Share,
-                    contentDescription = null,
-                    tint = BingeTheme.colors.onScrim,
-                    tone = LocalTopBarActionTone.current,
-                    size = dimensionResource(R.dimen.top_bar_icon_size),
-                )
-            },
-        )
+            scrimColor = BingeTheme.colors.scrim,
+            scrimForegroundColor = BingeTheme.colors.onScrim,
+        ) { glassBackgroundAlpha ->
+            ExpressiveIconButton(
+                onClick = {},
+                icon = Icons.Filled.Share,
+                contentDescription = null,
+                tint = BingeTheme.colors.onScrim,
+                tone = LocalTopBarActionTone.current,
+                size = dimensionResource(R.dimen.top_bar_icon_size),
+                glassBackgroundAlpha = glassBackgroundAlpha,
+            )
+        }
     }
 }

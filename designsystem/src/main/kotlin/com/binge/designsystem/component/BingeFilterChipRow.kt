@@ -151,6 +151,7 @@ fun BingeFilterChipPager(
     header: (@Composable () -> Unit)? = null,
     headerBackground: Color = MaterialTheme.colorScheme.background,
     scrimFraction: Float = 0f,
+    scrimColor: Color = MaterialTheme.colorScheme.background,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
     val pagerState = rememberFilterPagerState(
@@ -162,6 +163,7 @@ fun BingeFilterChipPager(
         modifier = modifier,
         headerBackground = headerBackground,
         scrimFraction = scrimFraction,
+        scrimColor = scrimColor,
         header = {
             header?.invoke()
             BingeFilterChipRow(

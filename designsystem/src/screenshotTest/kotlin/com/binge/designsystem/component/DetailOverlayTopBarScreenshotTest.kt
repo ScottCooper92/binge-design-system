@@ -1,13 +1,16 @@
 package com.binge.designsystem.component
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
@@ -44,6 +47,22 @@ class DetailOverlayTopBarScreenshotTest {
         }
     }
 
+    /**
+     * Light theme at the bar's fully-scrolled steady state (`progress = 1`): the state where the
+     * back button's Glass backing has faded to nothing and only the theme-following [TopBarScrim]
+     * is behind it. This is the frame that catches a tint left hardcoded at
+     * [BingeTheme.colors.onScrim] — it would render a white icon on the light bar this baseline
+     * expects instead.
+     */
+    @PreviewTest
+    @Preview(name = "scrolled-light", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_NO)
+    @Composable
+    fun ScrolledLight() {
+        ScreenshotTheme {
+            Sample(scroll = PAST_HERO_SCROLL_PX)
+        }
+    }
+
     @PreviewTest
     @Preview(name = "midscroll-dark", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_YES)
     @Composable
@@ -69,14 +88,19 @@ class DetailOverlayTopBarScreenshotTest {
                 title = "The Dark Knight",
                 scrollState = rememberScrollState(initial = scroll),
                 onBack = {},
-            ) {
+            ) { glassBackgroundAlpha ->
                 ExpressiveIconButton(
                     onClick = {},
                     icon = Icons.Filled.Share,
                     contentDescription = null,
-                    tint = BingeTheme.colors.onScrim,
+                    tint = lerp(
+                        BingeTheme.colors.onScrim,
+                        MaterialTheme.colorScheme.onBackground,
+                        1f - glassBackgroundAlpha,
+                    ),
                     tone = IconButtonTone.Glass,
                     size = dimensionResource(R.dimen.top_bar_icon_size),
+                    glassBackgroundAlpha = glassBackgroundAlpha,
                 )
             }
         }
