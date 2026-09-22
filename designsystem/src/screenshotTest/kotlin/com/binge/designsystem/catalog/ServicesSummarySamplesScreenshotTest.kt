@@ -18,4 +18,11 @@ class ServicesSummarySamplesScreenshotTest {
     fun Empty() {
         ServicesSummaryEmptySample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Overflow() {
+        ServicesSummaryOverflowSample()
+    }
 }
