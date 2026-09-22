@@ -69,13 +69,14 @@ fun BingeMediumTopBarThemeFollowingScrimSample() {
                 onBack = {},
                 containerColor = Color.Transparent,
                 scrimFraction = 1f,
-                actions = {
+                actions = { glassBackgroundAlpha ->
                     ExpressiveIconButton(
                         onClick = {},
                         icon = Icons.Filled.Search,
                         contentDescription = null,
                         tone = LocalTopBarActionTone.current,
                         size = dimensionResource(R.dimen.top_bar_icon_size),
+                        glassBackgroundAlpha = glassBackgroundAlpha,
                     )
                 },
             )
