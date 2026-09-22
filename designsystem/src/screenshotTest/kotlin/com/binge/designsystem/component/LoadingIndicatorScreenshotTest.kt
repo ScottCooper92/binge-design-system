@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
@@ -16,6 +17,16 @@ class LoadingIndicatorScreenshotTest {
     fun Default() {
         ScreenshotTheme {
             BingeLoadingIndicator()
+        }
+    }
+
+    /** A caller-supplied [color], for a spinner drawn against a non-default background. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun CustomColor() {
+        ScreenshotTheme {
+            BingeLoadingIndicator(color = MaterialTheme.colorScheme.tertiary)
         }
     }
 }
