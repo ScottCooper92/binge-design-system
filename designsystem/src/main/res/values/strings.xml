@@ -67,4 +67,10 @@
          halves are present, so it is a standalone glyph rather than part of either label. -->
     <string name="list_row_meta_separator" translatable="false">·</string>
     <string name="detail_rating">Rating</string>
+    <!-- ServicesSummary: trailing badge for the providers past its visible-logo cap. -->
+    <string name="services_summary_overflow_count">+%1$d</string>
+    <plurals name="services_summary_overflow_services">
+        <item quantity="one">%1$d more service selected</item>
+        <item quantity="other">%1$d more services selected</item>
+    </plurals>
 </resources>
