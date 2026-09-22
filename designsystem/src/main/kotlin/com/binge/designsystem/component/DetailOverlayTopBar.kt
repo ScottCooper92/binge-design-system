@@ -34,8 +34,10 @@ import com.binge.designsystem.theme.BingeTheme
  * The ramp spans a fixed band ([R.dimen.detail_overlay_bar_fade_band], ~one bar height) ending as the
  * hero clears, tracking the hero edge rather than the whole scroll; pinned so back stays reachable at
  * any offset. Both the scrim and the title that rides its fade follow the theme's own background/
- * on-background pair — [HeroScrim] does too — rather than the black-always default, since this bar
- * scrims a known hero backdrop rather than arbitrary scrolled content. Back and [actions] carry their
+ * on-background pair rather than the black-always default, since by the time this ramp engages the
+ * hero has already faded to the app's own background underneath it — unlike [HeroScrim] itself,
+ * which stays black-always because it sits directly over the raw, unpredictable backdrop with no
+ * compensating scrim of its own. Back and [actions] carry their
  * own [ExpressiveIconButton.glassBackgroundAlpha] wash at rest, fading out over the same ramp as the
  * bar's own scrim fades in — [actions] reads that value as its lambda argument, to pass along to icons
  * of its own. The back button's own tint travels the same ramp, from the always-legible
