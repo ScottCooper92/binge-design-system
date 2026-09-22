@@ -101,6 +101,12 @@
     <dimen name="medium_top_bar_collapsed_title_inset">8dp</dimen>
     <!-- Leading/trailing inset for back + actions, matching DetailOverlayTopBar's own default horizontalInset (padding_m) so a transparent bar's controls float the same distance from the edge everywhere. -->
     <dimen name="medium_top_bar_edge_inset">16dp</dimen>
+    <!-- How far TopBarScrim's fade tapers past the bar's own bottom edge, into the content scrolling under it — so the drop to fully transparent is a fade rather than the hard cutoff #94 found at the bar's own boundary. -->
+    <dimen name="top_bar_scrim_tail_height">24dp</dimen>
+    <!-- Tall enough to clear a medium bar's own expanded height plus top_bar_scrim_tail_height, with a
+         margin of visibly untouched background left below it — the room the tail-fade screenshot frames
+         need to show the fade completing past the bar's bottom edge rather than cutting off. -->
+    <dimen name="top_bar_scrim_tail_preview_height">220dp</dimen>
     <dimen name="detail_action_row_spacing">10dp</dimen>
     <dimen name="detail_action_button_size">48dp</dimen>
     <!--
