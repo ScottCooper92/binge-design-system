@@ -29,4 +29,11 @@ class TextButtonSamplesScreenshotTest {
     fun Error() {
         TextButtonErrorSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Icon() {
+        TextButtonIconSample()
+    }
 }

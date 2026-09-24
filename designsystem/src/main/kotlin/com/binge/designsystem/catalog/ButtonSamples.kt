@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.dimensionResource
@@ -73,6 +74,27 @@ fun FilledButtonDestructiveSample() {
         ) {
             BingeFilledButton(label = "Keep", onClick = {})
             BingeFilledButton(label = "Delete files", onClick = {}, destructive = true)
+        }
+    }
+}
+
+/**
+ * The outlined button's [leadingIcon][BingeOutlinedButton] pair — icon-and-label beside the
+ * icon-only collapse that [showLabel][BingeOutlinedButton] switches to.
+ */
+@Composable
+fun OutlinedButtonIconSample() {
+    ScreenshotTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            BingeOutlinedButton(label = "Report a problem", onClick = {}, leadingIcon = Icons.Filled.Flag)
+            BingeOutlinedButton(
+                label = "Report a problem",
+                onClick = {},
+                leadingIcon = Icons.Filled.Flag,
+                showLabel = false,
+            )
         }
     }
 }
