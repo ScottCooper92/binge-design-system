@@ -73,4 +73,8 @@
         <item quantity="one">%1$d more service selected</item>
         <item quantity="other">%1$d more services selected</item>
     </plurals>
+    <!-- ReorderableHandleRow: the shared drag-to-reorder row shell. -->
+    <string name="cd_reorder_handle">Drag to reorder</string>
+    <string name="cd_reorder_move_up">Move up</string>
+    <string name="cd_reorder_move_down">Move down</string>
 </resources>
