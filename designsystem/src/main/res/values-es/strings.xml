@@ -64,4 +64,8 @@
         <item quantity="many">%1$d de servicios más seleccionados</item>
         <item quantity="other">%1$d servicios más seleccionados</item>
     </plurals>
+    <!-- ReorderableHandleRow -->
+    <string name="cd_reorder_handle">Arrastrar para reordenar</string>
+    <string name="cd_reorder_move_up">Subir</string>
+    <string name="cd_reorder_move_down">Bajar</string>
 </resources>
