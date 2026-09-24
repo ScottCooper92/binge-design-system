@@ -30,6 +30,10 @@ import com.binge.designsystem.theme.BingeShapes
  * commits or opens something irreversible. Naming it keeps the colour in one place, and keeps the
  * next destructive button from quietly defaulting to `primary` — which is how a repository ends up
  * with an error-toned confirmation behind a neutral trigger.
+ *
+ * [showLabel] collapses the button to icon-only, keeping the same pill shape and tap target. It
+ * requires a [leadingIcon]: once the label's [Text] isn't there, the icon is what carries the
+ * accessible name via `contentDescription`.
  */
 @Composable
 fun BingeOutlinedButton(
@@ -43,6 +47,9 @@ fun BingeOutlinedButton(
     destructive: Boolean = false,
     contentColor: Color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
 ) {
+    require(showLabel || leadingIcon != null) {
+        "BingeOutlinedButton needs a leadingIcon to carry the accessible name when showLabel is false"
+    }
     OutlinedButton(
         // Swallow taps while loading so the in-flight action can't be re-triggered,
         // without greying the button out (the spinner takes the label's place).
