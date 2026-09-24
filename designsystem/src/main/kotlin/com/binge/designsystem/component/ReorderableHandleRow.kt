@@ -48,11 +48,20 @@ fun ReorderableHandleRow(
             .heightIn(min = dimensionResource(R.dimen.min_touch_target))
             .semantics {
                 customActions = listOfNotNull(
-                    onMoveUp?.let { move -> CustomAccessibilityAction(moveUpLabel) { move(); true } },
-                    onMoveDown?.let { move -> CustomAccessibilityAction(moveDownLabel) { move(); true } },
+                    onMoveUp?.let { move ->
+                        CustomAccessibilityAction(moveUpLabel) {
+                            move()
+                            true
+                        }
+                    },
+                    onMoveDown?.let { move ->
+                        CustomAccessibilityAction(moveDownLabel) {
+                            move()
+                            true
+                        }
+                    },
                 )
-            }
-            .padding(horizontal = dimensionResource(R.dimen.padding_m)),
+            }.padding(horizontal = dimensionResource(R.dimen.padding_m)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
