@@ -44,15 +44,29 @@ val PaneBackNavigationBehavior: BackNavigationBehavior = BackNavigationBehavior.
 val LocalIsSinglePaneNav = staticCompositionLocalOf { true }
 
 /**
- * [onBack] on a single pane, where a detail screen opened directly from a host's own list was pushed
- * full-screen and needs its own way back; `null` on two-pane, where it renders beside that list and a
- * second Back control would duplicate the one the list already offers.
- *
- * **Not for a screen nested a level deeper than that** — one pushed from within another detail screen
- * rather than from the host's own list directly (a specific list's own contents, say, pushed from a
- * list-of-lists screen rather than from the host's list pane). The pane beside a screen like that is
- * its *parent* screen, not a way back to itself, so it keeps its own Back unconditionally regardless
- * of pane mode.
+ * How many entries a host has stacked above its list pane's own root, for whatever is currently
+ * showing in the detail pane beside it — 1 for a screen pushed directly from the list, more for one
+ * nested further above that. The host provides its own live count per entry; a screen with no
+ * provider (a `@Preview`, or one outside a list-detail pane) defaults to 1. Read through
+ * [paneBackOrNull] rather than directly.
+ */
+val LocalPaneDepth = staticCompositionLocalOf { 1 }
+
+/**
+ * The one back-arrow rule for a list-detail pane, wherever it applies: hidden only when the list pane
+ * is showing beside the detail pane ([hubBeside]) and this is the sole entry stacked above the list
+ * root ([paneDepth] <= 1) — popping there would not return the viewer anywhere they came from, since
+ * the list pane never left the screen. A screen stacked deeper always keeps its own Back: the pane
+ * beside it is a parent screen, not a way back to itself, so depth alone tells a nested screen it
+ * need not opt in — replacing the old marker-interface opt-out.
+ */
+fun paneShowsBack(hubBeside: Boolean, paneDepth: Int): Boolean = !hubBeside || paneDepth > 1
+
+/**
+ * [onBack] where [paneShowsBack] says this entry should carry its own Back, `null` where the list
+ * pane beside it already offers one. Reads [LocalIsSinglePaneNav] and [LocalPaneDepth], both provided
+ * per entry by the host.
  */
 @Composable
-fun paneBackOrNull(onBack: () -> Unit): (() -> Unit)? = onBack.takeIf { LocalIsSinglePaneNav.current }
+fun paneBackOrNull(onBack: () -> Unit): (() -> Unit)? =
+    onBack.takeIf { paneShowsBack(hubBeside = !LocalIsSinglePaneNav.current, paneDepth = LocalPaneDepth.current) }
