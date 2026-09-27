@@ -101,6 +101,12 @@
     <dimen name="medium_top_bar_collapsed_title_inset">8dp</dimen>
     <!-- Leading/trailing inset for back + actions, matching DetailOverlayTopBar's own default horizontalInset (padding_m) so a transparent bar's controls float the same distance from the edge everywhere. -->
     <dimen name="medium_top_bar_edge_inset">16dp</dimen>
+    <!-- Where M3's two-row bar starts either title row, measured from the bar's start edge. BingePaneTopBar
+         shifts its titles from here onto the content inset, so this has to match M3, not a design choice. -->
+    <dimen name="pane_top_bar_title_inset">16dp</dimen>
+    <!-- BingePaneTopBar's expanded height beside a list pane: room for a displaySmall title under the
+         collapsed row, matching the list pane's own heading. -->
+    <dimen name="pane_top_bar_expanded_height">136dp</dimen>
     <!-- How far TopBarScrim's fade tapers past the bar's own bottom edge, into the content scrolling under it — so the drop to fully transparent is a fade rather than the hard cutoff #94 found at the bar's own boundary. -->
     <dimen name="top_bar_scrim_tail_height">24dp</dimen>
     <!-- Tall enough to clear a medium bar's own expanded height plus top_bar_scrim_tail_height, with a
