@@ -116,6 +116,18 @@
     -->
     <dimen name="two_pane_min_width">280dp</dimen>
     <!--
+      The inset a pane gives the edge it shares with the pane beside it, in place of the
+      screen_content_inset ramp it keeps at the window edge (resolvedContentPadding). Two panes each
+      insetting their inner edge by the full ramp, plus the scene's own spacer between them, left a
+      gutter three times the window margin; this edge only has to clear the neighbour, not a bezel.
+    -->
+    <dimen name="pane_inner_inset">8dp</dimen>
+    <!--
+      The spacer a list-detail scene puts between its panes, in place of Material adaptive's own 24dp.
+      Added to both panes' pane_inner_inset, it is the whole visible gap between their content.
+    -->
+    <dimen name="pane_spacer">8dp</dimen>
+    <!--
       Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it
       (#819). Below this the crease is close enough to the bottom edge that honouring it would leave a
       sheet too short to use, so it is ignored and the sheet keeps its own height.

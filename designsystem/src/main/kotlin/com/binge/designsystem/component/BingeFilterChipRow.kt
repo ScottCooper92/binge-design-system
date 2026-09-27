@@ -2,6 +2,8 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,12 +19,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.OverlaidHeaderContent
 import com.binge.designsystem.navOverlayStart
-import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.resolvedContentPadding
 
 /**
  * A horizontally-scrolling row of [BingeFilterChip]s — the selected one filled in the primary accent,
@@ -80,14 +83,23 @@ fun BingeFilterChipRow(
  * the `navOverlayPadding` they already apply. [navOverlayStart] reads zero wherever no rail is
  * overlaying, so every other caller is unaffected.
  *
+ * Per side through [resolvedContentPadding], so the row narrows its edge beside another pane exactly
+ * where the grid below it does.
+ *
  * [FilterChipRowSkeleton] reads the same function, so the plate and the row it stands in for cannot
  * disagree about where the first chip starts.
  */
 @Composable
 internal fun filterChipRowPadding(): PaddingValues {
-    val edge = resolvedContentInset()
     val vertical = dimensionResource(R.dimen.padding_s)
-    return PaddingValues(start = edge + navOverlayStart(), top = vertical, end = edge, bottom = vertical)
+    val layoutDirection = LocalLayoutDirection.current
+    val edges = resolvedContentPadding()
+    return PaddingValues(
+        start = edges.calculateStartPadding(layoutDirection) + navOverlayStart(),
+        top = vertical,
+        end = edges.calculateEndPadding(layoutDirection),
+        bottom = vertical,
+    )
 }
 
 /**

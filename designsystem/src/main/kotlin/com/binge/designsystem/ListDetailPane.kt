@@ -12,11 +12,20 @@ import androidx.compose.runtime.staticCompositionLocalOf
  * from a scene strategy's own preferred-width arithmetic — the list pane and the detail pane get
  * different real widths from the same directive, so only measuring what the host's `NavDisplay`
  * placed this entry's content at tells one pane's own width from another's.
+ *
+ * Also provides [LocalPaneInnerEdge] as [innerEdge] — the edge this pane shares with the one beside
+ * it, [PaneEdge.End] for a list pane and [PaneEdge.Start] for its detail — but only while
+ * [LocalIsSinglePaneNav] says both are on screen. Below the breakpoint the same entry fills the
+ * window alone and has no inner edge, so the caller passes its role once and never checks.
  */
 @Composable
-fun PaneContent(content: @Composable () -> Unit) {
+fun PaneContent(innerEdge: PaneEdge? = null, content: @Composable () -> Unit) {
+    val sharedEdge = innerEdge.takeUnless { LocalIsSinglePaneNav.current }
     BoxWithConstraints {
-        CompositionLocalProvider(LocalPaneWidth provides maxWidth) {
+        CompositionLocalProvider(
+            LocalPaneWidth provides maxWidth,
+            LocalPaneInnerEdge provides sharedEdge,
+        ) {
             content()
         }
     }
