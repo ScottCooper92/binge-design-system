@@ -8,7 +8,7 @@ import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.preview.ScreenshotTheme
 
-/** Alone in the window — renders exactly as [com.binge.designsystem.component.BingeTopBar]. */
+/** Alone in the window — renders exactly as [com.binge.designsystem.component.BingeMediumTopBar]. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingePaneTopBarAloneSample() {
