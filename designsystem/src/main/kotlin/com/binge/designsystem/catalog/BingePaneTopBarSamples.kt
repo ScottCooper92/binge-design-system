@@ -8,7 +8,12 @@ import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.preview.ScreenshotTheme
 
-/** Alone in the window — renders exactly as [com.binge.designsystem.component.BingeMediumTopBar]. */
+/**
+ * Alone in the window — [com.binge.designsystem.component.BingeMediumTopBar]'s shape, but with its
+ * `containerColor` pinned the way [com.binge.designsystem.component.BingeTopBar] pins its own, so it
+ * is not the same as calling [com.binge.designsystem.component.BingeMediumTopBar] directly with an
+ * unspecified colour.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingePaneTopBarAloneSample() {
