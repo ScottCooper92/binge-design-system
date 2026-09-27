@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -34,28 +35,22 @@ import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeTheme
 
 /**
- * The scroll behaviour to pair with [BingePaneTopBar]: collapse-and-stay beside another pane, where the
- * bar carries a large title that should settle into the small one, and M3's enter-always everywhere
- * else, matching what a [BingeTopBar] screen already uses. The two change together with the bar, so a
- * screen reads both from here rather than choosing one that only suits half the layouts.
+ * The scroll behaviour to pair with [BingePaneTopBar]: exit-until-collapsed everywhere, since both of
+ * its forms now carry a collapsing title — the two-row title beside another pane, [BingeMediumTopBar]'s
+ * own alone. A screen reads it from here rather than choosing one that only suits half the layouts.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun rememberPaneTopBarScrollBehavior(): TopAppBarScrollBehavior =
-    if (hasPaneBeside()) {
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    } else {
-        TopAppBarDefaults.enterAlwaysScrollBehavior()
-    }
+fun rememberPaneTopBarScrollBehavior(): TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
 /**
- * A screen's top bar that knows which pane it is in. Alone in the window it is exactly [BingeTopBar].
+ * A screen's top bar that knows which pane it is in. Alone in the window it is [BingeMediumTopBar].
  * Beside another pane it becomes a two-row bar with a `displaySmall` title on the content's own start
  * inset, so when both panes use it they open on the same heading at the same height, and each
  * collapses to the small title as that pane scrolls. Pair it with [rememberPaneTopBarScrollBehavior].
  *
- * The parameters are [BingeTopBar]'s, and mean the same in both forms, so a screen swaps the call and
- * nothing else.
+ * The parameters are [BingeMediumTopBar]'s, and mean the same in both forms, so a screen swaps the call
+ * and nothing else.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,12 +67,16 @@ fun BingePaneTopBar(
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     if (!hasPaneBeside()) {
-        BingeTopBar(
+        // BingeMediumTopBar only pins its scrolled colour to an explicit containerColor, leaving
+        // Color.Unspecified to M3's own defaults (whose scrolled container tints toward
+        // surfaceContainer). Resolving it here first — exactly as bingeTopBarColors does for
+        // BingeTopBar — keeps this form's seam-continuity guarantee the same as the two-row one.
+        BingeMediumTopBar(
             title = title,
             modifier = modifier,
             onBack = onBack,
             scrollBehavior = scrollBehavior,
-            containerColor = containerColor,
+            containerColor = containerColor.takeOrElse { MaterialTheme.colorScheme.background },
             scrimFraction = scrimFraction,
             foregroundScrimFraction = foregroundScrimFraction,
             scrimColor = scrimColor,
