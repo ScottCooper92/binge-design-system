@@ -24,6 +24,14 @@ enum class PaneEdge { Start, End }
 val LocalPaneInnerEdge = staticCompositionLocalOf<PaneEdge?> { null }
 
 /**
+ * Whether this screen shares the window with another pane — true for both panes of a list-detail
+ * scene showing side by side, false for a screen alone in the window or a single-pane scene. Reads
+ * [LocalPaneInnerEdge], so it answers for the pane as laid out, not for the device.
+ */
+@Composable
+fun hasPaneBeside(): Boolean = LocalPaneInnerEdge.current != null
+
+/**
  * A screen's own side padding, resolved against the width it is actually rendered at rather than
  * the window's. [R.dimen.screen_content_inset] ramps with the window through resource qualifiers —
  * 16 / 24 / 32dp at 0 / 600 / 840dp — which is right for a screen alone in the window and wrong for
