@@ -77,4 +77,6 @@
     <string name="cd_reorder_handle">Drag to reorder</string>
     <string name="cd_reorder_move_up">Move up</string>
     <string name="cd_reorder_move_down">Move down</string>
+    <!-- The uncounted attention badge: something wants the user, with no number to show. Symbol only. -->
+    <string name="badge_alert" translatable="false">!</string>
 </resources>
