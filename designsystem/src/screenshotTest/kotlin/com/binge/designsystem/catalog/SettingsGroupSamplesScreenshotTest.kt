@@ -23,6 +23,13 @@ class SettingsGroupSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun badges() {
+        SettingsGroupBadgesSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun selected() {
         SettingsGroupSelectedSample()
     }

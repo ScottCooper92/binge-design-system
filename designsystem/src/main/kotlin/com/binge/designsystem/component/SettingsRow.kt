@@ -35,6 +35,11 @@ data class SettingsRow(
     /** With [badgeCount], renders the count as a tonal pill in this colour instead of the default badge. */
     val badgeTint: Color? = null,
     /**
+     * An uncounted "needs you" badge ("!") in the badge slot, for something that wants attention but has
+     * nothing to count — a lapsed sign-in, say. Takes the slot over [badgeCount] when both are set.
+     */
+    val badgeAlert: Boolean = false,
+    /**
      * Marks the row as the one currently open, for a group used as a navigation list beside a
      * detail pane. It is a wash and a semantics flag, not a substitute for the chevron: the row
      * still opens the same thing when tapped.

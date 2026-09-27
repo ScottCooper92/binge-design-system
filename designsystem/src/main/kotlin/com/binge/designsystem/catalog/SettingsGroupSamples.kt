@@ -62,6 +62,33 @@ fun SettingsGroupTintedSample() {
 }
 
 /**
+ * The two badge forms on the default badge: a count, and the uncounted alert for something that
+ * wants the user with nothing to count. Each sits before the row's own trailing control.
+ */
+@Composable
+fun SettingsGroupBadgesSample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = "Companion apps",
+            rows = listOf(
+                SettingsRow(
+                    icon = Icons.Filled.Inbox,
+                    label = "Requests",
+                    detail = "2 waiting for you",
+                    badgeCount = 2,
+                ),
+                SettingsRow(
+                    icon = Icons.Filled.People,
+                    label = "Accounts",
+                    detail = "Sign in again to keep syncing",
+                    badgeAlert = true,
+                ),
+            ),
+        )
+    }
+}
+
+/**
  * A group standing in as a navigation list beside a detail pane: the open row carries the selected
  * wash, the rest do not. The wash is the only difference — the row keeps its chevron and its badge.
  */

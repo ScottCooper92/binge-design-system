@@ -141,7 +141,10 @@ private fun SettingsRowView(row: SettingsRow, modifier: Modifier = Modifier) {
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (row.badgeCount != null && row.badgeCount > 0) {
+            if (row.badgeAlert) {
+                Badge { Text(stringResource(R.string.badge_alert)) }
+                Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
+            } else if (row.badgeCount != null && row.badgeCount > 0) {
                 CountBadge(count = row.badgeCount, tint = row.badgeTint)
                 Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
             }
