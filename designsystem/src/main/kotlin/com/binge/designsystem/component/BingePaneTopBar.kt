@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -66,12 +67,16 @@ fun BingePaneTopBar(
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     if (!hasPaneBeside()) {
+        // BingeMediumTopBar only pins its scrolled colour to an explicit containerColor, leaving
+        // Color.Unspecified to M3's own defaults (whose scrolled container tints toward
+        // surfaceContainer). Resolving it here first — exactly as bingeTopBarColors does for
+        // BingeTopBar — keeps this form's seam-continuity guarantee the same as the two-row one.
         BingeMediumTopBar(
             title = title,
             modifier = modifier,
             onBack = onBack,
             scrollBehavior = scrollBehavior,
-            containerColor = containerColor,
+            containerColor = containerColor.takeOrElse { MaterialTheme.colorScheme.background },
             scrimFraction = scrimFraction,
             foregroundScrimFraction = foregroundScrimFraction,
             scrimColor = scrimColor,
