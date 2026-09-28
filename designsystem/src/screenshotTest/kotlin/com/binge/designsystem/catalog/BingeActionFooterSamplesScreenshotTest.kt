@@ -24,6 +24,14 @@ class BingeActionFooterSamplesScreenshotTest {
         BingeActionFooterOnPageSample()
     }
 
+    /** The `leadingIcon` variant — see #132. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun FooterWithIcon() {
+        BingeActionFooterWithIconSample()
+    }
+
     /** The raised, rounded `bottomBar` shape — the third container beside [Footer] and [FooterOnPage]. */
     @PreviewTest
     @ComponentPreviews

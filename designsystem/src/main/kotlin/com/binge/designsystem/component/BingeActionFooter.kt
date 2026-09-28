@@ -3,6 +3,8 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -10,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -45,12 +48,18 @@ import com.binge.designsystem.theme.BingeShapes
  * body reads [resolvedContentInset] passes that instead, so the button's edges land under its own
  * content's rather than a narrower fixed one — the two would otherwise visibly disagree the moment a
  * window is wide enough for [resolvedContentInset] to ramp past this default.
+ *
+ * [leadingIcon] matches the same action rendered as a [BingeOutlinedButton]/[BingeTextButton] tile
+ * elsewhere — a caller whose action promotes to this footer only once it is the sheet's sole primary
+ * CTA (dropping out of a tiered pool of two-or-more) should pass the same icon, so the action doesn't
+ * lose its icon purely because of how many peers it currently has.
  */
 @Composable
 fun BingeActionFooter(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    leadingIcon: ImageVector? = null,
     enabled: Boolean = true,
     loading: Boolean = false,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -69,6 +78,7 @@ fun BingeActionFooter(
         BingeFilledButton(
             label = label,
             onClick = onClick,
+            leadingIcon = leadingIcon,
             enabled = enabled,
             loading = loading,
             modifier =
@@ -86,6 +96,18 @@ fun BingeActionFooter(
 private fun PreviewBingeActionFooter() {
     BingeExpressiveTheme {
         BingeActionFooter(label = "Show results", onClick = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewBingeActionFooterWithIcon() {
+    BingeExpressiveTheme {
+        BingeActionFooter(
+            label = "Open on your server",
+            onClick = {},
+            leadingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+        )
     }
 }
 
