@@ -5,9 +5,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,10 +39,12 @@ private const val SKELETON_CHIP_COUNT = 3
  */
 @Composable
 fun FilterChipRowSkeleton(modifier: Modifier = Modifier) {
+    var consumedInsets by remember { mutableStateOf(NoInsets) }
     Row(
         modifier = modifier
+            .onConsumedWindowInsetsChanged { consumedInsets = it }
             .fillMaxWidth()
-            .padding(filterChipRowPadding()),
+            .padding(filterChipRowPadding(consumedInsets)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
         repeat(SKELETON_CHIP_COUNT) {

@@ -2,9 +2,13 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -15,7 +19,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +32,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.OverlaidHeaderContent
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
 
 /**
@@ -41,6 +49,7 @@ fun BingeFilterChipRow(
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
+    var consumedInsets by remember { mutableStateOf(NoInsets) }
     // A LazyRow won't follow the selection on its own, so a swipe-driven change could leave the
     // active chip off-screen. Scroll it in — but only when not already fully visible, so tapping a
     // visible chip doesn't jump the row.
@@ -55,8 +64,8 @@ fun BingeFilterChipRow(
     }
     LazyRow(
         state = listState,
-        modifier = modifier,
-        contentPadding = filterChipRowPadding(),
+        modifier = modifier.onConsumedWindowInsetsChanged { consumedInsets = it },
+        contentPadding = filterChipRowPadding(consumedInsets),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
         itemsIndexed(items) { index, item ->
@@ -86,21 +95,29 @@ fun BingeFilterChipRow(
  * Per side through [resolvedContentPadding], so the row narrows its edge beside another pane exactly
  * where the grid below it does.
  *
+ * Plus [paneSideInsets], less whatever an ancestor has already consumed ([consumed]). In landscape a
+ * side cutout would otherwise cover the leading chip while the content below clears it. A screen whose
+ * scaffold already padded and consumed those insets gets nothing added, so they are not reserved twice.
+ *
  * [FilterChipRowSkeleton] reads the same function, so the plate and the row it stands in for cannot
  * disagree about where the first chip starts.
  */
 @Composable
-internal fun filterChipRowPadding(): PaddingValues {
+internal fun filterChipRowPadding(consumed: WindowInsets): PaddingValues {
     val vertical = dimensionResource(R.dimen.padding_s)
     val layoutDirection = LocalLayoutDirection.current
     val edges = resolvedContentPadding()
+    val sides = paneSideInsets().exclude(consumed).asPaddingValues()
     return PaddingValues(
-        start = edges.calculateStartPadding(layoutDirection) + navOverlayStart(),
+        start = edges.calculateStartPadding(layoutDirection) + navOverlayStart() + sides.calculateStartPadding(layoutDirection),
         top = vertical,
-        end = edges.calculateEndPadding(layoutDirection),
+        end = edges.calculateEndPadding(layoutDirection) + sides.calculateEndPadding(layoutDirection),
         bottom = vertical,
     )
 }
+
+/** The consumed insets a chip row starts from, before an ancestor reports any. */
+internal val NoInsets = WindowInsets(0, 0, 0, 0)
 
 /**
  * A [PagerState] for [pageCount] pages kept in two-way sync with a selection the caller owns: an
@@ -152,7 +169,8 @@ fun rememberFilterPagerState(
  * padding, or it sits behind the chips.
  *
  * Window insets are deliberately *not* applied here. A screen nested in a scaffold has already had them
- * handled, and one that owns its window puts them in [header].
+ * handled, and one that owns its window puts them in [header]. The chip row is the exception: it clears
+ * [paneSideInsets] on its own, less any an ancestor already consumed — see [filterChipRowPadding].
  */
 @Composable
 fun BingeFilterChipPager(

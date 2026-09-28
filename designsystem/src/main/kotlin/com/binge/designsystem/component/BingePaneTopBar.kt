@@ -3,9 +3,12 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.union
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.hasPaneBeside
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeTheme
 
@@ -105,6 +109,10 @@ fun BingePaneTopBar(
  * M3 starts both titles [R.dimen.pane_top_bar_title_inset] in from the bar's edge; they are shifted
  * onto the content's own start — [resolvedContentPadding] plus any nav rail overlaying the pane — so a
  * title lines up with the rows under it. With a back button the collapsed title sits past it instead.
+ *
+ * The bar keeps M3's top inset but takes its side insets from [paneSideInsets], not M3's default.
+ * The default reserves a side cutout on both edges, so a cutout beside the other pane pushed the
+ * bar in from an edge that is nowhere near it.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -182,6 +190,7 @@ private fun TwoRowPaneTopBar(
                 }
             },
             expandedHeight = dimensionResource(R.dimen.pane_top_bar_expanded_height),
+            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             colors = bingeTopBarColors(containerColor),
             scrollBehavior = scrollBehavior,
         )

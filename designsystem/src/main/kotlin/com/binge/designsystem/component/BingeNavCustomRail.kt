@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -73,6 +74,10 @@ private const val RAIL_SCRIM_HOLD_FRACTION = 0.85f
  * insets so their content can bleed — so without this nothing holds a scrollable's last row off the
  * gesture bar. The floating bar folds the same safe area into its own strip.
  *
+ * That start inset already carries the window's start safe area, so the rail consumes it for [content].
+ * A screen that pads by [com.binge.designsystem.navOverlayStart] and also by the window's insets would
+ * otherwise reserve a start cutout twice: once in the published inset, once from the window.
+ *
  * The shell decides when to use this (the `binge_nav_rail_expanded` bool); the rail itself is
  * presentation-only and takes the same stateless [items]/[selectedKey]/[onSelect] contract.
  */
@@ -90,7 +95,9 @@ internal fun BingeNavCustomRail(
         CompositionLocalProvider(
             LocalNavOverlayInsets provides rememberNavOverlayInsets(BingeNavPresentation.CustomRail),
         ) {
-            content()
+            Box(Modifier.consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Start))) {
+                content()
+            }
         }
         val background = MaterialTheme.colorScheme.background
         NavigationRail(
