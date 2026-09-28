@@ -304,8 +304,8 @@
     <dimen name="settings_group_icon_size">38dp</dimen>
     <dimen name="settings_group_icon_glyph">20dp</dimen>
     <!-- CheckboxRow: a long checklist's own inset and checkbox-to-label gap, tighter than
-         SettingsGroup's since there is no icon box, and a divider indent that clears the checkbox
-         rather than starting flush with it. -->
+         SettingsGroup's since there is no icon box. The divider reuses the same horizontal inset,
+         so it starts flush with the row's own leading edge (the checkbox), not indented past it. -->
     <dimen name="checkbox_row_padding_h">16dp</dimen>
     <dimen name="checkbox_row_padding_v">4dp</dimen>
     <dimen name="checkbox_row_gap">8dp</dimen>
