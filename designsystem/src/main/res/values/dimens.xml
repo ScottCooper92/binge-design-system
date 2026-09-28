@@ -303,6 +303,12 @@
     <dimen name="settings_group_row_padding_v">14dp</dimen>
     <dimen name="settings_group_icon_size">38dp</dimen>
     <dimen name="settings_group_icon_glyph">20dp</dimen>
+    <!-- CheckboxRow: a long checklist's own inset and checkbox-to-label gap, tighter than
+         SettingsGroup's since there is no icon box, and a divider indent that clears the checkbox
+         rather than starting flush with it. -->
+    <dimen name="checkbox_row_padding_h">16dp</dimen>
+    <dimen name="checkbox_row_padding_v">4dp</dimen>
+    <dimen name="checkbox_row_gap">8dp</dimen>
     <!-- Catalog samples — bounded height for full-screen samples (state/gate screens, skeletons) so a
          fillMaxSize surface has a height to fill inside the wrap-content screenshot canvas. -->
     <dimen name="catalog_screen_preview_height">640dp</dimen>
