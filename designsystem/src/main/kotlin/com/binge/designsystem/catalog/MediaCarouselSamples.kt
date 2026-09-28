@@ -21,7 +21,7 @@ fun MediaCarouselSample() {
             items = listOf("The Dark Knight", "Inception", "Interstellar", "Tenet", "Dunkirk", "Oppenheimer"),
             itemKey = { it },
             onMoreClick = {},
-        ) { title ->
+        ) { _, title ->
             MediaCard(
                 posterUrl = null,
                 title = title,

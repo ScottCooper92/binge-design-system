@@ -31,7 +31,7 @@ class MediaCarouselScreenshotTest {
                 ),
                 itemKey = { it },
                 onMoreClick = {},
-            ) { title ->
+            ) { _, title ->
                 MediaCard(
                     posterUrl = null,
                     title = title,
