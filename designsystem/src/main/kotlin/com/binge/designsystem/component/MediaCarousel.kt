@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -20,6 +20,12 @@ import com.binge.designsystem.component.SeeAllTile
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
+/**
+ * A titled horizontal row of media items, with an optional trailing "see all" tile.
+ *
+ * [itemContent] receives each item's position in [items] as well as the item, so a caller reporting
+ * which position was tapped reads it from the slot rather than searching the list for it.
+ */
 @Composable
 fun <T> MediaCarousel(
     title: String,
@@ -34,7 +40,7 @@ fun <T> MediaCarousel(
     // A caller whose own parent already applied the overlay inset (e.g. a grid's navOverlayPadding)
     // passes its own value to avoid adding it twice.
     startPadding: Dp = horizontalPadding + navOverlayStart(),
-    itemContent: @Composable (T) -> Unit,
+    itemContent: @Composable (index: Int, item: T) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         SectionHeader(title = title, onMoreClick = onMoreClick, horizontalPadding = horizontalPadding, startPadding = startPadding)
@@ -42,7 +48,7 @@ fun <T> MediaCarousel(
             contentPadding = PaddingValues(start = startPadding, end = horizontalPadding),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
         ) {
-            items(items, key = itemKey) { item -> itemContent(item) }
+            itemsIndexed(items, key = { _, item -> itemKey(item) }) { index, item -> itemContent(index, item) }
             if (onEndTileClick != null) {
                 item(key = "media_carousel_end_tile") {
                     SeeAllTile(
@@ -67,7 +73,7 @@ private fun PreviewMediaCarousel() {
             items = listOf("The Dark Knight", "Inception", "Interstellar", "Tenet"),
             itemKey = { it },
             onMoreClick = {},
-        ) { title ->
+        ) { _, title ->
             MediaCard(posterUrl = null, title = title, rating = 8.5f, onClick = {})
         }
     }
