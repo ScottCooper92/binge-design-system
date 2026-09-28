@@ -1,6 +1,12 @@
 package com.binge.designsystem
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.res.dimensionResource
@@ -83,4 +89,25 @@ internal fun paneContentPadding(
         top = top,
         end = if (innerEdge == PaneEdge.End) inner else outer,
         bottom = bottom,
+    )
+
+/**
+ * The window's horizontal system-bar and display-cutout insets that this pane has to clear. A screen
+ * alone in the window clears both sides. A pane beside another clears only its outer side: its inner
+ * edge sits mid-window, nowhere near a cutout or a curved screen edge.
+ *
+ * Apply it with `Modifier.windowInsetsPadding`, or exclude what an ancestor already consumed, so a
+ * screen whose scaffold has already reserved these insets does not reserve them twice.
+ */
+@Composable
+fun paneSideInsets(): WindowInsets = paneSideInsets(WindowInsets.systemBars.union(WindowInsets.displayCutout), LocalPaneInnerEdge.current)
+
+/** [paneSideInsets]'s side selection, apart from the window and the composition locals it reads. */
+internal fun paneSideInsets(windowInsets: WindowInsets, innerEdge: PaneEdge?): WindowInsets =
+    windowInsets.only(
+        when (innerEdge) {
+            null -> WindowInsetsSides.Horizontal
+            PaneEdge.Start -> WindowInsetsSides.End
+            PaneEdge.End -> WindowInsetsSides.Start
+        },
     )
