@@ -24,3 +24,15 @@ fun HintCardInfoSample() {
         HintCard(text = "Changes only affect this device.", icon = Icons.Filled.Info)
     }
 }
+
+/** The opt-in dismissible form — a close control in the top-right corner, over wrapping text. */
+@Composable
+fun HintCardDismissibleSample() {
+    ScreenshotTheme {
+        HintCard(
+            text = "Press and hold an item, then drag to reorder. Screen reader users can use the Move up and " +
+                "Move down actions instead.",
+            onDismiss = {},
+        )
+    }
+}

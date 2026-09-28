@@ -223,6 +223,9 @@
     <dimen name="hero_dots_bottom_padding">22dp</dimen>
     <!-- Horizontal drag distance past which a swipe advances the hero to the next/prev title. -->
     <dimen name="hero_drag_threshold">60dp</dimen>
+    <!-- HintCard's dismissible form: end inset so wrapped text clears the close IconButton in the
+         top-right corner, sized to the button's own default touch target. -->
+    <dimen name="hint_card_dismiss_end_inset">48dp</dimen>
     <!-- FilterChipRowSkeleton's pill: the chip's own height, so the pill plus BingeFilterChipRow's vertical
          content padding is the band the resolved page puts above its grid (the gallery's and the library's
          first tile is reserved where it lands, not a chip row too high). -->
