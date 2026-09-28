@@ -23,6 +23,7 @@
     <string name="text_entry_expand">Ampliar a pantalla completa</string>
     <string name="text_entry_collapse">Contraer</string>
     <string name="binge_snackbar_dismiss">Descartar</string>
+    <string name="hint_card_dismiss">Descartar</string>
     <string name="cd_hero_slide">Mostrar %1$s</string>
     <string name="hero_trending_today">N.º %1$d en tendencia hoy</string>
     <string name="hero_meta_runtime">%1$d h %2$d min</string>

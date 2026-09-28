@@ -18,4 +18,11 @@ class HintCardSamplesScreenshotTest {
     fun Info() {
         HintCardInfoSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Dismissible() {
+        HintCardDismissibleSample()
+    }
 }
