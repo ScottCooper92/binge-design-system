@@ -193,10 +193,10 @@ private fun CinematicCopyRow(
             .padding(
                 start = dimensionResource(R.dimen.detail_cinematic_header_padding),
                 end = dimensionResource(R.dimen.detail_cinematic_header_padding),
-                bottom = dimensionResource(R.dimen.detail_cinematic_header_bottom_padding),
             )
-            // Lets the copy column's fillMaxHeight() below latch onto the poster's own height
-            // (computed from its fixed width via aspectRatio) rather than an unbounded one.
+            // No bottom padding here — every caller already follows this header with its own
+            // spacer, and stacking one here doubled that gap. IntrinsicSize.Max below lets the
+            // copy column's fillMaxHeight() latch onto the poster's own (aspectRatio-computed) height.
             .height(IntrinsicSize.Max),
         horizontalArrangement =
             Arrangement.spacedBy(dimensionResource(R.dimen.detail_cinematic_poster_copy_spacing)),
