@@ -40,13 +40,17 @@ fun HintCard(
     icon: ImageVector = Icons.Filled.Lightbulb,
     onDismiss: (() -> Unit)? = null,
 ) {
-    Box(modifier = modifier.fillMaxWidth()) {
+    Box(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(BingeShapes.Large)
+                .background(MaterialTheme.colorScheme.primary.tonalContainer()),
+    ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .clip(BingeShapes.Large)
-                    .background(MaterialTheme.colorScheme.primary.tonalContainer())
                     .padding(
                         start = dimensionResource(R.dimen.settings_group_row_padding_h),
                         top = dimensionResource(R.dimen.settings_group_row_padding_v),
