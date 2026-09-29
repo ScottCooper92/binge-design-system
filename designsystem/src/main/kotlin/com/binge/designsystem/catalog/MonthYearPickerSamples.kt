@@ -139,6 +139,20 @@ fun MonthYearPickerStaleSelectionSample() {
 }
 
 /**
+ * The year list open on the same stale selection: the list is narrowed to the bounds, and the year it
+ * highlights is the coerced one the headline and stepper show, not the stored year the bounds passed.
+ */
+@Composable
+fun MonthYearPickerStaleYearsOpenSample() {
+    MonthYearPickerSampleFrame(
+        MonthYearPickerMode.MonthAndYear,
+        MonthYearSelection(year = SampleYears.first, month = Month.JUNE),
+        yearsOpen = true,
+        minimum = YearMonth.of(SAMPLE_YEAR, Month.MARCH),
+    )
+}
+
+/**
  * A selection whose year stays in range but whose month has since fallen before the minimum: the
  * chosen month's cell is both selected (bordered pill) and dimmed/inert at once, the one combined
  * state new in this PR's `isEnabled` wiring.

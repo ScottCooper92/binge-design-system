@@ -139,7 +139,7 @@ internal fun MonthYearPickerContent(
                         )
                     } else {
                         YearGrid(
-                            selected = selection.year,
+                            selected = selection.coercedTo(range).year,
                             range = range,
                             onPick = {
                                 onSelectionChange(selection.pickYear(it))

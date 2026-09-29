@@ -85,6 +85,13 @@ class MonthYearPickerSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun StaleYearsOpen() {
+        MonthYearPickerStaleYearsOpenSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun SelectionDimmed() {
         MonthYearPickerSelectionDimmedSample()
     }
