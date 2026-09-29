@@ -40,4 +40,12 @@ class SettingsGroupSamplesScreenshotTest {
     fun external() {
         SettingsGroupExternalSample()
     }
+
+    /** The `rowVerticalPadding` override beside [titled]'s default rows (#133). */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun tallRows() {
+        SettingsGroupTallRowsSample()
+    }
 }
