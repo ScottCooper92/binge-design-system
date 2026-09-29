@@ -2,6 +2,8 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -44,6 +46,23 @@ fun BingeActionFooterOnPageSample() {
                 bottomPadding = 0.dp,
             )
         }
+    }
+}
+
+/**
+ * The footer's action carrying a [BingeActionFooter.leadingIcon] — the same action shown elsewhere as
+ * a tiered [com.binge.designsystem.component.BingeOutlinedButton]/[com.binge.designsystem.component.BingeTextButton]
+ * tile, promoted here to the sheet's sole primary CTA. Paired with [BingeActionFooterSample] to make
+ * the icon's presence legible as a variant of the same container.
+ */
+@Composable
+fun BingeActionFooterWithIconSample() {
+    ScreenshotTheme {
+        BingeActionFooter(
+            label = "Open on your server",
+            onClick = {},
+            leadingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+        )
     }
 }
 
