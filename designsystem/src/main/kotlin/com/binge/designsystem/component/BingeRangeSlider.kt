@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import kotlin.math.abs
 
 /**
  * A two-thumb range slider with the two chosen values written above the track, for entering a
@@ -26,6 +27,10 @@ import androidx.compose.ui.semantics.stateDescription
  * value as its state, so a screen reader hears "Minimum runtime, 90 min" rather than a bare
  * percentage. [onValuesChange] fires on every drag tick, so a caller that requeries on change
  * should edit a draft and apply it separately.
+ *
+ * A value the grid does not contain (a stored 6.3 on a half-point track) is kept when the other thumb is
+ * dragged: Material 3 snaps the untouched thumb to the nearest step, so a thumb that moved by less than half
+ * a step is reported at its old value.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +47,7 @@ fun BingeRangeSlider(
 ) {
     val startInteraction = remember { MutableInteractionSource() }
     val endInteraction = remember { MutableInteractionSource() }
+    val halfStep = (valueRange.endInclusive - valueRange.start) / (steps + 1) / 2f
     val startLabel = valueLabel(values.start)
     val endLabel = valueLabel(values.endInclusive)
     Column(modifier = modifier.fillMaxWidth()) {
@@ -54,7 +60,7 @@ fun BingeRangeSlider(
         }
         RangeSlider(
             value = values,
-            onValueChange = onValuesChange,
+            onValueChange = { next -> onValuesChange(next.keepingUntouchedThumbs(values, halfStep)) },
             valueRange = valueRange,
             steps = steps,
             enabled = enabled,
@@ -82,4 +88,14 @@ fun BingeRangeSlider(
             },
         )
     }
+}
+
+/** [next] with each thumb that moved by less than [halfStep] put back at its value in [old], and the start never past the end. */
+private fun ClosedFloatingPointRange<Float>.keepingUntouchedThumbs(
+    old: ClosedFloatingPointRange<Float>,
+    halfStep: Float,
+): ClosedFloatingPointRange<Float> {
+    val start = if (abs(start - old.start) < halfStep) old.start else start
+    val end = if (abs(endInclusive - old.endInclusive) < halfStep) old.endInclusive else endInclusive
+    return start..maxOf(start, end)
 }
