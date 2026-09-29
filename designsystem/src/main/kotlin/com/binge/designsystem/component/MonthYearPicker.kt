@@ -113,7 +113,7 @@ internal fun MonthYearPickerContent(
         Column {
             PickerHeader(
                 overline = title,
-                headline = pickerHeadline(mode, selection, locale, stringResource(R.string.month_year_picker_empty)),
+                headline = pickerHeadline(mode, selection.coercedTo(range), locale, stringResource(R.string.month_year_picker_empty)),
                 locale = locale,
             )
             Column(

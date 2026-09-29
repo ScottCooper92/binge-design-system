@@ -29,6 +29,13 @@ data class MonthYearSelection(
 internal fun MonthYearSelection.displayYear(range: IntRange): Int = (year ?: range.last).coerceIn(range)
 
 /**
+ * [this] with a chosen year pulled back inside [range], so the headline agrees with what the
+ * stepper and month grid show below it once the bounds have pushed the actual year out of range.
+ * Leaves an unchosen year as `null` rather than showing the range's fallback as if it were picked.
+ */
+internal fun MonthYearSelection.coercedTo(range: IntRange): MonthYearSelection = copy(year = year?.coerceIn(range))
+
+/**
  * Picking a month while the picker also asks for a year pins the year the stepper was showing, so
  * what the user saw is what they get.
  */

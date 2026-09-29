@@ -74,4 +74,11 @@ class MonthYearPickerSamplesScreenshotTest {
     fun Maximum() {
         MonthYearPickerMaximumSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun StaleSelection() {
+        MonthYearPickerStaleSelectionSample()
+    }
 }

@@ -175,6 +175,28 @@ class MonthYearPickerStateTest {
     }
 
     @Test
+    fun `coercing for display pulls a stale year into the narrowed range but leaves an unchosen year unset`() {
+        val narrowed = range.within(YearMonth.of(2018, 3), null)
+
+        val staleYear = MonthYearSelection(year = 1990, month = Month.MAY)
+        val inRangeYear = MonthYearSelection(year = 2018, month = Month.MAY)
+        val noYear = MonthYearSelection(month = Month.MAY)
+
+        assertEquals(inRangeYear, staleYear.coercedTo(narrowed))
+        assertEquals(inRangeYear, inRangeYear.coercedTo(narrowed))
+        assertEquals(noYear, noYear.coercedTo(narrowed))
+    }
+
+    @Test
+    fun `the headline for a stale year agrees with what the stepper and grid would show, once coerced`() {
+        val narrowed = range.within(YearMonth.of(2018, 3), null)
+        val stale = MonthYearSelection(year = 1990, month = Month.JUNE)
+
+        assertEquals("June 2018", pickerHeadline(MonthYearPickerMode.MonthAndYear, stale.coercedTo(narrowed), Locale.UK, "-"))
+        assertEquals(stale.displayYear(narrowed), stale.coercedTo(narrowed).year)
+    }
+
+    @Test
     fun `month-only mode never dims a month, even with bounds that would in a mode with a year`() {
         val max = YearMonth.of(2018, 6)
         val narrowed = range.within(null, max)

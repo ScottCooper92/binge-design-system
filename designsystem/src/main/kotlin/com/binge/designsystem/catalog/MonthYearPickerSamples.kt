@@ -123,3 +123,17 @@ fun MonthYearPickerMaximumSample() {
         maximum = YearMonth.of(SAMPLE_YEAR, Month.MARCH),
     )
 }
+
+/**
+ * A selection whose year the bounds have since moved past — the paired-field flow this dialog is
+ * built for, where the other field's own bound changed after this one was picked. The headline
+ * shows the same coerced year as the stepper and month grid below it, and confirm stays off.
+ */
+@Composable
+fun MonthYearPickerStaleSelectionSample() {
+    MonthYearPickerSampleFrame(
+        MonthYearPickerMode.MonthAndYear,
+        MonthYearSelection(year = SampleYears.first, month = Month.JUNE),
+        minimum = YearMonth.of(SAMPLE_YEAR, Month.MARCH),
+    )
+}
