@@ -267,7 +267,6 @@
     <!-- Cinematic detail header (expanded width): immersive backdrop + inline poster + copy column. -->
     <dimen name="detail_cinematic_header_height">460dp</dimen>
     <dimen name="detail_cinematic_header_padding">40dp</dimen>
-    <dimen name="detail_cinematic_header_bottom_padding">32dp</dimen>
     <dimen name="detail_cinematic_poster_width">196dp</dimen>
     <dimen name="detail_cinematic_poster_copy_spacing">28dp</dimen>
     <dimen name="detail_cinematic_copy_spacing">16dp</dimen>
