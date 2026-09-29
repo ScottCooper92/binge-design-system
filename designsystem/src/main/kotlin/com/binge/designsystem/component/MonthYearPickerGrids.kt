@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.shortMonthName
 import com.binge.designsystem.theme.BingeShapes
@@ -30,9 +31,6 @@ import java.util.Locale
 
 private const val MONTH_COLUMNS = 3
 private const val YEAR_COLUMNS = 3
-
-/** Material 3's disabled opacity, as [BingeFilterChip] applies it, so an unavailable month dims like other disabled controls. */
-private const val PICKER_CELL_DISABLED_ALPHA = 0.38f
 
 @Composable
 internal fun MonthGrid(
@@ -95,7 +93,7 @@ private fun PickerCell(
     Box(
         modifier = modifier
             .heightIn(min = dimensionResource(R.dimen.min_touch_target))
-            .alpha(if (enabled) 1f else PICKER_CELL_DISABLED_ALPHA)
+            .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
