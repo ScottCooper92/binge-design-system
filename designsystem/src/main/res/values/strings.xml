@@ -85,4 +85,5 @@
     <string name="month_year_picker_choose_year">Choose year</string>
     <string name="month_year_picker_cancel">Cancel</string>
     <string name="month_year_picker_confirm">OK</string>
+    <string name="month_year_picker_empty" translatable="false">—</string>
 </resources>

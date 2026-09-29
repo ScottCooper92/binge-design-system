@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,8 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Icon
@@ -97,40 +98,73 @@ internal fun MonthYearPickerContent(
         shape = MaterialTheme.shapes.extraLarge,
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_l)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
-        ) {
-            Text(text = title, style = MaterialTheme.typography.headlineSmall)
-            if (mode == MonthYearPickerMode.MonthAndYear) {
-                YearStepper(
-                    year = selection.displayYear(yearRange),
-                    yearRange = yearRange,
-                    yearsOpen = yearsOpen,
-                    onYearsOpenChange = onYearsOpenChange,
-                    onStep = { onSelectionChange(selection.stepYear(it, yearRange)) },
-                )
-            }
-            Box(modifier = Modifier.fillMaxWidth().height(dimensionResource(R.dimen.month_year_picker_grid_height))) {
-                if (mode == MonthYearPickerMode.Month || (mode == MonthYearPickerMode.MonthAndYear && !yearsOpen)) {
-                    MonthGrid(
-                        selected = selection.month,
-                        locale = locale,
-                        onPick = { onSelectionChange(selection.pickMonth(it, mode, yearRange)) },
-                    )
-                } else {
-                    YearGrid(
-                        selected = selection.year,
-                        range = yearRange,
-                        onPick = {
-                            onSelectionChange(selection.pickYear(it))
-                            onYearsOpenChange(false)
-                        },
+        Column {
+            PickerHeader(
+                overline = title,
+                headline = pickerHeadline(mode, selection, locale, stringResource(R.string.month_year_picker_empty)),
+                locale = locale,
+            )
+            Column(
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+            ) {
+                if (mode == MonthYearPickerMode.MonthAndYear) {
+                    YearStepper(
+                        year = selection.displayYear(yearRange),
+                        yearRange = yearRange,
+                        yearsOpen = yearsOpen,
+                        onYearsOpenChange = onYearsOpenChange,
+                        onStep = { onSelectionChange(selection.stepYear(it, yearRange)) },
                     )
                 }
+                Box(modifier = Modifier.fillMaxWidth().height(dimensionResource(R.dimen.month_year_picker_grid_height))) {
+                    if (mode == MonthYearPickerMode.Month || (mode == MonthYearPickerMode.MonthAndYear && !yearsOpen)) {
+                        MonthGrid(
+                            selected = selection.month,
+                            locale = locale,
+                            onPick = { onSelectionChange(selection.pickMonth(it, mode, yearRange)) },
+                        )
+                    } else {
+                        YearGrid(
+                            selected = selection.year,
+                            range = yearRange,
+                            onPick = {
+                                onSelectionChange(selection.pickYear(it))
+                                onYearsOpenChange(false)
+                            },
+                        )
+                    }
+                }
+                PickerActions(canConfirm = selection.isCompleteFor(mode), onConfirm = onConfirm, onDismiss = onDismiss)
             }
-            PickerActions(canConfirm = selection.isCompleteFor(mode), onConfirm = onConfirm, onDismiss = onDismiss)
         }
+    }
+}
+
+/** The accent block on top: the caller's title as a small overline, and what is picked so far, large. */
+@Composable
+private fun PickerHeader(
+    overline: String,
+    headline: String,
+    locale: Locale,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(dimensionResource(R.dimen.padding_l)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+    ) {
+        Text(
+            text = overline.uppercase(locale),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onPrimary,
+        )
+        Text(
+            text = headline,
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onPrimary,
+        )
     }
 }
 
@@ -148,7 +182,7 @@ private fun YearStepper(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = { onStep(-1) }, enabled = !yearsOpen && canStepYear(year, -1, yearRange)) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.month_year_picker_previous_year))
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.month_year_picker_previous_year))
         }
         Row(
             modifier = Modifier
@@ -156,14 +190,14 @@ private fun YearStepper(
                 .clickable(role = Role.Button) { onYearsOpenChange(!yearsOpen) },
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = year.toString(), style = MaterialTheme.typography.titleMedium)
+            Text(text = year.toString(), style = MaterialTheme.typography.headlineSmall)
             Icon(
                 imageVector = if (yearsOpen) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
                 contentDescription = stringResource(R.string.month_year_picker_choose_year),
             )
         }
         IconButton(onClick = { onStep(1) }, enabled = !yearsOpen && canStepYear(year, 1, yearRange)) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.month_year_picker_next_year))
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = stringResource(R.string.month_year_picker_next_year))
         }
     }
 }
@@ -179,7 +213,11 @@ private fun PickerActions(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        BingeTextButton(label = stringResource(R.string.month_year_picker_cancel), onClick = onDismiss)
+        BingeTextButton(
+            label = stringResource(R.string.month_year_picker_cancel),
+            onClick = onDismiss,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        )
         BingeTextButton(label = stringResource(R.string.month_year_picker_confirm), onClick = onConfirm, enabled = canConfirm)
     }
 }

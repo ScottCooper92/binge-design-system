@@ -1,6 +1,6 @@
 package com.binge.designsystem.component
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -18,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import com.binge.designsystem.R
@@ -76,7 +76,7 @@ internal fun YearGrid(
     }
 }
 
-/** One month or year: a tonal cell that fills with the accent when [selected]. */
+/** One month or year: a plain label, outlined in a pill sized to it when [selected], inside a full-width touch cell. */
 @Composable
 private fun PickerCell(
     label: String,
@@ -84,19 +84,28 @@ private fun PickerCell(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scheme = MaterialTheme.colorScheme
+    val accent = MaterialTheme.colorScheme.primary
     Box(
         modifier = modifier
             .heightIn(min = dimensionResource(R.dimen.min_touch_target))
-            .clip(BingeShapes.Chip)
-            .background(if (selected) scheme.primary else scheme.surfaceContainerLow)
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            color = if (selected) scheme.onPrimary else scheme.onSurface,
-        )
+        Box(
+            modifier = Modifier
+                .then(
+                    if (selected) {
+                        Modifier.border(dimensionResource(R.dimen.month_year_picker_selected_border), accent, BingeShapes.Pill)
+                    } else {
+                        Modifier
+                    },
+                ).padding(
+                    horizontal = dimensionResource(R.dimen.month_year_picker_pill_padding_h),
+                    vertical = dimensionResource(R.dimen.padding_s),
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+        }
     }
 }

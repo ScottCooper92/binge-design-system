@@ -93,3 +93,6 @@ fun formatRelativeOrAbsolute(
 
 /** A month's short name in [locale] ("Jan", "ene"), in the standalone form a picker cell shows. */
 fun shortMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.SHORT_STANDALONE, locale)
+
+/** A month's full name in [locale] ("March", "marzo"), in the standalone form a picker headline shows. */
+fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.FULL_STANDALONE, locale)

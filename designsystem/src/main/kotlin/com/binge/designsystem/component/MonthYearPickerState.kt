@@ -1,6 +1,8 @@
 package com.binge.designsystem.component
 
+import com.binge.designsystem.fullMonthName
 import java.time.Month
+import java.util.Locale
 
 /** Which parts of a date a [MonthYearPickerDialog] asks for. */
 enum class MonthYearPickerMode {
@@ -57,4 +59,24 @@ internal fun yearGridStartIndex(
 ): Int {
     val target = (year ?: range.last).coerceIn(range) - range.first
     return ((target / columns) - 1).coerceAtLeast(0) * columns
+}
+
+/**
+ * What the header shows for the current pick: the parts [mode] asks for, in reading order, with
+ * [empty] standing in for one not chosen yet, and [empty] alone when nothing is.
+ */
+internal fun pickerHeadline(
+    mode: MonthYearPickerMode,
+    selection: MonthYearSelection,
+    locale: Locale,
+    empty: String,
+): String {
+    val month = selection.month?.let { fullMonthName(it, locale) }
+    val year = selection.year?.toString()
+    return when (mode) {
+        MonthYearPickerMode.Year -> year ?: empty
+        MonthYearPickerMode.Month -> month ?: empty
+        MonthYearPickerMode.MonthAndYear ->
+            if (month == null && year == null) empty else "${month ?: empty} ${year ?: empty}"
+    }
 }

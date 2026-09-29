@@ -102,4 +102,26 @@ class MonthYearPickerStateTest {
         assertEquals("mar", shortMonthName(Month.MARCH, Locale("es")).lowercase())
         assertEquals("ene", shortMonthName(Month.JANUARY, Locale("es")).lowercase().trimEnd('.'))
     }
+
+    @Test
+    fun `the headline shows the parts the mode asks for, with a dash for one not chosen`() {
+        val both = MonthYearSelection(year = 2029, month = Month.MAY)
+
+        assertEquals("2029", pickerHeadline(MonthYearPickerMode.Year, both, Locale.UK, "-"))
+        assertEquals("May", pickerHeadline(MonthYearPickerMode.Month, both, Locale.UK, "-"))
+        assertEquals("May 2029", pickerHeadline(MonthYearPickerMode.MonthAndYear, both, Locale.UK, "-"))
+        assertEquals("-", pickerHeadline(MonthYearPickerMode.Year, MonthYearSelection(), Locale.UK, "-"))
+        assertEquals("-", pickerHeadline(MonthYearPickerMode.Month, MonthYearSelection(), Locale.UK, "-"))
+        assertEquals("-", pickerHeadline(MonthYearPickerMode.MonthAndYear, MonthYearSelection(), Locale.UK, "-"))
+        assertEquals("- 2029", pickerHeadline(MonthYearPickerMode.MonthAndYear, MonthYearSelection(year = 2029), Locale.UK, "-"))
+        assertEquals("May -", pickerHeadline(MonthYearPickerMode.MonthAndYear, MonthYearSelection(month = Month.MAY), Locale.UK, "-"))
+    }
+
+    @Test
+    fun `the headline uses the full month name in the locale`() {
+        assertEquals(
+            "marzo 2018",
+            pickerHeadline(MonthYearPickerMode.MonthAndYear, MonthYearSelection(2018, Month.MARCH), Locale("es"), "-").lowercase(),
+        )
+    }
 }
