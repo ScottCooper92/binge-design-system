@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -150,7 +151,9 @@ private fun YearStepper(
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.month_year_picker_previous_year))
         }
         Row(
-            modifier = Modifier.clickable(role = Role.Button) { onYearsOpenChange(!yearsOpen) },
+            modifier = Modifier
+                .heightIn(min = dimensionResource(R.dimen.min_touch_target))
+                .clickable(role = Role.Button) { onYearsOpenChange(!yearsOpen) },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(text = year.toString(), style = MaterialTheme.typography.titleMedium)
