@@ -60,6 +60,19 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
+      # gradle.properties turns the configuration cache on, but Gradle stores it under
+      # <project>/.gradle/configuration-cache, outside the Gradle User Home that setup-gradle
+      # restores, and a hosted runner starts every job from an empty disk. Without this step
+      # every run logs "Calculating task graph as no cached configuration is available" and
+      # pays to write an entry nothing reads back. The key is what invalidates an entry (the
+      # wrapper, build scripts, catalog and properties); Gradle still validates whatever it
+      # restores, so a near-miss from restore-keys is discarded rather than trusted.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .gradle/configuration-cache
+          key: gradle-config-cache-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
+          restore-keys: gradle-config-cache-${{ runner.os }}-
+
       # --continue surfaces every failure in one run rather than stopping at the first,
       # which matters most to author-ci-fix: it gets exactly one repair attempt per
       # commit, and a log showing only the first of three failures spends that attempt
