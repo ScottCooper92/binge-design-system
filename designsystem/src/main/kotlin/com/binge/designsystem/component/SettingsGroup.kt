@@ -32,6 +32,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
 import com.binge.designsystem.theme.BingeShapes
@@ -41,12 +42,17 @@ import com.binge.designsystem.theme.tonalContainer
  * A titled group of settings rows on one clipped surface, dividers between them. The title is
  * marked `heading()` so TalkBack can jump group to group rather than walking every row — a
  * settings screen runs to a dozen groups.
+ *
+ * [rowVerticalPadding] is the breathing room above and below each row's content. It defaults to the
+ * shared token so every settings screen stays alike; a caller that wants roomier rows — a sheet whose
+ * rows are its main content — passes its own.
  */
 @Composable
 fun SettingsGroup(
     title: String?,
     rows: List<SettingsRow>,
     modifier: Modifier = Modifier,
+    rowVerticalPadding: Dp = dimensionResource(R.dimen.settings_group_row_padding_v),
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (!title.isNullOrBlank()) {
@@ -69,7 +75,7 @@ fun SettingsGroup(
                 .background(MaterialTheme.colorScheme.surfaceContainer),
         ) {
             rows.forEachIndexed { index, row ->
-                SettingsRowView(row = row)
+                SettingsRowView(row = row, verticalPadding = rowVerticalPadding)
                 if (index < rows.lastIndex) {
                     HorizontalDivider(
                         thickness = dimensionResource(R.dimen.hairline_thickness),
@@ -84,7 +90,11 @@ fun SettingsGroup(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SettingsRowView(row: SettingsRow, modifier: Modifier = Modifier) {
+private fun SettingsRowView(
+    row: SettingsRow,
+    verticalPadding: Dp,
+    modifier: Modifier = Modifier,
+) {
     val external = row.clickable && row.trailingContent == null && row.destination == SettingsRowDestination.External
     val externalDescription = stringResource(R.string.cd_settings_row_external)
     Row(
@@ -106,7 +116,7 @@ private fun SettingsRowView(row: SettingsRow, modifier: Modifier = Modifier) {
                 onLongClick = row.onLongClick,
             ).padding(
                 horizontal = dimensionResource(R.dimen.settings_group_row_padding_h),
-                vertical = dimensionResource(R.dimen.settings_group_row_padding_v),
+                vertical = verticalPadding,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.R
 import com.binge.designsystem.component.SettingsGroup
 import com.binge.designsystem.component.SettingsRow
 import com.binge.designsystem.component.SettingsRowDestination
@@ -136,6 +138,25 @@ fun SettingsGroupExternalSample() {
                     destination = SettingsRowDestination.External,
                 ),
             ),
+        )
+    }
+}
+
+/**
+ * The same rows as [SettingsGroupTitledSample] with [SettingsGroup]'s `rowVerticalPadding` raised
+ * one rung on the padding ramp, for a caller whose rows are its main content (#133).
+ */
+@Composable
+fun SettingsGroupTallRowsSample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = "My library",
+            rows = listOf(
+                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
+                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
+                SettingsRow(icon = Icons.Filled.Settings, label = "Preferences"),
+            ),
+            rowVerticalPadding = dimensionResource(R.dimen.padding_m),
         )
     }
 }
