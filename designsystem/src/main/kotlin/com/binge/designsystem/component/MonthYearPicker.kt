@@ -134,7 +134,7 @@ internal fun MonthYearPickerContent(
                         MonthGrid(
                             selected = selection.month,
                             locale = locale,
-                            isEnabled = { monthAllowed(selection.displayYear(range), it, minimum, maximum) },
+                            isEnabled = { monthPickable(mode, selection.displayYear(range), it, minimum, maximum) },
                             onPick = { onSelectionChange(selection.pickMonth(it, mode, range)) },
                         )
                     } else {

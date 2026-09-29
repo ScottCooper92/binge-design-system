@@ -173,4 +173,17 @@ class MonthYearPickerStateTest {
             MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, narrowed),
         )
     }
+
+    @Test
+    fun `month-only mode never dims a month, even with bounds that would in a mode with a year`() {
+        val max = YearMonth.of(2018, 6)
+        val narrowed = range.within(null, max)
+        val shownYear = MonthYearSelection().displayYear(narrowed)
+
+        Month.entries.forEach { month ->
+            assertTrue(monthPickable(MonthYearPickerMode.Month, shownYear, month, null, max), "$month dimmed in month-only")
+        }
+        assertFalse(monthPickable(MonthYearPickerMode.MonthAndYear, shownYear, Month.JULY, null, max))
+        assertTrue(monthPickable(MonthYearPickerMode.MonthAndYear, shownYear, Month.JUNE, null, max))
+    }
 }

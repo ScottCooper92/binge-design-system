@@ -103,6 +103,18 @@ internal fun monthAllowed(
 }
 
 /**
+ * Whether [month] can be picked in [mode], with [year] the one the grid is showing. A mode that does not
+ * ask for a year has none to bound a month by, so it never dims one.
+ */
+internal fun monthPickable(
+    mode: MonthYearPickerMode,
+    year: Int,
+    month: Month,
+    minimum: YearMonth?,
+    maximum: YearMonth?,
+): Boolean = !mode.asksYear || monthAllowed(year, month, minimum, maximum)
+
+/**
  * Whether what is picked respects the bounds, which is what keeps OK off for an initial value the
  * bounds have since moved past. The month-only mode has no year to bound, so it always does.
  */
