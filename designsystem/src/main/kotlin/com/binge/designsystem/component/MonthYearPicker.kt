@@ -1,0 +1,182 @@
+package com.binge.designsystem.component
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.window.Dialog
+import com.binge.designsystem.R
+import java.time.Month
+import java.util.Locale
+
+/**
+ * A month and/or year picker in a dialog, for a bound that is a period rather than a day. [mode]
+ * says which parts to ask for; [onConfirm] gets a [MonthYearSelection] with every asked part set and
+ * the others `null`. [title] is the caller's copy, since only it knows what is being picked.
+ *
+ * The visible body is [MonthYearPickerContent], stateless so screenshot tests can render it: the
+ * modal [Dialog] window does not capture in previews.
+ */
+@Composable
+fun MonthYearPickerDialog(
+    title: String,
+    mode: MonthYearPickerMode,
+    yearRange: IntRange,
+    onDismiss: () -> Unit,
+    onConfirm: (MonthYearSelection) -> Unit,
+    initial: MonthYearSelection = MonthYearSelection(),
+) {
+    var year by rememberSaveable { mutableStateOf(initial.year) }
+    var monthValue by rememberSaveable { mutableStateOf(initial.month?.value) }
+    var yearsOpen by rememberSaveable { mutableStateOf(false) }
+    val selection = MonthYearSelection(year, monthValue?.let(Month::of))
+    Dialog(onDismissRequest = onDismiss) {
+        MonthYearPickerContent(
+            title = title,
+            mode = mode,
+            selection = selection,
+            yearRange = yearRange,
+            yearsOpen = yearsOpen,
+            onYearsOpenChange = { yearsOpen = it },
+            onSelectionChange = {
+                year = it.year
+                monthValue = it.month?.value
+            },
+            onConfirm = { onConfirm(selection) },
+            onDismiss = onDismiss,
+        )
+    }
+}
+
+/**
+ * Stateless body of [MonthYearPickerDialog]. [yearsOpen] swaps the month grid for a year grid when
+ * the mode asks for both; the year-only mode always shows the year grid.
+ */
+@Composable
+internal fun MonthYearPickerContent(
+    title: String,
+    mode: MonthYearPickerMode,
+    selection: MonthYearSelection,
+    yearRange: IntRange,
+    yearsOpen: Boolean,
+    onYearsOpenChange: (Boolean) -> Unit,
+    onSelectionChange: (MonthYearSelection) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    locale: Locale = LocalConfiguration.current.locales[0],
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    ) {
+        Column(
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_l)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+        ) {
+            Text(text = title, style = MaterialTheme.typography.headlineSmall)
+            if (mode == MonthYearPickerMode.MonthAndYear) {
+                YearStepper(
+                    year = selection.displayYear(yearRange),
+                    yearRange = yearRange,
+                    yearsOpen = yearsOpen,
+                    onYearsOpenChange = onYearsOpenChange,
+                    onStep = { onSelectionChange(selection.stepYear(it, yearRange)) },
+                )
+            }
+            Box(modifier = Modifier.fillMaxWidth().height(dimensionResource(R.dimen.month_year_picker_grid_height))) {
+                if (mode == MonthYearPickerMode.Month || (mode == MonthYearPickerMode.MonthAndYear && !yearsOpen)) {
+                    MonthGrid(
+                        selected = selection.month,
+                        locale = locale,
+                        onPick = { onSelectionChange(selection.pickMonth(it, mode, yearRange)) },
+                    )
+                } else {
+                    YearGrid(
+                        selected = selection.year,
+                        range = yearRange,
+                        onPick = {
+                            onSelectionChange(selection.pickYear(it))
+                            onYearsOpenChange(false)
+                        },
+                    )
+                }
+            }
+            PickerActions(canConfirm = selection.isCompleteFor(mode), onConfirm = onConfirm, onDismiss = onDismiss)
+        }
+    }
+}
+
+@Composable
+private fun YearStepper(
+    year: Int,
+    yearRange: IntRange,
+    yearsOpen: Boolean,
+    onYearsOpenChange: (Boolean) -> Unit,
+    onStep: (Int) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = { onStep(-1) }, enabled = !yearsOpen && canStepYear(year, -1, yearRange)) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.month_year_picker_previous_year))
+        }
+        Row(
+            modifier = Modifier.clickable(role = Role.Button) { onYearsOpenChange(!yearsOpen) },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(text = year.toString(), style = MaterialTheme.typography.titleMedium)
+            Icon(
+                imageVector = if (yearsOpen) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                contentDescription = stringResource(R.string.month_year_picker_choose_year),
+            )
+        }
+        IconButton(onClick = { onStep(1) }, enabled = !yearsOpen && canStepYear(year, 1, yearRange)) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.month_year_picker_next_year))
+        }
+    }
+}
+
+@Composable
+private fun PickerActions(
+    canConfirm: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BingeTextButton(label = stringResource(R.string.month_year_picker_cancel), onClick = onDismiss)
+        BingeTextButton(label = stringResource(R.string.month_year_picker_confirm), onClick = onConfirm, enabled = canConfirm)
+    }
+}

@@ -80,4 +80,9 @@
     <string name="cd_reorder_move_down">Move down</string>
     <!-- The uncounted attention badge: something wants the user, with no number to show. Symbol only. -->
     <string name="badge_alert" translatable="false">!</string>
+    <string name="month_year_picker_previous_year">Previous year</string>
+    <string name="month_year_picker_next_year">Next year</string>
+    <string name="month_year_picker_choose_year">Choose year</string>
+    <string name="month_year_picker_cancel">Cancel</string>
+    <string name="month_year_picker_confirm">OK</string>
 </resources>
