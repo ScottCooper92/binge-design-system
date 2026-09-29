@@ -60,7 +60,9 @@ fun BingeRangeSlider(
         }
         RangeSlider(
             value = values,
-            onValueChange = { next -> onValuesChange(next.keepingUntouchedThumbs(values, halfStep)) },
+            onValueChange = { next ->
+                onValuesChange(if (steps == 0) next else next.keepingUntouchedThumbs(values, halfStep))
+            },
             valueRange = valueRange,
             steps = steps,
             enabled = enabled,

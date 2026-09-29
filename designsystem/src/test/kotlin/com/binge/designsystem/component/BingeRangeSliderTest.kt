@@ -145,6 +145,43 @@ class BingeRangeSliderTest {
         assertEquals("the dragged end thumb did not move", true, reported.last().endInclusive < 8f)
         assertEquals("the untouched start thumb moved", 6f, reported.last().start)
     }
+
+    /**
+     * `steps = 0` is Material 3's documented way to ask for a continuous, non-snapping slider, so
+     * there is no grid for a small drag to be "off" of. The untouched-thumb filtering must not run
+     * at all here, or every ordinary drag tick — smaller than half the whole track — would be
+     * mistaken for the thumb not having moved and reverted.
+     */
+    @Test
+    fun `a continuous slider with steps = 0 still reports an ordinary drag`() {
+        val reported = mutableListOf<ClosedFloatingPointRange<Float>>()
+        var values by mutableStateOf(6f..8f)
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeRangeSlider(
+                    values = values,
+                    onValuesChange = {
+                        reported += it
+                        values = it
+                    },
+                    valueRange = 0f..10f,
+                    steps = 0,
+                    valueLabel = { it.toString() },
+                    startThumbDescription = "Minimum",
+                    endThumbDescription = "Maximum",
+                )
+            }
+        }
+
+        composeTestRule.onAllNodesWithContentDescription("Maximum", useUnmergedTree = true)[0].performTouchInput {
+            swipe(center, center + Offset(x = -SWIPE_PX, y = 0f))
+        }
+        composeTestRule.waitForIdle()
+
+        check(reported.isNotEmpty()) { "the drag reported no change, so the test proved nothing" }
+        assertEquals("the dragged end thumb did not move", true, reported.last().endInclusive < 8f)
+        assertEquals("the untouched start thumb moved", 6f, reported.last().start)
+    }
 }
 
 private const val SWIPE_PX = 120f
