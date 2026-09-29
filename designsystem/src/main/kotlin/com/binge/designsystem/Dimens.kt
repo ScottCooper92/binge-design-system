@@ -10,3 +10,9 @@ const val BACKDROP_ASPECT_RATIO = 16f / 9f
  * the remaining circle proportionally regardless of the avatar's size.
  */
 const val AVATAR_INITIALS_PADDING_FRACTION = 0.22f
+
+/**
+ * Material 3's opacity for disabled content, 38%. Every disabled control here dims by this one value, so a chip, a
+ * picker cell and a TV button read as disabled the same amount.
+ */
+const val DISABLED_ALPHA = 0.38f

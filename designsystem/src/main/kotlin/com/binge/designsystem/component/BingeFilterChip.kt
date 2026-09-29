@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -32,9 +33,6 @@ import com.binge.designsystem.theme.BingeShapes
 
 /** Darkens the count sub-pill on a selected (primary-filled) chip so it reads against the accent. */
 private const val FILTER_CHIP_COUNT_SCRIM_ALPHA = 0.22f
-
-/** Material 3's disabled opacity, applied to the whole chip so its fill, border and text dim together. */
-private const val FILTER_CHIP_DISABLED_ALPHA = 0.38f
 
 /**
  * The app's filter chip: a pill that fills with the primary accent when [selected] and is outlined
@@ -61,7 +59,7 @@ fun BingeFilterChip(
     val isSelected = selected
     Row(
         modifier = modifier
-            .alpha(if (enabled) 1f else FILTER_CHIP_DISABLED_ALPHA)
+            .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .clip(BingeShapes.Pill)
             .background(if (selected) scheme.primary else scheme.surfaceContainerLow)
             .then(

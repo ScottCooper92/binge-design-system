@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.tv.material3.MaterialTheme
+import com.binge.designsystem.DISABLED_ALPHA
 
 /**
  * The role a TV control surface plays, which fixes its resting colours via [tvButtonColors].
@@ -20,13 +21,6 @@ enum class TvButtonStyle { Primary, Secondary, Destructive }
  * to the solid error fill.
  */
 private const val DESTRUCTIVE_CONTAINER_ALPHA = 0.16f
-
-/**
- * A disabled outline is the border dimmed rather than a second border token, so the shape survives on any
- * background while still reading as quieter than an enabled Secondary — see [tvButtonColors]. Applied to
- * `border`, which is opaque, so the result is deterministic and not a function of the backdrop.
- */
-private const val DISABLED_BORDER_ALPHA = 0.38f
 
 /** Container / content / border for a TV control in one state — focus included, see [tvButtonColors]. */
 @Immutable
@@ -103,9 +97,9 @@ fun tvButtonColors(
         },
         border = when {
             focusFilled || filledAtRest -> Color.Transparent
-            // The disabled control's only visible edge, so it is dimmed rather than removed — this is the line
-            // that keeps a disabled button a button on a surface-backed panel.
-            !enabled -> colors.border.copy(alpha = DISABLED_BORDER_ALPHA)
+            // The disabled control's only visible edge, so it is dimmed rather than removed: the line that keeps it a
+            // button on any panel. Applied to `border`, which is opaque, so the result is not a function of the backdrop.
+            !enabled -> colors.border.copy(alpha = DISABLED_ALPHA)
             destructiveAtRest -> colors.error
             else -> colors.border
         },
