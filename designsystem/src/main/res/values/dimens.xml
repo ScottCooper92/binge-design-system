@@ -97,7 +97,9 @@
     <dimen name="button_filled_icon_spacing">8dp</dimen>
     <dimen name="button_tonal_size">52dp</dimen>
     <dimen name="top_bar_icon_size">48dp</dimen>
-    <!-- Target start inset the medium bar's title ramps to as it collapses, so the collapsed single-line title clears the circular nav container; the expanded large title stays at 0 on the 16dp content margin. -->
+    <!-- Extra start inset the medium bar's title ramps to as it collapses, on top of the content-inset
+         gap both rows already carry (see BingeMediumTopBar), so the collapsed single-line title also
+         clears the circular nav container beside it. -->
     <dimen name="medium_top_bar_collapsed_title_inset">8dp</dimen>
     <!-- Leading/trailing inset for back + actions, matching DetailOverlayTopBar's own default horizontalInset (padding_m) so a transparent bar's controls float the same distance from the edge everywhere. -->
     <dimen name="medium_top_bar_edge_inset">16dp</dimen>

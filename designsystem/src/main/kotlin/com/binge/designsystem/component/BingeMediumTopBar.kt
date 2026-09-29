@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeTheme
 
 /**
@@ -97,12 +98,15 @@ fun BingeMediumTopBar(
     // contrast guarantee) has faded away against a theme-following scrimForegroundColor.
     val glassBackgroundAlpha = 1f - foregroundScrimFraction
     val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
-    // The expanded large title sits on its own (second) row at the 16dp content margin, with no nav
-    // circle beside it; only the collapsed title animates up next to the circle. A flat inset would
-    // wrongly indent the expanded title, so ramp the start padding 0 -> target as the bar collapses.
+    // M3 starts both title rows at the same fixed R.dimen.pane_top_bar_title_inset (16dp) — right for
+    // the expanded title, which has no nav circle beside it, but content below runs on
+    // resolvedContentInset()'s own ramp (16/24/32dp), so the two only agree at the compact step. This
+    // closes that gap for both rows, then adds the collapsed row's own extra clearance on top so the
+    // single-line title still clears the circular nav container as it animates up next to it.
     val collapsedFraction = scrollBehavior?.state?.collapsedFraction ?: 0f
+    val contentInsetGap = resolvedContentInset() - dimensionResource(R.dimen.pane_top_bar_title_inset)
     val titleStartInset =
-        dimensionResource(R.dimen.medium_top_bar_collapsed_title_inset) * collapsedFraction
+        contentInsetGap + dimensionResource(R.dimen.medium_top_bar_collapsed_title_inset) * collapsedFraction
     Box {
         TopBarScrim(
             scrimFraction,
