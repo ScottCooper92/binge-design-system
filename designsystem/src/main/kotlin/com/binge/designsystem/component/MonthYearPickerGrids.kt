@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import com.binge.designsystem.R
@@ -30,10 +31,14 @@ import java.util.Locale
 private const val MONTH_COLUMNS = 3
 private const val YEAR_COLUMNS = 3
 
+/** Material 3's disabled opacity, as [BingeFilterChip] applies it, so an unavailable month dims like other disabled controls. */
+private const val PICKER_CELL_DISABLED_ALPHA = 0.38f
+
 @Composable
 internal fun MonthGrid(
     selected: Month?,
     locale: Locale,
+    isEnabled: (Month) -> Boolean,
     onPick: (Month) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -45,6 +50,7 @@ internal fun MonthGrid(
                     PickerCell(
                         label = shortMonthName(month, locale),
                         selected = month == selected,
+                        enabled = isEnabled(month),
                         onClick = { onPick(month) },
                         modifier = Modifier.weight(1f),
                     )
@@ -71,7 +77,7 @@ internal fun YearGrid(
         horizontalArrangement = Arrangement.spacedBy(gap),
     ) {
         items(items = range.toList(), key = { it }) { year ->
-            PickerCell(label = year.toString(), selected = year == selected, onClick = { onPick(year) })
+            PickerCell(label = year.toString(), selected = year == selected, enabled = true, onClick = { onPick(year) })
         }
     }
 }
@@ -81,6 +87,7 @@ internal fun YearGrid(
 private fun PickerCell(
     label: String,
     selected: Boolean,
+    enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -88,7 +95,8 @@ private fun PickerCell(
     Box(
         modifier = modifier
             .heightIn(min = dimensionResource(R.dimen.min_touch_target))
-            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
+            .alpha(if (enabled) 1f else PICKER_CELL_DISABLED_ALPHA)
+            .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Box(

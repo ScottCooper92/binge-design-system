@@ -6,6 +6,7 @@ import com.binge.designsystem.component.MonthYearPickerMode
 import com.binge.designsystem.component.MonthYearSelection
 import com.binge.designsystem.preview.ScreenshotTheme
 import java.time.Month
+import java.time.YearMonth
 import java.util.Locale
 
 private val SampleYears = 1990..2030
@@ -16,6 +17,8 @@ private fun MonthYearPickerSampleFrame(
     mode: MonthYearPickerMode,
     selection: MonthYearSelection,
     yearsOpen: Boolean = false,
+    minimum: YearMonth? = null,
+    maximum: YearMonth? = null,
 ) {
     ScreenshotTheme {
         MonthYearPickerContent(
@@ -23,6 +26,8 @@ private fun MonthYearPickerSampleFrame(
             mode = mode,
             selection = selection,
             yearRange = SampleYears,
+            minimum = minimum,
+            maximum = maximum,
             yearsOpen = yearsOpen,
             onYearsOpenChange = {},
             onSelectionChange = {},
@@ -82,5 +87,39 @@ fun MonthYearPickerRangeStartSample() {
     MonthYearPickerSampleFrame(
         MonthYearPickerMode.MonthAndYear,
         MonthYearSelection(year = SampleYears.first, month = Month.JANUARY),
+    )
+}
+
+/**
+ * An end that must not precede its start (March 2018): the boundary year's earlier months are dimmed
+ * and cannot be picked, and the previous-year arrow is off because no earlier year is offered.
+ */
+@Composable
+fun MonthYearPickerBoundedSample() {
+    MonthYearPickerSampleFrame(
+        MonthYearPickerMode.MonthAndYear,
+        MonthYearSelection(year = SAMPLE_YEAR, month = Month.JUNE),
+        minimum = YearMonth.of(SAMPLE_YEAR, Month.MARCH),
+    )
+}
+
+/** The same bound with the year list open: years before the minimum are not offered. */
+@Composable
+fun MonthYearPickerBoundedYearsOpenSample() {
+    MonthYearPickerSampleFrame(
+        MonthYearPickerMode.MonthAndYear,
+        MonthYearSelection(year = SAMPLE_YEAR, month = Month.JUNE),
+        yearsOpen = true,
+        minimum = YearMonth.of(SAMPLE_YEAR, Month.MARCH),
+    )
+}
+
+/** A start that must not follow its end (March 2018), seen from the boundary year: later months are dimmed. */
+@Composable
+fun MonthYearPickerMaximumSample() {
+    MonthYearPickerSampleFrame(
+        MonthYearPickerMode.MonthAndYear,
+        MonthYearSelection(year = SAMPLE_YEAR, month = Month.JANUARY),
+        maximum = YearMonth.of(SAMPLE_YEAR, Month.MARCH),
     )
 }

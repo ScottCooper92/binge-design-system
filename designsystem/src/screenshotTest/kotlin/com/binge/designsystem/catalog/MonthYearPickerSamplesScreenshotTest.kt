@@ -53,4 +53,25 @@ class MonthYearPickerSamplesScreenshotTest {
     fun RangeStart() {
         MonthYearPickerRangeStartSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Bounded() {
+        MonthYearPickerBoundedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun BoundedYearsOpen() {
+        MonthYearPickerBoundedYearsOpenSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Maximum() {
+        MonthYearPickerMaximumSample()
+    }
 }
