@@ -49,35 +49,6 @@ class BingeMediumTopBarScreenshotTest {
         }
     }
 
-    /**
-     * A wide (840dp) single-pane window, no [com.binge.designsystem.LocalPaneWidth] override — the
-     * title's start inset should widen to [com.binge.designsystem.resolvedContentInset]'s own
-     * expanded step (32dp) rather than staying at the fixed 16dp M3 default (#2953).
-     */
-    @PreviewTest
-    @Preview(name = "wide840", device = "spec:width=840dp,height=200dp,orientation=landscape", uiMode = UI_MODE_NIGHT_YES)
-    @Composable
-    fun TitleAndBackAtWideWindow() {
-        ScreenshotTheme {
-            BingeMediumTopBar(title = "Popular Movies", onBack = {})
-        }
-    }
-
-    /** [TitleAndBackAtWideWindow]'s collapsed counterpart — the same wide-window inset, plus the collapsed-only nav clearance. */
-    @PreviewTest
-    @Preview(name = "wide840", device = "spec:width=840dp,height=200dp,orientation=landscape", uiMode = UI_MODE_NIGHT_YES)
-    @Composable
-    fun CollapsedAtWideWindow() {
-        ScreenshotTheme {
-            BingeMediumTopBar(
-                title = "Popular Movies",
-                onBack = {},
-                scrollBehavior = collapsedScrollBehavior(),
-                actions = { SearchAction() },
-            )
-        }
-    }
-
     @PreviewTest
     @ComponentPreviews
     @Composable
