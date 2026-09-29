@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.R
 import com.binge.designsystem.preview.ComponentPreviews
@@ -37,6 +39,35 @@ class BingeMediumTopBarScreenshotTest {
     @ComponentPreviews
     @Composable
     fun Collapsed() {
+        ScreenshotTheme {
+            BingeMediumTopBar(
+                title = "Popular Movies",
+                onBack = {},
+                scrollBehavior = collapsedScrollBehavior(),
+                actions = { SearchAction() },
+            )
+        }
+    }
+
+    /**
+     * A wide (840dp) single-pane window, no [com.binge.designsystem.LocalPaneWidth] override — the
+     * title's start inset should widen to [com.binge.designsystem.resolvedContentInset]'s own
+     * expanded step (32dp) rather than staying at the fixed 16dp M3 default (#2953).
+     */
+    @PreviewTest
+    @Preview(name = "wide840", device = "spec:width=840dp,height=200dp,orientation=landscape", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun TitleAndBackAtWideWindow() {
+        ScreenshotTheme {
+            BingeMediumTopBar(title = "Popular Movies", onBack = {})
+        }
+    }
+
+    /** [TitleAndBackAtWideWindow]'s collapsed counterpart — the same wide-window inset, plus the collapsed-only nav clearance. */
+    @PreviewTest
+    @Preview(name = "wide840", device = "spec:width=840dp,height=200dp,orientation=landscape", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun CollapsedAtWideWindow() {
         ScreenshotTheme {
             BingeMediumTopBar(
                 title = "Popular Movies",
