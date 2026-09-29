@@ -69,4 +69,9 @@
     <string name="cd_reorder_handle">Arrastrar para reordenar</string>
     <string name="cd_reorder_move_up">Subir</string>
     <string name="cd_reorder_move_down">Bajar</string>
+    <string name="month_year_picker_previous_year">Año anterior</string>
+    <string name="month_year_picker_next_year">Año siguiente</string>
+    <string name="month_year_picker_choose_year">Elegir año</string>
+    <string name="month_year_picker_cancel">Cancelar</string>
+    <string name="month_year_picker_confirm">Aceptar</string>
 </resources>

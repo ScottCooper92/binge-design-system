@@ -4,9 +4,11 @@ import android.text.format.DateUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Instant
+import java.time.Month
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.format.TextStyle
 import java.util.Locale
 
 /**
@@ -88,3 +90,9 @@ fun formatRelativeOrAbsolute(
             .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale))
     }
 }
+
+/** A month's short name in [locale] ("Jan", "ene"), in the standalone form a picker cell shows. */
+fun shortMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.SHORT_STANDALONE, locale)
+
+/** A month's full name in [locale] ("March", "marzo"), in the standalone form a picker headline shows. */
+fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.FULL_STANDALONE, locale)
