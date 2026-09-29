@@ -137,3 +137,17 @@ fun MonthYearPickerStaleSelectionSample() {
         minimum = YearMonth.of(SAMPLE_YEAR, Month.MARCH),
     )
 }
+
+/**
+ * A selection whose year stays in range but whose month has since fallen before the minimum: the
+ * chosen month's cell is both selected (bordered pill) and dimmed/inert at once, the one combined
+ * state new in this PR's `isEnabled` wiring.
+ */
+@Composable
+fun MonthYearPickerSelectionDimmedSample() {
+    MonthYearPickerSampleFrame(
+        MonthYearPickerMode.MonthAndYear,
+        MonthYearSelection(year = SAMPLE_YEAR, month = Month.JANUARY),
+        minimum = YearMonth.of(SAMPLE_YEAR, Month.JUNE),
+    )
+}
