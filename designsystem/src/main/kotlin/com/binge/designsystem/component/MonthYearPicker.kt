@@ -34,12 +34,17 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.window.Dialog
 import com.binge.designsystem.R
 import java.time.Month
+import java.time.YearMonth
 import java.util.Locale
 
 /**
  * A month and/or year picker in a dialog, for a bound that is a period rather than a day. [mode]
  * says which parts to ask for; [onConfirm] gets a [MonthYearSelection] with every asked part set and
  * the others `null`. [title] is the caller's copy, since only it knows what is being picked.
+ *
+ * [minimum] and [maximum] bound what can be picked, for an end that must not precede its start: years
+ * outside them are not offered, and months outside them in the boundary year are dimmed and inert.
+ * They apply where a year is picked, so the month-only mode ignores them.
  *
  * The visible body is [MonthYearPickerContent], stateless so screenshot tests can render it: the
  * modal [Dialog] window does not capture in previews.
@@ -52,6 +57,8 @@ fun MonthYearPickerDialog(
     onDismiss: () -> Unit,
     onConfirm: (MonthYearSelection) -> Unit,
     initial: MonthYearSelection = MonthYearSelection(),
+    minimum: YearMonth? = null,
+    maximum: YearMonth? = null,
 ) {
     var year by rememberSaveable { mutableStateOf(initial.year) }
     var monthValue by rememberSaveable { mutableStateOf(initial.month?.value) }
@@ -63,6 +70,8 @@ fun MonthYearPickerDialog(
             mode = mode,
             selection = selection,
             yearRange = yearRange,
+            minimum = minimum,
+            maximum = maximum,
             yearsOpen = yearsOpen,
             onYearsOpenChange = { yearsOpen = it },
             onSelectionChange = {
@@ -91,8 +100,11 @@ internal fun MonthYearPickerContent(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    minimum: YearMonth? = null,
+    maximum: YearMonth? = null,
     locale: Locale = LocalConfiguration.current.locales[0],
 ) {
+    val range = yearRange.within(minimum, maximum)
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
@@ -101,7 +113,7 @@ internal fun MonthYearPickerContent(
         Column {
             PickerHeader(
                 overline = title,
-                headline = pickerHeadline(mode, selection, locale, stringResource(R.string.month_year_picker_empty)),
+                headline = pickerHeadline(mode, selection.coercedTo(range), locale, stringResource(R.string.month_year_picker_empty)),
                 locale = locale,
             )
             Column(
@@ -110,11 +122,11 @@ internal fun MonthYearPickerContent(
             ) {
                 if (mode == MonthYearPickerMode.MonthAndYear) {
                     YearStepper(
-                        year = selection.displayYear(yearRange),
-                        yearRange = yearRange,
+                        year = selection.displayYear(range),
+                        yearRange = range,
                         yearsOpen = yearsOpen,
                         onYearsOpenChange = onYearsOpenChange,
-                        onStep = { onSelectionChange(selection.stepYear(it, yearRange)) },
+                        onStep = { onSelectionChange(selection.stepYear(it, range)) },
                     )
                 }
                 Box(modifier = Modifier.fillMaxWidth().height(dimensionResource(R.dimen.month_year_picker_grid_height))) {
@@ -122,12 +134,13 @@ internal fun MonthYearPickerContent(
                         MonthGrid(
                             selected = selection.month,
                             locale = locale,
-                            onPick = { onSelectionChange(selection.pickMonth(it, mode, yearRange)) },
+                            isEnabled = { monthPickable(mode, selection.displayYear(range), it, minimum, maximum) },
+                            onPick = { onSelectionChange(selection.pickMonth(it, mode, range)) },
                         )
                     } else {
                         YearGrid(
-                            selected = selection.year,
-                            range = yearRange,
+                            selected = selection.coercedTo(range).year,
+                            range = range,
                             onPick = {
                                 onSelectionChange(selection.pickYear(it))
                                 onYearsOpenChange(false)
@@ -135,7 +148,11 @@ internal fun MonthYearPickerContent(
                         )
                     }
                 }
-                PickerActions(canConfirm = selection.isCompleteFor(mode), onConfirm = onConfirm, onDismiss = onDismiss)
+                PickerActions(
+                    canConfirm = selection.isCompleteFor(mode) && selection.isWithin(mode, minimum, maximum),
+                    onConfirm = onConfirm,
+                    onDismiss = onDismiss,
+                )
             }
         }
     }

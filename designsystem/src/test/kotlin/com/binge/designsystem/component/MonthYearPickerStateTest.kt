@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Month
+import java.time.YearMonth
 import java.util.Locale
 
 class MonthYearPickerStateTest {
@@ -123,5 +124,88 @@ class MonthYearPickerStateTest {
             "marzo 2018",
             pickerHeadline(MonthYearPickerMode.MonthAndYear, MonthYearSelection(2018, Month.MARCH), Locale("es"), "-").lowercase(),
         )
+    }
+
+    @Test
+    fun `bounds narrow the offered years and leave the range alone when they exclude every year`() {
+        assertEquals(2018..2030, range.within(YearMonth.of(2018, 3), null))
+        assertEquals(1990..2005, range.within(null, YearMonth.of(2005, 6)))
+        assertEquals(2010..2012, range.within(YearMonth.of(2010, 1), YearMonth.of(2012, 12)))
+        assertEquals(range, range.within(null, null))
+        assertEquals(range, range.within(YearMonth.of(2040, 1), null))
+        assertEquals(range, range.within(null, YearMonth.of(1980, 1)))
+    }
+
+    @Test
+    fun `a month is allowed only between the bounds, inclusive`() {
+        val min = YearMonth.of(2018, 3)
+        val max = YearMonth.of(2018, 9)
+
+        assertFalse(monthAllowed(2018, Month.FEBRUARY, min, null))
+        assertTrue(monthAllowed(2018, Month.MARCH, min, null))
+        assertTrue(monthAllowed(2019, Month.JANUARY, min, null))
+        assertTrue(monthAllowed(2018, Month.SEPTEMBER, min, max))
+        assertFalse(monthAllowed(2018, Month.OCTOBER, min, max))
+        assertTrue(monthAllowed(1990, Month.JANUARY, null, null))
+    }
+
+    @Test
+    fun `a selection outside the bounds is not within them, which keeps OK off`() {
+        val min = YearMonth.of(2018, 3)
+        val both = MonthYearPickerMode.MonthAndYear
+
+        assertFalse(MonthYearSelection(2018, Month.FEBRUARY).isWithin(both, min, null))
+        assertTrue(MonthYearSelection(2018, Month.MARCH).isWithin(both, min, null))
+        assertFalse(MonthYearSelection(year = 2017).isWithin(MonthYearPickerMode.Year, min, null))
+        assertTrue(MonthYearSelection(year = 2018).isWithin(MonthYearPickerMode.Year, min, null))
+        assertTrue(MonthYearSelection(month = Month.JANUARY).isWithin(MonthYearPickerMode.Month, min, null))
+        assertTrue(MonthYearSelection().isWithin(both, min, null))
+    }
+
+    @Test
+    fun `with a minimum and nothing chosen the stepper starts at the latest year, and picking pins it`() {
+        val narrowed = range.within(YearMonth.of(2028, 3), null)
+
+        assertEquals(2030, MonthYearSelection().displayYear(narrowed))
+        assertEquals(2028, MonthYearSelection(year = 2010).displayYear(narrowed))
+        assertEquals(
+            MonthYearSelection(year = 2030, month = Month.MAY),
+            MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, narrowed),
+        )
+    }
+
+    @Test
+    fun `coercing for display pulls a stale year into the narrowed range but leaves an unchosen year unset`() {
+        val narrowed = range.within(YearMonth.of(2018, 3), null)
+
+        val staleYear = MonthYearSelection(year = 1990, month = Month.MAY)
+        val inRangeYear = MonthYearSelection(year = 2018, month = Month.MAY)
+        val noYear = MonthYearSelection(month = Month.MAY)
+
+        assertEquals(inRangeYear, staleYear.coercedTo(narrowed))
+        assertEquals(inRangeYear, inRangeYear.coercedTo(narrowed))
+        assertEquals(noYear, noYear.coercedTo(narrowed))
+    }
+
+    @Test
+    fun `the headline for a stale year agrees with what the stepper and grid would show, once coerced`() {
+        val narrowed = range.within(YearMonth.of(2018, 3), null)
+        val stale = MonthYearSelection(year = 1990, month = Month.JUNE)
+
+        assertEquals("June 2018", pickerHeadline(MonthYearPickerMode.MonthAndYear, stale.coercedTo(narrowed), Locale.UK, "-"))
+        assertEquals(stale.displayYear(narrowed), stale.coercedTo(narrowed).year)
+    }
+
+    @Test
+    fun `month-only mode never dims a month, even with bounds that would in a mode with a year`() {
+        val max = YearMonth.of(2018, 6)
+        val narrowed = range.within(null, max)
+        val shownYear = MonthYearSelection().displayYear(narrowed)
+
+        Month.entries.forEach { month ->
+            assertTrue(monthPickable(MonthYearPickerMode.Month, shownYear, month, null, max), "$month dimmed in month-only")
+        }
+        assertFalse(monthPickable(MonthYearPickerMode.MonthAndYear, shownYear, Month.JULY, null, max))
+        assertTrue(monthPickable(MonthYearPickerMode.MonthAndYear, shownYear, Month.JUNE, null, max))
     }
 }

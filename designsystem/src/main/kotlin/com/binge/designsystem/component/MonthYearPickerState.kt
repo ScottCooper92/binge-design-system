@@ -2,6 +2,7 @@ package com.binge.designsystem.component
 
 import com.binge.designsystem.fullMonthName
 import java.time.Month
+import java.time.YearMonth
 import java.util.Locale
 
 /** Which parts of a date a [MonthYearPickerDialog] asks for. */
@@ -26,6 +27,13 @@ data class MonthYearSelection(
 
 /** The year the stepper shows: the chosen one, else the latest the range offers. */
 internal fun MonthYearSelection.displayYear(range: IntRange): Int = (year ?: range.last).coerceIn(range)
+
+/**
+ * [this] with a chosen year pulled back inside [range], so the headline agrees with what the
+ * stepper and month grid show below it once the bounds have pushed the actual year out of range.
+ * Leaves an unchosen year as `null` rather than showing the range's fallback as if it were picked.
+ */
+internal fun MonthYearSelection.coercedTo(range: IntRange): MonthYearSelection = copy(year = year?.coerceIn(range))
 
 /**
  * Picking a month while the picker also asks for a year pins the year the stepper was showing, so
@@ -78,5 +86,54 @@ internal fun pickerHeadline(
         MonthYearPickerMode.Month -> month ?: empty
         MonthYearPickerMode.MonthAndYear ->
             if (month == null && year == null) empty else "${month ?: empty} ${year ?: empty}"
+    }
+}
+
+/**
+ * [this] narrowed to the years [minimum] and [maximum] allow, so a year outside them is not offered.
+ * Left as it was when the bounds leave no year at all, rather than an empty grid.
+ */
+internal fun IntRange.within(minimum: YearMonth?, maximum: YearMonth?): IntRange {
+    val narrowed = maxOf(first, minimum?.year ?: first)..minOf(last, maximum?.year ?: last)
+    return if (narrowed.isEmpty()) this else narrowed
+}
+
+/** Whether [month] of [year] sits between [minimum] and [maximum], either of which may be absent. */
+internal fun monthAllowed(
+    year: Int,
+    month: Month,
+    minimum: YearMonth?,
+    maximum: YearMonth?,
+): Boolean {
+    val candidate = YearMonth.of(year, month)
+    return (minimum == null || candidate >= minimum) && (maximum == null || candidate <= maximum)
+}
+
+/**
+ * Whether [month] can be picked in [mode], with [year] the one the grid is showing. A mode that does not
+ * ask for a year has none to bound a month by, so it never dims one.
+ */
+internal fun monthPickable(
+    mode: MonthYearPickerMode,
+    year: Int,
+    month: Month,
+    minimum: YearMonth?,
+    maximum: YearMonth?,
+): Boolean = !mode.asksYear || monthAllowed(year, month, minimum, maximum)
+
+/**
+ * Whether what is picked respects the bounds, which is what keeps OK off for an initial value the
+ * bounds have since moved past. The month-only mode has no year to bound, so it always does.
+ */
+internal fun MonthYearSelection.isWithin(
+    mode: MonthYearPickerMode,
+    minimum: YearMonth?,
+    maximum: YearMonth?,
+): Boolean {
+    val year = year ?: return true
+    return when {
+        mode == MonthYearPickerMode.Month -> true
+        mode == MonthYearPickerMode.Year -> (minimum == null || year >= minimum.year) && (maximum == null || year <= maximum.year)
+        else -> month?.let { monthAllowed(year, it, minimum, maximum) } ?: true
     }
 }
