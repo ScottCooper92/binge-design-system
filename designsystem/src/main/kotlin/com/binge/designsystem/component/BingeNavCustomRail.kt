@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.LocalNavOverlayInsets
@@ -159,6 +160,6 @@ private fun NavRailItem(
         onClick = { onSelect(tab.key) },
         icon = { NavSuiteItemIcon(tab, avatarSize = avatarSize) },
         label = { Text(tab.label) },
-        modifier = modifier,
+        modifier = tab.testTag?.let { modifier.testTag(it) } ?: modifier,
     )
 }
