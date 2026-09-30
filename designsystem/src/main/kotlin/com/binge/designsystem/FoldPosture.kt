@@ -45,9 +45,9 @@ fun rememberHorizontalHinge(): HorizontalHinge? =
  * **Separating, not `HALF_OPENED`.** The state and the question differ: a dual-screen device reports
  * `FLAT` across a physical seam that occludes content just as a half-opened crease does, while a
  * foldable opened flat still reports a `FoldingFeature` that divides nothing. `isSeparating` is the
- * property that answers "is the window really in two pieces", which is what both callers are asking.
+ * property that answers "is the window really in two pieces", which is what the caller is asking.
  *
- * [toHinge] reads `bounds` in **window** pixels; it runs inside [Density] so each caller converts on
+ * [toHinge] reads `bounds` in **window** pixels; it runs inside [Density] so the caller converts on
  * the axis it cares about.
  */
 @Composable

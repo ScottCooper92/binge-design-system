@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test
 /**
  * The tabletop height cap.
  *
- * The first test is the load-bearing one: every
- * phone, tablet and flat-open foldable reports no separating horizontal fold, so if null ever stopped
- * meaning "no cap" every bottom sheet in the app would change height on hardware with no hinge in it.
+ * The first test is the load-bearing one: every phone, tablet and flat-open foldable reports no
+ * separating horizontal fold, so if null ever stopped meaning "no cap" every bottom sheet in the app
+ * would change height on hardware with no hinge in it.
  */
 class FoldSafeBottomHeightTest {
     @Test
