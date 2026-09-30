@@ -102,7 +102,7 @@ dependencies {
     implementation(libs.compose.ui.text.google.fonts)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material.color.utilities)
-    // Foldable posture: WindowInfoTracker/FoldingFeature behind rememberVerticalHinge.
+    // Foldable posture: WindowInfoTracker/FoldingFeature behind rememberHorizontalHinge.
     implementation(libs.androidx.window)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

@@ -17,13 +17,12 @@ import org.robolectric.annotation.Config
 import androidx.window.testing.layout.FoldingFeature as posedFold
 
 /**
- * Both hinge observers against a fold that is actually there.
+ * The hinge observer against a fold that is actually there.
  *
  * `androidx.window:window-testing` publishes a `WindowLayoutInfo` through the same
  * `WindowInfoTracker` the production code subscribes to, which is what makes the folded branch
- * reachable from the JVM at all — [VerticalHingeTest] covers only the null answer every non-foldable
- * window gives. It is not the device pass still owed: this proves the filter, the axis and the
- * pixel-to-dp conversion, not that real hardware reports the bounds assumed here.
+ * reachable from the JVM at all. It is not the device pass still owed: this proves the filter, the axis
+ * and the pixel-to-dp conversion, not that real hardware reports the bounds assumed here.
  *
  * Every test asserts a hinge is *seen* before asserting one is absent. The publisher's flow does not
  * replay, so a value that arrives before the composition subscribes is dropped silently — and a
@@ -48,31 +47,30 @@ class PosedFoldTest {
     val rules: RuleChain = RuleChain.outerRule(publisher).around(compose)
 
     private var horizontal: HorizontalHinge? = null
-    private var vertical: VerticalHinge? = null
 
     @Test
     fun `a half-opened horizontal fold is a tabletop hinge and nothing else`() {
-        observeBothAxes()
+        observe()
 
         publish(fold(FoldingFeature.Orientation.HORIZONTAL))
 
         assertEquals(HorizontalHinge(top = CREASE_START_DP, height = CREASE_SIZE_DP), horizontal)
-        assertNull("a horizontal fold was read as a two-pane hinge", vertical)
     }
 
     @Test
-    fun `a half-opened vertical fold is a two-pane hinge and nothing else`() {
-        observeBothAxes()
+    fun `a half-opened vertical fold is not a tabletop hinge`() {
+        observe()
+        publish(fold(FoldingFeature.Orientation.HORIZONTAL))
+        assertEquals(HorizontalHinge(top = CREASE_START_DP, height = CREASE_SIZE_DP), horizontal)
 
         publish(fold(FoldingFeature.Orientation.VERTICAL))
 
-        assertEquals(VerticalHinge(start = CREASE_START_DP, width = CREASE_SIZE_DP), vertical)
         assertNull("a vertical fold was read as tabletop", horizontal)
     }
 
     @Test
     fun `a window that stops reporting a fold stops reporting a hinge`() {
-        observeBothAxes()
+        observe()
         publish(fold(FoldingFeature.Orientation.HORIZONTAL))
         assertEquals(HorizontalHinge(top = CREASE_START_DP, height = CREASE_SIZE_DP), horizontal)
 
@@ -81,10 +79,9 @@ class PosedFoldTest {
         assertNull("the hinge latched on the first fold and never let go", horizontal)
     }
 
-    private fun observeBothAxes() {
+    private fun observe() {
         compose.setContent {
             horizontal = rememberHorizontalHinge()
-            vertical = rememberVerticalHinge()
         }
         compose.waitForIdle()
     }

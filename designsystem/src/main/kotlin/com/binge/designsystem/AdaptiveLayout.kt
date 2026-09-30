@@ -28,25 +28,6 @@ fun isExpandedLayout(): Boolean = booleanResource(R.bool.binge_layout_expanded)
 fun isLandscape(): Boolean = booleanResource(R.bool.binge_landscape)
 
 /**
- * Whether the window can hold a list and a detail side by side. Gates the two-pane split on both
- * Lists and Account.
- *
- * Two buckets resolve it, and the second exists because the first asks for the wrong thing.
- * `values-sw600dp-land` is the original: a landscape tablet. Its `land` came from the case where a
- * 998x448dp landscape phone had the width for two panes and nowhere to put them — so orientation
- * was standing in for *height*, and it excluded the unfolded foldable, which is expanded and
- * portrait (~852x883dp), as collateral. `values-w840dp-h600dp` says it directly: >=840dp
- * wide, Material's expanded-width breakpoint, and >=600dp tall. The landscape phone still misses
- * on its 448dp of height; the Fold no longer does.
- *
- * Still narrower than [isExpandedLayout], which is width-only and over-triggered on portrait
- * tablets. A tablet under 840dp wide in portrait keeps the width-capped single column; one above it
- * gets the split, which is the point — the gate is the window's shape, not the device's class.
- */
-@Composable
-fun isTwoPaneLayout(): Boolean = booleanResource(R.bool.binge_layout_two_pane)
-
-/**
  * Whether Discover is reachable as its own navigation destination (tablets). Hubs use this to drop
  * their in-content discover-entry tile where the nav tab makes it redundant; phones keep the tile.
  */
