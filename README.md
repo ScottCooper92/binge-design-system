@@ -40,7 +40,10 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── theme/       BingeColors, BingeShapes, the expressive theme, typography, contrast
 ├── component/   the shared M3 components: the nav shell, buttons, chips, top bars, sheets, cards,
 │                rows, tiles, the hero carousel, the skeletons
-├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel
+├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel, the
+│                          relative-or-absolute date formatter and month names
+├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
+│                icons, brushes, collapsing-title state and the shared aspect ratios
 ├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders
 ├── modifier/    skeleton shimmer, selection lift
 ├── layout/      layout anchors
@@ -50,7 +53,9 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── theme/       the tv-material theme, projected from the same tokens
 ├── focus/       the focus groups, the indicator, arrival and scroll units
 ├── nav/         the navigation rail shell
-├── component/   the button, the card row, the section title, the message plate, the initials avatar
+├── component/   the buttons, the card row, the section title, the message plate, the initials
+│                avatar, the QR code, the selected tick, the row emphasis and the vertical divider
+├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme
 
@@ -58,9 +63,10 @@ docs/
 └── tv-foundation.md   why focus is a parameter, and the accent model the TV components share
 ```
 
-Every dp lives in `src/main/res/values/dimens.xml` (with the width and orientation qualifiers next to
-it), every user-visible string in `values/strings.xml` with its Spanish translation alongside, and
-the screenshot baselines under `src/screenshotTestDebug/reference/`. The baselines are the ones Binge
+In each module every dp lives in `src/main/res/values/dimens.xml` (with the width and orientation
+qualifiers next to it) and the screenshot baselines under `src/screenshotTestDebug/reference/`. In
+`designsystem`, every user-visible string is in `values/strings.xml` with its Spanish translation
+alongside; `designsystem-tv` has no strings, because its components take their copy as parameters. The baselines are the ones Binge
 recorded; each slice validated byte-identical against them before it landed.
 
 ## Status
@@ -68,10 +74,12 @@ recorded; each slice validated byte-identical against them before it landed.
 **Pre-alpha, and consumed.** Binge and binge-seerr both include this build; Binge's own
 `core/designsystem` keeps only the components that still name one of its types.
 
-Two slices have landed: the theme, the preview scaffolding and the components that named nothing
-of Binge's, then the display formatters and the components they unlocked. Each arrived with its
-tests and baselines, and each is followed by a Binge PR that deletes its copies and re-points
-imports; between the two, Binge builds from its own copies of whatever the latest slice moved.
+Four slices have landed: the theme, the preview scaffolding and the components that named nothing
+of Binge's; then the display formatters and the components they unlocked; then the settings group
+with the relative-date formatter; and the `designsystem-tv` module, the TV foundation. Each arrived
+with its tests and baselines, and each is followed by a Binge PR that deletes its copies and
+re-points imports; between the two, Binge builds from its own copies of whatever the latest slice
+moved.
 
 ## How it is consumed
 
