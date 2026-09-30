@@ -74,4 +74,5 @@
     <string name="month_year_picker_choose_year">Elegir año</string>
     <string name="month_year_picker_cancel">Cancelar</string>
     <string name="month_year_picker_confirm">Aceptar</string>
+    <string name="info_row_link_separated">%1$s,</string>
 </resources>

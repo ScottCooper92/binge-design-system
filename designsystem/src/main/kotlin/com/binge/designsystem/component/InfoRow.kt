@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
@@ -133,7 +134,7 @@ private fun InfoRowLinks(links: List<InfoLink>) {
     ) {
         tokens.forEachIndexed { index, link ->
             InfoRowLink(
-                text = if (index < tokens.lastIndex) "${link.text}," else link.text,
+                text = if (index < tokens.lastIndex) stringResource(R.string.info_row_link_separated, link.text) else link.text,
                 onClick = link.onClick,
             )
         }
