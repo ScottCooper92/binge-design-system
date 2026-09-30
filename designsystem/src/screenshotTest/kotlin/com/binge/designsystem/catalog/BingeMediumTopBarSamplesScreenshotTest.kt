@@ -15,6 +15,13 @@ class BingeMediumTopBarSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun Transparent() {
+        BingeMediumTopBarTransparentSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun ThemeFollowingScrim() {
         BingeMediumTopBarThemeFollowingScrimSample()
     }
