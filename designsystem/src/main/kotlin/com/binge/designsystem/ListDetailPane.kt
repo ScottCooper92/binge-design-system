@@ -6,6 +6,7 @@ import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 
 /**
  * Provides [LocalPaneWidth] as the width [content] is actually measured at, rather than one derived
@@ -19,9 +20,13 @@ import androidx.compose.runtime.staticCompositionLocalOf
  * window alone and has no inner edge, so the caller passes its role once and never checks.
  */
 @Composable
-fun PaneContent(innerEdge: PaneEdge? = null, content: @Composable () -> Unit) {
+fun PaneContent(
+    innerEdge: PaneEdge? = null,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
     val sharedEdge = innerEdge.takeUnless { LocalIsSinglePaneNav.current }
-    BoxWithConstraints {
+    BoxWithConstraints(modifier = modifier) {
         CompositionLocalProvider(
             LocalPaneWidth provides maxWidth,
             LocalPaneInnerEdge provides sharedEdge,
