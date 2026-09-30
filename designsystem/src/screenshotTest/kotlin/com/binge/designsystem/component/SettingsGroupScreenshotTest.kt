@@ -1,10 +1,15 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.unit.dp
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -14,6 +19,23 @@ import com.binge.designsystem.preview.ScreenshotTheme
  * from its painter slot, and a badge with no [SettingsRow.badgeTint] of its own.
  */
 class SettingsGroupScreenshotTest {
+    /** [belowRows] sits on the same surface as the rows, not on a card of its own. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun BelowRows() {
+        ScreenshotTheme {
+            SettingsGroup(
+                title = null,
+                rows = listOf(SettingsRow(icon = Icons.Filled.Star, label = "Parent", detail = "Expanded")),
+                belowRows = {
+                    HorizontalDivider()
+                    Text(text = "Expanded content", modifier = Modifier.padding(16.dp))
+                },
+            )
+        }
+    }
+
     @PreviewTest
     @ComponentPreviews
     @Composable
