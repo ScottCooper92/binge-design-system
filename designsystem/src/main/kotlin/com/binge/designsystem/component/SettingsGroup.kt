@@ -45,7 +45,8 @@ import com.binge.designsystem.theme.tonalContainer
  *
  * [rowVerticalPadding] is the breathing room above and below each row's content. It defaults to the
  * shared token so every settings screen stays alike; a caller that wants roomier rows — a sheet whose
- * rows are its main content — passes its own.
+ * rows are its main content — passes its own. [titleSpacing] is the gap between the title and the
+ * first row.
  */
 @Composable
 fun SettingsGroup(
@@ -53,6 +54,7 @@ fun SettingsGroup(
     rows: List<SettingsRow>,
     modifier: Modifier = Modifier,
     rowVerticalPadding: Dp = dimensionResource(R.dimen.settings_group_row_padding_v),
+    titleSpacing: Dp = dimensionResource(R.dimen.padding_s),
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (!title.isNullOrBlank()) {
@@ -64,7 +66,7 @@ fun SettingsGroup(
                 // inside the screen's 16dp horizontal content padding.
                 modifier = Modifier
                     .padding(horizontal = dimensionResource(R.dimen.padding_s))
-                    .padding(bottom = dimensionResource(R.dimen.padding_s))
+                    .padding(bottom = titleSpacing)
                     .semantics { heading() },
             )
         }

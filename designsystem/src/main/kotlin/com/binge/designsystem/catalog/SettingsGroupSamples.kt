@@ -160,3 +160,22 @@ fun SettingsGroupTallRowsSample() {
         )
     }
 }
+
+/**
+ * The same rows as [SettingsGroupTitledSample] with [SettingsGroup]'s `titleSpacing` dropped one
+ * rung on the padding ramp, for a sheet whose titled groups sit close together.
+ */
+@Composable
+fun SettingsGroupTightTitleSample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = "My library",
+            rows = listOf(
+                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
+                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
+                SettingsRow(icon = Icons.Filled.Settings, label = "Preferences"),
+            ),
+            titleSpacing = dimensionResource(R.dimen.padding_xs),
+        )
+    }
+}
