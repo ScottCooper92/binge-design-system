@@ -1,7 +1,7 @@
 # binge-design-system
 
 The shared design system for [Binge](https://github.com/ScottCooper92) and the companion apps that
-talk to it through [binge-integrations](https://github.com/ScottCooper92/binge-integrations).
+talk to it through [binge-companions](https://github.com/ScottCooper92/binge-companions).
 
 ## Why this exists
 
