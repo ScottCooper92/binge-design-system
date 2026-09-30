@@ -12,4 +12,11 @@ class DetailHeroSamplesScreenshotTest {
     fun Hero() {
         DetailHeroSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MetaContent() {
+        DetailHeroMetaContentSample()
+    }
 }
