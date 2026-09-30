@@ -118,12 +118,6 @@
     <dimen name="detail_action_row_spacing">10dp</dimen>
     <dimen name="detail_action_button_size">48dp</dimen>
     <!--
-      Floor for either pane when a two-pane split snaps to a foldable's hinge (#819). A fold near the
-      window edge would otherwise hand one side a sliver; below this the split ignores the hinge and
-      keeps its default width, which is what every non-foldable window does anyway.
-    -->
-    <dimen name="two_pane_min_width">280dp</dimen>
-    <!--
       The inset a pane gives the edge it shares with the pane beside it, in place of the
       screen_content_inset ramp it keeps at the window edge (resolvedContentPadding). Two panes each
       insetting their inner edge by the full ramp, plus the scene's own spacer between them, left a
