@@ -85,6 +85,9 @@ fun DetailHero(
     // Opts into the MeshGradientPainter tonal wash (Compose 1.12) under the scrim. Title heroes (movie/tv)
     // ask for it; the episode hero keeps the plain scrim, so its render is unchanged.
     richBackdrop: Boolean = false,
+    // Drawn under the title (and under the tagline and meta line, when set), for a hero whose facts are
+    // chips rather than the one line of text [metaText] takes.
+    metaContent: (@Composable () -> Unit)? = null,
 ) {
     val eyebrowText = eyebrow?.takeIf { it.isNotBlank() }
         ?: genres.takeIf { it.isNotEmpty() }?.joinToString(" · ")
@@ -129,6 +132,7 @@ fun DetailHero(
             tagline = tagline,
             metaText = metaText,
             eyebrowText = eyebrowText,
+            metaContent = metaContent,
             modifier = Modifier.align(Alignment.BottomStart),
         )
     }
@@ -195,6 +199,7 @@ private fun HeroTextColumn(
     tagline: String?,
     metaText: String,
     eyebrowText: String?,
+    metaContent: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -240,6 +245,10 @@ private fun HeroTextColumn(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+        if (metaContent != null) {
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+            metaContent()
         }
     }
 }
