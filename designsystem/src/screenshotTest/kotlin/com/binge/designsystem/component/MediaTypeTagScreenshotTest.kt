@@ -11,7 +11,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.preview.ComponentPreviews
 import com.binge.designsystem.preview.ScreenshotTheme
 
-/** The shared media-type tag in its Movie and TV variants. */
+/** The shared media-type tag in its Movie, TV and Episode variants. */
 class MediaTypeTagScreenshotTest {
     @PreviewTest
     @ComponentPreviews
@@ -24,6 +24,7 @@ class MediaTypeTagScreenshotTest {
             ) {
                 MediaTypeTag(type = MediaTypeTagType.Movie)
                 MediaTypeTag(type = MediaTypeTagType.Tv)
+                MediaTypeTag(type = MediaTypeTagType.Episode)
             }
         }
     }

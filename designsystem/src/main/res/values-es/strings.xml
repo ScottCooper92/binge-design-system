@@ -6,6 +6,7 @@
     <string name="cd_filter_state_neutral">Sin definir</string>
     <string name="media_type_movie">Película</string>
     <string name="media_type_tv">Serie</string>
+    <string name="media_type_episode">Episodio</string>
     <string name="gallery_see_all">Ver todo</string>
     <string name="detail_show_more">Ver más</string>
     <string name="detail_show_less">Ver menos</string>
