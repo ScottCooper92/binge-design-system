@@ -29,7 +29,7 @@ import com.binge.designsystem.tv.theme.tvButtonColors
 import com.binge.designsystem.tv.R as TvR
 
 /**
- * The shared 10-foot text button: a pill coloured by [tvButtonColors], focus filling it amber (red for
+ * The shared 10-foot text button: a pill coloured by [tvButtonColors], focus filling it with the accent (red for
  * [TvButtonStyle.Destructive], so danger survives being focused).
  *
  * A disabled button stays focusable but inert — a D-pad control that refuses focus reads as broken, not

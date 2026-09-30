@@ -14,19 +14,19 @@ import androidx.compose.ui.focus.FocusRequester
  * Closes a TV overlay (a sheet, filter panel, or debug pane) the one correct way: latch the close, dispose the
  * overlay, return focus one frame after disposal, then reset the latch.
  *
- * That four-step latch was copy-pasted thirteen times across twelve screens, near character-for-character. It
+ * That four-step latch was copy-pasted across a dozen screens, near character-for-character. It
  * exists because acting inline loses the disposal race — an inline `restoreTvOverlayFocus` fires while the
- * focus-trapped overlay is still composed and is swallowed, the "focus falls to the rail" class. Thirteen
- * copies was thirteen places to forget a teardown path — one fix missed the third of three — or to leave a
+ * focus-trapped overlay is still composed and is swallowed, the "focus falls to the rail" class. A dozen
+ * copies was a dozen places to forget a teardown path — one fix missed the third of three — or to leave a
  * latch armed to fire a stale request later. This is that latch, once.
  *
  * Call [TvOverlayCloser.close] from every dismissal path — the `BackHandler`, the sheet `onDismiss`, a
  * navigate-away. It is idempotent within one close (a second [TvOverlayCloser.close] mid-flight is a no-op) and
  * re-armable across opens (the latch resets so the next open closes too).
  *
- * All thirteen close latches restore unconditionally; `TvDiscoverScreen`'s content-pane guard belongs to
- * its separate `awaitingRequery` re-focus (a load-gated re-request after a filter change), not to the close, so
- * there is no `shouldRestore` parameter here.
+ * Closing always restores focus. A screen that must hold back a re-request until its content has loaded owns
+ * that as a separate re-focus of its own, not as part of the close, so there is no `shouldRestore` parameter
+ * here.
  *
  * @param restoreTo the requester focus returns to once the overlay disposes (the grid/action-row entry).
  * @param onClose disposes the overlay (`sheet = null`, `debugOpen = false`), run before the focus return.

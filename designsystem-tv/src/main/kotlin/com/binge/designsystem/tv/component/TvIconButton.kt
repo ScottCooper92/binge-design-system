@@ -44,7 +44,7 @@ import com.binge.designsystem.tv.R as TvR
  * [label] never renders as its own [Text] node while resting, so it is required rather than optional: it
  * is the control's accessible name the whole time, and the copy the reveal shows once focused.
  *
- * Coloured by [tvButtonColors] like [TvButton], so an icon button focuses amber (red for
+ * Coloured by [tvButtonColors] like [TvButton], so an icon button focuses with the accent (red for
  * [TvButtonStyle.Destructive]) exactly like every other control.
  *
  * [initiallyFocused] seeds the focus flag so a screenshot can show the revealed frame (a baseline runs no
