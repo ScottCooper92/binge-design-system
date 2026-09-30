@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,7 +47,8 @@ import com.binge.designsystem.theme.tonalContainer
  * [rowVerticalPadding] is the breathing room above and below each row's content. It defaults to the
  * shared token so every settings screen stays alike; a caller that wants roomier rows — a sheet whose
  * rows are its main content — passes its own. [titleSpacing] is the gap between the title and the
- * first row.
+ * first row. [belowRows] draws inside the same surface after the last row, for a caller whose row
+ * expands into more content; it owns its own divider.
  */
 @Composable
 fun SettingsGroup(
@@ -55,6 +57,7 @@ fun SettingsGroup(
     modifier: Modifier = Modifier,
     rowVerticalPadding: Dp = dimensionResource(R.dimen.settings_group_row_padding_v),
     titleSpacing: Dp = dimensionResource(R.dimen.padding_s),
+    belowRows: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (!title.isNullOrBlank()) {
@@ -86,6 +89,7 @@ fun SettingsGroup(
                     )
                 }
             }
+            belowRows?.invoke(this)
         }
     }
 }
