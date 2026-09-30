@@ -52,15 +52,6 @@ class BingeMediumTopBarScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun Transparent() {
-        ScreenshotTheme {
-            TransparentBingeMediumTopBarSample()
-        }
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
     fun Scrimmed() {
         ScreenshotTheme {
             TransparentBingeMediumTopBarSample(scrimFraction = 1f)
