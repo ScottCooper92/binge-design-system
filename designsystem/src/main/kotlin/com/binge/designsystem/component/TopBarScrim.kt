@@ -68,13 +68,14 @@ fun BoxScope.TopBarScrim(
     fraction: Float,
     scrimColor: Color = BingeTheme.colors.scrim,
     tailHeight: Dp = dimensionResource(R.dimen.zero),
+    modifier: Modifier = Modifier,
 ) {
     if (fraction <= 0f) return
     val scrim = scrimColor
     val tail = tailHeight
     Box(
         modifier =
-            Modifier
+            modifier
                 .matchParentSize()
                 .drawBehind {
                     val paintHeight = size.height + tail.toPx()

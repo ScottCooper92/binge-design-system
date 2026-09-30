@@ -34,9 +34,13 @@ private const val MESH_BOTTOM_ALPHA = 0.06f
  * curved amber-to-purple band over the page background beneath it.
  */
 @Composable
-fun HeroBackdropMeshWash(accentStart: Color, accentEnd: Color) {
+fun HeroBackdropMeshWash(
+    accentStart: Color,
+    accentEnd: Color,
+    modifier: Modifier = Modifier,
+) {
     val painter = rememberHeroMeshPainter(accentStart, accentEnd)
-    Box(modifier = Modifier.fillMaxSize().clipToBounds().paint(painter))
+    Box(modifier = modifier.fillMaxSize().clipToBounds().paint(painter))
 }
 
 @Composable
