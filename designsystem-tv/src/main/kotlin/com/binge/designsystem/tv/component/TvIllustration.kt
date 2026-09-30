@@ -15,7 +15,7 @@ import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.tv.R as TvR
 
 /**
- * A single glyph presented as **art**: amber on a circular `surfaceVariant` plate.
+ * A single glyph presented as **art**: the accent on a circular `surfaceVariant` plate.
  *
  * The TV settings pane established this treatment for the illustration above a setting's name, and it is what
  * makes a lone icon read as an illustration rather than as a disabled control — the accent model's accent is

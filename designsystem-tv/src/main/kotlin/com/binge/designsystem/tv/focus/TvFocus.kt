@@ -28,7 +28,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.R as TvR
 
 /**
- * The **border** focus treatment — an amber outline in a gap — for elements whose own content a fill would cover
+ * The **border** focus treatment — an accent-coloured outline in a gap — for elements whose own content a fill would cover
  * (a poster, a provider logo, anything image-bearing); text/icons take [tvFocusFill] instead. See
  * `docs/tv-foundation.md` > The accent model.
  *
@@ -52,7 +52,7 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [restingColor] draws the same outline in a second colour while *un*focused; `Unspecified` (nothing drawn)
  * everywhere but an immersive hero. Rule 2 of the accent model keeps the accent out of resting states (a resting outline may be any
- * colour except amber; the hero's is white). Same geometry as the focused ring, not a `border`, so focus is a
+ * colour except the accent; the hero's is white). Same geometry as the focused ring, not a `border`, so focus is a
  * pure colour change with no pixel shift.
  *
  * Two consequences for callers, both about space the element does not own:
@@ -79,7 +79,7 @@ fun Modifier.tvFocusIndicator(
         )
 
 /**
- * The **fill** focus treatment — a solid amber surface behind the element — and the default way focus
+ * The **fill** focus treatment — a solid accent surface behind the element — and the default way focus
  * reads on TV (`docs/tv-foundation.md` > The accent model). Google TV's rail fills white with black
  * content; this is that, in the theme's accent.
  *
@@ -102,7 +102,7 @@ fun Modifier.tvFocusFill(
 /**
  * The content colour to use on top of [tvFocusFill]: `onPrimary` (a near-black brown) when focused,
  * otherwise the caller's resting colour. Kept next to the fill so no screen re-derives the pairing
- * and a focused row can't end up amber-on-amber.
+ * and a focused row can't end up accent-on-accent.
  */
 @Composable
 fun tvFocusContentColor(isFocused: Boolean, resting: Color): Color = if (isFocused) MaterialTheme.colorScheme.onPrimary else resting

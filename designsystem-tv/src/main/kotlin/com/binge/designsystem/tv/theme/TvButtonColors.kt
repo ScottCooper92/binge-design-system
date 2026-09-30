@@ -11,7 +11,7 @@ import com.binge.designsystem.DISABLED_ALPHA
  *
  * [Destructive] marks an irreversible action (sign out): a red-tinted container and red border at rest, and —
  * because the accent model makes the *fill* the focus channel while the hue stays the role — a solid **red** fill when
- * focused, where every other style fills amber. A dangerous action is at its most dangerous the instant before
+ * focused, where every other style fills with the accent. A dangerous action is at its most dangerous the instant before
  * OK, which is precisely when it is focused.
  */
 enum class TvButtonStyle { Primary, Secondary, Destructive }
@@ -33,14 +33,14 @@ data class TvButtonColors(
 /**
  * The TV accent model in one place — see `docs/tv-foundation.md`.
  *
- * **On a button, amber means focus and nothing else.** No control carries the accent at rest; a focused
- * one fills solid amber with dark content. That is tv-material's own behaviour, and it keeps the accent
+ * **On a button, the accent means focus and nothing else.** No control carries the accent at rest; a focused
+ * one fills solid with the accent and dark content. That is tv-material's own behaviour, and it keeps the accent
  * from having to mean "primary" and "focused" at once — the ambiguity that cost this model two rewrites.
  *
  * **Emphasis is shape, not colour.** Following the platform's button hierarchy, a
  * [TvButtonStyle.Primary] rests as a *filled* neutral (the higher-emphasis form) and everything else
  * rests as an *outline* — so a screen still reads as one prominent action among quieter ones, in greys,
- * and the amber appears only under the user's focus.
+ * and the accent appears only under the user's focus.
  *
  * Two exceptions, both deliberate:
  * - [TvButtonStyle.Destructive] keeps a red wash and red label **at rest**, because danger is a property

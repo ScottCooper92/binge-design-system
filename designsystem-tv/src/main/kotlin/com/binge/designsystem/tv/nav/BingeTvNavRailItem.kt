@@ -37,7 +37,7 @@ import com.binge.designsystem.tv.R as TvR
 /*
  * One entry in the nav rail — its visuals, and the rule for when focus becomes a selection. Split from the
  * rail because the two answer different questions: the rail owns *where focus is*, an item owns *what focus
- * means* (an amber treatment, and at most one commit).
+ * means* (an accent treatment, and at most one commit).
  */
 
 /**
@@ -83,14 +83,14 @@ internal fun RailItem(
 
 /**
  * The stateless item visuals. [selected] and [isFocused] coincide here (focus selects), so both drive one
- * treatment: an amber fill with `onPrimary` content while [expanded], and the amber accent on the bare icon
+ * treatment: an accent fill with `onPrimary` content while [expanded], and the accent on the bare icon
  * while collapsed. A collapsed strip gets no fill — a filled pill behind a lone icon reads as a button. The
  * label is shown per [showLabel], separate from [expanded]: while the rail is animating open it is held back
  * until the panel is wide enough to hold the label, so the label pops in rather than un-clipping left-to-right.
  *
  * **The rail deliberately does not adopt `TvRowEmphasis`:** its two tiers already express a
- * current-but-unfocused treatment as fill-versus-tint (expanded → full amber fill; collapsed → amber icon, no
- * fill). A dim-amber fill on top would give the collapsed strip the filled pill ruled out above and be a third
+ * current-but-unfocused treatment as fill-versus-tint (expanded → full accent fill; collapsed → accent icon, no
+ * fill). A dim-accent fill on top would give the collapsed strip the filled pill ruled out above and be a third
  * mark for a state already marked. There is no `Resting`/`Current` ambiguity to resolve: because the rail
  * selects on focus, "current" and "focused" never disagree while the rail has focus, so [current] as
  * one flag is honest rather than overloaded. `docs/tv-foundation.md` records this.
@@ -104,7 +104,7 @@ internal fun RailItemSurface(
     modifier: Modifier = Modifier,
     showLabel: Boolean = expanded,
 ) {
-    // Current-or-focused (they coincide) reads as amber; expanded it becomes a fill, so the content
+    // Current-or-focused (they coincide) reads as the accent; expanded it becomes a fill, so the content
     // flips to onPrimary to stay legible on it.
     val current = selected || isFocused
     val filled = current && expanded
@@ -166,7 +166,7 @@ internal fun RailItemSurface(
 }
 
 /**
- * The rail's [NavSuiteBadge.Label] treatment: a fixed-colour pill (never the item's amber accent, which a
+ * The rail's [NavSuiteBadge.Label] treatment: a fixed-colour pill (never the item's accent, which a
  * badge must stay legible against in either state) overlaid on the icon or avatar's corner. Sized by content
  * rather than pinned to a circle, so a two-digit count doesn't clip the way [tv_nav_rail_badge_size] alone
  * would.

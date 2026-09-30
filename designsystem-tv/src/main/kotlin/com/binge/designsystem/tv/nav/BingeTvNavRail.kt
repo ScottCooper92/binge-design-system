@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
@@ -27,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -42,7 +40,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
 import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
@@ -74,8 +71,8 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
  * the rail *beside*
  * the content (the resize this avoids); only expand-on-focus was worth borrowing.
  *
- * Because focus **is** selection here, the current destination needs one state treatment: a solid amber fill
- * with dark content when expanded, an amber icon when collapsed. Google TV's white-pill rail in Binge's amber.
+ * Because focus **is** selection here, the current destination needs one state treatment: a solid accent fill
+ * with dark content when expanded, an accent icon when collapsed. Google TV's white-pill rail in the app's own accent.
  * No border and no tick — a tick in a nav row reads as a checklist item rather than a location.
  *
  * **Focus is the commit** — [onSelect] fires on focus, not OK — so walking the rail walks the app and there is
@@ -428,23 +425,3 @@ private fun railGlassFraction(artworkPresent: Boolean): State<Float> =
         animationSpec = if (LocalReduceMotion.current) snap() else tween(TV_IMMERSIVE_CROSSFADE_MILLIS),
         label = "tvNavRailGlass",
     )
-
-/** A placeholder content pane for previews of the rail in isolation. */
-@Composable
-internal fun TvNavRailContentPlaceholder() {
-    Box(
-        // Centred in the content region beside the rail, not the full panel the pane spans — this caption is
-        // also the baselines' shift-don't-resize probe, so its centre must track the pane's visible half.
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = LocalTvContentInset.current)
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = "Content",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
