@@ -29,7 +29,7 @@ import kotlin.math.roundToInt
 private const val MAX_STARS = 5
 
 /**
- * A five-star rating on TMDB's 0–10 scale: each star is worth 2 points, so an odd value renders as a
+ * A five-star rating on a 0–10 scale: each star is worth 2 points, so an odd value renders as a
  * half star. When [interactive], tapping star N sets N full stars (a second tap on a full star toggles
  * it to a half), and long-pressing star N sets N − ½. New values report via [onRatingChange] on 1–10.
  *

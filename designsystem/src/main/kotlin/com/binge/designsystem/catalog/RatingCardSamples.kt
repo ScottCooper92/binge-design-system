@@ -14,7 +14,6 @@ fun RatingCardUnratedSample() {
     ScreenshotTheme {
         RatingCard(
             userRating = null,
-            isTv = false,
             isSignedIn = true,
             reviewCount = 7,
             averageReviewRating = 7.5f,
@@ -31,7 +30,6 @@ fun RatingCardRatedSample() {
     ScreenshotTheme {
         RatingCard(
             userRating = 9f,
-            isTv = false,
             isSignedIn = true,
             reviewCount = 0,
             averageReviewRating = null,
@@ -48,7 +46,6 @@ fun RatingCardSignedOutSample() {
     ScreenshotTheme {
         RatingCard(
             userRating = null,
-            isTv = false,
             isSignedIn = false,
             reviewCount = 12,
             averageReviewRating = 7.2f,
@@ -59,13 +56,12 @@ fun RatingCardSignedOutSample() {
     }
 }
 
-/** [RatingCard.rateable] false — a title TMDB won't yet accept a rating for, stars non-interactive. */
+/** [RatingCard.rateable] false — a title that can't yet be rated, stars non-interactive. */
 @Composable
 fun RatingCardNotYetRateableSample() {
     ScreenshotTheme {
         RatingCard(
             userRating = null,
-            isTv = false,
             isSignedIn = true,
             rateable = false,
             reviewCount = 0,

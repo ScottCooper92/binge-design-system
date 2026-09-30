@@ -13,7 +13,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = false, dynamicColor = false) {
             RatingCard(
                 userRating = null,
-                isTv = false,
                 isSignedIn = true,
                 reviewCount = 0,
                 averageReviewRating = null,
@@ -31,7 +30,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = true, dynamicColor = false) {
             RatingCard(
                 userRating = null,
-                isTv = true,
                 isSignedIn = true,
                 reviewCount = 0,
                 averageReviewRating = null,
@@ -49,7 +47,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = false, dynamicColor = false) {
             RatingCard(
                 userRating = 9f,
-                isTv = false,
                 isSignedIn = true,
                 reviewCount = 0,
                 averageReviewRating = null,
@@ -67,7 +64,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = true, dynamicColor = false) {
             RatingCard(
                 userRating = 9f,
-                isTv = false,
                 isSignedIn = true,
                 reviewCount = 0,
                 averageReviewRating = null,
@@ -85,7 +81,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = false, dynamicColor = false) {
             RatingCard(
                 userRating = null,
-                isTv = false,
                 isSignedIn = true,
                 reviewCount = 7,
                 averageReviewRating = 7.5f,
@@ -103,7 +98,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = true, dynamicColor = false) {
             RatingCard(
                 userRating = null,
-                isTv = true,
                 isSignedIn = true,
                 reviewCount = 7,
                 averageReviewRating = 7.5f,
@@ -121,7 +115,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = false, dynamicColor = false) {
             RatingCard(
                 userRating = 9f,
-                isTv = false,
                 isSignedIn = true,
                 reviewCount = 12,
                 averageReviewRating = null,
@@ -139,7 +132,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = true, dynamicColor = false) {
             RatingCard(
                 userRating = 9f,
-                isTv = false,
                 isSignedIn = true,
                 reviewCount = 12,
                 averageReviewRating = null,
@@ -157,7 +149,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = false, dynamicColor = false) {
             RatingCard(
                 userRating = null,
-                isTv = false,
                 isSignedIn = false,
                 reviewCount = 12,
                 averageReviewRating = 7.2f,
@@ -175,7 +166,6 @@ class RatingCardScreenshotTest {
         BingeExpressiveTheme(darkTheme = true, dynamicColor = false) {
             RatingCard(
                 userRating = null,
-                isTv = true,
                 isSignedIn = false,
                 reviewCount = 3,
                 averageReviewRating = null,
