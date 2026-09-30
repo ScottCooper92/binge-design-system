@@ -48,4 +48,12 @@ class SettingsGroupSamplesScreenshotTest {
     fun tallRows() {
         SettingsGroupTallRowsSample()
     }
+
+    /** The `titleSpacing` override beside [titled]'s default rows. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun tightTitle() {
+        SettingsGroupTightTitleSample()
+    }
 }
