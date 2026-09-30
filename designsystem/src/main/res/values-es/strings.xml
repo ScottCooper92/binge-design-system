@@ -39,8 +39,7 @@
         <item quantity="many">%1$s de votos</item>
         <item quantity="other">%1$s votos</item>
     </plurals>
-    <string name="rating_card_prompt_label_movie">Valora esta película</string>
-    <string name="rating_card_prompt_label_tv">Valora esta serie</string>
+    <string name="rating_card_prompt_label">Valora este título</string>
     <string name="rating_card_prompt_question">¿Qué te ha parecido?</string>
     <string name="rating_card_prompt_hint">Toca una estrella para puntuar; toca otra vez o mantén pulsada para media</string>
     <string name="rating_card_prompt_question_pending">Aún no ha salido</string>
@@ -50,8 +49,8 @@
     <string name="rating_card_change">Cambiar valoración</string>
     <string name="rating_card_change_title">Cambia tu valoración</string>
     <string name="rating_card_remove">Quitar valoración</string>
-    <string name="rating_card_reviews_subtitle">Media %1$s/10 · Lo que opinan otros usuarios de Binge</string>
-    <string name="rating_card_reviews_subtitle_no_average">Lo que opinan otros usuarios de Binge</string>
+    <string name="rating_card_reviews_subtitle">Media %1$s/10 · Lo que opinan otras personas</string>
+    <string name="rating_card_reviews_subtitle_no_average">Lo que opinan otras personas</string>
     <plurals name="rating_card_reviews_title">
         <item quantity="one">Leer %1$d reseña de la comunidad</item>
         <item quantity="many">Leer %1$d de reseñas de la comunidad</item>

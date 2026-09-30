@@ -45,15 +45,15 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.labelLargeEmphasis
 
 /**
- * Condensed rate-this-title card for the movie/TV detail screens. Shows an interactive
- * star picker when unrated, the user's score with an inline editor when rated, and — when
- * the title has community reviews — a footer that links through to the reviews screen.
+ * Condensed rate-this-title card. Shows an interactive star picker when unrated, the
+ * user's score with an inline editor when rated, and — when the title has community
+ * reviews — a footer that links through to the reviews screen.
  *
- * When [isSignedIn] is `false` the rate body is hidden entirely (TMDB requires a session
- * to submit ratings); the card collapses to just the reviews footer, or renders nothing
+ * When [isSignedIn] is `false` the rate body is hidden entirely (a rating needs a signed-in
+ * session); the card collapses to just the reviews footer, or renders nothing
  * if there are also no reviews to link to.
  *
- * [rateable] is for an already-rateable-in-principle title TMDB will still refuse — most
+ * [rateable] is for an already-rateable-in-principle title the service will still refuse — most
  * commonly one that hasn't released yet. It only affects the unrated body: the stars render
  * non-interactive and the prompt swaps to [notYetRateableQuestion]/[notYetRateableHint]. A
  * caller decides rateability from its own data (a release date, an air date); this component
@@ -62,7 +62,6 @@ import com.binge.designsystem.theme.labelLargeEmphasis
 @Composable
 fun RatingCard(
     userRating: Float?,
-    isTv: Boolean,
     isSignedIn: Boolean,
     reviewCount: Int,
     averageReviewRating: Float?,
@@ -71,13 +70,12 @@ fun RatingCard(
     onReviewsClick: () -> Unit,
     modifier: Modifier = Modifier,
     rateable: Boolean = true,
-    // The "Rate this …" eyebrow; defaults to the movie/show wording from [isTv]. Callers on other
-    // surfaces (e.g. an episode screen) can pass a more specific label.
-    @StringRes promptLabel: Int = if (isTv) R.string.rating_card_prompt_label_tv else R.string.rating_card_prompt_label_movie,
+    // The "Rate this …" eyebrow. A caller that knows what it is rating (a movie, an episode) passes a
+    // more specific label.
+    @StringRes promptLabel: Int = R.string.rating_card_prompt_label,
     @StringRes notYetRateableQuestion: Int = R.string.rating_card_prompt_question_pending,
     @StringRes notYetRateableHint: Int = R.string.rating_card_prompt_hint_pending,
-    // The reviews-footer subtitle, with and without a community average; both name the app by
-    // default, so a caller whose brand isn't Binge must override them.
+    // The reviews-footer subtitle, with and without a community average.
     @StringRes reviewsSubtitle: Int = R.string.rating_card_reviews_subtitle,
     @StringRes reviewsSubtitleNoAverage: Int = R.string.rating_card_reviews_subtitle_no_average,
 ) {
@@ -332,7 +330,6 @@ private fun PreviewRatingCardUnrated() {
     BingeExpressiveTheme {
         RatingCard(
             userRating = null,
-            isTv = false,
             isSignedIn = true,
             reviewCount = 7,
             averageReviewRating = 7.5f,
@@ -349,7 +346,6 @@ private fun PreviewRatingCardRated() {
     BingeExpressiveTheme {
         RatingCard(
             userRating = 9f,
-            isTv = false,
             isSignedIn = true,
             reviewCount = 0,
             averageReviewRating = null,
@@ -366,7 +362,6 @@ private fun PreviewRatingCardSignedOutWithReviews() {
     BingeExpressiveTheme {
         RatingCard(
             userRating = null,
-            isTv = false,
             isSignedIn = false,
             reviewCount = 12,
             averageReviewRating = 7.2f,
@@ -383,7 +378,6 @@ private fun PreviewRatingCardNotYetRateable() {
     BingeExpressiveTheme {
         RatingCard(
             userRating = null,
-            isTv = false,
             isSignedIn = true,
             rateable = false,
             reviewCount = 0,

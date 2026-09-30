@@ -46,8 +46,7 @@
         <item quantity="other">%1$s votes</item>
     </plurals>
     <!-- Rating card -->
-    <string name="rating_card_prompt_label_movie">Rate this movie</string>
-    <string name="rating_card_prompt_label_tv">Rate this show</string>
+    <string name="rating_card_prompt_label">Rate this title</string>
     <string name="rating_card_prompt_question">How was it?</string>
     <string name="rating_card_prompt_hint">Tap a star to rate — tap again or long-press for a half</string>
     <string name="rating_card_prompt_question_pending">Not out yet</string>
@@ -57,8 +56,8 @@
     <string name="rating_card_change">Change rating</string>
     <string name="rating_card_change_title">Change your rating</string>
     <string name="rating_card_remove">Remove rating</string>
-    <string name="rating_card_reviews_subtitle">Avg %1$s/10 · What other Binge users thought</string>
-    <string name="rating_card_reviews_subtitle_no_average">What other Binge users thought</string>
+    <string name="rating_card_reviews_subtitle">Avg %1$s/10 · What other people thought</string>
+    <string name="rating_card_reviews_subtitle_no_average">What other people thought</string>
     <plurals name="rating_card_reviews_title">
         <item quantity="one">Read %1$d community review</item>
         <item quantity="other">Read %1$d community reviews</item>
