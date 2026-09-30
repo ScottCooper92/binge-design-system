@@ -37,6 +37,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun cardRowFocused() = Frame { TvCardRowFocusedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun messagePlate() = Frame { TvMessagePlateSample() }
 
     @PreviewTest

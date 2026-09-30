@@ -171,6 +171,26 @@ fun TvCardRowSample() {
     }
 }
 
+/** [TvCardRowSample] with the ring seeded onto one cell, so the row's key-to-`isFocused` plumbing has a frame. */
+@Composable
+fun TvCardRowFocusedSample() {
+    val cellWidth = dimensionResource(DesR.dimen.card_width)
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        TvCardRow(
+            heading = "Seasons",
+            items = (1..4).toList(),
+            key = { it },
+            cellWidth = cellWidth,
+            initiallyFocusedKey = 2,
+            trailing = { isFocused, _, cellModifier ->
+                SamplePlate(label = "More", modifier = cellModifier.width(cellWidth), isFocused = isFocused)
+            },
+        ) { index, isFocused, _, cellModifier ->
+            SamplePlate(label = "Season $index", modifier = cellModifier, isFocused = isFocused)
+        }
+    }
+}
+
 /** A message with a headline, art and an action, centred as a full-screen state is. */
 @Composable
 fun TvMessagePlateSample() {
@@ -321,11 +341,16 @@ private fun NavRailSampleArtwork() {
 }
 
 @Composable
-private fun SamplePlate(label: String, modifier: Modifier = Modifier) {
+private fun SamplePlate(
+    label: String,
+    modifier: Modifier = Modifier,
+    isFocused: Boolean = false,
+) {
     Box(
         modifier =
             modifier
                 .aspectRatio(2f / 3f)
+                .tvFocusIndicator(isFocused)
                 .clip(BingeShapes.MediaCard)
                 .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
