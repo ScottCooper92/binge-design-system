@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
@@ -185,6 +186,7 @@ private fun NavFloatingItem(
         .clip(MaterialTheme.shapes.large)
         .then(if (selected) Modifier.background(colors.indicator) else Modifier)
         .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(item.key) })
+        .then(item.testTag?.let { Modifier.testTag(it) } ?: Modifier)
     CompositionLocalProvider(LocalContentColor provides contentColor) {
         when (style) {
             BingeNavFloatingStyle.Stacked -> StackedItemContent(item, modifier)

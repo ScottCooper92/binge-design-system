@@ -19,8 +19,10 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
@@ -45,6 +47,10 @@ sealed interface NavSuiteBadge {
  *
  * [isAccount] marks the Account destination so the custom rail can give it the larger avatar it needs
  * at that width — by flag rather than list position, so appending or reordering tabs can't move it.
+ *
+ * [testTag], when set, tags the item's clickable node in every presentation, so a UI-automation
+ * driver can find a destination by id rather than by its label. It is explicit rather than derived
+ * from [key] because [key] is opaque to the shell and has no stable string form.
  */
 data class BingeNavSuiteItem(
     val key: Any,
@@ -54,6 +60,7 @@ data class BingeNavSuiteItem(
     val avatarName: String? = null,
     val avatarUrl: String? = null,
     val isAccount: Boolean = false,
+    val testTag: String? = null,
 )
 
 /**
@@ -133,6 +140,7 @@ private fun BottomBarScaffold(
                     onClick = { onSelect(tab.key) },
                     icon = { NavSuiteItemIcon(tab) },
                     label = { Text(tab.label) },
+                    modifier = tab.testTag?.let { Modifier.testTag(it) } ?: Modifier,
                 )
             }
         },
