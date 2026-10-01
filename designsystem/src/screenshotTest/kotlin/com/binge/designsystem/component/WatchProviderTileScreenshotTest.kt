@@ -17,8 +17,8 @@ private const val PROVIDER_TILE_CANVAS_DP = 120
 /** Single provider tile — selected vs unselected, colour axis only. */
 class WatchProviderTileScreenshotTest {
     @PreviewTest
-    @Preview(name = "Light", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_NO)
-    @Preview(name = "Dark", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "light", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "dark", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun Selected() {
         ScreenshotTheme {
@@ -32,8 +32,8 @@ class WatchProviderTileScreenshotTest {
     }
 
     @PreviewTest
-    @Preview(name = "Light", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_NO)
-    @Preview(name = "Dark", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "light", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "dark", widthDp = PROVIDER_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun Unselected() {
         ScreenshotTheme {
