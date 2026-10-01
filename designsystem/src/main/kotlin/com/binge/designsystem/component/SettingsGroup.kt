@@ -136,6 +136,7 @@ private fun SettingsRowView(
                 enabled = interactive,
                 role = Role.Button,
                 onClick = row.onClick,
+                onLongClickLabel = row.onLongClickLabel,
                 onLongClick = row.onLongClick,
             ).padding(
                 horizontal = dimensionResource(R.dimen.settings_group_row_padding_h),
