@@ -320,3 +320,23 @@ fun SettingsGroupConnectorSample() {
         )
     }
 }
+
+/** Switch rows ([SettingsRow.toggled]): on, off and disabled, each drawing its own switch and no chevron. */
+@Composable
+fun SettingsGroupSwitchSample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = "Network",
+            rows = listOf(
+                SettingsRow(
+                    icon = Icons.Filled.Dns,
+                    label = "Trust proxy",
+                    detail = "Read the client address from headers",
+                    toggled = true,
+                ),
+                SettingsRow(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = false),
+                SettingsRow(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, disabled = true),
+            ),
+        )
+    }
+}

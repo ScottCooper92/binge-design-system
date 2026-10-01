@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
@@ -19,6 +20,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -121,7 +123,7 @@ private fun SettingsRowView(
     modifier: Modifier = Modifier,
 ) {
     val interactive = row.clickable && !row.loading && !row.disabled
-    val external = interactive && row.trailingContent == null && row.destination == SettingsRowDestination.External
+    val external = interactive && row.toggled == null && row.trailingContent == null && row.destination == SettingsRowDestination.External
     val externalDescription = stringResource(R.string.cd_settings_row_external)
     val loadingDescription = stringResource(R.string.cd_settings_row_loading)
     val connectorModifier = row.connector?.let { settingsRowConnector(it) } ?: Modifier
@@ -139,13 +141,8 @@ private fun SettingsRowView(
             }
             // The wash sits outside the click, so the ripple draws over it rather than under it.
             .background(if (row.selected) MaterialTheme.colorScheme.primary.tonalContainer() else Color.Transparent)
-            .combinedClickable(
-                enabled = interactive,
-                role = Role.Button,
-                onClick = row.onClick,
-                onLongClickLabel = row.onLongClickLabel,
-                onLongClick = row.onLongClick,
-            ).then(connectorModifier)
+            .then(rowActionModifier(row, interactive))
+            .then(connectorModifier)
             .padding(
                 horizontal = dimensionResource(R.dimen.settings_group_row_padding_h),
                 vertical = verticalPadding,
@@ -202,6 +199,7 @@ private fun SettingsRowView(
                     modifier = Modifier.size(dimensionResource(R.dimen.settings_group_loading_size)),
                 )
                 row.trailingContent != null -> row.trailingContent.invoke()
+                row.toggled != null -> Switch(checked = row.toggled, onCheckedChange = null, enabled = !row.disabled)
                 external -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.OpenInNew,
@@ -220,6 +218,29 @@ private fun SettingsRowView(
         }
     }
 }
+
+/**
+ * The row's tap. A switch row is one `Role.Switch` toggleable so the state reaches a screen reader; every
+ * other row keeps the `Role.Button` click and its long-press.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+private fun rowActionModifier(row: SettingsRow, interactive: Boolean): Modifier =
+    if (row.toggled != null) {
+        Modifier.toggleable(
+            value = row.toggled,
+            enabled = interactive,
+            role = Role.Switch,
+            onValueChange = { row.onClick() },
+        )
+    } else {
+        Modifier.combinedClickable(
+            enabled = interactive,
+            role = Role.Button,
+            onClick = row.onClick,
+            onLongClickLabel = row.onLongClickLabel,
+            onLongClick = row.onLongClick,
+        )
+    }
 
 /** The row's count: a tonal pill in [tint] when given (matching the row's sentiment), else the default badge. */
 @Composable

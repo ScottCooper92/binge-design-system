@@ -76,4 +76,12 @@ data class SettingsRow(
     val disabled: Boolean = false,
     /** What a long-press does, announced by TalkBack ("double tap and hold to …"). Only read with [onLongClick]. */
     val onLongClickLabel: String? = null,
+    /**
+     * Makes this a switch row: non-null is the switch's on/off state, null (the default) a plain button row.
+     * The whole row is then one `Role.Switch` node carrying a [androidx.compose.ui.state.ToggleableState], so a
+     * screen reader announces "Label, Switch, On" rather than "Label, Button". A tap calls [onClick], which
+     * should flip the state the caller owns. Unless [trailingContent] is set, the row draws the switch itself
+     * and no chevron. A switch row has no long-press; [onLongClick] is ignored.
+     */
+    val toggled: Boolean? = null,
 )
