@@ -2,6 +2,7 @@ package com.binge.designsystem.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -62,6 +63,29 @@ class SettingsGroupSemanticsTest {
         // what a screen reader should say about a row that only shows a value.
         composeTestRule.onNode(hasText("Version")).assertIsNotEnabled()
         assertTrue(clicked)
+    }
+
+    @Test
+    fun `a long-press row exposes its label to the screen reader`() {
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(
+                            icon = Icons.Filled.Bookmark,
+                            label = "Ada",
+                            onLongClick = {},
+                            onLongClickLabel = "Select",
+                        ),
+                    ),
+                )
+            }
+        }
+        val hasSelectLabel = SemanticsMatcher("long-click label is Select") { node ->
+            node.config.getOrNull(SemanticsActions.OnLongClick)?.label == "Select"
+        }
+        composeTestRule.onNode(hasText("Ada")).assert(hasSelectLabel)
     }
 
     @Test

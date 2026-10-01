@@ -60,4 +60,6 @@ data class SettingsRow(
     val loading: Boolean = false,
     /** Dimmed and inert, for a row that cannot be used because something else is in flight. */
     val disabled: Boolean = false,
+    /** What a long-press does, announced by TalkBack ("double tap and hold to …"). Only read with [onLongClick]. */
+    val onLongClickLabel: String? = null,
 )
