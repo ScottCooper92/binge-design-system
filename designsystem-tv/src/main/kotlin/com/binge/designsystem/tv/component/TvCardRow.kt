@@ -44,9 +44,8 @@ private const val TRAILING_KEY = "tv-card-row-trailing"
  * from the shared [rememberTvRowEntry] contract — see [TvRowEntry] for how the memory survives the
  * `LazyColumn` scroll-out disposal.
  *
- * Where a host app's own poster row is bound to its media-item model, this is generic over the cell: the
- * detail page's cast circles, season posters and stills are not media items, and hand-rolled their own rows
- * before.
+ * Generic over the cell, so it serves rows whose items are not a host app's poster model: avatars,
+ * thumbnails and stills as readily as cards.
  *
  * The [cell] slot receives the item, whether it is focused, an `onFocusChanged`, and a `cellModifier` (fixed
  * width plus, for the first cell, the entry requester) to apply to its **focusable** element. [trailing] is an
@@ -70,7 +69,7 @@ fun <T> TvCardRow(
     // docs/tv-foundation.md - and it rides the LazyRow rather than a cell
     // because a cell is disposed when it scrolls out.
     entryFocusRequester: FocusRequester? = null,
-    // Reports each focus gain with the cell's key — the hook a detail page's sections chain their anchor
+    // Reports each focus gain with the cell's key — the hook a page of stacked rows chains its anchor
     // reporter into, so a sideways move inside the row re-asserts the page's rest position.
     onCellFocused: ((Any) -> Unit)? = null,
     // Seeds the ring onto one cell for a screenshot; production passes null. A static baseline runs no coroutines and
@@ -107,9 +106,9 @@ fun <T> TvCardRow(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_header_gap)),
     ) {
         heading?.let { TvSectionTitle(text = it) }
-        // The detail screen scopes its LazyColumn with TvStableFocusScroll so crossing rows does not re-pivot
+        // A screen can scope its LazyColumn with TvStableFocusScroll so crossing rows does not re-pivot
         // it; that scope reaches in here too, and this row's own sideways scroll wants the ambient parking
-        // back. Same split the immersive hub keeps between its column and its rows.
+        // back. The column and its rows each keep their own scroll parking.
         TvInheritedFocusScroll {
             LazyRow(
                 state = rowState,

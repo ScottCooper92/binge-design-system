@@ -67,8 +67,8 @@ class TvRowEntry internal constructor(
  * caller-transparent default; pass it to steer entry from outside (a hub's cross-container memory). The
  * result is a fresh lightweight holder each recomposition — do not hoist it. See [TvRowEntry].
  *
- * [resetKey] names the data the memory belongs to (a query, a tab, a list id — the same idea `TvGridPane` takes
- * as its `queryKey`). Leave it null and the memory persists for the composition's life; pass it and a change
+ * [resetKey] names the data the memory belongs to (a query, a tab, a list id — the same idea a paged grid takes
+ * as its query key). Leave it null and the memory persists for the composition's life; pass it and a change
  * recreates the remembered index, so a new result set enters at the top (or at [overrideIndex]) rather than
  * restoring focus into an unrelated set. The reset rides `rememberSaveable(resetKey)`, so it survives disposal
  * within a key but starts fresh across one — the search rows' per-query reset.

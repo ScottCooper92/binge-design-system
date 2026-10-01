@@ -51,10 +51,10 @@ fun tvContentGutterStart(): Dp = LocalTvContentInset.current + dimensionResource
  * Whether any artwork is currently full-bleed behind the rail, so the rail knows when to be **glass** and when
  * to be a solid panel.
  *
- * The rail is only translucent where there is something to see through it to. Left permanently translucent, the
- * hub's 320ms hero↔backdrop crossfade plays out *inside the rail* every time focus crosses between the hero and
+ * The rail is only translucent where there is something to see through it to. Left permanently translucent, a
+ * host's hero↔backdrop crossfade plays out *inside the rail* every time focus crosses between the hero and
  * a row — the rail appears to flicker. Tracking presence lets the rail fade its own fill in step with that
- * crossfade instead: solid while the hero (or a flat screen such as Search or Settings) is up, glass once a
+ * crossfade instead: solid while the hero (or a flat screen with no backdrop) is up, glass once a
  * backdrop is behind it.
  *
  * A count rather than a flag because the crossfade composes the outgoing and incoming backdrops together — a
