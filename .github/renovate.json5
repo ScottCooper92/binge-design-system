@@ -1,0 +1,53 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
+  // Routine dependency version updates only. Security is handled by GitHub's own Dependabot, so
+  // vulnerabilityAlerts is disabled here to avoid two bots opening a PR for the same CVE.
+  extends: [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests", // action bumps keep the `# vX.Y.Z` SHA form
+    ":dependencyDashboard",
+    ":semanticCommitsDisabled",
+  ],
+
+  vulnerabilityAlerts: { enabled: false },
+
+  labels: ["dependencies"],
+  rebaseWhen: "conflicted",
+  prConcurrentLimit: 4,
+  schedule: ["before 6am on monday"],
+
+  // Let an immediately-yanked or broken release wash out before it reaches a PR.
+  minimumReleaseAge: "3 days",
+
+  // Auto-merge waits for all branch checks. A bump that shifts rendering fails
+  // validateDebugScreenshotTest and never auto-merges.
+  platformAutomerge: true,
+
+  // This repository has no submodules; kept off so the file stays safe to copy.
+  "git-submodules": { enabled: false },
+
+  packageRules: [
+    {
+      // Patch-level only, and only for actions and libraries that cannot change a rendered pixel.
+      // The toolchain rules below come later and override this.
+      matchUpdateTypes: ["patch"],
+      automerge: true,
+    },
+    {
+      // Compose, AGP, Kotlin and KSP must agree with the consumers' versions, and a rendering
+      // shift needs a human to decide on the re-record. Never auto-merge, even on a patch.
+      matchPackageNames: [
+        "/^org\\.jetbrains\\.kotlin[.:]/",
+        "/^com\\.google\\.devtools\\.ksp/",
+        "/^com\\.android\\.(tools\\.build|application|library)/",
+        "/^androidx\\.compose\\./",
+      ],
+      groupName: "compose + kotlin + android toolchain",
+      automerge: false,
+      prBodyNotes: [
+        "**Needs matching bumps in `Binge` and `binge-seerr`.** The root `libs.versions.toml` is not a local decision: Compose, AGP, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
+      ],
+    },
+  ],
+}
