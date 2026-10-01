@@ -122,18 +122,32 @@ jobs:
   # The caller files here are thin shims, where a mistake can become a silent startup_failure
   # with no log and nothing on the PR. Kept inside this workflow, not a workflow of its own: a
   # second required check would need keeping in sync with branch protection, and the bots
-  # match this workflow by name. Hosted runners carry Go and shellcheck, and actionlint runs
-  # shellcheck over `run:` blocks when it finds it. The version is pinned and `go install`
-  # verifies the module against the Go checksum database.
+  # match this workflow by name. actionlint cannot see across a `uses:` reference to a reusable
+  # workflow, so the callers' permissions are still proved by running them.
   actionlint:
+    if: github.event_name != 'schedule' && (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install actionlint
-        run: go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
-      - name: Lint workflows
-        run: "$(go env GOPATH)/bin/actionlint -color"
+
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+
+      # Same invocation as binge-ci's own CI: a pinned release verified against its published
+      # checksum. --severity=warning, not the default, because info fires SC2016 on single-quoted
+      # scripts where the quotes are correct.
+      - name: actionlint
+        env:
+          VERSION: 1.7.12
+          SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          set -euo pipefail
+          curl -sSLo actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${VERSION}/actionlint_${VERSION}_linux_amd64.tar.gz"
+          echo "${SHA256}  actionlint.tar.gz" | sha256sum -c -
+          tar xzf actionlint.tar.gz actionlint
+          ./actionlint -shellcheck 'shellcheck --severity=warning'
 
   # A red nightly has no PR or push to carry it, so without this it is a red mark in the
   # Actions tab that nothing points at. One issue stays open while the canary is red and
