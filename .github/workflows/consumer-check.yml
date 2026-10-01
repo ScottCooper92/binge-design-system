@@ -11,9 +11,35 @@ name: Consumer check (binge-seerr)
 # this supplies the evidence.
 #
 # Binge is the other consumer and is private, so it needs a token and is not covered here.
+#
+# It compiles the consumer's main and unit-test sources and nothing else: that is what catches a
+# changed public signature. The consumer's lint, unit tests and screenshot baselines say little
+# about this change, and made the job take over twenty minutes. A design change that moves
+# pixels moves the consumer's baselines by intent, so that part is reported by the consumer's
+# own bump PR. It also runs on pushes to main, which is what writes the Gradle cache:
+# setup-gradle only saves on the default branch, so a job that ran on pull requests alone would
+# start cold every time. It runs only when something the consumer compiles can have changed.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'designsystem/**'
+      - 'designsystem-tv/**'
+      - 'libs.versions.toml'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - '.github/workflows/consumer-check.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'designsystem/**'
+      - 'designsystem-tv/**'
+      - 'libs.versions.toml'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - '.github/workflows/consumer-check.yml'
 
 concurrency:
   group: consumer-check-${{ github.ref }}
@@ -24,7 +50,7 @@ permissions:
 
 jobs:
   seerr:
-    if: github.event.pull_request.draft == false
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -45,7 +71,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: design-system
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
@@ -54,47 +80,25 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
 
-      # Two steps so a compile or test break reads differently from a baseline change. The
-      # consumer's `build` pulls validateDebugScreenshotTest in by hand, so it is excluded
-      # here and run on its own below.
-      - name: Build, test and lint binge-seerr
-        id: build
-        continue-on-error: true
-        run: ./gradlew build -x validateDebugScreenshotTest --continue
-
-      - name: Validate binge-seerr screenshots
-        id: screenshots
-        continue-on-error: true
-        run: ./gradlew validateDebugScreenshotTest --continue
+      - name: Compile binge-seerr against this change
+        run: ./gradlew :app:compileDebugKotlin :app:compileDebugUnitTestKotlin --continue
 
       - name: Report
+        if: ${{ always() }}
         env:
-          BUILD_OUTCOME: ${{ steps.build.outcome }}
-          SCREENSHOT_OUTCOME: ${{ steps.screenshots.outcome }}
-          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          OUTCOME: ${{ job.status }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           {
-            echo "## binge-seerr against this PR (${PR_SHA})"
+            echo "## binge-seerr against this change (${SHA})"
             echo
             echo "Informational only. This is not a required check."
             echo
-            echo "| Step | Result |"
-            echo "| --- | --- |"
-            echo "| Compile, unit tests, lint | ${BUILD_OUTCOME} |"
-            echo "| Screenshot baselines | ${SCREENSHOT_OUTCOME} |"
+            echo "Compiled the consumer's main and unit-test sources. Lint, unit tests and screenshot baselines are not run here."
             echo
-            if [ "${BUILD_OUTCOME}" != "success" ]; then
-              echo "The consumer no longer builds against this change. Its bump PR will need code changes. Expected for an intentional signature change; say so in the PR body."
-            elif [ "${SCREENSHOT_OUTCOME}" != "success" ]; then
-              echo "The consumer compiles, but its screenshot baselines would change. Its bump PR will need a re-record. This also fires for any intentional design change, and for a screenshot failure that is not a comparison mismatch."
+            if [ "${OUTCOME}" = "success" ]; then
+              echo "binge-seerr still compiles against this change."
             else
-              echo "binge-seerr builds and renders unchanged against this change."
+              echo "The consumer no longer compiles against this change. Its bump PR will need code changes. Expected for an intentional signature change; say so in the PR body."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-          if [ "${SCREENSHOT_OUTCOME}" != "success" ] && [ "${BUILD_OUTCOME}" = "success" ]; then
-            echo "::warning title=binge-seerr baselines would change::The consumer compiles, but its screenshot baselines differ. See the job summary."
-          fi
-          if [ "${BUILD_OUTCOME}" != "success" ]; then
-            echo "::error title=binge-seerr does not build::The consumer breaks against this change. See the job summary."
-            exit 1
-          fi
