@@ -8,8 +8,8 @@ import androidx.compose.ui.platform.testTag
  *
  * A skeleton exists to reserve the geometry the real content fills, so that resolving is a fill rather than a
  * relayout. Nothing enforced that: the two are separate composable trees that happened to agree only
- * because someone checked. They drifted anyway — one skeleton promised a row of cast circles where the resolved page led
- * with a row of 2:3 season posters, and another screen never migrated off a single flat plate at all.
+ * because someone checked. They drift: a skeleton promises a row of circles where the resolved page leads with a row of 2:3 posters,
+ * or never leaves a single flat plate.
  *
  * An anchor is the handle that makes the agreement *assertable*: both trees tag the same point with the same
  * string, and `assertSkeletonReservesGeometry` (testFixtures) measures whether it moves across the resolve.
@@ -24,14 +24,14 @@ import androidx.compose.ui.platform.testTag
  */
 object TvLayoutAnchors {
     /**
-     * The anchor for one entry of a detail page — its hero or a content section — keyed by the entry's own key.
+     * The anchor for one entry of a page — its hero or a content section — keyed by the entry's own key.
      *
      * A page that applies this to every entry itself gets its anchors by existing rather than by remembering to
      * tag anything.
      */
     fun entry(key: String): String = "$PREFIX$key"
 
-    /** The detail page hero's key, which its skeleton counterpart has to match. */
+    /** The key for a page's hero entry, which its skeleton counterpart has to match. */
     const val HERO_KEY: String = "hero"
 
     private const val PREFIX = "tv-anchor:"

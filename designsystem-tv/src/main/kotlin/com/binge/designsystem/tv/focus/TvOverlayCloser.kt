@@ -14,11 +14,11 @@ import androidx.compose.ui.focus.FocusRequester
  * Closes a TV overlay (a sheet, filter panel, or debug pane) the one correct way: latch the close, dispose the
  * overlay, return focus one frame after disposal, then reset the latch.
  *
- * That four-step latch was copy-pasted across a dozen screens, near character-for-character. It
+ * That four-step latch is easy to copy-paste per screen. It
  * exists because acting inline loses the disposal race — an inline `restoreTvOverlayFocus` fires while the
- * focus-trapped overlay is still composed and is swallowed, the "focus falls to the rail" class. A dozen
- * copies was a dozen places to forget a teardown path — one fix missed the third of three — or to leave a
- * latch armed to fire a stale request later. This is that latch, once.
+ * focus-trapped overlay is still composed and is swallowed, the "focus falls to the rail" class. Each
+ * copy is another place to forget a teardown path, or to leave a latch armed to fire a stale request later.
+ * This is that latch, once.
  *
  * Call [TvOverlayCloser.close] from every dismissal path — the `BackHandler`, the sheet `onDismiss`, a
  * navigate-away. It is idempotent within one close (a second [TvOverlayCloser.close] mid-flight is a no-op) and
