@@ -18,8 +18,8 @@ private const val SEE_ALL_TILE_CANVAS_DP = 152
 /** Dashed-outline "see all" trailing tile sized like a poster cell, in both label forms. */
 class SeeAllTileScreenshotTest {
     @PreviewTest
-    @Preview(name = "Light", widthDp = SEE_ALL_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_NO)
-    @Preview(name = "Dark", widthDp = SEE_ALL_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "light", widthDp = SEE_ALL_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "dark", widthDp = SEE_ALL_TILE_CANVAS_DP, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun Tile() {
         ScreenshotTheme {

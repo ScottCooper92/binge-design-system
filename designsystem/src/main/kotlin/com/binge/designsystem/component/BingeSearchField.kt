@@ -152,7 +152,7 @@ private fun TrailingIconButton(
     }
 }
 
-@Preview(showBackground = true, name = "Empty")
+@Preview(showBackground = true, name = "empty")
 @Composable
 private fun PreviewBingeSearchFieldEmpty() {
     BingeExpressiveTheme(dynamicColor = false) {
@@ -165,7 +165,7 @@ private fun PreviewBingeSearchFieldEmpty() {
     }
 }
 
-@Preview(showBackground = true, name = "With query")
+@Preview(showBackground = true, name = "with-query")
 @Composable
 private fun PreviewBingeSearchFieldWithQuery() {
     BingeExpressiveTheme(dynamicColor = false) {
