@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +24,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeInitialsAvatar
 import com.binge.designsystem.component.SettingsGroup
 import com.binge.designsystem.component.SettingsRow
+import com.binge.designsystem.component.SettingsRowConnector
 import com.binge.designsystem.component.SettingsRowDestination
 import com.binge.designsystem.component.SettingsRows
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -279,5 +284,39 @@ fun SettingsRowsNoSurfaceSample() {
                 ),
             )
         }
+    }
+}
+
+/**
+ * A parent row with its children joined to it by [SettingsRow.connector]: the first children
+ * continue the line, the last one stops at the curve. Each child keeps its own icon box.
+ */
+@Composable
+fun SettingsGroupConnectorSample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = null,
+            rows = listOf(
+                SettingsRow(icon = Icons.Filled.Tune, label = "Advanced options"),
+                SettingsRow(
+                    icon = Icons.Filled.Dns,
+                    label = "Server",
+                    detail = "Home",
+                    connector = SettingsRowConnector.Continue,
+                ),
+                SettingsRow(
+                    icon = Icons.Filled.HighQuality,
+                    label = "Quality profile",
+                    detail = "HD-1080p",
+                    connector = SettingsRowConnector.Continue,
+                ),
+                SettingsRow(
+                    icon = Icons.Filled.Folder,
+                    label = "Root folder",
+                    detail = "/media/movies",
+                    connector = SettingsRowConnector.End,
+                ),
+            ),
+        )
     }
 }

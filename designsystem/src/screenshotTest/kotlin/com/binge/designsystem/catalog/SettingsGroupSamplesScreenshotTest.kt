@@ -80,4 +80,12 @@ class SettingsGroupSamplesScreenshotTest {
     fun noSurface() {
         SettingsRowsNoSurfaceSample()
     }
+
+    /** [SettingsRow.connector] joining three child rows to their parent. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun connector() {
+        SettingsGroupConnectorSample()
+    }
 }

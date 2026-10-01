@@ -15,6 +15,18 @@ enum class SettingsRowDestination {
     External,
 }
 
+/**
+ * How a [SettingsRow] joins the row above it as a child of that row: a line down the parent icon's
+ * axis that curves into this row, drawn on the row itself so it spans the row's full height.
+ */
+enum class SettingsRowConnector {
+    /** The line curves into this row and carries on down to the next sibling. */
+    Continue,
+
+    /** The last sibling: the line stops at the curve, an L rather than a T. */
+    End,
+}
+
 /** One row of a [SettingsGroup]: an icon in a tinted box, a label with an optional detail line, and a trailing slot. */
 @Immutable
 data class SettingsRow(
@@ -58,6 +70,8 @@ data class SettingsRow(
      * that it is in progress, and the row stops taking taps. It is not dimmed — it is the row doing the work.
      */
     val loading: Boolean = false,
+    /** Joins the row to a parent row above it; the icon box then follows a connector-width inset. */
+    val connector: SettingsRowConnector? = null,
     /** Dimmed and inert, for a row that cannot be used because something else is in flight. */
     val disabled: Boolean = false,
     /** What a long-press does, announced by TalkBack ("double tap and hold to …"). Only read with [onLongClick]. */
