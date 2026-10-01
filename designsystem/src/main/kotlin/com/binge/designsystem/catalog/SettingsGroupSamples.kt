@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Policy
@@ -222,6 +224,34 @@ fun SettingsGroupLeadingContentSample() {
                     },
                     label = "Grace Hopper",
                     detail = "Can request",
+                ),
+            ),
+        )
+    }
+}
+
+/**
+ * A call in flight from one row: it swaps its chevron for a spinner, and the rows that would start
+ * another call are dimmed and inert. A row that does not touch the same resource, here the link out,
+ * stays live.
+ */
+@Composable
+fun SettingsGroupBusySample() {
+    ScreenshotTheme {
+        SettingsGroup(
+            title = "Actions",
+            rows = listOf(
+                SettingsRow(
+                    icon = Icons.Filled.Policy,
+                    label = "Open on server",
+                    destination = SettingsRowDestination.External,
+                ),
+                SettingsRow(icon = Icons.Filled.Flag, label = "Report an issue", disabled = true),
+                SettingsRow(
+                    icon = Icons.Filled.Block,
+                    iconTint = BingeSentiment.Negative.accent(),
+                    label = "Block",
+                    loading = true,
                 ),
             ),
         )

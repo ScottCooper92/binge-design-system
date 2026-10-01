@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -34,6 +35,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
 import com.binge.designsystem.theme.BingeShapes
@@ -112,13 +114,17 @@ private fun SettingsRowView(
     verticalPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val external = row.clickable && row.trailingContent == null && row.destination == SettingsRowDestination.External
+    val interactive = row.clickable && !row.loading && !row.disabled
+    val external = interactive && row.trailingContent == null && row.destination == SettingsRowDestination.External
     val externalDescription = stringResource(R.string.cd_settings_row_external)
+    val loadingDescription = stringResource(R.string.cd_settings_row_loading)
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .alpha(if (row.disabled) DISABLED_ALPHA else 1f)
             .semantics {
                 selected = row.selected
+                if (row.loading) stateDescription = loadingDescription
                 // Appended to the row's own merged node rather than a contentDescription on the trailing
                 // icon, so a screen reader announces one node ("Watchlist, Opens in browser, Button")
                 // instead of reading the icon as a second stop.
@@ -127,7 +133,7 @@ private fun SettingsRowView(
             // The wash sits outside the click, so the ripple draws over it rather than under it.
             .background(if (row.selected) MaterialTheme.colorScheme.primary.tonalContainer() else Color.Transparent)
             .combinedClickable(
-                enabled = row.clickable,
+                enabled = interactive,
                 role = Role.Button,
                 onClick = row.onClick,
                 onLongClick = row.onLongClick,
@@ -180,6 +186,9 @@ private fun SettingsRowView(
                 Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
             }
             when {
+                row.loading -> BingeLoadingIndicator(
+                    modifier = Modifier.size(dimensionResource(R.dimen.settings_group_loading_size)),
+                )
                 row.trailingContent != null -> row.trailingContent.invoke()
                 external -> {
                     Icon(
@@ -188,7 +197,7 @@ private fun SettingsRowView(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                row.clickable -> {
+                interactive -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,

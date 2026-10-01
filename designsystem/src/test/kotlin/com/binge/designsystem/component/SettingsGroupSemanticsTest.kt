@@ -86,4 +86,41 @@ class SettingsGroupSemanticsTest {
             .onNode(hasText("Privacy policy"))
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Opens in browser"))
     }
+
+    @Test
+    fun `a loading row announces it is in progress and takes no tap`() {
+        var clicked = false
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Block", loading = true, onClick = { clicked = true }),
+                    ),
+                )
+            }
+        }
+        composeTestRule
+            .onNode(hasText("Block"))
+            .assertIsNotEnabled()
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "In progress"))
+        assertTrue(!clicked)
+    }
+
+    @Test
+    fun `a disabled row is inert and does not claim to be in progress`() {
+        var clicked = false
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Report", disabled = true, onClick = { clicked = true }),
+                    ),
+                )
+            }
+        }
+        composeTestRule.onNode(hasText("Report")).assertIsNotEnabled().assert(hasNoStateDescription)
+        assertTrue(!clicked)
+    }
 }

@@ -53,4 +53,11 @@ data class SettingsRow(
     val onLongClick: (() -> Unit)? = null,
     /** Rendered in place of the icon box when set, for a leading visual that is not a glyph — an avatar, say. */
     val leadingContent: (@Composable () -> Unit)? = null,
+    /**
+     * A call this row started is in flight: a small spinner takes the trailing slot, a screen reader hears
+     * that it is in progress, and the row stops taking taps. It is not dimmed — it is the row doing the work.
+     */
+    val loading: Boolean = false,
+    /** Dimmed and inert, for a row that cannot be used because something else is in flight. */
+    val disabled: Boolean = false,
 )
