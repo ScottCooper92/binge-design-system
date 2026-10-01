@@ -2,17 +2,23 @@ package com.binge.designsystem.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -169,5 +175,78 @@ class SettingsGroupSemanticsTest {
         }
         composeTestRule.onNodeWithText("Child").assertHasClickAction().performClick()
         assertTrue(clicked)
+    }
+
+    @Test
+    fun `a switch row is one switch node that exposes its on and off state`() {
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Trust proxy", toggled = true),
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Force IPv4", toggled = false),
+                    ),
+                )
+            }
+        }
+        val isSwitch = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch)
+        composeTestRule.onNode(hasText("Trust proxy")).assert(isSwitch).assertIsOn()
+        composeTestRule.onNode(hasText("Force IPv4")).assert(isSwitch).assertIsOff()
+        composeTestRule.onAllNodes(isToggleable()).assertCountEquals(2)
+    }
+
+    @Test
+    fun `tapping a switch row calls onClick once and does not flip the state itself`() {
+        var taps = 0
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Trust proxy", toggled = false, onClick = { taps++ }),
+                    ),
+                )
+            }
+        }
+        composeTestRule.onNode(hasText("Trust proxy")).performClick().assertIsOff()
+        assertEquals(1, taps)
+    }
+
+    @Test
+    fun `a disabled switch row is inert but still reports its state`() {
+        var taps = 0
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "CSRF", toggled = true, disabled = true, onClick = { taps++ }),
+                    ),
+                )
+            }
+        }
+        composeTestRule
+            .onNode(hasText("CSRF"))
+            .assertIsNotEnabled()
+            .assertIsOn()
+            .performClick()
+        assertEquals(0, taps)
+    }
+
+    @Test
+    fun `a plain row is still a button with no toggle state`() {
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist")),
+                )
+            }
+        }
+        composeTestRule
+            .onNode(hasText("Watchlist"))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ToggleableState))
     }
 }

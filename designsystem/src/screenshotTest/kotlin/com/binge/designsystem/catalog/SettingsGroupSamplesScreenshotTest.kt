@@ -88,4 +88,12 @@ class SettingsGroupSamplesScreenshotTest {
     fun connector() {
         SettingsGroupConnectorSample()
     }
+
+    /** [SettingsRow.toggled] switch rows: on, off and disabled. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun switches() {
+        SettingsGroupSwitchSample()
+    }
 }
