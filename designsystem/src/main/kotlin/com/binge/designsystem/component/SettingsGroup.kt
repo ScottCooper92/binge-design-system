@@ -197,7 +197,7 @@ private fun SettingsRowView(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                row.clickable -> {
+                interactive -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,
