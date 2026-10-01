@@ -77,12 +77,12 @@ internal fun ColumnScope.RailItemsRegion(
     val gap = Arrangement.spacedBy(gapDp)
     val bleed = dimensionResource(TvR.dimen.tv_focus_ring_bleed)
     val itemHeight = dimensionResource(TvR.dimen.tv_nav_rail_item_height)
-    // Collapsed the strip shows a fixed [TV_NAV_RAIL_COLLAPSED_ITEMS] rows (Account · these · Settings); a taller
-    // panel puts the slack below them, above the pinned Settings.
+    // Collapsed the strip shows a fixed [TV_NAV_RAIL_COLLAPSED_ITEMS] rows (header · these · footer); a taller
+    // panel puts the slack below them, above the pinned footer.
     val collapsedHeight = itemHeight * TV_NAV_RAIL_COLLAPSED_ITEMS + gapDp * (TV_NAV_RAIL_COLLAPSED_ITEMS - 1) + bleed * 2
     val density = LocalDensity.current
     val gapPx = with(density) { gapDp.toPx() }
-    // The bottom rows fade out over one row's height as they reach the Settings edge rather than hard-clipping.
+    // The bottom rows fade out over one row's height as they reach the footer edge rather than hard-clipping.
     val fadePx = with(density) { itemHeight.toPx() }
     val snapSpec = remember(gapPx) { RailSnapBringIntoViewSpec(gapPx) }
 
@@ -97,7 +97,7 @@ internal fun ColumnScope.RailItemsRegion(
         )
     }
 
-    // Account pins top in both states, inside the overscan-safe area — one of the two rows a TV that overscans
+    // The header pins top in both states, inside the overscan-safe area — one of the two rows a TV that overscans
     // could otherwise crop.
     Column(modifier = Modifier.padding(start = hPad, top = overscanV, end = hPad), verticalArrangement = gap) {
         header?.let { item(it) }
@@ -105,9 +105,10 @@ internal fun ColumnScope.RailItemsRegion(
 
     var availablePx by remember { mutableIntStateOf(0) }
     var contentPx by remember { mutableIntStateOf(0) }
-    // Once the tail — through the terminal footer row — is on screen, nothing needs to hide on collapse: the rows and Settings
-    // keep the places the expanded list showed them, and the pinned Settings (there only while the real row is off-screen) is
-    // skipped. Mid-list, the strip cuts to the [TV_NAV_RAIL_COLLAPSED_ITEMS]-row band. `> 0` guards the first unmeasured frame.
+    // Once the tail — through the terminal footer row — is on screen, nothing needs to hide on collapse: the rows and
+    // the footer keep the places the expanded list showed them, and the pinned footer (there only while the real row is
+    // off-screen) is skipped. Mid-list, the strip cuts to the [TV_NAV_RAIL_COLLAPSED_ITEMS]-row band. `> 0` guards the
+    // first unmeasured frame.
     val tailVisible = contentPx > 0 && contentPx - scrollState.value <= availablePx
     Box(modifier = Modifier.weight(1f).onSizeChanged { availablePx = it.height }) {
         CompositionLocalProvider(LocalBringIntoViewSpec provides snapSpec) {
@@ -116,7 +117,7 @@ internal fun ColumnScope.RailItemsRegion(
                     if (expanded || tailVisible) {
                         Modifier.fillMaxSize()
                     } else {
-                        // Fade the band's bottom so overflow rows dissolve above the pinned Settings instead of
+                        // Fade the band's bottom so overflow rows dissolve above the pinned footer instead of
                         // clipping. Off-screen compositing so the `DstIn` gradient erases the content's alpha
                         // rather than painting over it.
                         Modifier.fillMaxWidth().height(collapsedHeight).fadeBottom(fadePx)
@@ -128,7 +129,7 @@ internal fun ColumnScope.RailItemsRegion(
                 verticalArrangement = gap,
             ) {
                 items.forEach { railItem -> key(railItem.key) { item(railItem) } }
-                // Settings is the terminal scroll row when expanded or when the tail is on screen; only a
+                // The footer is the terminal scroll row when expanded or when the tail is on screen; only a
                 // mid-list collapse re-pins it to the bottom below.
                 if (expanded || tailVisible) footer?.let { key(it.key) { item(it) } }
             }
@@ -136,7 +137,7 @@ internal fun ColumnScope.RailItemsRegion(
     }
     // The stand-in gear *rises into* its pinned slot as the rail collapses (the YouTube gear-slide). Entry-only:
     // exit is instant because the expand path is focus-critical — an exit animation would keep this RailItem (and
-    // the selected-row FocusRequester it can carry) alive alongside the terminal Settings row it hands over to.
+    // the selected-row FocusRequester it can carry) alive alongside the terminal footer row it hands over to.
     AnimatedVisibility(
         visible = !expanded && !tailVisible,
         enter = if (LocalReduceMotion.current) EnterTransition.None else slideInVertically { it },

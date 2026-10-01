@@ -27,8 +27,8 @@ private val LocalInheritedBringIntoViewSpec = compositionLocalOf<BringIntoViewSp
  * the band jumps on every press.
  *
  * The scope reaches **every** scrollable inside [content], including a row nested in the wrapped list. A row that
- * wants the ambient feel back for its own scrolling calls [TvInheritedFocusScroll] — [TvCardRow] already does, so the horizontal card runs keep the default parking while the column they sit in
- * holds still.
+ * wants the ambient feel back for its own scrolling calls [TvInheritedFocusScroll] — [TvCardRow] already does, so the horizontal card
+ * runs keep the default parking while the column they sit in holds still.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
