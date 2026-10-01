@@ -27,9 +27,8 @@ import com.binge.designsystem.tv.R as TvR
  * the error's kind and never omits it — so the headline stays mandatory where it carries meaning.
  *
  * [icon] is the art above the copy. Optional and null by default, so a caller with nothing meaningful
- * to draw renders exactly what it did before rather than a shrug glyph. The phone's `EmptyScreen` has always
- * carried one and `TvSettingsPane` already proves the idiom reads at ten feet; this is the same argument in the
- * one anatomy every TV empty and failure state goes through.
+ * to draw renders exactly what it did before rather than a shrug glyph. Art above short copy reads well at ten feet,
+ * and this is the one anatomy every TV empty and failure state goes through.
  */
 @Composable
 fun TvMessagePlate(
@@ -57,7 +56,7 @@ private fun PlateContent(
     icon: ImageVector?,
     actions: @Composable (() -> Unit)?,
 ) {
-    // Centred on its own axis, as `TvSettingsPane` is: one short block of text under a piece of art, with no
+    // Centred on its own axis: one short block of text under a piece of art, with no
     // second column for the eye to track back to. The same reasoning that makes centred copy wrong for a list
     // makes it right here.
     Column(

@@ -135,7 +135,7 @@ internal fun ColumnScope.RailItemsRegion(
             }
         }
     }
-    // The stand-in gear *rises into* its pinned slot as the rail collapses (the YouTube gear-slide). Entry-only:
+    // The stand-in footer *rises into* its pinned slot as the rail collapses. Entry-only:
     // exit is instant because the expand path is focus-critical — an exit animation would keep this RailItem (and
     // the selected-row FocusRequester it can carry) alive alongside the terminal footer row it hands over to.
     AnimatedVisibility(

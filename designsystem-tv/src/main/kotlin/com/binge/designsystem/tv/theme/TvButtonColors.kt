@@ -58,7 +58,7 @@ data class TvButtonColors(
  *
  * So disabled is now `container = Color.Transparent` with a **dimmed border**: the shape is drawn rather than
  * filled, which is the only form that survives every backdrop. Picking a different container token was rejected
- * — `TvAccountSignedOut` already uses `surface` *and* `surfaceVariant` as backgrounds within one file, so no
+ * — a single screen can use `surface` *and* `surfaceVariant` as backgrounds, so no
  * opaque token is safe against the surface it is drawn on.
  *
  * Disabled and an enabled [TvButtonStyle.Secondary] are therefore both outlines, separated by border alpha and
