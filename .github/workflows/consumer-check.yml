@@ -1,0 +1,100 @@
+name: Consumer check (binge-seerr)
+
+# Informational. Builds binge-seerr, a public consumer of this repository, against this PR's
+# head commit, because a green build here says nothing about a consumer: a changed public
+# signature is only noticed by the bump PR that arrives after it merged.
+#
+# Deliberately NOT named `CI`. bot-review, author-ci-fix and author-conflicts match that name,
+# and this check can go red for a reason that has nothing to do with the diff being reviewed,
+# or for exactly the reason an intentional signature change should. Keep it out of branch
+# protection too. The PR-body obligation to say what a change means for the consumers stays;
+# this supplies the evidence.
+#
+# Binge is the other consumer and is private, so it needs a token and is not covered here.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: consumer-check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  seerr:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      # binge-seerr includes `binge-integrations` and `design-system` as submodule composite
+      # builds (its settings.gradle.kts), so both must exist before Gradle evaluates settings.
+      - name: Check out binge-seerr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ScottCooper92/binge-seerr
+          ref: main
+          submodules: true
+
+      # Swap the consumer's pinned design-system for this PR's candidate commit. The
+      # directory name is what its `includeBuild("design-system")` resolves.
+      - name: Replace design-system with this PR
+        run: rm -rf design-system
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: design-system
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
+
+      # Two steps so a compile or test break reads differently from a baseline change. The
+      # consumer's `build` pulls validateDebugScreenshotTest in by hand, so it is excluded
+      # here and run on its own below.
+      - name: Build, test and lint binge-seerr
+        id: build
+        continue-on-error: true
+        run: ./gradlew build -x validateDebugScreenshotTest --continue
+
+      - name: Validate binge-seerr screenshots
+        id: screenshots
+        continue-on-error: true
+        run: ./gradlew validateDebugScreenshotTest --continue
+
+      - name: Report
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          SCREENSHOT_OUTCOME: ${{ steps.screenshots.outcome }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          {
+            echo "## binge-seerr against this PR (${PR_SHA})"
+            echo
+            echo "Informational only. This is not a required check."
+            echo
+            echo "| Step | Result |"
+            echo "| --- | --- |"
+            echo "| Compile, unit tests, lint | ${BUILD_OUTCOME} |"
+            echo "| Screenshot baselines | ${SCREENSHOT_OUTCOME} |"
+            echo
+            if [ "${BUILD_OUTCOME}" != "success" ]; then
+              echo "The consumer no longer builds against this change. Its bump PR will need code changes. Expected for an intentional signature change; say so in the PR body."
+            elif [ "${SCREENSHOT_OUTCOME}" != "success" ]; then
+              echo "The consumer compiles, but its screenshot baselines would change. Its bump PR will need a re-record. This also fires for any intentional design change, and for a screenshot failure that is not a comparison mismatch."
+            else
+              echo "binge-seerr builds and renders unchanged against this change."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "${SCREENSHOT_OUTCOME}" != "success" ] && [ "${BUILD_OUTCOME}" = "success" ]; then
+            echo "::warning title=binge-seerr baselines would change::The consumer compiles, but its screenshot baselines differ. See the job summary."
+          fi
+          if [ "${BUILD_OUTCOME}" != "success" ]; then
+            echo "::error title=binge-seerr does not build::The consumer breaks against this change. See the job summary."
+            exit 1
+          fi
