@@ -85,26 +85,35 @@ fun BingeModalSideSheet(
                 enter = slideInHorizontally(tween(SIDE_SHEET_ANIMATION_MS)) { it },
                 exit = slideOutHorizontally(tween(SIDE_SHEET_ANIMATION_MS)) { it },
             ) {
-                Column(
-                    modifier =
-                        modifier
-                            .fillMaxHeight()
-                            .width(dimensionResource(R.dimen.side_sheet_width))
-                            .clip(
-                                RoundedCornerShape(
-                                    topStart = dimensionResource(R.dimen.side_sheet_corner),
-                                    bottomStart = dimensionResource(R.dimen.side_sheet_corner),
-                                ),
-                            ).background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                            // Swallow taps on the panel so they don't fall through to the scrim.
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = {},
-                            ),
-                    content = content,
-                )
+                BingeSideSheetPanel(modifier = modifier, content = content)
             }
         }
     }
+}
+
+/**
+ * The sheet's resting panel — container colour, start corners and width — apart from the [Dialog]
+ * window around it, so a catalog frame can render it (a modal window does not capture).
+ */
+@Composable
+internal fun BingeSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxHeight()
+                .width(dimensionResource(R.dimen.side_sheet_width))
+                .clip(
+                    RoundedCornerShape(
+                        topStart = dimensionResource(R.dimen.side_sheet_corner),
+                        bottomStart = dimensionResource(R.dimen.side_sheet_corner),
+                    ),
+                ).background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                // Swallow taps on the panel so they don't fall through to the scrim.
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {},
+                ),
+        content = content,
+    )
 }
