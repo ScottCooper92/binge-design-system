@@ -56,4 +56,20 @@ class SettingsGroupSamplesScreenshotTest {
     fun tightTitle() {
         SettingsGroupTightTitleSample()
     }
+
+    /** [SettingsRow.leadingContent] standing in for the icon box. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun leadingContent() {
+        SettingsGroupLeadingContentSample()
+    }
+
+    /** [SettingsRows] with no surface of its own, drawn inside a card the caller supplies. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun noSurface() {
+        SettingsRowsNoSurfaceSample()
+    }
 }

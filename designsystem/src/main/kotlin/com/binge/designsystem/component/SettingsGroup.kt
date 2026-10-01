@@ -75,21 +75,32 @@ fun SettingsGroup(
         }
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .clip(BingeShapes.Large)
                 .background(MaterialTheme.colorScheme.surfaceContainer),
         ) {
-            rows.forEachIndexed { index, row ->
-                SettingsRowView(row = row, verticalPadding = rowVerticalPadding)
-                if (index < rows.lastIndex) {
-                    HorizontalDivider(
-                        thickness = dimensionResource(R.dimen.hairline_thickness),
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        modifier = Modifier.padding(start = dimensionResource(R.dimen.settings_group_row_padding_h)),
-                    )
-                }
-            }
+            SettingsRows(rows = rows, rowVerticalPadding = rowVerticalPadding)
             belowRows?.invoke(this)
+        }
+    }
+}
+
+/** The rows of a [SettingsGroup] with their dividers and no surface, for a card that supplies its own. */
+@Composable
+fun SettingsRows(
+    rows: List<SettingsRow>,
+    modifier: Modifier = Modifier,
+    rowVerticalPadding: Dp = dimensionResource(R.dimen.settings_group_row_padding_v),
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        rows.forEachIndexed { index, row ->
+            SettingsRowView(row = row, verticalPadding = rowVerticalPadding)
+            if (index < rows.lastIndex) {
+                HorizontalDivider(
+                    thickness = dimensionResource(R.dimen.hairline_thickness),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    modifier = Modifier.padding(start = dimensionResource(R.dimen.settings_group_row_padding_h)),
+                )
+            }
         }
     }
 }
@@ -126,19 +137,23 @@ private fun SettingsRowView(
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(dimensionResource(R.dimen.settings_group_icon_size))
-                .clip(BingeShapes.MoreCard)
-                .background(row.iconTint?.tonalContainer() ?: MaterialTheme.colorScheme.surfaceContainerHigh),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = row.iconPainter?.invoke() ?: rememberVectorPainter(row.icon),
-                contentDescription = null,
-                tint = row.iconTint ?: MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(dimensionResource(R.dimen.settings_group_icon_glyph)),
-            )
+        if (row.leadingContent != null) {
+            row.leadingContent.invoke()
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(dimensionResource(R.dimen.settings_group_icon_size))
+                    .clip(BingeShapes.MoreCard)
+                    .background(row.iconTint?.tonalContainer() ?: MaterialTheme.colorScheme.surfaceContainerHigh),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = row.iconPainter?.invoke() ?: rememberVectorPainter(row.icon),
+                    contentDescription = null,
+                    tint = row.iconTint ?: MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(dimensionResource(R.dimen.settings_group_icon_glyph)),
+                )
+            }
         }
         Spacer(Modifier.width(dimensionResource(R.dimen.account_card_spacing)))
         Column(modifier = Modifier.weight(1f)) {

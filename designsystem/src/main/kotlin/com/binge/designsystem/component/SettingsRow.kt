@@ -51,4 +51,6 @@ data class SettingsRow(
     val trailingContent: (@Composable () -> Unit)? = null,
     val onClick: () -> Unit = {},
     val onLongClick: (() -> Unit)? = null,
+    /** Rendered in place of the icon box when set, for a leading visual that is not a glyph — an avatar, say. */
+    val leadingContent: (@Composable () -> Unit)? = null,
 )
