@@ -41,6 +41,14 @@ class SettingsGroupSamplesScreenshotTest {
         SettingsGroupExternalSample()
     }
 
+    /** [SettingsRow.loading] on the acting row and [SettingsRow.disabled] on the one it blocks. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun busy() {
+        SettingsGroupBusySample()
+    }
+
     /** The `rowVerticalPadding` override beside [titled]'s default rows (#133). */
     @PreviewTest
     @ComponentPreviews

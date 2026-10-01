@@ -46,6 +46,13 @@ data class SettingsRow(
      */
     val selected: Boolean = false,
     val clickable: Boolean = true,
+    /**
+     * A call this row started is in flight: a small spinner takes the trailing slot, a screen reader hears
+     * that it is in progress, and the row stops taking taps. It is not dimmed — it is the row doing the work.
+     */
+    val loading: Boolean = false,
+    /** Dimmed and inert, for a row that cannot be used because something else is in flight. */
+    val disabled: Boolean = false,
     /** Only read when [trailingContent] is null — a caller supplying its own trailing slot owns this too. */
     val destination: SettingsRowDestination = SettingsRowDestination.InApp,
     val trailingContent: (@Composable () -> Unit)? = null,
