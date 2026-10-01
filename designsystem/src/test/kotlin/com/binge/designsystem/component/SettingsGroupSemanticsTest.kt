@@ -83,7 +83,7 @@ class SettingsGroupSemanticsTest {
             }
         }
         val hasSelectLabel = SemanticsMatcher("long-click label is Select") { node ->
-            node.config.getOrNull(SemanticsActions.OnLongClick)?.label == "Select"
+            SemanticsActions.OnLongClick in node.config && node.config[SemanticsActions.OnLongClick].label == "Select"
         }
         composeTestRule.onNode(hasText("Ada")).assert(hasSelectLabel)
     }
