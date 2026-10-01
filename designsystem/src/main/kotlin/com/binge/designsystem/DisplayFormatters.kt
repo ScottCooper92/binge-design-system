@@ -19,6 +19,7 @@ import java.util.Locale
 private const val VOTE_COUNT_THOUSAND = 1_000
 private const val VOTE_COUNT_STEP = 1_000.0
 private const val MAX_BADGE_COUNT = 99
+private const val MIN_COLLAPSED_RUN = 3
 
 /** Instants within this window of "now" read as a relative span ("6 days ago"); older ones as an absolute date. */
 private const val RELATIVE_DATE_WINDOW_MILLIS = 30L * 24 * 60 * 60 * 1000
@@ -96,3 +97,21 @@ fun shortMonthName(month: Month, locale: Locale): String = month.getDisplayName(
 
 /** A month's full name in [locale] ("March", "marzo"), in the standalone form a picker headline shows. */
 fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.FULL_STANDALONE, locale)
+
+/**
+ * The numbers joined for display, with each run of [MIN_COLLAPSED_RUN] or more consecutive values
+ * collapsed to a range: `1, 2, 3, 5, 6` reads "1-3, 5, 6". Sorted and de-duplicated first, so order
+ * and repeats do not matter; empty input gives "". The numbers only, with no label, so the caller
+ * keeps its own plural resource around the text. Zero is an ordinary number.
+ */
+fun Collection<Int>.formatRanges(): String {
+    val runs = sorted().distinct().fold(mutableListOf<IntRange>()) { acc, n ->
+        val last = acc.lastOrNull()
+        if (last != null && last.last + 1 == n) acc[acc.lastIndex] = last.first..n else acc += n..n
+        acc
+    }
+    return runs.joinToString(", ") { run ->
+        val size = run.last - run.first + 1
+        if (size >= MIN_COLLAPSED_RUN) "${run.first}-${run.last}" else run.joinToString(", ")
+    }
+}
