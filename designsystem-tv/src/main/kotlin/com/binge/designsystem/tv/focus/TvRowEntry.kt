@@ -11,8 +11,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 
 /**
- * The remembered-entry-cell focus contract shared by the detail and hub rows (`TvCardRow`, `TvMediaRow`), the TV
- * detail/gallery/cast grids and search: returning to a container lands on the cell that last held focus, and a
+ * The remembered-entry-cell focus contract shared by card rows (`TvCardRow`) and the grids and search
+ * surfaces built on this seam: returning to a container lands on the cell that last held focus, and a
  * fresh one opens on its first — never a geometric pick. A container may fold a trailing tile (a see-all, say)
  * into its own entry-index space, in which case that tile is a cell like any other and can carry the requester;
  * `TvCardRow`'s trailing tile does. This is **the** TV focus-memory contract. Each of its four
@@ -25,20 +25,20 @@ import androidx.compose.ui.focus.focusRequester
  *    or the requester binds to nothing.
  * 4. Staleness is resolved against the current data — a too-large remembered index coerces in.
  *
- * Three surfaces in the host app keep their **own** memory rather than this seam, and correctly so: a paged
- * poster grid needs `Items` staleness plus a backdrop cell; an immersive hub steers entry across many rows at
+ * Some surfaces keep their **own** memory rather than this seam, and correctly so: a paged
+ * grid needs item staleness plus a backdrop cell; a hub steers entry across many rows at
  * once; a screen returning from a child by item *type* rather than by index cannot use an index. Each holds the
  * four invariants above in its own type, so its own memory test is the same contract by another shape.
  *
  * **The memory must stay separate from whatever draws the ring.** A ring key is nulled on blur so a container
  * that lost focus keeps none lit — and that blur is exactly the ↑ away that starts the round trip this serves;
- * collapse the two and no cell carries the requester when entry needs it. `TvCardRow` and the gallery grid keep
+ * collapse the two and no cell carries the requester when entry needs it. `TvCardRow` and the grids keep
  * a `focusedKey` beside their entry for that reason.
  *
  * The remembered index rides [rememberSaveable], which the enclosing `LazyColumn` item's `SaveableStateProvider`
- * preserves across the scroll-out disposal that wipes a plain `remember` (the failure `TvMediaRow` first hit). So
+ * preserves across the scroll-out disposal that wipes a plain `remember` (the failure a plain row first hit). So
  * the memory is **caller-transparent**: a row inside a lazy column restores itself with no id threaded through
- * the screen. A caller that must steer entry across containers — the hub, entered from the nav rail rather than
+ * the screen. A caller that must steer entry across containers — a hub, entered from the nav rail rather than
  * by scrolling — passes [rememberTvRowEntry]'s `overrideIndex` instead.
  *
  * Three lines of wiring, all required (a requester with no attached node does not throw — it warns and returns
@@ -64,7 +64,7 @@ class TvRowEntry internal constructor(
 
 /**
  * Remembers the entry cell for a lazy container of [itemCount] cells. Leave [overrideIndex] null for the
- * caller-transparent default; pass it to steer entry from outside (the hub's cross-container memory). The
+ * caller-transparent default; pass it to steer entry from outside (a hub's cross-container memory). The
  * result is a fresh lightweight holder each recomposition — do not hoist it. See [TvRowEntry].
  *
  * [resetKey] names the data the memory belongs to (a query, a tab, a list id — the same idea `TvGridPane` takes

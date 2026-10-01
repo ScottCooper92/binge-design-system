@@ -86,14 +86,14 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
  * pass under the rail, and what must stay clear of it pads by [LocalTvContentInset] (the collapsed width)
  * instead of the pane being structurally inset. The rail paints a scrim, not an opaque fill — but only over
  * real artwork: it fades between a solid panel and glass in step with the backdrop's own crossfade
- * ([TvRailArtworkPresence]), because a rail left translucent over the hub's hero↔backdrop transition reads as
+ * ([TvRailArtworkPresence]), because a rail left translucent over a screen's hero↔backdrop transition reads as
  * the rail itself flickering. The hold band is anchored in dp (`tv_nav_rail_scrim_falloff`), not a fraction of
  * width, so it reaches the label band expanded exactly as it reaches the icon collapsed — expanded and collapsed
  * read as the same glass, just wider. Fixed-width in both states rather than content-sized, since the items fill
  * its width.
  *
- * Three slots: [header] pinned top (account avatar), [items] the destination body, [footer] pinned bottom
- * (Settings). [expanded] is normally `null` (*follow focus*); a preview passes `true`/`false` to pin the state
+ * Three slots: [header] pinned top (account avatar, say), [items] the destination body, [footer] pinned bottom
+ * (a settings entry, say). [expanded] is normally `null` (*follow focus*); a preview passes `true`/`false` to pin the state
  * without a real focus event (focus-as-parameter — see `docs/tv-foundation.md`).
  *
  * [artworkBehind] pins the glass/solid fill the same way, and for the same reason. Production leaves it `null`
