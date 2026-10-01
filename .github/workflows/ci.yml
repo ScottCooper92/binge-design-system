@@ -93,9 +93,6 @@ jobs:
       # Gradle and AGP invent silently reappears in the artifact. Both the test reports
       # and the lint results are named, because a red run here is as likely to be lint
       # as it is to be a failing test, and author-ci-fix triages from what it can read.
-      # The screenshot report carries the expected/actual/diff triplet for a baseline
-      # that no longer matches, which is the only way to tell a real regression from a
-      # frame that needs re-recording.
       - name: Upload reports
         if: ${{ failure() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -105,7 +102,20 @@ jobs:
             **/build/reports/tests/**
             **/build/reports/lint-results-*.html
             **/build/reports/ktlint/**
-            **/build/reports/screenshotTest/**
+          if-no-files-found: ignore
+          retention-days: ${{ github.event_name == 'schedule' && 7 || 1 }}
+
+      # Only the diff images, not the HTML screenshot report: that report inlines the
+      # reference, actual and diff of every frame as base64 and reached ~485 MB in Binge.
+      # The references are committed and the actual render is one updateDebugScreenshotTest
+      # away. An empty match means the failure was not a comparison mismatch, so ignore it
+      # rather than fail the upload and hide the real error.
+      - name: Upload screenshot diffs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: screenshot-diffs
+          path: '**/build/outputs/screenshotTest-results/**/diffs/**'
           if-no-files-found: ignore
           retention-days: ${{ github.event_name == 'schedule' && 7 || 1 }}
 
