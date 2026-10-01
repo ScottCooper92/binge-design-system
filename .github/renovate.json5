@@ -7,7 +7,6 @@
     "config:recommended",
     "helpers:pinGitHubActionDigests", // action bumps keep the `# vX.Y.Z` SHA form
     ":dependencyDashboard",
-    ":semanticCommitsDisabled",
   ],
 
   vulnerabilityAlerts: { enabled: false },
