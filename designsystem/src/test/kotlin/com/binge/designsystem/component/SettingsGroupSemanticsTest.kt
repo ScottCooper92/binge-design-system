@@ -147,4 +147,27 @@ class SettingsGroupSemanticsTest {
         composeTestRule.onNode(hasText("Report")).assertIsNotEnabled().assert(hasNoStateDescription)
         assertTrue(!clicked)
     }
+
+    @Test
+    fun `a connected row keeps its label and its tap`() {
+        var clicked = false
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                SettingsGroup(
+                    title = null,
+                    rows = listOf(
+                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Parent"),
+                        SettingsRow(
+                            icon = Icons.Filled.Bookmark,
+                            label = "Child",
+                            connector = SettingsRowConnector.End,
+                            onClick = { clicked = true },
+                        ),
+                    ),
+                )
+            }
+        }
+        composeTestRule.onNodeWithText("Child").assertHasClickAction().performClick()
+        assertTrue(clicked)
+    }
 }

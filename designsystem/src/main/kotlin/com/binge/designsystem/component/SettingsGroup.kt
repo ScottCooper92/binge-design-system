@@ -25,8 +25,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -35,6 +40,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
@@ -118,6 +124,7 @@ private fun SettingsRowView(
     val external = interactive && row.trailingContent == null && row.destination == SettingsRowDestination.External
     val externalDescription = stringResource(R.string.cd_settings_row_external)
     val loadingDescription = stringResource(R.string.cd_settings_row_loading)
+    val connectorModifier = row.connector?.let { settingsRowConnector(it) } ?: Modifier
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -138,12 +145,16 @@ private fun SettingsRowView(
                 onClick = row.onClick,
                 onLongClickLabel = row.onLongClickLabel,
                 onLongClick = row.onLongClick,
-            ).padding(
+            ).then(connectorModifier)
+            .padding(
                 horizontal = dimensionResource(R.dimen.settings_group_row_padding_h),
                 vertical = verticalPadding,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (row.connector != null) {
+            Spacer(Modifier.width(dimensionResource(R.dimen.settings_group_icon_size) + dimensionResource(R.dimen.account_card_spacing)))
+        }
         if (row.leadingContent != null) {
             row.leadingContent.invoke()
         } else {
@@ -228,5 +239,38 @@ private fun CountBadge(count: Int, tint: Color?) {
                     vertical = dimensionResource(R.dimen.padding_xxs),
                 ),
         )
+    }
+}
+
+/**
+ * Draws [connector] across the row's full height, past its vertical padding and over the divider
+ * below, so the line stays continuous down a run of rows. It sits on the parent icon's axis and
+ * mirrors in right-to-left layouts.
+ */
+@Composable
+private fun settingsRowConnector(connector: SettingsRowConnector): Modifier {
+    val color = MaterialTheme.colorScheme.outline
+    val strokeWidth = with(LocalDensity.current) { dimensionResource(R.dimen.hairline_thickness).toPx() }
+    val axis = with(LocalDensity.current) {
+        (dimensionResource(R.dimen.settings_group_row_padding_h) + dimensionResource(R.dimen.settings_group_icon_size) / 2).toPx()
+    }
+    val reach = with(LocalDensity.current) { dimensionResource(R.dimen.settings_group_icon_size).toPx() / 2 }
+    val radius = with(LocalDensity.current) { dimensionResource(R.dimen.settings_group_connector_radius).toPx() }
+    return Modifier.drawBehind {
+        val rtl = layoutDirection == LayoutDirection.Rtl
+
+        fun x(value: Float) = if (rtl) size.width - value else value
+        val midY = size.height / 2
+        val curve = Path().apply {
+            moveTo(x(axis), 0f)
+            lineTo(x(axis), midY - radius)
+            quadraticTo(x(axis), midY, x(axis + radius), midY)
+            lineTo(x(axis + reach), midY)
+        }
+        drawPath(curve, color, style = Stroke(width = strokeWidth))
+        if (connector == SettingsRowConnector.Continue) {
+            // The hairline divider sits just below the row; run the line through it.
+            drawLine(color, Offset(x(axis), 0f), Offset(x(axis), size.height + strokeWidth), strokeWidth)
+        }
     }
 }

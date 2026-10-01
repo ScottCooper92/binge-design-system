@@ -299,6 +299,8 @@
     <dimen name="settings_group_icon_size">38dp</dimen>
     <dimen name="settings_group_icon_glyph">20dp</dimen>
     <dimen name="settings_group_loading_size">24dp</dimen>
+    <!-- SettingsRow.connector: the corner radius where the line turns into a child row. -->
+    <dimen name="settings_group_connector_radius">12dp</dimen>
     <!-- CheckboxRow: a long checklist's own inset and checkbox-to-label gap, tighter than
          SettingsGroup's since there is no icon box, and a divider indent that clears the checkbox
          rather than starting flush with it. -->
