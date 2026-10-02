@@ -44,7 +44,8 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 │                          relative-or-absolute date formatter and month names
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state and the shared aspect ratios
-├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders
+├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders,
+│                and the …Demo()s the catalog app runs live
 ├── modifier/    skeleton shimmer, selection lift
 ├── layout/      layout anchors
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
@@ -59,6 +60,9 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme
 
+catalog-app/        the debug-only catalog app, with a phone activity and a TV one
+catalog-registry/   the generator that lists the catalog's samples and demos for that app
+
 docs/
 └── tv-foundation.md   why focus is a parameter, and the accent model the TV components share
 ```
@@ -68,6 +72,44 @@ qualifiers next to it) and the screenshot baselines under `src/screenshotTestDeb
 `designsystem`, every user-visible string is in `values/strings.xml` with its Spanish translation
 alongside; `designsystem-tv` has no strings, because its components take their copy as parameters. The baselines are the ones Binge
 recorded; each slice validated byte-identical against them before it landed.
+
+## The catalog app
+
+`catalog-app` is a debug-only Android app that lists every sample and demo in the catalog and shows
+each one full screen on a device. It is for **behaviour a screenshot cannot show**: a real modal
+window, a bar that changes as a list scrolls, a button going busy, D-pad focus on TV, a locale.
+Appearance stays with the screenshot suite and Binge's screenshot gallery.
+
+Run it from a checkout:
+
+```sh
+./gradlew :catalog-app:installDebug
+```
+
+It installs beside Binge and binge-seerr, with two launcher entries: a phone one, and a leanback one
+for Android TV.
+
+**An entry appears with nothing to register.** The app is generated from the sources:
+
+- A public, no-parameter `@Composable fun …Sample()` in `designsystem/…/catalog/` or
+  `designsystem-tv/…/tv/catalog/` is listed as a sample.
+- A public, no-parameter `@Composable fun …Demo()` in `designsystem/…/catalog/` is listed under
+  Demos. It runs the real component with real state. Demos are never screenshot fixtures.
+- The first sentence of its KDoc is its description. The file name gives its group.
+- A public `…Sample` or `…Demo` that takes parameters, or is not composable, fails the build with its
+  file and line. A private or internal one is ignored.
+
+**Controls.** The phone detail view has dark mode, font scale (1.0, 1.3, 2.0), RTL, and language
+(system, English, Spanish, and the `en-XA` and `ar-XB` pseudolocales). The TV detail view has font
+scale and RTL: the TV theme is dark-only, so it has no dark toggle. The first three work by
+overriding composition locals around the sample, so no sample is edited. Resource qualifiers such as
+screen width are not reachable that way, which is why the app has no width presets. Language works
+differently, by handing the sample a context recreated for the locale.
+
+**Never published.** There is no release variant, no signing configuration and no APK artifact.
+`./gradlew build` compiles, lints and tests it with everything else, and nothing in Binge or
+binge-seerr substitutes it, so a consumer never configures it. `checkTvMaterialSeparation` also scans
+its `tv/` package.
 
 ## Status
 

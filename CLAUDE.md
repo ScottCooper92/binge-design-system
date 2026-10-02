@@ -58,6 +58,9 @@ agree with the consumers'.
 - Every component has a `…Sample()` in `catalog/` and a `@PreviewTest` frame that renders it, and a
   new visual variant gets its frame in the same PR. The catalog sample is the one public fixture for
   a component, so the screenshot test renders the sample rather than hand-rolling the same state.
+  The debug-only catalog app picks a new public `…Sample()` up on the next build with nothing to
+  register. Behaviour a frame cannot show (a real modal, a scroll-driven bar, a busy state) gets a
+  public no-parameter `…Demo()` beside it, which the app lists under Demos and no `@PreviewTest` renders.
 - A `@Preview(name = …)` token is short, lowercase and space-free: it is baked into the baseline's
   filename, and a long one breaks out of Windows' path limit under a worktree.
 
