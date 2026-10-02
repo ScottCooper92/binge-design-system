@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -14,6 +15,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -35,6 +38,10 @@ private const val GLASS_BACKGROUND_ALPHA = 0.4f
  * caller whose bar brings in its own scrim as it collapses ([DetailOverlayTopBar]), so the per-icon
  * backing hands off to that rather than stacking two washes once both are visible. Ignored by every
  * other tone.
+ *
+ * [loading] swaps the glyph for an indeterminate spinner at the glyph's size and swallows taps, so
+ * the button keeps its size and an in-flight action cannot be re-triggered. It is independent of
+ * [enabled], as on [BingeTextButton]: disabled dims, loading spins. The [contentDescription] stays.
  */
 @Composable
 fun ExpressiveIconButton(
@@ -47,6 +54,7 @@ fun ExpressiveIconButton(
     tone: IconButtonTone = IconButtonTone.Default,
     size: Dp = dimensionResource(R.dimen.button_tonal_size),
     glassBackgroundAlpha: Float = 1f,
+    loading: Boolean = false,
 ) {
     val background = when (tone) {
         IconButtonTone.Tonal -> MaterialTheme.colorScheme.surfaceContainerHigh
@@ -60,15 +68,25 @@ fun ExpressiveIconButton(
         modifier.size(size).clip(BingeShapes.Pill).background(background)
     }
     IconButton(
-        onClick = onClick,
+        onClick = { if (!loading) onClick() },
         modifier = containerModifier,
         enabled = enabled,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = tint,
-        )
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(dimensionResource(R.dimen.icon_button_glyph_size))
+                    .semantics { contentDescription?.let { this.contentDescription = it } },
+                color = tint,
+                strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
+            )
+        } else {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = tint,
+            )
+        }
     }
 }
 

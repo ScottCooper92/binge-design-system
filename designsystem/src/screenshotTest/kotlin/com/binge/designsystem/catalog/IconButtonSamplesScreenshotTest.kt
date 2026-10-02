@@ -22,4 +22,11 @@ class IconButtonSamplesScreenshotTest {
     fun Disabled() {
         IconButtonDisabledSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Loading() {
+        IconButtonLoadingSample()
+    }
 }

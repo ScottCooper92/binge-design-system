@@ -71,3 +71,17 @@ fun IconButtonDisabledSample() {
         )
     }
 }
+
+/** Loading icon button — the spinner stands in for the glyph at the same size, and taps are swallowed. */
+@Composable
+fun IconButtonLoadingSample() {
+    ScreenshotTheme {
+        ExpressiveIconButton(
+            onClick = {},
+            icon = Icons.Filled.Favorite,
+            contentDescription = FAVOURITE_LABEL,
+            tone = IconButtonTone.Tonal,
+            loading = true,
+        )
+    }
+}
