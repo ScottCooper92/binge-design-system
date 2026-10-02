@@ -1,9 +1,13 @@
 package com.binge.designsystem.catalogapp
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.catalogapp.overrides.FontScalePresets
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
@@ -20,9 +24,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The epic's "each opens": every registered sample composes in the detail view's box, under each
- * override. Catches a sample that needs bounded space the box does not give, or that throws under a
- * forced configuration, which no screenshot of the sample alone would show.
+ * The epic's "each opens": every registered sample and demo composes in a box that fills the screen
+ * and centres, as the detail view's does, under one combined override: dark, RTL and the largest
+ * font. Catches an entry that needs bounded space that box does not give, or that throws under a
+ * forced configuration, which no screenshot of a sample alone would show.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "w411dp-h900dp-xxhdpi")
@@ -45,7 +50,13 @@ class EverySampleOpensTest {
     /** [host] is whatever the real activity wraps around a sample: the TV theme, for the TV registry. */
     private fun assertEverySampleComposes(registry: List<CatalogEntry>, host: @Composable (@Composable () -> Unit) -> Unit) {
         val overrides = SampleOverrides(dark = true, fontScale = FontScalePresets.last(), rtl = true)
-        rule.setContent { host { WithOverrides(overrides, registry[index].content) } }
+        rule.setContent {
+            host {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    WithOverrides(overrides, registry[index].content)
+                }
+            }
+        }
 
         val failures = mutableListOf<String>()
         registry.indices.forEach { i ->

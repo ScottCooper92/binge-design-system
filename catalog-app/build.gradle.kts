@@ -19,9 +19,10 @@ plugins {
 }
 
 /**
- * Debug-only catalog app: lists every public `…Sample()` in the design system's `catalog/` package
- * and shows it full screen on a device, with live controls for dark mode, font scale and layout
- * direction. Run it with `./gradlew :catalog-app:installDebug`; it is never published or signed.
+ * Debug-only catalog app: lists every public `…Sample()` and `…Demo()` in the design system's
+ * `catalog/` packages (and the TV samples in `designsystem-tv`) and shows each one full screen on a
+ * device, with live controls for dark mode, font scale, layout direction and language. Run it with
+ * `./gradlew :catalog-app:installDebug`; it is never published or signed.
  *
  * The package differs from the application id on purpose. `com.binge.designsystem.catalog` already
  * holds the samples, so the app's namespace keeps its generated `R` class out of that package, and
