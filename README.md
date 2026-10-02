@@ -99,6 +99,11 @@ for Android TV.
 - A public `…Sample` or `…Demo` that takes parameters, or is not composable, fails the build with its
   file and line. A private or internal one is ignored.
 
+**The list is an adaptive grid.** The phone catalog is a grid of cards that gains columns as the window
+widens. A sample's card shows a live, scaled-down render of it. A demo's card shows an icon and a Demo
+badge, because a still image of "Open sheet" says nothing about what the demo does. Tapping anywhere on
+a card opens it, including on the preview.
+
 **Controls.** The phone detail view has dark mode, font scale (1.0, 1.3, 2.0), RTL, and language
 (system, English, Spanish, and the `en-XA` and `ar-XB` pseudolocales). The TV detail view has font
 scale and RTL: the TV theme is dark-only, so it has no dark toggle. The first three work by
