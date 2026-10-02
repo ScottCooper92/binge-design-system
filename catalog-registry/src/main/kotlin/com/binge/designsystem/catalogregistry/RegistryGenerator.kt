@@ -41,6 +41,7 @@ fun generateRegistry(
             appendLine("            group = ${sample.group.literal()},")
             appendLine("            name = ${sample.name.literal()},")
             appendLine("            description = ${sample.description.literal()},")
+            appendLine("            kind = CatalogKind.${sample.kind.name},")
             appendLine("            content = { ${sample.function}() },")
             appendLine("        ),")
         }

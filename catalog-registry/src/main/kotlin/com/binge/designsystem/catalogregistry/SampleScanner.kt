@@ -1,11 +1,18 @@
 package com.binge.designsystem.catalogregistry
 
-/** A public no-argument `@Composable fun …Sample()` found in a `catalog/` source file. */
+/**
+ * What a catalog entry is: a fixed fixture the screenshot suite also renders, or a stateful demo of
+ * behaviour a screenshot cannot show. The suffix of the function name decides.
+ */
+enum class EntryKind { Sample, Demo }
+
+/** A public no-argument `@Composable fun …Sample()` or `…Demo()` found in a `catalog/` source file. */
 data class SampleDeclaration(
     val function: String,
     val group: String,
     val name: String,
     val description: String,
+    val kind: EntryKind = EntryKind.Sample,
 )
 
 /** What one file contributed: the samples it registers and the shapes it could not register. */
@@ -15,12 +22,12 @@ data class ScanResult(
 )
 
 /**
- * Finds the catalog's public samples in Kotlin source text.
+ * Finds the catalog's public samples and demos in Kotlin source text.
  *
  * Source scanning rather than reflection or KSP, by decision on the catalog epic: the samples are
  * top-level, annotated one per line and carry a KDoc, which a line scan reads exactly, and a
- * reflection pass over Compose-rewritten signatures would not. A public function ending in `Sample`
- * that is not a no-argument composable is reported with its file and line instead of being skipped.
+ * reflection pass over Compose-rewritten signatures would not. A public function ending in `Sample` or
+ * `Demo` that is not a no-argument composable is reported with its file and line, not skipped.
  */
 object SampleScanner {
     private val declaration = Regex("""^(public\s+)?fun\s+(\w+)\s*\(""")
@@ -36,37 +43,37 @@ object SampleScanner {
         for ((index, line) in lines.withIndex()) {
             if (hiddenDeclaration.containsMatchIn(line)) continue
             val function = declaration.find(line)?.groupValues?.get(2) ?: continue
-            if (!function.endsWith(SUFFIX)) continue
+            val kind = EntryKind.entries.firstOrNull { function.endsWith(it.name) } ?: continue
             val where = "$fileName:${index + 1}"
             val annotations = annotationsAbove(lines, index)
             val parameters = parametersFrom(lines, index)
             when {
                 annotations.none { it.startsWith(COMPOSABLE) } ->
-                    problems += "$where: public $function is not @Composable; a catalog sample must be"
+                    problems += "$where: public $function is not @Composable; a catalog ${kind.noun} must be"
                 parameters.isNotBlank() ->
-                    problems += "$where: $function takes parameters ($parameters); a sample takes none"
+                    problems += "$where: $function takes parameters ($parameters); a ${kind.noun} takes none"
                 else -> samples += SampleDeclaration(
                     function = function,
                     group = group,
                     name = displayName(function),
                     description = firstSentence(kdocAbove(lines, index - annotations.size)),
+                    kind = kind,
                 )
             }
         }
         return ScanResult(samples, problems)
     }
 
-    /** `BingeConfirmDialogSamples.kt` → `BingeConfirmDialog`. */
-    fun groupOf(fileName: String): String =
-        fileName
-            .substringAfterLast('/')
-            .removeSuffix(".kt")
-            .removeSuffix("Samples")
-            .removeSuffix(SUFFIX)
+    /** `BingeConfirmDialogSamples.kt` → `BingeConfirmDialog`; a `…Demos.kt` file groups the same way. */
+    fun groupOf(fileName: String): String {
+        val stem = fileName.substringAfterLast('/').removeSuffix(".kt")
+        return EntryKind.entries.fold(stem) { name, kind -> name.removeSuffix(kind.name + "s").removeSuffix(kind.name) }
+    }
 
     /** `FilledButtonLoadingSample` → `Filled button loading`. */
     fun displayName(function: String): String {
-        val words = function.removeSuffix(SUFFIX).split(wordBoundary).filter { it.isNotEmpty() }
+        val stem = EntryKind.entries.fold(function) { name, kind -> name.removeSuffix(kind.name) }
+        val words = stem.split(wordBoundary).filter { it.isNotEmpty() }
         return words
             .mapIndexed { i, word -> if (i == 0 || word.all { it.isUpperCase() }) word else word.lowercase() }
             .joinToString(" ")
@@ -126,6 +133,6 @@ object SampleScanner {
             .trim()
     }
 
-    private const val SUFFIX = "Sample"
+    private val EntryKind.noun get() = name.lowercase()
     private const val COMPOSABLE = "@Composable"
 }

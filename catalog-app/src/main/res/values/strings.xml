@@ -10,6 +10,12 @@
     <string name="control_rtl">RTL</string>
     <string name="control_font_scale">Font scale</string>
     <string name="control_font_scale_option" translatable="false">%1$s×</string>
+    <string name="control_locale">Language</string>
+    <string name="locale_system">System</string>
+    <string name="locale_english" translatable="false">English</string>
+    <string name="locale_spanish" translatable="false">Español</string>
+    <string name="locale_pseudo_accented" translatable="false">en-XA</string>
+    <string name="locale_pseudo_mirrored" translatable="false">ar-XB</string>
     <string name="tv_catalog_title">Design system catalog: TV</string>
     <string name="tv_detail_back">Back</string>
 </resources>

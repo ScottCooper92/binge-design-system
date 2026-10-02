@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.binge.designsystem.catalogapp.overrides.FontScalePresets
+import com.binge.designsystem.catalogapp.overrides.SampleLocale
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogRegistry
 
@@ -25,6 +26,7 @@ fun CatalogApp() {
     var dark by rememberSaveable { mutableStateOf(systemDark) }
     var fontScale by rememberSaveable { mutableFloatStateOf(FontScalePresets.first()) }
     var rtl by rememberSaveable { mutableStateOf(false) }
+    var locale by rememberSaveable { mutableStateOf(SampleLocale.System) }
 
     val selected = CatalogRegistry.firstOrNull { it.id == selectedId }
     BackHandler(enabled = selected != null) { selectedId = null }
@@ -39,10 +41,11 @@ fun CatalogApp() {
     } else {
         SampleDetail(
             entry = selected,
-            overrides = SampleOverrides(dark, fontScale, rtl),
+            overrides = SampleOverrides(dark, fontScale, rtl, locale),
             onDarkChange = { dark = it },
             onFontScaleChange = { fontScale = it },
             onRtlChange = { rtl = it },
+            onLocaleChange = { locale = it },
             onBack = { selectedId = null },
         )
     }

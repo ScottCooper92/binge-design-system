@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import org.junit.Rule
 import org.junit.Test
@@ -70,5 +71,30 @@ class CatalogAppTest {
         rule.onNodeWithText("2.0×").performClick()
         rule.onNodeWithText("2.0×").assertIsSelected()
         rule.onNodeWithText("1.0×").assertIsNotSelected()
+    }
+
+    @Test
+    fun `demos are listed first under their own heading, found by search and open from the list`() {
+        launch()
+        rule.onNodeWithText("Demos").assertIsDisplayed()
+
+        search("enter always")
+        rule.onNodeWithText("Binge top bar enter always").performClick()
+
+        rule.onNodeWithText("collapsedFraction = 0.00").assertIsDisplayed()
+    }
+
+    @Test
+    fun `the language control is offered in the detail view`() {
+        launch()
+        search("button family")
+        rule.onNodeWithText("Button family").performClick()
+
+        rule
+            .onNodeWithText("Español")
+            .performScrollTo()
+            .assertIsNotSelected()
+            .performClick()
+        rule.onNodeWithText("Español").assertIsSelected()
     }
 }
