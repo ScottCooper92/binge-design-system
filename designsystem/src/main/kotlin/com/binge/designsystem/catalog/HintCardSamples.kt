@@ -1,6 +1,7 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.HintCard
@@ -33,6 +34,20 @@ fun HintCardDismissibleSample() {
             text = "Press and hold an item, then drag to reorder. Screen reader users can use the Move up and " +
                 "Move down actions instead.",
             onDismiss = {},
+        )
+    }
+}
+
+/** A dismissible hint with an action beneath it, trailed by an open-in-new glyph for an outside destination. */
+@Composable
+fun HintCardActionSample() {
+    ScreenshotTheme {
+        HintCard(
+            text = "Connect this app to Binge to request titles from your library.",
+            onDismiss = {},
+            actionLabel = "Open Binge",
+            onAction = {},
+            actionIcon = Icons.AutoMirrored.Filled.OpenInNew,
         )
     }
 }

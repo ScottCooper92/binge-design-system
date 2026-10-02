@@ -25,4 +25,11 @@ class HintCardSamplesScreenshotTest {
     fun Dismissible() {
         HintCardDismissibleSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Action() {
+        HintCardActionSample()
+    }
 }
