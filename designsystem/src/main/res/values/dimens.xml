@@ -167,7 +167,6 @@
     <dimen name="discover_quickclear_chip_close_icon">12dp</dimen>
     <!-- Modal side sheet (see BingeModalSideSheet): end-anchored panel width + leading corner radius -->
     <dimen name="side_sheet_width">340dp</dimen>
-    <dimen name="side_sheet_corner">28dp</dimen>
     <dimen name="discover_filter_chip_padding_h">14dp</dimen>
     <dimen name="discover_filter_chip_padding_v">8dp</dimen>
     <dimen name="discover_filter_chip_icon">14dp</dimen>

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +29,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.binge.designsystem.R
+import com.binge.designsystem.theme.BingeShapes
 
 private const val SIDE_SHEET_SCRIM_ALPHA = 0.5f
 private const val SIDE_SHEET_ANIMATION_MS = 250
@@ -102,12 +102,8 @@ internal fun BingeSideSheetPanel(modifier: Modifier = Modifier, content: @Compos
             modifier
                 .fillMaxHeight()
                 .width(dimensionResource(R.dimen.side_sheet_width))
-                .clip(
-                    RoundedCornerShape(
-                        topStart = dimensionResource(R.dimen.side_sheet_corner),
-                        bottomStart = dimensionResource(R.dimen.side_sheet_corner),
-                    ),
-                ).background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .clip(BingeShapes.HeroStart)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 // Swallow taps on the panel so they don't fall through to the scrim.
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
