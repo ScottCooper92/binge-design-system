@@ -12,28 +12,7 @@ class TextButtonSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun Enabled() {
+    fun States() {
         TextButtonSample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun Disabled() {
-        TextButtonDisabledSample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun Error() {
-        TextButtonErrorSample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun Icon() {
-        TextButtonIconSample()
     }
 }

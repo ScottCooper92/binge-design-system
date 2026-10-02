@@ -1,6 +1,10 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -15,11 +19,12 @@ private const val SEARCH_PLACEHOLDER = "Search services"
  */
 @Composable
 fun SearchFieldEmptySample() {
+    var query by remember { mutableStateOf("") }
     ScreenshotTheme {
         BingeSearchField(
-            query = "",
-            onQueryChange = {},
-            onClear = {},
+            query = query,
+            onQueryChange = { query = it },
+            onClear = { query = "" },
             placeholder = SEARCH_PLACEHOLDER,
         )
     }
@@ -28,11 +33,12 @@ fun SearchFieldEmptySample() {
 /** Populated field — the trailing clear button appears once the query is non-empty. */
 @Composable
 fun SearchFieldWithQuerySample() {
+    var query by remember { mutableStateOf("Netflix") }
     ScreenshotTheme {
         BingeSearchField(
-            query = "Netflix",
-            onQueryChange = {},
-            onClear = {},
+            query = query,
+            onQueryChange = { query = it },
+            onClear = { query = "" },
             placeholder = SEARCH_PLACEHOLDER,
         )
     }

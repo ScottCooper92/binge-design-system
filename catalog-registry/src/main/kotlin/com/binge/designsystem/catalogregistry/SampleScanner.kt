@@ -13,6 +13,10 @@ data class SampleDeclaration(
     val name: String,
     val description: String,
     val kind: EntryKind = EntryKind.Sample,
+    val onePerScreen: Boolean = false,
+    val catalogGroup: String? = null,
+    val fullScreen: Boolean = false,
+    val selfDescribing: Boolean = false,
 )
 
 /** What one file contributed: the samples it registers and the shapes it could not register. */
@@ -28,16 +32,29 @@ data class ScanResult(
  * top-level, annotated one per line and carry a KDoc, which a line scan reads exactly, and a
  * reflection pass over Compose-rewritten signatures would not. A public function ending in `Sample` or
  * `Demo` that is not a no-argument composable is reported with its file and line, not skipped.
+ *
+ * Three file annotations from the catalog package are read the same way, as lines: `@file:OnePerScreen`
+ * (and its `fullScreen = true`), `@file:CatalogGroup("…")`, `@file:SelfDescribing` and `@file:ScreenshotOnly`, whose file lists nothing.
  */
 object SampleScanner {
     private val declaration = Regex("""^(public\s+)?fun\s+(\w+)\s*\(""")
     private val hiddenDeclaration = Regex("""^(internal|private|protected)\s+""")
     private val sentenceEnd = Regex("""(?<=[.!?])\s+(?=[A-Z])""")
     private val kdocLink = Regex("""\[([^\]]+)]""")
+    private val onePerScreenMarker = Regex("""^@file:\s*([\w.]+\.)?OnePerScreen\b""")
+    private val fullScreenMarker = Regex("""^@file:\s*([\w.]+\.)?OnePerScreen\(\s*fullScreen\s*=\s*true\s*\)""")
+    private val selfDescribingMarker = Regex("""^@file:\s*([\w.]+\.)?SelfDescribing\b""")
+    private val screenshotOnlyMarker = Regex("""^@file:\s*([\w.]+\.)?ScreenshotOnly\b""")
+    private val catalogGroupMarker = Regex("""^@file:\s*([\w.]+\.)?CatalogGroup\(\s*(name\s*=\s*)?"([^"]+)"\s*\)""")
 
     fun scan(fileName: String, source: String): ScanResult {
         val lines = source.lines()
         val group = groupOf(fileName)
+        val onePerScreen = lines.any { onePerScreenMarker.containsMatchIn(it.trim()) }
+        val fullScreen = lines.any { fullScreenMarker.containsMatchIn(it.trim()) }
+        val selfDescribing = lines.any { selfDescribingMarker.containsMatchIn(it.trim()) }
+        val screenshotOnly = lines.any { screenshotOnlyMarker.containsMatchIn(it.trim()) }
+        val catalogGroup = lines.firstNotNullOfOrNull { catalogGroupMarker.find(it.trim())?.groupValues?.get(3) }
         val samples = mutableListOf<SampleDeclaration>()
         val problems = mutableListOf<String>()
         for ((index, line) in lines.withIndex()) {
@@ -58,10 +75,15 @@ object SampleScanner {
                     name = displayName(function),
                     description = firstSentence(kdocAbove(lines, index - annotations.size)),
                     kind = kind,
+                    onePerScreen = onePerScreen,
+                    catalogGroup = catalogGroup,
+                    fullScreen = fullScreen,
+                    selfDescribing = selfDescribing,
                 )
             }
         }
-        return ScanResult(samples, problems)
+        // A screenshot-only file is still checked, so a bad sample fails the build, but lists nothing.
+        return ScanResult(if (screenshotOnly) emptyList() else samples, problems)
     }
 
     /** `BingeConfirmDialogSamples.kt` → `BingeConfirmDialog`; a `…Demos.kt` file groups the same way. */

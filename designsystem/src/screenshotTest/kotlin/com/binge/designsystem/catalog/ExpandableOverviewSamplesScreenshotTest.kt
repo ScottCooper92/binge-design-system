@@ -11,4 +11,11 @@ class ExpandableOverviewSamplesScreenshotTest {
     fun ExpandableOverview() {
         ExpandableOverviewSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ExpandableOverviewShort() {
+        ExpandableOverviewShortSample()
+    }
 }

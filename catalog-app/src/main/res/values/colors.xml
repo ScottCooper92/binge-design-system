@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Binge's light surface (LightSurface in the design system's ExpressiveTheme.kt). -->
+    <color name="catalog_window_background">#FFFFFBFF</color>
+</resources>

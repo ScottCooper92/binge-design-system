@@ -93,23 +93,49 @@ for Android TV.
 
 - A public, no-parameter `@Composable fun …Sample()` in `designsystem/…/catalog/` or
   `designsystem-tv/…/tv/catalog/` is listed as a sample.
-- A public, no-parameter `@Composable fun …Demo()` in `designsystem/…/catalog/` is listed under
-  Demos. It runs the real component with real state. Demos are never screenshot fixtures.
-- The first sentence of its KDoc is its description. The file name gives its group.
+- A public, no-parameter `@Composable fun …Demo()` in `designsystem/…/catalog/` is listed as a demo.
+  It runs the real component with real state. Demos are never screenshot fixtures.
+- The first sentence of its KDoc is its description, and the app's search reads it.
 - A public `…Sample` or `…Demo` that takes parameters, or is not composable, fails the build with its
   file and line. A private or internal one is ignored.
 
-**The list is an adaptive grid.** The phone catalog is a grid of cards that gains columns as the window
-widens. A sample's card shows a live, scaled-down render of it. A demo's card shows an icon and a Demo
-badge, because a still image of "Open sheet" says nothing about what the demo does. Tapping anywhere on
-a card opens it, including on the preview.
+**One card per component.** Samples and demos are variants of a component, and the grid shows the
+component once. A component is its samples file, without the `Samples` suffix. A demo joins the
+component its function name starts with. A component's card shows a live, scaled-down render of its
+first sample, or an icon when it has only demos. Components with a demo come first, under Demos.
 
-**Controls.** The phone detail view has dark mode, font scale (1.0, 1.3, 2.0), RTL, and language
-(system, English, Spanish, and the `en-XA` and `ar-XB` pseudolocales). The TV detail view has font
-scale and RTL: the TV theme is dark-only, so it has no dark toggle. The first three work by
-overriding composition locals around the sample, so no sample is edited. Resource qualifiers such as
-screen width are not reachable that way, which is why the app has no width presets. Language works
-differently, by handing the sample a context recreated for the locale.
+**A component's page.** Tapping a card opens its page. Most components list every variant, one under
+the next, so they compare at a glance. A component a screen holds one of, such as a top bar, shows one
+variant at a time, and its variant is chosen in the tweaks sheet. A sample's controls work: a sample
+keeps its own state, seeded with the values its screenshot shows.
+
+**File annotations.** Four annotations in `catalog/` shape the page. They are source-only, and the
+generator reads them as lines:
+
+- `@file:OnePerScreen` shows the component one variant at a time. With `fullScreen = true` the
+  variant replaces the app's own chrome. A top bar is only judged at the real top of the window, and
+  its back button leaves through `LocalDemoBack`.
+- `@file:CatalogGroup("Top app bars")` lists every entry in the file under that name. Components a
+  screen chooses between share a page this way.
+- `@file:ScreenshotOnly` keeps the file's samples out of the app. They stay screenshot fixtures, and
+  a live demo stands in for them.
+- `@file:SelfDescribing` says the samples carry their own description, such as a button labelled with
+  its state. The app shows no description card over them.
+
+A variant that scrolls vertically cannot sit in a list. A test composes every listed variant in a
+lazy list, so it fails the build until that component is marked `OnePerScreen`.
+
+**Layout.** The phone catalog is a two-column grid with a search field. From 840dp wide, on a tablet or
+an unfolded foldable, the grid and the open component sit side by side, each in a `PaneContent`. The
+app runs edge to edge, and its chrome is built from the design system's own components.
+
+**Controls.** A floating button opens the tweaks: dark mode, font scale (1.0, 1.3, 2.0), RTL, and
+language (system, English, Spanish, and the `en-XA` and `ar-XB` pseudolocales). They stay set as you
+move between variants. The TV detail view has font scale and RTL: the TV theme is dark-only, so it has
+no dark toggle. The first three work by overriding composition locals around the sample, so no sample
+is edited. Resource qualifiers such as screen width are not reachable that way, which is why the app
+has no width presets. Language works differently, by handing the sample a context recreated for the
+locale.
 
 **Never published.** There is no release variant, no signing configuration and no APK artifact.
 `./gradlew build` compiles, lints and tests it with everything else, and nothing in Binge or

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    The window under the Compose content, which shows at launch and behind any frame Compose has not
+    drawn yet: Binge's own surface, as the catalog's chrome and every sample stand on, not the device's
+    default grey.
+    -->
+    <style name="Theme.Catalog" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/catalog_window_background</item>
+    </style>
+</resources>

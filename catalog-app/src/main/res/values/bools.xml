@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The tweaks open as a bottom sheet on a phone, and as a side sheet once the window is wide enough to keep the sample in view beside it. -->
+    <bool name="catalog_tweaks_side_sheet">false</bool>
+</resources>

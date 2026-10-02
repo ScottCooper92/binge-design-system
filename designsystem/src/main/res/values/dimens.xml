@@ -79,6 +79,7 @@
     <!-- Explicit zero for no-padding / no-border / collapsed cases -->
     <dimen name="zero">0dp</dimen>
     <dimen name="catalog_demo_list_row_height">96dp</dimen>
+    <dimen name="catalog_demo_artwork_height">280dp</dimen>
     <!-- Material minimum touch target (selectable rows, tappable bars) -->
     <dimen name="min_touch_target">48dp</dimen>
     <!-- Stroke width for small inline circular progress spinners -->

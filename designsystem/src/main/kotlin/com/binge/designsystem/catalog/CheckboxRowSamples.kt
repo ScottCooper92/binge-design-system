@@ -4,6 +4,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.CheckboxRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -13,8 +18,9 @@ import com.binge.designsystem.preview.ScreenshotTheme
  */
 @Composable
 fun CheckboxRowSample() {
+    var checked by remember { mutableStateOf(false) }
     ScreenshotTheme {
-        CheckboxRow(label = "Season 1", checked = false, onToggle = {})
+        CheckboxRow(label = "Season 1", checked = checked, onToggle = { checked = it })
     }
 }
 
@@ -25,6 +31,8 @@ fun CheckboxRowSample() {
  */
 @Composable
 fun CheckboxRowListSample() {
+    // Season 4 is disabled, so it keeps its seeded tick whatever is tapped.
+    val checked = remember { mutableStateListOf(false, true, false, true, false) }
     ScreenshotTheme {
         Column {
             val labels = listOf("Season 1", "Season 2", "Season 3", "Season 4", "Season 5")
@@ -34,8 +42,8 @@ fun CheckboxRowListSample() {
                         CheckboxRow(
                             label = label,
                             subtitle = "10 episodes",
-                            checked = true,
-                            onToggle = {},
+                            checked = checked[index],
+                            onToggle = { checked[index] = it },
                             showDivider = index < labels.lastIndex,
                         )
                     3 ->
@@ -56,8 +64,8 @@ fun CheckboxRowListSample() {
                     else ->
                         CheckboxRow(
                             label = label,
-                            checked = false,
-                            onToggle = {},
+                            checked = checked[index],
+                            onToggle = { checked[index] = it },
                             showDivider = index < labels.lastIndex,
                         )
                 }

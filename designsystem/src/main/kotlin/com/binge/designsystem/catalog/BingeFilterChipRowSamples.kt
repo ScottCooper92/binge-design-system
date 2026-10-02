@@ -1,3 +1,5 @@
+@file:CatalogGroup("Filter chips")
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.background
@@ -7,6 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
@@ -22,6 +28,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
  */
 @Composable
 fun BingeFilterChipRowSample() {
+    var selected by remember { mutableIntStateOf(0) }
     ScreenshotTheme {
         BingeFilterChipRow(
             items = listOf(
@@ -30,8 +37,8 @@ fun BingeFilterChipRowSample() {
                 FilterChipItem(label = "TV", count = 54),
                 FilterChipItem(label = "Watchlist"),
             ),
-            selectedIndex = 0,
-            onSelect = {},
+            selectedIndex = selected,
+            onSelect = { selected = it },
         )
     }
 }
@@ -46,6 +53,7 @@ fun BingeFilterChipRowSample() {
  */
 @Composable
 fun BingeFilterChipPagerSample() {
+    var selected by remember { mutableIntStateOf(0) }
     ScreenshotTheme {
         Box(
             modifier = Modifier
@@ -58,8 +66,8 @@ fun BingeFilterChipPagerSample() {
                     FilterChipItem(label = "Movies", count = 88),
                     FilterChipItem(label = "TV", count = 54),
                 ),
-                selectedIndex = 0,
-                onSelectedIndexChange = {},
+                selectedIndex = selected,
+                onSelectedIndexChange = { selected = it },
                 modifier = Modifier.fillMaxSize(),
             ) { _, _ ->
                 Box(

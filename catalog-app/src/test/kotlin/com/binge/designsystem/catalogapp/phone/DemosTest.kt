@@ -17,16 +17,15 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
-import com.binge.designsystem.catalog.BingeBottomSheetDemo
-import com.binge.designsystem.catalog.BingeConfirmDialogDemo
 import com.binge.designsystem.catalog.BingeMediumTopBarDemo
-import com.binge.designsystem.catalog.BingeModalSideSheetDemo
 import com.binge.designsystem.catalog.BingePaneTopBarDemo
 import com.binge.designsystem.catalog.BingeTextButtonLoadingDemo
 import com.binge.designsystem.catalog.BingeTopBarEnterAlwaysDemo
 import com.binge.designsystem.catalog.BingeTopBarExitUntilCollapsedDemo
+import com.binge.designsystem.catalog.DialogsDemo
 import com.binge.designsystem.catalog.ExpressiveIconButtonLoadingDemo
 import com.binge.designsystem.catalog.LocalisedStringsDemo
+import com.binge.designsystem.catalog.SheetsDemo
 import com.binge.designsystem.catalogapp.overrides.SampleLocale
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.overrides.WithOverrides
@@ -85,37 +84,40 @@ class DemosTest {
 
     @Test
     fun `the bottom sheet opens and dismisses for real`() {
-        rule.setContent { BingeBottomSheetDemo() }
+        rule.setContent { SheetsDemo() }
 
-        rule.onNodeWithText("Open bottom sheet").performClick()
-        rule.onNodeWithText("A real modal bottom sheet").assertIsDisplayed()
+        rule.onNodeWithText("Bottom sheet").performClick()
+        rule.onNodeWithText("A real modal bottom sheet", substring = true).assertIsDisplayed()
         rule.onNodeWithText("Done").performClick()
 
         rule.onNodeWithText("Dismissed by Done").assertIsDisplayed()
-        rule.onNodeWithText("A real modal bottom sheet").assertDoesNotExist()
+        rule.onNodeWithText("A real modal bottom sheet", substring = true).assertDoesNotExist()
     }
 
     @Test
-    fun `the confirm dialog reports whether it was confirmed or cancelled`() {
-        rule.setContent { BingeConfirmDialogDemo() }
+    fun `each dialog opens from its button and reports how it closed`() {
+        rule.setContent { DialogsDemo() }
 
-        rule.onNodeWithText("Open confirm dialog").performClick()
+        rule.onNodeWithText("Destructive confirm dialog").performClick()
         rule.onNodeWithText("Delete list?").assertIsDisplayed()
         rule.onNodeWithText("Cancel").performClick()
         rule.onNodeWithText("Cancelled").assertIsDisplayed()
         rule.onNodeWithText("Delete list?").assertDoesNotExist()
 
-        rule.onNodeWithText("Open confirm dialog").performClick()
-        rule.onNodeWithText("Delete").performClick()
+        rule.onNodeWithText("Confirm dialog").performClick()
+        rule.onNodeWithText("Remove").performClick()
         rule.onNodeWithText("Confirmed").assertIsDisplayed()
+        // The create-list dialog is not opened here: its field takes focus, and under Robolectric a
+        // focused field's blinking cursor keeps the clock busy until the heap runs out.
+        rule.onNodeWithText("Create list dialog").assertIsDisplayed()
     }
 
     @Test
     fun `the side sheet opens and closes for real`() {
-        rule.setContent { BingeModalSideSheetDemo() }
+        rule.setContent { SheetsDemo() }
 
-        rule.onNodeWithText("Open side sheet").performClick()
-        rule.onNodeWithText("A real modal side sheet").assertIsDisplayed()
+        rule.onNodeWithText("Side sheet").performClick()
+        rule.onNodeWithText("A real modal side sheet", substring = true).assertIsDisplayed()
         rule.onNodeWithText("Close").performClick()
 
         rule.onNodeWithText("Closed by button").assertIsDisplayed()
