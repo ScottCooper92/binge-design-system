@@ -37,3 +37,8 @@ rootProject.name = "binge-design-system"
 
 include(":designsystem")
 include(":designsystem-tv")
+
+// The debug-only catalog app and the generator behind its registry (see the epic, #200). Neither
+// is published, and neither is substituted by a consumer, so a consumer never configures them.
+include(":catalog-registry")
+include(":catalog-app")
