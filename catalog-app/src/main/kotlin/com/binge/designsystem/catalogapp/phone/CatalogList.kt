@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.catalogapp.R
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
@@ -64,7 +65,7 @@ private fun SearchField(
         trailingIcon = {
             if (query.isEmpty()) {
                 Text(
-                    stringResource(R.string.catalog_sample_count, count),
+                    pluralStringResource(R.plurals.catalog_entry_count, count, count),
                     modifier = Modifier.padding(end = dimensionResource(R.dimen.catalog_padding)),
                 )
             } else {
