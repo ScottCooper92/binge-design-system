@@ -190,7 +190,7 @@ fun Modifier.tvFocusGroup(): Modifier = this.focusRestorer().focusGroup()
  * One focus unit whose **entry is routed to a chosen child** — the first cell of a lazy row/grid, or a
  * remembered one — instead of left to a directional search.
  *
- * For **click-to-open** surfaces where arriving selects nothing (a media row, a grid, the immersive hub, a
+ * For **click-to-open** surfaces where arriving selects nothing (a media row, a grid, a full-screen hub, a
  * settings pane). A lazy container's default entry lands on whatever child sits nearest the beam, which for a
  * row still scrolled from a previous browse is its *last* cell (an episodes row landing on the see-all
  * tile). Routing entry to [entry] lands it where it should every time.
