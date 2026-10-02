@@ -2,6 +2,7 @@ package com.binge.designsystem.catalogapp.phone
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -100,6 +101,21 @@ class CatalogGridTest {
     @Test
     fun `Tab moves from one card straight to the next, not through its preview overlay`() {
         show(samples)
+
+        rule.onNodeWithText("Cell 0").requestFocus()
+        rule.onNodeWithText("Cell 0").performKeyInput { pressKey(Key.Tab) }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Cell 1").assertIsFocused()
+    }
+
+    @Test
+    fun `Tab skips a focusable control inside a preview and reaches the next card`() {
+        val withButton =
+            CatalogEntry(id = "B0", group = "Group", name = "Cell 0", description = "") {
+                Button(onClick = {}) { Text("Inner button") }
+            }
+        show(listOf(withButton) + samples.drop(1))
 
         rule.onNodeWithText("Cell 0").requestFocus()
         rule.onNodeWithText("Cell 0").performKeyInput { pressKey(Key.Tab) }
