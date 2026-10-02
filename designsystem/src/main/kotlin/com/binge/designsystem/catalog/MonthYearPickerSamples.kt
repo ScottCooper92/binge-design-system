@@ -1,6 +1,10 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.MonthYearPickerContent
 import com.binge.designsystem.component.MonthYearPickerMode
 import com.binge.designsystem.component.MonthYearSelection
@@ -20,17 +24,20 @@ private fun MonthYearPickerSampleFrame(
     minimum: YearMonth? = null,
     maximum: YearMonth? = null,
 ) {
+    // Each sample starts in its own state, which is all a frame sees, and then picks for real.
+    var current by remember { mutableStateOf(selection) }
+    var open by remember { mutableStateOf(yearsOpen) }
     ScreenshotTheme {
         MonthYearPickerContent(
             title = "From",
             mode = mode,
-            selection = selection,
+            selection = current,
             yearRange = SampleYears,
             minimum = minimum,
             maximum = maximum,
-            yearsOpen = yearsOpen,
-            onYearsOpenChange = {},
-            onSelectionChange = {},
+            yearsOpen = open,
+            onYearsOpenChange = { open = it },
+            onSelectionChange = { current = it },
             onConfirm = {},
             onDismiss = {},
             locale = Locale.UK,

@@ -1,3 +1,5 @@
+@file:CatalogGroup("Tags and badges")
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement

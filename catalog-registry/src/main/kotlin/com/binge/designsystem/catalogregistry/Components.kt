@@ -24,8 +24,8 @@ data class ComponentEntry(
  *   `BingeFilterChipRow` from folding into `BingeFilterChip`.
  *
  * [declarations] are given in source order, files in name order; the result is sorted by component
- * name, then the component's default variant (the function named after it) first, then samples before
- * demos, each in source order.
+ * name, then the component's default variant (the function named after it) first, then skeletons
+ * after the real thing they stand in for, then samples before demos, each in source order.
  */
 fun toComponents(declarations: List<SampleDeclaration>): List<ComponentEntry> {
     val sampleGroups = declarations.filter { it.kind == EntryKind.Sample }.map { it.group }.toSet()
@@ -62,6 +62,7 @@ fun toComponents(declarations: List<SampleDeclaration>): List<ComponentEntry> {
                 { it.second.componentName },
                 { it.second.component },
                 { it.second.variantName != DEFAULT_VARIANT },
+                { it.second.variantName.isSkeleton() },
                 { it.second.declaration.kind },
                 { it.first },
             ),
@@ -83,6 +84,9 @@ fun componentName(component: String): String {
     val unprefixed = component.removePrefix(DESIGN_SYSTEM_PREFIX)
     return SampleScanner.displayName(if (unprefixed.firstOrNull()?.isUpperCase() == true) unprefixed else component)
 }
+
+/** A loading placeholder, which reads after the component it stands in for, whatever its file is called. */
+private fun String.isSkeleton(): Boolean = contains("skeleton", ignoreCase = true)
 
 /** The variant named after its component, which the component's card shows. */
 const val DEFAULT_VARIANT = "Default"

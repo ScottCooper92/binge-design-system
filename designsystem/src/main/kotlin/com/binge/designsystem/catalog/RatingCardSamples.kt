@@ -1,3 +1,5 @@
+@file:CatalogGroup("Ratings")
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable

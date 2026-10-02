@@ -1,4 +1,4 @@
-@file:CatalogGroup("Filter chips")
+@file:CatalogGroup("Chips")
 
 package com.binge.designsystem.catalog
 

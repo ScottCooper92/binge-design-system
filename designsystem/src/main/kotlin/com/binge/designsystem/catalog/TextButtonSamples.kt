@@ -1,4 +1,5 @@
 @file:SelfDescribing
+@file:CatalogGroup("Buttons")
 
 package com.binge.designsystem.catalog
 

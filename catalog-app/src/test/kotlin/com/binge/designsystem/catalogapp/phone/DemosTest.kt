@@ -19,6 +19,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import com.binge.designsystem.catalog.BingeMediumTopBarDemo
 import com.binge.designsystem.catalog.BingePaneTopBarDemo
+import com.binge.designsystem.catalog.BingeSnackbarHostDemo
 import com.binge.designsystem.catalog.BingeTextButtonLoadingDemo
 import com.binge.designsystem.catalog.BingeTopBarEnterAlwaysDemo
 import com.binge.designsystem.catalog.BingeTopBarExitUntilCollapsedDemo
@@ -110,6 +111,17 @@ class DemosTest {
         // The create-list dialog is not opened here: its field takes focus, and under Robolectric a
         // focused field's blinking cursor keeps the clock busy until the heap runs out.
         rule.onNodeWithText("Create list dialog").assertIsDisplayed()
+    }
+
+    @Test
+    fun `the snackbar host shows a message and reports its action`() {
+        rule.setContent { BingeSnackbarHostDemo() }
+
+        rule.onNodeWithText("Error with Retry").performClick()
+        rule.onNodeWithText("Couldn't save your rating").assertIsDisplayed()
+        rule.onNodeWithText("Retry").performClick()
+
+        rule.onNodeWithText("Action tapped").assertIsDisplayed()
     }
 
     @Test

@@ -1,4 +1,5 @@
 @file:OnePerScreen
+@file:CatalogGroup("Layout")
 
 package com.binge.designsystem.catalog
 
