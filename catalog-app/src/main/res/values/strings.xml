@@ -10,4 +10,6 @@
     <string name="control_rtl">RTL</string>
     <string name="control_font_scale">Font scale</string>
     <string name="control_font_scale_option" translatable="false">%1$s×</string>
+    <string name="tv_catalog_title">Design system catalog: TV</string>
+    <string name="tv_detail_back">Back</string>
 </resources>

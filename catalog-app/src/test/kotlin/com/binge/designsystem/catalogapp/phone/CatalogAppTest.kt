@@ -1,4 +1,4 @@
-package com.binge.designsystem.catalogapp
+package com.binge.designsystem.catalogapp.phone
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.assertIsDisplayed

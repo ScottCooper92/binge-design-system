@@ -1,4 +1,4 @@
-package com.binge.designsystem.catalogapp
+package com.binge.designsystem.catalogapp.phone
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import com.binge.designsystem.catalogapp.R
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.byGroup
 import com.binge.designsystem.catalogapp.registry.matching

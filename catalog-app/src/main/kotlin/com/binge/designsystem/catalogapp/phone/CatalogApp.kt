@@ -1,4 +1,4 @@
-package com.binge.designsystem.catalogapp
+package com.binge.designsystem.catalogapp.phone
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.binge.designsystem.catalogapp.overrides.FontScalePresets
+import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogRegistry
 
 /**

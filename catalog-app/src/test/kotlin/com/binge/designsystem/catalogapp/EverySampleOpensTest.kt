@@ -1,10 +1,17 @@
 package com.binge.designsystem.catalogapp
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import com.binge.designsystem.catalogapp.overrides.FontScalePresets
+import com.binge.designsystem.catalogapp.overrides.SampleOverrides
+import com.binge.designsystem.catalogapp.overrides.WithOverrides
+import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.CatalogRegistry
+import com.binge.designsystem.catalogapp.registry.TvCatalogRegistry
+import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -27,13 +34,23 @@ class EverySampleOpensTest {
 
     @Test
     fun `every sample composes under forced dark, rtl and the largest font`() {
+        assertEverySampleComposes(CatalogRegistry) { it() }
+    }
+
+    @Test
+    fun `every TV sample composes under forced rtl and the largest font`() {
+        assertEverySampleComposes(TvCatalogRegistry) { BingeTvTheme(content = it) }
+    }
+
+    /** [host] is whatever the real activity wraps around a sample: the TV theme, for the TV registry. */
+    private fun assertEverySampleComposes(registry: List<CatalogEntry>, host: @Composable (@Composable () -> Unit) -> Unit) {
         val overrides = SampleOverrides(dark = true, fontScale = FontScalePresets.last(), rtl = true)
-        rule.setContent { WithOverrides(overrides, CatalogRegistry[index].content) }
+        rule.setContent { host { WithOverrides(overrides, registry[index].content) } }
 
         val failures = mutableListOf<String>()
-        CatalogRegistry.indices.forEach { i ->
+        registry.indices.forEach { i ->
             index = i
-            runCatching { rule.waitForIdle() }.onFailure { failures += "${CatalogRegistry[i].id}: ${it.message?.lineSequence()?.first()}" }
+            runCatching { rule.waitForIdle() }.onFailure { failures += "${registry[i].id}: ${it.message?.lineSequence()?.first()}" }
         }
 
         assertTrue("${failures.size} samples failed to compose:\n" + failures.joinToString("\n"), failures.isEmpty())

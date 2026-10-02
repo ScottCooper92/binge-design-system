@@ -1,4 +1,4 @@
-package com.binge.designsystem.catalogapp
+package com.binge.designsystem.catalogapp.phone
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import com.binge.designsystem.catalogapp.R
+import com.binge.designsystem.catalogapp.overrides.FontScalePresets
+import com.binge.designsystem.catalogapp.overrides.SampleOverrides
+import com.binge.designsystem.catalogapp.overrides.WithOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 
 /**

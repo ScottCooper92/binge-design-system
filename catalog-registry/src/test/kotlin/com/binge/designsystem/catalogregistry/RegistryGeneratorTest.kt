@@ -42,4 +42,17 @@ class RegistryGeneratorTest {
         assertTrue("AAmSamples.kt:2:" in thrown.problems[0])
         assertTrue("BBSamples.kt:1:" in thrown.problems[1])
     }
+
+    @Test
+    fun `a second catalog gets its own package and registry name`() {
+        val out = generateRegistry(
+            listOf("TvButtonSamples.kt" to "/** A button. */\n@Composable\nfun TvButtonSample() {}"),
+            catalogPackage = "com.binge.designsystem.tv.catalog",
+            registryName = "TvCatalogRegistry",
+        )
+
+        assertTrue("import com.binge.designsystem.tv.catalog.TvButtonSample" in out)
+        assertTrue("val TvCatalogRegistry: List<CatalogEntry> =" in out)
+        assertTrue("com.binge.designsystem.catalog.ButtonFamilySample" !in out)
+    }
 }
