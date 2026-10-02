@@ -41,6 +41,12 @@ object BingeShapes {
      */
     val HeroTop = RoundedCornerShape(topStart = HERO_RADIUS, topEnd = HERO_RADIUS)
 
+    /**
+     * [Hero]'s radius on the start corners only, for a surface that slides in from the end edge —
+     * [com.binge.designsystem.component.BingeModalSideSheet]'s panel, the side-on mirror of [HeroTop].
+     */
+    val HeroStart = RoundedCornerShape(topStart = HERO_RADIUS, bottomStart = HERO_RADIUS)
+
     /** A card that stacks rows (an onboarding points list): between [MediaCard] and [AccountCard], so it sits with both. */
     val ListCard = RoundedCornerShape(22.dp)
 
