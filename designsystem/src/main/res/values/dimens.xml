@@ -96,6 +96,7 @@
     <dimen name="button_filled_icon_size">20dp</dimen>
     <dimen name="button_filled_icon_spacing">8dp</dimen>
     <dimen name="button_tonal_size">52dp</dimen>
+    <dimen name="icon_button_glyph_size">24dp</dimen>
     <dimen name="top_bar_icon_size">48dp</dimen>
     <!-- Extra start inset the medium bar's title ramps to as it collapses, on top of the content-inset
          gap both rows already carry (see BingeMediumTopBar), so the collapsed single-line title also
