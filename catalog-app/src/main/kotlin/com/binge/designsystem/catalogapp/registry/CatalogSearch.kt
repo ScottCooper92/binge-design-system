@@ -14,5 +14,11 @@ fun List<CatalogEntry>.matching(query: String): List<CatalogEntry> {
     }
 }
 
-/** Entries in registry order, gathered under their group. */
-fun List<CatalogEntry>.byGroup(): List<Pair<String, List<CatalogEntry>>> = groupBy { it.group }.toList()
+/** The heading every demo is listed under, ahead of the sample groups. */
+const val DEMOS_SECTION = "Demos"
+
+/** Entries in registry order, gathered under their group, with every demo under [DEMOS_SECTION] first. */
+fun List<CatalogEntry>.byGroup(): List<Pair<String, List<CatalogEntry>>> {
+    val (demos, samples) = partition { it.kind == CatalogKind.Demo }
+    return listOfNotNull(demos.takeIf { it.isNotEmpty() }?.let { DEMOS_SECTION to it }) + samples.groupBy { it.group }.toList()
+}

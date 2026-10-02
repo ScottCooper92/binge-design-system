@@ -55,4 +55,12 @@ class RegistryGeneratorTest {
         assertTrue("val TvCatalogRegistry: List<CatalogEntry> =" in out)
         assertTrue("com.binge.designsystem.catalog.ButtonFamilySample" !in out)
     }
+
+    @Test
+    fun `writes each entry's kind`() {
+        val out = generateRegistry(listOf("BusyDemos.kt" to "/** Busy. */\n@Composable\nfun BusyDemo() {}", button))
+
+        assertTrue("kind = CatalogKind.Demo," in out)
+        assertTrue("kind = CatalogKind.Sample," in out)
+    }
 }

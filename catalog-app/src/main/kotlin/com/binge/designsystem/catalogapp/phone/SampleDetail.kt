@@ -26,6 +26,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.catalogapp.R
 import com.binge.designsystem.catalogapp.overrides.FontScalePresets
+import com.binge.designsystem.catalogapp.overrides.SampleLocale
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.overrides.WithOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
@@ -42,6 +43,7 @@ fun SampleDetail(
     onDarkChange: (Boolean) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onRtlChange: (Boolean) -> Unit,
+    onLocaleChange: (SampleLocale) -> Unit,
     onBack: () -> Unit,
 ) {
     Scaffold(
@@ -57,7 +59,7 @@ fun SampleDetail(
         },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            OverrideControls(overrides, onDarkChange, onFontScaleChange, onRtlChange)
+            OverrideControls(overrides, onDarkChange, onFontScaleChange, onRtlChange, onLocaleChange)
             HorizontalDivider()
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 WithOverrides(overrides, entry.content)
@@ -72,6 +74,7 @@ private fun OverrideControls(
     onDarkChange: (Boolean) -> Unit,
     onFontScaleChange: (Float) -> Unit,
     onRtlChange: (Boolean) -> Unit,
+    onLocaleChange: (SampleLocale) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -97,6 +100,14 @@ private fun OverrideControls(
                 selected = overrides.fontScale == scale,
                 onClick = { onFontScaleChange(scale) },
                 label = { Text(stringResource(R.string.control_font_scale_option, scale.toString())) },
+            )
+        }
+        Text(stringResource(R.string.control_locale))
+        SampleLocale.entries.forEach { locale ->
+            FilterChip(
+                selected = overrides.locale == locale,
+                onClick = { onLocaleChange(locale) },
+                label = { Text(stringResource(locale.labelRes())) },
             )
         }
     }

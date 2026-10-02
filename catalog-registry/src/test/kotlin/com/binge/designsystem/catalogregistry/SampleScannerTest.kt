@@ -146,4 +146,44 @@ class SampleScannerTest {
         assertEquals("TV card row", SampleScanner.displayName("TVCardRowSample"))
         assertEquals("Media card rated", SampleScanner.displayName("MediaCardRatedSample"))
     }
+
+    @Test
+    fun `finds a demo and marks its kind, grouping a Demos file like a Samples file`() {
+        val result = SampleScanner.scan(
+            "TopBarDemos.kt",
+            "/** A bar that scrolls. Try it. */\n@Composable\nfun BingeTopBarEnterAlwaysDemo() {}\n\n/** Fixture. */\n@Composable\nfun BingeTopBarSample() {}",
+        )
+
+        assertTrue(result.problems.isEmpty())
+        assertEquals(
+            listOf(
+                SampleDeclaration(
+                    "BingeTopBarEnterAlwaysDemo",
+                    "TopBar",
+                    "Binge top bar enter always",
+                    "A bar that scrolls",
+                    EntryKind.Demo,
+                ),
+                SampleDeclaration("BingeTopBarSample", "TopBar", "Binge top bar", "Fixture", EntryKind.Sample),
+            ),
+            result.samples,
+        )
+    }
+
+    @Test
+    fun `a parameterised or non-composable demo fails like a sample, naming it a demo`() {
+        val result = scan("@Composable\nfun BusyDemo(x: Int) {}\n\nfun PlainDemo() {}", "BusyDemos.kt")
+
+        assertEquals(2, result.problems.size)
+        assertTrue("a demo takes none" in result.problems[0], result.problems[0])
+        assertTrue("a catalog demo must be" in result.problems[1], result.problems[1])
+    }
+
+    @Test
+    fun `a function that merely contains the word is not an entry`() {
+        val result = scan("@Composable\nfun DemoReel(x: Int) {}\n\n@Composable\nfun SampleSizeDemoHelper(x: Int) {}")
+
+        assertTrue(result.samples.isEmpty())
+        assertTrue(result.problems.isEmpty())
+    }
 }

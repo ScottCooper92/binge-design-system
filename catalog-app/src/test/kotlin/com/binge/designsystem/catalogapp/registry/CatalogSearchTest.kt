@@ -9,7 +9,8 @@ class CatalogSearchTest {
         group: String,
         name: String,
         description: String = "",
-    ) = CatalogEntry(id, group, name, description) {}
+        kind: CatalogKind = CatalogKind.Sample,
+    ) = CatalogEntry(id, group, name, description, kind) {}
 
     private val entries =
         listOf(
@@ -42,5 +43,17 @@ class CatalogSearchTest {
 
         assertEquals(listOf("Button", "MediaCard"), grouped.map { it.first })
         assertEquals(listOf("A", "B"), grouped.first().second.map { it.id })
+    }
+
+    @Test
+    fun `demos are gathered under their own section ahead of the sample groups`() {
+        val mixed =
+            entries + entry("D", "TopBar", "Top bar enter always", kind = CatalogKind.Demo) +
+                entry("E", "Modal", "Sheet", kind = CatalogKind.Demo)
+
+        val grouped = mixed.byGroup()
+
+        assertEquals(listOf(DEMOS_SECTION, "Button", "MediaCard"), grouped.map { it.first })
+        assertEquals(listOf("D", "E"), grouped.first().second.map { it.id })
     }
 }
