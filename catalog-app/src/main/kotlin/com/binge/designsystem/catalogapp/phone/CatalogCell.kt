@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
@@ -51,8 +52,14 @@ fun CatalogCell(
                 CatalogKind.Demo -> DemoVisual(entry)
             }
             // A preview is a picture, not a control: this swallows taps meant for a button inside it
-            // and opens the entry instead. Its own semantics are cleared so the card is the one target.
-            Box(Modifier.matchParentSize().clearAndSetSemantics {}.clickable(onClick = onClick))
+            // and opens the entry instead. It is not a focus stop or a semantics node, so the card is the one target.
+            Box(
+                Modifier
+                    .matchParentSize()
+                    .clearAndSetSemantics {}
+                    .focusProperties { canFocus = false }
+                    .clickable(onClick = onClick),
+            )
         }
         Text(
             text = entry.name,

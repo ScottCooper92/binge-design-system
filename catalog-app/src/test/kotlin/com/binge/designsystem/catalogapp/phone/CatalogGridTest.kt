@@ -5,15 +5,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.CatalogKind
@@ -90,6 +95,17 @@ class CatalogGridTest {
 
         rule.onNodeWithText("Demos").assertIsDisplayed()
         rule.onAllNodesWithText("Demo").assertCountEquals(1)
+    }
+
+    @Test
+    fun `Tab moves from one card straight to the next, not through its preview overlay`() {
+        show(samples)
+
+        rule.onNodeWithText("Cell 0").requestFocus()
+        rule.onNodeWithText("Cell 0").performKeyInput { pressKey(Key.Tab) }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Cell 1").assertIsFocused()
     }
 
     private companion object {
