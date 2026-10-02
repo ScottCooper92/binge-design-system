@@ -32,10 +32,10 @@ private const val CELL_COUNT = 3
 
 /**
  * [TvCardRow]'s trailing (see-all) tile must be remembered as the row's entry cell exactly like any other
- * cell — the gap #2551 fixed for `TvMediaRow`, mirrored here. Without the fix, [rememberTvRowEntry] sizes
+ * cell, as the row's other cells already are. Without that, [rememberTvRowEntry] sizes
  * itself to `items.size` alone, the trailing tile never carries an [TvRowEntry.entryModifier] and never calls
  * [TvRowEntry.rememberFocused], so Back from a drill-down opened off the tile lands on the last card instead
- * of the tile — `TvDetailCastRow`'s "see all" into the full cast grid is the concrete surface.
+ * of the tile — a row of cards whose "see all" opens the full grid is the concrete surface.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -154,7 +154,7 @@ class TvCardRowFocusMemoryTest {
         Box(Modifier.testTag(RAIL).size(CELL_WIDTH_DP.dp).focusable())
     }
 
-    /** Three cards plus a trailing see-all tile, wired exactly as a real caller (e.g. `TvDetailCastRow`) would. */
+    /** Three cards plus a trailing see-all tile, wired exactly as a real caller would. */
     @Composable
     private fun CardRowWithTrailing(entryRequester: FocusRequester, overrideIndex: Int? = null) {
         TvCardRow(
