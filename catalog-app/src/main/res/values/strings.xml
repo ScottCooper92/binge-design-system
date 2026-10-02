@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Design system catalog</string>
-    <string name="catalog_search_hint">Search samples</string>
+    <string name="catalog_search_hint">Search samples and demos</string>
     <string name="catalog_search_clear">Clear search</string>
     <string name="catalog_empty">No samples match “%1$s”</string>
-    <string name="catalog_sample_count">%1$d samples</string>
+    <string name="catalog_sample_count">%1$d entries</string>
+    <string name="catalog_demo_badge">Demo</string>
     <string name="detail_back">Back to the list</string>
     <string name="control_dark">Dark</string>
     <string name="control_rtl">RTL</string>
