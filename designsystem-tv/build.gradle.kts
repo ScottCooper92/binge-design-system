@@ -97,7 +97,10 @@ val checkTvMaterialSeparation = tasks.register("checkTvMaterialSeparation") {
     val root = rootProject.layout.projectDirectory.asFile
     val tvSources = fileTree(layout.projectDirectory.dir("src")) { include("**/*.kt") }
     val phoneSources = fileTree(rootProject.layout.projectDirectory.dir("designsystem/src")) { include("**/*.kt") }
-    inputs.files(tvSources, phoneSources)
+    // The catalog app holds both sides in one module, split by package: `tv/` is TV source, everything
+    // else is phone or shared source, and the shared `registry/` and `overrides/` packages import neither.
+    val catalogAppSources = fileTree(rootProject.layout.projectDirectory.dir("catalog-app/src")) { include("**/*.kt") }
+    inputs.files(tvSources, phoneSources, catalogAppSources)
     val allowlist = tvMaterialSeparationAllowlist
     doLast {
         val violations = mutableListOf<String>()
@@ -120,6 +123,12 @@ val checkTvMaterialSeparation = tasks.register("checkTvMaterialSeparation") {
         }
         scan(tvSources.files, "androidx.compose.material3", "TV source")
         scan(phoneSources.files, "androidx.tv", "phone source")
+
+        fun File.inCatalogPackage(vararg names: String) = invariantSeparatorsPath.let { path -> names.any { "/catalogapp/$it/" in path } }
+        val catalogFiles = catalogAppSources.files
+        scan(catalogFiles.filter { it.inCatalogPackage("tv") }, "androidx.compose.material3", "catalog TV source")
+        scan(catalogFiles.filterNot { it.inCatalogPackage("tv") }, "androidx.tv", "catalog phone or shared source")
+        scan(catalogFiles.filter { it.inCatalogPackage("registry", "overrides") }, "androidx.compose.material3", "catalog shared source")
         if (violations.isNotEmpty()) {
             throw GradleException(
                 "Material 3 and tv-material must not be mixed. TV source may only use androidx.tv.material3; " +

@@ -234,6 +234,15 @@ fun TvFocusIndicatorSample() {
 }
 
 /**
+ * The rail shell expanded, with a header, destinations and a footer. The parameterised overload below
+ * is the screenshot frames' fixture; this is the public no-argument form the catalog app lists.
+ */
+@Composable
+fun TvNavRailSample() {
+    TvNavRailSample(expanded = true)
+}
+
+/**
  * The rail shell with a header, destinations and a footer; [expanded] pins which resting shape renders.
  *
  * [artworkBehind] pins the other half of the rail's fill, and puts something behind it worth seeing through
@@ -241,7 +250,7 @@ fun TvFocusIndicatorSample() {
  * item's [NavSuiteBadge.Label] a sample count — a companion's pending-attention badge on the rail.
  */
 @Composable
-fun TvNavRailSample(
+internal fun TvNavRailSample(
     expanded: Boolean,
     selectedKey: String = "movies",
     artworkBehind: Boolean = false,

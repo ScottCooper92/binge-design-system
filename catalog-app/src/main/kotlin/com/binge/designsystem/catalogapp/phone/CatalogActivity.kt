@@ -1,4 +1,4 @@
-package com.binge.designsystem.catalogapp
+package com.binge.designsystem.catalogapp.phone
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

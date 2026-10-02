@@ -62,9 +62,9 @@ androidComponents {
 }
 
 /**
- * Writes `CatalogRegistry.kt` from the design system's catalog sources by running `:catalog-registry`.
- * The samples are read by relative path, not through the `:designsystem` project, so this build
- * stays free of cross-project access.
+ * Writes `CatalogRegistry.kt` and `TvCatalogRegistry.kt` from the two design-system modules' catalog
+ * sources by running `:catalog-registry`. The samples are read by relative path, not through the
+ * `:designsystem` and `:designsystem-tv` projects, so this build stays free of cross-project access.
  */
 abstract class GenerateCatalogRegistry
     @Inject
@@ -82,7 +82,10 @@ abstract class GenerateCatalogRegistry
         abstract val outputDir: DirectoryProperty
 
         @get:Internal
-        abstract val samplesDir: DirectoryProperty
+        abstract val phoneSamplesDir: DirectoryProperty
+
+        @get:Internal
+        abstract val tvSamplesDir: DirectoryProperty
 
         @TaskAction
         fun generate() {
@@ -90,7 +93,11 @@ abstract class GenerateCatalogRegistry
             exec.javaexec {
                 classpath = generator
                 mainClass.set("com.binge.designsystem.catalogregistry.RegistryGenerator")
-                args(samplesDir.get().asFile.absolutePath, out.resolve("CatalogRegistry.kt").absolutePath)
+                args(
+                    out.absolutePath,
+                    "CatalogRegistry=com.binge.designsystem.catalog=${phoneSamplesDir.get().asFile.absolutePath}",
+                    "TvCatalogRegistry=com.binge.designsystem.tv.catalog=${tvSamplesDir.get().asFile.absolutePath}",
+                )
             }
         }
     }
@@ -103,6 +110,7 @@ val generator by configurations.creating {
 dependencies {
     generator(project(":catalog-registry"))
     implementation(project(":designsystem"))
+    implementation(project(":designsystem-tv"))
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.compose.ui.tooling)
 
@@ -118,14 +126,16 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
 }
 
-val catalogSources = layout.projectDirectory.dir("../designsystem/src/main/kotlin/com/binge/designsystem/catalog")
+val phoneCatalogSources = layout.projectDirectory.dir("../designsystem/src/main/kotlin/com/binge/designsystem/catalog")
+val tvCatalogSources = layout.projectDirectory.dir("../designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/catalog")
 
 androidComponents {
     onVariants { variant ->
         val generate =
             tasks.register<GenerateCatalogRegistry>("generate${variant.name.replaceFirstChar { it.uppercase() }}CatalogRegistry") {
-                samples.from(fileTree(catalogSources) { include("*.kt") })
-                samplesDir.set(catalogSources)
+                samples.from(fileTree(phoneCatalogSources) { include("*.kt") }, fileTree(tvCatalogSources) { include("*.kt") })
+                phoneSamplesDir.set(phoneCatalogSources)
+                tvSamplesDir.set(tvCatalogSources)
                 generator.from(configurations.named("generator"))
                 outputDir.set(layout.buildDirectory.dir("generated/catalogRegistry/${variant.name}"))
             }

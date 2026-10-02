@@ -1,4 +1,4 @@
-package com.binge.designsystem.catalogapp
+package com.binge.designsystem.catalogapp.overrides
 
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
