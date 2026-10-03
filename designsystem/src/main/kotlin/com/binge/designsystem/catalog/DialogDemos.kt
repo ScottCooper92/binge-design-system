@@ -40,6 +40,7 @@ fun DialogsDemo() {
 
         fun close(how: String) {
             open = null
+            submitting = false
             outcome = how
         }
         Column(

@@ -33,7 +33,7 @@ data class ScanResult(
  * reflection pass over Compose-rewritten signatures would not. A public function ending in `Sample` or
  * `Demo` that is not a no-argument composable is reported with its file and line, not skipped.
  *
- * Three file annotations from the catalog package are read the same way, as lines: `@file:OnePerScreen`
+ * Four file annotations from the catalog package are read the same way, as lines: `@file:OnePerScreen`
  * (and its `fullScreen = true`), `@file:CatalogGroup("…")`, `@file:SelfDescribing` and `@file:ScreenshotOnly`, whose file lists nothing.
  */
 object SampleScanner {
