@@ -24,14 +24,19 @@ import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
-import kotlin.math.roundToInt
+import kotlin.math.ceil
 
 private const val MAX_STARS = 5
 
 /**
- * A five-star rating on a 0–10 scale: each star is worth 2 points, so an odd value renders as a
- * half star. When [interactive], tapping star N sets N full stars (a second tap on a full star toggles
- * it to a half), and long-pressing star N sets N − ½. New values report via [onRatingChange] on 1–10.
+ * A five-star rating on a 0–10 scale. [rating] is shown to the nearest half star, which is
+ * `rating / 2` rounded to the nearest 0.5, so 7.4 is three and a half stars and 7.6 is four. A value
+ * exactly between two half stars rounds **down**: 7.5 reads as three and a half stars, agreeing with
+ * the "7.5" a card prints beside it rather than the four stars a round-half-up would draw. See
+ * [ratingToHalves] for the edge cases.
+ *
+ * When [interactive], tapping star N sets N full stars (a second tap on a full star toggles it to a
+ * half), and long-pressing star N sets N − ½. New values report via [onRatingChange] on 1–10.
  *
  * Each interactive star is a button naming the value it sets, with its half a long-press away, so every
  * value on the scale is reachable without the gesture — the whole rating control published a label and
@@ -45,8 +50,8 @@ fun StarRating(
     interactive: Boolean = false,
     onRatingChange: ((Float) -> Unit)? = null,
 ) {
-    val halves = rating.coerceIn(0f, 10f).roundToInt()
-    val ratingDescription = stringResource(R.string.cd_rating_out_of_ten, halves.toFloat().formatRating())
+    val halves = ratingToHalves(rating)
+    val ratingDescription = stringResource(R.string.cd_rating_out_of_ten, announcedRating(rating).formatRating())
 
     Row(
         modifier = modifier.semantics { contentDescription = ratingDescription },
@@ -72,6 +77,25 @@ fun StarRating(
         }
     }
 }
+
+/**
+ * The number of half stars (0–10) that [rating] on the 0–10 scale draws: `rating / 2` rounded to the
+ * nearest 0.5 star, with ties rounding down.
+ *
+ * Every tie falls on an x.5 rating (7.5 sits exactly between 3.5 and 4 stars), so ties go down to make
+ * the star row never read higher than the number beside it. Out-of-range values clamp to 0 and 10, and
+ * NaN draws no stars.
+ */
+internal fun ratingToHalves(rating: Float): Int {
+    if (rating.isNaN()) return 0
+    return ceil(rating.coerceIn(0f, MAX_RATING) - HALF_POINT).toInt().coerceAtLeast(0)
+}
+
+/** The rating a screen reader announces: the true value, clamped to the scale, not the drawn half star. */
+internal fun announcedRating(rating: Float): Float = if (rating.isNaN()) 0f else rating.coerceIn(0f, MAX_RATING)
+
+private const val MAX_RATING = 10f
+private const val HALF_POINT = 0.5f
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
