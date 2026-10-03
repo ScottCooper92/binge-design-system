@@ -36,4 +36,11 @@ class TextButtonSamplesScreenshotTest {
     fun Icon() {
         TextButtonIconSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TrailingIcon() {
+        TextButtonTrailingIconSample()
+    }
 }

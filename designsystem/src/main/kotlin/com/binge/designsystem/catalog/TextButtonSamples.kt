@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -66,5 +67,17 @@ fun TextButtonIconSample() {
                 contentColor = MaterialTheme.colorScheme.error,
             )
         }
+    }
+}
+
+/** The text button's [trailingIcon][BingeTextButton] — the glyph after the label, for a destination outside the app. */
+@Composable
+fun TextButtonTrailingIconSample() {
+    ScreenshotTheme {
+        BingeTextButton(
+            label = "Open server",
+            onClick = {},
+            trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+        )
     }
 }
