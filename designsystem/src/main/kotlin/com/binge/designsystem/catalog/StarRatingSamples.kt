@@ -36,8 +36,11 @@ fun StarRatingDisplaySample() {
     }
 }
 
-/** The read-only row across the scale: none, an odd value's half star, a typical score, and full. */
-private val DISPLAY_RATINGS = listOf(0f, 3f, 7f, 10f)
+/**
+ * The read-only row across the scale: none, an odd value's half star, a typical score, the values
+ * either side of 7.5 (which rounds down to 3.5 stars), and full.
+ */
+private val DISPLAY_RATINGS = listOf(0f, 3f, 7f, 7.25f, 7.5f, 7.75f, 10f)
 
 /** A rating beside the value it shows, so the sample names its own state. */
 @Composable
@@ -47,9 +50,11 @@ private fun RatingLine(rating: Float, stars: @Composable () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         stars()
-        Text("${rating.roundToInt()} / 10", style = MaterialTheme.typography.bodyMedium)
+        Text("${rating.label()} / 10", style = MaterialTheme.typography.bodyMedium)
     }
 }
+
+private fun Float.label(): String = if (this % 1f == 0f) roundToInt().toString() else toString()
 
 /** Interactive picker at the larger tap size — empty, with a half-star landing point. */
 @Composable
