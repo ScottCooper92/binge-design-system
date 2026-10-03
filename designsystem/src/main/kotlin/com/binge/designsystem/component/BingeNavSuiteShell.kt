@@ -98,6 +98,7 @@ fun BingeNavSuiteShell(
     items: List<BingeNavSuiteItem>,
     selectedKey: Any?,
     onSelect: (Any) -> Unit,
+    modifier: Modifier = Modifier,
     presentation: BingeNavPresentation = rememberBingeNavPresentation(),
     floatingTone: BingeNavFloatingTone = BingeNavFloatingTone.AlwaysDark,
     floatingStyle: BingeNavFloatingStyle = BingeNavFloatingStyle.IconWithSelectedLabel,
@@ -105,11 +106,11 @@ fun BingeNavSuiteShell(
 ) {
     when (presentation) {
         BingeNavPresentation.CustomRail ->
-            BingeNavCustomRail(items = items, selectedKey = selectedKey, onSelect = onSelect, content = content)
+            BingeNavCustomRail(items = items, selectedKey = selectedKey, onSelect = onSelect, modifier = modifier, content = content)
         BingeNavPresentation.BottomBar ->
-            BottomBarScaffold(items = items, selectedKey = selectedKey, onSelect = onSelect, content = content)
+            BottomBarScaffold(items = items, selectedKey = selectedKey, onSelect = onSelect, modifier = modifier, content = content)
         BingeNavPresentation.FloatingBar ->
-            BingeNavFloatingBarScaffold(items, selectedKey, onSelect, floatingTone, floatingStyle, content)
+            BingeNavFloatingBarScaffold(items, selectedKey, onSelect, floatingTone, floatingStyle, modifier, content)
     }
 }
 
@@ -119,6 +120,7 @@ private fun BottomBarScaffold(
     items: List<BingeNavSuiteItem>,
     selectedKey: Any?,
     onSelect: (Any) -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     // Slide the bottom bar away while the keyboard is up. It sits behind the keyboard anyway, and hiding it lets
@@ -130,6 +132,7 @@ private fun BottomBarScaffold(
         if (imeVisible) scaffoldState.hide() else scaffoldState.show()
     }
     NavigationSuiteScaffold(
+        modifier = modifier,
         state = scaffoldState,
         layoutType = NavigationSuiteType.NavigationBar,
         containerColor = MaterialTheme.colorScheme.background,
