@@ -1,7 +1,9 @@
 package com.binge.designsystem.catalogapp.overrides
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -45,7 +47,7 @@ data class SampleOverrides(
  * locals (`LocalConfiguration`, `LocalDensity`, `LocalLayoutDirection`): samples wrap themselves in
  * `ScreenshotTheme`, which follows `isSystemInDarkTheme()`. Resource qualifiers are not reachable that
  * way, because resources come from the `Context`, so a locale is applied by handing the sample a
- * context recreated for it ([LocalContext] and [LocalResources]), which `stringResource` reads.
+ * context localized for it ([LocalContext] and [LocalResources]), which `stringResource` reads.
  */
 @Composable
 fun WithOverrides(overrides: SampleOverrides, content: @Composable () -> Unit) {
@@ -75,10 +77,26 @@ fun WithOverrides(overrides: SampleOverrides, content: @Composable () -> Unit) {
     )
 }
 
-private fun Context.localizedTo(locale: Locale): Context =
-    createConfigurationContext(
-        Configuration(resources.configuration).apply {
-            setLocale(locale)
-            setLayoutDirection(locale)
-        },
-    )
+/**
+ * This context with its resources in [locale]. A wrapper over this context rather than the bare one
+ * `createConfigurationContext` returns, so the activity stays reachable by unwrapping: a sample that
+ * hands [LocalContext] to `WindowInfoTracker`, as `FoldPosture` does, needs a UI context, and a bare
+ * configuration context is not one (#215).
+ */
+internal fun Context.localizedTo(locale: Locale): Context {
+    val resources =
+        createConfigurationContext(
+            Configuration(resources.configuration).apply {
+                setLocale(locale)
+                setLayoutDirection(locale)
+            },
+        ).resources
+    return LocalizedContext(this, resources)
+}
+
+private class LocalizedContext(
+    base: Context,
+    private val localized: Resources,
+) : ContextWrapper(base) {
+    override fun getResources(): Resources = localized
+}
