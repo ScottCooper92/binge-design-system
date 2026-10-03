@@ -25,6 +25,10 @@ android {
     namespace = "com.binge.designsystem"
     compileSdk = 37
 
+    testFixtures {
+        enable = true
+    }
+
     defaultConfig {
         // 26 matches Binge's floor. A component that cannot run on a consumer's oldest device is
         // not shareable, whatever this build says.
@@ -125,4 +129,7 @@ dependencies {
     testImplementation(composeBom)
     testImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)
+    testFixturesImplementation(composeBom)
+    testFixturesImplementation(libs.compose.ui)
+    testFixturesImplementation(libs.compose.ui.test.junit4)
 }
