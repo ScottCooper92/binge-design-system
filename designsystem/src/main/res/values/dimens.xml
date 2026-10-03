@@ -295,16 +295,16 @@
     <!-- Larger avatar for the square, vertically-stacked profile card in the expanded two-pane. -->
     <dimen name="account_avatar_size_large">88dp</dimen>
     <dimen name="account_group_label_detail_spacing">2dp</dimen>
-    <!-- SettingsGroup: each row's inset and the tinted icon box with its glyph. -->
-    <dimen name="settings_group_row_padding_h">16dp</dimen>
-    <dimen name="settings_group_row_padding_v">14dp</dimen>
-    <dimen name="settings_group_icon_size">38dp</dimen>
-    <dimen name="settings_group_icon_glyph">20dp</dimen>
-    <dimen name="settings_group_loading_size">24dp</dimen>
-    <!-- SettingsRow.connector: the corner radius where the line turns into a child row. -->
-    <dimen name="settings_group_connector_radius">12dp</dimen>
+    <!-- ItemGroup: each row's inset and the tinted icon box with its glyph. -->
+    <dimen name="item_group_row_padding_h">16dp</dimen>
+    <dimen name="item_group_row_padding_v">14dp</dimen>
+    <dimen name="item_group_icon_size">38dp</dimen>
+    <dimen name="item_group_icon_glyph">20dp</dimen>
+    <dimen name="item_group_loading_size">24dp</dimen>
+    <!-- ListItem.connector: the corner radius where the line turns into a child row. -->
+    <dimen name="item_group_connector_radius">12dp</dimen>
     <!-- CheckboxRow: a long checklist's own inset and checkbox-to-label gap, tighter than
-         SettingsGroup's since there is no icon box, and a divider indent that clears the checkbox
+         ItemGroup's since there is no icon box, and a divider indent that clears the checkbox
          rather than starting flush with it. -->
     <dimen name="checkbox_row_padding_h">16dp</dimen>
     <dimen name="checkbox_row_padding_v">4dp</dimen>

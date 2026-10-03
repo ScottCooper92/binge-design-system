@@ -62,18 +62,18 @@ fun HintCard(
                     Modifier
                         .fillMaxWidth()
                         .padding(
-                            start = dimensionResource(R.dimen.settings_group_row_padding_h),
-                            top = dimensionResource(R.dimen.settings_group_row_padding_v),
+                            start = dimensionResource(R.dimen.item_group_row_padding_h),
+                            top = dimensionResource(R.dimen.item_group_row_padding_v),
                             end = if (onDismiss != null) {
                                 dimensionResource(R.dimen.hint_card_dismiss_end_inset)
                             } else {
-                                dimensionResource(R.dimen.settings_group_row_padding_h)
+                                dimensionResource(R.dimen.item_group_row_padding_h)
                             },
                         ).then(
                             if (hasAction) {
                                 Modifier
                             } else {
-                                Modifier.padding(bottom = dimensionResource(R.dimen.settings_group_row_padding_v))
+                                Modifier.padding(bottom = dimensionResource(R.dimen.item_group_row_padding_v))
                             },
                         ),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),

@@ -50,22 +50,22 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.tonalContainer
 
 /**
- * A titled group of settings rows on one clipped surface, dividers between them. The title is
+ * A titled group of list items on one clipped surface, dividers between them. The title is
  * marked `heading()` so TalkBack can jump group to group rather than walking every row — a
- * settings screen runs to a dozen groups.
+ * screen of grouped items runs to a dozen groups.
  *
  * [rowVerticalPadding] is the breathing room above and below each row's content. It defaults to the
- * shared token so every settings screen stays alike; a caller that wants roomier rows — a sheet whose
+ * shared token so every group stays alike; a caller that wants roomier rows — a sheet whose
  * rows are its main content — passes its own. [titleSpacing] is the gap between the title and the
  * first row. [belowRows] draws inside the same surface after the last row, for a caller whose row
  * expands into more content; it owns its own divider.
  */
 @Composable
-fun SettingsGroup(
+fun ItemGroup(
     title: String?,
-    rows: List<SettingsRow>,
+    rows: List<ListItem>,
     modifier: Modifier = Modifier,
-    rowVerticalPadding: Dp = dimensionResource(R.dimen.settings_group_row_padding_v),
+    rowVerticalPadding: Dp = dimensionResource(R.dimen.item_group_row_padding_v),
     titleSpacing: Dp = dimensionResource(R.dimen.padding_s),
     belowRows: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
@@ -88,27 +88,27 @@ fun SettingsGroup(
                 .clip(BingeShapes.Large)
                 .background(MaterialTheme.colorScheme.surfaceContainer),
         ) {
-            SettingsRows(rows = rows, rowVerticalPadding = rowVerticalPadding)
+            ItemRows(rows = rows, rowVerticalPadding = rowVerticalPadding)
             belowRows?.invoke(this)
         }
     }
 }
 
-/** The rows of a [SettingsGroup] with their dividers and no surface, for a card that supplies its own. */
+/** The rows of a [ItemGroup] with their dividers and no surface, for a card that supplies its own. */
 @Composable
-fun SettingsRows(
-    rows: List<SettingsRow>,
+fun ItemRows(
+    rows: List<ListItem>,
     modifier: Modifier = Modifier,
-    rowVerticalPadding: Dp = dimensionResource(R.dimen.settings_group_row_padding_v),
+    rowVerticalPadding: Dp = dimensionResource(R.dimen.item_group_row_padding_v),
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         rows.forEachIndexed { index, row ->
-            SettingsRowView(row = row, verticalPadding = rowVerticalPadding)
+            ListItemView(row = row, verticalPadding = rowVerticalPadding)
             if (index < rows.lastIndex) {
                 HorizontalDivider(
                     thickness = dimensionResource(R.dimen.hairline_thickness),
                     color = MaterialTheme.colorScheme.outlineVariant,
-                    modifier = Modifier.padding(start = dimensionResource(R.dimen.settings_group_row_padding_h)),
+                    modifier = Modifier.padding(start = dimensionResource(R.dimen.item_group_row_padding_h)),
                 )
             }
         }
@@ -117,16 +117,16 @@ fun SettingsRows(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SettingsRowView(
-    row: SettingsRow,
+private fun ListItemView(
+    row: ListItem,
     verticalPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
     val interactive = row.clickable && !row.loading && !row.disabled
-    val external = interactive && row.toggled == null && row.trailingContent == null && row.destination == SettingsRowDestination.External
-    val externalDescription = stringResource(R.string.cd_settings_row_external)
-    val loadingDescription = stringResource(R.string.cd_settings_row_loading)
-    val connectorModifier = row.connector?.let { settingsRowConnector(it) } ?: Modifier
+    val external = interactive && row.toggled == null && row.trailingContent == null && row.destination == ListItemDestination.External
+    val externalDescription = stringResource(R.string.cd_list_item_external)
+    val loadingDescription = stringResource(R.string.cd_list_item_loading)
+    val connectorModifier = row.connector?.let { listItemConnector(it) } ?: Modifier
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -144,20 +144,20 @@ private fun SettingsRowView(
             .then(rowActionModifier(row, interactive))
             .then(connectorModifier)
             .padding(
-                horizontal = dimensionResource(R.dimen.settings_group_row_padding_h),
+                horizontal = dimensionResource(R.dimen.item_group_row_padding_h),
                 vertical = verticalPadding,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (row.connector != null) {
-            Spacer(Modifier.width(dimensionResource(R.dimen.settings_group_icon_size) + dimensionResource(R.dimen.account_card_spacing)))
+            Spacer(Modifier.width(dimensionResource(R.dimen.item_group_icon_size) + dimensionResource(R.dimen.account_card_spacing)))
         }
         if (row.leadingContent != null) {
             row.leadingContent.invoke()
         } else {
             Box(
                 modifier = Modifier
-                    .size(dimensionResource(R.dimen.settings_group_icon_size))
+                    .size(dimensionResource(R.dimen.item_group_icon_size))
                     .clip(BingeShapes.MoreCard)
                     .background(row.iconTint?.tonalContainer() ?: MaterialTheme.colorScheme.surfaceContainerHigh),
                 contentAlignment = Alignment.Center,
@@ -166,7 +166,7 @@ private fun SettingsRowView(
                     painter = row.iconPainter?.invoke() ?: rememberVectorPainter(row.icon),
                     contentDescription = null,
                     tint = row.iconTint ?: MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(dimensionResource(R.dimen.settings_group_icon_glyph)),
+                    modifier = Modifier.size(dimensionResource(R.dimen.item_group_icon_glyph)),
                 )
             }
         }
@@ -196,7 +196,7 @@ private fun SettingsRowView(
             }
             when {
                 row.loading -> BingeLoadingIndicator(
-                    modifier = Modifier.size(dimensionResource(R.dimen.settings_group_loading_size)),
+                    modifier = Modifier.size(dimensionResource(R.dimen.item_group_loading_size)),
                 )
                 row.trailingContent != null -> row.trailingContent.invoke()
                 row.toggled != null -> Switch(checked = row.toggled, onCheckedChange = null, enabled = !row.disabled)
@@ -224,7 +224,7 @@ private fun SettingsRowView(
  * other row keeps the `Role.Button` click and its long-press.
  */
 @OptIn(ExperimentalFoundationApi::class)
-private fun rowActionModifier(row: SettingsRow, interactive: Boolean): Modifier =
+private fun rowActionModifier(row: ListItem, interactive: Boolean): Modifier =
     if (row.toggled != null) {
         Modifier.toggleable(
             value = row.toggled,
@@ -269,14 +269,14 @@ private fun CountBadge(count: Int, tint: Color?) {
  * mirrors in right-to-left layouts.
  */
 @Composable
-private fun settingsRowConnector(connector: SettingsRowConnector): Modifier {
+private fun listItemConnector(connector: ListItemConnector): Modifier {
     val color = MaterialTheme.colorScheme.outline
     val strokeWidth = with(LocalDensity.current) { dimensionResource(R.dimen.hairline_thickness).toPx() }
     val axis = with(LocalDensity.current) {
-        (dimensionResource(R.dimen.settings_group_row_padding_h) + dimensionResource(R.dimen.settings_group_icon_size) / 2).toPx()
+        (dimensionResource(R.dimen.item_group_row_padding_h) + dimensionResource(R.dimen.item_group_icon_size) / 2).toPx()
     }
-    val reach = with(LocalDensity.current) { dimensionResource(R.dimen.settings_group_icon_size).toPx() / 2 }
-    val radius = with(LocalDensity.current) { dimensionResource(R.dimen.settings_group_connector_radius).toPx() }
+    val reach = with(LocalDensity.current) { dimensionResource(R.dimen.item_group_icon_size).toPx() / 2 }
+    val radius = with(LocalDensity.current) { dimensionResource(R.dimen.item_group_connector_radius).toPx() }
     return Modifier.drawBehind {
         val rtl = layoutDirection == LayoutDirection.Rtl
 
@@ -289,7 +289,7 @@ private fun settingsRowConnector(connector: SettingsRowConnector): Modifier {
             lineTo(x(axis + reach), midY)
         }
         drawPath(curve, color, style = Stroke(width = strokeWidth))
-        if (connector == SettingsRowConnector.Continue) {
+        if (connector == ListItemConnector.Continue) {
             // The hairline divider sits just below the row; run the line through it.
             drawLine(color, Offset(x(axis), 0f), Offset(x(axis), size.height + strokeWidth), strokeWidth)
         }
