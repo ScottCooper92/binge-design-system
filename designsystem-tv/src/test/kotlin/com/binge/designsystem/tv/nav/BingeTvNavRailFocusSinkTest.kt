@@ -39,7 +39,7 @@ private const val EARLY_WINDOW_FRAMES = 6
 private const val SETTLE_FRAMES = 10
 
 /**
- * [TvFocusSink]'s integration into [BingeTvNavRail]'s content group (#2518), driven through the real group
+ * [TvFocusSink]'s integration into [BingeTvNavRail]'s content group, driven through the real group
  * rather than in isolation — [BingeTvNavRailAdverseScheduleFocusTest] already proves the retry loop converges
  * with the sink present; this file asserts on the sink itself along that same path, plus its absence case.
  *
@@ -51,7 +51,7 @@ private const val SETTLE_FRAMES = 10
  * sink at all. So the window below asserts the sink wins the pane repeatedly through the wait — real content is
  * never left target-less for a sustained stretch — rather than a specific frame's parity or an uninterrupted
  * hold. Whether that in-between frame should also be closed off (a shell-root interceptor, not a second sink)
- * is #2517's own open question, not this issue's.
+ * is a separate open question, outside what this file asserts.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")

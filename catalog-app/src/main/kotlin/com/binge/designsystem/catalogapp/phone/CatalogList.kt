@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.catalogapp.R
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
@@ -98,7 +99,7 @@ private fun SearchField(
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
-            text = stringResource(R.string.catalog_component_count, count),
+            text = pluralStringResource(R.plurals.catalog_component_count, count, count),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.catalog_padding_small)),

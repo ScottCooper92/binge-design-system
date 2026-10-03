@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
@@ -72,8 +73,14 @@ fun CatalogCell(
             }
             if (component.hasDemo) DemoBadge(Modifier.align(Alignment.TopEnd))
             // A preview is a picture, not a control: this swallows taps meant for a button inside it
-            // and opens the entry instead. Its own semantics are cleared so the card is the one target.
-            Box(Modifier.matchParentSize().clearAndSetSemantics {}.clickable(onClick = onClick))
+            // and opens the entry instead. Neither it nor the preview is a focus stop or a semantics node.
+            Box(
+                Modifier
+                    .matchParentSize()
+                    .clearAndSetSemantics {}
+                    .focusProperties { canFocus = false }
+                    .clickable(onClick = onClick),
+            )
         }
         Column(Modifier.padding(dimensionResource(R.dimen.catalog_padding_small))) {
             Text(
@@ -123,7 +130,9 @@ private fun ScaledPreview(content: @Composable () -> Unit, modifier: Modifier = 
     val canvasWidthPx = with(LocalDensity.current) { dimensionResource(R.dimen.catalog_preview_canvas_width).roundToPx() }
     Layout(
         content = {
-            Box(Modifier.clearAndSetSemantics {}, contentAlignment = Alignment.Center) { content() }
+            // Semantics and focus are separate trees: clearing one leaves the other, so both are cleared
+            // and a control inside a sample is neither announced nor a Tab or D-pad stop.
+            Box(Modifier.clearAndSetSemantics {}.focusProperties { canFocus = false }, contentAlignment = Alignment.Center) { content() }
         },
         // The sample's own ScreenshotTheme draws `surface` behind it; the same here, so it shows no box.
         modifier = modifier.clipToBounds().background(MaterialTheme.colorScheme.surface),

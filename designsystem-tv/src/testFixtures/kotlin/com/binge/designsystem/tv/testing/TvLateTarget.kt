@@ -21,9 +21,9 @@ private val SIBLING_SIZE = 80.dp
 const val TV_LATE_TARGET_SIBLING_TAG = "tv-late-target-sibling"
 
 /**
- * The adverse-schedule fixture (#2521): a focusable sibling stand-in ([siblingTag]) — modelling the outgoing
- * screen/overlay a handoff waits on — that composes until [dispose] flips true, at which point [content] — the real target a
- * handoff's retry loop is aimed at — is composed only after [delayFrames] `withFrameNanos` ticks have passed.
+ * The adverse-schedule fixture: a focusable sibling stand-in ([siblingTag]) — modelling the outgoing
+ * screen/overlay a handoff waits on — that composes until [dispose] flips true, at which point [content] — the real
+ * target a handoff's retry loop is aimed at — is composed only after [delayFrames] `withFrameNanos` ticks have passed.
  *
  * A fixture, not a parameterised test per screen: every handoff under test (`offerFocusToContent`,
  * `contentHandoffInFlight`, `offerTvArrivalFocus`) already retries every frame against whatever the target

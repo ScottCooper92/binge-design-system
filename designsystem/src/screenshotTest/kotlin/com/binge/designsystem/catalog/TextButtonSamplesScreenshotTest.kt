@@ -15,4 +15,11 @@ class TextButtonSamplesScreenshotTest {
     fun States() {
         TextButtonSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TrailingIcon() {
+        TextButtonTrailingIconSample()
+    }
 }
