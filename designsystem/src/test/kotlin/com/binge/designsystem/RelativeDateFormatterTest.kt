@@ -37,6 +37,14 @@ class RelativeDateFormatterTest {
         assertEquals("4 weeks ago", formatRelativeOrAbsolute(NOW - 30 * DAY, now = NOW))
     }
 
+    /** DateUtils would say "0 minutes ago" for anything under a minute (#240). */
+    @Test
+    fun `an instant under a minute old reads as now`() {
+        assertEquals("now", formatRelativeOrAbsolute(NOW, now = NOW))
+        assertEquals("now", formatRelativeOrAbsolute(NOW - 59_000, now = NOW))
+        assertEquals("1 minute ago", formatRelativeOrAbsolute(NOW - 60_000, now = NOW))
+    }
+
     @Test
     fun `an instant days old reads in days`() {
         assertEquals("6 days ago", formatRelativeOrAbsolute(NOW - 6 * DAY, now = NOW))
