@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 /**
- * [paneShowsBack]'s derivation from stack depth rather than a per-screen marker (#2706, ported from
- * the reference companion's `SectionPanesTest`).
+ * [paneShowsBack]'s derivation from stack depth rather than a per-screen marker. Depth is what lets a
+ * nested screen keep its Back without opting in. Ported from the reference companion's
+ * `SectionPanesTest`.
  */
 class ListDetailPaneTest {
     @Test
