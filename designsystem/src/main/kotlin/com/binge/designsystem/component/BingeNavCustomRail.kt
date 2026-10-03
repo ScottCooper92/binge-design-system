@@ -87,12 +87,13 @@ internal fun BingeNavCustomRail(
     items: List<BingeNavSuiteItem>,
     selectedKey: Any?,
     onSelect: (Any) -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val railWidth = dimensionResource(R.dimen.nav_custom_rail_width)
     val safeInsets = WindowInsets.safeDrawing.asPaddingValues()
     val safeStart = safeInsets.calculateStartPadding(LocalLayoutDirection.current)
-    Box(Modifier.fillMaxSize()) {
+    Box(modifier.fillMaxSize()) {
         CompositionLocalProvider(
             LocalNavOverlayInsets provides rememberNavOverlayInsets(BingeNavPresentation.CustomRail),
         ) {

@@ -127,12 +127,13 @@ internal fun BingeNavFloatingBarScaffold(
     onSelect: (Any) -> Unit,
     tone: BingeNavFloatingTone,
     style: BingeNavFloatingStyle,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val computed = rememberNavOverlayInsets(BingeNavPresentation.FloatingBar).calculateBottomPadding()
     var measured by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
-    Box(Modifier.fillMaxSize()) {
+    Box(modifier.fillMaxSize()) {
         CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(bottom = maxOf(computed, measured))) {
             content()
         }
