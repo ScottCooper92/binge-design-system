@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Binge's dark surface (DarkSurface in the design system's ExpressiveTheme.kt). -->
+    <color name="catalog_window_background">#FF161618</color>
+</resources>

@@ -2,14 +2,23 @@
 <resources>
     <string name="app_name" translatable="false">Design system catalog</string>
     <string name="catalog_search_hint">Search samples and demos</string>
+    <string name="catalog_empty">No components match “%1$s”</string>
     <string name="catalog_search_clear">Clear search</string>
-    <string name="catalog_empty">No entries match “%1$s”</string>
-    <plurals name="catalog_entry_count">
-        <item quantity="one">%1$d entry</item>
-        <item quantity="other">%1$d entries</item>
+    <string name="catalog_pick_component">Pick a component to see its variants here</string>
+    <plurals name="catalog_component_count">
+        <item quantity="one">%1$d component</item>
+        <item quantity="other">%1$d components</item>
     </plurals>
+    <plurals name="catalog_variant_count">
+        <item quantity="one">%1$d variant</item>
+        <item quantity="other">%1$d variants</item>
+    </plurals>
+    <string name="catalog_section_demos">Demos</string>
+    <string name="catalog_section_components">Components</string>
     <string name="catalog_demo_badge">Demo</string>
-    <string name="detail_back">Back to the list</string>
+    <string name="detail_tweaks">Tweaks</string>
+    <string name="control_variant">Variant</string>
+    <string name="control_appearance">Appearance</string>
     <string name="control_dark">Dark</string>
     <string name="control_rtl">RTL</string>
     <string name="control_font_scale">Font scale</string>

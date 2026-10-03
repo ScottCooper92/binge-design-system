@@ -1,16 +1,20 @@
 package com.binge.designsystem.catalogapp.phone
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,7 +28,12 @@ class CatalogAppTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private fun launch() = rule.setContent { MaterialTheme { CatalogApp() } }
+    private fun launch() = rule.setContent { BingeExpressiveTheme { CatalogApp() } }
+
+    private fun openTweaks() {
+        rule.onNodeWithContentDescription("Tweaks").performClick()
+        rule.waitForIdle()
+    }
 
     private fun search(text: String) {
         rule.onNode(hasSetTextAction()).performTextInput(text)
@@ -39,15 +48,27 @@ class CatalogAppTest {
     }
 
     @Test
-    fun `searching narrows the list and selecting opens the sample, back returns`() {
+    fun `searching narrows the grid and a component opens on its variants, back returns`() {
         launch()
         search("button family")
 
-        rule.onNodeWithText("Button family").performClick()
+        rule.onNodeWithText("Button").performClick()
+        rule.onNodeWithText("Family").assertIsDisplayed()
         rule.onNodeWithText("Filled").assertIsDisplayed()
 
-        rule.onNodeWithContentDescription("Back to the list").performClick()
+        rule.onNodeWithContentDescription(NAVIGATE_BACK).performClick()
         rule.onNode(hasSetTextAction()).assertIsDisplayed()
+    }
+
+    @Test
+    fun `the grid keeps its scroll position across opening a component`() {
+        launch()
+        rule.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Watch provider grid"))
+        rule.onNodeWithText("Watch provider grid").performClick()
+
+        rule.onNodeWithContentDescription(NAVIGATE_BACK).performClick()
+
+        rule.onNodeWithText("Watch provider grid").assertIsDisplayed()
     }
 
     @Test
@@ -55,14 +76,15 @@ class CatalogAppTest {
         launch()
         search("zzz-no-such-sample")
 
-        rule.onNodeWithText("No entries match “zzz-no-such-sample”").assertIsDisplayed()
+        rule.onNodeWithText("No components match “zzz-no-such-sample”").assertIsDisplayed()
     }
 
     @Test
-    fun `the three controls toggle in the detail view`() {
+    fun `the controls toggle in the tweaks sheet`() {
         launch()
         search("button family")
-        rule.onNodeWithText("Button family").performClick()
+        rule.onNodeWithText("Button").performClick()
+        openTweaks()
 
         rule.onNodeWithText("RTL").assertIsNotSelected().performClick()
         rule.onNodeWithText("RTL").assertIsSelected()
@@ -74,21 +96,60 @@ class CatalogAppTest {
     }
 
     @Test
-    fun `demos are listed first under their own heading, found by search and open from the list`() {
+    fun `a top bar demo replaces the page's chrome and its own back button leaves`() {
         launch()
         rule.onNodeWithText("Demos").assertIsDisplayed()
 
         search("enter always")
-        rule.onNodeWithText("Binge top bar enter always").performClick()
+        rule.onNodeWithText("Top app bars").performClick()
 
         rule.onNodeWithText("collapsedFraction = 0.00").assertIsDisplayed()
+        // No catalog bar above the demo: its title would name the page.
+        rule.onNodeWithText("Top app bars").assertDoesNotExist()
+
+        rule.onNodeWithContentDescription(NAVIGATE_BACK).performClick()
+        rule.onNode(hasSetTextAction()).assertIsDisplayed()
     }
 
     @Test
-    fun `the language control is offered in the detail view`() {
+    fun `the top app bars share a page whose sheet switches the bar`() {
+        launch()
+        search("enter always")
+        rule.onNodeWithText("Top app bars").performClick()
+        openTweaks()
+
+        rule.onNode(hasText("Detail overlay top bar") and hasClickAction()).performScrollTo().performClick()
+
+        rule.onNode(hasText("Detail overlay top bar") and hasClickAction()).assertIsSelected()
+        rule.onNodeWithText("collapsedFraction = 0.00").assertDoesNotExist()
+        rule.onNodeWithText("scrolled = 0.00").assertExists()
+    }
+
+    @Test
+    fun `the navigation bars share a page, and their fixtures are not listed`() {
+        launch()
+        search("floating")
+
+        rule.onNodeWithText("Navigation bars").assertIsDisplayed()
+        rule.onNodeWithText("Nav floating bar").assertDoesNotExist()
+    }
+
+    @Test
+    fun `a listed component offers no variant choice in the sheet`() {
         launch()
         search("button family")
-        rule.onNodeWithText("Button family").performClick()
+        rule.onNodeWithText("Button").performClick()
+        openTweaks()
+
+        rule.onNodeWithText("Variant").assertDoesNotExist()
+    }
+
+    @Test
+    fun `the language control is offered in the tweaks sheet`() {
+        launch()
+        search("button family")
+        rule.onNodeWithText("Button").performClick()
+        openTweaks()
 
         rule
             .onNodeWithText("Español")
@@ -96,5 +157,10 @@ class CatalogAppTest {
             .assertIsNotSelected()
             .performClick()
         rule.onNodeWithText("Español").assertIsSelected()
+    }
+
+    private companion object {
+        /** The design system's own back button, on the demo's bar. */
+        const val NAVIGATE_BACK = "Back"
     }
 }

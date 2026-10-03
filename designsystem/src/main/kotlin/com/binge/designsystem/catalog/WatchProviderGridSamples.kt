@@ -1,17 +1,27 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.WatchProviderGrid
 import com.binge.designsystem.component.WatchProviderGridSkeleton
 import com.binge.designsystem.preview.ScreenshotTheme
 
+/**
+ * The provider grid with two services selected, which also shows the tile in both its states. Tapping
+ * a tile toggles it, so the catalog app can try the selection for real; the first frame, which is all
+ * a screenshot sees, always starts from the same two.
+ */
 @Composable
 fun WatchProviderGridSample() {
+    var selected by remember { mutableStateOf(catalogSelectedWatchProviderIds()) }
     ScreenshotTheme {
         WatchProviderGrid(
             providers = catalogSampleWatchProviders(),
-            selectedWatchProviderIds = catalogSelectedWatchProviderIds(),
-            onToggle = {},
+            selectedWatchProviderIds = selected,
+            onToggle = { id -> selected = if (id in selected) selected - id else selected + id },
         )
     }
 }

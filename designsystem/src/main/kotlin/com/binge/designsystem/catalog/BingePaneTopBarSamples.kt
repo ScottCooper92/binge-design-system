@@ -1,3 +1,5 @@
+@file:ScreenshotOnly
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.material.icons.Icons

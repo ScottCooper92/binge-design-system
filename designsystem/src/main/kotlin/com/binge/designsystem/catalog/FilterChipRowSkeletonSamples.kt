@@ -1,3 +1,5 @@
+@file:CatalogGroup("Filter chips")
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable

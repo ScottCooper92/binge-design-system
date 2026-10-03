@@ -10,13 +10,22 @@ class RegistryGeneratorTest {
     private val card = "CardSamples.kt" to "/** A card. */\n@Composable\nfun CardRatedSample() {}\n\n@Composable\nfun CardEmptySample() {}"
 
     @Test
-    fun `lists every sample with its import, in a stable order`() {
+    fun `lists every sample with its import, by component and then source order`() {
         val out = generateRegistry(listOf(card, button))
 
         assertTrue("import com.binge.designsystem.catalog.ButtonFamilySample" in out)
         assertTrue("content = { CardEmptySample() }," in out)
         val order = Regex("""id = "(\w+)"""").findAll(out).map { it.groupValues[1] }.toList()
-        assertEquals(listOf("ButtonFamilySample", "CardEmptySample", "CardRatedSample"), order)
+        assertEquals(listOf("ButtonFamilySample", "CardRatedSample", "CardEmptySample"), order)
+    }
+
+    @Test
+    fun `writes each entry's component and the name it has there`() {
+        val out = generateRegistry(listOf(card))
+
+        assertTrue("""group = "Card",""" in out, out)
+        assertTrue("""groupName = "Card",""" in out, out)
+        assertTrue("""name = "Rated",""" in out, out)
     }
 
     @Test

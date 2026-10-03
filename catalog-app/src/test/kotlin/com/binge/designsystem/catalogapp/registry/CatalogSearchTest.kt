@@ -1,6 +1,8 @@
 package com.binge.designsystem.catalogapp.registry
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class CatalogSearchTest {
@@ -10,7 +12,7 @@ class CatalogSearchTest {
         name: String,
         description: String = "",
         kind: CatalogKind = CatalogKind.Sample,
-    ) = CatalogEntry(id, group, name, description, kind) {}
+    ) = CatalogEntry(id = id, group = group, name = name, description = description, kind = kind) {}
 
     private val entries =
         listOf(
@@ -38,22 +40,46 @@ class CatalogSearchTest {
     }
 
     @Test
-    fun `groups keep registry order and their members`() {
-        val grouped = entries.byGroup()
+    fun `matches on the function name, so a component is found by its code name`() {
+        val named = listOf(entry("ButtonFamilySample", "Button", "Family"), entry("ButtonIconSample", "Button", "Icon"))
 
-        assertEquals(listOf("Button", "MediaCard"), grouped.map { it.first })
-        assertEquals(listOf("A", "B"), grouped.first().second.map { it.id })
+        assertEquals(listOf("ButtonFamilySample"), named.matching("buttonfamilysample").map { it.id })
     }
 
     @Test
-    fun `demos are gathered under their own section ahead of the sample groups`() {
-        val mixed =
-            entries + entry("D", "TopBar", "Top bar enter always", kind = CatalogKind.Demo) +
-                entry("E", "Modal", "Sheet", kind = CatalogKind.Demo)
+    fun `components keep registry order and their variants`() {
+        val components = entries.components()
 
-        val grouped = mixed.byGroup()
+        assertEquals(listOf("Button", "MediaCard"), components.map { it.group })
+        assertEquals(listOf("A", "B"), components.first().variants.map { it.id })
+    }
 
-        assertEquals(listOf(DEMOS_SECTION, "Button", "MediaCard"), grouped.map { it.first })
-        assertEquals(listOf("D", "E"), grouped.first().second.map { it.id })
+    @Test
+    fun `a component previews its first sample, and a demo only when it has no sample`() {
+        val withDemoFirst = listOf(entry("D", "TopBar", "Enter always", kind = CatalogKind.Demo), entry("S", "TopBar", "Default"))
+        val demoOnly = listOf(entry("L", "Locale", "Localised strings", kind = CatalogKind.Demo))
+
+        val topBar = withDemoFirst.components().single()
+
+        assertEquals("S", topBar.preview.id)
+        assertTrue(topBar.hasDemo)
+        assertEquals(
+            "L",
+            demoOnly
+                .components()
+                .single()
+                .preview.id,
+        )
+        assertFalse(entries.components().first().hasDemo)
+    }
+
+    @Test
+    fun `a component is one per screen only when a variant's file says so`() {
+        val marked = CatalogEntry("T", "TopBar", name = "Default", description = "", onePerScreen = true) {}
+        val demo = entry("D", "Sheet", "Open", kind = CatalogKind.Demo)
+
+        assertTrue(listOf(marked, entry("U", "TopBar", "Transparent")).components().single().onePerScreen)
+        assertFalse(listOf(demo).components().single().onePerScreen)
+        assertFalse(entries.components().first().onePerScreen)
     }
 }

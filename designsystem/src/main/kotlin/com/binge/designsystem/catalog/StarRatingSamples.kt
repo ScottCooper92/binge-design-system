@@ -1,6 +1,10 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.StarRating
@@ -23,12 +27,13 @@ fun StarRatingDisplaySample() {
 /** Interactive picker at the larger tap size — empty, with a half-star landing point. */
 @Composable
 fun StarRatingInteractiveSample() {
+    var rating by remember { mutableFloatStateOf(5f) }
     ScreenshotTheme {
         StarRating(
-            rating = 5f,
+            rating = rating,
             starSize = dimensionResource(R.dimen.star_rating_size_interactive),
             interactive = true,
-            onRatingChange = {},
+            onRatingChange = { rating = it },
         )
     }
 }

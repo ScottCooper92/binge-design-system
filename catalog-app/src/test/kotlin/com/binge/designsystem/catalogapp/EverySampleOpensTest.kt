@@ -2,6 +2,7 @@ package com.binge.designsystem.catalogapp
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -15,6 +16,7 @@ import com.binge.designsystem.catalogapp.overrides.WithOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.CatalogRegistry
 import com.binge.designsystem.catalogapp.registry.TvCatalogRegistry
+import com.binge.designsystem.catalogapp.registry.components
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -45,6 +47,29 @@ class EverySampleOpensTest {
     @Test
     fun `every TV sample composes under forced rtl and the largest font`() {
         assertEverySampleComposes(TvCatalogRegistry) { BingeTvTheme(content = it) }
+    }
+
+    /**
+     * A component that is not one per screen lists its variants in a `LazyColumn`, which gives each an
+     * unbounded height: a variant that scrolls vertically, or insists on filling the height, throws there.
+     */
+    @Test
+    fun `every listed variant composes as a lazy list item`() {
+        val listed = CatalogRegistry.components().filterNot { it.onePerScreen }.flatMap { it.variants }
+        val overrides = SampleOverrides(dark = true, fontScale = FontScalePresets.last(), rtl = true)
+        rule.setContent {
+            LazyColumn(Modifier.fillMaxSize()) {
+                item(key = listed[index].id) { WithOverrides(overrides, listed[index].content) }
+            }
+        }
+
+        val failures = mutableListOf<String>()
+        listed.indices.forEach { i ->
+            index = i
+            runCatching { rule.waitForIdle() }.onFailure { failures += "${listed[i].id}: ${it.message?.lineSequence()?.first()}" }
+        }
+
+        assertTrue("${failures.size} listed variants failed to compose:\n" + failures.joinToString("\n"), failures.isEmpty())
     }
 
     /** [host] is whatever the real activity wraps around a sample: the TV theme, for the TV registry. */

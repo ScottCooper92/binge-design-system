@@ -186,4 +186,34 @@ class SampleScannerTest {
         assertTrue(result.samples.isEmpty())
         assertTrue(result.problems.isEmpty())
     }
+
+    @Test
+    fun `a file marked OnePerScreen marks every sample in it, and only that file`() {
+        val marked = SampleScanner.scan("TopBarSamples.kt", "@file:OnePerScreen\n\npackage x\n\n@Composable\nfun TopBarSample() {}")
+        val plain = SampleScanner.scan("ButtonSamples.kt", "package x\n\n@Composable\nfun ButtonSample() {}")
+
+        assertEquals(true, marked.samples.single().onePerScreen)
+        assertEquals(false, plain.samples.single().onePerScreen)
+    }
+
+    @Test
+    fun `a file's CatalogGroup names the group its entries are listed under`() {
+        val result = SampleScanner.scan(
+            "TopBarDemos.kt",
+            "@file:CatalogGroup(\"Top app bars\")\n\npackage x\n\n@Composable\nfun TopBarDemo() {}",
+        )
+
+        assertEquals("Top app bars", result.samples.single().catalogGroup)
+    }
+
+    @Test
+    fun `a ScreenshotOnly file lists nothing, but a bad sample in it still fails`() {
+        val result = SampleScanner.scan(
+            "TopBarSamples.kt",
+            "@file:ScreenshotOnly\n\npackage x\n\n@Composable\nfun TopBarSample() {}\n\nfun BadSample() {}",
+        )
+
+        assertEquals(emptyList<SampleDeclaration>(), result.samples)
+        assertEquals(1, result.problems.size)
+    }
 }
