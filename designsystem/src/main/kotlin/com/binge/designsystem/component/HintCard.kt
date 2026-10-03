@@ -5,21 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +92,7 @@ fun HintCard(
                 )
             }
             if (actionLabel != null && onAction != null) {
-                HintCardAction(label = actionLabel, onClick = onAction, icon = actionIcon)
+                BingeTextButton(label = actionLabel, onClick = onAction, trailingIcon = actionIcon)
             }
         }
         if (onDismiss != null) {
@@ -107,30 +102,6 @@ fun HintCard(
                     contentDescription = stringResource(R.string.hint_card_dismiss),
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun HintCardAction(
-    label: String,
-    onClick: () -> Unit,
-    icon: ImageVector?,
-) {
-    TextButton(
-        onClick = onClick,
-        modifier = Modifier.defaultMinSize(minHeight = dimensionResource(R.dimen.button_filled_height)),
-        shape = BingeShapes.Medium,
-        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-    ) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge)
-        if (icon != null) {
-            Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-            )
         }
     }
 }

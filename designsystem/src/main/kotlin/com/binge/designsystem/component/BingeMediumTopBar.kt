@@ -41,12 +41,14 @@ import com.binge.designsystem.theme.BingeTheme
  * tone from [LocalTopBarActionTone], provided here around the [actions] slot, so callers don't
  * hardcode it.
  *
- * A transparent bar draws nothing behind itself, so [scrimFraction] puts a [TopBarScrim] behind it —
- * ramp it on the same [scrollBehavior]'s `collapsedFraction`, or the content passing under runs
- * through the title. A screen whose bar and header need *one* scrim across both (the chip-filtered
- * screens) leaves this at 0 and scrims the header instead. That scrim tapers past this bar's own
- * bottom edge into the content scrolling under it, rather than cutting off at the bar's boundary
- * (#94).
+ * A transparent bar draws nothing behind itself, so [scrimFraction] puts a [TopBarScrim] behind it.
+ * Drive it with how much of the bar the scrolled content overlaps: `collapsedFraction` for the
+ * collapsing behaviours this bar is used with (`exitUntilCollapsed`), where a high fraction means
+ * content is under the bar. A behaviour that hides the bar instead would want `overlappedFraction`,
+ * since `collapsedFraction` then measures bar visibility. A screen whose bar and header need *one*
+ * scrim across both (the chip-filtered screens) leaves this at 0 and scrims the header instead.
+ * That scrim tapers past this bar's own bottom edge into the content scrolling under it, rather
+ * than cutting off at the bar's boundary (#94).
  *
  * [scrimColor]/[scrimForegroundColor] default to a theme-following pair
  * (`MaterialTheme.colorScheme.background`/`onBackground`), exactly as on [BingeTopBar] — every

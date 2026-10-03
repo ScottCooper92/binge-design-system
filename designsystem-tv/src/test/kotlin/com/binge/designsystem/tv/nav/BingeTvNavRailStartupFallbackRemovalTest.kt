@@ -24,14 +24,14 @@ private const val RAIL_ITEM = "rail item"
 private const val PROBE_FRAMES = 200
 
 /**
- * #2523: the startup `LaunchedEffect`'s `if (!contentHasFocus && !railHasFocus) railEntry.requestFocus()`
- * fallback (pre-#2518, target-less-destination era) is deleted here. This is the evidence it was safe to delete
+ * The startup `LaunchedEffect`'s `if (!contentHasFocus && !railHasFocus) railEntry.requestFocus()`
+ * fallback (from before [TvFocusSink], when a destination could be target-less) is deleted here. This is the evidence it was safe to delete
  * — driven through [BingeTvNavRail] rather than in isolation, exactly the destination the fallback existed for:
  * one that composes nothing focusable at all, ever.
  *
  * With [TvFocusSink] mounted, that destination is no longer target-less: the sink claims the content group's
  * entry on its first frame, satisfying the startup loop's `taken()` check before the deleted line could ever
- * run. What happens *after* is the oscillation #2518's own PRs measured and shipped anyway (a sink that holds
+ * run. What happens *after* is an oscillation that was measured and accepted when the sink was introduced (a sink that holds
  * focus is itself "the pane has focus", so it disposes itself the next frame, and Compose's own disposal-
  * triggered recovery search — not this rail's code — lands the frame in between): sink and rail alternate every
  * other frame, indefinitely, for a destination this pathological. The fallback's guard needed *both*

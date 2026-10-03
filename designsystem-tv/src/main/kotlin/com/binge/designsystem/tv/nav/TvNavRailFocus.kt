@@ -12,7 +12,7 @@ import androidx.compose.ui.focus.FocusRequester
  */
 
 /**
- * Startup budget: enough frames for a first screen to arrive and claim focus from `TvFocusSink` (#2523). No
+ * Startup budget: enough frames for a first screen to arrive and claim focus from `TvFocusSink`. No
  * longer a retry-until-we-must-bail window — the sink means the loop's `taken()` check is satisfied within a
  * frame or two of any destination, real or still-loading, so this is a cold-start sanity bound rather than
  * something a destination is expected to run out.

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,6 +34,10 @@ import com.binge.designsystem.theme.BingeShapes
  * [showLabel] collapses the button to icon-only, keeping the same pill shape and tap target. It
  * requires a [leadingIcon]: once the label's [Text] isn't there, the icon is what carries the
  * accessible name via `contentDescription`.
+ *
+ * [trailingIcon] follows the label at the same size and spacing as [leadingIcon], such as an
+ * open-in-new glyph for a destination outside the app. It is decorative: the label carries the name,
+ * so it is not drawn when [showLabel] is false or while [loading].
  */
 @Composable
 fun BingeTextButton(
@@ -40,6 +45,7 @@ fun BingeTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     leadingIcon: ImageVector? = null,
+    trailingIcon: ImageVector? = null,
     showLabel: Boolean = true,
     enabled: Boolean = true,
     loading: Boolean = false,
@@ -79,6 +85,14 @@ fun BingeTextButton(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
                 )
+                if (trailingIcon != null) {
+                    Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
+                    Icon(
+                        imageVector = trailingIcon,
+                        contentDescription = null,
+                        modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
+                    )
+                }
             }
         }
     }
@@ -101,6 +115,18 @@ private fun PreviewBingeTextButtonWithIcon() {
             onClick = {},
             leadingIcon = Icons.Filled.Block,
             contentColor = MaterialTheme.colorScheme.error,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewBingeTextButtonTrailingIcon() {
+    BingeExpressiveTheme {
+        BingeTextButton(
+            label = "Open server",
+            onClick = {},
+            trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
         )
     }
 }

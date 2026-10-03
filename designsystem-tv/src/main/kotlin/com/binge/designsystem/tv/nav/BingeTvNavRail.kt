@@ -121,7 +121,7 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
  * requester, exactly as [railFocusRequester] does for the rail side.
  *
  * [overlayEpoch] is bumped by an owner each time a full-screen overlay closes (a shell hoisted above the entry
- * an overlay disposes, #2519) — a third depth-style signal alongside [contentDepth], read the same way: any
+ * an overlay disposes) — a third depth-style signal alongside [contentDepth], read the same way: any
  * change means the pane just came back fresh, focus-dead, and needs the same sequenced offer the push side
  * gets, not a one-shot request into an entry the incoming skeleton hasn't grown yet. Left at its default the
  * rail never re-hands focus after a pop — the old behaviour.
@@ -167,7 +167,7 @@ fun BingeTvNavRail(
     // Focus starts in the content, not the rail — requesting it on mount opened the app rail-focused over the start destination.
     // The content `focusGroup` delegates to its first child (the startup hand-off in `docs/tv-foundation.md`),
     // retried per frame since a cold-start destination is a target-less placeholder (Shield-verified); it
-    // yields to a user already in the rail. No rail fallback below (#2523) — [TvFocusSink] is always something
+    // yields to a user already in the rail. No rail fallback below — [TvFocusSink] is always something
     // to land on, so a destination with nothing focusable of its own no longer leaves this loop with nowhere
     // to send the redirect.
     LaunchedEffect(Unit) {
@@ -259,7 +259,7 @@ fun BingeTvNavRail(
             }
             // A sibling of the destination's own content, never inside it: the group's entry requester
             // (`contentFocus`) then always has something to land on from frame one, rather than racing
-            // whatever the destination composes first (#2518). Gone the instant the pane reports focus —
+            // whatever the destination composes first. Gone the instant the pane reports focus —
             // including the sink's own: re-composing it forces Compose's own recovery search rather than
             // leaving a stale grant unable to yield to whatever the destination grows next (see the class
             // KDoc's fault-injection note on [TvFocusSink] usage).
@@ -373,7 +373,7 @@ private fun contentHandoffInFlight(
 
 /**
  * Hands focus back to the content after a full-screen overlay closes, and reports whether that is in flight —
- * [overlayEpoch]'s counterpart to [contentHandoffInFlight] (#2519).
+ * [overlayEpoch]'s counterpart to [contentHandoffInFlight].
  *
  * No [awaitContentFocusLost] here: unlike a drill-down, the pane this returns to is a *fresh* mount — nothing in
  * it has ever held focus, so there is nothing to wait on losing. What it shares with the drill-down case is the

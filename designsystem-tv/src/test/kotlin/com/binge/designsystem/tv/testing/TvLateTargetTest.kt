@@ -27,7 +27,7 @@ private const val SETTLE_FRAMES = 10
 
 /**
  * [TvLateTarget] must actually delay as advertised, or every consumer test built on it would go green for the
- * wrong reason (#2521's own concern about a fixture that doesn't delay). This pins its two halves: the sibling
+ * wrong reason, which is the risk with any fixture that doesn't really delay. This pins its two halves: the sibling
  * shows until [TvLateTarget.dispose], and the real content composes only [TvLateTarget.delayFrames] frames after.
  */
 @RunWith(RobolectricTestRunner::class)
