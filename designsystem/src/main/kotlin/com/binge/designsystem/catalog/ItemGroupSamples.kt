@@ -22,11 +22,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeInitialsAvatar
-import com.binge.designsystem.component.SettingsGroup
-import com.binge.designsystem.component.SettingsRow
-import com.binge.designsystem.component.SettingsRowConnector
-import com.binge.designsystem.component.SettingsRowDestination
-import com.binge.designsystem.component.SettingsRows
+import com.binge.designsystem.component.ItemGroup
+import com.binge.designsystem.component.ItemRows
+import com.binge.designsystem.component.ListItem
+import com.binge.designsystem.component.ListItemConnector
+import com.binge.designsystem.component.ListItemDestination
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
 import com.binge.designsystem.theme.BingeShapes
@@ -34,19 +34,19 @@ import com.binge.designsystem.theme.accent
 import com.binge.designsystem.theme.tonalContainer
 
 /**
- * Public samples for [SettingsGroup] — a clipped card of settings rows with dividers: a titled group
+ * Public samples for [ItemGroup] — a clipped card of list items with dividers: a titled group
  * of plain rows, and an untitled group with tinted icons and count badges. See the convention KDoc
  * on [MediaCardRatedSample].
  */
 @Composable
-fun SettingsGroupTitledSample() {
+fun ItemGroupTitledSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "My library",
             rows = listOf(
-                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
-                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
-                SettingsRow(icon = Icons.Filled.Settings, label = "Preferences"),
+                ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
+                ListItem(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
+                ListItem(icon = Icons.Filled.Settings, label = "Preferences"),
             ),
         )
     }
@@ -54,12 +54,12 @@ fun SettingsGroupTitledSample() {
 
 /** An untitled group whose rows carry sentiment-tinted icons and trailing count badges. */
 @Composable
-fun SettingsGroupTintedSample() {
+fun ItemGroupTintedSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = null,
             rows = listOf(
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.Inbox,
                     iconTint = BingeSentiment.Caution.accent(),
                     label = "Requests",
@@ -67,7 +67,7 @@ fun SettingsGroupTintedSample() {
                     badgeCount = 3,
                     badgeTint = BingeSentiment.Caution.accent(),
                 ),
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.People,
                     iconTint = BingeSentiment.Info.accent(),
                     label = "Users",
@@ -85,18 +85,18 @@ fun SettingsGroupTintedSample() {
  * wants the user with nothing to count. Each sits before the row's own trailing control.
  */
 @Composable
-fun SettingsGroupBadgesSample() {
+fun ItemGroupBadgesSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "Companion apps",
             rows = listOf(
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.Inbox,
                     label = "Requests",
                     detail = "2 waiting for you",
                     badgeCount = 2,
                 ),
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.People,
                     label = "Accounts",
                     detail = "Sign in again to keep syncing",
@@ -112,12 +112,12 @@ fun SettingsGroupBadgesSample() {
  * wash, the rest do not. The wash is the only difference — the row keeps its chevron and its badge.
  */
 @Composable
-fun SettingsGroupSelectedSample() {
+fun ItemGroupSelectedSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "Manage",
             rows = listOf(
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.Inbox,
                     iconTint = BingeSentiment.Caution.accent(),
                     label = "Requests",
@@ -126,13 +126,13 @@ fun SettingsGroupSelectedSample() {
                     badgeTint = BingeSentiment.Caution.accent(),
                     selected = true,
                 ),
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.People,
                     iconTint = BingeSentiment.Info.accent(),
                     label = "Users",
                     detail = "Roles, quotas & permissions",
                 ),
-                SettingsRow(icon = Icons.Filled.Settings, label = "Settings", detail = "Server & connection"),
+                ListItem(icon = Icons.Filled.Settings, label = "Settings", detail = "Server & connection"),
             ),
         )
     }
@@ -143,16 +143,16 @@ fun SettingsGroupSelectedSample() {
  * in-app row so the two read as distinct promises at a glance.
  */
 @Composable
-fun SettingsGroupExternalSample() {
+fun ItemGroupExternalSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "About",
             rows = listOf(
-                SettingsRow(icon = Icons.Filled.Settings, label = "Preferences"),
-                SettingsRow(
+                ListItem(icon = Icons.Filled.Settings, label = "Preferences"),
+                ListItem(
                     icon = Icons.Filled.Policy,
                     label = "Privacy policy",
-                    destination = SettingsRowDestination.External,
+                    destination = ListItemDestination.External,
                 ),
             ),
         )
@@ -160,18 +160,18 @@ fun SettingsGroupExternalSample() {
 }
 
 /**
- * The same rows as [SettingsGroupTitledSample] with [SettingsGroup]'s `rowVerticalPadding` raised
+ * The same rows as [ItemGroupTitledSample] with [ItemGroup]'s `rowVerticalPadding` raised
  * one rung on the padding ramp, for a caller whose rows are its main content (#133).
  */
 @Composable
-fun SettingsGroupTallRowsSample() {
+fun ItemGroupTallRowsSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "My library",
             rows = listOf(
-                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
-                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
-                SettingsRow(icon = Icons.Filled.Settings, label = "Preferences"),
+                ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
+                ListItem(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
+                ListItem(icon = Icons.Filled.Settings, label = "Preferences"),
             ),
             rowVerticalPadding = dimensionResource(R.dimen.padding_m),
         )
@@ -179,18 +179,18 @@ fun SettingsGroupTallRowsSample() {
 }
 
 /**
- * The same rows as [SettingsGroupTitledSample] with [SettingsGroup]'s `titleSpacing` dropped one
+ * The same rows as [ItemGroupTitledSample] with [ItemGroup]'s `titleSpacing` dropped one
  * rung on the padding ramp, for a sheet whose titled groups sit close together.
  */
 @Composable
-fun SettingsGroupTightTitleSample() {
+fun ItemGroupTightTitleSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "My library",
             rows = listOf(
-                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
-                SettingsRow(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
-                SettingsRow(icon = Icons.Filled.Settings, label = "Preferences"),
+                ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist", detail = "42 titles"),
+                ListItem(icon = Icons.Filled.Bookmark, label = "Watched", detail = "186 titles"),
+                ListItem(icon = Icons.Filled.Settings, label = "Preferences"),
             ),
             titleSpacing = dimensionResource(R.dimen.padding_xs),
         )
@@ -198,33 +198,33 @@ fun SettingsGroupTightTitleSample() {
 }
 
 /**
- * [SettingsRow.leadingContent] standing in for the icon box: a user list, each row led by an avatar
+ * [ListItem.leadingContent] standing in for the icon box: a user list, each row led by an avatar
  * rather than a glyph. `icon` is still supplied (the parameter has no default) but never drawn,
  * since [leadingContent] wins when set.
  */
 @Composable
-fun SettingsGroupLeadingContentSample() {
+fun ItemGroupLeadingContentSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "Users",
             rows = listOf(
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.People,
                     leadingContent = {
                         BingeInitialsAvatar(
                             name = "Ada Lovelace",
-                            size = dimensionResource(R.dimen.settings_group_icon_size),
+                            size = dimensionResource(R.dimen.item_group_icon_size),
                         )
                     },
                     label = "Ada Lovelace",
                     detail = "Owner",
                 ),
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.People,
                     leadingContent = {
                         BingeInitialsAvatar(
                             name = "Grace Hopper",
-                            size = dimensionResource(R.dimen.settings_group_icon_size),
+                            size = dimensionResource(R.dimen.item_group_icon_size),
                         )
                     },
                     label = "Grace Hopper",
@@ -241,18 +241,18 @@ fun SettingsGroupLeadingContentSample() {
  * stays live.
  */
 @Composable
-fun SettingsGroupBusySample() {
+fun ItemGroupBusySample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "Actions",
             rows = listOf(
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.Policy,
                     label = "Open on server",
-                    destination = SettingsRowDestination.External,
+                    destination = ListItemDestination.External,
                 ),
-                SettingsRow(icon = Icons.Filled.Flag, label = "Report an issue", disabled = true),
-                SettingsRow(
+                ListItem(icon = Icons.Filled.Flag, label = "Report an issue", disabled = true),
+                ListItem(
                     icon = Icons.Filled.Block,
                     iconTint = BingeSentiment.Negative.accent(),
                     label = "Block",
@@ -264,11 +264,11 @@ fun SettingsGroupBusySample() {
 }
 
 /**
- * [SettingsRows] with no surface of its own, drawn inside a card the caller supplies — the request
- * quota readout living on the account card, rather than [SettingsGroup]'s own clipped surface.
+ * [ItemRows] with no surface of its own, drawn inside a card the caller supplies — the request
+ * quota readout living on the account card, rather than [ItemGroup]'s own clipped surface.
  */
 @Composable
-fun SettingsRowsNoSurfaceSample() {
+fun ItemRowsNoSurfaceSample() {
     ScreenshotTheme {
         Column(
             modifier = Modifier
@@ -277,10 +277,10 @@ fun SettingsRowsNoSurfaceSample() {
                 .background(BingeSentiment.Info.accent().tonalContainer())
                 .padding(vertical = dimensionResource(R.dimen.padding_s)),
         ) {
-            SettingsRows(
+            ItemRows(
                 rows = listOf(
-                    SettingsRow(icon = Icons.Filled.Inbox, label = "Request quota", detail = "8 of 10 used this month"),
-                    SettingsRow(icon = Icons.Filled.Inbox, label = "Resets", detail = "In 12 days", clickable = false),
+                    ListItem(icon = Icons.Filled.Inbox, label = "Request quota", detail = "8 of 10 used this month"),
+                    ListItem(icon = Icons.Filled.Inbox, label = "Resets", detail = "In 12 days", clickable = false),
                 ),
             )
         }
@@ -288,54 +288,54 @@ fun SettingsRowsNoSurfaceSample() {
 }
 
 /**
- * A parent row with its children joined to it by [SettingsRow.connector]: the first children
+ * A parent row with its children joined to it by [ListItem.connector]: the first children
  * continue the line, the last one stops at the curve. Each child keeps its own icon box.
  */
 @Composable
-fun SettingsGroupConnectorSample() {
+fun ItemGroupConnectorSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = null,
             rows = listOf(
-                SettingsRow(icon = Icons.Filled.Tune, label = "Advanced options"),
-                SettingsRow(
+                ListItem(icon = Icons.Filled.Tune, label = "Advanced options"),
+                ListItem(
                     icon = Icons.Filled.Dns,
                     label = "Server",
                     detail = "Home",
-                    connector = SettingsRowConnector.Continue,
+                    connector = ListItemConnector.Continue,
                 ),
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.HighQuality,
                     label = "Quality profile",
                     detail = "HD-1080p",
-                    connector = SettingsRowConnector.Continue,
+                    connector = ListItemConnector.Continue,
                 ),
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.Folder,
                     label = "Root folder",
                     detail = "/media/movies",
-                    connector = SettingsRowConnector.End,
+                    connector = ListItemConnector.End,
                 ),
             ),
         )
     }
 }
 
-/** Switch rows ([SettingsRow.toggled]): on, off and disabled, each drawing its own switch and no chevron. */
+/** Switch rows ([ListItem.toggled]): on, off and disabled, each drawing its own switch and no chevron. */
 @Composable
-fun SettingsGroupSwitchSample() {
+fun ItemGroupSwitchSample() {
     ScreenshotTheme {
-        SettingsGroup(
+        ItemGroup(
             title = "Network",
             rows = listOf(
-                SettingsRow(
+                ListItem(
                     icon = Icons.Filled.Dns,
                     label = "Trust proxy",
                     detail = "Read the client address from headers",
                     toggled = true,
                 ),
-                SettingsRow(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = false),
-                SettingsRow(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, disabled = true),
+                ListItem(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = false),
+                ListItem(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, disabled = true),
             ),
         )
     }

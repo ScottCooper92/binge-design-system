@@ -32,7 +32,7 @@ private val hasNoStateDescription = SemanticsMatcher.keyNotDefined(SemanticsProp
 /** A screen reader jumps group to group by the title, and a row's tap is the row's, not the group's. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
-class SettingsGroupSemanticsTest {
+class ItemGroupSemanticsTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -40,9 +40,9 @@ class SettingsGroupSemanticsTest {
     fun `a group's title is a heading`() {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = "My library",
-                    rows = listOf(SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist")),
+                    rows = listOf(ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist")),
                 )
             }
         }
@@ -55,11 +55,11 @@ class SettingsGroupSemanticsTest {
         var clicked = false
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist", onClick = { clicked = true }),
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Version", detail = "1.0", clickable = false),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist", onClick = { clicked = true }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Version", detail = "1.0", clickable = false),
                     ),
                 )
             }
@@ -75,10 +75,10 @@ class SettingsGroupSemanticsTest {
     fun `a long-press row exposes its label to the screen reader`() {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(
+                        ListItem(
                             icon = Icons.Filled.Bookmark,
                             label = "Ada",
                             onLongClick = {},
@@ -98,14 +98,14 @@ class SettingsGroupSemanticsTest {
     fun `an external row announces that it opens in browser`() {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist"),
-                        SettingsRow(
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist"),
+                        ListItem(
                             icon = Icons.Filled.Bookmark,
                             label = "Privacy policy",
-                            destination = SettingsRowDestination.External,
+                            destination = ListItemDestination.External,
                         ),
                     ),
                 )
@@ -122,10 +122,10 @@ class SettingsGroupSemanticsTest {
         var clicked = false
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Block", loading = true, onClick = { clicked = true }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Block", loading = true, onClick = { clicked = true }),
                     ),
                 )
             }
@@ -142,10 +142,10 @@ class SettingsGroupSemanticsTest {
         var clicked = false
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Report", disabled = true, onClick = { clicked = true }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Report", disabled = true, onClick = { clicked = true }),
                     ),
                 )
             }
@@ -159,14 +159,14 @@ class SettingsGroupSemanticsTest {
         var clicked = false
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Parent"),
-                        SettingsRow(
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Parent"),
+                        ListItem(
                             icon = Icons.Filled.Bookmark,
                             label = "Child",
-                            connector = SettingsRowConnector.End,
+                            connector = ListItemConnector.End,
                             onClick = { clicked = true },
                         ),
                     ),
@@ -181,11 +181,11 @@ class SettingsGroupSemanticsTest {
     fun `a switch row is one switch node that exposes its on and off state`() {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Trust proxy", toggled = true),
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Force IPv4", toggled = false),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Trust proxy", toggled = true),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Force IPv4", toggled = false),
                     ),
                 )
             }
@@ -201,10 +201,10 @@ class SettingsGroupSemanticsTest {
         var taps = 0
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "Trust proxy", toggled = false, onClick = { taps++ }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Trust proxy", toggled = false, onClick = { taps++ }),
                     ),
                 )
             }
@@ -218,10 +218,10 @@ class SettingsGroupSemanticsTest {
         var taps = 0
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
                     rows = listOf(
-                        SettingsRow(icon = Icons.Filled.Bookmark, label = "CSRF", toggled = true, disabled = true, onClick = { taps++ }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "CSRF", toggled = true, disabled = true, onClick = { taps++ }),
                     ),
                 )
             }
@@ -238,9 +238,9 @@ class SettingsGroupSemanticsTest {
     fun `a plain row is still a button with no toggle state`() {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                SettingsGroup(
+                ItemGroup(
                     title = null,
-                    rows = listOf(SettingsRow(icon = Icons.Filled.Bookmark, label = "Watchlist")),
+                    rows = listOf(ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist")),
                 )
             }
         }

@@ -6,8 +6,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 
-/** Where a [SettingsRow] takes the user, and so which trailing glyph promises the right thing. */
-enum class SettingsRowDestination {
+/** Where a [ListItem] takes the user, and so which trailing glyph promises the right thing. */
+enum class ListItemDestination {
     /** Pushes a screen inside the app, or opens a sheet; Back returns here. The chevron. */
     InApp,
 
@@ -16,10 +16,10 @@ enum class SettingsRowDestination {
 }
 
 /**
- * How a [SettingsRow] joins the row above it as a child of that row: a line down the parent icon's
+ * How a [ListItem] joins the row above it as a child of that row: a line down the parent icon's
  * axis that curves into this row, drawn on the row itself so it spans the row's full height.
  */
-enum class SettingsRowConnector {
+enum class ListItemConnector {
     /** The line curves into this row and carries on down to the next sibling. */
     Continue,
 
@@ -27,9 +27,9 @@ enum class SettingsRowConnector {
     End,
 }
 
-/** One row of a [SettingsGroup]: an icon in a tinted box, a label with an optional detail line, and a trailing slot. */
+/** One row of a [ItemGroup]: an icon in a tinted box, a label with an optional detail line, and a trailing slot. */
 @Immutable
-data class SettingsRow(
+data class ListItem(
     val icon: ImageVector,
     /**
      * Rendered in place of [icon] when set, for a glyph the caller resolves itself — one loaded from
@@ -59,7 +59,7 @@ data class SettingsRow(
     val selected: Boolean = false,
     val clickable: Boolean = true,
     /** Only read when [trailingContent] is null — a caller supplying its own trailing slot owns this too. */
-    val destination: SettingsRowDestination = SettingsRowDestination.InApp,
+    val destination: ListItemDestination = ListItemDestination.InApp,
     val trailingContent: (@Composable () -> Unit)? = null,
     val onClick: () -> Unit = {},
     val onLongClick: (() -> Unit)? = null,
@@ -71,7 +71,7 @@ data class SettingsRow(
      */
     val loading: Boolean = false,
     /** Joins the row to a parent row above it; the icon box then follows a connector-width inset. */
-    val connector: SettingsRowConnector? = null,
+    val connector: ListItemConnector? = null,
     /** Dimmed and inert, for a row that cannot be used because something else is in flight. */
     val disabled: Boolean = false,
     /** What a long-press does, announced by TalkBack ("double tap and hold to …"). Only read with [onLongClick]. */

@@ -16,18 +16,18 @@ import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
  * The variants the catalog sample does not show: a non-clickable row (no chevron), a row drawn
- * from its painter slot, and a badge with no [SettingsRow.badgeTint] of its own.
+ * from its painter slot, and a badge with no [ListItem.badgeTint] of its own.
  */
-class SettingsGroupScreenshotTest {
+class ItemGroupScreenshotTest {
     /** [belowRows] sits on the same surface as the rows, not on a card of its own. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun BelowRows() {
         ScreenshotTheme {
-            SettingsGroup(
+            ItemGroup(
                 title = null,
-                rows = listOf(SettingsRow(icon = Icons.Filled.Star, label = "Parent", detail = "Expanded")),
+                rows = listOf(ListItem(icon = Icons.Filled.Star, label = "Parent", detail = "Expanded")),
                 belowRows = {
                     HorizontalDivider()
                     Text(text = "Expanded content", modifier = Modifier.padding(16.dp))
@@ -41,10 +41,10 @@ class SettingsGroupScreenshotTest {
     @Composable
     fun UntitledNonClickable() {
         ScreenshotTheme {
-            SettingsGroup(
+            ItemGroup(
                 title = null,
                 rows = listOf(
-                    SettingsRow(
+                    ListItem(
                         icon = Icons.Filled.Notifications,
                         label = "Notifications",
                         detail = "Push alerts enabled",
@@ -55,16 +55,16 @@ class SettingsGroupScreenshotTest {
         }
     }
 
-    /** [SettingsRow.badgeTint] left null: the count renders as the default Material badge, not a tinted pill. */
+    /** [ListItem.badgeTint] left null: the count renders as the default Material badge, not a tinted pill. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun DefaultBadge() {
         ScreenshotTheme {
-            SettingsGroup(
+            ItemGroup(
                 title = null,
                 rows = listOf(
-                    SettingsRow(
+                    ListItem(
                         icon = Icons.Filled.Notifications,
                         label = "Notifications",
                         detail = "Push alerts enabled",
@@ -75,16 +75,16 @@ class SettingsGroupScreenshotTest {
         }
     }
 
-    /** The painter slot wins over [SettingsRow.icon]: the row draws the star, never the bell it names as fallback. */
+    /** The painter slot wins over [ListItem.icon]: the row draws the star, never the bell it names as fallback. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun PainterIcon() {
         ScreenshotTheme {
-            SettingsGroup(
+            ItemGroup(
                 title = null,
                 rows = listOf(
-                    SettingsRow(
+                    ListItem(
                         icon = Icons.Filled.Notifications,
                         iconPainter = { rememberVectorPainter(Icons.Filled.Star) },
                         label = "Seerr",
