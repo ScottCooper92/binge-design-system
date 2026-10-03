@@ -29,6 +29,19 @@ class RelativeDateFormatterTest {
         assertTrue("was '$label'", label.orEmpty().endsWith("ago"))
     }
 
+    /** Past a week the platform drops to its own short date unless asked for weeks (#219). */
+    @Test
+    fun `an instant weeks old inside the window reads in weeks`() {
+        assertEquals("1 week ago", formatRelativeOrAbsolute(NOW - 7 * DAY, now = NOW))
+        assertEquals("3 weeks ago", formatRelativeOrAbsolute(NOW - 21 * DAY, now = NOW))
+        assertEquals("4 weeks ago", formatRelativeOrAbsolute(NOW - 30 * DAY, now = NOW))
+    }
+
+    @Test
+    fun `an instant days old reads in days`() {
+        assertEquals("6 days ago", formatRelativeOrAbsolute(NOW - 6 * DAY, now = NOW))
+    }
+
     @Test
     fun `an instant past the window reads as the absolute long date`() {
         val label = formatRelativeOrAbsolute(NOW - 120 * DAY, now = NOW, locale = Locale.UK, zone = ZoneOffset.UTC)
