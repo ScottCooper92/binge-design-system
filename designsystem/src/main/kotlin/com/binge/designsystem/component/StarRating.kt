@@ -24,6 +24,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
+import java.util.Locale
 import kotlin.math.ceil
 
 private const val MAX_STARS = 5
@@ -83,12 +84,16 @@ fun StarRating(
  * nearest 0.5 star, with ties rounding down.
  *
  * Every tie falls on an x.5 rating (7.5 sits exactly between 3.5 and 4 stars), so ties go down to make
- * the star row never read higher than the number beside it. Out-of-range values clamp to 0 and 10, and
- * NaN draws no stars.
+ * the star row never read higher than the number beside it. The tie is judged on that number, the
+ * rating rounded to one decimal as [formatRating] prints it, not on the raw value: 7.52 prints "7.5",
+ * so it draws three and a half stars too (#232). Out-of-range values clamp to 0 and 10, and NaN draws
+ * no stars.
  */
 internal fun ratingToHalves(rating: Float): Int {
     if (rating.isNaN()) return 0
-    return ceil(rating.coerceIn(0f, MAX_RATING) - HALF_POINT).toInt().coerceAtLeast(0)
+    // The same format as formatRating, in a fixed locale so it parses back: the two cannot disagree.
+    val shown = "%.1f".format(Locale.ROOT, rating.coerceIn(0f, MAX_RATING)).toFloat()
+    return ceil(shown - HALF_POINT).toInt().coerceAtLeast(0)
 }
 
 /** The rating a screen reader announces: the true value, clamped to the scale, not the drawn half star. */
