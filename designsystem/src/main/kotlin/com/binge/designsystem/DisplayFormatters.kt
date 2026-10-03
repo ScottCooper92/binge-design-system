@@ -1,5 +1,6 @@
 package com.binge.designsystem
 
+import android.icu.text.RelativeDateTimeFormatter
 import android.text.format.DateUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -66,12 +67,12 @@ fun String.toInitials(fallback: String = take(2).uppercase()): String =
 fun badgeCountLabel(count: Int): String = if (count > MAX_BADGE_COUNT) "$MAX_BADGE_COUNT+" else count.toString()
 
 /**
- * A conversational date for [timeMillis]: a relative span ("just now", "6 days ago", "3 weeks ago")
+ * A conversational date for [timeMillis]: a relative span ("now", "6 days ago", "3 weeks ago")
  * for recent instants, falling back to the absolute long date ("12 June 2026") once it ages past the
  * relative window or sits in the future. `null` when [timeMillis] is `null` so callers can drop the
  * line entirely. [now] is a parameter so frames pass a fixed instant rather than the drifting clock.
- * [locale] and [zone] govern the absolute date only: the relative span is the platform's own
- * `DateUtils` copy, which always follows the device locale.
+ * [locale] and [zone] govern the absolute date only: the relative span is the platform's own copy
+ * (`DateUtils`, and ICU's "now" under a minute), which always follows the device locale.
  */
 fun formatRelativeOrAbsolute(
     timeMillis: Long?,
@@ -81,7 +82,13 @@ fun formatRelativeOrAbsolute(
 ): String? {
     if (timeMillis == null) return null
     val age = now - timeMillis
-    return if (age in 0..RELATIVE_DATE_WINDOW_MILLIS) {
+    return if (age in 0 until DateUtils.MINUTE_IN_MILLIS) {
+        // DateUtils counts whole minutes, so under one it says "0 minutes ago" (#240).
+        RelativeDateTimeFormatter.getInstance().format(
+            RelativeDateTimeFormatter.Direction.PLAIN,
+            RelativeDateTimeFormatter.AbsoluteUnit.NOW,
+        )
+    } else if (age in 0..RELATIVE_DATE_WINDOW_MILLIS) {
         // DateUtils stops counting at a week unless asked for weeks: at minute resolution it falls back
         // to its own short absolute date, a second date style beside the long one below (#219).
         val resolution = if (age < DateUtils.WEEK_IN_MILLIS) DateUtils.MINUTE_IN_MILLIS else DateUtils.WEEK_IN_MILLIS
