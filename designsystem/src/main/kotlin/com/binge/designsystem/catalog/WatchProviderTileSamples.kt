@@ -24,7 +24,7 @@ fun WatchProviderTileSelectedSample() {
             provider = WatchProviderUi(id = 1, name = "Netflix", logoUrl = ""),
             selected = true,
             onToggle = {},
-            modifier = Modifier.width(dimensionResource(R.dimen.see_all_tile_width)),
+            modifier = Modifier.width(dimensionResource(R.dimen.provider_tile_sample_width)),
         )
     }
 }
@@ -37,7 +37,7 @@ fun WatchProviderTileUnselectedSample() {
             provider = WatchProviderUi(id = 2, name = "Disney+", logoUrl = ""),
             selected = false,
             onToggle = {},
-            modifier = Modifier.width(dimensionResource(R.dimen.see_all_tile_width)),
+            modifier = Modifier.width(dimensionResource(R.dimen.provider_tile_sample_width)),
         )
     }
 }

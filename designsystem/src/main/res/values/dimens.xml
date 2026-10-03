@@ -69,6 +69,8 @@
     <dimen name="provider_tile_check_badge_size">20dp</dimen>
     <dimen name="provider_tile_check_inset">5dp</dimen>
     <dimen name="provider_tile_check_icon">13dp</dimen>
+    <!-- The width the catalog samples pin a provider tile to, a typical grid cell. Not see_all_tile_width: that is the poster cell, and only matches by coincidence (#248). -->
+    <dimen name="provider_tile_sample_width">120dp</dimen>
     <!-- Selected-services summary (shared by onboarding + account watch providers) -->
     <dimen name="services_summary_logo">24dp</dimen>
     <!-- Fixed min height for the summary slot so the empty-hint and the lead+logos
