@@ -36,10 +36,12 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 fun CreateListDialog(
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit,
+    modifier: Modifier = Modifier,
     isSubmitting: Boolean = false,
 ) {
     var name by rememberSaveable { mutableStateOf("") }
     AlertDialog(
+        modifier = modifier,
         // Back and a tap outside both arrive here, and Cancel is already off while submitting.
         onDismissRequest = { if (!isSubmitting) onDismiss() },
         title = { Text(stringResource(R.string.create_list_title)) },
