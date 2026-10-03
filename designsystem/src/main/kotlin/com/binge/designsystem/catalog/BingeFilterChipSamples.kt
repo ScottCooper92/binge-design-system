@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilterChip
@@ -21,14 +25,18 @@ import com.binge.designsystem.preview.ScreenshotTheme
  */
 @Composable
 fun BingeFilterChipFamilySample() {
+    // Seeded with the frame's selection, then each chip toggles on its own.
+    var all by remember { mutableStateOf(true) }
+    var action by remember { mutableStateOf(false) }
+    var trending by remember { mutableStateOf(false) }
     ScreenshotTheme {
         Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
-            BingeFilterChip(label = "All", selected = true, onClick = {}, count = 142)
-            BingeFilterChip(label = "Action", selected = false, onClick = {})
+            BingeFilterChip(label = "All", selected = all, onClick = { all = !all }, count = 142)
+            BingeFilterChip(label = "Action", selected = action, onClick = { action = !action })
             BingeFilterChip(
                 label = "Trending",
-                selected = false,
-                onClick = {},
+                selected = trending,
+                onClick = { trending = !trending },
                 leadingIcon = Icons.Filled.Star,
             )
         }
