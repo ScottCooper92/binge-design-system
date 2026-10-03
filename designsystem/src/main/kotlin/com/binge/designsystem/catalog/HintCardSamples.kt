@@ -1,9 +1,17 @@
+@file:SelfDescribing
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.HintCard
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -12,8 +20,8 @@ import com.binge.designsystem.preview.ScreenshotTheme
 fun HintCardSample() {
     ScreenshotTheme {
         HintCard(
-            text = "Press and hold an item, then drag to reorder. Screen reader users can use the Move up and " +
-                "Move down actions instead.",
+            text = "Default: the lightbulb icon, and text that wraps onto more lines once it runs past the " +
+                "width of the card, like this.",
         )
     }
 }
@@ -22,19 +30,24 @@ fun HintCardSample() {
 @Composable
 fun HintCardInfoSample() {
     ScreenshotTheme {
-        HintCard(text = "Changes only affect this device.", icon = Icons.Filled.Info)
+        HintCard(text = "Info: any icon can stand in for the lightbulb.", icon = Icons.Filled.Info)
     }
 }
 
 /** The opt-in dismissible form — a close control in the top-right corner, over wrapping text. */
 @Composable
 fun HintCardDismissibleSample() {
+    var visible by remember { mutableStateOf(true) }
     ScreenshotTheme {
-        HintCard(
-            text = "Press and hold an item, then drag to reorder. Screen reader users can use the Move up and " +
-                "Move down actions instead.",
-            onDismiss = {},
-        )
+        if (visible) {
+            HintCard(
+                text = "Dismissible: the close button in the corner hides the card, and longer text wraps clear " +
+                    "of it.",
+                onDismiss = { visible = false },
+            )
+        } else {
+            TextButton(onClick = { visible = true }) { Text("Show the hint again") }
+        }
     }
 }
 
@@ -43,7 +56,7 @@ fun HintCardDismissibleSample() {
 fun HintCardActionSample() {
     ScreenshotTheme {
         HintCard(
-            text = "Connect this app to Binge to request titles from your library.",
+            text = "Action: a button under the text, here with the glyph for a destination outside the app.",
             onDismiss = {},
             actionLabel = "Open Binge",
             onAction = {},

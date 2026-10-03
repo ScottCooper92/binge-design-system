@@ -8,6 +8,8 @@ import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -50,11 +52,12 @@ class CatalogAppTest {
     @Test
     fun `searching narrows the grid and a component opens on its variants, back returns`() {
         launch()
-        search("button family")
+        search("filled button")
 
-        rule.onNodeWithText("Button").performClick()
-        rule.onNodeWithText("Family").assertIsDisplayed()
-        rule.onNodeWithText("Filled").assertIsDisplayed()
+        rule.onNodeWithText("Buttons").performClick()
+        // The filled button's list leads the page: its heading, and its buttons named by their state.
+        rule.onNodeWithText("Filled button").assertIsDisplayed()
+        rule.onAllNodesWithText("Leading icon").onFirst().assertIsDisplayed()
 
         rule.onNodeWithContentDescription(NAVIGATE_BACK).performClick()
         rule.onNode(hasSetTextAction()).assertIsDisplayed()
@@ -82,8 +85,8 @@ class CatalogAppTest {
     @Test
     fun `the controls toggle in the tweaks sheet`() {
         launch()
-        search("button family")
-        rule.onNodeWithText("Button").performClick()
+        search("filled button")
+        rule.onNodeWithText("Buttons").performClick()
         openTweaks()
 
         rule.onNodeWithText("RTL").assertIsNotSelected().performClick()
@@ -137,8 +140,8 @@ class CatalogAppTest {
     @Test
     fun `a listed component offers no variant choice in the sheet`() {
         launch()
-        search("button family")
-        rule.onNodeWithText("Button").performClick()
+        search("filled button")
+        rule.onNodeWithText("Buttons").performClick()
         openTweaks()
 
         rule.onNodeWithText("Variant").assertDoesNotExist()
@@ -147,8 +150,8 @@ class CatalogAppTest {
     @Test
     fun `the language control is offered in the tweaks sheet`() {
         launch()
-        search("button family")
-        rule.onNodeWithText("Button").performClick()
+        search("filled button")
+        rule.onNodeWithText("Buttons").performClick()
         openTweaks()
 
         rule

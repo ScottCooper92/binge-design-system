@@ -1,3 +1,5 @@
+@file:CatalogGroup("Buttons")
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement

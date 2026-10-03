@@ -1,3 +1,6 @@
+@file:CatalogGroup("Buttons")
+@file:SelfDescribing
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement
@@ -13,88 +16,38 @@ import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public samples for the button family (see the convention on [MediaCardRatedSample]). Each is a
- * no-arg `@Composable` wrapped in [ScreenshotTheme], called by both the catalog `@Preview` and the
- * matching screenshot test so the two renders are identical.
+ * Every state of [BingeFilledButton] in one list, each button labelled with the state it is in, so
+ * the sample says what it shows without a caption: enabled, with a leading icon, disabled,
+ * destructive (the tone only reads against the enabled one above it) and loading, where a spinner
+ * replaces the label and taps are swallowed.
  */
 @Composable
-fun ButtonFamilySample() {
+fun FilledButtonSample() {
     ScreenshotTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
-            BingeFilledButton(
-                label = "Filled",
-                leadingIcon = Icons.Filled.PlayArrow,
-                onClick = {},
-            )
-            BingeOutlinedButton(label = "Outlined", onClick = {})
-        }
-    }
-}
-
-/** Filled button in its loading state — taps are swallowed and a spinner replaces the label. */
-@Composable
-fun FilledButtonLoadingSample() {
-    ScreenshotTheme {
-        BingeFilledButton(
-            label = "Watch trailer",
-            onClick = {},
-            loading = true,
-        )
-    }
-}
-
-/**
- * A destructive outlined button beside an ordinary one. The pair is the sample: the tone only means
- * anything against the button it is not.
- */
-@Composable
-fun OutlinedButtonDestructiveSample() {
-    ScreenshotTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
-            BingeOutlinedButton(label = "Keep", onClick = {})
-            BingeOutlinedButton(label = "Delete files", onClick = {}, destructive = true)
+        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            BingeFilledButton(label = "Enabled", onClick = {})
+            BingeFilledButton(label = "Leading icon", onClick = {}, leadingIcon = Icons.Filled.PlayArrow)
+            BingeFilledButton(label = "Disabled", onClick = {}, enabled = false)
+            BingeFilledButton(label = "Destructive", onClick = {}, destructive = true)
+            BingeFilledButton(label = "Loading", onClick = {}, loading = true)
         }
     }
 }
 
 /**
- * The same pair on the filled button, where the tone moves the container rather than the label.
- * Framed separately from the outlined pair because a filled error button is the louder of the two
- * and the one a caller is most likely to reach for by passing colours by hand.
+ * Every state of [BingeOutlinedButton] in one list, each labelled with its state: enabled, with a
+ * leading icon, disabled, destructive, loading, and the icon-only collapse `showLabel = false` gives.
  */
 @Composable
-fun FilledButtonDestructiveSample() {
+fun OutlinedButtonSample() {
     ScreenshotTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
-            BingeFilledButton(label = "Keep", onClick = {})
-            BingeFilledButton(label = "Delete files", onClick = {}, destructive = true)
-        }
-    }
-}
-
-/**
- * The outlined button's [leadingIcon][BingeOutlinedButton] pair — icon-and-label beside the
- * icon-only collapse that [showLabel][BingeOutlinedButton] switches to.
- */
-@Composable
-fun OutlinedButtonIconSample() {
-    ScreenshotTheme {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
-            BingeOutlinedButton(label = "Report a problem", onClick = {}, leadingIcon = Icons.Filled.Flag)
-            BingeOutlinedButton(
-                label = "Report a problem",
-                onClick = {},
-                leadingIcon = Icons.Filled.Flag,
-                showLabel = false,
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            BingeOutlinedButton(label = "Enabled", onClick = {})
+            BingeOutlinedButton(label = "Leading icon", onClick = {}, leadingIcon = Icons.Filled.Flag)
+            BingeOutlinedButton(label = "Disabled", onClick = {}, enabled = false)
+            BingeOutlinedButton(label = "Destructive", onClick = {}, destructive = true)
+            BingeOutlinedButton(label = "Loading", onClick = {}, loading = true)
+            BingeOutlinedButton(label = "Icon only", onClick = {}, leadingIcon = Icons.Filled.Flag, showLabel = false)
         }
     }
 }

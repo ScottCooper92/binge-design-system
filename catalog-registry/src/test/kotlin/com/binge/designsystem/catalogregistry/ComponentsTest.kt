@@ -116,4 +116,16 @@ class ComponentsTest {
         assertEquals(setOf("Top app bars"), group.map { it.componentName }.toSet())
         assertEquals("BingeTopBar", entries.single { it.declaration.kind == EntryKind.Sample }.component)
     }
+
+    @Test
+    fun `a skeleton follows the real variants, whichever file sorts first`() {
+        val entries = toComponents(
+            listOf(
+                SampleDeclaration("CarouselSkeletonSample", "CarouselSkeleton", "", "", catalogGroup = "Media carousel"),
+                SampleDeclaration("MediaCarouselSample", "MediaCarousel", "", "", catalogGroup = "Media carousel"),
+            ),
+        )
+
+        assertEquals(listOf("MediaCarouselSample", "CarouselSkeletonSample"), entries.map { it.declaration.function })
+    }
 }

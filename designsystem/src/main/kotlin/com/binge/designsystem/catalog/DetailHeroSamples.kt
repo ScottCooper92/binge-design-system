@@ -1,4 +1,5 @@
 @file:OnePerScreen
+@file:CatalogGroup("Detail headers")
 
 package com.binge.designsystem.catalog
 

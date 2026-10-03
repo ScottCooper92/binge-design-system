@@ -5,36 +5,21 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
 /**
- * Screenshot coverage for the combined button-family catalog sample. Renders the shared
- * [ButtonFamilySample], the group's one public fixture. This is the template a per-group
- * ticket follows when a group sample has no single-component screenshot test of its own.
+ * Screenshot coverage for the button catalog samples: one frame per button, each a labelled list of
+ * its states, so the frame is the whole state matrix of that button.
  */
 class ButtonSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun Family() {
-        ButtonFamilySample()
+    fun Filled() {
+        FilledButtonSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun Destructive() {
-        OutlinedButtonDestructiveSample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun DestructiveFilled() {
-        FilledButtonDestructiveSample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun OutlinedIcon() {
-        OutlinedButtonIconSample()
+    fun Outlined() {
+        OutlinedButtonSample()
     }
 }

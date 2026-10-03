@@ -9,7 +9,7 @@ class CatalogRegistryTest {
     @Test
     fun `the generated registry lists the catalog`() {
         assertTrue(CatalogRegistry.size > 100, "expected the design system's samples, got ${CatalogRegistry.size}")
-        assertTrue(CatalogRegistry.any { it.id == "ButtonFamilySample" })
+        assertTrue(CatalogRegistry.any { it.id == "FilledButtonSample" })
     }
 
     @Test

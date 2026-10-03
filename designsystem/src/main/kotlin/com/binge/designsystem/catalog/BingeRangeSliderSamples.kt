@@ -2,6 +2,10 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
@@ -14,10 +18,12 @@ private const val SAMPLE_STEPS = 15
 
 @Composable
 private fun RangeSliderSampleFrame(values: ClosedFloatingPointRange<Float>, enabled: Boolean = true) {
+    // Each sample starts at its own values, which is all a frame sees, and then drags for real.
+    var current by remember { mutableStateOf(values) }
     ScreenshotTheme {
         BingeRangeSlider(
-            values = values,
-            onValuesChange = {},
+            values = current,
+            onValuesChange = { current = it },
             valueRange = 0f..SAMPLE_MAX,
             steps = SAMPLE_STEPS,
             valueLabel = { if (it >= SAMPLE_MAX) "${it.toInt()}+ min" else "${it.toInt()} min" },
