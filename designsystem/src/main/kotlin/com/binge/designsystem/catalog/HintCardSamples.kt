@@ -54,13 +54,18 @@ fun HintCardDismissibleSample() {
 /** A dismissible hint with an action beneath it, trailed by an open-in-new glyph for an outside destination. */
 @Composable
 fun HintCardActionSample() {
+    var visible by remember { mutableStateOf(true) }
     ScreenshotTheme {
-        HintCard(
-            text = "Action: a button under the text, here with the glyph for a destination outside the app.",
-            onDismiss = {},
-            actionLabel = "Open Binge",
-            onAction = {},
-            actionIcon = Icons.AutoMirrored.Filled.OpenInNew,
-        )
+        if (visible) {
+            HintCard(
+                text = "Action: a button under the text, here with the glyph for a destination outside the app.",
+                onDismiss = { visible = false },
+                actionLabel = "Open Binge",
+                onAction = {},
+                actionIcon = Icons.AutoMirrored.Filled.OpenInNew,
+            )
+        } else {
+            TextButton(onClick = { visible = true }) { Text("Show the hint again") }
+        }
     }
 }

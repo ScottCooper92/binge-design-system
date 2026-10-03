@@ -3,6 +3,10 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.RatingCard
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -13,14 +17,15 @@ import com.binge.designsystem.preview.ScreenshotTheme
  */
 @Composable
 fun RatingCardUnratedSample() {
+    var rating by remember { mutableStateOf<Float?>(null) }
     ScreenshotTheme {
         RatingCard(
-            userRating = null,
+            userRating = rating,
             isSignedIn = true,
             reviewCount = 7,
             averageReviewRating = 7.5f,
-            onRate = {},
-            onRemoveRating = {},
+            onRate = { rating = it },
+            onRemoveRating = { rating = null },
             onReviewsClick = {},
         )
     }
@@ -29,14 +34,15 @@ fun RatingCardUnratedSample() {
 /** A recorded user rating — the star row collapses to the rated summary with an edit affordance. */
 @Composable
 fun RatingCardRatedSample() {
+    var rating by remember { mutableStateOf<Float?>(9f) }
     ScreenshotTheme {
         RatingCard(
-            userRating = 9f,
+            userRating = rating,
             isSignedIn = true,
             reviewCount = 0,
             averageReviewRating = null,
-            onRate = {},
-            onRemoveRating = {},
+            onRate = { rating = it },
+            onRemoveRating = { rating = null },
             onReviewsClick = {},
         )
     }

@@ -17,6 +17,10 @@ import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
@@ -113,6 +117,8 @@ fun ItemGroupBadgesSample() {
  */
 @Composable
 fun ItemGroupSelectedSample() {
+    // Seeded on Requests; tapping a row opens it, as a navigation list beside a pane would.
+    var open by remember { mutableStateOf("Requests") }
     ScreenshotTheme {
         ItemGroup(
             title = "Manage",
@@ -124,15 +130,24 @@ fun ItemGroupSelectedSample() {
                     detail = "Approve, decline & track",
                     badgeCount = 3,
                     badgeTint = BingeSentiment.Caution.accent(),
-                    selected = true,
+                    selected = open == "Requests",
+                    onClick = { open = "Requests" },
                 ),
                 ListItem(
                     icon = Icons.Filled.People,
                     iconTint = BingeSentiment.Info.accent(),
                     label = "Users",
                     detail = "Roles, quotas & permissions",
+                    selected = open == "Users",
+                    onClick = { open = "Users" },
                 ),
-                ListItem(icon = Icons.Filled.Settings, label = "Settings", detail = "Server & connection"),
+                ListItem(
+                    icon = Icons.Filled.Settings,
+                    label = "Settings",
+                    detail = "Server & connection",
+                    selected = open == "Settings",
+                    onClick = { open = "Settings" },
+                ),
             ),
         )
     }

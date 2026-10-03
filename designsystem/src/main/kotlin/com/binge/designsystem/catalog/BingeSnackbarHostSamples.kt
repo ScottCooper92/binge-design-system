@@ -9,7 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -41,14 +47,19 @@ fun BingeSnackbarSample() {
 /** Message-only with a trailing dismiss icon — the error/no-action form. */
 @Composable
 fun BingeSnackbarDismissSample() {
+    var visible by remember { mutableStateOf(true) }
     ScreenshotTheme {
-        BingeSnackbar(
-            message = "Couldn't complete that action. Please try again.",
-            actionLabel = null,
-            onActionClick = {},
-            showDismissAction = true,
-            onDismiss = {},
-        )
+        if (visible) {
+            BingeSnackbar(
+                message = "Couldn't complete that action. Please try again.",
+                actionLabel = null,
+                onActionClick = {},
+                showDismissAction = true,
+                onDismiss = { visible = false },
+            )
+        } else {
+            TextButton(onClick = { visible = true }) { Text("Show the snackbar again") }
+        }
     }
 }
 
@@ -65,11 +76,12 @@ private val snackbarSampleTabs = listOf(
  */
 @Composable
 fun BingeSnackbarOverFloatingBarSample() {
+    var selectedKey by remember { mutableStateOf<Any>("movies") }
     ScreenshotTheme {
         BingeNavSuiteShell(
             items = snackbarSampleTabs,
-            selectedKey = "movies",
-            onSelect = {},
+            selectedKey = selectedKey,
+            onSelect = { selectedKey = it },
             presentation = BingeNavPresentation.FloatingBar,
         ) {
             val navOverlayBottom = LocalNavOverlayInsets.current.calculateBottomPadding()
