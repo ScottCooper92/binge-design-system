@@ -53,7 +53,8 @@ class DemosTest {
     }
 
     private fun fraction(): String {
-        val node = rule.onNode(hasText("collapsedFraction", substring = true)).fetchSemanticsNode()
+        // Either name: each demo prints the fraction its bar is actually built from.
+        val node = rule.onNode(hasText("Fraction = ", substring = true)).fetchSemanticsNode()
         return node.config[SemanticsProperties.Text].joinToString { it.text }.substringAfter("= ")
     }
 

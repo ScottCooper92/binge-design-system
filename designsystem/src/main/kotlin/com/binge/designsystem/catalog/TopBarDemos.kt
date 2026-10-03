@@ -58,7 +58,8 @@ private const val DEMO_ARTWORK_CELLS = 3
  * Each top bar live over a long list that opens on a band of artwork and runs into banded rows, so a
  * transparent bar has imagery to sit on at rest and both bands pass beneath it as you scroll. The bar
  * is drawn over the list, as the app's screens draw it, and is built from one number the behaviour
- * gives, which is printed at the bottom.
+ * gives, which is printed at the bottom. That number is `collapsedFraction` for a bar that collapses
+ * in place, and `overlappedFraction` for a pinned or enter-always bar, which each demo passes.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,12 +140,17 @@ fun BingeTopBarDemo() {
     }
 }
 
-/** [BingeTopBar] with the enter-always behaviour: the bar leaves on a scroll down and returns on a scroll up. */
+/**
+ * [BingeTopBar] with the enter-always behaviour: the bar leaves on a scroll down and returns on a scroll up.
+ * Its scrim follows `overlappedFraction`, as [BingeTopBar]'s KDoc says. On this behaviour
+ * `collapsedFraction` measures how far the bar has slid off screen, which would clear the scrim exactly
+ * when the bar comes back over content.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingeTopBarEnterAlwaysDemo() {
     val behavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    ScrollingBarDemoHost(behavior) { fraction ->
+    ScrollingBarDemoHost(behavior, "overlappedFraction", { it.overlappedFraction }) { fraction ->
         BingeTopBar(
             title = DEMO_TITLE,
             onBack = LocalDemoBack.current,

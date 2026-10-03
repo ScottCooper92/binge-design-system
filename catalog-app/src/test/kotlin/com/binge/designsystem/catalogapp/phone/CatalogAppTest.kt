@@ -106,7 +106,7 @@ class CatalogAppTest {
         search("enter always")
         rule.onNodeWithText("Top app bars").performClick()
 
-        rule.onNodeWithText("collapsedFraction = 0.00").assertIsDisplayed()
+        rule.onNodeWithText("overlappedFraction = 0.00").assertIsDisplayed()
         // No catalog bar above the demo: its title would name the page.
         rule.onNodeWithText("Top app bars").assertDoesNotExist()
 
@@ -124,7 +124,7 @@ class CatalogAppTest {
         rule.onNode(hasText("Detail overlay top bar") and hasClickAction()).performScrollTo().performClick()
 
         rule.onNode(hasText("Detail overlay top bar") and hasClickAction()).assertIsSelected()
-        rule.onNodeWithText("collapsedFraction = 0.00").assertDoesNotExist()
+        rule.onNodeWithText("overlappedFraction = 0.00").assertDoesNotExist()
         rule.onNodeWithText("scrolled = 0.00").assertExists()
     }
 
