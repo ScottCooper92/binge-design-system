@@ -4,49 +4,49 @@ import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
-/** Screenshot coverage for the [SettingsGroup] catalog samples. */
-class SettingsGroupSamplesScreenshotTest {
+/** Screenshot coverage for the [ItemGroup] catalog samples. */
+class ItemGroupSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun titled() {
-        SettingsGroupTitledSample()
+        ItemGroupTitledSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun tinted() {
-        SettingsGroupTintedSample()
+        ItemGroupTintedSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun badges() {
-        SettingsGroupBadgesSample()
+        ItemGroupBadgesSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun selected() {
-        SettingsGroupSelectedSample()
+        ItemGroupSelectedSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun external() {
-        SettingsGroupExternalSample()
+        ItemGroupExternalSample()
     }
 
-    /** [SettingsRow.loading] on the acting row and [SettingsRow.disabled] on the one it blocks. */
+    /** [ListItem.loading] on the acting row and [ListItem.disabled] on the one it blocks. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun busy() {
-        SettingsGroupBusySample()
+        ItemGroupBusySample()
     }
 
     /** The `rowVerticalPadding` override beside [titled]'s default rows (#133). */
@@ -54,7 +54,7 @@ class SettingsGroupSamplesScreenshotTest {
     @ComponentPreviews
     @Composable
     fun tallRows() {
-        SettingsGroupTallRowsSample()
+        ItemGroupTallRowsSample()
     }
 
     /** The `titleSpacing` override beside [titled]'s default rows. */
@@ -62,38 +62,38 @@ class SettingsGroupSamplesScreenshotTest {
     @ComponentPreviews
     @Composable
     fun tightTitle() {
-        SettingsGroupTightTitleSample()
+        ItemGroupTightTitleSample()
     }
 
-    /** [SettingsRow.leadingContent] standing in for the icon box. */
+    /** [ListItem.leadingContent] standing in for the icon box. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun leadingContent() {
-        SettingsGroupLeadingContentSample()
+        ItemGroupLeadingContentSample()
     }
 
-    /** [SettingsRows] with no surface of its own, drawn inside a card the caller supplies. */
+    /** [ItemRows] with no surface of its own, drawn inside a card the caller supplies. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun noSurface() {
-        SettingsRowsNoSurfaceSample()
+        ItemRowsNoSurfaceSample()
     }
 
-    /** [SettingsRow.connector] joining three child rows to their parent. */
+    /** [ListItem.connector] joining three child rows to their parent. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun connector() {
-        SettingsGroupConnectorSample()
+        ItemGroupConnectorSample()
     }
 
-    /** [SettingsRow.toggled] switch rows: on, off and disabled. */
+    /** [ListItem.toggled] switch rows: on, off and disabled. */
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun switches() {
-        SettingsGroupSwitchSample()
+        ItemGroupSwitchSample()
     }
 }
