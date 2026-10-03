@@ -82,7 +82,10 @@ fun formatRelativeOrAbsolute(
     if (timeMillis == null) return null
     val age = now - timeMillis
     return if (age in 0..RELATIVE_DATE_WINDOW_MILLIS) {
-        DateUtils.getRelativeTimeSpanString(timeMillis, now, DateUtils.MINUTE_IN_MILLIS).toString()
+        // DateUtils stops counting at a week unless asked for weeks: at minute resolution it falls back
+        // to its own short absolute date, a second date style beside the long one below (#219).
+        val resolution = if (age < DateUtils.WEEK_IN_MILLIS) DateUtils.MINUTE_IN_MILLIS else DateUtils.WEEK_IN_MILLIS
+        DateUtils.getRelativeTimeSpanString(timeMillis, now, resolution).toString()
     } else {
         Instant
             .ofEpochMilli(timeMillis)
