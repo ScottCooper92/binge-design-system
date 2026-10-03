@@ -19,6 +19,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
@@ -42,6 +43,9 @@ private const val GLASS_BACKGROUND_ALPHA = 0.4f
  * [loading] swaps the glyph for an indeterminate spinner at the glyph's size and swallows taps, so
  * the button keeps its size and an in-flight action cannot be re-triggered. It is independent of
  * [enabled], as on [BingeTextButton]: disabled dims, loading spins. The [contentDescription] stays.
+ *
+ * [tint] is read at the call site, outside [IconButton], so the button's own disabled content colour
+ * never reaches the glyph; a disabled button dims [tint] itself by [DISABLED_ALPHA].
  */
 @Composable
 fun ExpressiveIconButton(
@@ -67,6 +71,7 @@ fun ExpressiveIconButton(
     } else {
         modifier.size(size).clip(BingeShapes.Pill).background(background)
     }
+    val glyphTint = if (enabled) tint else tint.copy(alpha = tint.alpha * DISABLED_ALPHA)
     IconButton(
         onClick = { if (!loading) onClick() },
         modifier = containerModifier,
@@ -77,14 +82,14 @@ fun ExpressiveIconButton(
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.icon_button_glyph_size))
                     .semantics { contentDescription?.let { this.contentDescription = it } },
-                color = tint,
+                color = glyphTint,
                 strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
             )
         } else {
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = tint,
+                tint = glyphTint,
             )
         }
     }

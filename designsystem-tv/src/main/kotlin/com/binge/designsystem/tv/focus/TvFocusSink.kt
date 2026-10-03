@@ -18,7 +18,7 @@ import com.binge.designsystem.tv.R as TvR
 const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
 
 /**
- * A passive, inert focus target for a pane with nothing else focusable yet (#2518). A caller composes it
+ * A passive, inert focus target for a pane with nothing else focusable yet. A caller composes it
  * conditionally — `if (!paneHasFocus) TvFocusSink(...)` — as a sibling of the pane's real content, never inside
  * a scrollable, so the pane's own entry requester always has *something* to land on from its first frame
  * instead of racing the destination's first focusable child. **Gate presence on the pane's own `hasFocus`, not
@@ -31,7 +31,7 @@ const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
  *
  * **Never calls `requestFocus` itself.** It only receives what a group's own entry redirect, an explicit
  * request, or Compose's own recovery search hands it — a puller here would reproduce the rail collapsing under
- * a user still walking it (#1335). [leftEntry] is the one sanctioned way out by D-pad: the content pane passes
+ * a user still walking it. [leftEntry] is the one sanctioned way out by D-pad: the content pane passes
  * its rail's selected-item requester so ← still opens the rail; the overlay host leaves it `null`, since Back
  * is the only way out of an overlay. Every other direction is cancelled, so a stray press during a skeleton
  * does nothing rather than landing on a geometric pick behind the pane.

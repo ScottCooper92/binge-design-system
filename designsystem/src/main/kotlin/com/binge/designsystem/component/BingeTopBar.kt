@@ -47,12 +47,15 @@ import com.binge.designsystem.theme.BingeTheme
  * [Color.Transparent] to let a hero screen's imagery show through: the override drives both resting
  * and scrolled container, so the bar stays transparent on scroll and nav + actions go Glass.
  *
- * A transparent bar draws nothing behind itself, so [scrimFraction] puts a [TopBarScrim] behind it —
- * ramp it on the same [scrollBehavior]'s `collapsedFraction`, or the content passing under runs
- * through the title, exactly as on [BingeMediumTopBar]. A screen whose bar and header want *one*
- * scrim across both (Gallery) leaves this at 0 and scrims the header instead. That scrim tapers past
- * this bar's own bottom edge into the content scrolling under it, rather than cutting off at the
- * bar's boundary (#94).
+ * A transparent bar draws nothing behind itself, so [scrimFraction] puts a [TopBarScrim] behind it.
+ * Drive it with how much of the bar the scrolled content overlaps: the same [scrollBehavior]'s
+ * `collapsedFraction` for a collapsing behaviour (`exitUntilCollapsed`), and its `overlappedFraction`
+ * for one that hides the bar (`enterAlwaysScrollBehavior`) or pins it. On an enter-always bar
+ * `collapsedFraction` measures how far the bar has slid off screen, the inverse of what the scrim
+ * needs, so the scrim would vanish exactly when the bar is showing over content. A screen whose
+ * bar and header want *one* scrim across both (Gallery) leaves this at 0 and scrims the header
+ * instead. That scrim tapers past this bar's own bottom edge into the content scrolling under it,
+ * rather than cutting off at the bar's boundary (#94).
  *
  * [scrimColor]/[scrimForegroundColor] default to a theme-following pair
  * (`MaterialTheme.colorScheme.background`/`onBackground`) — every current caller scrims a plain,

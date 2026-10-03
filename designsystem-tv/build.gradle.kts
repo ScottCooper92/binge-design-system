@@ -36,7 +36,7 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
 
-    // Publishes the adverse-schedule focus harness (#2521) to this module's own test source set — the target
+    // Publishes the adverse-schedule focus harness to this module's own test source set — the target
     // arriving frames late is a property of the retry loops that live here, so the fixture belongs beside them
     // rather than being hand-rolled per test.
     testFixtures {
@@ -167,7 +167,7 @@ dependencies {
     // JUnit 5 for the plain tests; the vintage engine runs the JUnit4-style Robolectric tests on the same
     // platform, exactly as :designsystem arranges it. The focus units are the reason this module needs the
     // Compose test stack at all: their contracts are about where focus lands, which is only observable by
-    // driving a real composition (Binge#2514).
+    // driving a real composition.
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit4)

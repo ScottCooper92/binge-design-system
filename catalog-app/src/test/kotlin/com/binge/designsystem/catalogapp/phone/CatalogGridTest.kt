@@ -2,17 +2,23 @@ package com.binge.designsystem.catalogapp.phone
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalogapp.registry.CatalogComponent
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
@@ -107,6 +113,32 @@ class CatalogGridTest {
         rule.onNodeWithText("Components").assertIsDisplayed()
         rule.onAllNodesWithText("Demo").assertCountEquals(1)
         assertTrue(rule.onNodeWithText("Cell 1").getBoundsInRoot().top < rule.onNodeWithText("Cell 0").getBoundsInRoot().top)
+    }
+
+    @Test
+    fun `Tab moves from one card straight to the next, not through its preview overlay`() {
+        show(samples)
+
+        rule.onNodeWithText("Cell 0").requestFocus()
+        rule.onNodeWithText("Cell 0").performKeyInput { pressKey(Key.Tab) }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Cell 1").assertIsFocused()
+    }
+
+    @Test
+    fun `Tab skips a focusable control inside a preview and reaches the next card`() {
+        val withButton =
+            CatalogEntry(id = "B0", group = "G0", groupName = "Cell 0", name = "Default", description = "") {
+                Button(onClick = {}) { Text("Inner button") }
+            }
+        show(listOf(withButton) + samples.drop(1))
+
+        rule.onNodeWithText("Cell 0").requestFocus()
+        rule.onNodeWithText("Cell 0").performKeyInput { pressKey(Key.Tab) }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Cell 1").assertIsFocused()
     }
 
     private companion object {

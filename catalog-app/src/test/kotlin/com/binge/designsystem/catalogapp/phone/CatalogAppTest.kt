@@ -76,7 +76,7 @@ class CatalogAppTest {
         launch()
         search("zzz-no-such-sample")
 
-        rule.onNodeWithText("No samples match “zzz-no-such-sample”").assertIsDisplayed()
+        rule.onNodeWithText("No components match “zzz-no-such-sample”").assertIsDisplayed()
     }
 
     @Test

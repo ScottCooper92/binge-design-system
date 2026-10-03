@@ -89,7 +89,7 @@ class TvSamplesScreenshotTest {
     @Composable
     fun navRailCollapsedLastSelected() = Frame { TvNavRailSample(expanded = false, selectedKey = "lists") }
 
-    /** A companion's pending-attention count on a rail destination (#2510) — the collapsed icon's corner. */
+    /** A companion's pending-attention count on a rail destination — the collapsed icon's corner. */
     @PreviewTest
     @TvPreviews
     @Composable

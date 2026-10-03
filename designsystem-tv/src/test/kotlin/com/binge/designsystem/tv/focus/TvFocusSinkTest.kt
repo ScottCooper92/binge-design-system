@@ -26,7 +26,7 @@ import org.robolectric.annotation.Config
 private const val LEFT_TARGET = "left-target"
 
 /**
- * [TvFocusSink]'s own directional contract (#2518 decision 5): ← is the one sanctioned way out, everywhere
+ * [TvFocusSink]'s own directional contract: ← is the one sanctioned way out, everywhere
  * else is cancelled. [BingeTvNavRailAdverseScheduleFocusTest] and [BingeTvNavRailFocusTest] cover the sink's
  * integration into the rail's content group — presence keyed on the pane's own focus, convergence onto a
  * late-composing real target, and the parked-rail case landing on the sink instead.

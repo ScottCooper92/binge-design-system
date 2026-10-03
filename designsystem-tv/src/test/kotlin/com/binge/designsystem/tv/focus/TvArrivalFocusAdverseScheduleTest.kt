@@ -37,7 +37,7 @@ private const val SETTLE_FRAMES = 10
 private val PAST_ARRIVAL_TIMEOUT = Duration.ofMillis(3_100)
 
 /**
- * The overlay-arrival adverse-schedule cases #2521 asks for: [offerTvArrivalFocus] (via [TvArrivalFocusEffect])
+ * The overlay-arrival adverse-schedule cases: [offerTvArrivalFocus] (via [TvArrivalFocusEffect])
  * converges on a target composed N frames past the disposing sibling, for N in {0, 1, 10, 60} — same ceiling
  * rationale as `BingeTvNavRailAdverseScheduleFocusTest`.
  *
