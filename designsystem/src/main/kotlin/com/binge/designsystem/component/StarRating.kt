@@ -51,7 +51,7 @@ fun StarRating(
     onRatingChange: ((Float) -> Unit)? = null,
 ) {
     val halves = ratingToHalves(rating)
-    val ratingDescription = stringResource(R.string.cd_rating_out_of_ten, halves.toFloat().formatRating())
+    val ratingDescription = stringResource(R.string.cd_rating_out_of_ten, announcedRating(rating).formatRating())
 
     Row(
         modifier = modifier.semantics { contentDescription = ratingDescription },
@@ -90,6 +90,9 @@ internal fun ratingToHalves(rating: Float): Int {
     if (rating.isNaN()) return 0
     return ceil(rating.coerceIn(0f, MAX_RATING) - HALF_POINT).toInt().coerceAtLeast(0)
 }
+
+/** The rating a screen reader announces: the true value, clamped to the scale, not the drawn half star. */
+internal fun announcedRating(rating: Float): Float = if (rating.isNaN()) 0f else rating.coerceIn(0f, MAX_RATING)
 
 private const val MAX_RATING = 10f
 private const val HALF_POINT = 0.5f

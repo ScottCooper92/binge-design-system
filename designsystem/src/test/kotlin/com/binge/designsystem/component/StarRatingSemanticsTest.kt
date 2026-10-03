@@ -103,6 +103,14 @@ class StarRatingSemanticsTest {
         composeTestRule.onNodeWithContentDescription("Rating: 6.0 out of 10").assertExists()
     }
 
+    /** The announcement is the true rating, not the half star drawn: 7.5 reads as 7.5 beside 3.5 stars. */
+    @Test
+    fun `the row announces the true rating rather than the rounded stars`() {
+        setRating(7.5f)
+
+        composeTestRule.onNodeWithContentDescription("Rating: 7.5 out of 10").assertExists()
+    }
+
     /**
      * An interactive star is 28dp with 3dp to the next, the app's smallest target and well under the
      * 48dp guidance. A gesture detector gets no expansion; `combinedClickable` does.
