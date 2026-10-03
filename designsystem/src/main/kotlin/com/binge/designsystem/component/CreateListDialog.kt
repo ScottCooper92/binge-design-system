@@ -26,6 +26,8 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * Dialog for naming and creating a new list. The caller keeps the dialog open for the whole
  * create→add round trip and drives [isSubmitting] from the in-flight signal, so the confirm action
  * shows a spinner instead of dismissing immediately — the caller dismisses on the success event.
+ * While it runs, nothing else dismisses the dialog either: Cancel is disabled, and back or a tap
+ * outside is ignored, so [onDismiss] is never called mid-submit.
  *
  * The visible body is delegated to [CreateListDialogContent] so it can be rendered directly in
  * screenshot tests, since the modal [AlertDialog] window itself does not capture in previews.
@@ -38,7 +40,8 @@ fun CreateListDialog(
 ) {
     var name by rememberSaveable { mutableStateOf("") }
     AlertDialog(
-        onDismissRequest = onDismiss,
+        // Back and a tap outside both arrive here, and Cancel is already off while submitting.
+        onDismissRequest = { if (!isSubmitting) onDismiss() },
         title = { Text(stringResource(R.string.create_list_title)) },
         text = {
             CreateListNameField(
