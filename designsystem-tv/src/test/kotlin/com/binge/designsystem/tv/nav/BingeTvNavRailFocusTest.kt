@@ -88,12 +88,12 @@ private const val HANDOFF_HOLD_FRAMES = 3
  *
  * **Why "the startup offer is still retrying" is no longer a testable window.** [offerFocusToContent]'s loop
  * exits the instant `taken()` is true, checked *before* it ever calls `withFrameNanos` that iteration — and
- * since [TvFocusSink] (#2518) guarantees `content`'s focus group always has *something* focusable, the offer's
+ * since [TvFocusSink] guarantees `content`'s focus group always has *something* focusable, the offer's
  * `LaunchedEffect` claims the sink and completes within a frame or two of mount, for every destination, loading
  * or not (see the next test's KDoc). A real key dispatched while the offer is *provably* still active would
  * therefore need to land inside a one-or-two-frame window in which, by construction, nothing has been focused
  * yet for a key event to meaningfully originate from — not a harness limitation to route around, but the actual
- * shape of the production code post-#2518. Pinning a test to that exact frame count is precisely the kind of
+ * shape of the production code now that the sink exists. Pinning a test to that exact frame count is precisely the kind of
  * coupling this file's frame-budget comments already warn against (`TvNavRailFocus.kt`: "these numbers can't be
  * tuned into a fix"), so it is not built here. The one real-key test below presses ← only once `content` already
  * holds something focusable, which needs no new composition afterward and so never depends on an active effect
@@ -135,7 +135,7 @@ class BingeTvNavRailFocusTest {
     /**
      * With content never becoming focusable and nothing else claiming focus either, focus is still on the rail
      * or [TvFocusSink] well past the startup offer's 120-frame budget — there is no dead end where neither holds
-     * it. #2523 deletes the offer's own `railEntry.requestFocus()` fallback: since #2518, [TvFocusSink] claims
+     * it. The offer has no `railEntry.requestFocus()` fallback of its own: [TvFocusSink] claims
      * the content group's entry before that fallback could ever run, and the two then alternate every frame
      * indefinitely (a sink holding focus disposes itself the next frame, and Compose's own disposal-triggered
      * recovery search — not this rail's code — lands the frame in between). Landing on the rail specifically at
@@ -226,7 +226,7 @@ class BingeTvNavRailFocusTest {
      * on a focus loss: the pane an overlay closes onto is a fresh mount that never held focus. The rail is
      * parked with focus per the class KDoc's recovery-park modelling, standing in for whatever the pop actually
      * left focus on; the handoff must still take content the moment it has something to offer, without ever
-     * having anything to wait on losing. Since #2518, "content has nothing to offer" no longer means the group is
+     * having anything to wait on losing. Because of [TvFocusSink], "content has nothing to offer" no longer means the group is
      * empty — [TvFocusSink] is always something, so the handoff claims *that* rather than leaving focus parked
      * on the rail. Fault injection: reverting this handoff's `yieldToRail` from `userMovedToRail` to a raw
      * `railHasFocus` read — the exact regression #54 names — fails this, since the parked rail reads

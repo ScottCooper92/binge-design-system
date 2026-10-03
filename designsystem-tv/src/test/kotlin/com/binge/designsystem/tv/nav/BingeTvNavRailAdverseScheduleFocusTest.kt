@@ -37,13 +37,13 @@ private const val TARGET = "target"
 private const val SETTLE_FRAMES = 10
 
 /**
- * The adverse-schedule cases #2521 asks for on [BingeTvNavRail]'s two content-side handoffs: the startup offer
+ * The adverse-schedule cases for [BingeTvNavRail]'s two content-side handoffs: the startup offer
  * (cold start) and [contentHandoffInFlight] (drill-down), each proven to converge for a target that only
  * composes N frames after the loop starts — not merely one that attaches late, which [TvLateTarget] rules out
- * by construction (see its KDoc). N = 60 is the deliberate ceiling (#2521's decision 3): a full second at 60fps,
+ * by construction (see its KDoc). N = 60 is the deliberate ceiling: a full second at 60fps,
  * comfortably inside both loops' frame budgets ([FOCUS_HANDOFF_FRAMES] 120, [CONTENT_HANDOFF_FRAMES] 600).
  *
- * Convergence is asserted per #2521's decision 4 — the target holds focus and the rail does not — not the path
+ * Convergence is what is asserted — the target holds focus and the rail does not — not the path
  * taken to get there.
  *
  * [overlayCloseHandoffInFlight] gets the same N-frames-late cases (#65): it shares [contentHandoffInFlight]'s
