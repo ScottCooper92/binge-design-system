@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.testTag
  * skeleton promised a row of cast circles where its seasons row lands, episode detail never migrated
  * off a flat plate — and the anchors that caught it are
  * [com.binge.designsystem.tv.layout.TvLayoutAnchors]. This is that object's phone counterpart, measured
- * by the same harness (`assertSkeletonReservesGeometry`, testFixtures).
+ * by the same harness (`assertSkeletonReservesGeometry`, in this module's testFixtures).
  *
  * An anchor is the handle that makes the agreement *assertable*: both trees tag the same point with the same
  * string, and the harness measures whether it moves across the resolve. The tag is keyed on the **section's
