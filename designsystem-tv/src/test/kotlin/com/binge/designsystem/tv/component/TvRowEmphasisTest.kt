@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 
 /**
- * [tvRowEmphasis] is the whole of #1331 that is not a colour: the two-input table that used to be one boolean.
+ * [tvRowEmphasis] is everything about a row's emphasis that is not a colour: the two-input table that used to be one boolean.
  *
  * Four rows, and the two that matter are the pair that differ only in [tvRowEmphasis]' second argument — the
  * described row *with* and *without* focus in its column. Before the third state existed both were the full
