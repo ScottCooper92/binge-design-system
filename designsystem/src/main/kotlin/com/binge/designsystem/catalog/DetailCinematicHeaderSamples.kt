@@ -34,3 +34,26 @@ fun DetailCinematicHeaderSample() {
         )
     }
 }
+
+/**
+ * [DetailCinematicHeader] with a tagline in place of the synopsis, for a screen that shows the
+ * synopsis further down the page. The copy sits low, just above the facts row.
+ */
+@Composable
+fun DetailCinematicHeaderTaglineSample() {
+    ScreenshotTheme {
+        DetailCinematicHeader(
+            title = "The Dark Knight",
+            genres = listOf("Action", "Crime", "Drama"),
+            synopsis = null,
+            tagline = "Why So Serious?",
+            stats = listOf(
+                DetailStat(Icons.Filled.Star, "9.0", "Rating"),
+                DetailStat(Icons.Filled.Star, "2008", "Released"),
+                DetailStat(Icons.Filled.Star, "2h 32m", "Runtime"),
+            ),
+            backdropUrl = null,
+            posterUrl = null,
+        )
+    }
+}

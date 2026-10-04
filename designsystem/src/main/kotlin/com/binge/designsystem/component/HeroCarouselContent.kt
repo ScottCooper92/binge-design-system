@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -22,105 +20,109 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.sp
 import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
 import com.binge.designsystem.navOverlayStart
-import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.theme.BingeTheme
 
-private const val HERO_SIDE_GRADIENT_START_ALPHA = 0.55f
-private const val HERO_SIDE_GRADIENT_MID_ALPHA = 0.28f
-private const val HERO_SIDE_GRADIENT_MID_STOP = 0.34f
-private const val HERO_SIDE_GRADIENT_CLEAR_STOP = 0.7f
-private const val HERO_BOTTOM_GRADIENT_MID_ALPHA = 0.35f
-private const val HERO_BOTTOM_GRADIENT_END_ALPHA = 0.82f
-private const val HERO_BOTTOM_GRADIENT_START_STOP = 0.32f
-private const val HERO_BOTTOM_GRADIENT_MID_STOP = 0.7f
 private const val HERO_PILL_ALPHA = 0.16f
-private const val HERO_TITLE_SHADOW_BLUR = 24f
-private const val HERO_TITLE_SHADOW_Y = 4f
+private const val HERO_PILL_LIGHT_THEME_ALPHA = 0.88f
 private const val HERO_TAGLINE_ALPHA = 0.86f
 private const val HERO_META_ALPHA = 0.9f
-private const val HERO_META_GENRE_ALPHA = 0.72f
 private const val HERO_META_DOT_ALPHA = 0.45f
+private const val LIGHT_BACKGROUND_LUMINANCE = 0.5f
+
+/** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
+private val HERO_TITLE_MIN_SIZE = 28.sp
 private const val MINUTES_PER_HOUR = 60
 internal const val MAX_META_GENRES = 2
 
 /**
- * Legibility treatment behind the hero copy: a bottom-up vertical scrim plus a gentle side scrim so
- * start-anchored copy holds over bright backdrops. The side ramp is anchored to the layout's start
- * edge, not the screen's left, because the copy it protects is [Alignment.BottomStart] and mirrors
- * under RTL. Both ramps share the [BingeTheme.colors.scrim] tone and top out below full opacity, so
- * the pair reads as one smooth vignette, not two crossing gradients.
+ * Where a slide's copy column sits inside the carousel, in px: its top edge and its horizontal
+ * extent, so the end edge can be read for either layout direction.
+ */
+internal data class HeroCopyBounds(
+    val top: Float,
+    val left: Float,
+    val right: Float,
+) {
+    /** The copy's end edge: its right in a left-to-right layout, its left in a right-to-left one. */
+    fun end(layoutDirection: LayoutDirection): Float = if (layoutDirection == LayoutDirection.Rtl) left else right
+}
+
+/**
+ * The backing behind one slide's copy, in the theme's page colour, so the copy reads in
+ * `onBackground` in either theme and the carousel ends on the colour the page starts with.
+ *
+ * Two layers. The copy fade eases in over [R.dimen.hero_copy_fade_band] above the copy, is 45% at its
+ * top and solid at the foot. It is masked horizontally: full behind the copy, falling away over
+ * [R.dimen.hero_copy_fade_falloff] past its end edge, so the art beyond the copy stays raw. The seam
+ * band then runs the full width at the foot, [R.dimen.hero_seam_band] tall, so the art meets the page
+ * cleanly on the far side too, with raw art between it and the copy fade.
+ *
+ * Drawn inside each slide's backdrop, from that slide's own [bounds], so it crossfades with the art.
  */
 @Composable
-internal fun BoxScope.HeroScrims() {
-    val scrim = BingeTheme.colors.scrim
+internal fun BoxScope.HeroCopyHuggingScrim(bounds: HeroCopyBounds) {
+    val page = MaterialTheme.colorScheme.background
+    val density = LocalDensity.current
+    val bandPx = with(density) { dimensionResource(R.dimen.hero_copy_fade_band).toPx() }
+    val falloffPx = with(density) { dimensionResource(R.dimen.hero_copy_fade_falloff).toPx() }
+    val seamPx = with(density) { dimensionResource(R.dimen.hero_seam_band).toPx() }
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    HERO_BOTTOM_GRADIENT_START_STOP to Color.Transparent,
-                    HERO_BOTTOM_GRADIENT_MID_STOP to scrim.copy(alpha = HERO_BOTTOM_GRADIENT_MID_ALPHA),
-                    1f to scrim.copy(alpha = HERO_BOTTOM_GRADIENT_END_ALPHA),
-                ),
-            ),
-    )
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                startHorizontalGradient(
-                    0f to scrim.copy(alpha = HERO_SIDE_GRADIENT_START_ALPHA),
-                    HERO_SIDE_GRADIENT_MID_STOP to scrim.copy(alpha = HERO_SIDE_GRADIENT_MID_ALPHA),
-                    HERO_SIDE_GRADIENT_CLEAR_STOP to Color.Transparent,
-                ),
-            ),
-    )
-    // The foot, faded into the page's background so the carousel ends on the colour the page starts
-    // with, not on the scrim's black. As tall as the dots' bottom padding: below the dots and the
-    // copy, so neither loses its dark backing, in either theme.
-    Box(
-        modifier = Modifier
-            .align(Alignment.BottomStart)
-            .fillMaxWidth()
-            .height(dimensionResource(R.dimen.hero_dots_bottom_padding))
-            .background(Brush.verticalGradient(0f to Color.Transparent, 1f to MaterialTheme.colorScheme.background)),
+            // The horizontal mask applies to the copy fade only, so it needs its own layer to mask into.
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            .drawWithContent {
+                drawPageFade(page, copyTop = bounds.top, bandPx = bandPx, ramp = CopyFadeRamp)
+                maskPastCopyEnd(copyEnd = bounds.end(layoutDirection), falloffPx = falloffPx)
+                drawSeamBand(page, bandPx = seamPx)
+            },
     )
 }
 
 /**
  * Start-anchored cinematic copy: trending pill, title, optional tagline, meta row, actions slot. The
  * still behind it runs to the panel edge under an overlaying rail; the copy does not, so it takes the
- * nav overlay's start inset on top of its own padding.
+ * nav overlay's start inset on top of its own padding. [R.dimen.hero_copy_max_width] caps the copy
+ * itself, inside those insets, so a wide rail inset does not squeeze the title.
+ *
+ * Reports its bounds through [onCopyBounds], for the slide's [HeroCopyHuggingScrim].
  */
 @Composable
 internal fun BoxScope.HeroCopyOverlay(
     item: HeroItem,
     rank: Int,
     heroActions: @Composable (HeroItem) -> Unit,
+    onCopyBounds: (HeroCopyBounds) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
             .align(Alignment.BottomStart)
-            .widthIn(max = dimensionResource(R.dimen.hero_copy_max_width))
-            .padding(
+            .onGloballyPositioned {
+                val position = it.positionInParent()
+                onCopyBounds(HeroCopyBounds(top = position.y, left = position.x, right = position.x + it.size.width))
+            }.padding(
                 start = dimensionResource(R.dimen.hero_copy_start_padding) + navOverlayStart(),
                 end = dimensionResource(R.dimen.hero_metadata_end_padding),
                 bottom = dimensionResource(R.dimen.hero_copy_bottom_padding),
-            ),
+            ).widthIn(max = dimensionResource(R.dimen.hero_copy_max_width)),
     ) {
         // The backdrop button behind it announces all of this copy (heroContentDescription), so the
         // copy stays visual-only. HeroActions is outside: those are controls, not the hero's name.
@@ -134,13 +136,25 @@ internal fun BoxScope.HeroCopyOverlay(
     }
 }
 
+/**
+ * The rank pill. In a dark theme it is a faint light wash over the art. In a light theme that wash
+ * turns a muddy grey over the art, so the pill inverts: a near-solid dark pill with light ink.
+ */
 @Composable
 private fun HeroTrendingPill(rank: Int) {
+    val scheme = MaterialTheme.colorScheme
+    val lightTheme = scheme.background.luminance() > LIGHT_BACKGROUND_LUMINANCE
+    val pillColor = if (lightTheme) {
+        scheme.inverseSurface.copy(alpha = HERO_PILL_LIGHT_THEME_ALPHA)
+    } else {
+        scheme.onBackground.copy(alpha = HERO_PILL_ALPHA)
+    }
+    val pillInk = if (lightTheme) scheme.inverseOnSurface else scheme.onBackground
     Row(
         modifier = Modifier
             .padding(bottom = dimensionResource(R.dimen.padding_s))
             .clip(BingeShapes.Pill)
-            .background(BingeTheme.colors.onScrim.copy(alpha = HERO_PILL_ALPHA))
+            .background(pillColor)
             .padding(
                 horizontal = dimensionResource(R.dimen.hero_pill_padding_h),
                 vertical = dimensionResource(R.dimen.hero_pill_padding_v),
@@ -151,32 +165,31 @@ private fun HeroTrendingPill(rank: Int) {
         Icon(
             imageVector = Icons.Filled.LocalFireDepartment,
             contentDescription = null,
-            tint = BingeTheme.colors.onScrim,
+            tint = pillInk,
             modifier = Modifier.size(dimensionResource(R.dimen.hero_pill_icon_size)),
         )
         Text(
             text = stringResource(R.string.hero_trending_today, rank),
             style = MaterialTheme.typography.labelMedium,
-            color = BingeTheme.colors.onScrim,
+            color = pillInk,
         )
     }
 }
 
+/**
+ * The title, in `onBackground` over the page-colour fade, so it needs no shadow. It shrinks a step or
+ * two to stay on one line before it wraps.
+ */
 @Composable
 private fun HeroTitle(title: String) {
+    val style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.ExtraBold)
     Text(
         text = title,
-        style = MaterialTheme.typography.displaySmall.copy(
-            fontWeight = FontWeight.ExtraBold,
-            shadow = Shadow(
-                color = BingeTheme.colors.titleShadow,
-                offset = Offset(0f, HERO_TITLE_SHADOW_Y),
-                blurRadius = HERO_TITLE_SHADOW_BLUR,
-            ),
-        ),
-        color = BingeTheme.colors.onScrim,
+        style = style,
+        color = MaterialTheme.colorScheme.onBackground,
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
+        autoSize = OneLineOrWrapAutoSize(max = style.fontSize, min = HERO_TITLE_MIN_SIZE, step = HeroTitleSizeStep),
     )
 }
 
@@ -185,14 +198,14 @@ private fun HeroTagline(tagline: String) {
     Text(
         text = tagline,
         style = MaterialTheme.typography.bodyLarge,
-        color = BingeTheme.colors.onScrim.copy(alpha = HERO_TAGLINE_ALPHA),
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_TAGLINE_ALPHA),
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier.padding(top = dimensionResource(R.dimen.hero_tagline_top_spacing)),
     )
 }
 
-/** A meta-row entry: [isGenre] entries render dimmer (the trailing genre list), per the mock. */
+/** A meta-row entry: [isGenre] entries (the trailing genre list) take the accent, as on the detail heroes. */
 private data class HeroMetaPart(
     val text: String,
     val isGenre: Boolean,
@@ -220,9 +233,11 @@ private fun HeroMetaRow(item: HeroItem) {
             Text(
                 text = part.text,
                 style = MaterialTheme.typography.labelLarge,
-                color = BingeTheme.colors.onScrim.copy(
-                    alpha = if (part.isGenre) HERO_META_GENRE_ALPHA else HERO_META_ALPHA,
-                ),
+                color = if (part.isGenre) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
+                },
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -252,13 +267,14 @@ private fun HeroRating(rating: Float) {
         Icon(
             imageVector = Icons.Filled.Star,
             contentDescription = null,
-            tint = BingeTheme.colors.ratingStar,
+            // primary rather than the fixed star amber, which is too pale on a light theme's page.
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(dimensionResource(R.dimen.hero_meta_star_size)),
         )
         Text(
             text = rating.formatRating(),
             style = MaterialTheme.typography.labelLarge,
-            color = BingeTheme.colors.onScrim.copy(alpha = HERO_META_ALPHA),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA),
         )
     }
 }
@@ -269,7 +285,7 @@ private fun HeroMetaDot() {
         modifier = Modifier
             .size(dimensionResource(R.dimen.hero_meta_dot_size))
             .clip(BingeShapes.Pill)
-            .background(BingeTheme.colors.onScrim.copy(alpha = HERO_META_DOT_ALPHA)),
+            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_DOT_ALPHA)),
     )
 }
 
