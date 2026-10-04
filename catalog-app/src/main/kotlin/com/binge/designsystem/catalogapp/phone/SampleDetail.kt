@@ -131,7 +131,7 @@ private fun TweaksFab(
 }
 
 /**
- * What the variants stand on: the surface of the theme they render in, light or dark as the overrides
+ * What the variants stand on: the background of the theme they render in, light or dark as the overrides
  * say. Every sample wraps itself in `ScreenshotTheme`, whose `Surface` is sized to the sample, so a
  * stage in any other colour shows each one as a box. The page's own labels and hint cards on the stage
  * take the same theme, so they read against it; only the colours change, not the font scale or
@@ -144,7 +144,7 @@ private fun SampleStage(
     content: @Composable () -> Unit,
 ) {
     BingeExpressiveTheme(darkTheme = overrides.dark, dynamicColor = false) {
-        Surface(modifier) { content() }
+        Surface(modifier, color = MaterialTheme.colorScheme.background) { content() }
     }
 }
 
