@@ -26,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.theme.BingeTheme
 
 @Composable
 fun DiscoverQuickClearChip(
@@ -40,11 +39,12 @@ fun DiscoverQuickClearChip(
     val errorOutline = MaterialTheme.colorScheme.error.copy(alpha = 0.35f)
     val errorClose = MaterialTheme.colorScheme.error.copy(alpha = 0.25f)
     val backgroundColor = when (tone) {
-        QuickClearTone.Include -> MaterialTheme.colorScheme.secondaryContainer
+        // primary, to match the Filters button this chip sits beside.
+        QuickClearTone.Include -> MaterialTheme.colorScheme.primary
         QuickClearTone.Exclude -> errorTint
     }
     val contentColor = when (tone) {
-        QuickClearTone.Include -> MaterialTheme.colorScheme.onSecondaryContainer
+        QuickClearTone.Include -> MaterialTheme.colorScheme.onPrimary
         QuickClearTone.Exclude -> MaterialTheme.colorScheme.error
     }
     val borderColor = when (tone) {
@@ -52,7 +52,7 @@ fun DiscoverQuickClearChip(
         QuickClearTone.Exclude -> errorOutline
     }
     val closeBackground = when (tone) {
-        QuickClearTone.Include -> BingeTheme.colors.scrim.copy(alpha = 0.1f)
+        QuickClearTone.Include -> MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)
         QuickClearTone.Exclude -> errorClose
     }
 

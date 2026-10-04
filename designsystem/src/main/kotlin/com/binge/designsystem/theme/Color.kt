@@ -6,7 +6,13 @@ import androidx.compose.ui.graphics.Color
 
 /** Brand */
 private val BingeAmber = Color(0xFFFFC107)
-private val BingeAmberLight = Color(0xFF7B5800)
+
+/**
+ * Light `primary`: a burnt amber leaning orange, for text, icons and in-form controls on a white
+ * page. It clears 5.3:1 on the background and 4.6:1 on `surfaceContainer`. Big fills take the fixed
+ * roles instead, which stay the bright [BingeAmber] in both themes.
+ */
+private val BingeAmberLight = Color(0xFF9C5A00)
 private val BingeGold = Color(0xFFFFE082)
 
 /**

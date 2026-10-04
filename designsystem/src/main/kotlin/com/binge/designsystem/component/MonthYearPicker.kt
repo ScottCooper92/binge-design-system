@@ -158,7 +158,10 @@ internal fun MonthYearPickerContent(
     }
 }
 
-/** The accent block on top: the caller's title as a small overline, and what is picked so far, large. */
+/**
+ * The accent block on top: the caller's title as a small overline, and what is picked so far, large.
+ * A big fill, so it is the fixed amber rather than `primary`, as BingeFilledButton is.
+ */
 @Composable
 private fun PickerHeader(
     overline: String,
@@ -168,19 +171,19 @@ private fun PickerHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.primaryFixedDim)
             .padding(dimensionResource(R.dimen.padding_l)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
         Text(
             text = overline.uppercase(locale),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimaryFixed,
         )
         Text(
             text = headline,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onPrimaryFixed,
         )
     }
 }
