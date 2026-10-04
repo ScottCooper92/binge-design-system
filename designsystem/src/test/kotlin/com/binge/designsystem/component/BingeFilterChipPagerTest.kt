@@ -1,7 +1,9 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,6 +14,7 @@ import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollToIndex
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -25,7 +28,9 @@ import org.robolectric.annotation.Config
 private const val PAGE_TAG = "pager-page"
 
 /**
- * Regression guard for the stale-capture fix in [BingeFilterChipPager].
+ * Behaviour of [BingeFilterChipPager] a screenshot frame cannot show.
+ *
+ * The first test is a regression guard for the stale-capture fix.
  *
  * The settled-swipe effect is keyed only on the pager state, so its `collect` lambda outlives its
  * launching composition. Before the fix it compared each settled page against the `selectedIndex`
@@ -78,5 +83,42 @@ class BingeFilterChipPagerTest {
             listOf(1, 0),
             reported,
         )
+    }
+
+    @Test
+    fun `beyondViewportPageCount of 1 composes the next page without a swipe`() {
+        setPager(beyondViewportPageCount = 1)
+
+        composeTestRule.onNodeWithText("page 1").assertExists()
+        composeTestRule.onNodeWithText("page 2").assertDoesNotExist()
+    }
+
+    @Test
+    fun `the default composes only the visible page`() {
+        setPager(beyondViewportPageCount = null)
+
+        composeTestRule.onNodeWithText("page 0").assertExists()
+        composeTestRule.onNodeWithText("page 1").assertDoesNotExist()
+    }
+
+    /** Three pages on the first, with [beyondViewportPageCount] passed through, or left to its default when null. */
+    private fun setPager(beyondViewportPageCount: Int?) {
+        composeTestRule.setContent {
+            BingeExpressiveTheme {
+                val items = listOf(FilterChipItem("All"), FilterChipItem("Movies"), FilterChipItem("TV"))
+                val page: @Composable (PaddingValues, Int) -> Unit = { _, index -> Text(text = "page $index") }
+                if (beyondViewportPageCount == null) {
+                    BingeFilterChipPager(items = items, selectedIndex = 0, onSelectedIndexChange = {}, pageContent = page)
+                } else {
+                    BingeFilterChipPager(
+                        items = items,
+                        selectedIndex = 0,
+                        onSelectedIndexChange = {},
+                        beyondViewportPageCount = beyondViewportPageCount,
+                        pageContent = page,
+                    )
+                }
+            }
+        }
     }
 }
