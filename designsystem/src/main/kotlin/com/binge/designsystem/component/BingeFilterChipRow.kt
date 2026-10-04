@@ -171,6 +171,13 @@ fun rememberFilterPagerState(
  * Window insets are deliberately *not* applied here. A screen nested in a scaffold has already had them
  * handled, and one that owns its window puts them in [header]. The chip row is the exception: it clears
  * [paneSideInsets] on its own, less any an ancestor already consumed — see [filterChipRowPadding].
+ *
+ * [beyondViewportPageCount] is how many pages either side of the visible one stay composed. At the
+ * default of 0 a neighbouring page is composed only once a swipe towards it begins. A caller whose
+ * pages load their own data can raise it to 1, so the pages beside the selected one start loading
+ * before the user swipes to them rather than showing a placeholder on arrival. The cost is that every
+ * composed neighbour does its work: a page that fetches from the network fetches for a filter the
+ * user may never open.
  */
 @Composable
 fun BingeFilterChipPager(
@@ -182,6 +189,7 @@ fun BingeFilterChipPager(
     headerBackground: Color = MaterialTheme.colorScheme.background,
     scrimFraction: Float = 0f,
     scrimColor: Color = MaterialTheme.colorScheme.background,
+    beyondViewportPageCount: Int = 0,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
     val pagerState = rememberFilterPagerState(
@@ -203,7 +211,11 @@ fun BingeFilterChipPager(
             )
         },
     ) { contentPadding ->
-        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            beyondViewportPageCount = beyondViewportPageCount,
+        ) { page ->
             pageContent(contentPadding, page)
         }
     }
