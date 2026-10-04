@@ -134,8 +134,8 @@ private fun ScaledPreview(content: @Composable () -> Unit, modifier: Modifier = 
             // and a control inside a sample is neither announced nor a Tab or D-pad stop.
             Box(Modifier.clearAndSetSemantics {}.focusProperties { canFocus = false }, contentAlignment = Alignment.Center) { content() }
         },
-        // The sample's own ScreenshotTheme draws `surface` behind it; the same here, so it shows no box.
-        modifier = modifier.clipToBounds().background(MaterialTheme.colorScheme.surface),
+        // The sample's own ScreenshotTheme draws `background` behind it; the same here, so it shows no box.
+        modifier = modifier.clipToBounds().background(MaterialTheme.colorScheme.background),
     ) { measurables, constraints ->
         val scale = constraints.maxWidth.toFloat() / canvasWidthPx
         val canvasHeightPx = (constraints.maxHeight / scale).roundToInt()
