@@ -279,10 +279,13 @@ fun BingePaneTopBarDetailPaneDemo() {
 
 /**
  * [DetailOverlayTopBar] over a real [DetailHero] and the page below it: glass at rest, the wash thinning
- * and the bar's own scrim coming in as the hero scrolls up, then a solid titled bar.
+ * and the bar's own scrim coming in as the hero scrolls up, then a solid titled bar. The status bar
+ * icons stay light over the hero through [DarkStatusBarEffect] and hand off to the theme's once the
+ * scrim is past halfway.
  */
 @Composable
 fun DetailOverlayTopBarDemo() {
+    DarkStatusBarEffect()
     val scroll = rememberScrollState()
     ScreenshotTheme {
         Box(Modifier.fillMaxSize()) {
