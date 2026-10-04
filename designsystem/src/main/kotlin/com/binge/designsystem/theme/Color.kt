@@ -10,6 +10,13 @@ private val BingeAmberLight = Color(0xFF7B5800)
 private val BingeGold = Color(0xFFFFE082)
 
 /**
+ * Ink for the fixed amber roles. `primaryFixed` and `primaryFixedDim` are the same amber in both
+ * themes, so the text and icons on them are the same dark ink in both themes too.
+ */
+private val AmberInk = Color(0xFF3E2800)
+private val AmberInkVariant = Color(0xFF593D00)
+
+/**
  * Tertiary accent — teal, amber's complement, so the scheme has a contrasting second hue rather
  * than the single amber family. Light tone reads on white; dark tone on dark surfaces.
  */
@@ -71,6 +78,21 @@ val DarkColorScheme = darkColorScheme(
     surfaceContainerHighest = DarkSurfaceHighest,
     outline = DarkOutline,
     outlineVariant = DarkOutlineVariant,
+    // Every role below falls back to M3's purple baseline when it is left unset, so each takes a
+    // value from our own ramps instead. The inverse roles are the light theme's, which is what
+    // "inverse" means in a dark scheme.
+    surfaceVariant = DarkSurfaceHighest,
+    surfaceDim = DarkBackground,
+    surfaceBright = DarkSurfaceHighest,
+    inverseSurface = LightSurfaceHigh,
+    inverseOnSurface = LightOnSurface,
+    inversePrimary = BingeAmberLight,
+    // The fixed roles are the same in both themes: amber that reads as amber whether the page
+    // behind it is light or dark.
+    primaryFixed = BingeGold,
+    primaryFixedDim = BingeAmber,
+    onPrimaryFixed = AmberInk,
+    onPrimaryFixedVariant = AmberInkVariant,
 )
 
 val LightColorScheme = lightColorScheme(
@@ -102,4 +124,15 @@ val LightColorScheme = lightColorScheme(
     surfaceContainerHighest = LightSurfaceHighest,
     outline = LightOutline,
     outlineVariant = LightOutlineVariant,
+    // As in the dark scheme: our own values for the roles M3 would otherwise fill with purple.
+    surfaceVariant = LightSurfaceHighest,
+    surfaceDim = LightSurfaceHighest,
+    surfaceBright = LightSurfaceLowest,
+    inverseSurface = DarkSurfaceHigh,
+    inverseOnSurface = DarkOnSurface,
+    inversePrimary = BingeAmber,
+    primaryFixed = BingeGold,
+    primaryFixedDim = BingeAmber,
+    onPrimaryFixed = AmberInk,
+    onPrimaryFixedVariant = AmberInkVariant,
 )

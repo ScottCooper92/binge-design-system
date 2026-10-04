@@ -68,6 +68,9 @@ class TokenContrastTest {
             Pair("$theme onBackground/background", scheme.onBackground, scheme.background, text),
             Pair("$theme onError/error", scheme.onError, scheme.error, text),
             Pair("$theme onErrorContainer/errorContainer", scheme.onErrorContainer, scheme.errorContainer, text),
+            Pair("$theme inverseOnSurface/inverseSurface", scheme.inverseOnSurface, scheme.inverseSurface, text),
+            Pair("$theme onPrimaryFixed/primaryFixed", scheme.onPrimaryFixed, scheme.primaryFixed, text),
+            Pair("$theme onPrimaryFixed/primaryFixedDim", scheme.onPrimaryFixed, scheme.primaryFixedDim, text),
         )
         return pairs
     }
