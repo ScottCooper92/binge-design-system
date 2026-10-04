@@ -100,7 +100,11 @@ fun DetailHero(
             backdropUrl = backdropUrl,
             contentDescription = title,
             richBackdrop = richBackdrop,
+            // The top band only backs this hero's own back button. A screen with its own overlay top
+            // bar (every current caller) brings that bar's scrim, and a second band would double it.
+            topScrim = showChrome,
         )
+        HeroFootBlend(Modifier.align(Alignment.BottomStart))
 
         if (showChrome) {
             ExpressiveIconButton(
@@ -152,6 +156,9 @@ fun HeroBackdrop(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     richBackdrop: Boolean = false,
+    // Whether the scrim darkens the top band too, behind chrome drawn over the image. A caller whose
+    // screen supplies its own scrimmed top bar turns it off.
+    topScrim: Boolean = true,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         SubcomposeAsyncImage(
@@ -168,12 +175,12 @@ fun HeroBackdrop(
                 accentEnd = BingeTheme.colors.accentPurple,
             )
         }
-        HeroScrim()
+        HeroScrim(topScrim)
     }
 }
 
 @Composable
-private fun HeroScrim() {
+private fun HeroScrim(top: Boolean) {
     // Always-black rather than theme-following: this sits directly over unpredictable backdrop
     // imagery with no compensating scrim of its own (unlike DetailCinematicHeader's CinematicScrim,
     // which has CinematicSideScrim to guarantee coverage where its title lands), so only a
@@ -184,12 +191,30 @@ private fun HeroScrim() {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0.00f to scrim.copy(alpha = HERO_SCRIM_TOP_ALPHA),
+                    0.00f to if (top) scrim.copy(alpha = HERO_SCRIM_TOP_ALPHA) else Color.Transparent,
                     HERO_SCRIM_CLEAR_STOP to Color.Transparent,
                     HERO_SCRIM_MID_STOP to scrim.copy(alpha = HERO_SCRIM_MID_ALPHA),
                     1.00f to scrim.copy(alpha = HERO_SCRIM_BOTTOM_ALPHA),
                 ),
             ),
+    )
+}
+
+/**
+ * The hero's foot: the strip under the text column, faded from nothing into the page's own background,
+ * so the hero ends on the colour the page below starts with rather than on [HeroScrim]'s black. It is
+ * exactly the text column's bottom padding tall, so it never sits behind copy and legibility is
+ * [HeroScrim]'s alone, as before. Its top adds nothing, which is what keeps the join with the scrim
+ * invisible. DetailCinematicHeader already blends this way; this brings the phone hero in line.
+ */
+@Composable
+private fun HeroFootBlend(modifier: Modifier = Modifier) {
+    val page = MaterialTheme.colorScheme.background
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(dimensionResource(R.dimen.detail_hero_text_bottom_padding))
+            .background(Brush.verticalGradient(0f to Color.Transparent, 1f to page)),
     )
 }
 
