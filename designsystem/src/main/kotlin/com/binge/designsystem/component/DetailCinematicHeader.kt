@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -80,7 +81,7 @@ private const val CINEMATIC_SYNOPSIS_MAX_LINES = 4
  * 46dp (as it does on a large foldable).
  *
  * The backing behind the copy hugs it rather than covering the art. [CopyHuggingScrim] fades the page
- * colour up behind the title, genres and tagline and falls away past the widest of them, so a short
+ * colour up behind the title, genres, tagline and synopsis and falls away past the widest of them, so a short
  * title leaves the far side of the art raw. A second, stronger band runs the full width behind the
  * facts row, which spans it. Both are placed from the copy's measured bounds, so they follow a title
  * that wraps or a tagline that is missing.
@@ -189,7 +190,7 @@ private fun CinematicCopyRow(
             val lineGap = dimensionResource(R.dimen.padding_xs)
             Text(
                 text = title,
-                modifier = Modifier.reportsLineEnd(copyBounds, CopyLine.Title),
+                modifier = reportsLineEnd(copyBounds, CopyLine.Title),
                 style = titleStyle,
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 2,
@@ -204,7 +205,7 @@ private fun CinematicCopyRow(
                 Spacer(Modifier.height(lineGap))
                 Text(
                     text = eyebrow,
-                    modifier = Modifier.reportsLineEnd(copyBounds, CopyLine.Genres),
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Genres),
                     style = MaterialTheme.typography.labelLarge,
                     // Matches DetailHero and the TV hero, both of which key genres off the theme's
                     // accent.
@@ -215,7 +216,7 @@ private fun CinematicCopyRow(
                 Spacer(Modifier.height(lineGap))
                 Text(
                     text = tagline,
-                    modifier = Modifier.reportsLineEnd(copyBounds, CopyLine.Tagline),
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Tagline),
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
@@ -225,10 +226,15 @@ private fun CinematicCopyRow(
             }
             if (!synopsis.isNullOrBlank()) {
                 Spacer(Modifier.height(dimensionResource(R.dimen.detail_cinematic_copy_spacing)))
-                CinematicSynopsis(synopsis, initiallyOverflowing = synopsisInitiallyOverflowing)
+                CinematicSynopsis(
+                    synopsis,
+                    initiallyOverflowing = synopsisInitiallyOverflowing,
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Synopsis),
+                )
             }
             Spacer(Modifier.height(dimensionResource(R.dimen.detail_cinematic_copy_spacing)))
             if (stats.isNotEmpty()) {
+                DisposableEffect(copyBounds) { onDispose { copyBounds.statsTop = null } }
                 DetailStatRow(
                     stats = stats,
                     valueColor = MaterialTheme.colorScheme.onBackground,
@@ -243,7 +249,7 @@ private fun CinematicCopyRow(
 }
 
 /** The copy lines whose end edges [CopyHuggingScrim] falls away from. */
-private enum class CopyLine { Title, Genres, Tagline }
+private enum class CopyLine { Title, Genres, Tagline, Synopsis }
 
 /**
  * Where the cinematic copy sits, in root coordinates, as the layout reports it: the top of the copy,
@@ -269,11 +275,18 @@ private class CinematicCopyBounds {
         }
 }
 
-private fun Modifier.reportsLineEnd(bounds: CinematicCopyBounds, line: CopyLine): Modifier =
-    onGloballyPositioned {
+/**
+ * Reports [line]'s extent into [bounds] and forgets it when the line leaves composition, so a header
+ * reused for another title does not fade around a line that is no longer there.
+ */
+@Composable
+private fun reportsLineEnd(bounds: CinematicCopyBounds, line: CopyLine): Modifier {
+    DisposableEffect(bounds, line) { onDispose { bounds.lines.remove(line) } }
+    return Modifier.onGloballyPositioned {
         val left = it.positionInRoot().x
         bounds.lines[line] = left to left + it.size.width
     }
+}
 
 /**
  * The page-colour backing behind the cinematic copy, in two layers.
@@ -324,12 +337,17 @@ private fun CopyHuggingScrim(bounds: CinematicCopyBounds, headerOrigin: Offset) 
  * only - at runtime the layout pass reports the truth.
  */
 @Composable
-private fun CinematicSynopsis(text: String, initiallyOverflowing: Boolean = false) {
+private fun CinematicSynopsis(
+    text: String,
+    modifier: Modifier = Modifier,
+    initiallyOverflowing: Boolean = false,
+) {
     var overflows by remember(text, initiallyOverflowing) { mutableStateOf(initiallyOverflowing) }
     var showSheet by remember(text) { mutableStateOf(false) }
 
     Text(
         text = text,
+        modifier = modifier,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
         maxLines = CINEMATIC_SYNOPSIS_MAX_LINES,
