@@ -1,6 +1,8 @@
 package com.binge.designsystem.component
 
+import android.app.Activity
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -14,14 +16,17 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.core.view.WindowInsetsControllerCompat
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeTheme
 
@@ -46,6 +51,11 @@ import com.binge.designsystem.theme.BingeTheme
  * needs the same lerp — `lerp(BingeTheme.colors.onScrim, MaterialTheme.colorScheme.onBackground, 1f -
  * glassBackgroundAlpha)` — rather than a tint fixed at `onScrim`, or it goes illegible in light theme
  * once the bar's own scrim has taken over.
+ *
+ * The status bar icons ride the same hand-off. Over the hero they are light, as
+ * [DarkStatusBarEffect] sets them. Once the scrim is past halfway they follow the theme, or a light
+ * theme leaves white icons on a light bar. A screen that calls no [DarkStatusBarEffect] has no hero
+ * under the bar, so its icons follow the theme at every offset.
  *
  * Call it inside the [androidx.compose.foundation.layout.Box] / `BoxWithConstraints` that also
  * hosts the scrolling content, so it top-aligns over the same [scrollState].
@@ -106,6 +116,7 @@ fun BoxScope.DetailOverlayTopBar(
     // following TopBarScrim is what's behind the icon instead, so the tint has to land on
     // onBackground to match it, or a light theme leaves a white icon on a light bar.
     val iconTint = lerp(BingeTheme.colors.onScrim, MaterialTheme.colorScheme.onBackground, progress)
+    DetailBarStatusBarEffect(progress)
     Box(
         modifier = modifier
             .align(Alignment.TopStart)
@@ -141,5 +152,43 @@ fun BoxScope.DetailOverlayTopBar(
             )
             actions(glassBackgroundAlpha)
         }
+    }
+}
+
+/** Scrim progress past which the bar reads as the theme's background, and the icons follow it. */
+private const val STATUS_BAR_HANDOFF_PROGRESS = 0.5f
+
+/**
+ * Whether the status bar wants dark icons at scrim [progress]. With a hero under the bar
+ * ([heroUnderBar]) and the scrim below the hand-off, the hero's black scrim is behind the icons, so
+ * they stay light. Past the hand-off, or with no hero at all, the theme's background is behind them,
+ * so they follow it.
+ */
+internal fun detailBarWantsDarkStatusBarIcons(
+    progress: Float,
+    heroUnderBar: Boolean,
+    isDarkTheme: Boolean,
+): Boolean = !isDarkTheme && (progress >= STATUS_BAR_HANDOFF_PROGRESS || !heroUnderBar)
+
+/**
+ * Sets the status bar icons for the bar's scrim [progress]. Keyed on which side of the hand-off the
+ * scroll is on rather than the progress itself, so it writes to the window only when the scroll
+ * crosses it. A launched effect rather than a disposable one, so it lands after a
+ * [DarkStatusBarEffect] entering in the same frame and sees that screen's hold.
+ */
+@Composable
+private fun DetailBarStatusBarEffect(progress: Float) {
+    val view = LocalView.current
+    if (view.isInEditMode) return
+    val isDarkTheme = isSystemInDarkTheme()
+    val pastHandOff = progress >= STATUS_BAR_HANDOFF_PROGRESS
+    LaunchedEffect(pastHandOff, isDarkTheme) {
+        val window = (view.context as Activity).window
+        WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars =
+            detailBarWantsDarkStatusBarIcons(
+                progress = progress,
+                heroUnderBar = darkStatusBarHolds.count(window) > 0,
+                isDarkTheme = isDarkTheme,
+            )
     }
 }
