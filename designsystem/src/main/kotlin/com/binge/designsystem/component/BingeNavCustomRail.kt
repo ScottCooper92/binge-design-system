@@ -49,7 +49,7 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.86f
 private const val RAIL_SCRIM_HOLD_FRACTION = 0.85f
 
 /**
- * The bespoke expanded rail (tablet landscape / unfolded foldable). Every destination — Account
+ * The bespoke expanded rail (landscape tablet). Every destination — Account
  * included — sits in one centred group; item chrome (icon/avatar + label + selected pill) matches
  * the floating bar via [NavSuiteItemIcon].
  *
@@ -59,8 +59,8 @@ private const val RAIL_SCRIM_HOLD_FRACTION = 0.85f
  * being separated from the destinations it sits among. It keeps the larger avatar, though — at this
  * width the bar's 26dp reads undersized.
  *
- * The column scrolls, so a short expanded window (small unfolded foldable, or a height-limited
- * >=840dp split pane) pushes nothing off-screen.
+ * The column scrolls, so a short window (a landscape tablet in a height-limited split, say) pushes
+ * nothing off-screen.
  *
  * The rail **overlays** [content] rather than reserving width beside it, so a hub's artwork reaches
  * the panel edge and passes under the glass. What must stay clear opts out through the start inset

@@ -97,7 +97,7 @@ fun BingeNavSuiteShellBottomBarSignedOutSample() {
 
 /**
  * Portrait-tablet shell: the bottom bar with the 5-item tablet set (Discover included). A portrait
- * tablet is `sw600dp` (Discover shown) yet < 840dp wide (bottom bar, not the custom rail), so this
+ * tablet is `sw600dp` (Discover shown) yet < 1000dp wide (no custom rail), so this
  * is the real portrait-tablet nav — the wide bar spreads all five items.
  */
 @Composable

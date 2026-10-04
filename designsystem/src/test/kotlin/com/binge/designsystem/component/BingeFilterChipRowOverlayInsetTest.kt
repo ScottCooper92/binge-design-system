@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config
 /**
  * The chip row clears an overlaying expanded nav rail.
  *
- * On a tablet or unfolded foldable the rail overlays content rather than reserving width beside it, so
+ * On a landscape tablet the rail overlays content rather than reserving width beside it, so
  * every screen under the shell opts out of the covered strip individually. Search's field above the
  * chips and its result grids below both did; the chips did not, and the leading chip rendered against
  * the rail's glass.
@@ -35,7 +35,7 @@ import org.robolectric.annotation.Config
  * there is no second value to check.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], application = android.app.Application::class, qualifiers = "sw600dp-w840dp-h782dp-xhdpi")
+@Config(sdk = [34], application = android.app.Application::class, qualifiers = "sw800dp-w1280dp-h800dp-xhdpi")
 class BingeFilterChipRowOverlayInsetTest {
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -54,7 +54,7 @@ class BingeFilterChipRowOverlayInsetTest {
 
     /**
      * Resolved rather than hardcoded: `screen_content_inset` ramps with width (16 / 24 / 32dp) and this
-     * class runs at `w840dp`, so a literal would pin the phone value on a canvas that never uses it.
+     * class runs at `w1280dp`, the landscape-tablet window the rail appears on, so a literal would pin the phone value on a canvas that never uses it.
      */
     private fun edgePadding(): Dp {
         val resources = RuntimeEnvironment.getApplication().resources
