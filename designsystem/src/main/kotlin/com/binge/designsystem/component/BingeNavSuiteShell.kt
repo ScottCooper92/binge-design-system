@@ -72,19 +72,34 @@ enum class BingeNavPresentation {
     /** Compact / portrait: the bottom navigation bar. */
     BottomBar,
 
-    /** Tablet landscape / unfolded foldable: the bespoke expanded rail with the account avatar. */
+    /**
+     * Landscape tablet (a window >=1000dp wide with a smallest width >=600dp): the bespoke expanded
+     * rail with the account avatar.
+     */
     CustomRail,
 
-    /** Everything that isn't an expanded window: the floating pill, bottom-centred over content. */
+    /**
+     * Everything that isn't a landscape tablet — phones, portrait tablets and unfolded foldables: the
+     * floating pill, bottom-centred over content.
+     */
     FloatingBar,
 }
 
 /**
  * The Binge app shell. Presentation is chosen by one qualifier-resolved bool resource
- * (`binge_nav_rail_expanded`), not imperative width/orientation code: a genuine expanded window keeps
- * the bespoke side rail, and every other bucket — portrait phone, landscape phone, portrait tablet —
- * gets the floating bar. Orientation no longer selects a presentation, so the landscape swap that
- * used to need an Activity recreation is gone.
+ * (`binge_nav_rail_expanded`), not imperative width/orientation code. The bespoke side rail is for a
+ * landscape tablet only: a window at least 1000dp wide with a smallest width of at least 600dp
+ * (`values-sw600dp-w1000dp`). Every other bucket gets the floating bar: portrait phone, landscape
+ * phone, portrait tablet, and an unfolded foldable in either orientation.
+ *
+ * The 1000dp line sits between a near-square unfolded book-style foldable (~850-880dp wide either
+ * way round) and a typical landscape tablet (~1280dp). Material's 1200dp "large" breakpoint was
+ * considered, but it would drop ~1100dp small tablets to the floating bar.
+ *
+ * Resources, not code, because the configuration is known before the first frame. A runtime check
+ * such as a fold-state listener reports later, so the shell would draw one presentation and then swap
+ * to the other. Orientation does not select a presentation on its own either, so rotating does not
+ * need an Activity recreation.
  *
  * [BottomBar] is retained as the pre-floating presentation: nothing in production selects it, and the
  * catalog + retention test pin it explicitly so the docked bar stays comparable and testable.
@@ -170,8 +185,9 @@ internal fun NavSuiteItemIcon(item: BingeNavSuiteItem, avatarSize: Dp = dimensio
 
 /**
  * The [BingeNavPresentation] for the current window, read straight from the qualifier-resolved
- * `binge_nav_rail_expanded` bool: the custom rail on an expanded window, the floating bar everywhere
- * else. See [BingeNavSuiteShell] for why this lives in resources, not code.
+ * `binge_nav_rail_expanded` bool: the custom rail on a landscape tablet (>=1000dp wide, >=600dp
+ * smallest width), the floating bar everywhere else, unfolded foldables included. See
+ * [BingeNavSuiteShell] for the 1000dp line and why it lives in resources, not code.
  */
 @Composable
 fun rememberBingeNavPresentation(): BingeNavPresentation =

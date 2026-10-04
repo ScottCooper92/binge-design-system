@@ -103,8 +103,8 @@ enum class BingeNavFloatingStyle {
 
 /**
  * The M3 expressive `FloatingToolbar` pressed into service as the app's primary navigation,
- * replacing the bottom bar and the standard rail on every window bucket except an expanded one,
- * which keeps [BingeNavCustomRail].
+ * replacing the bottom bar and the standard rail on every window bucket except a landscape tablet,
+ * which keeps [BingeNavCustomRail]. Unfolded foldables get this bar.
  *
  * Off-spec by design: M3 scopes floating toolbars to contextual *actions*, not navigation, so the
  * container is Material but the items below are not [androidx.compose.material3.NavigationBarItem] —

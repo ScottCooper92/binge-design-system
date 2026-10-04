@@ -316,7 +316,7 @@
     <dimen name="catalog_screen_preview_height">640dp</dimen>
     <!-- Avatar diameter for the account item in the bottom bar / floating bar (matches the icon box). -->
     <dimen name="nav_item_avatar_size">26dp</dimen>
-    <!-- Bespoke expanded rail (tablet / unfolded foldable). M3's collapsed rail width, kept rather than
+    <!-- Bespoke expanded rail (landscape tablet). M3's collapsed rail width, kept rather than
          widened for scrim runway: the rail overlays content, but this width is still the inset every
          non-bleeding surface clears by, and that is space the content wants more than the glass does. -->
     <dimen name="nav_custom_rail_width">96dp</dimen>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape tablet: the bespoke custom rail. Every other window gets the floating bar: phones,
+         portrait tablets and unfolded foldables.
+         Gated on BOTH smallest-width >=600dp AND available-width >=1000dp (folder qualifiers AND),
+         so a wide landscape phone (w>=1000dp but sw~411dp) does NOT get it.
+         Why 1000dp: it sits between a near-square unfolded book-style foldable (~850-880dp wide in
+         either orientation) and a typical landscape tablet (~1280dp). Material's 1200dp "large"
+         breakpoint was considered, but it would drop ~1100dp small tablets to the floating bar.
+         This bucket is more specific than values-w840dp, so it wins for this one name; no other
+         resource resolution changes. -->
+    <bool name="binge_nav_rail_expanded">true</bool>
+</resources>
