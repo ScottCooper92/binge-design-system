@@ -100,9 +100,6 @@ fun DetailHero(
             backdropUrl = backdropUrl,
             contentDescription = title,
             richBackdrop = richBackdrop,
-            // The top band only backs this hero's own back button. A screen with its own overlay top
-            // bar (every current caller) brings that bar's scrim, and a second band would double it.
-            topScrim = showChrome,
         )
         HeroFootBlend(Modifier.align(Alignment.BottomStart))
 
@@ -156,9 +153,6 @@ fun HeroBackdrop(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     richBackdrop: Boolean = false,
-    // Whether the scrim darkens the top band too, behind chrome drawn over the image. A caller whose
-    // screen supplies its own scrimmed top bar turns it off.
-    topScrim: Boolean = true,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         SubcomposeAsyncImage(
@@ -175,12 +169,12 @@ fun HeroBackdrop(
                 accentEnd = BingeTheme.colors.accentPurple,
             )
         }
-        HeroScrim(topScrim)
+        HeroScrim()
     }
 }
 
 @Composable
-private fun HeroScrim(top: Boolean) {
+private fun HeroScrim() {
     // Always-black rather than theme-following: this sits directly over unpredictable backdrop
     // imagery with no compensating scrim of its own (unlike DetailCinematicHeader's CinematicScrim,
     // which has CinematicSideScrim to guarantee coverage where its title lands), so only a
@@ -191,7 +185,7 @@ private fun HeroScrim(top: Boolean) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    0.00f to if (top) scrim.copy(alpha = HERO_SCRIM_TOP_ALPHA) else Color.Transparent,
+                    0.00f to scrim.copy(alpha = HERO_SCRIM_TOP_ALPHA),
                     HERO_SCRIM_CLEAR_STOP to Color.Transparent,
                     HERO_SCRIM_MID_STOP to scrim.copy(alpha = HERO_SCRIM_MID_ALPHA),
                     1.00f to scrim.copy(alpha = HERO_SCRIM_BOTTOM_ALPHA),
