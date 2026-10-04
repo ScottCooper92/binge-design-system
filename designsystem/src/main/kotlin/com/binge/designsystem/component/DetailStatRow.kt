@@ -3,6 +3,7 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,13 +37,16 @@ fun DetailStatRow(
     // that stay legible whichever theme is active, rather than a light theme's dark-on-dark text.
     valueColor: Color = Color.Unspecified,
     labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    // The screen's content inset by default, for a row that spans the page. A row inside something
+    // that already pads its content, such as a card, passes PaddingValues() so it is not indented twice.
+    contentPadding: PaddingValues = PaddingValues(horizontal = resolvedContentInset()),
 ) {
     if (stats.isEmpty()) return
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = resolvedContentInset())
+            .padding(contentPadding)
             .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
