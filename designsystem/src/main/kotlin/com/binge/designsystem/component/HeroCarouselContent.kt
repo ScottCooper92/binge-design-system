@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -86,6 +88,16 @@ internal fun BoxScope.HeroScrims() {
                     HERO_SIDE_GRADIENT_CLEAR_STOP to Color.Transparent,
                 ),
             ),
+    )
+    // The foot, faded into the page's background so the carousel ends on the colour the page starts
+    // with, not on the scrim's black. As tall as the dots' bottom padding: below the dots and the
+    // copy, so neither loses its dark backing, in either theme.
+    Box(
+        modifier = Modifier
+            .align(Alignment.BottomStart)
+            .fillMaxWidth()
+            .height(dimensionResource(R.dimen.hero_dots_bottom_padding))
+            .background(Brush.verticalGradient(0f to Color.Transparent, 1f to MaterialTheme.colorScheme.background)),
     )
 }
 

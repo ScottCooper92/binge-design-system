@@ -101,6 +101,7 @@ fun DetailHero(
             contentDescription = title,
             richBackdrop = richBackdrop,
         )
+        HeroFootBlend(Modifier.align(Alignment.BottomStart))
 
         if (showChrome) {
             ExpressiveIconButton(
@@ -190,6 +191,24 @@ private fun HeroScrim() {
                     1.00f to scrim.copy(alpha = HERO_SCRIM_BOTTOM_ALPHA),
                 ),
             ),
+    )
+}
+
+/**
+ * The hero's foot: the strip under the text column, faded from nothing into the page's own background,
+ * so the hero ends on the colour the page below starts with rather than on [HeroScrim]'s black. It is
+ * exactly the text column's bottom padding tall, so it never sits behind copy and legibility is
+ * [HeroScrim]'s alone, as before. Its top adds nothing, which is what keeps the join with the scrim
+ * invisible. DetailCinematicHeader already blends this way; this brings the phone hero in line.
+ */
+@Composable
+private fun HeroFootBlend(modifier: Modifier = Modifier) {
+    val page = MaterialTheme.colorScheme.background
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(dimensionResource(R.dimen.detail_hero_text_bottom_padding))
+            .background(Brush.verticalGradient(0f to Color.Transparent, 1f to page)),
     )
 }
 
