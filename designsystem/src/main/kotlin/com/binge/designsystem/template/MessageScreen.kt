@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,6 +46,9 @@ data class ScreenAction(
  * A screen, or the part of one under its bar, that says one thing: nothing here yet, something went wrong,
  * or a gate to pass first. An icon in a pill, a [headline], the [body], and up to two actions.
  *
+ * [actions] is for a message with more than two ways out, or a destructive one: when set it replaces the
+ * [primary]/[secondary] row and stacks full width under the body, at the same gap.
+ *
  * Both apps render their loading, empty and error arms through this, so they read alike; each maps its own
  * error model onto the copy. [announce] makes the whole message a polite live region, for a failure that
  * replaced content the user was reading. It centres clear of a floating navigation bar.
@@ -57,6 +62,7 @@ fun MessageScreen(
     primary: ScreenAction? = null,
     secondary: ScreenAction? = null,
     announce: Boolean = false,
+    actions: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier.fillMaxSize().padding(navOverlayPadding()),
@@ -89,7 +95,15 @@ fun MessageScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
-            if (primary != null || secondary != null) {
+            if (actions != null) {
+                Spacer(Modifier.height(dimensionResource(R.dimen.message_screen_action_gap)))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    content = actions,
+                )
+            } else if (primary != null || secondary != null) {
                 Spacer(Modifier.height(dimensionResource(R.dimen.message_screen_action_gap)))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),

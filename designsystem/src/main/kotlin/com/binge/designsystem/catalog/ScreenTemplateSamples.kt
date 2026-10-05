@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilledButton
+import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.FilterChipItem
@@ -123,6 +124,34 @@ fun MessageScreenSample() {
                     secondary = ScreenAction("Settings", onClick = {}),
                     announce = true,
                     modifier = Modifier.padding(inner),
+                )
+            }
+        }
+    }
+}
+
+/** A message with three ways out, one of them destructive: the stacked actions slot, full width. */
+@Composable
+fun MessageScreenStackedActionsSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "Requests", onBack = LocalDemoBack.current) { padding ->
+            ScreenBody(padding) { inner ->
+                MessageScreen(
+                    headline = "Can't reach the server",
+                    body = "Check your connection, then try again.",
+                    icon = Icons.Filled.CloudOff,
+                    announce = true,
+                    modifier = Modifier.padding(inner),
+                    actions = {
+                        BingeFilledButton(
+                            label = "Try again",
+                            onClick = {},
+                            leadingIcon = Icons.Filled.Refresh,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        BingeOutlinedButton(label = "Edit connection", onClick = {}, modifier = Modifier.fillMaxWidth())
+                        BingeOutlinedButton(label = "Disconnect", onClick = {}, destructive = true, modifier = Modifier.fillMaxWidth())
+                    },
                 )
             }
         }
