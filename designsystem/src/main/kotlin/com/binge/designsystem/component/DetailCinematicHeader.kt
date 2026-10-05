@@ -124,10 +124,10 @@ fun DetailCinematicHeader(
             error = { ImagePlaceholder(Modifier.fillMaxSize(), iconAlignment = Alignment.TopCenter) },
         )
         HeroBackdropMeshWash(
-            accentStart = MaterialTheme.colorScheme.primary,
+            accentStart = MaterialTheme.colorScheme.primaryFixedDim,
             accentEnd = BingeTheme.colors.accentPurple,
         )
-        CopyHuggingScrim(copyBounds, headerOrigin)
+        CopyHuggingScrim(copyBounds) { headerOrigin }
 
         CinematicCopyRow(
             title = title,
@@ -300,10 +300,11 @@ private fun reportsLineEnd(bounds: CinematicCopyBounds, line: CopyLine): Modifie
  * above the row, is 62% at the row's top and 85% halfway down it, which keeps the row's small labels
  * legible over any art, and solid at the foot.
  *
- * Draws nothing until the copy has been measured.
+ * Draws nothing until the copy has been measured. [headerOrigin] is a lambda so the scroll-driven
+ * position is read in the draw phase and does not recompose the header.
  */
 @Composable
-private fun CopyHuggingScrim(bounds: CinematicCopyBounds, headerOrigin: Offset) {
+private fun CopyHuggingScrim(bounds: CinematicCopyBounds, headerOrigin: () -> Offset) {
     val page = MaterialTheme.colorScheme.background
     val density = LocalDensity.current
     val bandPx = with(density) { dimensionResource(R.dimen.hero_copy_fade_band).toPx() }
@@ -314,12 +315,13 @@ private fun CopyHuggingScrim(bounds: CinematicCopyBounds, headerOrigin: Offset) 
             // The horizontal mask applies to the copy fade only, so it needs its own layer to mask into.
             .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
             .drawWithContent {
+                val origin = headerOrigin()
                 val copyTop = bounds.copyTop ?: return@drawWithContent
                 val copyEnd = bounds.copyEnd(layoutDirection) ?: return@drawWithContent
-                drawPageFade(page, copyTop = copyTop - headerOrigin.y, bandPx = bandPx, ramp = CopyFadeRamp)
-                maskPastCopyEnd(copyEnd = copyEnd - headerOrigin.x, falloffPx = falloffPx)
+                drawPageFade(page, copyTop = copyTop - origin.y, bandPx = bandPx, ramp = CopyFadeRamp)
+                maskPastCopyEnd(copyEnd = copyEnd - origin.x, falloffPx = falloffPx)
                 bounds.statsTop?.let { statsTop ->
-                    drawPageFade(page, copyTop = statsTop - headerOrigin.y, bandPx = bandPx, ramp = StatsFadeRamp)
+                    drawPageFade(page, copyTop = statsTop - origin.y, bandPx = bandPx, ramp = StatsFadeRamp)
                 }
             },
     )
