@@ -175,6 +175,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(composeBom)
     testImplementation(libs.compose.ui.test.junit4)
+    testImplementation(testFixtures(project(":designsystem")))
     debugImplementation(libs.compose.ui.test.manifest)
 
     // The adverse-schedule fixture's compile surface is Compose + compose-ui-test, the same stack the focus

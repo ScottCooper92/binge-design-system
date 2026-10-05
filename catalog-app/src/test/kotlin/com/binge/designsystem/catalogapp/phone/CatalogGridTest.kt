@@ -11,7 +11,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -24,6 +23,7 @@ import com.binge.designsystem.catalogapp.registry.CatalogComponent
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.CatalogKind
 import com.binge.designsystem.catalogapp.registry.components
+import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -38,7 +38,7 @@ import org.robolectric.annotation.Config
 @Config(qualifiers = "w411dp-h900dp-xxhdpi")
 class CatalogGridTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createKeyboardComposeRule()
 
     private val samples =
         (0 until SAMPLE_COUNT).map { index ->
