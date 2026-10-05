@@ -20,9 +20,9 @@ class HeroCarouselSamplesScreenshotTest {
     }
 
     /**
-     * The regression guard for `HeroScrims`' direction-aware side ramp. The copy it darkens is
-     * `Alignment.BottomStart` and mirrors, so an absolute `Brush.horizontalGradient` would leave the
-     * dense end of the vignette on the side the copy just left. One cell rather than the full
+     * The regression guard for the direction-aware fade behind the copy. The copy is
+     * `Alignment.BottomStart` and mirrors, so the fade has to fall away from the copy's end edge, its
+     * left in RTL. Read the wrong edge and the fade sits on the side the copy just left. One cell rather than the full
      * `@ComponentPreviews` matrix: the fault is a mirrored ramp, which every cell would show identically
      * — and it shows over the flat placeholder, since `validateDebugScreenshotTest` diffs pixels
      * exactly.

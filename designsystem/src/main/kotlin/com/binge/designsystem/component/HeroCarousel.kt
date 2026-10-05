@@ -18,10 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -49,7 +51,6 @@ import com.binge.designsystem.component.HeroBackdrop
 import com.binge.designsystem.component.ImagePlaceholder
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.theme.BingeTheme
 import com.binge.designsystem.theme.LocalReduceMotion
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
@@ -165,6 +166,10 @@ fun HeroCarousel(
                 )
             },
     ) {
+        // Each slide's copy bounds, by item id, as its copy last laid out. Each backdrop draws its own
+        // fade from them, so the fade changes shape inside the crossfade along with the art, rather
+        // than jumping once the new copy has measured.
+        val copyBounds = remember { mutableStateMapOf<Int, HeroCopyBounds>() }
         HeroBackdrop(
             items = items,
             index = current,
@@ -173,8 +178,15 @@ fun HeroCarousel(
                 onItemClick(id)
             },
             reduceMotion = reduceMotion,
+            copyBounds = copyBounds,
         )
-        HeroCopyOverlay(item = items[current], rank = current + 1, heroActions = heroActions)
+        val currentItem = items[current]
+        HeroCopyOverlay(
+            item = currentItem,
+            rank = current + 1,
+            heroActions = heroActions,
+            onCopyBounds = { copyBounds[currentItem.id] = it },
+        )
         if (count > 1) {
             HeroDots(items = items, selectedIndex = current, onSelect = { index = it })
         }
@@ -187,6 +199,7 @@ private fun BoxScope.HeroBackdrop(
     index: Int,
     onItemClick: (Int) -> Unit,
     reduceMotion: Boolean,
+    copyBounds: Map<Int, HeroCopyBounds>,
 ) {
     // Instant swap (0ms) under reduce-motion; the 700ms fade is a motion effect the a11y pref opts out of.
     val crossfadeMs = if (reduceMotion) 0 else CROSSFADE_MS
@@ -214,7 +227,7 @@ private fun BoxScope.HeroBackdrop(
                 loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
                 error = { ImagePlaceholder(Modifier.fillMaxSize()) },
             )
-            HeroScrims()
+            copyBounds[item.id]?.let { HeroCopyHuggingScrim(it) }
         }
     }
 }
@@ -237,7 +250,8 @@ private fun BoxScope.HeroDots(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
 ) {
-    val onScrim = BingeTheme.colors.onScrim
+    // onBackground, as the copy is: the dots sit on the solid foot of the fade, not on the art.
+    val dotColor = MaterialTheme.colorScheme.onBackground
     val selectedWidth = dimensionResource(R.dimen.hero_indicator_size_selected)
     val unselectedWidth = dimensionResource(R.dimen.hero_indicator_size_unselected)
     val height = dimensionResource(R.dimen.hero_indicator_height)
@@ -257,7 +271,7 @@ private fun BoxScope.HeroDots(
                     .width(if (selected) selectedWidth else unselectedWidth)
                     .height(height)
                     .clip(BingeShapes.Pill)
-                    .background(if (selected) onScrim else onScrim.copy(alpha = INDICATOR_UNSELECTED_ALPHA))
+                    .background(if (selected) dotColor else dotColor.copy(alpha = INDICATOR_UNSELECTED_ALPHA))
                     .selectable(
                         selected = selected,
                         role = Role.Tab,

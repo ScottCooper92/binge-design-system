@@ -25,6 +25,9 @@ import com.binge.designsystem.theme.BingeShapes
  * [destructive] carries the same meaning here as on [BingeOutlinedButton]: the action commits
  * something irreversible. It chooses the [colors] default rather than being read separately, so an
  * explicit [colors] still wins and a caller that already passes one renders exactly as before.
+ *
+ * The fill is the fixed amber, the same in both themes. Light `primary` is a darker amber tuned for
+ * text, and as a large fill it reads muddy.
  */
 @Composable
 fun BingeFilledButton(
@@ -36,8 +39,8 @@ fun BingeFilledButton(
     loading: Boolean = false,
     destructive: Boolean = false,
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-        contentColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
+        containerColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primaryFixedDim,
+        contentColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimaryFixed,
     ),
 ) {
     Button(

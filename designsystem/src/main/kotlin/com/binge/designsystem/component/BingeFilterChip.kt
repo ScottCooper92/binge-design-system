@@ -55,13 +55,14 @@ fun BingeFilterChip(
     enabled: Boolean = true,
 ) {
     val scheme = MaterialTheme.colorScheme
-    val foreground = if (selected) scheme.onPrimary else scheme.onSurfaceVariant
+    // A selected chip is a big amber fill, so it takes the fixed amber, as BingeFilledButton does.
+    val foreground = if (selected) scheme.onPrimaryFixed else scheme.onSurfaceVariant
     val isSelected = selected
     Row(
         modifier = modifier
             .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .clip(BingeShapes.Pill)
-            .background(if (selected) scheme.primary else scheme.surfaceContainerLow)
+            .background(if (selected) scheme.primaryFixedDim else scheme.surfaceContainerLow)
             .then(
                 if (selected) {
                     Modifier

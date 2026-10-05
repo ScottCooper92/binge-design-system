@@ -50,9 +50,11 @@ fun IncludeExcludeChip(
     val chipColors = when (state) {
         IncludeExcludeState.Include ->
             ChipColors(
-                background = MaterialTheme.colorScheme.secondaryContainer,
+                // primary, not the fixed amber: an in-form control, so it matches the sliders and
+                // radios beside it in the same sheet.
+                background = MaterialTheme.colorScheme.primary,
                 border = Color.Transparent,
-                content = MaterialTheme.colorScheme.onSecondaryContainer,
+                content = MaterialTheme.colorScheme.onPrimary,
                 decoration = TextDecoration.None,
             )
         IncludeExcludeState.Exclude ->

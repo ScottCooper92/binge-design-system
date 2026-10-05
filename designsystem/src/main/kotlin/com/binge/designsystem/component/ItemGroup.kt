@@ -199,7 +199,12 @@ private fun ListItemView(
                     modifier = Modifier.size(dimensionResource(R.dimen.item_group_loading_size)),
                 )
                 row.trailingContent != null -> row.trailingContent.invoke()
-                row.toggled != null -> Switch(checked = row.toggled, onCheckedChange = null, enabled = !row.disabled)
+                row.toggled != null -> Switch(
+                    checked = row.toggled,
+                    onCheckedChange = null,
+                    enabled = !row.disabled,
+                    colors = bingeSwitchColors(),
+                )
                 external -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.OpenInNew,
