@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -39,6 +38,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.centredReadingColumn
 import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.isLandscape
+import com.binge.designsystem.theme.BingeShapes
 
 /**
  * A multi-step flow on a phone, foldable or tablet: back and a step read-out at the top, the step below, and
@@ -207,7 +207,7 @@ private fun StepDot(reached: Boolean, current: Boolean) {
         Modifier
             .height(size)
             .width(if (current) dimensionResource(R.dimen.step_dot_active_width) else size)
-            .clip(CircleShape)
+            .clip(BingeShapes.Pill)
             .background(if (reached) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh),
     )
 }

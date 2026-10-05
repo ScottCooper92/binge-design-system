@@ -102,9 +102,11 @@ fun FormScreen(
             extraActions()
         },
         bottomBar = {
-            bottomBar()
-            if (placement == FormActionPlacement.Footer && primaryAction != null && notReady == null) {
-                FormFooter(primary = primaryAction, secondary = secondaryAction)
+            Column {
+                bottomBar()
+                if (placement == FormActionPlacement.Footer && primaryAction != null && notReady == null) {
+                    FormFooter(primary = primaryAction, secondary = secondaryAction)
+                }
             }
         },
     ) { padding ->

@@ -20,6 +20,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,7 +61,6 @@ enum class ScreenBar {
  *
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
  * floating navigation bar. Split it with [screenOuterPadding] and [screenInnerPadding], or use [ScreenBody].
- * Design notes: `docs/templates.md`.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,21 +112,24 @@ fun BingeScreenScaffold(
         snackbarHost = { BingeSnackbarHost(snackbarHostState) },
     ) { scaffoldPadding ->
         val padding = screenPadding(scaffoldPadding, hasBar = bar != ScreenBar.None)
-        if (header == null) {
-            content(padding)
-        } else {
-            OverlaidHeaderContent(
-                // The bar's height joins the header rather than padding it from outside, so the body reaches
-                // the top of the window and passes under both.
-                header = {
-                    Spacer(Modifier.height(padding.calculateTopPadding()))
-                    header()
-                },
-                modifier = Modifier.padding(padding.screenOuterPadding()),
-                headerBackground = Color.Transparent,
-                scrimFraction = scrim,
-            ) { overlay ->
-                content(PaddingValues(top = overlay.calculateTopPadding(), bottom = padding.calculateBottomPadding()))
+        // The overlay is folded into [padding], so a child's own navOverlayPadding() must not count it twice.
+        CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues()) {
+            if (header == null) {
+                content(padding)
+            } else {
+                OverlaidHeaderContent(
+                    // The bar's height joins the header rather than padding it from outside, so the body reaches
+                    // the top of the window and passes under both.
+                    header = {
+                        Spacer(Modifier.height(padding.calculateTopPadding()))
+                        header()
+                    },
+                    modifier = Modifier.padding(padding.screenOuterPadding()),
+                    headerBackground = Color.Transparent,
+                    scrimFraction = scrim,
+                ) { overlay ->
+                    content(PaddingValues(top = overlay.calculateTopPadding(), bottom = padding.calculateBottomPadding()))
+                }
             }
         }
     }

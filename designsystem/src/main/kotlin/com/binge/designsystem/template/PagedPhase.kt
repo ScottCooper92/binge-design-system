@@ -75,6 +75,9 @@ fun pagedPhase(
  * Follows one list from frame to frame to work out [pagedPhase]'s `cacheBehind`. A list with a mediator is
  * behind its cache until a refresh has finished, and after that only while the refresh wrote rows none of
  * which have shown yet: once rows have shown, an empty list is real. A list with no mediator is never behind.
+ *
+ * [phase] is called during composition and writes the tracker's fields, so it must stay idempotent for a
+ * repeated frame.
  */
 class PagedPhaseTracker {
     private var refresh: PagedRefresh? = null

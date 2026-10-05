@@ -135,6 +135,7 @@ private fun HeroDetailFrame(
     Scaffold(
         modifier = modifier,
         snackbarHost = { BingeSnackbarHost(snackbarHostState, Modifier.windowInsetsPadding(bottomInsets())) },
+        bottomBar = { footer?.invoke() },
         contentWindowInsets = WindowInsets(0),
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -146,7 +147,6 @@ private fun HeroDetailFrame(
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
                 content = page,
             )
-            footer?.invoke()
         }
     }
 }

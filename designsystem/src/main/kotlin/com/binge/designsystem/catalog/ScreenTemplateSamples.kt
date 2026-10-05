@@ -64,7 +64,7 @@ private const val SAMPLE_STEPS = 3
 @Composable
 fun BingeScreenScaffoldSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        BingeScreenScaffold(title = "Episodes", onBack = {}) { padding ->
+        BingeScreenScaffold(title = "Episodes", onBack = LocalDemoBack.current) { padding ->
             SampleRows(padding)
         }
     }
@@ -74,7 +74,7 @@ fun BingeScreenScaffoldSample() {
 @Composable
 fun BingeScreenScaffoldSmallBarSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        BingeScreenScaffold(title = "Users", onBack = {}, bar = ScreenBar.Small) { padding ->
+        BingeScreenScaffold(title = "Users", onBack = LocalDemoBack.current, bar = ScreenBar.Small) { padding ->
             SampleRows(padding)
         }
     }
@@ -86,7 +86,7 @@ fun BingeScreenScaffoldBottomBarSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         BingeScreenScaffold(
             title = "Sliders",
-            onBack = {},
+            onBack = LocalDemoBack.current,
             bar = ScreenBar.Small,
             bottomBar = {
                 Box(
@@ -109,7 +109,7 @@ fun BingeScreenScaffoldBottomBarSample() {
 @Composable
 fun MessageScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        BingeScreenScaffold(title = "Requests", onBack = {}) { padding ->
+        BingeScreenScaffold(title = "Requests", onBack = LocalDemoBack.current) { padding ->
             ScreenBody(padding) { inner ->
                 MessageScreen(
                     headline = "Can't reach the server",
@@ -148,7 +148,7 @@ fun FilteredListScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FilteredListScreen(
             title = "Requests",
-            onBack = {},
+            onBack = LocalDemoBack.current,
             filters = listOf(FilterChipItem("All", 42), FilterChipItem("Pending", 3), FilterChipItem("Approved", 39)),
             selectedFilter = selected,
             onFilterChange = { selected = it },
@@ -165,7 +165,7 @@ fun FilteredListScreenNotReadySample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FilteredListScreen(
             title = "Requests",
-            onBack = {},
+            onBack = LocalDemoBack.current,
             filters = emptyList(),
             selectedFilter = 0,
             onFilterChange = {},
@@ -183,14 +183,14 @@ fun HeroDetailScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         HeroDetailScreen(
             title = "A title",
-            onBack = {},
+            onBack = LocalDemoBack.current,
             hero = {
                 DetailHero(
                     title = "A title",
                     backdropUrl = null,
                     tagline = "The line a poster would carry.",
                     metaText = "2026 · 1h 52m",
-                    onBack = {},
+                    onBack = LocalDemoBack.current,
                     showChrome = false,
                 )
             },
@@ -206,7 +206,7 @@ fun HeroDetailScreenFooterSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         HeroDetailScreen(
             title = "A title",
-            onBack = {},
+            onBack = LocalDemoBack.current,
             footer = {
                 Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerHigh)) {
                     BingeFilledButton(
@@ -222,7 +222,7 @@ fun HeroDetailScreenFooterSample() {
                     backdropUrl = null,
                     tagline = null,
                     metaText = "Requested today",
-                    onBack = {},
+                    onBack = LocalDemoBack.current,
                     showChrome = false,
                 )
             },
@@ -238,7 +238,7 @@ fun FormScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FormScreen(
             title = "General",
-            onBack = {},
+            onBack = LocalDemoBack.current,
             primaryAction = FormAction("Save", onClick = {}),
         ) {
             SampleForm()
@@ -252,7 +252,7 @@ fun FormScreenFooterSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FormScreen(
             title = "Network",
-            onBack = {},
+            onBack = LocalDemoBack.current,
             placement = FormActionPlacement.Footer,
             primaryAction = FormAction("Save", onClick = {}),
             secondaryAction = FormAction("Cancel", onClick = {}),
@@ -265,11 +265,14 @@ fun FormScreenFooterSample() {
 /** The middle step of a flow: portrait stacks the art, heading and choices; a wide window splits them. */
 @Composable
 fun StepFlowScreenSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         StepFlowScreen(
             stepCount = SAMPLE_STEPS,
-            currentStep = 1,
-            onBack = {},
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
             aside = {
                 Box(
                     modifier =
@@ -283,8 +286,8 @@ fun StepFlowScreenSample() {
                 StepHeading(kicker = "Privacy", title = "Share usage data?", subtitle = "Counts of which screens are opened. Nothing more.")
             },
             footer = {
-                BingeFilledButton(label = "Share", onClick = {}, modifier = Modifier.fillMaxWidth())
-                BingeTextButton(label = "Don't share", onClick = {}, modifier = Modifier.fillMaxWidth())
+                BingeFilledButton(label = "Share", onClick = advance, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Don't share", onClick = advance, modifier = Modifier.fillMaxWidth())
             },
         ) {
             MessageScreen(
