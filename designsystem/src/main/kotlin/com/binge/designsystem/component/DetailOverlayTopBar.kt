@@ -64,12 +64,14 @@ import com.binge.designsystem.theme.BingeTheme
  * up with the copy beneath them: the compact [DetailHero] gutters its copy at `padding_m`, while
  * [DetailCinematicHeader] uses the wider `detail_cinematic_header_padding`. Pass the inset the
  * header under it uses, or back and share float outboard of the content they belong to.
+ *
+ * A null [onBack] drops the back button, for a detail in a pane beside the list that already offers the way back.
  */
 @Composable
 fun BoxScope.DetailOverlayTopBar(
     title: String,
     scrollState: ScrollState,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
     heroHeight: Dp = dimensionResource(R.dimen.detail_hero_height),
     horizontalInset: Dp = dimensionResource(R.dimen.padding_m),
@@ -97,7 +99,7 @@ fun BoxScope.DetailOverlayTopBar(
 fun BoxScope.DetailOverlayTopBar(
     title: String,
     scrollOffsetPx: () -> Float,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
     heroHeight: Dp = dimensionResource(R.dimen.detail_hero_height),
     horizontalInset: Dp = dimensionResource(R.dimen.padding_m),
@@ -133,15 +135,17 @@ fun BoxScope.DetailOverlayTopBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
-            ExpressiveIconButton(
-                onClick = onBack,
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(R.string.cd_navigate_back),
-                tint = iconTint,
-                tone = IconButtonTone.Glass,
-                size = dimensionResource(R.dimen.top_bar_icon_size),
-                glassBackgroundAlpha = glassBackgroundAlpha,
-            )
+            if (onBack != null) {
+                ExpressiveIconButton(
+                    onClick = onBack,
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.cd_navigate_back),
+                    tint = iconTint,
+                    tone = IconButtonTone.Glass,
+                    size = dimensionResource(R.dimen.top_bar_icon_size),
+                    glassBackgroundAlpha = glassBackgroundAlpha,
+                )
+            }
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
