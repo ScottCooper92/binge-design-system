@@ -70,6 +70,7 @@ internal fun ColumnScope.RailItemsRegion(
     railEntry: FocusRequester,
     scrollState: ScrollState,
     labelsVisible: Boolean = expanded,
+    pinFooter: Boolean = false,
 ) {
     val hPad = dimensionResource(TvR.dimen.tv_nav_rail_padding)
     val overscanV = dimensionResource(TvR.dimen.tv_overscan_vertical)
@@ -131,7 +132,7 @@ internal fun ColumnScope.RailItemsRegion(
                 items.forEach { railItem -> key(railItem.key) { item(railItem) } }
                 // The footer is the terminal scroll row when expanded or when the tail is on screen; only a
                 // mid-list collapse re-pins it to the bottom below.
-                if (expanded || tailVisible) footer?.let { key(it.key) { item(it) } }
+                if (!pinFooter && (expanded || tailVisible)) footer?.let { key(it.key) { item(it) } }
             }
         }
     }
@@ -139,7 +140,7 @@ internal fun ColumnScope.RailItemsRegion(
     // exit is instant because the expand path is focus-critical — an exit animation would keep this RailItem (and
     // the selected-row FocusRequester it can carry) alive alongside the terminal footer row it hands over to.
     AnimatedVisibility(
-        visible = !expanded && !tailVisible,
+        visible = pinFooter || (!expanded && !tailVisible),
         enter = if (LocalReduceMotion.current) EnterTransition.None else slideInVertically { it },
         exit = ExitTransition.None,
     ) {
