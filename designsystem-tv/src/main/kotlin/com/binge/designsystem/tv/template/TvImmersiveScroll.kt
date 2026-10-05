@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.template
 
 import android.os.SystemClock
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +52,24 @@ internal fun listTopClip(state: LazyListState, target: () -> Int): () -> Float =
                 .filter { it.index == t }
                 .map { it.offset },
         )
+    }
+
+/** The top of the row holding [targetLead] in a grid, as [listTopClip] is for a list; every cell of the row shares it. */
+internal fun gridTopClip(state: LazyGridState, targetLead: () -> Int): () -> Float =
+    {
+        val lead = targetLead()
+        val row = state.layoutInfo.visibleItemsInfo
+            .firstOrNull { it.index == lead }
+            ?.row
+        val tops =
+            if (row == null) {
+                emptyList()
+            } else {
+                state.layoutInfo.visibleItemsInfo
+                    .filter { it.row == row }
+                    .map { it.offset.y }
+            }
+        immersiveClipTopPx(tops)
     }
 
 /** [live], lagging by a short settle so a held sweep does not restart the backdrop crossfade on every card. */
