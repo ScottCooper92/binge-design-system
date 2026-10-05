@@ -40,6 +40,21 @@ class StarRatingScreenshotTest {
         }
     }
 
+    /** The lowest rating TMDB accepts, in the editor: a half star rather than an empty row that reads as unrated. */
+    @PreviewTest
+    @Preview(showBackground = true)
+    @Composable
+    fun StarRatingInteractiveLowest() {
+        BingeExpressiveTheme(darkTheme = false, dynamicColor = false) {
+            StarRating(
+                rating = 0.5f,
+                starSize = dimensionResource(R.dimen.star_rating_size_interactive),
+                interactive = true,
+                onRatingChange = {},
+            )
+        }
+    }
+
     @PreviewTest
     @Preview(showBackground = true)
     @Composable
