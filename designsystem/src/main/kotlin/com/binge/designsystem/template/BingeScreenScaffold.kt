@@ -59,6 +59,8 @@ enum class ScreenBar {
  * offers the way back. A [header] (a search field, filter chips) is drawn over the body below the bar, and one
  * scrim spans both. [barScrim] is false only where something under the bar draws the scrim for it.
  *
+ * [bottomBar] reaches the true edge of the window and clears the navigation bar itself, as `FormFooter` does.
+ *
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
  * floating navigation bar. Split it with [screenOuterPadding] and [screenInnerPadding], or use [ScreenBody].
  */

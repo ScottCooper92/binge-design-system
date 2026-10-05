@@ -43,7 +43,8 @@ import com.binge.designsystem.paneBackOrNull
  *
  * [hero] is the header the page uses (`DetailHero`, `DetailCinematicHeader`, or a person's own); [heroHeight]
  * is where the bar's fade starts, and [horizontalInset] lines the bar's controls up with the hero's copy. A
- * [footer] sits below the scroll rather than over it, so the scroll always clears it. [inFlight] draws a thin
+ * [footer] sits below the scroll rather than over it, so the scroll always clears it. It reaches the true
+ * edge of the window, so it clears the navigation bar itself, as `FormFooter` does. [inFlight] draws a thin
  * bar under the top bar without reflowing the page. [onBack] is dropped in a pane whose list already offers it.
  * The hero runs full-bleed; [content] centres at [contentMaxWidth] on a wide window.
  */
