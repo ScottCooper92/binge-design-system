@@ -135,7 +135,7 @@ private fun HeroDetailFrame(
     if (darkStatusBar) DarkStatusBarEffect()
     Scaffold(
         modifier = modifier,
-        snackbarHost = { BingeSnackbarHost(snackbarHostState, Modifier.windowInsetsPadding(bottomInsets())) },
+        snackbarHost = { BingeSnackbarHost(snackbarHostState, Modifier.windowInsetsPadding(snackbarInsets(hasFooter = footer != null))) },
         bottomBar = { footer?.invoke() },
         contentWindowInsets = WindowInsets(0),
     ) { padding ->
@@ -183,7 +183,8 @@ private fun BoxScope.HeroDetailBar(
 }
 
 @Composable
-private fun bottomInsets(): WindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+private fun snackbarInsets(hasFooter: Boolean): WindowInsets =
+    WindowInsets.safeDrawing.only(if (hasFooter) WindowInsetsSides.Horizontal else WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
 
 /** The bottom alone, for the scroll: its box has already cleared the sides. */
 @Composable

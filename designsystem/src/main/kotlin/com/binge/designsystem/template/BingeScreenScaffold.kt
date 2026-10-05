@@ -21,12 +21,17 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.max
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
@@ -81,6 +86,7 @@ fun BingeScreenScaffold(
     val scrollBehavior = rememberScreenBarScrollBehavior(bar)
     val scrim = scrollBehavior?.let { if (bar == ScreenBar.Collapsing) it.state.collapsedFraction else it.state.overlappedFraction } ?: 0f
     val back = onBack?.let { paneBackOrNull(it) }
+    var bottomBarHeight by remember { mutableIntStateOf(0) }
     Scaffold(
         modifier = scrollBehavior?.let { modifier.nestedScroll(it.nestedScrollConnection) } ?: modifier,
         contentWindowInsets = WindowInsets(0),
@@ -110,8 +116,13 @@ fun BingeScreenScaffold(
                 ScreenBar.None -> Unit
             }
         },
-        bottomBar = bottomBar,
-        snackbarHost = { BingeSnackbarHost(snackbarHostState) },
+        bottomBar = { Box(Modifier.onSizeChanged { bottomBarHeight = it.height }) { bottomBar() } },
+        snackbarHost = {
+            // The Scaffold lifts the snackbar above a pinned bar. With none, it clears the navigation bar the
+            // way the body does: by the part the floating navigation bar's inset does not already cover.
+            val uncovered = if (bottomBarHeight > 0) dimensionResource(R.dimen.zero) else snackbarNavigationInset()
+            BingeSnackbarHost(snackbarHostState, Modifier.padding(bottom = uncovered))
+        },
     ) { scaffoldPadding ->
         val padding = screenPadding(scaffoldPadding, hasBar = bar != ScreenBar.None)
         // The overlay is folded into [padding], so a child's own navOverlayPadding() must not count it twice.
@@ -183,6 +194,13 @@ private fun rememberScreenBarScrollBehavior(bar: ScreenBar): TopAppBarScrollBeha
         ScreenBar.Small -> TopAppBarDefaults.enterAlwaysScrollBehavior()
         ScreenBar.None -> null
     }
+
+@Composable
+private fun snackbarNavigationInset(): Dp {
+    val overlay = LocalNavOverlayInsets.current.calculateBottomPadding()
+    val navigation = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    return max(overlay, navigation) - overlay
+}
 
 /**
  * The one insets policy. The sides clear this pane's system bars and cutout plus a navigation rail drawn over
