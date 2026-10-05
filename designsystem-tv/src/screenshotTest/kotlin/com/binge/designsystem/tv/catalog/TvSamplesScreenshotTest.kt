@@ -84,6 +84,17 @@ class TvSamplesScreenshotTest {
     @Composable
     fun navRailCollapsed() = Frame { TvNavRailSample(expanded = false) }
 
+    /** A short list with the footer pinned: it stays on the bottom edge instead of following the last destination. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun navRailCollapsedPinnedFooter() = Frame { TvNavRailSample(expanded = false, pinFooter = true) }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun navRailExpandedPinnedFooter() = Frame { TvNavRailSample(expanded = true, pinFooter = true) }
+
     @PreviewTest
     @TvPreviews
     @Composable

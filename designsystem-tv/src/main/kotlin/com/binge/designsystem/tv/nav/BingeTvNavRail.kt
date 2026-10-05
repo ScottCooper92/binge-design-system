@@ -144,6 +144,9 @@ fun BingeTvNavRail(
     itemsScrollState: ScrollState = rememberScrollState(),
     artworkBehind: Boolean? = null,
     overlayEpoch: Int = 0,
+    // Keeps the footer on the bottom edge of the panel at all times, rather than following the last item while
+    // the list fits and only pinning once it overflows. Off by default, which is how every existing rail behaves.
+    pinFooter: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     // The rail's entry point: whichever item is selected. Used for the three ways focus arrives here — the ←
@@ -306,6 +309,7 @@ fun BingeTvNavRail(
                 railEntry = railEntry,
                 scrollState = itemsScrollState,
                 labelsVisible = labelsVisible,
+                pinFooter = pinFooter,
             )
         }
     }

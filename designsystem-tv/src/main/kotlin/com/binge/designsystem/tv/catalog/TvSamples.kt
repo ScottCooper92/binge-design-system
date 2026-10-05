@@ -247,7 +247,8 @@ fun TvNavRailSample() {
  *
  * [artworkBehind] pins the other half of the rail's fill, and puts something behind it worth seeing through
  * to — without both, a frame cannot tell a scrim from a solid panel. [badgedItemKey], when set, gives that
- * item's [NavSuiteBadge.Label] a sample count — a companion's pending-attention badge on the rail.
+ * item's [NavSuiteBadge.Label] a sample count — a companion's pending-attention badge on the rail. [pinFooter] shows
+ * the footer on the bottom edge with a short list, which would otherwise carry it up beside the last destination.
  */
 @Composable
 internal fun TvNavRailSample(
@@ -255,11 +256,15 @@ internal fun TvNavRailSample(
     selectedKey: String = "movies",
     artworkBehind: Boolean = false,
     badgedItemKey: String? = null,
+    pinFooter: Boolean = false,
 ) {
+    // Few enough destinations to fit, which is the case a pinned footer changes: the footer stays on the bottom edge
+    // rather than following the last destination.
+    val sampleItems = if (pinFooter) NavRailSampleItems.take(PINNED_FOOTER_SAMPLE_ITEMS) else NavRailSampleItems
     val items = if (badgedItemKey == null) {
-        NavRailSampleItems
+        sampleItems
     } else {
-        NavRailSampleItems.map {
+        sampleItems.map {
             if (it.key == badgedItemKey) it.copy(badge = NavSuiteBadge.Label("3")) else it
         }
     }
@@ -271,6 +276,7 @@ internal fun TvNavRailSample(
         onSelect = {},
         expanded = expanded,
         artworkBehind = artworkBehind,
+        pinFooter = pinFooter,
         content = { NavRailSampleContent(artworkBehind = artworkBehind) },
     )
 }
@@ -284,6 +290,8 @@ fun TvInitialsAvatarSample() {
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
     )
 }
+
+private const val PINNED_FOOTER_SAMPLE_ITEMS = 3
 
 val NavRailSampleHeader: TvNavRailItem =
     TvNavRailItem(
