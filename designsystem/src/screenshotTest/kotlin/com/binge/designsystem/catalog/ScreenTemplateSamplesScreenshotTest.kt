@@ -29,6 +29,11 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenStatePreview
     @Composable
+    fun messageStackedActions() = MessageScreenStackedActionsSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
     fun messageEmpty() = MessageScreenEmptySample()
 
     @PreviewTest
