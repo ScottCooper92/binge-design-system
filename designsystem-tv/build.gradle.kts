@@ -153,6 +153,8 @@ dependencies {
     implementation(libs.compose.material.icons)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    // The step-flow templates install the system Back handler for the step they show.
+    implementation(libs.androidx.activity.compose)
     // The QR code encodes its payload here rather than taking a bitmap, so it draws at panel size.
     implementation(libs.qrcodegen)
     // The initials avatar loads a remote avatar where one is given, through the same Coil stack as the phone's.
