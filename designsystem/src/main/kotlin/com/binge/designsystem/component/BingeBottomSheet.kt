@@ -66,9 +66,15 @@ fun BingeBottomSheet(
     val scope = rememberCoroutineScope()
     val dock =
         if (dockable) {
-            rememberBingeSheetDock(sheetState) {
-                scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
-            }
+            rememberBingeSheetDock(
+                sheetState = sheetState,
+                gesturesEnabled = gesturesEnabled,
+                close = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
+                },
+                expand = { scope.launch { sheetState.expand() } },
+                partialExpand = { scope.launch { sheetState.partialExpand() } },
+            )
         } else {
             null
         }

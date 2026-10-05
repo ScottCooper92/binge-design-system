@@ -2,6 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="cd_navigate_back">Back</string>
     <string name="cd_close_sheet">Close</string>
+    <string name="cd_expand_sheet">Expand</string>
+    <string name="cd_collapse_sheet">Collapse</string>
     <string name="cd_filter_state_included">Included</string>
     <string name="cd_filter_state_excluded">Excluded</string>
     <string name="cd_filter_state_neutral">Not set</string>

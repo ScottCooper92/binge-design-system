@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -34,6 +36,11 @@ import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.lerp
@@ -55,7 +62,32 @@ class BingeSheetDock internal constructor(
     private val travelPx: Float,
     /** Hides the sheet, then dismisses it: what a docked bar's close does. */
     val close: () -> Unit,
+    private val expandSheet: () -> Unit,
+    private val partialExpandSheet: () -> Unit,
+    private val gesturesEnabled: Boolean,
 ) {
+    /** True while the sheet rests part-way open, so the handle can offer to expand it. */
+    internal val canExpand: Boolean
+        get() = gesturesEnabled && sheetState.currentValue == SheetValue.PartiallyExpanded
+
+    /** True while the sheet is fully open and has a part-way anchor to return to. */
+    internal val canCollapse: Boolean
+        get() = gesturesEnabled && sheetState.currentValue == SheetValue.Expanded && sheetState.hasPartiallyExpandedState
+
+    /** What a tap on the drag handle does: expand a part-way sheet, collapse an expanded one, else dismiss. */
+    internal fun toggle() {
+        when {
+            !gesturesEnabled -> Unit
+            canExpand -> expandSheet()
+            canCollapse -> partialExpandSheet()
+            else -> close()
+        }
+    }
+
+    internal fun expand() = expandSheet()
+
+    internal fun collapse() = partialExpandSheet()
+
     /** How docked the sheet is: 0 while it floats clear of the status bar, 1 once its top edge is under it. */
     val fraction: Float
         get() = sheetTopOrNull()?.let { dockFraction(it, statusBarBottom().toFloat(), travelPx) } ?: 0f
@@ -89,13 +121,29 @@ internal fun pinnedFooterLift(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun rememberBingeSheetDock(sheetState: SheetState, close: () -> Unit): BingeSheetDock {
+internal fun rememberBingeSheetDock(
+    sheetState: SheetState,
+    gesturesEnabled: Boolean,
+    close: () -> Unit,
+    expand: () -> Unit,
+    partialExpand: () -> Unit,
+): BingeSheetDock {
     val density = LocalDensity.current
     val statusBars = WindowInsets.statusBars
     val travelPx = with(density) { dimensionResource(R.dimen.sheet_dock_travel).toPx() }
     val latestClose by rememberUpdatedState(close)
-    return remember(sheetState, statusBars, travelPx, density) {
-        BingeSheetDock(sheetState, { statusBars.getTop(density) }, travelPx, { latestClose() })
+    val latestExpand by rememberUpdatedState(expand)
+    val latestPartialExpand by rememberUpdatedState(partialExpand)
+    return remember(sheetState, statusBars, travelPx, density, gesturesEnabled) {
+        BingeSheetDock(
+            sheetState,
+            { statusBars.getTop(density) },
+            travelPx,
+            { latestClose() },
+            { latestExpand() },
+            { latestPartialExpand() },
+            gesturesEnabled,
+        )
     }
 }
 
@@ -144,7 +192,38 @@ fun BingeSheetDockingHeader(
         header = header,
         dockedTopBar = { dockedTopBar(dock.close) },
         modifier = modifier,
+        handleModifier = dockHandleModifier(dock),
     )
+}
+
+/**
+ * The tap and accessibility actions Material 3 puts on the drag handle it draws itself, which a docking sheet
+ * gives up by drawing its own handle: tap to expand or collapse, and expand, collapse and dismiss for a screen reader.
+ */
+@Composable
+private fun dockHandleModifier(dock: BingeSheetDock): Modifier {
+    val expandLabel = stringResource(R.string.cd_expand_sheet)
+    val collapseLabel = stringResource(R.string.cd_collapse_sheet)
+    val closeLabel = stringResource(R.string.cd_close_sheet)
+    return Modifier
+        .clickable(onClickLabel = null) { dock.toggle() }
+        .semantics(mergeDescendants = true) {
+            dismiss(closeLabel) {
+                dock.close()
+                true
+            }
+            if (dock.canExpand) {
+                expand(expandLabel) {
+                    dock.expand()
+                    true
+                }
+            } else if (dock.canCollapse) {
+                collapse(collapseLabel) {
+                    dock.collapse()
+                    true
+                }
+            }
+        }
 }
 
 /**
@@ -158,13 +237,14 @@ internal fun DockingHeaderLayout(
     header: @Composable () -> Unit,
     dockedTopBar: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    handleModifier: Modifier = Modifier,
 ) {
     Layout(
         contents =
             listOf(
                 {
                     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        BottomSheetDefaults.DragHandle()
+                        Box(handleModifier) { BottomSheetDefaults.DragHandle() }
                         header()
                     }
                 },
