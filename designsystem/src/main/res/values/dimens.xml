@@ -351,4 +351,14 @@
     <dimen name="month_year_picker_pill_padding_h">20dp</dimen>
     <!-- How far before docking under the status bar a BingeBottomSheet crossfades its header into its docked top bar. -->
     <dimen name="sheet_dock_travel">28dp</dimen>
+    <!-- Screen templates -->
+    <dimen name="message_screen_padding_h">32dp</dimen>
+    <dimen name="message_screen_icon_size">44dp</dimen>
+    <dimen name="message_screen_icon_gap">20dp</dimen>
+    <dimen name="message_screen_action_gap">22dp</dimen>
+    <dimen name="step_chrome_height">48dp</dimen>
+    <dimen name="step_chrome_padding_h">20dp</dimen>
+    <dimen name="step_dot_size">7dp</dimen>
+    <dimen name="step_dot_active_width">26dp</dimen>
+    <dimen name="step_dot_spacing">7dp</dimen>
 </resources>
