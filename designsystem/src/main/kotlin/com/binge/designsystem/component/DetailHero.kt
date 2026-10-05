@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import android.app.Activity
+import android.view.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsControllerCompat
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
@@ -39,10 +41,12 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
 
 private const val HERO_SCRIM_TOP_ALPHA = 0.55f
-private const val HERO_SCRIM_MID_ALPHA = 0.60f
-private const val HERO_SCRIM_BOTTOM_ALPHA = 0.90f
 private const val HERO_SCRIM_CLEAR_STOP = 0.25f
-private const val HERO_SCRIM_MID_STOP = 0.60f
+private const val HERO_TAGLINE_ALPHA = 0.85f
+private const val HERO_META_ALPHA = 0.80f
+
+/** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
+private val HERO_TITLE_MIN_SIZE = 28.sp
 
 /**
  * Sets the status bar to always-light icons for a screen whose content runs under it — [HeroScrim]
@@ -51,7 +55,10 @@ private const val HERO_SCRIM_MID_STOP = 0.60f
  * on-dark in light theme against a backdrop that never actually lightens.
  *
  * Restores to the theme-following state on dispose, so the screen navigated back to reads normally
- * rather than inheriting light icons it never asked for.
+ * rather than inheriting light icons it never asked for. The restore waits for the last effect on
+ * the window to leave. A transition between two screens that both call this composes them together,
+ * and the outgoing one disposes after the incoming one has set light icons; restoring then would put
+ * dark icons over the incoming hero.
  */
 @Composable
 fun DarkStatusBarEffect() {
@@ -59,15 +66,24 @@ fun DarkStatusBarEffect() {
     val isDark = isSystemInDarkTheme()
     if (!view.isInEditMode) {
         DisposableEffect(Unit) {
-            val controller = WindowInsetsControllerCompat(
-                (view.context as Activity).window,
-                view,
-            )
+            val window = (view.context as Activity).window
+            val controller = WindowInsetsControllerCompat(window, view)
+            darkStatusBarHolds.acquire(window)
             controller.isAppearanceLightStatusBars = false
-            onDispose { controller.isAppearanceLightStatusBars = !isDark }
+            onDispose {
+                if (darkStatusBarHolds.release(window)) {
+                    controller.isAppearanceLightStatusBars = !isDark
+                }
+            }
         }
     }
 }
+
+/**
+ * The live [DarkStatusBarEffect]s per window. [DetailOverlayTopBar] reads it too: a live hold means a
+ * hero sits under the bar, and only then does the bar keep the icons light at rest.
+ */
+internal val darkStatusBarHolds = StatusBarHolds<Window>()
 
 @Composable
 fun DetailHero(
@@ -101,7 +117,6 @@ fun DetailHero(
             contentDescription = title,
             richBackdrop = richBackdrop,
         )
-        HeroFootBlend(Modifier.align(Alignment.BottomStart))
 
         if (showChrome) {
             ExpressiveIconButton(
@@ -140,9 +155,10 @@ fun DetailHero(
 }
 
 /**
- * The imagery layer a hero sits on: the backdrop (with its loading/error plate) under the standard
- * scrim, so copy over it stays legible whatever the artwork is. [richBackdrop] adds the
- * MeshGradientPainter tonal wash between the two, which the title heroes opt into.
+ * The imagery layer a hero sits on: the backdrop (with its loading/error plate) under the black
+ * status-bar band. [richBackdrop] adds the MeshGradientPainter tonal wash between the two, which the
+ * title heroes opt into. The copy brings its own backing: put [heroCopyFade] on the column that
+ * holds it.
  *
  * Public so a hero speaking a different vocabulary — `CollectionHero`, which has no tagline, genres
  * or single-title meta line — can reuse the imagery without inheriting [DetailHero]'s slots.
@@ -164,8 +180,10 @@ fun HeroBackdrop(
             error = { ImagePlaceholder(Modifier.fillMaxSize()) },
         )
         if (richBackdrop) {
+            // The fixed amber, not primary: the wash sits on raw art in both themes, and light primary
+            // is a burnt amber tuned for text on a white page, which turns muddy there.
             HeroBackdropMeshWash(
-                accentStart = MaterialTheme.colorScheme.primary,
+                accentStart = MaterialTheme.colorScheme.primaryFixedDim,
                 accentEnd = BingeTheme.colors.accentPurple,
             )
         }
@@ -173,12 +191,16 @@ fun HeroBackdrop(
     }
 }
 
+/**
+ * The black band under the status bar: strongest at the top edge and clear by a quarter of the way
+ * down. It keeps the light status bar icons [DarkStatusBarEffect] sets legible over any art. Black in
+ * both themes, because those icons are light in both themes.
+ *
+ * It no longer backs the copy. [HeroTextColumn] carries its own [heroCopyFade] in the page colour, so
+ * the copy reads in `onBackground` and a light theme ends the hero on its own white page.
+ */
 @Composable
 private fun HeroScrim() {
-    // Always-black rather than theme-following: this sits directly over unpredictable backdrop
-    // imagery with no compensating scrim of its own (unlike DetailCinematicHeader's CinematicScrim,
-    // which has CinematicSideScrim to guarantee coverage where its title lands), so only a
-    // guaranteed-dark backing keeps the title/tagline/meta legible regardless of what's underneath.
     val scrim = BingeTheme.colors.scrim
     Box(
         modifier = Modifier
@@ -187,31 +209,16 @@ private fun HeroScrim() {
                 Brush.verticalGradient(
                     0.00f to scrim.copy(alpha = HERO_SCRIM_TOP_ALPHA),
                     HERO_SCRIM_CLEAR_STOP to Color.Transparent,
-                    HERO_SCRIM_MID_STOP to scrim.copy(alpha = HERO_SCRIM_MID_ALPHA),
-                    1.00f to scrim.copy(alpha = HERO_SCRIM_BOTTOM_ALPHA),
                 ),
             ),
     )
 }
 
 /**
- * The hero's foot: the strip under the text column, faded from nothing into the page's own background,
- * so the hero ends on the colour the page below starts with rather than on [HeroScrim]'s black. It is
- * exactly the text column's bottom padding tall, so it never sits behind copy and legibility is
- * [HeroScrim]'s alone, as before. Its top adds nothing, which is what keeps the join with the scrim
- * invisible. DetailCinematicHeader already blends this way; this brings the phone hero in line.
+ * The hero's copy: title, then genres, then tagline, so the small text sits nearest the seam where
+ * [heroCopyFade] is strongest. The column runs the hero's full width, so the fade behind it does too.
+ * The title shrinks a step or two to stay on one line before it wraps; the genres take the accent.
  */
-@Composable
-private fun HeroFootBlend(modifier: Modifier = Modifier) {
-    val page = MaterialTheme.colorScheme.background
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(dimensionResource(R.dimen.detail_hero_text_bottom_padding))
-            .background(Brush.verticalGradient(0f to Color.Transparent, 1f to page)),
-    )
-}
-
 @Composable
 private fun HeroTextColumn(
     title: String,
@@ -223,50 +230,55 @@ private fun HeroTextColumn(
 ) {
     Column(
         modifier = modifier
+            .fillMaxWidth()
+            .heroCopyFade()
             .padding(
                 start = resolvedContentInset(),
                 end = resolvedContentInset(),
                 bottom = dimensionResource(R.dimen.detail_hero_text_bottom_padding),
             ),
     ) {
+        val titleStyle = MaterialTheme.typography.displaySmall
+        val lineGap = dimensionResource(R.dimen.padding_xs)
         Text(
             text = title,
-            style = MaterialTheme.typography.displaySmall,
-            color = BingeTheme.colors.onScrim,
+            style = titleStyle,
+            color = MaterialTheme.colorScheme.onBackground,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            autoSize = OneLineOrWrapAutoSize(max = titleStyle.fontSize, min = HERO_TITLE_MIN_SIZE, step = HeroTitleSizeStep),
         )
         if (!eyebrowText.isNullOrBlank()) {
-            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+            Spacer(Modifier.height(lineGap))
             Text(
-                text = eyebrowText.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
+                text = eyebrowText,
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
         }
         if (!tagline.isNullOrBlank()) {
-            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+            Spacer(Modifier.height(lineGap))
             Text(
                 text = tagline,
                 style = MaterialTheme.typography.bodyMedium,
-                color = BingeTheme.colors.onScrim.copy(alpha = 0.85f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_TAGLINE_ALPHA),
                 fontStyle = FontStyle.Italic,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }
         if (metaText.isNotBlank()) {
-            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+            Spacer(Modifier.height(lineGap))
             Text(
                 text = metaText,
                 style = MaterialTheme.typography.bodySmall,
-                color = BingeTheme.colors.onScrim.copy(alpha = 0.80f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }
         if (metaContent != null) {
-            Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+            Spacer(Modifier.height(lineGap))
             metaContent()
         }
     }

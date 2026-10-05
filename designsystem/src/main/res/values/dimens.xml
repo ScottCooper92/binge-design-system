@@ -209,7 +209,8 @@
     <dimen name="hero_indicator_size_unselected">6dp</dimen>
     <dimen name="hero_indicator_height">6dp</dimen>
     <!-- Cinematic hero: left-anchored copy column + glass trending pill + glass nav arrows. -->
-    <dimen name="hero_copy_max_width">440dp</dimen>
+    <!-- Caps the copy itself, not the copy plus its start and end insets. -->
+    <dimen name="hero_copy_max_width">560dp</dimen>
     <dimen name="hero_copy_start_padding">28dp</dimen>
     <dimen name="hero_copy_bottom_padding">28dp</dimen>
     <dimen name="hero_pill_padding_h">11dp</dimen>
@@ -221,6 +222,13 @@
     <dimen name="hero_meta_star_size">16dp</dimen>
     <dimen name="hero_meta_dot_size">3dp</dimen>
     <dimen name="hero_dots_bottom_padding">22dp</dimen>
+    <!-- The page-colour fade behind a hero's copy (heroCopyFade and the carousel's per-slide fade):
+         the eased band it rises over above the copy, and how far past the copy's end edge it falls
+         away. The carousel adds a shorter full-width band at its foot, so the art meets the page
+         cleanly across the whole width. -->
+    <dimen name="hero_copy_fade_band">72dp</dimen>
+    <dimen name="hero_copy_fade_falloff">400dp</dimen>
+    <dimen name="hero_seam_band">128dp</dimen>
     <!-- Horizontal drag distance past which a swipe advances the hero to the next/prev title. -->
     <dimen name="hero_drag_threshold">60dp</dimen>
     <!-- HintCard's dismissible form: end inset so wrapped text clears the close IconButton in the

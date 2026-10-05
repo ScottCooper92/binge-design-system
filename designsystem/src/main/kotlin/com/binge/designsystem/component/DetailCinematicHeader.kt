@@ -1,6 +1,5 @@
 package com.binge.designsystem.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,19 +18,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.R
@@ -39,19 +49,13 @@ import com.binge.designsystem.component.HeroBackdropMeshWash
 import com.binge.designsystem.component.ImagePlaceholder
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
-import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
 
-private const val CINEMATIC_SCRIM_MID_ALPHA = 0.55f
-private const val CINEMATIC_SCRIM_BOTTOM_ALPHA = 0.90f
-private const val CINEMATIC_SCRIM_MID_STOP = 0.62f
-private const val CINEMATIC_SCRIM_DEEP_STOP = 0.88f
-private const val CINEMATIC_SIDE_SCRIM_ALPHA = 0.80f
-private const val CINEMATIC_SIDE_SCRIM_MID_ALPHA = 0.45f
-private const val CINEMATIC_SIDE_SCRIM_MID_STOP = 0.45f
-private const val CINEMATIC_SIDE_SCRIM_CLEAR_STOP = 0.85f
 private const val CINEMATIC_SYNOPSIS_ALPHA = 0.85f
+
+/** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
+private val CINEMATIC_TITLE_MIN_SIZE = 34.sp
 
 // The poster (196dp wide, 2:3) runs ~294dp tall against a 460dp header. The copy column now fills
 // that same height and pins the facts row to its bottom edge, so this clamp is a safety cap for
@@ -60,7 +64,8 @@ private const val CINEMATIC_SYNOPSIS_MAX_LINES = 4
 
 /**
  * Immersive expanded-width detail header: full-bleed backdrop gradient-blended into the background,
- * and an inline poster beside a copy column (title → eyebrow → [synopsis] → [stats]). Sizes to its
+ * and an inline poster beside a copy column (title → genres → [tagline] → [synopsis] → [stats]). The
+ * copy sits at the column's foot, just above the facts row, so the fade behind it can stay low. Sizes to its
  * container width so it composes correctly in a side pane; the height is the fixed cinematic header
  * height. The expanded counterpart to [DetailHero]; the single-column detail keeps using
  * [DetailHero].
@@ -74,6 +79,12 @@ private const val CINEMATIC_SYNOPSIS_MAX_LINES = 4
  * detail widths share — a header that carried its own controls scrolled them away with itself and
  * left no way back, and its controls collided with this poster once the status bar inset grew past
  * 46dp (as it does on a large foldable).
+ *
+ * The backing behind the copy hugs it rather than covering the art. [CopyHuggingScrim] fades the page
+ * colour up behind the title, genres, tagline and synopsis and falls away past the widest of them, so a short
+ * title leaves the far side of the art raw. A second, stronger band runs the full width behind the
+ * facts row, which spans it. Both are placed from the copy's measured bounds, so they follow a title
+ * that wraps or a tagline that is missing.
  */
 @Composable
 fun DetailCinematicHeader(
@@ -88,12 +99,17 @@ fun DetailCinematicHeader(
     // initiallyOverflowing does, and for the same reason: onTextLayout fires a frame too late for
     // the preview screenshot lane. Preview and test use only.
     synopsisInitiallyOverflowing: Boolean = false,
+    // An italic line under the genres, for a caller that shows the synopsis further down the page.
+    tagline: String? = null,
 ) {
     val eyebrow = genres.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    var headerOrigin by remember { mutableStateOf(Offset.Zero) }
+    val copyBounds = remember { CinematicCopyBounds() }
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(dimensionResource(R.dimen.detail_cinematic_header_height)),
+            .height(dimensionResource(R.dimen.detail_cinematic_header_height))
+            .onGloballyPositioned { headerOrigin = it.positionInRoot() },
     ) {
         SubcomposeAsyncImage(
             model = backdropUrl,
@@ -111,80 +127,32 @@ fun DetailCinematicHeader(
             accentStart = MaterialTheme.colorScheme.primary,
             accentEnd = BingeTheme.colors.accentPurple,
         )
-        CinematicScrim()
-        CinematicSideScrim()
+        CopyHuggingScrim(copyBounds, headerOrigin)
 
         CinematicCopyRow(
             title = title,
             eyebrow = eyebrow,
+            tagline = tagline,
             synopsis = synopsis,
             stats = stats,
             posterUrl = posterUrl,
             synopsisInitiallyOverflowing = synopsisInitiallyOverflowing,
+            copyBounds = copyBounds,
             modifier = Modifier.align(Alignment.BottomStart),
         )
     }
 }
 
 @Composable
-private fun CinematicScrim() {
-    // Theme-following rather than the black-always default — the header runs to the same app
-    // background at its lower edge, so a black scrim landing there would read as a mismatch the
-    // moment it faded in over a light theme. Safe here, unlike DetailHero's own HeroScrim (which
-    // stays black-always), because CinematicSideScrim gives the title real guaranteed coverage
-    // independent of this ramp's own thin band at the title's vertical position.
-    //
-    // Clear until the mid stop — no top wash. The pinned DetailOverlayTopBar draws no chrome here
-    // either, but its own Glass-toned icons carry their own translucent backing regardless of what's
-    // behind them, so they don't need this scrim's help for contrast.
-    val scrim = MaterialTheme.colorScheme.background
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    0.00f to Color.Transparent,
-                    CINEMATIC_SCRIM_MID_STOP to scrim.copy(alpha = CINEMATIC_SCRIM_MID_ALPHA),
-                    CINEMATIC_SCRIM_DEEP_STOP to scrim.copy(alpha = CINEMATIC_SCRIM_BOTTOM_ALPHA),
-                    1.00f to scrim,
-                ),
-            ),
-    )
-}
-
-/**
- * The start-side ramp the poster and copy sit on. [CinematicScrim] runs vertically and is at its
- * clearest at the very top of the header — which is exactly where the poster's top edge and the
- * title begin, so on a bright backdrop they land on the one band that darkens nothing.
- *
- * Horizontal rather than a deeper vertical ramp because the content it protects is start-aligned:
- * this darkens behind it and leaves the end of the backdrop — the half the image is composed
- * around — as visible as before.
- */
-@Composable
-private fun CinematicSideScrim() {
-    val scrim = MaterialTheme.colorScheme.background
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                startHorizontalGradient(
-                    0f to scrim.copy(alpha = CINEMATIC_SIDE_SCRIM_ALPHA),
-                    CINEMATIC_SIDE_SCRIM_MID_STOP to scrim.copy(alpha = CINEMATIC_SIDE_SCRIM_MID_ALPHA),
-                    CINEMATIC_SIDE_SCRIM_CLEAR_STOP to Color.Transparent,
-                ),
-            ),
-    )
-}
-
-@Composable
 private fun CinematicCopyRow(
     title: String,
     eyebrow: String?,
+    tagline: String?,
     synopsis: String?,
     stats: List<DetailStat>,
     posterUrl: String?,
     synopsisInitiallyOverflowing: Boolean,
+    copyBounds: CinematicCopyBounds,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -214,40 +182,147 @@ private fun CinematicCopyRow(
             error = { ImagePlaceholder(Modifier.fillMaxSize()) },
         )
         Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+            // Pushes the copy down to sit just above the facts row, so the fade behind it stays low
+            // and the art above it stays raw.
+            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.onGloballyPositioned { copyBounds.copyTop = it.positionInRoot().y })
+            val titleStyle = MaterialTheme.typography.displayMedium
+            val lineGap = dimensionResource(R.dimen.padding_xs)
             Text(
                 text = title,
-                style = MaterialTheme.typography.displayMedium,
+                modifier = reportsLineEnd(copyBounds, CopyLine.Title),
+                style = titleStyle,
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+                autoSize = OneLineOrWrapAutoSize(
+                    max = titleStyle.fontSize,
+                    min = CINEMATIC_TITLE_MIN_SIZE,
+                    step = HeroTitleSizeStep,
+                ),
             )
             if (!eyebrow.isNullOrBlank()) {
-                Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
+                Spacer(Modifier.height(lineGap))
                 Text(
-                    text = eyebrow.uppercase(),
-                    style = MaterialTheme.typography.labelSmall,
+                    text = eyebrow,
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Genres),
+                    style = MaterialTheme.typography.labelLarge,
                     // Matches DetailHero and the TV hero, both of which key genres off the theme's
-                    // accent rather than onScrim.
+                    // accent.
                     color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            if (!tagline.isNullOrBlank()) {
+                Spacer(Modifier.height(lineGap))
+                Text(
+                    text = tagline,
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Tagline),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             if (!synopsis.isNullOrBlank()) {
                 Spacer(Modifier.height(dimensionResource(R.dimen.detail_cinematic_copy_spacing)))
-                CinematicSynopsis(synopsis, initiallyOverflowing = synopsisInitiallyOverflowing)
+                CinematicSynopsis(
+                    synopsis,
+                    initiallyOverflowing = synopsisInitiallyOverflowing,
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Synopsis),
+                )
             }
-            // Absorbs whatever's left, so the facts row below always sits at the poster's bottom
-            // edge instead of trailing directly under a short synopsis.
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(dimensionResource(R.dimen.detail_cinematic_copy_spacing)))
             if (stats.isNotEmpty()) {
+                DisposableEffect(copyBounds) { onDispose { copyBounds.statsTop = null } }
                 DetailStatRow(
                     stats = stats,
                     valueColor = MaterialTheme.colorScheme.onBackground,
                     labelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
-                    modifier = Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)),
+                    modifier = Modifier
+                        .layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS))
+                        .onGloballyPositioned { copyBounds.statsTop = it.positionInRoot().y },
                 )
             }
         }
     }
+}
+
+/** The copy lines whose end edges [CopyHuggingScrim] falls away from. */
+private enum class CopyLine { Title, Genres, Tagline, Synopsis }
+
+/**
+ * Where the cinematic copy sits, in root coordinates, as the layout reports it: the top of the copy,
+ * the end edge of each copy line, and the top of the facts row.
+ */
+@Stable
+private class CinematicCopyBounds {
+    var copyTop by mutableStateOf<Float?>(null)
+    var statsTop by mutableStateOf<Float?>(null)
+
+    /** Each line's horizontal extent, as (left, right). */
+    val lines = mutableStateMapOf<CopyLine, Pair<Float, Float>>()
+
+    /**
+     * The copy's end edge, in root coordinates: the furthest right of any line in a left-to-right
+     * layout, the furthest left in a right-to-left one.
+     */
+    fun copyEnd(layoutDirection: LayoutDirection): Float? =
+        if (layoutDirection == LayoutDirection.Rtl) {
+            lines.values.minOfOrNull { it.first }
+        } else {
+            lines.values.maxOfOrNull { it.second }
+        }
+}
+
+/**
+ * Reports [line]'s extent into [bounds] and forgets it when the line leaves composition, so a header
+ * reused for another title does not fade around a line that is no longer there.
+ */
+@Composable
+private fun reportsLineEnd(bounds: CinematicCopyBounds, line: CopyLine): Modifier {
+    DisposableEffect(bounds, line) { onDispose { bounds.lines.remove(line) } }
+    return Modifier.onGloballyPositioned {
+        val left = it.positionInRoot().x
+        bounds.lines[line] = left to left + it.size.width
+    }
+}
+
+/**
+ * The page-colour backing behind the cinematic copy, in two layers.
+ *
+ * The copy fade eases in over [R.dimen.hero_copy_fade_band] above the title, is 45% at the title and
+ * solid at the header's foot. It is masked horizontally: full behind the copy, falling away over
+ * [R.dimen.hero_copy_fade_falloff] past the widest copy line, so the art beyond a short title stays
+ * raw.
+ *
+ * The stats band runs the full width, because the facts row does. It eases in over the same band
+ * above the row, is 62% at the row's top and 85% halfway down it, which keeps the row's small labels
+ * legible over any art, and solid at the foot.
+ *
+ * Draws nothing until the copy has been measured.
+ */
+@Composable
+private fun CopyHuggingScrim(bounds: CinematicCopyBounds, headerOrigin: Offset) {
+    val page = MaterialTheme.colorScheme.background
+    val density = LocalDensity.current
+    val bandPx = with(density) { dimensionResource(R.dimen.hero_copy_fade_band).toPx() }
+    val falloffPx = with(density) { dimensionResource(R.dimen.hero_copy_fade_falloff).toPx() }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            // The horizontal mask applies to the copy fade only, so it needs its own layer to mask into.
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            .drawWithContent {
+                val copyTop = bounds.copyTop ?: return@drawWithContent
+                val copyEnd = bounds.copyEnd(layoutDirection) ?: return@drawWithContent
+                drawPageFade(page, copyTop = copyTop - headerOrigin.y, bandPx = bandPx, ramp = CopyFadeRamp)
+                maskPastCopyEnd(copyEnd = copyEnd - headerOrigin.x, falloffPx = falloffPx)
+                bounds.statsTop?.let { statsTop ->
+                    drawPageFade(page, copyTop = statsTop - headerOrigin.y, bandPx = bandPx, ramp = StatsFadeRamp)
+                }
+            },
+    )
 }
 
 /**
@@ -262,12 +337,17 @@ private fun CinematicCopyRow(
  * only - at runtime the layout pass reports the truth.
  */
 @Composable
-private fun CinematicSynopsis(text: String, initiallyOverflowing: Boolean = false) {
+private fun CinematicSynopsis(
+    text: String,
+    modifier: Modifier = Modifier,
+    initiallyOverflowing: Boolean = false,
+) {
     var overflows by remember(text, initiallyOverflowing) { mutableStateOf(initiallyOverflowing) }
     var showSheet by remember(text) { mutableStateOf(false) }
 
     Text(
         text = text,
+        modifier = modifier,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
         maxLines = CINEMATIC_SYNOPSIS_MAX_LINES,
