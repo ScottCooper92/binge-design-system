@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="cd_navigate_back">Volver</string>
+    <string name="cd_close_sheet">Cerrar</string>
     <string name="cd_filter_state_included">Incluido</string>
     <string name="cd_filter_state_excluded">Excluido</string>
     <string name="cd_filter_state_neutral">Sin definir</string>

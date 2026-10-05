@@ -2,6 +2,7 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -10,17 +11,27 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import com.binge.designsystem.rememberFoldSafeBottomHeight
 import com.binge.designsystem.theme.BingeShapes
+import kotlinx.coroutines.launch
 
 /**
  * Wraps [ModalBottomSheet] with the binge defaults: surfaceContainerHigh container,
  * onSurface content, expressive corner radius, and `skipPartiallyExpanded = true`. For
  * advanced callers that need a reference to the sheet state, use [ModalBottomSheet] directly.
+ *
+ * [dockable] opts the sheet into docking, usually with `skipPartiallyExpanded = false` so it opens part-way: as
+ * its top edge reaches the status bar its top corners square off and [BingeSheetDockingHeader] swaps the drag handle
+ * and header for a [BingeSheetTopBar], and [bingeSheetPinnedFooter] keeps a footer on the window's bottom edge while
+ * the sheet is part-way open. Both read [LocalBingeSheetDock], which only a dockable sheet provides. A dockable sheet
+ * draws no drag handle of its own; [BingeSheetDockingHeader] draws it.
  *
  * When [gesturesEnabled] is `false` the sheet is **locked**: drag-to-dismiss / partial-collapse,
  * scrim-tap dismiss and back-press dismiss are all suppressed, so the sheet stays fully expanded
@@ -47,17 +58,31 @@ fun BingeBottomSheet(
     skipPartiallyExpanded: Boolean = true,
     gesturesEnabled: Boolean = true,
     dismissOnClickOutside: Boolean = gesturesEnabled,
+    dockable: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val foldSafeHeight = rememberFoldSafeBottomHeight()
+    val sheetState = rememberLockableSheetState(skipPartiallyExpanded, gesturesEnabled)
+    val scope = rememberCoroutineScope()
+    val dock =
+        if (dockable) {
+            rememberBingeSheetDock(sheetState) {
+                scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
+            }
+        } else {
+            null
+        }
+    val dockFraction by remember(dock) { derivedStateOf { dock?.fraction ?: 0f } }
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
         modifier = foldSafeHeight?.let { modifier.heightIn(max = it) } ?: modifier,
-        sheetState = rememberLockableSheetState(skipPartiallyExpanded, gesturesEnabled),
+        sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        shape = BingeShapes.HeroTop,
+        shape = if (dock != null) DockingSheetShape(dockFraction) else BingeShapes.HeroTop,
+        // A docking sheet draws its drag handle itself, inside BingeSheetDockingHeader, so it can fade into the bar.
+        dragHandle = if (dock != null) null else ({ BottomSheetDefaults.DragHandle() }),
         // A confirm sheet suppresses only scrim-tap dismiss (so an accidental outside tap can't
         // discard an in-progress choice) while leaving back-press and drag as deliberate cancels —
         // pass dismissOnClickOutside = false with gesturesEnabled = true for that.
@@ -65,8 +90,9 @@ fun BingeBottomSheet(
             shouldDismissOnBackPress = gesturesEnabled,
             shouldDismissOnClickOutside = dismissOnClickOutside,
         ),
-        content = content,
-    )
+    ) {
+        CompositionLocalProvider(LocalBingeSheetDock provides dock) { content() }
+    }
 }
 
 /**
