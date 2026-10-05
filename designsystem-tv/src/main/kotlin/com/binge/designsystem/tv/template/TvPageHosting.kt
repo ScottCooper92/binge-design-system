@@ -3,6 +3,7 @@ package com.binge.designsystem.tv.template
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -55,8 +56,8 @@ fun tvPagePadding(hosting: TvPageHosting): PaddingValues {
 
 /**
  * The page root's focus wiring for [hosting]: entry routed to [entry] in every mode, plus the arrival effect
- * the mode calls for. [enabled] holds the claim back until the target exists; [key] re-places a pre-shell
- * page's focus when what it shows changes (the next step).
+ * the mode calls for. [enabled] holds the claim back until the target exists; [key] re-places an overlay's or
+ * pre-shell page's focus when what it shows changes (the next step).
  */
 @Composable
 internal fun tvPageArrival(
@@ -69,8 +70,9 @@ internal fun tvPageArrival(
     return when (hosting) {
         TvPageHosting.RailDestination -> Modifier.tvEntryFocusGroup(entry)
         TvPageHosting.Overlay -> {
-            val arrival = remember(entry) { TvArrivalFocus(entry) }
-            TvArrivalFocusEffect(arrival, enabled)
+            val arrival = remember(entry, key) { TvArrivalFocus(entry) }
+            // The effect is keyed on `enabled` alone, so a new holder needs a fresh effect to be offered.
+            key(arrival) { TvArrivalFocusEffect(arrival, enabled) }
             Modifier.tvArrivalObserver(arrival).tvEntryFocusGroup(entry)
         }
         TvPageHosting.PreShell -> {

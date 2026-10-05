@@ -28,7 +28,8 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The frame every board, list and form page sits in, so none of them hand-roll the padding and background.
  * [entry] is where focus lands when it enters the page; whether the page also claims it is [hosting]'s call
- * (see [TvPageHosting]), and [arrivalEnabled] holds the claim back until the target exists.
+ * (see [TvPageHosting]), and [arrivalEnabled] holds the claim back until the target exists. [trailing] sits in
+ * the heading band, so it is not shown when [title] is null.
  */
 @Composable
 fun TvBoard(

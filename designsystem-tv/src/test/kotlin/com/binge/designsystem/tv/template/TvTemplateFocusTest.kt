@@ -25,6 +25,7 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -150,6 +151,64 @@ class TvTemplateFocusTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Retry").assertIsFocused()
+    }
+
+    @Test
+    fun `an overlay step flow re-places focus on the new step's target when the step changes`() {
+        var step by mutableIntStateOf(0)
+        composeTestRule.setContent {
+            Hosted {
+                val first = remember { FocusRequester() }
+                val second = remember { FocusRequester() }
+                TvStepFlow(
+                    stepCount = 2,
+                    currentStep = step,
+                    progressLabel = "Step ${step + 1} of 2",
+                    hosting = TvPageHosting.Overlay,
+                    entry = if (step == 0) first else second,
+                ) {
+                    if (step == 0) {
+                        Target(ENTRY, first)
+                    } else {
+                        Target(SECOND_ENTRY, second)
+                    }
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(ENTRY).assertIsFocused()
+
+        step = 1
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(SECOND_ENTRY).assertIsFocused()
+    }
+
+    @Test
+    fun `an overlay message page with no action claims focus on its sink`() {
+        composeTestRule.setContent {
+            Hosted { TvMessagePage(body = "Body", hosting = TvPageHosting.Overlay) }
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(TV_FOCUS_SINK_TAG).assertIsFocused()
+    }
+
+    @Test
+    fun `a loading overlay message page claims focus on its sink`() {
+        composeTestRule.setContent {
+            Hosted {
+                TvMessagePage(
+                    body = "Body",
+                    hosting = TvPageHosting.Overlay,
+                    primary = TvPageAction("Retry") {},
+                    loading = true,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(TV_FOCUS_SINK_TAG).assertIsFocused()
     }
 
     @Composable

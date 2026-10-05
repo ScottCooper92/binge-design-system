@@ -105,8 +105,6 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.text.google.fonts)
     implementation(libs.androidx.core.ktx)
-    // The step-flow templates install the system Back handler for the step they show.
-    implementation(libs.androidx.activity.compose)
     implementation(libs.material.color.utilities)
     // Foldable posture: WindowInfoTracker/FoldingFeature behind rememberHorizontalHinge.
     implementation(libs.androidx.window)

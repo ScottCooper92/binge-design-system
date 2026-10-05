@@ -45,16 +45,24 @@ fun TvMessagePage(
     loading: Boolean = false,
 ) {
     val entry = remember { FocusRequester() }
+    val sinkEntry = remember { FocusRequester() }
     val hasAction = !loading && primary != null
+    val arrival =
+        tvPageArrival(
+            hosting = hosting,
+            entry = if (hasAction) entry else sinkEntry,
+            enabled = true,
+            key = if (hasAction) primary?.label else null,
+        )
     Box(
         modifier =
             modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .then(tvPageArrival(hosting, entry.takeIf { hasAction }, enabled = hasAction, key = primary?.label))
+                .then(arrival)
                 .padding(tvPagePadding(hosting)),
     ) {
-        if (!hasAction) TvFocusSink()
+        if (!hasAction) Box(Modifier.focusRequester(sinkEntry)) { TvFocusSink() }
         TvMessagePlate(
             body = body,
             headline = headline,
