@@ -30,6 +30,7 @@ import com.binge.designsystem.tv.component.TvDetailAction
 import com.binge.designsystem.tv.component.TvDetailActionRow
 import com.binge.designsystem.tv.component.TvDetailHero
 import com.binge.designsystem.tv.component.TvDetailHeroItem
+import com.binge.designsystem.tv.component.TvHeroOverview
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
@@ -67,7 +68,7 @@ private fun sampleActions(): List<TvDetailAction> =
     )
 
 @Composable
-private fun SampleHero() {
+private fun SampleHero(entryFocus: FocusRequester, synopsisFocused: Boolean = false) {
     TvDetailHero(
         item = SampleHeroItem,
         artwork = {
@@ -80,17 +81,23 @@ private fun SampleHero() {
                         ),
             )
         },
+        overview = if (synopsisFocused) {
+            TvHeroOverview(isFocused = true, onFocusChanged = {}, onClick = {})
+        } else {
+            null
+        },
         poster = { Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) },
     ) {
-        TvDetailActionRow(actions = sampleActions(), entryFocus = remember { FocusRequester() })
+        TvDetailActionRow(actions = sampleActions(), entryFocus = entryFocus)
     }
 }
 
 @Composable
-private fun SampleDetailPage(initialFocusedSectionKey: String? = null) {
+private fun SampleDetailPage(initialFocusedSectionKey: String? = null, synopsisFocused: Boolean = false) {
+    val entryFocus = remember { FocusRequester() }
     OverlayHosted {
-        TvDetailPage(initialFocusedSectionKey = initialFocusedSectionKey) {
-            hero { SampleHero() }
+        TvDetailPage(entryFocus = entryFocus, initialFocusedSectionKey = initialFocusedSectionKey) {
+            hero { SampleHero(entryFocus, synopsisFocused) }
             section(SECTION_KEY) { onFocused ->
                 SampleCardRow(heading = "Seasons requested", onFocused = onFocused)
             }
@@ -134,6 +141,12 @@ fun TvDetailPageSample() {
 @Composable
 fun TvDetailPageFocusedSample() {
     SampleDetailPage(initialFocusedSectionKey = SECTION_KEY)
+}
+
+/** The synopsis as a focusable block: the hero's one focus stop when a band has no action row, drawn with its ring. */
+@Composable
+fun TvDetailPageSynopsisFocusedSample() {
+    SampleDetailPage(synopsisFocused = true)
 }
 
 /** The action row: one labelled primary, labelled secondary actions where a bare glyph would not name them, and icons. */

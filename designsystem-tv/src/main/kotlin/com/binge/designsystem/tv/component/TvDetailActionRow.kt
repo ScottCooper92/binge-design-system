@@ -72,7 +72,8 @@ fun TvDetailActionRow(
 
 /**
  * One action in a [TvDetailActionRow]. [isPrimary] marks the row's one emphasised lead action — a filled, labelled
- * pill; every other action is icon-only, with [label] as its accessible name. [focusRequester] lets a caller hand
+ * pill; every other action is an icon button with [label] as its accessible name, or a labelled button when
+ * [showLabel] is set. [focusRequester] lets a caller hand
  * focus back to this action after a sheet it opened closes.
  */
 data class TvDetailAction(

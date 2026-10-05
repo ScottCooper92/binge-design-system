@@ -25,7 +25,7 @@ import com.binge.designsystem.theme.BingeTheme
 /**
  * The backdrop is not full-bleed: it fills the right [BACKDROP_WIDTH_FRACTION] of its band, end-aligned, so
  * the copy sits on clean surface and the still reads as an intentional panel rather than a dim wash behind
- * the whole band. Shared by every hero band, so they cannot drift.
+ * the whole band.
  */
 internal const val BACKDROP_WIDTH_FRACTION = 0.62f
 
@@ -64,30 +64,26 @@ private const val MESH_ACCENT_ALPHA = 0.22f
 private const val MESH_ANCHOR_ALPHA = 0.10f
 
 /**
- * The end-aligned artwork panel shared by every hero band: [artwork] filling the right
- * [BACKDROP_WIDTH_FRACTION] of its band, veiled by a horizontal scrim that melts into [veilColor] at its
- * left edge, holds past the copy, then opens to near-clear at the right. The scrim lives **inside** the
- * panel so it veils the still, not the whole band.
+ * The end-aligned artwork panel of [TvDetailHero]: [artwork] filling the right [BACKDROP_WIDTH_FRACTION] of
+ * its band, veiled by a horizontal scrim that melts into [veilColor] at its left edge, holds past the copy,
+ * then opens to near-clear at the right. The scrim lives **inside** the panel so it veils the still, not the
+ * whole band.
  *
  * [veilColor] is the surface the panel sits on, so the veil dissolves into it seamlessly rather than showing
- * a two-tone edge: the page `background` for all three callers — the detail hero's unbounded band over the
- * detail screen's opaque base, the season board's band above the tabs, and the hub hero's bounded card,
- * filled with that same `background` so the card melts into the page rather than reading as a lighter box.
+ * a two-tone edge.
  *
- * [bedFoot] adds a vertical veil landing full [veilColor] at the foot. The detail hero and the season board
- * need it — below their bands is flat `background`, so a hard artwork edge there would seam; the hub's panel
- * fills a self-contained card with nothing below it, so it passes false.
+ * [bedFoot] adds a vertical veil landing full [veilColor] at the foot. Below the band is flat `background`,
+ * so a hard artwork edge there would seam.
  *
  * [artwork] is a slot because a screenshot has no network — a default-only panel would only bake its
- * fallback plate. The season board also crossfades inside that slot, so its still swaps under a still veil.
+ * fallback plate.
  *
  * [richBackdrop] opts the panel into a `MeshGradientPainter` tonal wash (Compose 1.12) drawn between the
  * still and the veil — a soft, non-linear pull of two accent tones into the still, richer than the flat
- * veil alone. Only the detail hero asks for it; the hub, season board and episode still keep the plain
- * veil so their renders are unchanged. It sits under the veil, so legibility is untouched.
+ * veil alone. It sits under the veil, so legibility is untouched.
  */
 @Composable
-fun BoxScope.TvHeroArtworkPanel(
+internal fun BoxScope.TvHeroArtworkPanel(
     veilColor: Color,
     bedFoot: Boolean,
     richBackdrop: Boolean = false,
@@ -123,7 +119,7 @@ fun BoxScope.TvHeroArtworkPanel(
  * The colours swap rather than the coordinates: a mesh patch is defined by its vertex winding, and mirroring
  * x would invert it rather than reflect it.
  *
- * Clipped to bounds for the same reason as the phone hero's mesh wash: a mesh patch's edges are cubic beziers that
+ * Clipped to bounds because a mesh patch's edges are cubic beziers that
  * bow outside the box, and `paint` does not clip. The transparent bottom row means nothing can pool past the
  * foot, but the top row's accent would otherwise bleed above the panel.
  */

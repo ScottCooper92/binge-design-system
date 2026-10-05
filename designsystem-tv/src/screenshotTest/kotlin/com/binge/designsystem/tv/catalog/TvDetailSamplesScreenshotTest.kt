@@ -22,6 +22,11 @@ class TvDetailSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pageSynopsisFocused() = Frame { TvDetailPageSynopsisFocusedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun actionRow() = Frame { TvDetailActionRowSample() }
 
     @Composable

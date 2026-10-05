@@ -71,10 +71,6 @@ fun TvDetailPage(
     initialFocusedSectionKey: String? = null,
     listState: LazyListState? = null,
     contentPadding: PaddingValues = PaddingValues(bottom = dimensionResource(TvR.dimen.tv_detail_page_content_bottom)),
-    // Gates rememberAnchorKeeper's corrective scroll below. Every real caller leaves this at its default;
-    // TvDetailPageScrollContractTest sets it false to read rememberLazyListState's own restored
-    // position with no chance of this correction supplying it instead.
-    anchorCorrectionEnabled: Boolean = true,
     sections: TvDetailPageScope.() -> Unit,
 ) {
     val entries = TvDetailPageScope().apply(sections).entries
@@ -106,8 +102,7 @@ fun TvDetailPage(
         scrollTarget,
         focusedItemKey,
         shouldScroll = {
-            anchorCorrectionEnabled &&
-                (scrollTarget != state.firstVisibleItemIndex || scrollOffset != state.firstVisibleItemScrollOffset)
+            scrollTarget != state.firstVisibleItemIndex || scrollOffset != state.firstVisibleItemScrollOffset
         },
     ) {
         if (reduceMotion) {
@@ -175,8 +170,7 @@ class TvDetailPageScope internal constructor() {
 
     /**
      * A content section, anchored to `tv_detail_page_section_anchor_top` when it holds focus. [content]
-     * receives a reporter to chain into the row's per-cell focus callback ([TvCardRow.onCellFocused],
-     * [TvMediaRow]'s `onItemFocused`) so a sideways move re-asserts the anchor.
+     * receives a reporter to chain into the row's per-cell focus callback ([TvCardRow]'s `onCellFocused`) so a sideways move re-asserts the anchor.
      */
     fun section(key: String, content: @Composable (onItemFocused: (Any) -> Unit) -> Unit) {
         entries += TvDetailPageEntry(key, content)
