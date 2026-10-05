@@ -62,7 +62,7 @@ data class TvHubRow<T>(
     val key: String,
     val title: String,
     val items: List<T>,
-    /** The row's end tile, opening the whole set behind it; null means the row has none. */
+    /** The row's end tile, opening the whole set behind it; null means the row has none. Shown only when the hub is given a `seeAllLabel`. */
     val onSeeAll: (() -> Unit)? = null,
 )
 
@@ -120,12 +120,14 @@ fun <T : Any> TvImmersiveHub(
     initialFocused: Pair<String, Int>? = null,
     entryFocusRequester: FocusRequester? = null,
     hosting: TvPageHosting = currentTvPageHosting(),
-    seeAllLabel: String = "",
+    seeAllLabel: String? = null,
     // Where a caller aims focus on the tile of a row (to restore it after the set it opened closes).
     seeAllModifier: (rowKey: String) -> Modifier = { Modifier },
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, onClick: () -> Unit, cellModifier: Modifier) -> Unit,
 ) {
     val hasHero = hero != null
+    // The rows the list lays out; every index below is a slot in this list, so an empty row cannot shift them.
+    val visibleRows = rows.filter { it.items.isNotEmpty() }
     var focusedRowKey by rememberSaveable { mutableStateOf(initialFocused?.first) }
     var heroHasFocus by remember { mutableStateOf(false) }
     var bodyHasFocus by remember { mutableStateOf(false) }
@@ -147,7 +149,7 @@ fun <T : Any> TvImmersiveHub(
     val settledRowKey = rememberSettledFocus(focusedRowKey, reduceMotion)
     // The hero is the resting state; without one the backdrop is never "resting", it just shows the first item.
     val showHero = hasHero && (heroHasFocus || settledItem == null || (!bodyHasFocus && entryRowKey == null))
-    val restingItem = if (hasHero) null else rows.firstOrNull { it.items.isNotEmpty() }?.items?.first()
+    val restingItem = if (hasHero) null else visibleRows.firstOrNull()?.items?.first()
     val backdropItem = if (showHero) null else (settledItem ?: restingItem)
     val bursting = rememberBursting(focusedRowKey)
 
@@ -155,7 +157,7 @@ fun <T : Any> TvImmersiveHub(
     val contentTopPx = with(LocalDensity.current) { contentTop.roundToPx() }
     // Seeded, not only driven: a static frame runs no coroutines, so a baseline relying on the anchor effect below
     // would capture an unscrolled list.
-    val initialIndex = initialFocused?.let { (rowKey, _) -> rows.indexOfFirst { it.key == rowKey }.takeIf { it >= 0 }?.plus(1) } ?: 0
+    val initialIndex = initialFocused?.let { (rowKey, _) -> visibleRows.indexOfFirst { it.key == rowKey }.takeIf { it >= 0 }?.plus(1) } ?: 0
     val listState =
         rememberLazyListState(
             initialFirstVisibleItemIndex = initialIndex,
@@ -163,9 +165,9 @@ fun <T : Any> TvImmersiveHub(
         )
     // List slot 0 is the hero, or a spacer of the same band so the rows sit under the copy either way.
     val heroSlots = 1
-    val focusedIndex = rows.indexOfFirst { it.key == focusedRowKey }
+    val focusedIndex = visibleRows.indexOfFirst { it.key == focusedRowKey }
     val scrollTarget = if (showHero || focusedIndex < 0) 0 else focusedIndex + heroSlots
-    val settledRowIndex = rows.indexOfFirst { it.key == settledRowKey }
+    val settledRowIndex = visibleRows.indexOfFirst { it.key == settledRowKey }
     val movingUp = focusedIndex >= 0 && settledRowIndex >= 0 && focusedIndex < settledRowIndex
     val clipTarget = if ((bursting || focusedRowKey != settledRowKey) && movingUp) settledRowIndex + heroSlots else scrollTarget
     val scrollOffset = if (scrollTarget == 0) 0 else -contentTopPx
@@ -188,7 +190,7 @@ fun <T : Any> TvImmersiveHub(
             }
         }
     // Without a hero, entry from outside (the rail) lands on the first row.
-    val effectiveEntryKey = entryRowKey ?: if (hasHero) null else rows.firstOrNull { it.items.isNotEmpty() }?.key
+    val effectiveEntryKey = entryRowKey ?: if (hasHero) null else visibleRows.firstOrNull()?.key
 
     Box(modifier = modifier.fillMaxSize().onFocusChanged(reportBodyFocus)) {
         TvImmersiveBackdrop(item = backdropItem, artwork = artwork, copy = copy)
@@ -200,7 +202,7 @@ fun <T : Any> TvImmersiveHub(
                         .fillMaxSize()
                         .immersiveTopClip(enabled = !showHero, listTopClip(listState) { clipTarget })
                         // Do not set userScrollEnabled = false: focus search reaches off-screen lazy items through the scroll machinery.
-                        .then(tvPageArrival(hosting, hubEntry, enabled = rows.any { it.items.isNotEmpty() }, key = Unit)),
+                        .then(tvPageArrival(hosting, hubEntry, enabled = visibleRows.isNotEmpty(), key = Unit)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_row_gap)),
                 // Lets the last row scroll up to the anchor.
                 contentPadding = PaddingValues(bottom = dimensionResource(TvR.dimen.tv_immersive_rows_bottom)),
@@ -222,7 +224,7 @@ fun <T : Any> TvImmersiveHub(
                         Spacer(Modifier.fillMaxWidth().height(contentTop))
                     }
                 }
-                items(items = rows.filter { it.items.isNotEmpty() }, key = { it.key }) { row ->
+                items(items = visibleRows, key = { it.key }) { row ->
                     TvCardRow(
                         items = row.items,
                         key = itemId,
@@ -231,7 +233,7 @@ fun <T : Any> TvImmersiveHub(
                         entryFocusRequester = hubEntry.takeIf { row.key == effectiveEntryKey },
                         initiallyFocusedKey = initialFocused?.takeIf { it.first == row.key }?.second,
                         overrideIndex =
-                            if (seeAllRowKey == row.key && row.onSeeAll != null) {
+                            if (seeAllRowKey == row.key && row.onSeeAll != null && seeAllLabel != null) {
                                 row.items.size
                             } else {
                                 rowMemory[row.key]?.let { id -> row.items.indexOfFirst { itemId(it) == id }.takeIf { it >= 0 } }
@@ -248,10 +250,10 @@ fun <T : Any> TvImmersiveHub(
                             }
                         },
                         trailing =
-                            row.onSeeAll?.let { onSeeAll ->
+                            row.onSeeAll?.takeIf { seeAllLabel != null }?.let { onSeeAll ->
                                 { isFocused, onFocusChanged, cellModifier ->
                                     TvSeeAllTile(
-                                        label = seeAllLabel,
+                                        label = seeAllLabel.orEmpty(),
                                         isFocused = isFocused,
                                         onFocusChanged = onFocusChanged,
                                         onClick = onSeeAll,

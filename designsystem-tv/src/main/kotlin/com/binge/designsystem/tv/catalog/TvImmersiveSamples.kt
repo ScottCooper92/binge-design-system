@@ -14,10 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -39,7 +35,7 @@ import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 private const val ROW_ITEM_COUNT = 8
-private const val SEE_ALL_AFTER = 7
+private const val TONE_COUNT = 7
 
 private data class SampleTitle(
     val id: Int,
@@ -87,7 +83,7 @@ private fun RailHosted(content: @Composable () -> Unit) {
 /** The hub's cards, in a spread of container tones so a frame reads as a run of different posters. */
 @Composable
 private fun sampleTone(id: Int): Color =
-    when (id % SEE_ALL_AFTER) {
+    when (id % TONE_COUNT) {
         0 -> MaterialTheme.colorScheme.primaryContainer
         1 -> MaterialTheme.colorScheme.secondaryContainer
         2 -> MaterialTheme.colorScheme.tertiaryContainer
@@ -100,7 +96,6 @@ private fun SampleHub(
     initialFocused: Pair<String, Int>? = null,
     rows: List<TvHubRow<SampleTitle>> = SampleRows,
 ) {
-    var focusedId by remember { mutableStateOf(initialFocused?.second) }
     RailHosted {
         TvImmersiveHub(
             rows = rows,
@@ -149,10 +144,7 @@ private fun SampleHub(
                         .clip(BingeShapes.MediaCard)
                         .background(sampleTone(title.id))
                         .tvClickable(
-                            onFocusChanged = {
-                                if (it) focusedId = title.id
-                                onFocusChanged(it)
-                            },
+                            onFocusChanged = onFocusChanged,
                             onClick = onClick,
                         ),
             )
@@ -195,6 +187,15 @@ fun TvImmersiveHubHeroSample() {
 @Composable
 fun TvImmersiveHubFocusedSample() {
     SampleHub(initialFocused = "approved" to 202)
+}
+
+/** An empty first row is skipped: focus on the row after it still anchors that row, not the one below. */
+@Composable
+fun TvImmersiveHubEmptyRowSample() {
+    SampleHub(
+        initialFocused = "approved" to 202,
+        rows = listOf(TvHubRow<SampleTitle>(key = "pending", title = "Pending (0)", items = emptyList())) + SampleRows.drop(1),
+    )
 }
 
 /** The tile that closes a row, at rest and focused, beside each other. */

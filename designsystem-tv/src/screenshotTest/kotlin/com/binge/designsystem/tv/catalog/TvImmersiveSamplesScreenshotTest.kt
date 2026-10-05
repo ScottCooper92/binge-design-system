@@ -27,6 +27,11 @@ class TvImmersiveSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun hubEmptyRow() = Frame { TvImmersiveHubEmptyRowSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun seeAllTile() = Frame { TvSeeAllTileSample() }
 
     @Composable
