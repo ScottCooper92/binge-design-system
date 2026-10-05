@@ -315,7 +315,7 @@ fun StepFlowScreenLoadingSample() {
 }
 
 @Composable
-internal fun SampleRows(padding: PaddingValues) {
+private fun SampleRows(padding: PaddingValues) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = padding.screenListPadding(),

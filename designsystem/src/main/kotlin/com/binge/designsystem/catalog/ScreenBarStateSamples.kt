@@ -24,7 +24,7 @@ import com.binge.designsystem.template.ScreenBar
 import com.binge.designsystem.template.screenListPadding
 
 /*
- * The scaffold's bar at the three moments a frame at rest cannot show, for each bar type. The bar's state is
+ * The scaffold's bar in three states, for each bar type. The bar's state is
  * seeded and handed in as the scroll behaviour, which is how a caller that owns the state uses it too.
  */
 
@@ -38,7 +38,7 @@ fun BingeScreenScaffoldScrolledUnderSample() = BarStateSample(ScreenBar.Collapsi
 
 /** The collapsing bar fully collapsed over scrolled rows, as it sits once the body has moved on. */
 @Composable
-fun BingeScreenScaffoldShownOverContentSample() = BarStateSample(ScreenBar.Collapsing, collapsed = 0f, overlapped = 1f)
+fun BingeScreenScaffoldShownOverContentSample() = BarStateSample(ScreenBar.Collapsing, collapsed = 1f, overlapped = 1f)
 
 /** The collapsing bar with no way back, as on a screen that is the root of its stack. */
 @Composable
@@ -65,7 +65,13 @@ private fun BarStateSample(
     overlapped: Float,
     hasBack: Boolean = true,
 ) {
-    val limit = with(LocalDensity.current) { TopAppBarDefaults.TopAppBarExpandedHeight.toPx() }
+    // The limit the bar itself works to: the medium bar collapses by the difference of its two heights.
+    val travel = if (bar == ScreenBar.Collapsing) {
+        TopAppBarDefaults.MediumAppBarExpandedHeight - TopAppBarDefaults.MediumAppBarCollapsedHeight
+    } else {
+        TopAppBarDefaults.TopAppBarExpandedHeight
+    }
+    val limit = with(LocalDensity.current) { travel.toPx() }
     val state = rememberTopAppBarState(
         initialHeightOffsetLimit = -limit,
         initialHeightOffset = -limit * collapsed,
