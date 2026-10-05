@@ -349,4 +349,6 @@
     <!-- MonthYearPicker: outline of the chosen month/year pill, and the horizontal padding that sizes the pill to its label inside the full-width touch cell -->
     <dimen name="month_year_picker_selected_border">2dp</dimen>
     <dimen name="month_year_picker_pill_padding_h">20dp</dimen>
+    <!-- How far before docking under the status bar a BingeBottomSheet crossfades its header into its docked top bar. -->
+    <dimen name="sheet_dock_travel">28dp</dimen>
 </resources>
