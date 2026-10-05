@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.theme.LocalReduceMotion
@@ -79,9 +78,10 @@ fun <T : Any> TvImmersiveGrid(
         rememberAnchorKeeper(rememberedIndex) {
             if (reduceMotion) gridState.scrollToItem(anchor) else gridState.animateScrollToItem(anchor)
         }
+    // A paged source can report a count before the remembered cell's page arrives; offering focus then would time out.
+    val rememberedLoaded = count > 0 && itemAt(rememberedIndex) != null
     val backdropItem = if (count > 0) itemAt(settledIndex.coerceIn(0, count - 1)) else null
     val padding = tvPagePadding(hosting)
-    val ringBleedPx = with(LocalDensity.current) { dimensionResource(TvR.dimen.tv_focus_ring_bleed).toPx() }
     val direction = LocalLayoutDirection.current
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -114,12 +114,10 @@ fun <T : Any> TvImmersiveGrid(
                             top =
                                 dimensionResource(TvR.dimen.tv_immersive_content_top) - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
                         )
-                        // Clipped a ring's bleed above the row, so the focus ring on its first row is not cut off.
-                        .immersiveTopClip(
-                            enabled = count > 0 && !bursting,
-                        ) { (gridTopClip(gridState) { anchor }() - ringBleedPx).coerceAtLeast(0f) }
+                        // Clipped at the ring's top: the content padding already puts the row's bleed inside the viewport.
+                        .immersiveTopClip(enabled = count > 0 && !bursting, topPx = gridTopClip(gridState) { anchor })
                         .onFocusChanged(reportBodyFocus)
-                        .then(tvPageArrival(hosting, entry, enabled = count > 0, key = Unit)),
+                        .then(tvPageArrival(hosting, entry, enabled = count > 0 && rememberedLoaded, key = Unit)),
                 contentPadding =
                     PaddingValues(
                         start = padding.calculateStartPadding(direction),

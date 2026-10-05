@@ -270,15 +270,18 @@ fun <T : Any> TvImmersiveHub(
     }
 }
 
-/** The backdrop layer: [artwork] full-bleed under a scrim, with [copy] in the band above the rows. */
+/**
+ * The backdrop layer: [artwork] full-bleed under a scrim, with [copy] in the band above the rows.
+ *
+ * [copyTopInset] reserves space at the top of the copy's band for a caller drawing over it, such as the grid's
+ * heading. The copy is bottom-anchored, so without it a tall block would overflow up into the heading.
+ */
 @Composable
 fun <T : Any> TvImmersiveBackdrop(
     item: T?,
     artwork: @Composable (T) -> Unit,
     copy: @Composable ColumnScope.(T) -> Unit,
     modifier: Modifier = Modifier,
-    // Reserves space at the top of the copy's band for a caller drawing over it (the grid's heading): the copy is
-    // bottom-anchored, so without it a tall block would overflow up into the heading.
     copyTopInset: Dp = Dp.Hairline,
 ) {
     Crossfade(

@@ -244,13 +244,13 @@ private val SampleGridTitles =
     }
 
 @Composable
-private fun SampleGrid(initialFocusedIndex: Int? = null) {
+private fun SampleGrid(titles: List<SampleTitle> = SampleGridTitles, initialFocusedIndex: Int? = null) {
     RailHosted {
         TvImmersiveGrid(
-            heading = "Approved (30)",
-            count = SampleGridTitles.size,
-            itemAt = { SampleGridTitles.getOrNull(it) },
-            itemKey = { SampleGridTitles[it].id },
+            heading = "All titles (${titles.size})",
+            count = titles.size,
+            itemAt = { titles.getOrNull(it) },
+            itemKey = { titles[it].id },
             artwork = { title -> SampleArtwork(title) },
             copy = { title -> SampleCopy(title) },
             initialFocusedIndex = initialFocusedIndex,
@@ -270,4 +270,22 @@ fun TvImmersiveGridSample() {
 @Composable
 fun TvImmersiveGridFocusedSample() {
     SampleGrid(initialFocusedIndex = GRID_FOCUSED_INDEX)
+}
+
+private const val GRID_DEMO_ITEM_COUNT = 90
+
+private val DemoGridTitles =
+    List(GRID_DEMO_ITEM_COUNT) { index ->
+        SampleTitle(
+            id = 500 + index,
+            title = "A title in the grid ${index + 1}",
+            meta = "TV show  ·  2025  ·  15",
+            synopsis = "A synopsis long enough to fill two lines of the copy band over the grid, so the demo shows how it clamps.",
+        )
+    }
+
+/** The grid running live over enough rows to scroll: the anchor scroll, the top clip as it moves and the backdrop following focus. */
+@Composable
+fun TvImmersiveGridDemo() {
+    SampleGrid(titles = DemoGridTitles)
 }
