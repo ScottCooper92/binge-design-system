@@ -25,8 +25,8 @@ data class MonthYearSelection(
     fun isCompleteFor(mode: MonthYearPickerMode): Boolean = (!mode.asksYear || year != null) && (!mode.asksMonth || month != null)
 }
 
-/** The year the stepper shows: the chosen one, else the latest the range offers. */
-internal fun MonthYearSelection.displayYear(range: IntRange): Int = (year ?: range.last).coerceIn(range)
+/** The year the stepper shows: the chosen one, else [defaultYear] (the current year, for most callers), held inside [range]. */
+internal fun MonthYearSelection.displayYear(range: IntRange, defaultYear: Int): Int = (year ?: defaultYear).coerceIn(range)
 
 /**
  * [this] with a chosen year pulled back inside [range], so the headline agrees with what the
@@ -43,7 +43,8 @@ internal fun MonthYearSelection.pickMonth(
     month: Month,
     mode: MonthYearPickerMode,
     range: IntRange,
-): MonthYearSelection = if (mode.asksYear) copy(month = month, year = displayYear(range)) else copy(month = month)
+    defaultYear: Int,
+): MonthYearSelection = if (mode.asksYear) copy(month = month, year = displayYear(range, defaultYear)) else copy(month = month)
 
 internal fun MonthYearSelection.pickYear(year: Int): MonthYearSelection = copy(year = year)
 
@@ -53,19 +54,26 @@ internal fun canStepYear(
     range: IntRange,
 ): Boolean = current + delta in range
 
-internal fun MonthYearSelection.stepYear(delta: Int, range: IntRange): MonthYearSelection =
-    if (canStepYear(displayYear(range), delta, range)) copy(year = displayYear(range) + delta) else this
+internal fun MonthYearSelection.stepYear(
+    delta: Int,
+    range: IntRange,
+    defaultYear: Int,
+): MonthYearSelection {
+    val shown = displayYear(range, defaultYear)
+    return if (canStepYear(shown, delta, range)) copy(year = shown + delta) else this
+}
 
 /**
  * The first cell to scroll the year grid to, one row above the one holding [year] so it is not
- * pinned to the top edge. With no year chosen it lands on the range's last row.
+ * pinned to the top edge. With no year chosen it lands on [defaultYear]'s row.
  */
 internal fun yearGridStartIndex(
     year: Int?,
     range: IntRange,
     columns: Int,
+    defaultYear: Int,
 ): Int {
-    val target = (year ?: range.last).coerceIn(range) - range.first
+    val target = (year ?: defaultYear).coerceIn(range) - range.first
     return ((target / columns) - 1).coerceAtLeast(0) * columns
 }
 

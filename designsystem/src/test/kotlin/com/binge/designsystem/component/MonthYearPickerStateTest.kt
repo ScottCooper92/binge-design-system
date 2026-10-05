@@ -40,31 +40,37 @@ class MonthYearPickerStateTest {
     }
 
     @Test
-    fun `with no year chosen the stepper shows the latest year in range`() {
-        assertEquals(2030, MonthYearSelection().displayYear(range))
-        assertEquals(2018, MonthYearSelection(year = 2018).displayYear(range))
+    fun `with no year chosen the stepper shows the default year, not the latest in range`() {
+        assertEquals(2010, MonthYearSelection().displayYear(range, defaultYear = 2010))
+        assertEquals(2018, MonthYearSelection(year = 2018).displayYear(range, defaultYear = 2010))
+    }
+
+    @Test
+    fun `a default year outside the range is clamped into it`() {
+        assertEquals(2030, MonthYearSelection().displayYear(range, defaultYear = 2040))
+        assertEquals(1990, MonthYearSelection().displayYear(range, defaultYear = 1980))
     }
 
     @Test
     fun `a year outside the range is clamped for display rather than shown`() {
-        assertEquals(2030, MonthYearSelection(year = 2099).displayYear(range))
-        assertEquals(1990, MonthYearSelection(year = 1800).displayYear(range))
+        assertEquals(2030, MonthYearSelection(year = 2099).displayYear(range, range.last))
+        assertEquals(1990, MonthYearSelection(year = 1800).displayYear(range, range.last))
     }
 
     @Test
     fun `picking a month pins the year the stepper was showing when a year is asked for`() {
-        val picked = MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, range)
+        val picked = MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, range, range.last)
 
         assertEquals(MonthYearSelection(year = 2030, month = Month.MAY), picked)
         assertEquals(
             MonthYearSelection(year = 2018, month = Month.MAY),
-            MonthYearSelection(year = 2018).pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, range),
+            MonthYearSelection(year = 2018).pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, range, range.last),
         )
     }
 
     @Test
     fun `picking a month in month-only mode leaves the year unset`() {
-        val picked = MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.Month, range)
+        val picked = MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.Month, range, range.last)
 
         assertNull(picked.year)
         assertEquals(Month.MAY, picked.month)
@@ -74,11 +80,11 @@ class MonthYearPickerStateTest {
     fun `stepping moves the shown year by one and stops at the ends of the range`() {
         val mid = MonthYearSelection(year = 2018, month = Month.MARCH)
 
-        assertEquals(2019, mid.stepYear(1, range).year)
-        assertEquals(2017, mid.stepYear(-1, range).year)
-        assertEquals(Month.MARCH, mid.stepYear(1, range).month)
-        assertEquals(MonthYearSelection(year = 2030), MonthYearSelection(year = 2030).stepYear(1, range))
-        assertEquals(MonthYearSelection(year = 1990), MonthYearSelection(year = 1990).stepYear(-1, range))
+        assertEquals(2019, mid.stepYear(1, range, range.last).year)
+        assertEquals(2017, mid.stepYear(-1, range, range.last).year)
+        assertEquals(Month.MARCH, mid.stepYear(1, range, range.last).month)
+        assertEquals(MonthYearSelection(year = 2030), MonthYearSelection(year = 2030).stepYear(1, range, range.last))
+        assertEquals(MonthYearSelection(year = 1990), MonthYearSelection(year = 1990).stepYear(-1, range, range.last))
         assertFalse(canStepYear(2030, 1, range))
         assertFalse(canStepYear(1990, -1, range))
         assertTrue(canStepYear(2018, 1, range))
@@ -86,15 +92,28 @@ class MonthYearPickerStateTest {
 
     @Test
     fun `the year grid starts one row above the chosen year and never before the first row`() {
-        assertEquals(0, yearGridStartIndex(1990, range, columns = 3))
-        assertEquals(0, yearGridStartIndex(1994, range, columns = 3))
-        assertEquals(3, yearGridStartIndex(1996, range, columns = 3))
-        assertEquals(24, yearGridStartIndex(2018, range, columns = 3))
+        assertEquals(0, yearGridStartIndex(1990, range, columns = 3, defaultYear = range.last))
+        assertEquals(0, yearGridStartIndex(1994, range, columns = 3, defaultYear = range.last))
+        assertEquals(3, yearGridStartIndex(1996, range, columns = 3, defaultYear = range.last))
+        assertEquals(24, yearGridStartIndex(2018, range, columns = 3, defaultYear = range.last))
     }
 
     @Test
-    fun `with no year chosen the year grid starts near the end of the range`() {
-        assertEquals(yearGridStartIndex(2030, range, columns = 3), yearGridStartIndex(null, range, columns = 3))
+    fun `with no year chosen the year grid starts on the default year's row, clamped into the range`() {
+        assertEquals(
+            yearGridStartIndex(2018, range, columns = 3, defaultYear = range.last),
+            yearGridStartIndex(null, range, columns = 3, defaultYear = 2018),
+        )
+        assertEquals(
+            yearGridStartIndex(2030, range, columns = 3, defaultYear = range.last),
+            yearGridStartIndex(null, range, columns = 3, defaultYear = 2040),
+        )
+    }
+
+    @Test
+    fun `with no year chosen stepping moves from the default year, not the end of the range`() {
+        assertEquals(MonthYearSelection(year = 2011), MonthYearSelection().stepYear(1, range, defaultYear = 2010))
+        assertEquals(MonthYearSelection(year = 2009), MonthYearSelection().stepYear(-1, range, defaultYear = 2010))
     }
 
     @Test
@@ -163,15 +182,22 @@ class MonthYearPickerStateTest {
     }
 
     @Test
-    fun `with a minimum and nothing chosen the stepper starts at the latest year, and picking pins it`() {
+    fun `with a minimum after the default year and nothing chosen the stepper starts at the minimum, and picking pins it`() {
         val narrowed = range.within(YearMonth.of(2028, 3), null)
 
-        assertEquals(2030, MonthYearSelection().displayYear(narrowed))
-        assertEquals(2028, MonthYearSelection(year = 2010).displayYear(narrowed))
+        assertEquals(2028, MonthYearSelection().displayYear(narrowed, defaultYear = 2020))
+        assertEquals(2028, MonthYearSelection(year = 2010).displayYear(narrowed, defaultYear = 2020))
         assertEquals(
-            MonthYearSelection(year = 2030, month = Month.MAY),
-            MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, narrowed),
+            MonthYearSelection(year = 2028, month = Month.MAY),
+            MonthYearSelection().pickMonth(Month.MAY, MonthYearPickerMode.MonthAndYear, narrowed, defaultYear = 2020),
         )
+    }
+
+    @Test
+    fun `with a minimum before the default year and nothing chosen the stepper starts on the default year`() {
+        val narrowed = range.within(YearMonth.of(2005, 3), null)
+
+        assertEquals(2020, MonthYearSelection().displayYear(narrowed, defaultYear = 2020))
     }
 
     @Test
@@ -193,14 +219,14 @@ class MonthYearPickerStateTest {
         val stale = MonthYearSelection(year = 1990, month = Month.JUNE)
 
         assertEquals("June 2018", pickerHeadline(MonthYearPickerMode.MonthAndYear, stale.coercedTo(narrowed), Locale.UK, "-"))
-        assertEquals(stale.displayYear(narrowed), stale.coercedTo(narrowed).year)
+        assertEquals(stale.displayYear(narrowed, narrowed.last), stale.coercedTo(narrowed).year)
     }
 
     @Test
     fun `month-only mode never dims a month, even with bounds that would in a mode with a year`() {
         val max = YearMonth.of(2018, 6)
         val narrowed = range.within(null, max)
-        val shownYear = MonthYearSelection().displayYear(narrowed)
+        val shownYear = MonthYearSelection().displayYear(narrowed, narrowed.last)
 
         Month.entries.forEach { month ->
             assertTrue(monthPickable(MonthYearPickerMode.Month, shownYear, month, null, max), "$month dimmed in month-only")
