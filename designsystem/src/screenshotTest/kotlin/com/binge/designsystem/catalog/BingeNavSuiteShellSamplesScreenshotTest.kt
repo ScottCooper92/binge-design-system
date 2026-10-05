@@ -37,32 +37,32 @@ class BingeNavSuiteShellSamplesScreenshotTest {
     }
 
     @PreviewTest
-    @Preview(name = "rail-tablet-light", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_NO)
-    @Preview(name = "rail-tablet-dark", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "rail-tablet-light", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "rail-tablet-dark", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun TabletRail() {
         BingeNavSuiteShellTabletRailSample()
     }
 
     @PreviewTest
-    @Preview(name = "rail-art-light", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_NO)
-    @Preview(name = "rail-art-dark", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "rail-art-light", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "rail-art-dark", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun TabletRailOverArtwork() {
         BingeNavSuiteShellTabletRailOverArtworkSample()
     }
 
     @PreviewTest
-    @Preview(name = "rail-art-rtl-light", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_NO)
-    @Preview(name = "rail-art-rtl-dark", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "rail-art-rtl-light", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "rail-art-rtl-dark", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun TabletRailOverArtworkRtl() {
         BingeNavSuiteShellTabletRailOverArtworkRtlSample()
     }
 
     @PreviewTest
-    @Preview(name = "rail-list-light", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_NO)
-    @Preview(name = "rail-list-dark", widthDp = 900, heightDp = 600, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "rail-list-light", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "rail-list-dark", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun TabletRailOverList() {
         BingeNavSuiteShellTabletRailOverListSample()

@@ -9,8 +9,9 @@
     <!-- Landscape (wide-but-short) gate: drives layouts that place side by side what portrait stacks
          (e.g. the onboarding watch-type choices). Default (portrait): off. -->
     <bool name="binge_landscape">false</bool>
-    <!-- Adaptive nav shell tier selection (see BingeNavSuiteShell): the expanded window keeps the
-         bespoke side rail, every other bucket gets the floating bar. Default: not expanded. -->
+    <!-- Adaptive nav shell tier selection (see BingeNavSuiteShell): a landscape tablet
+         (values-sw600dp-w1000dp) keeps the bespoke side rail, every other bucket gets the floating
+         bar. Default: the floating bar. -->
     <bool name="binge_nav_rail_expanded">false</bool>
     <!-- Hub HeroCarousel height tier (see HeroCarousel). Default (portrait phone / tall window):
          the full hero_height. Short windows (landscape phone) flip this true and the hero height is
