@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import android.app.Activity
+import android.view.Window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +52,10 @@ private const val HERO_SCRIM_MID_STOP = 0.60f
  * on-dark in light theme against a backdrop that never actually lightens.
  *
  * Restores to the theme-following state on dispose, so the screen navigated back to reads normally
- * rather than inheriting light icons it never asked for.
+ * rather than inheriting light icons it never asked for. The restore waits for the last effect on
+ * the window to leave. A transition between two screens that both call this composes them together,
+ * and the outgoing one disposes after the incoming one has set light icons; restoring then would put
+ * dark icons over the incoming hero.
  */
 @Composable
 fun DarkStatusBarEffect() {
@@ -59,15 +63,24 @@ fun DarkStatusBarEffect() {
     val isDark = isSystemInDarkTheme()
     if (!view.isInEditMode) {
         DisposableEffect(Unit) {
-            val controller = WindowInsetsControllerCompat(
-                (view.context as Activity).window,
-                view,
-            )
+            val window = (view.context as Activity).window
+            val controller = WindowInsetsControllerCompat(window, view)
+            darkStatusBarHolds.acquire(window)
             controller.isAppearanceLightStatusBars = false
-            onDispose { controller.isAppearanceLightStatusBars = !isDark }
+            onDispose {
+                if (darkStatusBarHolds.release(window)) {
+                    controller.isAppearanceLightStatusBars = !isDark
+                }
+            }
         }
     }
 }
+
+/**
+ * The live [DarkStatusBarEffect]s per window. [DetailOverlayTopBar] reads it too: a live hold means a
+ * hero sits under the bar, and only then does the bar keep the icons light at rest.
+ */
+internal val darkStatusBarHolds = StatusBarHolds<Window>()
 
 @Composable
 fun DetailHero(

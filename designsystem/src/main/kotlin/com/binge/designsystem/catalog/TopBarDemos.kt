@@ -39,12 +39,14 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeMediumTopBar
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.component.BingeTopBar
+import com.binge.designsystem.component.DarkStatusBarEffect
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.DetailOverlayTopBar
 import com.binge.designsystem.component.ExpressiveIconButton
 import com.binge.designsystem.component.IconButtonTone
 import com.binge.designsystem.component.LocalTopBarActionTint
 import com.binge.designsystem.component.LocalTopBarActionTone
+import com.binge.designsystem.component.StatusBarScrim
 import com.binge.designsystem.component.rememberPaneTopBarScrollBehavior
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
@@ -277,10 +279,13 @@ fun BingePaneTopBarDetailPaneDemo() {
 
 /**
  * [DetailOverlayTopBar] over a real [DetailHero] and the page below it: glass at rest, the wash thinning
- * and the bar's own scrim coming in as the hero scrolls up, then a solid titled bar.
+ * and the bar's own scrim coming in as the hero scrolls up, then a solid titled bar. The status bar
+ * icons stay light over the hero through [DarkStatusBarEffect] and hand off to the theme's once the
+ * scrim is past halfway.
  */
 @Composable
 fun DetailOverlayTopBarDemo() {
+    DarkStatusBarEffect()
     val scroll = rememberScrollState()
     ScreenshotTheme {
         Box(Modifier.fillMaxSize()) {
@@ -300,6 +305,26 @@ fun DetailOverlayTopBarDemo() {
                 ShareAction(glassBackgroundAlpha)
             }
             FractionLabel("scrolled", scroll.heroFraction(), Modifier.align(Alignment.BottomCenter))
+        }
+    }
+}
+
+/**
+ * [StatusBarScrim] over a page that scrolls under the status bar with light icons held by
+ * [DarkStatusBarEffect]: the artwork and then the banded rows pass beneath, and the icons stay on a
+ * dark floor throughout. The light theme shows it best, where the rows would otherwise leave white
+ * icons on a light page.
+ */
+@Composable
+fun StatusBarScrimDemo() {
+    DarkStatusBarEffect()
+    ScreenshotTheme {
+        Box(Modifier.fillMaxSize()) {
+            LazyColumn(Modifier.fillMaxSize()) {
+                item { DemoArtwork() }
+                items(DEMO_ROW_COUNT) { index -> DemoRow(index) }
+            }
+            StatusBarScrim()
         }
     }
 }
