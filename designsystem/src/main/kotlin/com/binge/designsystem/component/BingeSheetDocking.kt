@@ -60,12 +60,19 @@ class BingeSheetDock internal constructor(
     private val sheetState: SheetState,
     private val statusBarBottom: () -> Int,
     private val travelPx: Float,
-    /** Hides the sheet, then dismisses it: what a docked bar's close does. */
+    /**
+     * Hides the sheet, then dismisses it: what a docked bar's close does. On a locked sheet, which cannot animate
+     * away, it asks the host to dismiss straight away.
+     */
     val close: () -> Unit,
     private val expandSheet: () -> Unit,
     private val partialExpandSheet: () -> Unit,
     private val gesturesEnabled: Boolean,
 ) {
+    /** True unless the sheet is locked: the handle offers no gesture-style actions on a locked sheet. */
+    internal val handleEnabled: Boolean
+        get() = gesturesEnabled
+
     /** True while the sheet rests part-way open, so the handle can offer to expand it. */
     internal val canExpand: Boolean
         get() = gesturesEnabled && sheetState.currentValue == SheetValue.PartiallyExpanded
@@ -206,8 +213,9 @@ private fun dockHandleModifier(dock: BingeSheetDock): Modifier {
     val collapseLabel = stringResource(R.string.cd_collapse_sheet)
     val closeLabel = stringResource(R.string.cd_close_sheet)
     return Modifier
-        .clickable(onClickLabel = null) { dock.toggle() }
+        .clickable(enabled = dock.handleEnabled, onClickLabel = null) { dock.toggle() }
         .semantics(mergeDescendants = true) {
+            if (!dock.handleEnabled) return@semantics
             dismiss(closeLabel) {
                 dock.close()
                 true

@@ -70,7 +70,12 @@ fun BingeBottomSheet(
                 sheetState = sheetState,
                 gesturesEnabled = gesturesEnabled,
                 close = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
+                    if (gesturesEnabled) {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
+                    } else {
+                        // A locked sheet vetoes hide(), so the explicit close hands the dismissal to the host directly.
+                        onDismissRequest()
+                    }
                 },
                 expand = { scope.launch { sheetState.expand() } },
                 partialExpand = { scope.launch { sheetState.partialExpand() } },
