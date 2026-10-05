@@ -62,11 +62,12 @@ internal fun MonthGrid(
 internal fun YearGrid(
     selected: Int?,
     range: IntRange,
+    defaultYear: Int,
     onPick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val gap = dimensionResource(R.dimen.padding_s)
-    val state = rememberLazyGridState(initialFirstVisibleItemIndex = yearGridStartIndex(selected, range, YEAR_COLUMNS))
+    val state = rememberLazyGridState(initialFirstVisibleItemIndex = yearGridStartIndex(selected, range, YEAR_COLUMNS, defaultYear))
     LazyVerticalGrid(
         columns = GridCells.Fixed(YEAR_COLUMNS),
         state = state,

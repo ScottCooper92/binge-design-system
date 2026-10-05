@@ -33,6 +33,8 @@ private fun MonthYearPickerSampleFrame(
             mode = mode,
             selection = current,
             yearRange = SampleYears,
+            // The range's last year, so an empty sample's frame does not move with the clock.
+            defaultYear = SampleYears.last,
             minimum = minimum,
             maximum = maximum,
             yearsOpen = open,
