@@ -22,6 +22,36 @@ class ScreenTemplateSamplesScreenshotTest {
     fun screenScaffoldSmallBar() = BingeScreenScaffoldSmallBarSample()
 
     @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldScrolledUnder() = BingeScreenScaffoldScrolledUnderSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldShownOverContent() = BingeScreenScaffoldShownOverContentSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldNoBack() = BingeScreenScaffoldNoBackSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldSmallScrolledUnder() = BingeScreenScaffoldSmallBarScrolledUnderSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldSmallShownOverContent() = BingeScreenScaffoldSmallBarShownOverContentSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldSmallNoBack() = BingeScreenScaffoldSmallBarNoBackSample()
+
+    @PreviewTest
     @ScreenPreviews
     @Composable
     fun message() = MessageScreenSample()

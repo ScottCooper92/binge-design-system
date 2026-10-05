@@ -64,6 +64,9 @@ enum class ScreenBar {
  * offers the way back. A [header] (a search field, filter chips) is drawn over the body below the bar, and one
  * scrim spans both. [barScrim] is false only where something under the bar draws the scrim for it.
  *
+ * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state; it
+ * is ignored for [ScreenBar.None].
+ *
  * [bottomBar] reaches the true edge of the window and clears the navigation bar itself, as `FormFooter` does.
  *
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
@@ -78,17 +81,19 @@ fun BingeScreenScaffold(
     bar: ScreenBar = ScreenBar.Collapsing,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     barScrim: Boolean = true,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
     header: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     content: @Composable (padding: PaddingValues) -> Unit,
 ) {
-    val scrollBehavior = rememberScreenBarScrollBehavior(bar)
-    val scrim = scrollBehavior?.let { if (bar == ScreenBar.Collapsing) it.state.collapsedFraction else it.state.overlappedFraction } ?: 0f
+    val ownBehavior = rememberScreenBarScrollBehavior(bar)
+    val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
+    val scrim = behavior?.let { if (bar == ScreenBar.Collapsing) it.state.collapsedFraction else it.state.overlappedFraction } ?: 0f
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
     Scaffold(
-        modifier = scrollBehavior?.let { modifier.nestedScroll(it.nestedScrollConnection) } ?: modifier,
+        modifier = behavior?.let { modifier.nestedScroll(it.nestedScrollConnection) } ?: modifier,
         contentWindowInsets = WindowInsets(0),
         topBar = {
             val barScrimFraction = if (barScrim && header == null) scrim else 0f
@@ -97,7 +102,7 @@ fun BingeScreenScaffold(
                     BingePaneTopBar(
                         title = title,
                         onBack = back,
-                        scrollBehavior = scrollBehavior,
+                        scrollBehavior = behavior,
                         containerColor = Color.Transparent,
                         scrimFraction = barScrimFraction,
                         foregroundScrimFraction = scrim,
@@ -107,7 +112,7 @@ fun BingeScreenScaffold(
                     BingeTopBar(
                         title = title,
                         onBack = back,
-                        scrollBehavior = scrollBehavior,
+                        scrollBehavior = behavior,
                         containerColor = Color.Transparent,
                         scrimFraction = barScrimFraction,
                         foregroundScrimFraction = scrim,
