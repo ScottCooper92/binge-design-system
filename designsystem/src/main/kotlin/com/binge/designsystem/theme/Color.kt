@@ -94,7 +94,8 @@ val DarkColorScheme = darkColorScheme(
     inverseOnSurface = LightOnSurface,
     inversePrimary = BingeAmberLight,
     // The fixed roles are the same in both themes: amber that reads as amber whether the page
-    // behind it is light or dark.
+    // behind it is light or dark. They carry the brand's big fills, so a brand overrides all four
+    // with its primary family; see BingeBrand.
     primaryFixed = BingeGold,
     primaryFixedDim = BingeAmber,
     onPrimaryFixed = AmberInk,

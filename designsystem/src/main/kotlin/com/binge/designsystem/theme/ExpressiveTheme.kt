@@ -33,6 +33,11 @@ val LocalReduceMotion = staticCompositionLocalOf { false }
  *
  * [BingeColors] is deliberately not part of this. Its tokens carry meaning rather than brand, and
  * two apps should agree on what amber-means-waiting means.
+ *
+ * A brand overrides `primaryFixed`, `primaryFixedDim`, `onPrimaryFixed` and `onPrimaryFixedVariant`
+ * together with the primary family. Filled buttons, selected filter chips, switches, the month-year
+ * picker header and the hero mesh wash sit on the fixed roles. A scheme copied from Binge's and left
+ * without them shows Binge's amber.
  */
 @Immutable
 class BingeBrand(
