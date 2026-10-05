@@ -36,6 +36,9 @@ private const val MAX_STARS = 5
  * the "7.5" a card prints beside it rather than the four stars a round-half-up would draw. See
  * [ratingToHalves] for the edge cases.
  *
+ * An [interactive] control never draws a positive [rating] as no stars: a 0.5 the user rated on the
+ * TMDB website would otherwise open as "unrated" beside an enabled Save. See [interactiveHalves].
+ *
  * When [interactive], tapping star N sets N full stars (a second tap on a full star toggles it to a
  * half), and long-pressing star N sets N − ½. New values report via [onRatingChange] on 1–10.
  *
@@ -51,7 +54,7 @@ fun StarRating(
     interactive: Boolean = false,
     onRatingChange: ((Float) -> Unit)? = null,
 ) {
-    val halves = ratingToHalves(rating)
+    val halves = if (interactive) interactiveHalves(rating) else ratingToHalves(rating)
     val ratingDescription = stringResource(R.string.cd_rating_out_of_ten, announcedRating(rating).formatRating())
 
     Row(
@@ -95,6 +98,13 @@ internal fun ratingToHalves(rating: Float): Int {
     val shown = "%.1f".format(Locale.ROOT, rating.coerceIn(0f, MAX_RATING)).toFloat()
     return ceil(shown - HALF_POINT).toInt().coerceAtLeast(0)
 }
+
+/**
+ * [ratingToHalves] for the control the user edits: a rating above zero draws at least a half star.
+ * Ties-down is right for a display beside a printed number, but the editor re-opens a stored value,
+ * and 0.5 (which TMDB accepts) drawing nothing reads as unrated.
+ */
+internal fun interactiveHalves(rating: Float): Int = ratingToHalves(rating).let { if (rating > 0f && it == 0) 1 else it }
 
 /** The rating a screen reader announces: the true value, clamped to the scale, not the drawn half star. */
 internal fun announcedRating(rating: Float): Float = if (rating.isNaN()) 0f else rating.coerceIn(0f, MAX_RATING)

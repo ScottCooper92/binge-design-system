@@ -70,4 +70,17 @@ class RatingToHalvesTest {
     fun `NaN draws no stars`() {
         assertEquals(0, ratingToHalves(Float.NaN))
     }
+
+    @Test
+    fun `an interactive control draws a positive rating as at least a half star`() {
+        assertEquals(1, interactiveHalves(0.5f))
+        assertEquals(1, interactiveHalves(0.25f))
+    }
+
+    @Test
+    fun `an interactive control agrees with the display everywhere else`() {
+        listOf(0f, 1f, 4.5f, 7.5f, 9.5f, 10f, Float.NaN, -3f).forEach {
+            assertEquals("$it", ratingToHalves(it).toLong(), interactiveHalves(it).toLong())
+        }
+    }
 }
