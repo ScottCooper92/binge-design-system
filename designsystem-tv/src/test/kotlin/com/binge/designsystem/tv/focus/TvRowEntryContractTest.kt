@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -43,7 +43,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvRowEntryContractTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createKeyboardComposeRule()
 
     /** Saveable: the remembered cell rides `rememberSaveable`, so a saved-state restore keeps it (not a reset to 0). */
     @Test

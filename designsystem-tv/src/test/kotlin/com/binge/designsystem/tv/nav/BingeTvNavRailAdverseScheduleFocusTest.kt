@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.testing.TV_LATE_TARGET_SIBLING_TAG
 import com.binge.designsystem.tv.testing.TvLateTarget
 import com.binge.designsystem.tv.theme.BingeTvTheme
@@ -58,7 +58,7 @@ private const val SETTLE_FRAMES = 10
  * [contentHandoffInFlight] gets one more case (#72): unlike the startup offer, it wraps its retry in
  * [kotlinx.coroutines.withTimeoutOrNull]([CONTENT_HANDOFF_TIMEOUT_MS]) — a real elapsed-time cap distinct from
  * [CONTENT_HANDOFF_FRAMES]'s retry count. It reads as a wall-clock trap, but under this harness it isn't one:
- * [createComposeRule]'s composition — every `LaunchedEffect`, including the one `withTimeoutOrNull` schedules
+ * [createKeyboardComposeRule]'s composition — every `LaunchedEffect`, including the one `withTimeoutOrNull` schedules
  * its deadline on — runs on the `TestDispatcher` backing `composeTestRule.mainClock`'s own
  * `TestCoroutineScheduler` (`AndroidComposeUiTestEnvironment` builds `TestMonotonicFrameClock` and the
  * `Recomposer`'s effect context from that same dispatcher; verified by decompiling `ui-test-android:1.12.0`).
@@ -77,7 +77,7 @@ private const val SETTLE_FRAMES = 10
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class BingeTvNavRailAdverseScheduleFocusTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createKeyboardComposeRule()
 
     @Test
     fun `the startup offer converges on a target composed 0 frames late`() = assertColdStartConverges(0)

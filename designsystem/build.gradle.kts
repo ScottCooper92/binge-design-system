@@ -132,4 +132,8 @@ dependencies {
     testFixturesImplementation(composeBom)
     testFixturesImplementation(libs.compose.ui)
     testFixturesImplementation(libs.compose.ui.test.junit4)
+    // Not for its API: material3 is pinned ahead of the BOM and pulls the Compose UI line forward, so
+    // this compiles the keyboard rule against the ui-test every test runs, which has ComposeUiTestConfig.
+    testFixturesImplementation(libs.compose.material3)
+    testFixturesImplementation(libs.robolectric)
 }

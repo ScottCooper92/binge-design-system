@@ -124,6 +124,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(platform(libs.compose.bom))
     testImplementation(libs.compose.ui.test.junit4)
+    testImplementation(testFixtures(project(":designsystem")))
     debugImplementation(libs.compose.ui.test.manifest)
 }
 

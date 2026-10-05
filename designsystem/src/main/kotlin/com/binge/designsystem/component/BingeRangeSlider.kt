@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.RangeSliderState
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,13 +59,17 @@ fun BingeRangeSlider(
             Text(text = startLabel, style = MaterialTheme.typography.labelLarge)
             Text(text = endLabel, style = MaterialTheme.typography.labelLarge)
         }
+        // Material keeps the slider's state; this component stays controlled, so the state is written from
+        // [values] on every composition and a drag only reports through onValueChange.
+        val state = remember(steps, valueRange) {
+            RangeSliderState(values.start, values.endInclusive, steps, valueRange)
+        }
+        state.syncTo(values)
         RangeSlider(
-            value = values,
+            state = state,
             onValueChange = { next ->
                 onValuesChange(if (steps == 0) next else next.keepingUntouchedThumbs(values, halfStep))
             },
-            valueRange = valueRange,
-            steps = steps,
             enabled = enabled,
             startThumbInteractionSource = startInteraction,
             endThumbInteractionSource = endInteraction,
@@ -89,6 +94,20 @@ fun BingeRangeSlider(
                 )
             },
         )
+    }
+}
+
+/**
+ * Writes [values] into the state. Each setter clamps against the other thumb, so the thumb moving
+ * away from the other goes first: a range that jumps past the current one is not clamped on the way.
+ */
+private fun RangeSliderState.syncTo(values: ClosedFloatingPointRange<Float>) {
+    if (values.start > endValue) {
+        endValue = values.endInclusive
+        startValue = values.start
+    } else {
+        startValue = values.start
+        endValue = values.endInclusive
     }
 }
 

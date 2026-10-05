@@ -5,9 +5,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
+import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertTrue
@@ -44,7 +44,7 @@ private const val PROBE_FRAMES = 200
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class BingeTvNavRailStartupFallbackRemovalTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createKeyboardComposeRule()
 
     @Test
     fun `content or rail holds focus every frame for a destination with nothing focusable, ever`() {

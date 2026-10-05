@@ -10,12 +10,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -35,7 +35,7 @@ private const val LEFT_TARGET = "left-target"
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvFocusSinkTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createKeyboardComposeRule()
 
     @Test
     fun `left moves focus to the supplied entry`() {
