@@ -36,14 +36,19 @@ val LocalReduceMotion = staticCompositionLocalOf { false }
  *
  * A brand overrides `primaryFixed`, `primaryFixedDim`, `onPrimaryFixed` and `onPrimaryFixedVariant`
  * together with the primary family. Filled buttons, selected filter chips, switches, the month-year
- * picker header and the hero mesh wash sit on the fixed roles. A scheme copied from Binge's and left
- * without them shows Binge's amber.
+ * picker header and the hero mesh wash sit on the fixed roles. A scheme that changes `primary` but keeps
+ * any of Binge's fixed roles is rejected here, rather than rendering Binge's amber in another palette.
  */
 @Immutable
 class BingeBrand(
     val light: ColorScheme,
     val dark: ColorScheme,
 ) {
+    init {
+        requireOwnFixedRoles(light, LightColorScheme, "light")
+        requireOwnFixedRoles(dark, DarkColorScheme, "dark")
+    }
+
     companion object {
         /** Binge's own, and the default, so an app that passes nothing renders exactly as Binge does. */
         val Binge = BingeBrand(light = LightColorScheme, dark = DarkColorScheme)
@@ -82,6 +87,23 @@ fun BingeExpressiveTheme(
             shapes = BingeShapes.Material3,
             content = content,
         )
+    }
+}
+
+private fun requireOwnFixedRoles(
+    scheme: ColorScheme,
+    binge: ColorScheme,
+    name: String,
+) {
+    if (scheme.primary == binge.primary) return
+    val kept = listOfNotNull(
+        "primaryFixed".takeIf { scheme.primaryFixed == binge.primaryFixed },
+        "primaryFixedDim".takeIf { scheme.primaryFixedDim == binge.primaryFixedDim },
+        "onPrimaryFixed".takeIf { scheme.onPrimaryFixed == binge.onPrimaryFixed },
+        "onPrimaryFixedVariant".takeIf { scheme.onPrimaryFixedVariant == binge.onPrimaryFixedVariant },
+    )
+    require(kept.isEmpty()) {
+        "The $name scheme changes primary but keeps Binge's ${kept.joinToString()}: set them with the primary family."
     }
 }
 
