@@ -116,4 +116,9 @@ class ScreenTemplateSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun screenScaffoldBottomBarUnderSystemBars() = PreviewSystemBarInsets { BingeScreenScaffoldBottomBarSample() }
+
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
+    fun screenScaffoldLargeBar() = BingeScreenScaffoldLargeBarSample()
 }
