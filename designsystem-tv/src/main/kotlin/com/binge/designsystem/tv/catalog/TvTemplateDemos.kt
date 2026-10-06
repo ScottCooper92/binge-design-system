@@ -82,9 +82,9 @@ fun TvMessagePageDemo() {
         }
     }
     TvMessagePage(
-        headline = "Server unreachable",
+        headline = if (loading) null else "Server unreachable",
         body = if (loading) "Loading…" else "Check the server is running, then try again.",
-        icon = Icons.Filled.CloudOff,
+        icon = if (loading) null else Icons.Filled.CloudOff,
         hosting = TvPageHosting.Overlay,
         loading = loading,
         primary = TvPageAction("Retry") { loading = true },

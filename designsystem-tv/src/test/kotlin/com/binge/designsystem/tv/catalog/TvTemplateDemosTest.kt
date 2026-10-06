@@ -39,8 +39,10 @@ class TvTemplateDemosTest {
     fun `the message page demo moves focus to Retry once it has loaded`() {
         composeTestRule.mainClock.autoAdvance = true
         composeTestRule.setContent { BingeTvTheme { TvMessagePageDemo() } }
+        composeTestRule.onNodeWithText("Server unreachable").assertDoesNotExist()
         composeTestRule.mainClock.advanceTimeBy(DEMO_WAIT_MILLIS)
         composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Server unreachable").assertExists()
         composeTestRule.onNodeWithText("Retry").assertIsFocused()
     }
 
