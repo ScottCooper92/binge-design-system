@@ -32,6 +32,11 @@ class TvTemplateSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun twoPanePageBoard() = Frame { TvTwoPanePageBoardSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun stepFlow() = Frame { TvStepFlowSample() }
 
     @PreviewTest
