@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilledButton
+import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DetailHero
@@ -87,6 +88,28 @@ fun BingeScreenScaffoldSample() {
 fun BingeScreenScaffoldSmallBarSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         BingeScreenScaffold(title = "Users", onBack = LocalDemoBack.current, bar = ScreenBar.Small) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/** The large bar: a subtitle summarising what the screen shows, and a control at the end of the title row. */
+@Composable
+fun BingeScreenScaffoldLargeBarSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(
+            title = "Discover",
+            bar = ScreenBar.Large,
+            subtitle = "Movies · Popular · 2 filters",
+            titleTrailing = {
+                BingeFilterChip(
+                    label = "Filters",
+                    selected = true,
+                    onClick = {},
+                    count = 2,
+                )
+            },
+        ) { padding ->
             SampleRows(padding)
         }
     }

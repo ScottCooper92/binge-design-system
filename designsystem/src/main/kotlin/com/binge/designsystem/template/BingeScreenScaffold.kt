@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.max
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeLargeTopBar
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.BingeTopBar
@@ -51,6 +52,9 @@ enum class ScreenBar {
     /** A single-line bar that slides away as the body scrolls down and returns as it scrolls up. */
     Small,
 
+    /** A large collapsing bar whose expanded heading carries a subtitle line and a trailing control. */
+    Large,
+
     /** No bar: the body reaches the top of the window and clears the status bar itself. */
     None,
 }
@@ -65,7 +69,8 @@ enum class ScreenBar {
  * scrim spans both. [barScrim] is false only where something under the bar draws the scrim for it.
  *
  * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state; it
- * is ignored for [ScreenBar.None].
+ * is ignored for [ScreenBar.None]. [subtitle] and [titleTrailing] are [ScreenBar.Large]'s, and show while it is
+ * expanded; a caller whose action takes over once it collapses hoists [scrollBehavior] to fade it.
  *
  * [bottomBar] reaches the true edge of the window and clears the navigation bar itself, as `FormFooter` does.
  *
@@ -82,6 +87,8 @@ fun BingeScreenScaffold(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     barScrim: Boolean = true,
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    subtitle: String? = null,
+    titleTrailing: (@Composable () -> Unit)? = null,
     header: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
@@ -89,7 +96,7 @@ fun BingeScreenScaffold(
 ) {
     val ownBehavior = rememberScreenBarScrollBehavior(bar)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
-    val scrim = behavior?.let { if (bar == ScreenBar.Collapsing) it.state.collapsedFraction else it.state.overlappedFraction } ?: 0f
+    val scrim = behavior?.let { if (bar == ScreenBar.Small) it.state.overlappedFraction else it.state.collapsedFraction } ?: 0f
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
     Scaffold(
@@ -116,6 +123,18 @@ fun BingeScreenScaffold(
                         containerColor = Color.Transparent,
                         scrimFraction = barScrimFraction,
                         foregroundScrimFraction = scrim,
+                        actions = actions,
+                    )
+                ScreenBar.Large ->
+                    BingeLargeTopBar(
+                        title = title,
+                        subtitle = subtitle,
+                        onBack = back,
+                        scrollBehavior = behavior,
+                        containerColor = Color.Transparent,
+                        scrimFraction = barScrimFraction,
+                        foregroundScrimFraction = scrim,
+                        titleTrailing = titleTrailing,
                         actions = actions,
                     )
                 ScreenBar.None -> Unit
@@ -195,7 +214,7 @@ fun PaddingValues.screenListPadding(): PaddingValues {
 @Composable
 private fun rememberScreenBarScrollBehavior(bar: ScreenBar): TopAppBarScrollBehavior? =
     when (bar) {
-        ScreenBar.Collapsing -> TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+        ScreenBar.Collapsing, ScreenBar.Large -> TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
         ScreenBar.Small -> TopAppBarDefaults.enterAlwaysScrollBehavior()
         ScreenBar.None -> null
     }

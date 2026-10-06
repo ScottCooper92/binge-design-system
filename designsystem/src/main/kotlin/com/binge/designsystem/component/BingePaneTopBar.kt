@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.hasPaneBeside
 import com.binge.designsystem.navOverlayStart
@@ -89,7 +92,7 @@ fun BingePaneTopBar(
         )
         return
     }
-    TwoRowPaneTopBar(
+    TwoRowTopBar(
         title = title,
         modifier = modifier,
         onBack = onBack,
@@ -104,7 +107,8 @@ fun BingePaneTopBar(
 }
 
 /**
- * [BingePaneTopBar]'s two-row form. Icon tone, tint and scrim hand-off are [BingeTopBar]'s.
+ * [BingePaneTopBar]'s two-row form, and [BingeLargeTopBar]'s. Icon tone, tint and scrim hand-off are
+ * [BingeTopBar]'s. A [subtitle] and a [titleTrailing] show on the expanded row only.
  *
  * M3 starts both titles [R.dimen.pane_top_bar_title_inset] in from the bar's edge; they are shifted
  * onto the content's own start — [resolvedContentPadding] plus any nav rail overlaying the pane — so a
@@ -116,7 +120,7 @@ fun BingePaneTopBar(
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun TwoRowPaneTopBar(
+internal fun TwoRowTopBar(
     title: String,
     modifier: Modifier,
     onBack: (() -> Unit)?,
@@ -127,6 +131,9 @@ private fun TwoRowPaneTopBar(
     scrimColor: Color,
     scrimForegroundColor: Color,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit,
+    expandedHeight: Dp = dimensionResource(R.dimen.pane_top_bar_expanded_height),
+    subtitle: String? = null,
+    titleTrailing: (@Composable () -> Unit)? = null,
 ) {
     val transparent = containerColor == Color.Transparent
     val iconTone = if (transparent) IconButtonTone.Glass else IconButtonTone.Default
@@ -137,6 +144,7 @@ private fun TwoRowPaneTopBar(
     val contentStart =
         resolvedContentPadding().calculateStartPadding(LocalLayoutDirection.current) + navOverlayStart()
     val onContentInset = contentStart - dimensionResource(R.dimen.pane_top_bar_title_inset)
+    val contentEnd = resolvedContentPadding().calculateEndPadding(LocalLayoutDirection.current)
     val besideBackButton = dimensionResource(R.dimen.padding_s)
     Box {
         TopBarScrim(
@@ -146,19 +154,60 @@ private fun TwoRowPaneTopBar(
         )
         TwoRowsTopAppBar(
             title = { expanded ->
-                Text(
-                    title,
-                    style = if (expanded) MaterialTheme.typography.displaySmall else LocalTextStyle.current,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = titleColor,
-                    modifier =
-                        if (expanded || onBack == null) {
-                            Modifier.offset(x = onContentInset)
-                        } else {
-                            Modifier.padding(start = besideBackButton)
-                        },
-                )
+                val titleModifier =
+                    if (expanded || onBack == null) {
+                        Modifier.offset(x = onContentInset)
+                    } else {
+                        Modifier.padding(start = besideBackButton)
+                    }
+                val trailing = titleTrailing.takeIf { expanded }
+                if (trailing == null) {
+                    Text(
+                        title,
+                        style = if (expanded) MaterialTheme.typography.displaySmall else LocalTextStyle.current,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = titleColor,
+                        modifier = titleModifier,
+                    )
+                } else {
+                    // Padded rather than offset, so the control ends on the content's edge too: M3 already
+                    // keeps the title row its own small end inset, which the end padding takes off.
+                    val zero = dimensionResource(R.dimen.zero)
+                    val endInset = contentEnd - dimensionResource(R.dimen.top_bar_title_row_end_inset)
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(start = onContentInset.coerceAtLeast(zero), end = endInset.coerceAtLeast(zero)),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            title,
+                            style = MaterialTheme.typography.displaySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = titleColor,
+                            modifier = Modifier.weight(1f),
+                        )
+                        trailing()
+                    }
+                }
+            },
+            subtitle = { expanded ->
+                if (expanded && subtitle != null) {
+                    Text(
+                        subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier =
+                            Modifier
+                                .offset(x = onContentInset)
+                                .padding(bottom = dimensionResource(R.dimen.padding_s)),
+                    )
+                }
             },
             modifier = modifier,
             navigationIcon = {
@@ -189,7 +238,7 @@ private fun TwoRowPaneTopBar(
                     }
                 }
             },
-            expandedHeight = dimensionResource(R.dimen.pane_top_bar_expanded_height),
+            expandedHeight = expandedHeight,
             windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             colors = bingeTopBarColors(containerColor),
             scrollBehavior = scrollBehavior,
