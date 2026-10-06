@@ -171,24 +171,25 @@ fun TvImmersiveHubSample() {
 /** The same hub with a hero above the rows, which gives way to the backdrop once a card takes focus. */
 @Composable
 fun TvImmersiveHubHeroSample() {
-    SampleHub(
-        hero = {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = tvContentGutterStart(), top = dimensionResource(TvR.dimen.tv_overscan_vertical)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
-            ) {
-                Text(text = "Server status", style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onSurface)
-                Text(
-                    text = "Connected  ·  version 2.7",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        },
-    )
+    SampleHub(hero = { SampleHero() })
+}
+
+@Composable
+private fun SampleHero() {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(start = tvContentGutterStart(), top = dimensionResource(TvR.dimen.tv_overscan_vertical)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+    ) {
+        Text(text = "Server status", style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            text = "Connected  ·  version 2.7",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 /** Focus on the second row: the row is pulled to the top of the inset viewport and the rows above it are clipped away. */
@@ -288,4 +289,22 @@ private val DemoGridTitles =
 @Composable
 fun TvImmersiveGridDemo() {
     SampleGrid(titles = DemoGridTitles)
+}
+
+private val DemoHubRows =
+    listOf(
+        sampleRow("pending", "Pending (8)", firstId = 600),
+        sampleRow("approved", "Approved (24)", firstId = 700, seeAll = true),
+        sampleRow("processing", "Processing (5)", firstId = 800),
+        sampleRow("available", "Available (31)", firstId = 900, seeAll = true),
+        sampleRow("declined", "Declined (3)", firstId = 1000),
+    )
+
+/**
+ * The hub running live, under a hero and over enough rows to scroll: the anchor scroll and the top clip as focus
+ * moves down and back up, the hero giving way to the backdrop, and a see-all tile closing two of the rows.
+ */
+@Composable
+fun TvImmersiveHubDemo() {
+    SampleHub(hero = { SampleHero() }, rows = DemoHubRows)
 }
