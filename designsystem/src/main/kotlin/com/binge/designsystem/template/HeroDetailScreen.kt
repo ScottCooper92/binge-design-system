@@ -128,6 +128,33 @@ fun HeroDetailLazyScreen(
     }
 }
 
+/**
+ * The frame a [HeroDetailScreen] page shows before it has a hero: its loading skeleton or its failure, under the
+ * same back control at rest, so back works whether or not the load does. [content] draws from the top of the
+ * window, as the hero would, and the status bar follows the theme, since no artwork sits under it yet. Pass the
+ * page's [snackbarHostState] so a message raised while it loads survives the swap to the loaded page.
+ */
+@Composable
+fun HeroDetailStateScreen(
+    onBack: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    horizontalInset: Dp = dimensionResource(R.dimen.padding_m),
+    content: @Composable BoxScope.() -> Unit,
+) {
+    HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = false, modifier = modifier, footer = null) {
+        content()
+        HeroDetailBar(
+            title = "",
+            onBack = onBack,
+            heroHeight = dimensionResource(R.dimen.detail_hero_height),
+            horizontalInset = horizontalInset,
+            inFlight = false,
+            actions = {},
+        ) { 0f }
+    }
+}
+
 private const val HERO_ITEM_KEY = "hero-detail-hero"
 
 /**
