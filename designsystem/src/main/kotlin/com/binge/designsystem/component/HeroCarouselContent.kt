@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
@@ -39,13 +38,13 @@ import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.theme.BingeTheme
 
 private const val HERO_PILL_ALPHA = 0.16f
 private const val HERO_PILL_LIGHT_THEME_ALPHA = 0.88f
 private const val HERO_TAGLINE_ALPHA = 0.86f
 private const val HERO_META_ALPHA = 0.9f
 private const val HERO_META_DOT_ALPHA = 0.45f
-private const val LIGHT_BACKGROUND_LUMINANCE = 0.5f
 
 /** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
 private val HERO_TITLE_MIN_SIZE = 28.sp
@@ -143,7 +142,7 @@ internal fun BoxScope.HeroCopyOverlay(
 @Composable
 private fun HeroTrendingPill(rank: Int) {
     val scheme = MaterialTheme.colorScheme
-    val lightTheme = scheme.background.luminance() > LIGHT_BACKGROUND_LUMINANCE
+    val lightTheme = !BingeTheme.isDark
     val pillColor = if (lightTheme) {
         scheme.inverseSurface.copy(alpha = HERO_PILL_LIGHT_THEME_ALPHA)
     } else {

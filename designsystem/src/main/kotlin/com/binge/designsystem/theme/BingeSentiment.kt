@@ -3,7 +3,6 @@ package com.binge.designsystem.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 
 /**
  * The app's semantic colour vocabulary: a sentiment names *what a colour means*, not a hue, so
@@ -60,5 +59,4 @@ private const val TONAL_CONTAINER_ALPHA_DARK = 0.16f
  * sentiment accent sits on for a chip, a tag, or a row-icon box.
  */
 @Composable
-fun Color.tonalContainer(): Color =
-    copy(alpha = if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) TONAL_CONTAINER_ALPHA_DARK else TONAL_CONTAINER_ALPHA_LIGHT)
+fun Color.tonalContainer(): Color = copy(alpha = if (BingeTheme.isDark) TONAL_CONTAINER_ALPHA_DARK else TONAL_CONTAINER_ALPHA_LIGHT)

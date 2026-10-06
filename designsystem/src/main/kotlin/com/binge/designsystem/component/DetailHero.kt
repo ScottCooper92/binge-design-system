@@ -1,9 +1,7 @@
 package com.binge.designsystem.component
 
-import android.app.Activity
 import android.view.Window
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,10 +61,10 @@ private val HERO_TITLE_MIN_SIZE = 28.sp
 @Composable
 fun DarkStatusBarEffect() {
     val view = LocalView.current
-    val isDark = isSystemInDarkTheme()
-    if (!view.isInEditMode) {
+    val isDark = BingeTheme.isDark
+    val window = view.context.findActivity()?.window
+    if (!view.isInEditMode && window != null) {
         DisposableEffect(Unit) {
-            val window = (view.context as Activity).window
             val controller = WindowInsetsControllerCompat(window, view)
             darkStatusBarHolds.acquire(window)
             controller.isAppearanceLightStatusBars = false
