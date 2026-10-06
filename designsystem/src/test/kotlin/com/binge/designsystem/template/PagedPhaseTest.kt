@@ -72,6 +72,22 @@ class PagedPhaseTest {
     }
 
     @Test
+    fun `a mediator list that never records a refresh stays on the skeleton with an idle, empty cache`() {
+        assertEquals(
+            listOf(PagedPhase.Skeleton, PagedPhase.Skeleton),
+            phases(Frame(source = idle, mediator = complete), Frame(source = complete, mediator = complete)),
+        )
+    }
+
+    @Test
+    fun `a mediator list that records its skipped refresh as writing nothing reads empty`() {
+        assertEquals(
+            listOf(PagedPhase.Empty),
+            phases(Frame(source = complete, mediator = complete, refresh = wrote(0))),
+        )
+    }
+
+    @Test
     fun `a mediator list stays on the skeleton until its refresh is known, then reads empty`() {
         assertEquals(
             listOf(PagedPhase.Skeleton, PagedPhase.Skeleton, PagedPhase.Empty),
