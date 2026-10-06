@@ -1,8 +1,6 @@
 package com.binge.designsystem.component
 
-import android.app.Activity
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -183,11 +181,11 @@ internal fun detailBarWantsDarkStatusBarIcons(
 @Composable
 private fun DetailBarStatusBarEffect(progress: Float) {
     val view = LocalView.current
-    if (view.isInEditMode) return
-    val isDarkTheme = isSystemInDarkTheme()
+    val window = view.context.findActivity()?.window
+    if (view.isInEditMode || window == null) return
+    val isDarkTheme = BingeTheme.isDark
     val pastHandOff = progress >= STATUS_BAR_HANDOFF_PROGRESS
     LaunchedEffect(pastHandOff, isDarkTheme) {
-        val window = (view.context as Activity).window
         WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars =
             detailBarWantsDarkStatusBarIcons(
                 progress = progress,

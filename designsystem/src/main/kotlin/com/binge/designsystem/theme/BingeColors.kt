@@ -1,10 +1,12 @@
 package com.binge.designsystem.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 /**
  * Extended color palette for tokens outside Material 3's ColorScheme — accents, image-overlay
@@ -160,9 +162,25 @@ val LocalBingeColors = staticCompositionLocalOf<BingeColors> {
     error("BingeColors not provided — wrap content with BingeExpressiveTheme.")
 }
 
+/** The `darkTheme` [BingeExpressiveTheme] was given, or null outside one. Read it through [BingeTheme.isDark]. */
+internal val LocalBingeDarkTheme = staticCompositionLocalOf<Boolean?> { null }
+
+/** Below this, a surface reads as dark: the fallback [BingeTheme.isDark] takes outside [BingeExpressiveTheme]. */
+private const val DARK_SURFACE_LUMINANCE = 0.5f
+
 object BingeTheme {
     val colors: BingeColors
         @Composable
         @ReadOnlyComposable
         get() = LocalBingeColors.current
+
+    /**
+     * Whether the theme in effect is dark: the flag [BingeExpressiveTheme] was given, so an in-app override of
+     * the system setting holds. Outside that theme, the surface's luminance decides. Never read
+     * `isSystemInDarkTheme()` for this; it answers for the system, not for the app.
+     */
+    val isDark: Boolean
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalBingeDarkTheme.current ?: (MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE)
 }

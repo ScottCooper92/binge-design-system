@@ -75,6 +75,7 @@ fun BingeExpressiveTheme(
     CompositionLocalProvider(
         LocalReduceMotion provides reduceMotion,
         LocalBingeColors provides bingeColors,
+        LocalBingeDarkTheme provides darkTheme,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

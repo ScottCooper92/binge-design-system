@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -40,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
+import com.binge.designsystem.theme.BingeTheme
 
 /**
  * Which colours the floating nav wears. The bar floats over whatever the screen is showing —
@@ -75,9 +75,6 @@ enum class BingeNavFloatingTone {
      */
     Outlined,
 }
-
-/** Below this surface luminance the active scheme is a dark one. */
-private const val DARK_SURFACE_LUMINANCE = 0.5f
 
 /** Opacity of the inverted container — translucent enough to feel layered, opaque enough to stay legible. */
 private const val NAV_FLOATING_CONTAINER_ALPHA = 0.92f
@@ -303,9 +300,7 @@ private fun BingeNavFloatingTone.resolve(): NavFloatingColors {
                 outline = scheme.outlineVariant,
             )
         BingeNavFloatingTone.AlwaysDark -> {
-            // Read darkness off the scheme rather than isSystemInDarkTheme(): the theme owns that
-            // decision and a caller may override it, but surface's luminance is always the truth.
-            val darkTheme = scheme.surface.luminance() < DARK_SURFACE_LUMINANCE
+            val darkTheme = BingeTheme.isDark
             NavFloatingColors(
                 toolbar = FloatingToolbarDefaults.standardFloatingToolbarColors().copy(
                     // Translucent only in the light theme. A dark pill over a light background loses

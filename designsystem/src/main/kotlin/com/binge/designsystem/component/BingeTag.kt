@@ -13,11 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.theme.BingeTheme
 import com.binge.designsystem.theme.labelSmallEmphasis
 
 /**
@@ -54,7 +54,7 @@ fun BingeTag(
         if (tint == null) {
             MaterialTheme.colorScheme.surfaceContainerHigh
         } else {
-            val alpha = if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) TAG_TINT_ALPHA_DARK else TAG_TINT_ALPHA_LIGHT
+            val alpha = if (BingeTheme.isDark) TAG_TINT_ALPHA_DARK else TAG_TINT_ALPHA_LIGHT
             tint.copy(alpha = alpha)
         }
     Row(
