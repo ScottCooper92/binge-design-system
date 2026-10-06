@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -30,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
@@ -48,6 +50,7 @@ import com.binge.designsystem.template.FormAction
 import com.binge.designsystem.template.FormActionPlacement
 import com.binge.designsystem.template.FormScreen
 import com.binge.designsystem.template.FormSection
+import com.binge.designsystem.template.HeroDetailLazyScreen
 import com.binge.designsystem.template.HeroDetailScreen
 import com.binge.designsystem.template.LoadingMessageScreen
 import com.binge.designsystem.template.MessageScreen
@@ -236,6 +239,36 @@ fun HeroDetailScreenSample() {
             },
         ) {
             SampleCopy()
+        }
+    }
+}
+
+/** A lazy page under the hero: its rows spaced, capped and centred on a wide window, with a gap under the last. */
+@Composable
+fun HeroDetailLazyScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailLazyScreen(
+            title = "A collection",
+            onBack = LocalDemoBack.current,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(bottom = dimensionResource(R.dimen.padding_l)),
+            hero = {
+                DetailHero(
+                    title = "A collection",
+                    backdropUrl = null,
+                    tagline = null,
+                    metaText = "6 films",
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            items(SAMPLE_ROWS) { index ->
+                ListRow(modifier = Modifier.widthIn(max = dimensionResource(R.dimen.content_max_width))) { textModifier ->
+                    Text(text = "Part ${index + 1}", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
+                }
+            }
         }
     }
 }

@@ -92,6 +92,11 @@ class ScreenTemplateSamplesScreenshotTest {
     fun heroDetailFooter() = HeroDetailScreenFooterSample()
 
     @PreviewTest
+    @ScreenPreviews
+    @Composable
+    fun heroDetailLazy() = HeroDetailLazyScreenSample()
+
+    @PreviewTest
     @ScreenStatePreview
     @Composable
     fun form() = FormScreenSample()
