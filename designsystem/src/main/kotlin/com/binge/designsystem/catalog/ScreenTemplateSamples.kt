@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
@@ -28,6 +31,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilledButton
@@ -53,6 +57,7 @@ import com.binge.designsystem.template.ScreenBody
 import com.binge.designsystem.template.StepFlowScreen
 import com.binge.designsystem.template.StepHeading
 import com.binge.designsystem.template.screenListPadding
+import com.binge.designsystem.theme.BingeShapes
 
 /*
  * The screen templates, each at the size it ships: a whole window. Every sample fills its slots with plain
@@ -61,6 +66,8 @@ import com.binge.designsystem.template.screenListPadding
 
 private const val SAMPLE_ROWS = 14
 private const val SAMPLE_STEPS = 3
+private const val SAMPLE_GRID_COLUMNS = 3
+private const val SAMPLE_GRID_TILES = 24
 
 /** A collapsing-bar screen over a list: the bar scrims in as rows pass under it. */
 @Composable
@@ -340,6 +347,46 @@ fun StepFlowScreenSample() {
 fun StepFlowScreenLoadingSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         StepFlowScreen(stepCount = SAMPLE_STEPS, currentStep = 0, loading = true) {}
+    }
+}
+
+/** A step whose content scrolls itself: a lazy grid takes the height left under the heading, above the commit. */
+@Composable
+fun StepFlowScreenLazyStepSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
+            contentScrolls = { false },
+            heading = { StepHeading(kicker = "Services", title = "Where do you watch?", subtitle = "Pick as many as you like.") },
+            footer = {
+                BingeFilledButton(
+                    label = "Continue",
+                    onClick = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(SAMPLE_GRID_COLUMNS),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                items(SAMPLE_GRID_TILES) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .aspectRatio(1f)
+                                .clip(BingeShapes.Medium)
+                                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                    )
+                }
+            }
+        }
     }
 }
 

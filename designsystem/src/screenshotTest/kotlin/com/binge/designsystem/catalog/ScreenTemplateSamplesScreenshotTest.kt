@@ -111,6 +111,11 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun stepFlowLoading() = StepFlowScreenLoadingSample()
 
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowLazyStep() = StepFlowScreenLazyStepSample()
+
     /** The insets a default frame cannot see: the bottom bar clears the nav bar, the rows clear the bar. */
     @PreviewTest
     @ScreenStatePreview

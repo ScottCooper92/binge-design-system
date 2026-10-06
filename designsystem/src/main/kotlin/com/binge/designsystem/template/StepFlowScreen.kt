@@ -1,6 +1,12 @@
 package com.binge.designsystem.template
 
-import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +35,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +47,11 @@ import com.binge.designsystem.centredReadingColumn
 import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.isLandscape
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.theme.LocalReduceMotion
+import kotlin.coroutines.cancellation.CancellationException
+
+/** How long a step takes to slide across: long enough to read as a direction, short enough not to wait on. */
+private const val STEP_SLIDE_MILLIS = 280
 
 /**
  * A multi-step flow on a phone, foldable or tablet: back and a step read-out at the top, the step below, and
@@ -46,9 +59,13 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * Portrait stacks the [aside] (an illustration), the [heading] and the [content] in one scroll. A landscape or
  * expanded window has the width and not the height, so the aside, heading and footer go on one side and the
- * content scrolls on the other. Back shows from the second step, and BACK steps back too. [loading] replaces
- * the step with a centred indicator. The read-out is hidden for a single-step flow. The same shape as the TV
- * step flow, so a flow ports between form factors by swapping the template.
+ * content scrolls on the other. Back shows from the second step, and BACK, predictive back included, steps
+ * back too. [loading] replaces the step with a centred indicator. The read-out is hidden for a single-step flow.
+ *
+ * Each slot is handed the step it draws, and should branch on that rather than on [currentStep]: changing step
+ * slides the whole step across, and the outgoing one must keep drawing itself while it leaves. A step whose
+ * content scrolls itself, a lazy grid, returns false from [contentScrolls] and gets the remaining height instead.
+ * The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
  */
 @Composable
 fun StepFlowScreen(
@@ -57,13 +74,14 @@ fun StepFlowScreen(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     loading: Boolean = false,
-    heading: (@Composable () -> Unit)? = null,
-    aside: (@Composable ColumnScope.() -> Unit)? = null,
-    footer: (@Composable ColumnScope.() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit,
+    contentScrolls: (step: Int) -> Boolean = { true },
+    heading: (@Composable (step: Int) -> Unit)? = null,
+    aside: (@Composable ColumnScope.(step: Int) -> Unit)? = null,
+    footer: (@Composable ColumnScope.(step: Int) -> Unit)? = null,
+    content: @Composable ColumnScope.(step: Int) -> Unit,
 ) {
     val back = onBack.takeIf { currentStep > 0 }
-    BackHandler(enabled = back != null) { back?.invoke() }
+    StepBackHandler(back)
     // systemBars + displayCutout rather than safeDrawing, so a step raising the keyboard does not shift the
     // whole flow: a step with a text field owns its own imePadding.
     Column(
@@ -75,10 +93,13 @@ fun StepFlowScreen(
     ) {
         StepChrome(stepCount = stepCount, currentStep = currentStep, onBack = back)
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            when {
-                loading -> LoadingMessageScreen()
-                isLandscape() || isExpandedLayout() -> SplitStep(heading, aside, footer, content)
-                else -> StackedStep(heading, aside, footer, content)
+            if (loading) {
+                LoadingMessageScreen()
+            } else {
+                StepTransition(currentStep) { step ->
+                    val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
+                    if (isLandscape() || isExpandedLayout()) SplitStep(slots) else StackedStep(slots)
+                }
             }
         }
     }
@@ -103,13 +124,55 @@ fun StepHeading(
     }
 }
 
+/** One step's slots, already bound to the step they draw. */
+private class StepSlots(
+    val step: Int,
+    val heading: (@Composable (step: Int) -> Unit)?,
+    val aside: (@Composable ColumnScope.(step: Int) -> Unit)?,
+    val footer: (@Composable ColumnScope.(step: Int) -> Unit)?,
+    val content: @Composable ColumnScope.(step: Int) -> Unit,
+    val scrolls: Boolean,
+)
+
+/**
+ * Forward slides the next step in from the end edge, back from the start; reduced motion swaps it in place.
+ * The chrome stays put above it, so the read-out moves without the back button sliding away with the step.
+ */
 @Composable
-private fun StackedStep(
-    heading: (@Composable () -> Unit)?,
-    aside: (@Composable ColumnScope.() -> Unit)?,
-    footer: (@Composable ColumnScope.() -> Unit)?,
-    content: @Composable ColumnScope.() -> Unit,
-) {
+private fun StepTransition(currentStep: Int, step: @Composable (Int) -> Unit) {
+    val reduceMotion = LocalReduceMotion.current
+    AnimatedContent(
+        targetState = currentStep,
+        modifier = Modifier.fillMaxSize(),
+        transitionSpec = {
+            if (reduceMotion) {
+                EnterTransition.None togetherWith ExitTransition.None
+            } else {
+                val direction = if (targetState > initialState) SlideDirection.Start else SlideDirection.End
+                slideIntoContainer(direction, tween(STEP_SLIDE_MILLIS)) togetherWith
+                    slideOutOfContainer(direction, tween(STEP_SLIDE_MILLIS))
+            }
+        },
+        label = "step-flow",
+    ) { target -> step(target) }
+}
+
+/** BACK, and the predictive back gesture, steps back once the gesture commits; a cancelled gesture does nothing. */
+@Composable
+private fun StepBackHandler(onBack: (() -> Unit)?) {
+    val currentOnBack by rememberUpdatedState(onBack)
+    PredictiveBackHandler(enabled = onBack != null) { progress ->
+        try {
+            progress.collect { }
+            currentOnBack?.invoke()
+        } catch (_: CancellationException) {
+            // The gesture was abandoned, which is not a step back.
+        }
+    }
+}
+
+@Composable
+private fun StackedStep(slots: StepSlots) {
     Column(
         modifier =
             Modifier
@@ -117,24 +180,23 @@ private fun StackedStep(
                 .padding(horizontal = dimensionResource(R.dimen.padding_l)),
     ) {
         Column(
-            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
+            modifier = Modifier.weight(1f).then(if (slots.scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
         ) {
-            aside?.invoke(this)
-            heading?.invoke()
-            content()
+            slots.aside?.invoke(this, slots.step)
+            slots.heading?.invoke(slots.step)
+            if (slots.scrolls) {
+                slots.content(this, slots.step)
+            } else {
+                Column(modifier = Modifier.fillMaxWidth().weight(1f)) { slots.content(this, slots.step) }
+            }
         }
-        footer?.let { StepFooter(it) }
+        slots.footer?.let { footer -> StepFooter { footer(slots.step) } }
     }
 }
 
 @Composable
-private fun SplitStep(
-    heading: (@Composable () -> Unit)?,
-    aside: (@Composable ColumnScope.() -> Unit)?,
-    footer: (@Composable ColumnScope.() -> Unit)?,
-    content: @Composable ColumnScope.() -> Unit,
-) {
+private fun SplitStep(slots: StepSlots) {
     Row(
         modifier = Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.padding_l)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
@@ -144,16 +206,19 @@ private fun SplitStep(
                 modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
             ) {
-                aside?.invoke(this)
-                heading?.invoke()
+                slots.aside?.invoke(this, slots.step)
+                slots.heading?.invoke(slots.step)
             }
-            footer?.let { StepFooter(it) }
+            slots.footer?.let { footer -> StepFooter { footer(slots.step) } }
         }
         Column(
-            modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .then(if (slots.scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
-            content = content,
-        )
+        ) { slots.content(this, slots.step) }
     }
 }
 
