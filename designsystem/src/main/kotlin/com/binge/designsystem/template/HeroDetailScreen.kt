@@ -1,10 +1,12 @@
 package com.binge.designsystem.template
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -85,7 +87,9 @@ fun HeroDetailScreen(
 
 /**
  * [HeroDetailScreen] for a long page that stays lazy: [content] adds items after the [hero] item, and the bar
- * fades on how far the hero has scrolled out of [listState].
+ * fades on how far the hero has scrolled out of [listState]. [verticalArrangement], [horizontalAlignment] and
+ * [contentPadding] are the list's own, and apply to the hero item too: a spacing between every row, rows
+ * capped and centred on a wide window, a gap under the last one.
  */
 @Composable
 fun HeroDetailLazyScreen(
@@ -100,6 +104,9 @@ fun HeroDetailLazyScreen(
     inFlight: Boolean = false,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     footer: (@Composable () -> Unit)? = null,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    contentPadding: PaddingValues = PaddingValues(),
     hero: @Composable () -> Unit,
     content: LazyListScope.() -> Unit,
 ) {
@@ -107,6 +114,9 @@ fun HeroDetailLazyScreen(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize().then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
+            contentPadding = contentPadding,
+            verticalArrangement = verticalArrangement,
+            horizontalAlignment = horizontalAlignment,
         ) {
             item(key = HERO_ITEM_KEY) { hero() }
             content()
