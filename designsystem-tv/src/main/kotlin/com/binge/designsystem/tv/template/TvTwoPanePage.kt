@@ -66,6 +66,15 @@ sealed interface TvTwoPaneSplit {
     }
 }
 
+/** How [TvTwoPanePage] places its copy and spaces its panes. */
+enum class TvTwoPaneStyle {
+    /** Copy centred beside a form or panel, the panes held well apart: sign-in, setup, a step. */
+    Form,
+
+    /** Copy top-aligned beside a list or grid, the divider splitting a narrower gap: settings, a picker board. */
+    Board,
+}
+
 /**
  * A TV page in two panes: [copy] says what this page is and what to do, [action] holds what the remote walks
  * through. The template for sign-in, setup, settings and onboarding steps.
@@ -73,13 +82,15 @@ sealed interface TvTwoPaneSplit {
  * The action pane scrolls when [actionScrolls] (a column of fields), or hands its whole height to a lazy
  * child that scrolls itself when not. [pinnedAction] sits under the action pane as its unweighted child, so a
  * commit stays reachable however long the pane gets. [actionFirst] mirrors the panes for a page whose
- * choices lead (a grid of services, then why). Focus entry lands on [entry]; see [TvBoard] for [hosting].
+ * choices lead (a grid of services, then why). [style] picks the form or the board shape. Focus entry lands
+ * on [entry]; see [TvBoard] for [hosting].
  */
 @Composable
 fun TvTwoPanePage(
     modifier: Modifier = Modifier,
     title: String? = null,
     split: TvTwoPaneSplit = TvTwoPaneSplit.Balanced,
+    style: TvTwoPaneStyle = TvTwoPaneStyle.Form,
     hosting: TvPageHosting = currentTvPageHosting(),
     entry: FocusRequester? = null,
     arrivalEnabled: Boolean = true,
@@ -100,10 +111,15 @@ fun TvTwoPanePage(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_two_pane_gap)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(style.paneGap)),
         ) {
             val copyPane: @Composable RowScope.() -> Unit = {
-                CopyPane(modifier = paneModifier(split, isCopy = true), alignment = copyAlignment, content = copy)
+                CopyPane(
+                    modifier = paneModifier(split, isCopy = true),
+                    style = style,
+                    alignment = copyAlignment,
+                    content = copy,
+                )
             }
             val actionPane: @Composable RowScope.() -> Unit = {
                 ActionPane(
@@ -164,15 +180,27 @@ fun TvTwoPaneCopy(
     }
 }
 
+/** The gap between neighbouring panes, so with a divider the gap on each side of the rule. */
+private val TvTwoPaneStyle.paneGap: Int
+    get() = when (this) {
+        TvTwoPaneStyle.Form -> TvR.dimen.tv_two_pane_gap
+        TvTwoPaneStyle.Board -> TvR.dimen.tv_two_pane_board_gap
+    }
+
 @Composable
 private fun CopyPane(
+    style: TvTwoPaneStyle,
     alignment: Alignment.Horizontal,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val arrangement = when (style) {
+        TvTwoPaneStyle.Form -> Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l), Alignment.CenterVertically)
+        TvTwoPaneStyle.Board -> Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Top)
+    }
     Column(
         modifier = modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l), Alignment.CenterVertically),
+        verticalArrangement = arrangement,
         horizontalAlignment = alignment,
         content = content,
     )

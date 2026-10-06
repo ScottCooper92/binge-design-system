@@ -26,11 +26,13 @@ import com.binge.designsystem.tv.template.TvBoard
 import com.binge.designsystem.tv.template.TvMessagePage
 import com.binge.designsystem.tv.template.TvPageAction
 import com.binge.designsystem.tv.template.TvPageHosting
+import com.binge.designsystem.tv.template.TvScreenHeading
 import com.binge.designsystem.tv.template.TvStepFlow
 import com.binge.designsystem.tv.template.TvStepHeading
 import com.binge.designsystem.tv.template.TvTwoPaneCopy
 import com.binge.designsystem.tv.template.TvTwoPanePage
 import com.binge.designsystem.tv.template.TvTwoPaneSplit
+import com.binge.designsystem.tv.template.TvTwoPaneStyle
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -42,6 +44,7 @@ import com.binge.designsystem.tv.R as TvR
 
 private const val SAMPLE_STEP_COUNT = 3
 private const val SAMPLE_ROWS = 5
+private const val SAMPLE_GRID_COLUMNS = 3
 
 /** Sign-in on a television: the pitch on the left, a fixed-width panel carrying the QR hand-off on the right. */
 @Composable
@@ -117,6 +120,47 @@ fun TvTwoPanePageListDetailSample() {
             },
         )
     }
+}
+
+/** A picker board: the heading and a running count top-aligned beside the grid, the divider halving the gap. */
+@Composable
+fun TvTwoPanePageBoardSample() {
+    TvTwoPanePage(
+        split = TvTwoPaneSplit.ListDetail,
+        style = TvTwoPaneStyle.Board,
+        hosting = TvPageHosting.Overlay,
+        actionScrolls = false,
+        copy = {
+            TvScreenHeading(title = "Services")
+            Text(
+                text = "Pick what you subscribe to, and lists show where each title streams.",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = "2 selected",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        },
+        action = {
+            Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m))) {
+                repeat(SAMPLE_ROWS) { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m))) {
+                        repeat(SAMPLE_GRID_COLUMNS) { column ->
+                            val index = row * SAMPLE_GRID_COLUMNS + column
+                            TvButtonSurface(
+                                "Service ${index + 1}",
+                                TvButtonStyle.Secondary,
+                                enabled = true,
+                                isFocused = index == 0,
+                            )
+                        }
+                    }
+                }
+            }
+        },
+    )
 }
 
 /** Choices lead and the explanation follows, with the commit pinned under the choices so it stays reachable. */
