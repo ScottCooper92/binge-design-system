@@ -124,10 +124,9 @@ by a consumer, so **default to reporting "referenced by no code in either repo" 
 Check `../Binge` and `../binge-seerr` before calling anything dead.
 
 - **Unreferenced value resources** (`dimen`/`string`/`plurals`/`color`/`integer`/`bool`): 1 occurrence
-  repo-wide (the declaration) is unused *in this repo*; then grep the consumers. Check qualifier files
-  (`values-land`, `values-sw600dp`, `values-w600dp`, `values-w840dp`, `values-w1240dp`,
-  `values-sw600dp-w840dp`, `values-w840dp-h600dp`, `values-sw600dp-land`) for overrides of anything
-  flagged, and for overrides without a base entry.
+  repo-wide (the declaration) is unused *in this repo*; then grep the consumers. Check every
+  `values-*` qualifier folder under each module's `src/main/res` (list them; do not work from memory)
+  for overrides of anything flagged, and for overrides without a base entry.
 - **Unreferenced drawables** (0 occurrences of the filename); exempt manifest/adaptive-icon references.
 - **Catalog samples** with no frame; **public symbols** no consumer imports (KDoc claiming a consumer
   that does not exist is worth more than the line it occupies); dead enum entries / sealed subtypes.

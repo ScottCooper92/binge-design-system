@@ -22,6 +22,14 @@ foundation that names none of Binge's types. Material 3 and tv-material must not
 TV layer is its own module and `checkTvMaterialSeparation` (wired into `check`) fails on an import
 across the seam; the colour-scheme adapter in `BingeTvTokens.kt` is the one sanctioned crossing.
 
+Both modules also hold the screen templates, in a `template` package each: whole-screen frames
+that Binge and the companion build their pages from, so a screen of the same kind is laid out the
+same way in both apps. On the phone (`com.binge.designsystem.template`) they are the scaffold, the
+message screen, the filtered list, the hero detail page, the form and the step flow. On the TV
+(`com.binge.designsystem.tv.template`) they are the page hosting, the board, the two-pane page, the
+step flow, the message page, the detail page and the immersive hub and grid. A template follows
+the one rule below like any component: it takes slots and callbacks, never a Binge type.
+
 ## The one rule everything else serves
 
 **A component here may not know what Binge's data looks like.**
