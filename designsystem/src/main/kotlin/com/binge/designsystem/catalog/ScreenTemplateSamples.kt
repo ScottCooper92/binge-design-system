@@ -53,6 +53,7 @@ import com.binge.designsystem.template.FormScreen
 import com.binge.designsystem.template.FormSection
 import com.binge.designsystem.template.HeroDetailLazyScreen
 import com.binge.designsystem.template.HeroDetailScreen
+import com.binge.designsystem.template.HeroDetailStateScreen
 import com.binge.designsystem.template.LoadingMessageScreen
 import com.binge.designsystem.template.MessageScreen
 import com.binge.designsystem.template.ScreenAction
@@ -293,6 +294,30 @@ fun HeroDetailLazyScreenSample() {
                 }
             }
         }
+    }
+}
+
+/** A detail page whose load failed: the message under the page's back control, so the way out stays where it was. */
+@Composable
+fun HeroDetailStateScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailStateScreen(onBack = LocalDemoBack.current) {
+            MessageScreen(
+                headline = "Can't load this title",
+                body = "Check your connection, then try again.",
+                icon = Icons.Filled.CloudOff,
+                primary = ScreenAction("Try again", onClick = {}, leadingIcon = Icons.Filled.Refresh),
+                announce = true,
+            )
+        }
+    }
+}
+
+/** The same frame while the page loads. */
+@Composable
+fun HeroDetailStateScreenLoadingSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailStateScreen(onBack = LocalDemoBack.current) { LoadingMessageScreen() }
     }
 }
 

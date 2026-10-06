@@ -99,6 +99,16 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenStatePreview
     @Composable
+    fun heroDetailState() = HeroDetailStateScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailStateLoading() = HeroDetailStateScreenLoadingSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
     fun form() = FormScreenSample()
 
     @PreviewTest
