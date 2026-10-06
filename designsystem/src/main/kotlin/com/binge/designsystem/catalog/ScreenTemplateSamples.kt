@@ -353,14 +353,22 @@ fun StepFlowScreenLoadingSample() {
 /** A step whose content scrolls itself: a lazy grid takes the height left under the heading, above the commit. */
 @Composable
 fun StepFlowScreenLazyStepSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         StepFlowScreen(
             stepCount = SAMPLE_STEPS,
-            currentStep = 1,
-            onBack = LocalDemoBack.current,
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
             contentScrolls = { false },
             heading = { StepHeading(kicker = "Services", title = "Where do you watch?", subtitle = "Pick as many as you like.") },
-            footer = { BingeFilledButton(label = "Continue", onClick = {}, modifier = Modifier.fillMaxWidth()) },
+            footer = {
+                BingeFilledButton(
+                    label = "Continue",
+                    onClick = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(SAMPLE_GRID_COLUMNS),

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -44,7 +45,7 @@ class StepFlowScreenTest {
     private fun setFlow(
         reduceMotion: Boolean = false,
         contentScrolls: Boolean = true,
-        content: @androidx.compose.runtime.Composable (Int) -> Unit = { Text("Step $it") },
+        content: @Composable (Int) -> Unit = { Text("Step $it") },
     ) {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
