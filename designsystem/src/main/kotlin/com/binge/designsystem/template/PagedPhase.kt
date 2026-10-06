@@ -75,6 +75,8 @@ fun pagedPhase(
  * Follows one list from frame to frame to work out [pagedPhase]'s `cacheBehind`. A list with a mediator is
  * behind its cache until a refresh has finished, and after that only while the refresh wrote rows none of
  * which have shown yet: once rows have shown, an empty list is real. A list with no mediator is never behind.
+ * So a mediator list must record a [PagedRefresh] even when `initialize()` skips its first refresh, or an
+ * empty cache stays on the skeleton.
  *
  * [phase] is called during composition and writes the tracker's fields, so it must stay idempotent for a
  * repeated frame.
@@ -102,7 +104,8 @@ class PagedPhaseTracker {
 
 /**
  * The phase of the list on screen, from a count and load states rather than `LazyPagingItems`, so the
- * code under test needs no paging collection. [key] is the list's identity; [lastRefresh] is null without a mediator.
+ * code under test needs no paging collection. [key] is the list's identity; [lastRefresh] is null without a
+ * mediator, and with one it must be recorded even for a skipped initial refresh (see [PagedPhaseTracker]).
  */
 @Composable
 fun rememberPagedPhase(
