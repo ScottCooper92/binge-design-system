@@ -67,4 +67,19 @@
     <dimen name="tv_see_all_icon">32dp</dimen>
     <!-- A poster in an immersive row: 120dp wide, so 180dp tall at 2:3 and about seven across a 960dp panel. -->
     <dimen name="tv_immersive_card_width">120dp</dimen>
+    <!-- Detail page: the hero band, its copy column, the poster beside it, and how sections anchor under it. -->
+    <dimen name="tv_detail_page_hero_height">424dp</dimen>
+    <dimen name="tv_detail_page_hero_content_top">60dp</dimen>
+    <dimen name="tv_detail_page_poster_width">190dp</dimen>
+    <dimen name="tv_detail_page_hero_gap">32dp</dimen>
+    <dimen name="tv_detail_page_copy_width">460dp</dimen>
+    <dimen name="tv_detail_page_copy_gap">13dp</dimen>
+    <dimen name="tv_detail_page_synopsis_padding">10dp</dimen>
+    <dimen name="tv_detail_page_meta_gap">10dp</dimen>
+    <dimen name="tv_detail_page_certification_padding_horizontal">5dp</dimen>
+    <dimen name="tv_detail_page_certification_padding_vertical">1dp</dimen>
+    <dimen name="tv_detail_page_action_primary_min_width">220dp</dimen>
+    <dimen name="tv_detail_page_section_gap">32dp</dimen>
+    <dimen name="tv_detail_page_section_anchor_top">64dp</dimen>
+    <dimen name="tv_detail_page_content_bottom">240dp</dimen>
 </resources>
