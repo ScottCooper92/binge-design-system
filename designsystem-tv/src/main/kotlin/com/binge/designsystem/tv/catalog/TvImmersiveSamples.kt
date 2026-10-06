@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.template.TvHubRow
+import com.binge.designsystem.tv.template.TvImmersiveGrid
 import com.binge.designsystem.tv.template.TvImmersiveHub
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -102,54 +104,60 @@ private fun SampleHub(
             itemId = { it.id },
             cardWidth = dimensionResource(TvR.dimen.tv_immersive_card_width),
             onItemClick = {},
-            artwork = { title ->
-                // A gradient in the card's own tone, since a sample has no network to fetch art from.
-                val tone = sampleTone(title.id)
-                Box(
-                    modifier =
-                        Modifier.fillMaxSize().background(Brush.linearGradient(listOf(tone, MaterialTheme.colorScheme.background))),
-                )
-            },
-            copy = { title ->
-                Text(
-                    text = title.meta,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                )
-                Text(
-                    text = title.title,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = title.synopsis,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
+            artwork = { title -> SampleArtwork(title) },
+            copy = { title -> SampleCopy(title) },
             hero = hero,
             initialFocused = initialFocused,
             seeAllLabel = "See all",
         ) { title, isFocused, onFocusChanged, onClick, cellModifier ->
-            Box(
-                modifier =
-                    cellModifier
-                        .aspectRatio(POSTER_RATIO)
-                        .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
-                        .clip(BingeShapes.MediaCard)
-                        .background(sampleTone(title.id))
-                        .tvClickable(
-                            onFocusChanged = onFocusChanged,
-                            onClick = onClick,
-                        ),
-            )
+            SampleCard(title = title, isFocused = isFocused, onFocusChanged = onFocusChanged, onClick = onClick, modifier = cellModifier)
         }
     }
+}
+
+/** A gradient in the card's own tone, since a sample has no network to fetch art from. */
+@Composable
+private fun SampleArtwork(title: SampleTitle) {
+    val tone = sampleTone(title.id)
+    Box(modifier = Modifier.fillMaxSize().background(Brush.linearGradient(listOf(tone, MaterialTheme.colorScheme.background))))
+}
+
+@Composable
+private fun ColumnScope.SampleCopy(title: SampleTitle) {
+    Text(text = title.meta, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+    Text(
+        text = title.title,
+        style = MaterialTheme.typography.displaySmall,
+        color = MaterialTheme.colorScheme.onSurface,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
+    Text(
+        text = title.synopsis,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+@Composable
+private fun SampleCard(
+    title: SampleTitle,
+    isFocused: Boolean,
+    onFocusChanged: (Boolean) -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .aspectRatio(POSTER_RATIO)
+                .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
+                .clip(BingeShapes.MediaCard)
+                .background(sampleTone(title.id))
+                .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick),
+    )
 }
 
 private const val POSTER_RATIO = 2f / 3f
@@ -220,4 +228,64 @@ fun TvSeeAllTileSample() {
             modifier = Modifier.width(dimensionResource(TvR.dimen.tv_immersive_card_width)),
         )
     }
+}
+
+private const val GRID_ITEM_COUNT = 30
+private const val GRID_FOCUSED_INDEX = 8
+
+private val SampleGridTitles =
+    List(GRID_ITEM_COUNT) { index ->
+        SampleTitle(
+            id = 400 + index,
+            title = "A title in the grid ${index + 1}",
+            meta = "TV show  ·  2025  ·  15",
+            synopsis = "A synopsis long enough to fill two lines of the copy band over the grid, so the sample shows how it clamps.",
+        )
+    }
+
+@Composable
+private fun SampleGrid(titles: List<SampleTitle> = SampleGridTitles, initialFocusedIndex: Int? = null) {
+    RailHosted {
+        TvImmersiveGrid(
+            heading = "All titles (${titles.size})",
+            count = titles.size,
+            itemAt = { titles.getOrNull(it) },
+            itemKey = { titles[it].id },
+            artwork = { title -> SampleArtwork(title) },
+            copy = { title -> SampleCopy(title) },
+            initialFocusedIndex = initialFocusedIndex,
+        ) { title, isFocused, onFocusChanged, cellModifier ->
+            SampleCard(title, isFocused, onFocusChanged, onClick = {}, modifier = cellModifier)
+        }
+    }
+}
+
+/** Every title behind a see-all tile as a paged grid: at rest it shows the first title's backdrop. */
+@Composable
+fun TvImmersiveGridSample() {
+    SampleGrid()
+}
+
+/** Focus on the second row: the row is anchored under the heading and the first is clipped away. */
+@Composable
+fun TvImmersiveGridFocusedSample() {
+    SampleGrid(initialFocusedIndex = GRID_FOCUSED_INDEX)
+}
+
+private const val GRID_DEMO_ITEM_COUNT = 90
+
+private val DemoGridTitles =
+    List(GRID_DEMO_ITEM_COUNT) { index ->
+        SampleTitle(
+            id = 500 + index,
+            title = "A title in the grid ${index + 1}",
+            meta = "TV show  ·  2025  ·  15",
+            synopsis = "A synopsis long enough to fill two lines of the copy band over the grid, so the demo shows how it clamps.",
+        )
+    }
+
+/** The grid running live over enough rows to scroll: the anchor scroll, the top clip as it moves and the backdrop following focus. */
+@Composable
+fun TvImmersiveGridDemo() {
+    SampleGrid(titles = DemoGridTitles)
 }

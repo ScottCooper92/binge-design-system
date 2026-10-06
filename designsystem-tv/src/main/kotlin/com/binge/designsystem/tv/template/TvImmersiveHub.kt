@@ -270,13 +270,19 @@ fun <T : Any> TvImmersiveHub(
     }
 }
 
-/** The backdrop layer: [artwork] full-bleed under a scrim, with [copy] in the band above the rows. */
+/**
+ * The backdrop layer: [artwork] full-bleed under a scrim, with [copy] in the band above the rows.
+ *
+ * [copyTopInset] reserves space at the top of the copy's band for a caller drawing over it, such as the grid's
+ * heading. The copy is bottom-anchored, so without it a tall block would overflow up into the heading.
+ */
 @Composable
 fun <T : Any> TvImmersiveBackdrop(
     item: T?,
     artwork: @Composable (T) -> Unit,
     copy: @Composable ColumnScope.(T) -> Unit,
     modifier: Modifier = Modifier,
+    copyTopInset: Dp = Dp.Hairline,
 ) {
     Crossfade(
         targetState = item,
@@ -293,7 +299,7 @@ fun <T : Any> TvImmersiveBackdrop(
                     TvImmersiveScrim()
                 }
                 ReportTvRailArtwork()
-                TvImmersiveCopyBand { copy(focused) }
+                TvImmersiveCopyBand(copyTopInset) { copy(focused) }
             }
         }
     }
@@ -301,7 +307,7 @@ fun <T : Any> TvImmersiveBackdrop(
 
 /** The text band above the rows, bottom-anchored so the copy does not shift as a title wraps. */
 @Composable
-private fun BoxScope.TvImmersiveCopyBand(content: @Composable ColumnScope.() -> Unit) {
+private fun BoxScope.TvImmersiveCopyBand(copyTopInset: Dp, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier =
             Modifier
@@ -311,7 +317,7 @@ private fun BoxScope.TvImmersiveCopyBand(content: @Composable ColumnScope.() -> 
                 .padding(
                     start = tvContentGutterStart(),
                     end = dimensionResource(DesR.dimen.padding_m),
-                    top = dimensionResource(TvR.dimen.tv_overscan_vertical),
+                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset,
                     bottom = dimensionResource(DesR.dimen.padding_l),
                 ),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
