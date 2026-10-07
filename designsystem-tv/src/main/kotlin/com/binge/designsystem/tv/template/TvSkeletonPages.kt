@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +24,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
@@ -41,10 +42,9 @@ private const val SYNOPSIS_LINES = 3
  * poster plates under their headings, laid out where the loaded hub puts them so nothing moves when the content
  * arrives. [rows] and [cardsPerRow] say how much to suggest; the cards run off the edge as a loaded row does.
  *
- * It is a page, hosted like the hub: [hosting] says how focus is placed, while the edges follow the hub's own, the
- * content gutter at the start and rows that run to the end of the screen. Nothing in it is focusable, so while it shows the
- * D-pad has nowhere to go, and focus is placed by the loaded page when it replaces this one. [description] names the
- * state for a screen reader.
+ * It is a page, laid out like the hub: its edges follow the hub's own, the content gutter at the start and rows that
+ * run to the end of the screen. Nothing in it is focusable, so while it shows the D-pad has nowhere to go, and focus
+ * is placed by the loaded page when it replaces this one. [description] names the state for a screen reader.
  */
 @Composable
 fun TvImmersiveHubSkeleton(
@@ -52,7 +52,6 @@ fun TvImmersiveHubSkeleton(
     rows: Int = 2,
     cardsPerRow: Int = 8,
     cardWidth: Dp = dimensionResource(TvR.dimen.tv_immersive_card_width),
-    hosting: TvPageHosting = currentTvPageHosting(),
     description: String? = null,
 ) {
     Column(
@@ -113,7 +112,6 @@ fun TvDetailPageSkeleton(
 ) {
     val page = tvPagePadding(hosting)
     val direction = LocalLayoutDirection.current
-    val rtl = direction == LayoutDirection.Rtl
     Column(
         modifier =
             modifier
@@ -121,8 +119,8 @@ fun TvDetailPageSkeleton(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(
                     PaddingValues(
-                        start = page.calculateLeftPadding(direction).takeIf { rtl.not() } ?: page.calculateRightPadding(direction),
-                        end = page.calculateRightPadding(direction).takeIf { rtl.not() } ?: page.calculateLeftPadding(direction),
+                        start = page.calculateStartPadding(direction),
+                        end = page.calculateEndPadding(direction),
                         bottom = page.calculateBottomPadding(),
                     ),
                 ).describedAs(description),
