@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
+import com.binge.designsystem.tv.layout.TvLayoutAnchors
+import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -57,10 +59,11 @@ fun TvImmersiveHubSkeleton(
                 .describedAs(description),
     ) {
         Column(
-            modifier = Modifier.height(
-                dimensionResource(TvR.dimen.tv_immersive_content_top) - dimensionResource(TvR.dimen.tv_overscan_vertical),
-            ),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_skeleton_line_gap)),
+            modifier = Modifier
+                .height(
+                    dimensionResource(TvR.dimen.tv_immersive_content_top) - dimensionResource(TvR.dimen.tv_overscan_vertical),
+                ).padding(bottom = dimensionResource(DesR.dimen.padding_l)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
         ) {
             TvSkeletonBlock(
                 Modifier
@@ -111,7 +114,10 @@ fun TvDetailPageSkeleton(
                 .describedAs(description),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_page_section_gap)),
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_page_hero_gap))) {
+        Row(
+            modifier = Modifier.tvLayoutAnchor(TvLayoutAnchors.entry(TvLayoutAnchors.HERO_KEY)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_page_hero_gap)),
+        ) {
             TvSkeletonBlock(
                 Modifier.width(dimensionResource(TvR.dimen.tv_detail_page_poster_width)).aspectRatio(POSTER_RATIO),
                 shape = BingeShapes.MediaCard,
@@ -163,7 +169,7 @@ fun TvDetailPageSkeleton(
                 }
             }
         }
-        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_skeleton_line_gap))) {
+        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_header_gap))) {
             TvSkeletonBlock(
                 Modifier
                     .width(
@@ -171,7 +177,7 @@ fun TvDetailPageSkeleton(
                     ).height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
             )
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_sm)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
                 userScrollEnabled = false,
             ) {
                 items(DETAIL_CARDS) {
@@ -190,7 +196,7 @@ private val DETAIL_CARDS = List(6) { it }
 
 @Composable
 private fun PosterRowSkeleton(cards: Int, cardWidth: Dp) {
-    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_skeleton_line_gap))) {
+    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_header_gap))) {
         TvSkeletonBlock(
             Modifier
                 .width(
@@ -198,7 +204,7 @@ private fun PosterRowSkeleton(cards: Int, cardWidth: Dp) {
                 ).height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
         )
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_sm)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
             userScrollEnabled = false,
         ) {
             items(List(cards) { it }) {

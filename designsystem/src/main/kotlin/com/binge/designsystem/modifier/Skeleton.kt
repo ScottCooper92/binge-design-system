@@ -30,14 +30,18 @@ private const val SHIMMER_HIGHLIGHT_ALPHA = 0.35f
  *
  * A `surfaceVariant` base with a lighter highlight sweeping across; the sweep freezes at a fixed offset
  * under [LocalReduceMotion] so screenshot baselines stay deterministic. [shape] clips the placeholder,
- * defaulting to the media-card radius (the common poster/card case).
+ * defaulting to the media-card radius (the common poster/card case). [base] and [highlight] default to the
+ * Material 3 scheme; a host outside Material 3 passes its own.
  */
 @Composable
-fun Modifier.skeleton(visible: Boolean, shape: Shape = BingeShapes.MediaCard): Modifier {
+fun Modifier.skeleton(
+    visible: Boolean,
+    shape: Shape = BingeShapes.MediaCard,
+    base: Color = MaterialTheme.colorScheme.surfaceVariant,
+    highlight: Color = MaterialTheme.colorScheme.surface.copy(alpha = SHIMMER_HIGHLIGHT_ALPHA),
+): Modifier {
     if (!visible) return this
 
-    val base = MaterialTheme.colorScheme.surfaceVariant
-    val highlight = MaterialTheme.colorScheme.surface.copy(alpha = SHIMMER_HIGHLIGHT_ALPHA)
     val progress = shimmerProgress()
 
     return this
