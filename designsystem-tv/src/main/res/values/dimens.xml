@@ -83,4 +83,14 @@
     <dimen name="tv_detail_page_section_gap">32dp</dimen>
     <dimen name="tv_detail_page_section_anchor_top">64dp</dimen>
     <dimen name="tv_detail_page_content_bottom">240dp</dimen>
+
+    <!-- Skeleton pages: the placeholders that stand for a hub's or a detail page's text, sized like the text they replace -->
+    <dimen name="tv_skeleton_overline_width">96dp</dimen>
+    <dimen name="tv_skeleton_title_width">320dp</dimen>
+    <dimen name="tv_skeleton_title_height">40dp</dimen>
+    <dimen name="tv_skeleton_meta_width">240dp</dimen>
+    <dimen name="tv_skeleton_meta_height">18dp</dimen>
+    <dimen name="tv_skeleton_heading_width">160dp</dimen>
+    <dimen name="tv_skeleton_action_height">48dp</dimen>
+    <dimen name="tv_skeleton_card_width">140dp</dimen>
 </resources>
