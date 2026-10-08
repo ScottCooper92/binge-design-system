@@ -26,6 +26,8 @@
     <string name="cd_remove_filter">Remove filter</string>
     <string name="cd_list_item_external">Opens in browser</string>
     <string name="cd_list_item_loading">In progress</string>
+    <string name="cd_group_expanded">Expanded</string>
+    <string name="cd_group_collapsed">Collapsed</string>
     <string name="text_entry_cancel">Cancel</string>
     <string name="text_entry_character_count" translatable="false">%1$d / %2$d</string>
     <string name="text_entry_expand">Expand to full screen</string>

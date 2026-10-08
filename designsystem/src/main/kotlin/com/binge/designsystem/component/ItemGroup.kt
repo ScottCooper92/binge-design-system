@@ -16,6 +16,8 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Badge
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -37,6 +39,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -126,6 +130,7 @@ private fun ListItemView(
     val external = interactive && row.toggled == null && row.trailingContent == null && row.destination == ListItemDestination.External
     val externalDescription = stringResource(R.string.cd_list_item_external)
     val loadingDescription = stringResource(R.string.cd_list_item_loading)
+    val expandedDescription = stringResource(if (row.expanded == true) R.string.cd_group_expanded else R.string.cd_group_collapsed)
     val connectorModifier = row.connector?.let { listItemConnector(it) } ?: Modifier
     Row(
         modifier = modifier
@@ -138,6 +143,22 @@ private fun ListItemView(
                 // icon, so a screen reader announces one node ("Watchlist, Opens in browser, Button")
                 // instead of reading the icon as a second stop.
                 if (external) stateDescription = externalDescription
+                if (row.expanded != null) {
+                    stateDescription = expandedDescription
+                    if (interactive) {
+                        if (row.expanded) {
+                            collapse {
+                                row.onClick()
+                                true
+                            }
+                        } else {
+                            expand {
+                                row.onClick()
+                                true
+                            }
+                        }
+                    }
+                }
             }
             // The wash sits outside the click, so the ripple draws over it rather than under it.
             .background(if (row.selected) MaterialTheme.colorScheme.primary.tonalContainer() else Color.Transparent)
@@ -205,6 +226,13 @@ private fun ListItemView(
                     enabled = !row.disabled,
                     colors = bingeSwitchColors(),
                 )
+                row.expanded != null -> {
+                    Icon(
+                        imageVector = if (row.expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 external -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.OpenInNew,
