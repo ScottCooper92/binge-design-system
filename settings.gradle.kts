@@ -7,8 +7,14 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        mavenCentral()
+        // Google's mirror of Maven Central, asked before Central. Shared build hosts (CI runners, cloud agent sessions)
+        // are rate-limited by Central and get 429s mid-build, and Gradle treats a 429 as a failure rather than a miss,
+        // so the build stops even when a later repository has the artifact. Anything the mirror lacks falls through.
+        maven("https://maven-central.storage-download.googleapis.com/maven2/") { name = "MavenCentralMirror" }
+        // The portal before Central: some plugins (ktlint's, for one) are published only there, and a 429 from
+        // Central would fail the build before the portal was asked.
         gradlePluginPortal()
+        mavenCentral()
     }
 }
 
@@ -22,6 +28,8 @@ dependencyResolutionManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+        // The same mirror, ahead of Central, for the same reason as above.
+        maven("https://maven-central.storage-download.googleapis.com/maven2/") { name = "MavenCentralMirror" }
         mavenCentral()
     }
 
