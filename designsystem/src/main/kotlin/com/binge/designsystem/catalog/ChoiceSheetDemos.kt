@@ -25,7 +25,7 @@ private const val SLOW_LIST_MILLIS = 1_500L
 
 /**
  * The choice rows opening their real sheets: a short list in a plain sheet, a long one that opens part-way and docks,
- * a multi-choice sheet with its filter, and a list that fails on its first read and loads on the retry.
+ * a multi-choice sheet with its filter, and a list that is read only when its sheet opens, fails the first time and loads on the retry.
  */
 @Composable
 fun ChoiceSheetsDemo() {
@@ -35,7 +35,9 @@ fun ChoiceSheetsDemo() {
         var languages by remember { mutableStateOf(setOf("ja")) }
         var attempts by remember { mutableIntStateOf(0) }
         var slow by remember { mutableStateOf<BingeChoiceList<String>>(BingeChoiceList.Loading) }
-        LaunchedEffect(attempts) {
+        var slowOpened by remember { mutableStateOf(false) }
+        LaunchedEffect(attempts, slowOpened) {
+            if (!slowOpened) return@LaunchedEffect
             slow = BingeChoiceList.Loading
             delay(SLOW_LIST_MILLIS)
             slow =
@@ -70,7 +72,16 @@ fun ChoiceSheetsDemo() {
                         { languages = it },
                         filterPlaceholder = "Filter languages",
                     ),
-                    bingeChoiceItem(Icons.Filled.Public, "Slow list", slow, null, "Not set", {}),
+                    bingeChoiceItem(
+                        Icons.Filled.Public,
+                        "Slow list",
+                        slow,
+                        null,
+                        "Not set",
+                        {},
+                        onOpen = { slowOpened = true },
+                        selectedLabel = "Japan",
+                    ),
                 ),
         )
     }

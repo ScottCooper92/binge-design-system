@@ -1,6 +1,8 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -141,5 +143,33 @@ class BingeChoiceSheetTest {
         assertTrue(BingeChoiceList.Loading.opensPartWay())
         assertFalse(BingeChoiceList.Ready((1..PEEK_THRESHOLD).map { BingeChoice(it, "$it") }).opensPartWay())
         assertFalse(BingeChoiceList.Failed("x", "y") {}.opensPartWay())
+    }
+
+    @Test
+    fun `a loading row names the saved selection, not the empty label, and tapping reports the open`() {
+        var opened = 0
+        rule.setContent {
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Region",
+                            choices = BingeChoiceList.Loading,
+                            selected = "jp",
+                            emptyLabel = "Not set",
+                            onSelect = {},
+                            onOpen = { opened++ },
+                            selectedLabel = "Japan",
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Japan").assertIsDisplayed()
+        assertTrue(rule.onAllNodesWithText("Not set").fetchSemanticsNodes().isEmpty())
+        rule.onNodeWithText("Region").performClick()
+        assertEquals(1, opened)
     }
 }

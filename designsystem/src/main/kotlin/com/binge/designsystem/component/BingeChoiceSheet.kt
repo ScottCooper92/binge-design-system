@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -119,6 +120,7 @@ fun <T> BingeMultiChoiceSheet(
     filterPlaceholder: String? = null,
 ) {
     val partWay = remember { choices.opensPartWay() }
+    // Plain remember: a generic T has no Saver, so a rotation reopens the sheet with the filter kept and the ticks reset.
     var draft by remember { mutableStateOf(selected) }
     BingeBottomSheet(onDismissRequest = onDismiss, modifier = modifier, skipPartiallyExpanded = !partWay, dockable = partWay) {
         ChoiceSheetTop(title = title) {
@@ -146,6 +148,11 @@ fun <T> BingeMultiChoiceSheet(
  * detail ([emptyLabel] when nothing in the list is chosen). A tap opens a [BingeChoiceSheet]. The sheet belongs to
  * this call, so a screen lists its rows and nothing else. A row that is not [enabled] dims, and closes its sheet if
  * open, so a pick cannot land in a draft that is already being saved.
+ *
+ * [onOpen] runs when the tap opens the sheet: the point to start reading a list fetched on open. While [choices] is not
+ * [BingeChoiceList.Ready] the detail is [selectedLabel], if given, so the row still names the saved value; then
+ * [emptyLabel]. The row emits its sheet as it is composed, so build it in composition on each pass, not inside a
+ * `remember`.
  */
 @Composable
 fun <T> bingeChoiceItem(
@@ -156,24 +163,30 @@ fun <T> bingeChoiceItem(
     emptyLabel: String,
     onSelect: (T) -> Unit,
     enabled: Boolean = true,
+    onOpen: () -> Unit = {},
+    selectedLabel: String? = null,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
     if (open) BingeChoiceSheet(title = title, choices = choices, selected = selected, onSelect = onSelect, onDismiss = { open = false })
     val chosen = (choices as? BingeChoiceList.Ready)?.choices?.firstOrNull { it.value == selected }
+    val detail = if (choices is BingeChoiceList.Ready) chosen?.label ?: emptyLabel else selectedLabel ?: emptyLabel
     return ListItem(
         icon = icon,
         label = title,
-        detail = chosen?.label ?: emptyLabel,
+        detail = detail,
         clickable = enabled,
         disabled = !enabled,
-        onClick = { open = true },
+        onClick = {
+            open = true
+            onOpen()
+        },
     )
 }
 
 /**
  * [bingeChoiceItem] for several values: the chosen labels, in list order, as the detail, and a [BingeMultiChoiceSheet]
- * on tap.
+ * on tap. [onOpen] and [selectedLabel] work as they do there; [selectedLabel] is the whole detail for the selection.
  */
 @Composable
 fun <T> bingeMultiChoiceItem(
@@ -187,6 +200,8 @@ fun <T> bingeMultiChoiceItem(
     onDone: (Set<T>) -> Unit,
     enabled: Boolean = true,
     filterPlaceholder: String? = null,
+    onOpen: () -> Unit = {},
+    selectedLabel: String? = null,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
@@ -203,18 +218,23 @@ fun <T> bingeMultiChoiceItem(
         )
     }
     val chosen =
-        (choices as? BingeChoiceList.Ready)
-            ?.choices
-            ?.filter { it.value in selected }
-            ?.joinToString { it.label }
-            .orEmpty()
+        if (choices is BingeChoiceList.Ready) {
+            choices.choices
+                .filter { it.value in selected }
+                .joinToString { it.label }
+        } else {
+            selectedLabel.orEmpty()
+        }
     return ListItem(
         icon = icon,
         label = title,
         detail = chosen.ifEmpty { emptyLabel },
         clickable = enabled,
         disabled = !enabled,
-        onClick = { open = true },
+        onClick = {
+            open = true
+            onOpen()
+        },
     )
 }
 
@@ -251,7 +271,7 @@ internal fun <T> SingleChoiceList(
     modifier: Modifier = Modifier,
     onSelect: (T) -> Unit,
 ) {
-    ChoiceListBody(choices, modifier) { ready ->
+    ChoiceListBody(choices, modifier.selectableGroup()) { ready ->
         ready.forEach { choice -> RadioChoiceRow(choice, selected = choice.value == selected) { onSelect(choice.value) } }
     }
 }
