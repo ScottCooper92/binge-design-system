@@ -4,9 +4,16 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,8 +25,13 @@ import com.binge.designsystem.LocalPaneWidth
 import com.binge.designsystem.PaneContent
 import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.resolvedContentPadding
+import com.binge.designsystem.template.BingeScreenScaffold
+import com.binge.designsystem.template.ScreenBar
+import com.binge.designsystem.template.screenInnerPadding
+import com.binge.designsystem.template.screenListPadding
 import kotlin.math.roundToInt
 
 /**
@@ -45,6 +57,45 @@ fun PaneContentSinglePaneSample() {
     ScreenshotTheme {
         PaneContent(innerEdge = PaneEdge.End, modifier = Modifier.fillMaxSize()) {
             PaneContentBody()
+        }
+    }
+}
+
+/**
+ * A detail pane beside its list, through the scaffold: a small bar, a chip row and list rows. All three start on one
+ * edge, the pane's narrow inner inset from the edge it shares with the list.
+ */
+@Composable
+fun PaneContentDetailScaffoldSample() {
+    ScreenshotTheme {
+        CompositionLocalProvider(LocalIsSinglePaneNav provides false) {
+            PaneContent(innerEdge = PaneEdge.Start, modifier = Modifier.fillMaxSize()) {
+                BingeScreenScaffold(title = "Requests", bar = ScreenBar.Small) { padding ->
+                    Column(Modifier.padding(padding.screenInnerPadding())) {
+                        Row(
+                            modifier = Modifier.padding(resolvedContentPadding()),
+                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                        ) {
+                            BingeFilterChip(label = "Pending", selected = true, onClick = {})
+                            BingeFilterChip(label = "Approved", selected = false, onClick = {})
+                        }
+                        LazyColumn(
+                            contentPadding = PaddingValues().screenListPadding(),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                        ) {
+                            items(listOf("The Bear", "Severance", "Shōgun")) { title ->
+                                Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primaryContainer)) {
+                                    Text(
+                                        text = title,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_m)),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
