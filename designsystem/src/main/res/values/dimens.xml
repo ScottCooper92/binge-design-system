@@ -364,4 +364,7 @@
     <dimen name="step_dot_size">7dp</dimen>
     <dimen name="step_dot_active_width">26dp</dimen>
     <dimen name="step_dot_spacing">7dp</dimen>
+    <!-- BingePinField: one box per digit, and the thicker outline on the box being typed or on an error. -->
+    <dimen name="pin_cell_size">56dp</dimen>
+    <dimen name="pin_cell_border_focused">2dp</dimen>
 </resources>
