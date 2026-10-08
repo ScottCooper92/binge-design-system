@@ -1,0 +1,145 @@
+package com.binge.designsystem.component
+
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.dp
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = android.app.Application::class)
+class BingeChoiceSheetTest {
+    @get:Rule
+    val rule = createComposeRule()
+
+    private val many = BingeChoiceList.Ready((1..100).map { BingeChoice(it, "Choice $it") })
+
+    @Test
+    fun `the last choice of a long list is reachable and picks`() {
+        var picked: Int? = null
+        rule.setContent { SingleChoiceList(choices = many, selected = 1, modifier = Modifier.heightIn(max = 300.dp)) { picked = it } }
+
+        rule
+            .onNodeWithText("Choice 100")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+
+        assertEquals(100, picked)
+    }
+
+    @Test
+    fun `chosen values lead, by the selection the sheet opened with, and a tick does not move a row`() {
+        val choices = BingeChoiceList.Ready(listOf(BingeChoice("a", "Alpha"), BingeChoice("b", "Bravo"), BingeChoice("c", "Charlie")))
+        rule.setContent {
+            var chosen by remember { mutableStateOf(setOf("c")) }
+            MultiChoiceList(
+                choices = choices,
+                chosen = chosen,
+                leading = setOf("c"),
+                filterPlaceholder = null,
+                onToggle = { value, on -> chosen = if (on) chosen + value else chosen - value },
+            )
+        }
+        rule.onNodeWithText("Bravo").performClick()
+
+        rule.onNodeWithText("Bravo").assertIsOn()
+        val labels = listOf("Charlie", "Alpha", "Bravo").map {
+            rule
+                .onNodeWithText(it)
+                .fetchSemanticsNode()
+                .boundsInRoot.top
+        }
+        assertEquals(labels.sorted(), labels)
+    }
+
+    @Test
+    fun `the filter narrows the rows by label`() {
+        rule.setContent {
+            MultiChoiceList(
+                choices = BingeChoiceList.Ready(
+                    listOf(BingeChoice("de", "German"), BingeChoice("ja", "Japanese"), BingeChoice("es", "Spanish")),
+                ),
+                chosen = emptySet(),
+                leading = emptySet(),
+                filterPlaceholder = "Filter",
+                onToggle = { _, _ -> },
+            )
+        }
+
+        rule.onNode(hasSetTextAction()).performTextInput("an")
+
+        rule.onNodeWithText("German").assertIsDisplayed()
+        rule.onNodeWithText("Japanese").assertIsDisplayed()
+        rule.onNodeWithText("Spanish").assertIsDisplayed()
+        rule.onNode(hasSetTextAction()).performTextInput("ese")
+        assertEquals(0, rule.onAllNodesWithText("German").fetchSemanticsNodes().size)
+        rule.onNodeWithText("Japanese").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a part-way sheet opens fully while the keyboard is up, so the keyboard does not cover the filter`() {
+        var dock: BingeSheetDock? = null
+        var keyboard by mutableStateOf(false)
+        rule.setContent {
+            BingeBottomSheet(onDismissRequest = {}, skipPartiallyExpanded = false, dockable = true) {
+                dock = LocalBingeSheetDock.current
+                MultiChoiceList(
+                    choices = many,
+                    chosen = emptySet(),
+                    leading = emptySet(),
+                    filterPlaceholder = "Filter",
+                    onToggle = { _, _ -> },
+                    imeVisible = keyboard,
+                )
+            }
+        }
+        rule.waitForIdle()
+        assertTrue(dock!!.canExpand)
+
+        keyboard = true
+        rule.waitForIdle()
+
+        assertFalse(dock!!.canExpand)
+        assertTrue(dock!!.canCollapse)
+    }
+
+    @Test
+    fun `a failed list offers its retry`() {
+        var retried = false
+        rule.setContent {
+            SingleChoiceList<String>(BingeChoiceList.Failed("No list.", "Try again") { retried = true }, selected = null, onSelect = {})
+        }
+
+        rule.onNodeWithText("Try again").performClick()
+
+        assertTrue(retried)
+    }
+
+    @Test
+    fun `a long or loading list opens part-way and a short or failed one does not`() {
+        assertTrue(many.opensPartWay())
+        assertTrue(BingeChoiceList.Loading.opensPartWay())
+        assertFalse(BingeChoiceList.Ready((1..PEEK_THRESHOLD).map { BingeChoice(it, "$it") }).opensPartWay())
+        assertFalse(BingeChoiceList.Failed("x", "y") {}.opensPartWay())
+    }
+}
