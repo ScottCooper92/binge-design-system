@@ -1,5 +1,4 @@
 @file:CatalogGroup("Text entry")
-@file:SelfDescribing
 
 package com.binge.designsystem.catalog
 
@@ -23,16 +22,20 @@ fun BingePinFieldSample() {
     }
 }
 
-/** Public sample for [BingePinField] after a wrong PIN: every box is marked, and the next digit starts again. */
+/** Public sample for [BingePinField] after a wrong PIN: every box is marked, and backspace edits the code and clears the mark. */
 @Composable
 fun BingePinFieldErrorSample() {
     var pin by remember { mutableStateOf("4821") }
+    var wrong by remember { mutableStateOf(true) }
     ScreenshotTheme {
         BingePinField(
             value = pin,
-            onValueChange = { pin = it },
+            onValueChange = {
+                pin = it
+                wrong = false
+            },
             label = "PIN shown on the TV",
-            error = "That PIN doesn't match the TV",
+            error = "That PIN doesn't match the TV".takeIf { wrong },
             autoFocus = false,
         )
     }

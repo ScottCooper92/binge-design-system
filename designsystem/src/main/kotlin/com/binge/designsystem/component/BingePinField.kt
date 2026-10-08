@@ -124,5 +124,5 @@ private fun PinCell(
     }
 }
 
-/** A television's hand-off PIN is four digits; a caller with another code passes its own length. */
-const val DEFAULT_PIN_LENGTH = 4
+/** Four digits unless the caller passes its own length. */
+private const val DEFAULT_PIN_LENGTH = 4
