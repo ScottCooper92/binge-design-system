@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloseFullscreen
 import androidx.compose.material.icons.outlined.OpenInFull
@@ -48,6 +49,8 @@ private const val TEXT_ENTRY_MAX_LINES = 6
  *
  * @param submitEnabled whether submit is allowed; callers gate on "non-blank" (default) and, for
  *   edits, "changed". @param maxLength when set, caps input and shows an `n / max` counter.
+ * @param keyboardOptions the keyboard the field asks for: a number pad for a count, `Uri` for an
+ *   address, autocorrect off for a username or a key. The default is a plain text keyboard.
  */
 @Composable
 fun TextEntrySurface(
@@ -68,6 +71,7 @@ fun TextEntrySurface(
     expanded: Boolean = false,
     onExpandToggle: (() -> Unit)? = null,
     cancelLabel: String = stringResource(R.string.text_entry_cancel),
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     header: @Composable ColumnScope.() -> Unit = {},
 ) {
     Column(
@@ -94,6 +98,7 @@ fun TextEntrySurface(
             minLines = minLines,
             maxLines = if (expanded) Int.MAX_VALUE else maxLines,
             supportingText = textEntrySupport(error, value.length, maxLength),
+            keyboardOptions = keyboardOptions,
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
