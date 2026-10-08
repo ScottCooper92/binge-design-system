@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
@@ -170,6 +171,37 @@ class BingeChoiceSheetTest {
         rule.onNodeWithText("Japan").assertIsDisplayed()
         assertTrue(rule.onAllNodesWithText("Not set").fetchSemanticsNodes().isEmpty())
         rule.onNodeWithText("Region").performClick()
+        rule.waitForIdle()
         assertEquals(1, opened)
+    }
+
+    @Test
+    fun a_row_restored_open_runs_onOpen_again() {
+        val restoration = StateRestorationTester(rule)
+        var opened = 0
+        restoration.setContent {
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Region",
+                            choices = BingeChoiceList.Loading,
+                            selected = null,
+                            emptyLabel = "Not set",
+                            onSelect = {},
+                            onOpen = { opened++ },
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Region").performClick()
+        rule.waitForIdle()
+        assertEquals(1, opened)
+        restoration.emulateSavedInstanceStateRestore()
+        rule.waitForIdle()
+        assertEquals(2, opened)
     }
 }

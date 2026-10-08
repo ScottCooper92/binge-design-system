@@ -33,6 +33,7 @@ fun ChoiceSheetsDemo() {
         var region by remember { mutableStateOf<String?>("Japan") }
         var longPick by remember { mutableStateOf<String?>(null) }
         var languages by remember { mutableStateOf(setOf("ja")) }
+        var slowPick by remember { mutableStateOf<String?>("Japan") }
         var attempts by remember { mutableIntStateOf(0) }
         var slow by remember { mutableStateOf<BingeChoiceList<String>>(BingeChoiceList.Loading) }
         var slowOpened by remember { mutableStateOf(false) }
@@ -76,11 +77,11 @@ fun ChoiceSheetsDemo() {
                         Icons.Filled.Public,
                         "Slow list",
                         slow,
-                        null,
+                        slowPick,
                         "Not set",
-                        {},
+                        { slowPick = it },
                         onOpen = { slowOpened = true },
-                        selectedLabel = "Japan",
+                        selectedLabel = slowPick,
                     ),
                 ),
         )

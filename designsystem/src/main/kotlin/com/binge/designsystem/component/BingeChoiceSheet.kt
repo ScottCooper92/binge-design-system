@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -149,7 +150,7 @@ fun <T> BingeMultiChoiceSheet(
  * this call, so a screen lists its rows and nothing else. A row that is not [enabled] dims, and closes its sheet if
  * open, so a pick cannot land in a draft that is already being saved.
  *
- * [onOpen] runs when the tap opens the sheet: the point to start reading a list fetched on open. While [choices] is not
+ * [onOpen] runs when the sheet opens, by a tap or by being restored open after recreation: the point to start reading a list fetched on open. While [choices] is not
  * [BingeChoiceList.Ready] the detail is [selectedLabel], if given, so the row still names the saved value; then
  * [emptyLabel]. The row emits its sheet as it is composed, so build it in composition on each pass, not inside a
  * `remember`.
@@ -168,6 +169,8 @@ fun <T> bingeChoiceItem(
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
+    val currentOnOpen by rememberUpdatedState(onOpen)
+    LaunchedEffect(open) { if (open) currentOnOpen() }
     if (open) BingeChoiceSheet(title = title, choices = choices, selected = selected, onSelect = onSelect, onDismiss = { open = false })
     val chosen = (choices as? BingeChoiceList.Ready)?.choices?.firstOrNull { it.value == selected }
     val detail = if (choices is BingeChoiceList.Ready) chosen?.label ?: emptyLabel else selectedLabel ?: emptyLabel
@@ -177,10 +180,7 @@ fun <T> bingeChoiceItem(
         detail = detail,
         clickable = enabled,
         disabled = !enabled,
-        onClick = {
-            open = true
-            onOpen()
-        },
+        onClick = { open = true },
     )
 }
 
@@ -205,6 +205,8 @@ fun <T> bingeMultiChoiceItem(
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
+    val currentOnOpen by rememberUpdatedState(onOpen)
+    LaunchedEffect(open) { if (open) currentOnOpen() }
     if (open) {
         BingeMultiChoiceSheet(
             title = title,
@@ -231,10 +233,7 @@ fun <T> bingeMultiChoiceItem(
         detail = chosen.ifEmpty { emptyLabel },
         clickable = enabled,
         disabled = !enabled,
-        onClick = {
-            open = true
-            onOpen()
-        },
+        onClick = { open = true },
     )
 }
 
