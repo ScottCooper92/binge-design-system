@@ -50,4 +50,26 @@ class ChoiceSectionsTest {
         assertEquals(listOf("Canada", "Albania"), sections.current.map { it.value })
         assertEquals(listOf("Chile"), sections.suggested.map { it.value })
     }
+
+    /** The pinned row (no header), Current and Suggested (a header and a row each), then A's header at 5. */
+    @Test
+    fun `a pinned value leads on its own, in no section, and its row counts towards the letters' positions`() {
+        val sections =
+            choiceSections(choices, current = listOf("Brazil", "Chile"), suggested = listOf("Chile", "Canada"), pinned = listOf("Chile"))
+        assertEquals(listOf("Chile"), sections.pinned.map { it.value })
+        assertEquals(listOf("Brazil"), sections.current.map { it.value })
+        assertEquals(listOf("Canada"), sections.suggested.map { it.value })
+        assertEquals(listOf("Albania", "Algeria", "Brazil", "Canada"), sections.all.map { it.value })
+        assertEquals(listOf('A', 'B', 'C'), sections.byLetter.map { it.first })
+        assertEquals(5, sections.indexOf('A'))
+    }
+
+    @Test
+    fun `a short list puts its pinned values first and keeps the rest in order`() {
+        assertEquals(
+            listOf("Chile", "Albania", "Algeria", "Brazil", "Canada"),
+            choices.pinnedFirst(listOf("Chile", "Mars")).map { it.value },
+        )
+        assertEquals(choices, choices.pinnedFirst(emptyList()))
+    }
 }
