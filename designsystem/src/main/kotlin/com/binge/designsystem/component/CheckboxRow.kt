@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -73,7 +74,10 @@ fun CheckboxRow(
                     )
                 }
             }
-            trailingContent?.invoke()
+            trailingContent?.let { trailing ->
+                val gap = dimensionResource(R.dimen.row_trailing_control_gap) - dimensionResource(R.dimen.checkbox_row_gap)
+                Box(Modifier.padding(start = gap)) { trailing() }
+            }
         }
         if (showDivider) {
             HorizontalDivider(

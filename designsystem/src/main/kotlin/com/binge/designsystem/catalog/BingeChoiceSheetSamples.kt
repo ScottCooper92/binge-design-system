@@ -357,3 +357,24 @@ fun BingeChoiceSheetPinnedSample() {
         }
     }
 }
+
+/** Marked choices whose labels reach the end of their rows: the text stops the trailing gap short of the radio. */
+@Composable
+fun BingeChoiceSheetLongLabelSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = false, title = REGION_TITLE) {
+            SingleChoiceList(
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(
+                            BingeChoice("GB", "United Kingdom of Great Britain and Northern Ireland", mark = "GB"),
+                            BingeChoice("SH", "Saint Helena, Ascension and Tristan da Cunha", mark = "SH"),
+                            BingeChoice("JP", "Japan", mark = "JP"),
+                        ),
+                    ),
+                selected = "SH",
+                onSelect = {},
+            )
+        }
+    }
+}

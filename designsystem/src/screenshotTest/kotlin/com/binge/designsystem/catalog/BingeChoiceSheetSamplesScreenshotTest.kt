@@ -74,4 +74,11 @@ class BingeChoiceSheetSamplesScreenshotTest {
     fun Pinned() {
         BingeChoiceSheetPinnedSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun LongLabel() {
+        BingeChoiceSheetLongLabelSample()
+    }
 }

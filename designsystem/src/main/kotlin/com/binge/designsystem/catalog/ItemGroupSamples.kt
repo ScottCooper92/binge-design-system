@@ -392,3 +392,27 @@ fun ItemGroupSwitchSample() {
         )
     }
 }
+
+/** Labels long enough to reach the end of their rows: the text stops the trailing gap short of the switch and the chevron. */
+@Composable
+fun ItemGroupLongLabelSample() {
+    var partial by remember { mutableStateOf(true) }
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Requests",
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.Tune,
+                    label = "Allow partial series requests for every user",
+                    toggled = partial,
+                    onClick = { partial = !partial },
+                ),
+                ListItem(
+                    icon = Icons.Filled.HighQuality,
+                    label = "Default quality profile for new requests",
+                    detail = "Applied when a request names no profile of its own",
+                ),
+            ),
+        )
+    }
+}
