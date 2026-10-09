@@ -219,6 +219,17 @@ private fun ListItemView(
                 )
             }
         }
+        val chevron = interactive && row.destination != ListItemDestination.Action
+        val trails =
+            row.badgeAlert ||
+                (row.badgeCount ?: 0) > 0 ||
+                row.loading ||
+                row.trailingContent != null ||
+                row.toggled != null ||
+                row.expanded != null ||
+                external ||
+                chevron
+        if (trails) Spacer(Modifier.width(dimensionResource(R.dimen.row_trailing_control_gap)))
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (row.badgeAlert) {
                 Badge { Text(stringResource(R.string.badge_alert)) }
@@ -252,7 +263,7 @@ private fun ListItemView(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                interactive && row.destination != ListItemDestination.Action -> {
+                chevron -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,

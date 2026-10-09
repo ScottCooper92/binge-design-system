@@ -322,6 +322,9 @@
     <dimen name="checkbox_row_padding_h">16dp</dimen>
     <dimen name="checkbox_row_padding_v">4dp</dimen>
     <dimen name="checkbox_row_gap">8dp</dimen>
+    <!-- Between a row's text and a control at its end (a switch, a checkbox, a radio, a trailing slot): wider than the
+         gap after a leading icon, so a long label does not run up to the control. A consumer's own rows can match it. -->
+    <dimen name="row_trailing_control_gap">24dp</dimen>
     <!-- Catalog samples — bounded height for full-screen samples (state/gate screens, skeletons) so a
          fillMaxSize surface has a height to fill inside the wrap-content screenshot canvas. -->
     <dimen name="catalog_screen_preview_height">640dp</dimen>

@@ -56,6 +56,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 import kotlinx.coroutines.launch
@@ -572,7 +573,7 @@ private fun <T> RadioChoiceRow(
                 Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        if (markSlot) RadioButton(selected = selected, onClick = null)
+        if (markSlot) RadioButton(selected = selected, onClick = null, modifier = Modifier.padding(start = trailingControlExtra()))
     }
 }
 
@@ -722,9 +723,13 @@ private fun <T> CheckChoiceRow(
                 Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Checkbox(checked = checked, onCheckedChange = null)
+        Checkbox(checked = checked, onCheckedChange = null, modifier = Modifier.padding(start = trailingControlExtra()))
     }
 }
+
+/** What a choice row adds to its own gap before a control at its end, to make it [R.dimen.row_trailing_control_gap]. */
+@Composable
+private fun trailingControlExtra(): Dp = dimensionResource(R.dimen.row_trailing_control_gap) - dimensionResource(R.dimen.padding_m)
 
 @Composable
 private fun ChoiceSectionHeader(text: String) =

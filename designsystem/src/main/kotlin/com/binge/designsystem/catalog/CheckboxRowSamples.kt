@@ -73,3 +73,19 @@ fun CheckboxRowListSample() {
         }
     }
 }
+
+/** A label long enough to reach the trailing slot: the text stops the trailing gap short of it. */
+@Composable
+fun CheckboxRowLongLabelSample() {
+    var checked by remember { mutableStateOf(true) }
+    ScreenshotTheme {
+        CheckboxRow(
+            label = "Season 12: the one with the longest title in the list",
+            checked = checked,
+            onToggle = { checked = it },
+            trailingContent = {
+                Text(text = "Available", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            },
+        )
+    }
+}
