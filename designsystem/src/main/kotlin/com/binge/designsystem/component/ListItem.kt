@@ -91,4 +91,10 @@ data class ListItem(
      * and no chevron. A switch row has no long-press; [onLongClick] is ignored.
      */
     val toggled: Boolean? = null,
+    /**
+     * Makes this the header of an expandable group: non-null is whether the group is open. Unless [trailingContent]
+     * is set, the row draws a chevron pointing the way it will move. A screen reader hears "Expanded" or "Collapsed"
+     * and is offered the expand or collapse action, which calls [onClick]. See [BingeExpandableGroup].
+     */
+    val expanded: Boolean? = null,
 )
