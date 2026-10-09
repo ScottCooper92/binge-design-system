@@ -387,7 +387,11 @@ private fun <T> ChoiceListBody(
             }
             val tall = if (LocalBingeSheetDock.current != null) Modifier.heightIn(min = windowHeight) else Modifier
             Box(
-                modifier.fillMaxWidth().then(clearBar).then(tall).padding(inset),
+                modifier
+                    .fillMaxWidth()
+                    .then(clearBar)
+                    .then(tall)
+                    .padding(inset),
                 contentAlignment = Alignment.TopCenter,
             ) { BingeLoadingIndicator() }
         }
