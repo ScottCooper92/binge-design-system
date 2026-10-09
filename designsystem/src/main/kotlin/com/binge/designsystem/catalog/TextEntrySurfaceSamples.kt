@@ -1,3 +1,4 @@
+@file:CatalogGroup("Text entry")
 @file:SelfDescribing
 
 package com.binge.designsystem.catalog

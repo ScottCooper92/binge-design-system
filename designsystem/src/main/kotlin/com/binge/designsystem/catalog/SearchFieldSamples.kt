@@ -1,3 +1,5 @@
+@file:CatalogGroup("Text entry")
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
@@ -11,7 +13,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 private const val SEARCH_PLACEHOLDER = "Search services"
 
 /**
- * Public samples for [BingeSearchField] — the pill search input (group `"Inputs"`). See the
+ * Public samples for [BingeSearchField] — the pill search input, in the catalog's "Text entry" group. See the
  * convention KDoc on [MediaCardRatedSample].
  *
  * Empty shows the placeholder and no trailing affordance; with-query shows the clear button — the two
