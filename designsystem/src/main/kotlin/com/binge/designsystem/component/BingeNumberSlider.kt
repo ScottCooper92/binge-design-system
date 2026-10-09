@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -77,6 +79,14 @@ fun BingeNumberSlider(
                 valueRange = range.first.toFloat()..top.toFloat(),
                 steps = (top - range.first - 1).coerceAtLeast(0),
                 enabled = enabled,
+                // A hundred stops' tick marks blur into a dotted texture; the steppers are what land on one.
+                colors =
+                    SliderDefaults.colors(
+                        activeTickColor = Color.Transparent,
+                        inactiveTickColor = Color.Transparent,
+                        disabledActiveTickColor = Color.Transparent,
+                        disabledInactiveTickColor = Color.Transparent,
+                    ),
                 modifier =
                     Modifier.weight(1f).semantics {
                         contentDescription = description
@@ -103,10 +113,8 @@ fun BingeNumberSlider(
 }
 
 @Composable
-internal fun SliderBound(
-    text: String,
-    modifier: Modifier = Modifier,
-) = Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = modifier)
+internal fun SliderBound(text: String, modifier: Modifier = Modifier) =
+    Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = modifier)
 
 /**
  * A number setting as a [ListItem] for an [ItemGroup]: its [title], and its value ([format] of it, or [openEndLabel]) as

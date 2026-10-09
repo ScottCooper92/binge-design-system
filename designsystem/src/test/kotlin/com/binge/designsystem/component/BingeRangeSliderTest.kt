@@ -30,10 +30,7 @@ class BingeRangeSliderTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun setSlider(
-        values: ClosedFloatingPointRange<Float>,
-        openEndLabel: String? = null,
-    ) {
+    private fun setSlider(values: ClosedFloatingPointRange<Float>, openEndLabel: String? = null) {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
                 BingeRangeSlider(

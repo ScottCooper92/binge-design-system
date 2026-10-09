@@ -7,8 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -30,10 +32,7 @@ class BingeNumberSliderTest {
 
     private var value by mutableStateOf<Int?>(10)
 
-    private fun setSlider(
-        initial: Int?,
-        openEndLabel: String? = "Unlimited",
-    ) {
+    private fun setSlider(initial: Int?, openEndLabel: String? = "Unlimited") {
         value = initial
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
@@ -94,7 +93,8 @@ class BingeNumberSliderTest {
 
         composeTestRule.onNodeWithContentDescription("Increase Movie requests").assertIsNotEnabled()
         composeTestRule.onNodeWithText("1 a week").assertExists()
-        assertEquals(2, composeTestRule.onAllNodes(androidx.compose.ui.test.hasText("100 a week")).fetchSemanticsNodes().size)
+        // The readout and the bound under the track's end.
+        composeTestRule.onAllNodesWithText("100 a week").assertCountEquals(2)
     }
 
     @Test
