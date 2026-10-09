@@ -209,6 +209,8 @@ fun <T> BingeMultiChoiceSheet(
             null
         }, restore = { null }),
     ) { mutableStateOf(selected) }
+    // Pinned at open: with [applyAsPicked], [selected] follows each tick, and a row must not jump under the finger.
+    val openedWith = remember { selected }
     val pick: (Set<T>) -> Unit = { picked ->
         draft = picked
         if (applyAsPicked) onDone(picked)
@@ -237,7 +239,7 @@ fun <T> BingeMultiChoiceSheet(
         MultiChoiceList(
             choices = choices,
             chosen = draft,
-            leading = selected,
+            leading = openedWith,
             filterPlaceholder = filterPlaceholder,
             onToggle = { value, on -> pick(if (on) draft + value else draft - value) },
             underNavigationBar = partWay,
