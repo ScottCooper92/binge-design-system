@@ -36,6 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
@@ -375,8 +377,24 @@ private fun <T> ChoiceListBody(
             Modifier
         }
     when (choices) {
-        BingeChoiceList.Loading ->
-            Box(modifier.fillMaxWidth().then(clearBar).padding(inset), contentAlignment = Alignment.Center) { BingeLoadingIndicator() }
+        BingeChoiceList.Loading -> {
+            // In a docking sheet the wait is a window tall, as the list will be. A sheet holding only a spinner fits
+            // whole, so it would settle fully open and then fill the screen when the list arrived; this tall, it peeks
+            // part-way and the list arrives into a sheet that stays where it is.
+            val windowHeight = with(LocalDensity.current) {
+                LocalWindowInfo.current.containerSize.height
+                    .toDp()
+            }
+            val tall = if (LocalBingeSheetDock.current != null) Modifier.heightIn(min = windowHeight) else Modifier
+            Box(
+                modifier
+                    .fillMaxWidth()
+                    .then(clearBar)
+                    .then(tall)
+                    .padding(inset),
+                contentAlignment = Alignment.TopCenter,
+            ) { BingeLoadingIndicator() }
+        }
         is BingeChoiceList.Failed ->
             Column(
                 modifier = modifier.fillMaxWidth().then(clearBar).padding(inset),
