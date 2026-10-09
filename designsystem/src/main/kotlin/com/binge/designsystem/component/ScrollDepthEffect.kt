@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
@@ -32,6 +33,11 @@ private class DeepestIndex {
  *
  * A surface that laid out nothing — an error or empty state — reports `null` rather than zero: it had no
  * depth to reach, which is not the same as a visit that opened it and scrolled nothing.
+ *
+ * A configuration change (a rotation, a theme or locale change) is not a leave: the disposal it causes reports
+ * nothing, and the recreated effect carries on from the list's restored position. So one visit is one report.
+ * The deepest index is not carried across the change, though: the report is the deepest row seen since the
+ * recreation, so a visit that went deeper before a rotation and then scrolled back up under-reports.
  */
 @Composable
 fun ScrollDepthEffect(listState: LazyListState, onVisitEnded: (deepestIndex: Int?) -> Unit) {
@@ -59,6 +65,7 @@ private fun ScrollDepthEffect(onVisitEnded: (Int?) -> Unit, lastVisibleIndex: ()
     val deepest = remember { DeepestIndex() }
     // Keyed on Unit, so the effect runs for the surface's whole life holding whatever it first captured.
     val currentLastVisibleIndex by rememberUpdatedState(lastVisibleIndex)
+    val activity = LocalActivity.current
     LaunchedEffect(Unit) {
         snapshotFlow { currentLastVisibleIndex() }
             .distinctUntilChanged()
@@ -67,6 +74,6 @@ private fun ScrollDepthEffect(onVisitEnded: (Int?) -> Unit, lastVisibleIndex: ()
             }
     }
     DisposableEffect(Unit) {
-        onDispose { currentOnVisitEnded(deepest.value) }
+        onDispose { if (activity?.isChangingConfigurations != true) currentOnVisitEnded(deepest.value) }
     }
 }
