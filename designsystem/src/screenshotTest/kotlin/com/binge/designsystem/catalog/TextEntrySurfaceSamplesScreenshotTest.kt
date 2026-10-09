@@ -29,4 +29,11 @@ class TextEntrySurfaceSamplesScreenshotTest {
     fun Counter() {
         TextEntrySurfaceCounterSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Masked() {
+        TextEntrySurfaceMaskedSample()
+    }
 }
