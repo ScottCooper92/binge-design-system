@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
@@ -84,15 +85,17 @@ fun BingeExpandableGroupOpenSample() {
 @Composable
 fun BingeExpandableGroupStatesSample() {
     ScreenshotTheme {
+        var loadingOpen by rememberSaveable { mutableStateOf(true) }
+        var failedOpen by rememberSaveable { mutableStateOf(true) }
         Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
             BingeExpandableGroup(
                 title = null,
-                header = bingeExpandableItem(Icons.Filled.Tune, ADVANCED, expanded = true, onExpandedChange = {}),
+                header = bingeExpandableItem(Icons.Filled.Tune, ADVANCED, expanded = loadingOpen, onExpandedChange = { loadingOpen = it }),
                 content = BingeGroupContent.Loading,
             )
             BingeExpandableGroup(
                 title = null,
-                header = bingeExpandableItem(Icons.Filled.Tune, ADVANCED, expanded = true, onExpandedChange = {}),
+                header = bingeExpandableItem(Icons.Filled.Tune, ADVANCED, expanded = failedOpen, onExpandedChange = { failedOpen = it }),
                 content = BingeGroupContent.Failed("Couldn't load the server's options.", "Try again") {},
             )
         }

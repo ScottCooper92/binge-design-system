@@ -18,6 +18,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.LocalIsSinglePaneNav
@@ -68,6 +72,8 @@ fun PaneContentSinglePaneSample() {
 @Composable
 fun PaneContentDetailScaffoldSample() {
     ScreenshotTheme {
+        var pending by rememberSaveable { mutableStateOf(true) }
+        var approved by rememberSaveable { mutableStateOf(false) }
         CompositionLocalProvider(LocalIsSinglePaneNav provides false) {
             PaneContent(innerEdge = PaneEdge.Start, modifier = Modifier.fillMaxSize()) {
                 BingeScreenScaffold(title = "Requests", bar = ScreenBar.Small) { padding ->
@@ -76,8 +82,8 @@ fun PaneContentDetailScaffoldSample() {
                             modifier = Modifier.padding(resolvedContentPadding()),
                             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
                         ) {
-                            BingeFilterChip(label = "Pending", selected = true, onClick = {})
-                            BingeFilterChip(label = "Approved", selected = false, onClick = {})
+                            BingeFilterChip(label = "Pending", selected = pending, onClick = { pending = !pending })
+                            BingeFilterChip(label = "Approved", selected = approved, onClick = { approved = !approved })
                         }
                         LazyColumn(
                             contentPadding = PaddingValues().screenListPadding(),
