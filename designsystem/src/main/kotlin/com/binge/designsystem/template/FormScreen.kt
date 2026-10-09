@@ -102,7 +102,9 @@ fun FormScreen(
             extraActions()
         },
         bottomBar = {
-            Column {
+            // The scaffold never lifts its bottomBar, so the footer rides the keyboard here; the body below
+            // consumes the taller bar, which leaves the fields' own imePadding nothing to add.
+            Column(Modifier.imePadding()) {
                 bottomBar()
                 if (placement == FormActionPlacement.Footer && primaryAction != null && notReady == null) {
                     FormFooter(primary = primaryAction, secondary = secondaryAction)

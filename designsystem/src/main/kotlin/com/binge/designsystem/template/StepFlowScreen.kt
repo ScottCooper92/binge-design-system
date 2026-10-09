@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -83,7 +84,7 @@ fun StepFlowScreen(
     val back = onBack.takeIf { currentStep > 0 }
     StepBackHandler(back)
     // systemBars + displayCutout rather than safeDrawing, so a step raising the keyboard does not shift the
-    // whole flow: a step with a text field owns its own imePadding.
+    // chrome: a step with a text field owns its own imePadding, and a footer rides above the keyboard.
     Column(
         modifier =
             modifier
@@ -177,6 +178,7 @@ private fun StackedStep(slots: StepSlots) {
         modifier =
             Modifier
                 .centredReadingColumn(dimensionResource(R.dimen.content_max_width))
+                .then(if (slots.footer != null) Modifier.imePadding() else Modifier)
                 .padding(horizontal = dimensionResource(R.dimen.padding_l)),
     ) {
         Column(
@@ -201,7 +203,7 @@ private fun SplitStep(slots: StepSlots) {
         modifier = Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.padding_l)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
     ) {
-        Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+        Column(modifier = Modifier.weight(1f).fillMaxHeight().then(if (slots.footer != null) Modifier.imePadding() else Modifier)) {
             Column(
                 modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
