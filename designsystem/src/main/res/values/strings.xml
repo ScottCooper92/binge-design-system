@@ -95,4 +95,5 @@
     <string name="choice_section_current">Current</string>
     <string name="choice_section_suggested">Suggested</string>
     <string name="choice_section_all">All</string>
+    <string name="choice_section_selected">Selected</string>
 </resources>

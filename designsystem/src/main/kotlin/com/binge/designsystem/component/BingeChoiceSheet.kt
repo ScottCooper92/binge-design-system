@@ -29,7 +29,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -150,12 +152,17 @@ fun <T> BingeChoiceSheet(
 }
 
 /**
- * A pick of any number of values from a list. The choices are checkboxes, with the ones already chosen first. Ticks
- * collect in the sheet and apply only on [doneLabel], which hands back the new set; Clear empties it, and closing the
- * sheet any other way discards the change.
+ * A pick of any number of values from a list. The choices are checkboxes. Ticks collect in the sheet and apply only on
+ * [doneLabel], which hands back the new set; Clear empties it, and closing the sheet any other way discards the change.
+ *
+ * A list of [SECTIONS_THRESHOLD] or more, with no filter text, is sectioned: **Selected** (the [selected] values the
+ * sheet opened with, so a row does not jump when it is ticked), **Suggested** ([suggested], in order), then **All**. A
+ * value in Suggested and in All is ticked in both. From [INDEX_THRESHOLD] choices, All has a header per first letter and
+ * a [BingeLetterRail] down the edge. A shorter list reads whole, with the ones already chosen first.
  *
  * Pass [filterPlaceholder] for a list long enough to search, a hundred entries or more, say: a filter field then sits
- * under the header and narrows the rows by label. The sheet opens and docks as [BingeChoiceSheet] does.
+ * under the header and narrows the rows by label. [actions] adds buttons to the header, before Clear and Done. The
+ * sheet opens and docks as [BingeChoiceSheet] does.
  */
 @Composable
 fun <T> BingeMultiChoiceSheet(
@@ -168,6 +175,8 @@ fun <T> BingeMultiChoiceSheet(
     clearLabel: String,
     modifier: Modifier = Modifier,
     filterPlaceholder: String? = null,
+    suggested: List<T> = emptyList(),
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     val partWay = remember { choices.opensPartWay() }
     // Plain remember: a generic T has no Saver, so a rotation reopens the sheet with the filter kept and the ticks reset.
@@ -181,6 +190,7 @@ fun <T> BingeMultiChoiceSheet(
         edgeToEdge = partWay,
     ) {
         ChoiceSheetTop(title = title) {
+            actions()
             BingeTextButton(label = clearLabel, onClick = { draft = emptySet() }, enabled = draft.isNotEmpty())
             BingeTextButton(
                 label = doneLabel,
@@ -197,6 +207,7 @@ fun <T> BingeMultiChoiceSheet(
             filterPlaceholder = filterPlaceholder,
             onToggle = { value, on -> draft = if (on) draft + value else draft - value },
             underNavigationBar = partWay,
+            suggested = suggested,
         )
     }
 }
@@ -330,7 +341,14 @@ internal fun <T> SingleChoiceList(
     onSelect: (T) -> Unit,
 ) {
     if (choices is BingeChoiceList.Ready && choices.choices.size >= SECTIONS_THRESHOLD) {
-        SectionedChoiceList(choices.choices, selected, suggested, underNavigationBar, modifier.selectableGroup(), onSelect)
+        SectionedChoiceList(
+            choices = choices.choices,
+            current = listOfNotNull(selected),
+            currentLabel = stringResource(R.string.choice_section_current),
+            suggested = suggested,
+            underNavigationBar = underNavigationBar,
+            modifier = modifier.selectableGroup(),
+        ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, clearOfRail) { onSelect(choice.value) } }
         return
     }
     ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
@@ -355,6 +373,7 @@ internal fun <T> MultiChoiceList(
     initialQuery: String = "",
     imeVisible: Boolean = WindowInsets.isImeVisible,
     underNavigationBar: Boolean = false,
+    suggested: List<T> = emptyList(),
 ) {
     var query by rememberSaveable { mutableStateOf(initialQuery) }
     // The sheet's keyboard inset pads the bottom of its content, which is off screen while it rests part-way, so the
@@ -379,6 +398,17 @@ internal fun <T> MultiChoiceList(
                         vertical = dimensionResource(R.dimen.padding_s),
                     ),
             )
+        }
+        if (choices is BingeChoiceList.Ready && choices.choices.size >= SECTIONS_THRESHOLD && query.isBlank()) {
+            SectionedChoiceList(
+                choices = choices.choices,
+                current = choices.choices.map { it.value }.filter { it in leading },
+                currentLabel = stringResource(R.string.choice_section_selected),
+                suggested = suggested,
+                underNavigationBar = underNavigationBar,
+                modifier = Modifier,
+            ) { choice, clearOfRail -> CheckChoiceRow(choice, choice.value in chosen, clearOfRail) { on -> onToggle(choice.value, on) } }
+            return@Column
         }
         ChoiceListBody(choices, underNavigationBar = underNavigationBar) { ready ->
             val matching = ready.filter { query.isBlank() || it.label.contains(query.trim(), ignoreCase = true) }
@@ -517,43 +547,40 @@ private fun ChoiceMark(choice: BingeChoice<*>) =
     }
 
 /**
- * A long single-choice list in sections: Current, Suggested, All. From [INDEX_THRESHOLD] choices All is lettered, with
- * sticky headers and a [BingeLetterRail] that jumps to a letter and lights the one at the top of the list.
+ * A long choice list in sections: the current choices (Current for one, Selected for several), Suggested, then All. From
+ * [INDEX_THRESHOLD] choices All is lettered, with sticky headers and a [BingeLetterRail] that jumps to a letter and
+ * lights the one at the top of the list. [row] draws one choice, told whether to end short of the rail.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun <T> SectionedChoiceList(
     choices: List<BingeChoice<T>>,
-    selected: T?,
+    current: Collection<T>,
+    currentLabel: String,
     suggested: List<T>,
     underNavigationBar: Boolean,
     modifier: Modifier,
-    onSelect: (T) -> Unit,
+    row: @Composable (BingeChoice<T>, Boolean) -> Unit,
 ) {
-    val sections = remember(choices, selected, suggested) { choiceSections(choices, selected, suggested) }
+    val sections = remember(choices, current, suggested) { choiceSections(choices, current, suggested) }
     val lettered = choices.size >= INDEX_THRESHOLD
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val navigationBar = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val end = dimensionResource(R.dimen.padding_l) + if (underNavigationBar) navigationBar else 0.dp
-    val currentLabel = stringResource(R.string.choice_section_current)
     val suggestedLabel = stringResource(R.string.choice_section_suggested)
     val allLabel = stringResource(R.string.choice_section_all)
     Box(modifier = modifier.fillMaxWidth()) {
         LazyColumn(state = listState, contentPadding = PaddingValues(bottom = end)) {
-            choiceSection("current", currentLabel, sections.current, selected, lettered, onSelect)
-            choiceSection("suggested", suggestedLabel, sections.suggested, selected, lettered, onSelect)
+            choiceSection("current", currentLabel, sections.current, lettered, row)
+            choiceSection("suggested", suggestedLabel, sections.suggested, lettered, row)
             if (lettered) {
                 sections.byLetter.forEach { (letter, rows) ->
                     stickyHeader(key = "letter-$letter") { ChoiceSectionHeader(letter.toString()) }
-                    rows.forEach { choice ->
-                        item(key = "all-${choice.value}") {
-                            RadioChoiceRow(choice, choice.value == selected, clearOfRail = true) { onSelect(choice.value) }
-                        }
-                    }
+                    rows.forEach { choice -> item(key = "all-${choice.value}") { row(choice, true) } }
                 }
             } else {
-                choiceSection("all", allLabel, choices, selected, clearOfRail = false, onSelect = onSelect)
+                choiceSection("all", allLabel, choices, clearOfRail = false, row)
             }
         }
         if (lettered) {
@@ -573,14 +600,45 @@ private fun <T> LazyListScope.choiceSection(
     key: String,
     label: String,
     rows: List<BingeChoice<T>>,
-    selected: T?,
     clearOfRail: Boolean,
-    onSelect: (T) -> Unit,
+    row: @Composable (BingeChoice<T>, Boolean) -> Unit,
 ) {
     if (rows.isEmpty()) return
     item(key = "header-$key") { ChoiceSectionHeader(label) }
-    rows.forEach { choice ->
-        item(key = "$key-${choice.value}") { RadioChoiceRow(choice, choice.value == selected, clearOfRail) { onSelect(choice.value) } }
+    rows.forEach { choice -> item(key = "$key-${choice.value}") { row(choice, clearOfRail) } }
+}
+
+/** One checkbox row of a sectioned list: the choice's mark first, if it has one, and the checkbox at the end. */
+@Composable
+private fun <T> CheckChoiceRow(
+    choice: BingeChoice<T>,
+    checked: Boolean,
+    clearOfRail: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = dimensionResource(R.dimen.min_touch_target))
+                .toggleable(value = checked, role = Role.Checkbox, onValueChange = onToggle)
+                .padding(
+                    start = dimensionResource(R.dimen.padding_m),
+                    end = dimensionResource(if (clearOfRail) R.dimen.letter_rail_width else R.dimen.padding_m),
+                    top = dimensionResource(R.dimen.padding_s),
+                    bottom = dimensionResource(R.dimen.padding_s),
+                ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+    ) {
+        if (choice.icon != null || choice.mark != null) ChoiceMark(choice)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            choice.subtitle?.let {
+                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Checkbox(checked = checked, onCheckedChange = null)
     }
 }
 
@@ -647,11 +705,18 @@ internal fun <T> choiceSections(
     choices: List<BingeChoice<T>>,
     selected: T?,
     suggested: List<T>,
+): ChoiceSections<T> = choiceSections(choices, listOfNotNull(selected), suggested)
+
+/** [choiceSections] for any number of current values: a multi-choice list's chosen ones lead. */
+internal fun <T> choiceSections(
+    choices: List<BingeChoice<T>>,
+    current: Collection<T>,
+    suggested: List<T>,
 ): ChoiceSections<T> {
     val byValue = choices.associateBy { it.value }
     return ChoiceSections(
-        current = listOfNotNull(byValue[selected]),
-        suggested = suggested.distinct().filter { it != selected }.mapNotNull { byValue[it] },
+        current = current.mapNotNull { byValue[it] },
+        suggested = suggested.distinct().filter { it !in current }.mapNotNull { byValue[it] },
         byLetter =
             choices
                 .groupBy { sectionLetter(it.label) }

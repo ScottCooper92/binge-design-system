@@ -53,4 +53,11 @@ class BingeChoiceSheetSamplesScreenshotTest {
     fun Sectioned() {
         BingeChoiceSheetSectionedSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiSectioned() {
+        BingeMultiChoiceSheetSectionedSample()
+    }
 }
