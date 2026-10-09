@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Public
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
@@ -206,5 +207,46 @@ class BingeChoiceSheetTest {
         restoration.emulateSavedInstanceStateRestore()
         rule.waitForIdle()
         assertEquals(2, opened)
+    }
+
+    private fun ticksAcrossRestore(draftSaver: Saver<Set<String>, out Any>?): Set<String>? {
+        val restoration = StateRestorationTester(rule)
+        var done: Set<String>? = null
+        val choices = BingeChoiceList.Ready(listOf(BingeChoice("a", "Alpha"), BingeChoice("b", "Bravo")))
+        restoration.setContent {
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeMultiChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Languages",
+                            choices = choices,
+                            selected = setOf("a"),
+                            emptyLabel = "None",
+                            doneLabel = "Done",
+                            clearLabel = "Clear",
+                            onDone = { done = it },
+                            draftSaver = draftSaver,
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Languages").performClick()
+        rule.onNodeWithText("Bravo").performClick()
+        restoration.emulateSavedInstanceStateRestore()
+        rule.onNodeWithText("Done").performClick()
+        return done
+    }
+
+    @Test
+    fun a_multi_choice_sheet_with_a_draft_saver_keeps_its_ticks_across_a_restore() {
+        assertEquals(setOf("a", "b"), ticksAcrossRestore(Saver(save = { ArrayList(it) }, restore = { it.toSet() })))
+    }
+
+    @Test
+    fun a_multi_choice_sheet_without_a_draft_saver_reopens_from_the_selection() {
+        assertEquals(setOf("a"), ticksAcrossRestore(draftSaver = null))
     }
 }

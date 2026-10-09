@@ -44,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -163,6 +164,10 @@ fun <T> BingeChoiceSheet(
  * Pass [filterPlaceholder] for a list long enough to search, a hundred entries or more, say: a filter field then sits
  * under the header and narrows the rows by label. [actions] adds buttons to the header, before Clear and Done. The
  * sheet opens and docks as [BingeChoiceSheet] does.
+ *
+ * Pass [draftSaver] to keep the ticks across a rotation or process death, as a sheet restored open should. A generic [T]
+ * has no saver of its own, so without one the sheet reopens with the ticks reset to [selected]. For `String` values,
+ * `Saver(save = { ArrayList(it) }, restore = { it.toSet() })` is enough.
  */
 @Composable
 fun <T> BingeMultiChoiceSheet(
@@ -177,10 +182,15 @@ fun <T> BingeMultiChoiceSheet(
     filterPlaceholder: String? = null,
     suggested: List<T> = emptyList(),
     actions: @Composable RowScope.() -> Unit = {},
+    draftSaver: Saver<Set<T>, out Any>? = null,
 ) {
     val partWay = remember { choices.opensPartWay() }
-    // Plain remember: a generic T has no Saver, so a rotation reopens the sheet with the filter kept and the ticks reset.
-    var draft by remember { mutableStateOf(selected) }
+    // Without a saver, nothing is saved, so the ticks start again from [selected].
+    var draft by rememberSaveable(
+        stateSaver = draftSaver ?: Saver<Set<T>, Any>(save = {
+            null
+        }, restore = { null }),
+    ) { mutableStateOf(selected) }
     BingeBottomSheet(
         onDismissRequest = onDismiss,
         modifier = modifier,
@@ -255,6 +265,7 @@ fun <T> bingeChoiceItem(
 /**
  * [bingeChoiceItem] for several values: the chosen labels, in list order, as the detail, and a [BingeMultiChoiceSheet]
  * on tap. [onOpen] and [selectedLabel] work as they do there; [selectedLabel] is the whole detail for the selection.
+ * [draftSaver] keeps the sheet's ticks across a rotation, as on [BingeMultiChoiceSheet].
  */
 @Composable
 fun <T> bingeMultiChoiceItem(
@@ -270,6 +281,7 @@ fun <T> bingeMultiChoiceItem(
     filterPlaceholder: String? = null,
     onOpen: () -> Unit = {},
     selectedLabel: String? = null,
+    draftSaver: Saver<Set<T>, out Any>? = null,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
@@ -285,6 +297,7 @@ fun <T> bingeMultiChoiceItem(
             doneLabel = doneLabel,
             clearLabel = clearLabel,
             filterPlaceholder = filterPlaceholder,
+            draftSaver = draftSaver,
         )
     }
     val chosen =
