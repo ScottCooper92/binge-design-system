@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -355,7 +358,7 @@ internal fun <T> MultiChoiceList(
 /**
  * A choice list's body: the rows for a ready list, scrolling on their own so the last of hundreds is reachable at any
  * sheet height; a loading indicator; or the failure's message with its retry. [underNavigationBar] is for an
- * edge-to-edge sheet: the end of the list then also clears the navigation bar it scrolls under.
+ * edge-to-edge sheet: each of the three then also clears the navigation bar it runs under.
  */
 @Composable
 private fun <T> ChoiceListBody(
@@ -365,12 +368,18 @@ private fun <T> ChoiceListBody(
     rows: @Composable ColumnScope.(List<BingeChoice<T>>) -> Unit,
 ) {
     val inset = dimensionResource(R.dimen.padding_l)
+    val clearBar =
+        if (underNavigationBar) {
+            Modifier.windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
+        } else {
+            Modifier
+        }
     when (choices) {
         BingeChoiceList.Loading ->
-            Box(modifier.fillMaxWidth().padding(inset), contentAlignment = Alignment.Center) { BingeLoadingIndicator() }
+            Box(modifier.fillMaxWidth().then(clearBar).padding(inset), contentAlignment = Alignment.Center) { BingeLoadingIndicator() }
         is BingeChoiceList.Failed ->
             Column(
-                modifier = modifier.fillMaxWidth().padding(inset),
+                modifier = modifier.fillMaxWidth().then(clearBar).padding(inset),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
             ) {
