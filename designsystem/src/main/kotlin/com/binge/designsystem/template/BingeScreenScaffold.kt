@@ -43,6 +43,7 @@ import com.binge.designsystem.component.OverlaidHeaderContent
 import com.binge.designsystem.paneBackOrNull
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.resolvedContentPadding
 
 /** Which top bar a [BingeScreenScaffold] carries. */
 enum class ScreenBar {
@@ -201,13 +202,21 @@ fun PaddingValues.screenOuterPadding(): PaddingValues {
 fun PaddingValues.screenInnerPadding(): PaddingValues = PaddingValues(top = calculateTopPadding(), bottom = calculateBottomPadding())
 
 /**
- * [screenInnerPadding] with the content inset on the sides and below, for a list under the bar or a header:
- * the top is already the bar's or header's own height, so the inset is not stacked onto it as well.
+ * [screenInnerPadding] with the content inset on the sides and below, for a list under the bar or a header: the top is
+ * already the bar's or header's own height, so the inset is not stacked onto it as well. The sides are
+ * [resolvedContentPadding]'s, so beside another pane the shared edge takes the narrower inner inset.
  */
 @Composable
 fun PaddingValues.screenListPadding(): PaddingValues {
-    val inset = resolvedContentInset()
-    return PaddingValues(start = inset, top = calculateTopPadding(), end = inset, bottom = inset + calculateBottomPadding())
+    // Per side, so the edge a pane shares with the one beside it takes pane_inner_inset rather than the window inset.
+    val sides = resolvedContentPadding()
+    val direction = LocalLayoutDirection.current
+    return PaddingValues(
+        start = sides.calculateStartPadding(direction),
+        top = calculateTopPadding(),
+        end = sides.calculateEndPadding(direction),
+        bottom = resolvedContentInset() + calculateBottomPadding(),
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

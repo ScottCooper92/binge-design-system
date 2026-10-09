@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -24,11 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.hasPaneBeside
+import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeTheme
 
 /**
@@ -106,6 +112,17 @@ fun BingeTopBar(
     // contrast guarantee) has faded away against a theme-following scrimForegroundColor.
     val glassBackgroundAlpha = 1f - foregroundScrimFraction
     val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
+    val titleModifier =
+        if (onBack == null && hasPaneBeside()) {
+            // Beside another pane, the title starts where the pane's content does, as the two-row bar's does: M3 puts it
+            // pane_top_bar_title_inset in, and the content may start nearer the shared edge than that.
+            val contentStart = resolvedContentPadding().calculateStartPadding(LocalLayoutDirection.current) + navOverlayStart()
+            Modifier.offset(x = contentStart - dimensionResource(R.dimen.pane_top_bar_title_inset))
+        } else {
+            // Clears the filled circular nav container, whose visible edge sits ~12dp closer to
+            // the title than a bare glyph would; restores a standard-spacing gap.
+            Modifier.padding(start = dimensionResource(R.dimen.padding_s))
+        }
     Box {
         TopBarScrim(
             scrimFraction,
@@ -119,9 +136,7 @@ fun BingeTopBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = titleColor,
-                    // Clears the filled circular nav container, whose visible edge sits ~12dp closer to
-                    // the title than a bare glyph would; restores a standard-spacing gap.
-                    modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_s)),
+                    modifier = titleModifier,
                 )
             },
             modifier = modifier,
