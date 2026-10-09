@@ -96,4 +96,7 @@
     <string name="choice_section_suggested">Suggested</string>
     <string name="choice_section_all">All</string>
     <string name="choice_section_selected">Selected</string>
+    <string name="number_slider_decrease">Decrease %1$s</string>
+    <string name="number_slider_increase">Increase %1$s</string>
+    <string name="range_slider_readout">%1$s – %2$s</string>
 </resources>

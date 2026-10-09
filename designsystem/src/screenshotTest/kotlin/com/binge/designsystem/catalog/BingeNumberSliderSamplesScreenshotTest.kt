@@ -4,53 +4,46 @@ import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
-class BingeRangeSliderSamplesScreenshotTest {
+class BingeNumberSliderSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun Unset() {
-        BingeRangeSliderUnsetSample()
+    fun Value() {
+        BingeNumberSliderValueSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun MinOnly() {
-        BingeRangeSliderMinOnlySample()
+    fun OpenEnd() {
+        BingeNumberSliderOpenEndSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun MaxOnly() {
-        BingeRangeSliderMaxOnlySample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun Range() {
-        BingeRangeSliderRangeSample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun Adjacent() {
-        BingeRangeSliderAdjacentSample()
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun Disabled() {
-        BingeRangeSliderDisabledSample()
+    fun Minimum() {
+        BingeNumberSliderMinimumSample()
     }
 
     @PreviewTest
     @ComponentPreviews
     @Composable
     fun Closed() {
-        BingeRangeSliderClosedSample()
+        BingeNumberSliderClosedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Disabled() {
+        BingeNumberSliderDisabledSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Item() {
+        BingeNumberItemSample()
     }
 }

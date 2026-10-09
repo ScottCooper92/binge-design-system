@@ -26,16 +26,17 @@ private fun RangeSliderSampleFrame(values: ClosedFloatingPointRange<Float>, enab
             onValuesChange = { current = it },
             valueRange = 0f..SAMPLE_MAX,
             steps = SAMPLE_STEPS,
-            valueLabel = { if (it >= SAMPLE_MAX) "${it.toInt()}+ min" else "${it.toInt()} min" },
+            valueLabel = { "${it.toInt()} min" },
             startThumbDescription = "Minimum",
             endThumbDescription = "Maximum",
             enabled = enabled,
+            openEndLabel = "${SAMPLE_MAX.toInt()}+ min",
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
         )
     }
 }
 
-/** Both thumbs parked at the ends: nothing is constrained. */
+/** Both thumbs parked at the ends: nothing is constrained, and the open end reads "240+ min". */
 @Composable
 fun BingeRangeSliderUnsetSample() {
     RangeSliderSampleFrame(0f..SAMPLE_MAX)
@@ -70,3 +71,24 @@ fun BingeRangeSliderAdjacentSample() {
 fun BingeRangeSliderDisabledSample() {
     RangeSliderSampleFrame(60f..150f, enabled = false)
 }
+
+/** A closed track, where the top is a value like any other: a rating from 0 to 10 in half points. */
+@Composable
+fun BingeRangeSliderClosedSample() {
+    var current by remember { mutableStateOf(6.5f..9f) }
+    ScreenshotTheme {
+        BingeRangeSlider(
+            values = current,
+            onValuesChange = { current = it },
+            valueRange = 0f..RATING_MAX,
+            steps = RATING_STEPS,
+            valueLabel = { "%.1f".format(java.util.Locale.ROOT, it) },
+            startThumbDescription = "Minimum rating",
+            endThumbDescription = "Maximum rating",
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
+        )
+    }
+}
+
+private const val RATING_MAX = 10f
+private const val RATING_STEPS = 19
