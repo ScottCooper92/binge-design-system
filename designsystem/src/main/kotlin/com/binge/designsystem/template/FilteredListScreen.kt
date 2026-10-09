@@ -3,6 +3,7 @@ package com.binge.designsystem.template
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -60,7 +61,7 @@ fun FilteredListScreen(
                 items = filters,
                 selectedIndex = selectedFilter,
                 onSelectedIndexChange = onFilterChange,
-                modifier = Modifier.fillMaxSize().padding(padding.screenOuterPadding()),
+                modifier = Modifier.fillMaxSize().padding(padding.screenOuterPadding()).consumeWindowInsets(padding.screenOuterPadding()),
                 // The bar's height joins the pager's header, so the rows reach the top of the window and pass under both.
                 header = {
                     Spacer(Modifier.height(padding.calculateTopPadding()))

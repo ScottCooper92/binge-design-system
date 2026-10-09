@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -100,8 +104,11 @@ fun BingeScreenScaffold(
     val scrim = behavior?.let { if (bar == ScreenBar.Small) it.state.overlappedFraction else it.state.collapsedFraction } ?: 0f
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
+    // What an ancestor already reserved, such as the custom rail's start inset, is not reserved again (#372).
+    var consumed by remember { mutableStateOf(WindowInsets(0, 0, 0, 0)) }
     Scaffold(
-        modifier = behavior?.let { modifier.nestedScroll(it.nestedScrollConnection) } ?: modifier,
+        modifier = (behavior?.let { modifier.nestedScroll(it.nestedScrollConnection) } ?: modifier)
+            .onConsumedWindowInsetsChanged { consumed = it },
         contentWindowInsets = WindowInsets(0),
         topBar = {
             val barScrimFraction = if (barScrim && header == null) scrim else 0f
@@ -149,7 +156,7 @@ fun BingeScreenScaffold(
             BingeSnackbarHost(snackbarHostState, Modifier.padding(bottom = uncovered))
         },
     ) { scaffoldPadding ->
-        val padding = screenPadding(scaffoldPadding, hasBar = bar != ScreenBar.None)
+        val padding = screenPadding(scaffoldPadding, hasBar = bar != ScreenBar.None, consumed = consumed)
         // The overlay is folded into [padding], so a child's own navOverlayPadding() must not count it twice.
         CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues()) {
             if (header == null) {
@@ -162,7 +169,8 @@ fun BingeScreenScaffold(
                         Spacer(Modifier.height(padding.calculateTopPadding()))
                         header()
                     },
-                    modifier = Modifier.padding(padding.screenOuterPadding()),
+                    // Consumed as well as padded, so a header's chip row does not add the side insets again (#371).
+                    modifier = Modifier.padding(padding.screenOuterPadding()).consumeWindowInsets(padding.screenOuterPadding()),
                     headerBackground = Color.Transparent,
                     scrimFraction = scrim,
                 ) { overlay ->
@@ -183,7 +191,7 @@ fun ScreenBody(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.(inner: PaddingValues) -> Unit,
 ) {
-    Box(modifier = modifier.fillMaxSize().padding(padding.screenOuterPadding())) {
+    Box(modifier = modifier.fillMaxSize().padding(padding.screenOuterPadding()).consumeWindowInsets(padding.screenOuterPadding())) {
         content(padding.screenInnerPadding())
     }
 }
@@ -236,14 +244,18 @@ private fun snackbarNavigationInset(): Dp {
 }
 
 /**
- * The one insets policy. The sides clear this pane's system bars and cutout plus a navigation rail drawn over
- * it. The bottom clears a pinned bottom bar when there is one, or else the floating navigation bar or the
+ * The one insets policy. The sides clear this pane's system bars and cutout, less what an ancestor [consumed], plus a
+ * navigation rail drawn over it. The bottom clears a pinned bottom bar when there is one, or else the floating navigation bar or the
  * gesture bar, whichever is taller: inside the shell the floating bar's inset already covers the gesture bar.
  */
 @Composable
-private fun screenPadding(scaffoldPadding: PaddingValues, hasBar: Boolean): PaddingValues {
+private fun screenPadding(
+    scaffoldPadding: PaddingValues,
+    hasBar: Boolean,
+    consumed: WindowInsets,
+): PaddingValues {
     val direction = LocalLayoutDirection.current
-    val sides = paneSideInsets().asPaddingValues()
+    val sides = paneSideInsets().exclude(consumed).asPaddingValues()
     val overlay = LocalNavOverlayInsets.current
     val bottomBar = scaffoldPadding.calculateBottomPadding()
     val navigation = max(overlay.calculateBottomPadding(), WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
