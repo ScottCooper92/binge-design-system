@@ -18,9 +18,10 @@ run-name: >-
 # Thin caller. The workflow itself lives in ScottCooper92/binge-ci.
 #
 # PUBLIC repository, and one that two other builds include directly. `./gradlew build`
-# here cannot see the consumers, so a change that compiles fine in this repository can
-# still break Binge or a companion at their next sync - which is why auto_merge is off.
-# Turn it on when the carve has landed and the review has a track record here.
+# here cannot see every consumer, so a change that compiles fine in this repository can
+# still break a consuming app at its next sync. auto_merge was off until the review had a
+# track record here. It is on now: CI's `seerr` job builds binge-seerr against the change, and
+# a consumer break that gets through surfaces at that consumer's own submodule bump.
 on:
   workflow_run:
     workflows: ["CI"]
@@ -73,7 +74,7 @@ jobs:
     uses: ScottCooper92/binge-ci/.github/workflows/bot-review.yml@v1
     with:
       dispatch_pr: ${{ inputs.pr }}
-      auto_merge: false
+      auto_merge: true
       # The screenshot suite belongs in this list: ci.yml runs validateDebugScreenshotTest
       # beside `build`, so a baseline mismatch is already reported and is not the
       # reviewer's to raise.
