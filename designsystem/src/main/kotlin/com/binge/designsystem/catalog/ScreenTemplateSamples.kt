@@ -94,6 +94,19 @@ fun BingeScreenScaffoldSmallBarSample() {
     }
 }
 
+/**
+ * No bar at all: the scaffold switches off the top bar and its scroll behaviour, and the body reserves the status
+ * bar's inset itself so its first row does not sit under the clock.
+ */
+@Composable
+fun BingeScreenScaffoldNoBarSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "No bar", bar = ScreenBar.None) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
 /** The large bar: a subtitle summarising what the screen shows, and a control at the end of the title row. */
 @Composable
 fun BingeScreenScaffoldLargeBarSample() {
