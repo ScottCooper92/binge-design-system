@@ -118,7 +118,16 @@ still an issue; a serious problem inside the diff is a change to make now.
 [binge-ci](https://github.com/ScottCooper92/binge-ci). They act only on PRs carrying the `agent`
 label.
 
-**That label is maintainers-only.** Applying it grants an agent code execution with this
-repository's secrets in scope. Do not apply it to a PR you have not read, and never to one from a
-fork — the workflows already refuse fork PRs, and that guard is the load-bearing control here rather
-than a formality.
+**Label every PR you open, and add `hold` when a human must do the merging.** Ordinary work gets
+`agent` by default, including from the agent that opened it. Review here is CI plus the reviewer bot,
+not a human reading the diff, so withholding the label buys no extra check. It only parks the PR. `agent`
+buys the review and, once it passes, the bot's merge. `hold` withholds the merge: the PR is reviewed and
+kept current, but a maintainer lands it.
+
+Add `hold` alongside `agent` for changes to what governs the agents: `.github/workflows/`, `CLAUDE.md`,
+`.ai/agents/` and `.claude/skills/`. A mistake there can disable the checks that would have caught it.
+Also add it for a change to a public API that a consumer would have to follow in the same sync.
+
+The label still grants an agent code execution with this repository's secrets in scope. Never apply it
+to a PR from a fork; the workflows refuse fork PRs, and that guard is the load-bearing control. Don't
+apply it to someone else's PR you haven't read.
