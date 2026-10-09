@@ -373,6 +373,8 @@ fun ItemGroupConnectorSample() {
 /** Switch rows ([ListItem.toggled]): on, off and disabled, each drawing its own switch and no chevron. */
 @Composable
 fun ItemGroupSwitchSample() {
+    var trustProxy by remember { mutableStateOf(true) }
+    var forceIpv4 by remember { mutableStateOf(false) }
     ScreenshotTheme {
         ItemGroup(
             title = "Network",
@@ -381,9 +383,10 @@ fun ItemGroupSwitchSample() {
                     icon = Icons.Filled.Dns,
                     label = "Trust proxy",
                     detail = "Read the client address from headers",
-                    toggled = true,
+                    toggled = trustProxy,
+                    onClick = { trustProxy = !trustProxy },
                 ),
-                ListItem(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = false),
+                ListItem(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = forceIpv4, onClick = { forceIpv4 = !forceIpv4 }),
                 ListItem(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, disabled = true),
             ),
         )
