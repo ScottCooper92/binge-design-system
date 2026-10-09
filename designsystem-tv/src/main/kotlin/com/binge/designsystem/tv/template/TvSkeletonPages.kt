@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -45,10 +46,13 @@ private const val SYNOPSIS_LINES = 3
  * It is a page, laid out like the hub: its edges follow the hub's own, the content gutter at the start and rows that
  * run to the end of the screen. Nothing in it is focusable, so while it shows the D-pad has nowhere to go, and focus
  * is placed by the loaded page when it replaces this one. [description] names the state for a screen reader.
+ * [hosting] is the loaded hub's: an overlay or a pre-shell page lands focus on the first row at once, and the hub
+ * anchors that row at the foot of the copy band rather than a row gap below it, so the skeleton's rows sit there too.
  */
 @Composable
 fun TvImmersiveHubSkeleton(
     modifier: Modifier = Modifier,
+    hosting: TvPageHosting = currentTvPageHosting(),
     rows: Int = 2,
     cardsPerRow: Int = 8,
     cardWidth: Dp = dimensionResource(TvR.dimen.tv_immersive_card_width),
@@ -61,13 +65,13 @@ fun TvImmersiveHubSkeleton(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(top = dimensionResource(TvR.dimen.tv_overscan_vertical))
                 .describedAs(description),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_row_gap)),
     ) {
         Column(
             modifier = Modifier
                 .height(
                     dimensionResource(TvR.dimen.tv_immersive_content_top) - dimensionResource(TvR.dimen.tv_overscan_vertical),
-                ).padding(start = tvContentGutterStart(), bottom = dimensionResource(DesR.dimen.padding_l)),
+                ).padding(start = tvContentGutterStart(), bottom = dimensionResource(DesR.dimen.padding_l))
+                .tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
         ) {
             TvSkeletonBlock(
@@ -89,13 +93,14 @@ fun TvImmersiveHubSkeleton(
                     ).height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
             )
         }
+        if (hosting == TvPageHosting.RailDestination) Spacer(Modifier.height(dimensionResource(TvR.dimen.tv_immersive_row_gap)))
         // Measured at their own height and clipped by the screen: a loaded hub's rows run off the bottom, and a row
         // squeezed into what is left would draw its heading over its cards.
         Column(
             modifier = Modifier.wrapContentHeight(align = Alignment.Top, unbounded = true),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_row_gap)),
         ) {
-            repeat(rows) { PosterRowSkeleton(cardsPerRow, cardWidth) }
+            repeat(rows) { index -> PosterRowSkeleton(cardsPerRow, cardWidth, Modifier.tvLayoutAnchor(TvLayoutAnchors.hubRow(index))) }
         }
     }
 }
@@ -210,9 +215,13 @@ private const val LAST_LINE_FRACTION = 0.6f
 private const val DETAIL_CARDS = 6
 
 @Composable
-private fun PosterRowSkeleton(cards: Int, cardWidth: Dp) {
+private fun PosterRowSkeleton(
+    cards: Int,
+    cardWidth: Dp,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_header_gap)),
     ) {
         TvSkeletonBlock(
