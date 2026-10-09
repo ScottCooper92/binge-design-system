@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -42,6 +43,7 @@ import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.DarkStatusBarEffect
 import com.binge.designsystem.component.DetailOverlayTopBar
 import com.binge.designsystem.paneBackOrNull
+import com.binge.designsystem.paneSideInsets
 
 /**
  * A detail page under a hero: the [hero] runs full-bleed to the top of the window, a bar fades in over it as
@@ -193,7 +195,7 @@ private const val HERO_ITEM_KEY = "hero-detail-hero"
 
 /**
  * The outer frame both forms share: no bar of the Scaffold's own, since the overlay bar clears the status bar
- * itself; the page's sides clear a cutout in landscape, and the footer reaches the true edge.
+ * itself; the page's outer sides clear a cutout in landscape, and the footer reaches the true edge.
  */
 @Composable
 private fun HeroDetailFrame(
@@ -216,7 +218,7 @@ private fun HeroDetailFrame(
                     Modifier
                         .weight(1f, fill = false)
                         .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+                        .windowInsetsPadding(paneSideInsets()),
                 content = page,
             )
         }
@@ -255,7 +257,7 @@ private fun BoxScope.HeroDetailBar(
 
 @Composable
 private fun snackbarInsets(hasFooter: Boolean): WindowInsets =
-    WindowInsets.safeDrawing.only(if (hasFooter) WindowInsetsSides.Horizontal else WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+    if (hasFooter) paneSideInsets() else paneSideInsets().union(pageBottomInset())
 
 /** The bottom alone, for the scroll: its box has already cleared the sides. */
 @Composable
