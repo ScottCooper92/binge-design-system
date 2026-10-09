@@ -1,8 +1,8 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +17,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
@@ -41,8 +42,8 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * [clearsNavigationBar] is the one case that does need the real inset: a `bottomBar` slot sits
  * outside a Scaffold's own body, so nothing insets it automatically. On, only the button clears the
- * gesture area — the [Surface] itself stays unpadded so its background still extends full-bleed
- * behind it, edge to edge like the rest of the window.
+ * gesture area and the side insets on its pane's outer edges — the [Surface] itself stays unpadded so its
+ * background still extends full-bleed behind it, edge to edge like the rest of the window.
  *
  * [horizontalPadding] defaults to the fixed spacing a sheet's own content already uses. A page whose
  * body reads [resolvedContentInset] passes that instead, so the button's edges land under its own
@@ -84,7 +85,7 @@ fun BingeActionFooter(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .then(if (clearsNavigationBar) Modifier.navigationBarsPadding() else Modifier)
+                    .then(if (clearsNavigationBar) Modifier.windowInsetsPadding(bottomBarInsets()) else Modifier)
                     .padding(horizontal = horizontalPadding)
                     .padding(top = dimensionResource(R.dimen.padding_sm), bottom = bottomPadding),
         )

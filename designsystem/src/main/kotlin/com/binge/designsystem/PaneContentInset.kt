@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
@@ -101,6 +102,13 @@ internal fun paneContentPadding(
  */
 @Composable
 fun paneSideInsets(): WindowInsets = paneSideInsets(WindowInsets.systemBars.union(WindowInsets.displayCutout), LocalPaneInnerEdge.current)
+
+/**
+ * What a bar in a `bottomBar` slot clears: the navigation bar below it, and the side insets on the pane's outer
+ * edges. The slot sits outside the scaffold's padded body, so nothing above the bar has cleared a side cutout.
+ */
+@Composable
+internal fun bottomBarInsets(): WindowInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Bottom).union(paneSideInsets())
 
 /** [paneSideInsets]'s side selection, apart from the window and the composition locals it reads. */
 internal fun paneSideInsets(windowInsets: WindowInsets, innerEdge: PaneEdge?): WindowInsets =
