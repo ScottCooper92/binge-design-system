@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
@@ -37,6 +37,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
+import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeTextButton
@@ -84,6 +85,7 @@ fun FormScreen(
     notReady: (@Composable (padding: PaddingValues) -> Unit)? = null,
     content: @Composable ColumnScope.(padding: PaddingValues) -> Unit,
 ) {
+    val showsFooter = placement == FormActionPlacement.Footer && primaryAction != null && notReady == null
     BingeScreenScaffold(
         title = title,
         modifier = modifier,
@@ -102,9 +104,12 @@ fun FormScreen(
             extraActions()
         },
         bottomBar = {
-            Column {
+            // The scaffold never lifts its bottomBar, so a footer rides the keyboard here; the body below
+            // consumes the taller bar, which leaves the fields' own imePadding nothing to add. Without a footer
+            // the bar stays unlifted, so the scaffold keeps clearing a floating nav overlay.
+            Column(if (showsFooter) Modifier.imePadding() else Modifier) {
                 bottomBar()
-                if (placement == FormActionPlacement.Footer && primaryAction != null && notReady == null) {
+                if (showsFooter && primaryAction != null) {
                     FormFooter(primary = primaryAction, secondary = secondaryAction)
                 }
             }
@@ -186,7 +191,7 @@ fun FormFooter(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .navigationBarsPadding()
+                    .windowInsetsPadding(bottomBarInsets())
                     .padding(horizontal = resolvedContentInset())
                     .padding(top = dimensionResource(R.dimen.padding_sm), bottom = dimensionResource(R.dimen.padding_m)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),

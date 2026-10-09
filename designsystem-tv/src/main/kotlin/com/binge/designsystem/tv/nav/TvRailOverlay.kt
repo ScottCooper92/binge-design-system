@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,13 @@ import com.binge.designsystem.tv.R as TvR
  * previews and overlay hostings are automatically un-inset.
  */
 val LocalTvContentInset = compositionLocalOf { 0.dp }
+
+/**
+ * Where Left from a rail destination's [com.binge.designsystem.tv.focus.TvFocusSink] goes: the rail's selected item,
+ * provided by the rail around its content and null anywhere else. A template whose sink can hold focus in a rail
+ * destination passes it, so a page with nothing focusable still opens the rail on Left.
+ */
+val LocalTvRailEntry = staticCompositionLocalOf<FocusRequester?> { null }
 
 /**
  * The pane's animated rightward translation while the rail expands. A backdrop cancels it in the draw phase

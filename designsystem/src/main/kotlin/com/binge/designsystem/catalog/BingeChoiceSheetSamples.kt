@@ -166,6 +166,26 @@ fun BingeMultiChoiceSheetSample() {
     }
 }
 
+/**
+ * A multi-choice sheet that applies each tick as it is made, for a setting saved as it changes: Clear in the header and
+ * no Done, since there is nothing left to confirm.
+ */
+@Composable
+fun BingeMultiChoiceSheetAppliedSample() {
+    ScreenshotTheme {
+        val chosen = setOf("ja", "es")
+        SheetFrame(docked = false, title = LANGUAGES_TITLE, actions = true, withDone = false) {
+            MultiChoiceList(
+                choices = BingeChoiceList.Ready(SampleLanguages),
+                chosen = chosen,
+                leading = chosen,
+                filterPlaceholder = null,
+                onToggle = { _, _ -> },
+            )
+        }
+    }
+}
+
 /** A list read when its sheet opens: loading, then failed with the consumer's message and a retry. */
 @Composable
 fun BingeChoiceSheetStatesSample() {
@@ -219,6 +239,7 @@ private fun SheetFrame(
     docked: Boolean,
     title: String,
     actions: Boolean = false,
+    withDone: Boolean = true,
     body: @Composable ColumnScope.() -> Unit,
 ) {
     val fraction = if (docked) 1f else 0f
@@ -231,17 +252,17 @@ private fun SheetFrame(
     ) {
         DockingHeaderLayout(
             fraction = { fraction },
-            header = { ChoiceSheetHeader(title) { if (actions) SampleActions() } },
-            dockedTopBar = { BingeSheetTopBar(title = title, onClose = {}, actions = { if (actions) SampleActions() }) },
+            header = { ChoiceSheetHeader(title) { if (actions) SampleActions(withDone) } },
+            dockedTopBar = { BingeSheetTopBar(title = title, onClose = {}, actions = { if (actions) SampleActions(withDone) }) },
         )
         body()
     }
 }
 
 @Composable
-private fun SampleActions() {
+private fun SampleActions(withDone: Boolean) {
     BingeTextButton(label = CLEAR, onClick = {})
-    BingeTextButton(label = DONE, onClick = {})
+    if (withDone) BingeTextButton(label = DONE, onClick = {})
 }
 
 /**

@@ -16,6 +16,7 @@ import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.focus.TvFocusSink
+import com.binge.designsystem.tv.nav.LocalTvRailEntry
 import com.binge.designsystem.tv.theme.TvButtonStyle
 
 /** One way out of a [TvMessagePage]: what the button says, and what pressing it does. */
@@ -62,7 +63,9 @@ fun TvMessagePage(
                 .then(arrival)
                 .padding(tvPagePadding(hosting)),
     ) {
-        if (!hasAction) Box(Modifier.focusRequester(sinkEntry)) { TvFocusSink() }
+        // In a rail destination the sink is all there is to focus, so Left from it opens the rail (#368).
+        val railEntry = LocalTvRailEntry.current.takeIf { hosting == TvPageHosting.RailDestination }
+        if (!hasAction) Box(Modifier.focusRequester(sinkEntry)) { TvFocusSink(leftEntry = railEntry) }
         TvMessagePlate(
             body = body,
             headline = headline,

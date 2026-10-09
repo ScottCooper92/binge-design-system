@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -75,6 +76,7 @@ fun BingeNumberSliderDisabledSample() {
 @Composable
 fun BingeNumberItemSample() {
     ScreenshotTheme {
+        var value by rememberSaveable { mutableStateOf<Int?>(null) }
         ItemGroup(
             title = null,
             rows =
@@ -82,10 +84,10 @@ fun BingeNumberItemSample() {
                     bingeNumberItem(
                         icon = Icons.Filled.Movie,
                         title = "Movie requests",
-                        value = null,
+                        value = value,
                         range = SAMPLE_RANGE,
                         format = { it.toString() },
-                        onChange = {},
+                        onChange = { value = it },
                         openEndLabel = SAMPLE_OPEN_END,
                     ),
                 ),

@@ -11,9 +11,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -284,5 +286,77 @@ class BingeChoiceSheetTest {
     @Test
     fun a_multi_choice_sheet_without_a_draft_saver_reopens_from_the_selection() {
         assertEquals(setOf("a"), ticksAcrossRestore(draftSaver = null))
+    }
+
+    @Test
+    fun a_multi_choice_sheet_that_applies_as_picked_reports_each_tick_and_clear_and_shows_no_done() {
+        val applied = mutableListOf<Set<String>>()
+        val choices = BingeChoiceList.Ready(listOf(BingeChoice("a", "Alpha"), BingeChoice("b", "Bravo")))
+        rule.setContent {
+            var selected by remember { mutableStateOf(setOf("a")) }
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeMultiChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Languages",
+                            choices = choices,
+                            selected = selected,
+                            emptyLabel = "None",
+                            doneLabel = "Done",
+                            clearLabel = "Clear",
+                            onDone = {
+                                applied += it
+                                selected = it
+                            },
+                            applyAsPicked = true,
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Languages").performClick()
+        assertTrue(rule.onAllNodesWithText("Done").fetchSemanticsNodes().isEmpty())
+        rule.onNodeWithText("Bravo").performClick()
+        rule.onNodeWithText("Clear").performClick()
+
+        assertEquals(listOf(setOf("a", "b"), emptySet<String>()), applied)
+    }
+
+    @Test
+    fun a_multi_choice_sheet_that_applies_as_picked_keeps_its_row_order_when_a_row_is_ticked() {
+        val choices =
+            BingeChoiceList.Ready(
+                listOf(BingeChoice("a", "Alpha"), BingeChoice("b", "Bravo"), BingeChoice("c", "Charlie")),
+            )
+        rule.setContent {
+            var selected by remember { mutableStateOf(setOf("a")) }
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeMultiChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Languages",
+                            choices = choices,
+                            selected = selected,
+                            emptyLabel = "None",
+                            doneLabel = "Done",
+                            clearLabel = "Clear",
+                            onDone = { selected = it },
+                            applyAsPicked = true,
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Languages").performClick()
+
+        fun tops() = listOf("Alpha", "Bravo", "Charlie").map { rule.onNode(hasText(it) and isToggleable()).getBoundsInRoot().top }
+        val before = tops()
+        rule.onNode(hasText("Charlie") and isToggleable()).performClick()
+
+        assertEquals(before, tops())
     }
 }

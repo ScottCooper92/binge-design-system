@@ -24,8 +24,11 @@ import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.R as TvR
 
-/** The trailing (see-all) cell's focus key. A String so it can never collide with a caller's item key. */
-private const val TRAILING_KEY = "tv-card-row-trailing"
+/**
+ * The trailing (see-all) cell's key, reported through `onCellFocused` like any cell's so a page can tell the tile from a
+ * card. An item whose key is this same string would be taken for the tile.
+ */
+internal const val TRAILING_KEY = "tv-card-row-trailing"
 
 /**
  * The standard TV detail row: an optional heading over a horizontal run of fixed-width cards, with the focus

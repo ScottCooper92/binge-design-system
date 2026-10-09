@@ -257,6 +257,7 @@ fun BingeTvNavRail(
                 LocalTvContentInset provides collapsedWidth,
                 LocalTvPaneShift provides contentShiftState,
                 LocalTvRailArtwork provides artwork,
+                LocalTvRailEntry provides railEntry,
             ) {
                 content()
             }
