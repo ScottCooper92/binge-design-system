@@ -10,6 +10,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 /**
@@ -67,12 +68,13 @@ fun String.toInitials(fallback: String = take(2).uppercase()): String =
 fun badgeCountLabel(count: Int): String = if (count > MAX_BADGE_COUNT) "$MAX_BADGE_COUNT+" else count.toString()
 
 /**
- * A conversational date for [timeMillis]: a relative span ("now", "6 days ago", "3 weeks ago")
- * for recent instants, falling back to the absolute long date ("12 June 2026") once it ages past the
- * relative window or sits in the future. `null` when [timeMillis] is `null` so callers can drop the
+ * A conversational date for [timeMillis]: a relative span ("now", "6 days ago", "in 3 hours") for an
+ * instant within the relative window either side of [now], falling back to the absolute long date
+ * ("12 June 2026") beyond it. `null` when [timeMillis] is `null` so callers can drop the
  * line entirely. [now] is a parameter so frames pass a fixed instant rather than the drifting clock.
  * [locale] and [zone] govern the absolute date only: the relative span is the platform's own copy
- * (`DateUtils`, and ICU's "now" under a minute), which always follows the device locale.
+ * (`DateUtils` for the past, ICU's `RelativeDateTimeFormatter` for "now" and the whole future), which
+ * always follows the device locale and zone.
  */
 fun formatRelativeOrAbsolute(
     timeMillis: Long?,
@@ -82,6 +84,8 @@ fun formatRelativeOrAbsolute(
 ): String? {
     if (timeMillis == null) return null
     val age = now - timeMillis
+    // The future reads the same way as the past ("in 3 hours", "tomorrow"), so a scheduled time sits beside a past one.
+    if (age < 0 && -age <= RELATIVE_DATE_WINDOW_MILLIS) return relativeFuture(now, -age)
     return if (age in 0 until DateUtils.MINUTE_IN_MILLIS) {
         // DateUtils counts whole minutes, so under one it says "0 minutes ago" (#240).
         RelativeDateTimeFormatter.getInstance().format(
@@ -99,6 +103,36 @@ fun formatRelativeOrAbsolute(
             .atZone(zone)
             .toLocalDate()
             .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale))
+    }
+}
+
+/**
+ * [distance] ahead, inside the window: "now" under a minute, then "in 20 minutes", "in 3 hours", "tomorrow", "in 5
+ * days", "in 2 weeks". ICU's formatter rather than `DateUtils`, which capitalises a future span for standing alone
+ * ("In 3 hours") and so reads wrong inside a sentence ("Next run In 3 hours").
+ */
+private fun relativeFuture(now: Long, distance: Long): String {
+    val formatter = RelativeDateTimeFormatter.getInstance()
+    val next = RelativeDateTimeFormatter.Direction.NEXT
+    return when {
+        distance < DateUtils.MINUTE_IN_MILLIS ->
+            formatter.format(RelativeDateTimeFormatter.Direction.PLAIN, RelativeDateTimeFormatter.AbsoluteUnit.NOW)
+        distance < DateUtils.HOUR_IN_MILLIS ->
+            formatter.format((distance / DateUtils.MINUTE_IN_MILLIS).toDouble(), next, RelativeDateTimeFormatter.RelativeUnit.MINUTES)
+        distance < DateUtils.DAY_IN_MILLIS ->
+            formatter.format((distance / DateUtils.HOUR_IN_MILLIS).toDouble(), next, RelativeDateTimeFormatter.RelativeUnit.HOURS)
+        distance < DateUtils.WEEK_IN_MILLIS -> {
+            // Calendar days in the device zone, as DateUtils counts the past: 26 hours ahead can be two days out.
+            val zone = ZoneId.systemDefault()
+            val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+            val days = ChronoUnit.DAYS.between(today, Instant.ofEpochMilli(now + distance).atZone(zone).toLocalDate())
+            if (days <= 1) {
+                formatter.format(next, RelativeDateTimeFormatter.AbsoluteUnit.DAY)
+            } else {
+                formatter.format(days.toDouble(), next, RelativeDateTimeFormatter.RelativeUnit.DAYS)
+            }
+        }
+        else -> formatter.format((distance / DateUtils.WEEK_IN_MILLIS).toDouble(), next, RelativeDateTimeFormatter.RelativeUnit.WEEKS)
     }
 }
 

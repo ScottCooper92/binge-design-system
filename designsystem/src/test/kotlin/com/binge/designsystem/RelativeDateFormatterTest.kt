@@ -56,9 +56,36 @@ class RelativeDateFormatterTest {
         assertEquals("12 February 2026", label)
     }
 
+    /** A scheduled time reads the way a past one does, never as a negative span ("-3 hours ago"). */
     @Test
-    fun `a future instant reads as the absolute date rather than a negative span`() {
-        val label = formatRelativeOrAbsolute(NOW + DAY, now = NOW, locale = Locale.UK, zone = ZoneOffset.UTC)
-        assertEquals("13 June 2026", label)
+    fun `a future instant inside the window reads as a relative span ahead`() {
+        assertEquals("now", formatRelativeOrAbsolute(NOW + 59_000, now = NOW))
+        assertEquals("in 20 minutes", formatRelativeOrAbsolute(NOW + 20 * 60_000, now = NOW))
+        assertEquals("in 3 hours", formatRelativeOrAbsolute(NOW + 3 * 60 * 60_000, now = NOW))
+        assertEquals("tomorrow", formatRelativeOrAbsolute(NOW + DAY, now = NOW))
+        assertEquals("in 5 days", formatRelativeOrAbsolute(NOW + 5 * DAY, now = NOW))
+        assertEquals("in 2 weeks", formatRelativeOrAbsolute(NOW + 14 * DAY, now = NOW))
+    }
+
+    /** Days are calendar days in the device zone, as on the past side, not 24-hour blocks. */
+    @Test
+    fun `a future instant counts calendar days across midnight`() {
+        val zone = java.util.TimeZone.getDefault()
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"))
+        try {
+            val evening = NOW + 22 * 60 * 60_000
+            assertEquals("in 2 days", formatRelativeOrAbsolute(evening + 26 * 60 * 60_000, now = evening))
+            assertEquals("in 2 days", formatRelativeOrAbsolute(evening + 46 * 60 * 60_000, now = evening))
+            assertEquals("tomorrow", formatRelativeOrAbsolute(NOW + 32 * 60 * 60_000, now = NOW + 2 * 60 * 60_000))
+            assertEquals("in 3 hours", formatRelativeOrAbsolute(NOW + 3 * 60 * 60_000, now = NOW))
+        } finally {
+            java.util.TimeZone.setDefault(zone)
+        }
+    }
+
+    @Test
+    fun `a future instant past the window reads as the absolute long date`() {
+        val label = formatRelativeOrAbsolute(NOW + 120 * DAY, now = NOW, locale = Locale.UK, zone = ZoneOffset.UTC)
+        assertEquals("10 October 2026", label)
     }
 }
