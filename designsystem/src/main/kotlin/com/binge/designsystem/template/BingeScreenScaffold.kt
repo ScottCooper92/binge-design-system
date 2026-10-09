@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -151,9 +152,10 @@ fun BingeScreenScaffold(
         bottomBar = { Box(Modifier.onSizeChanged { bottomBarHeight = it.height }) { bottomBar() } },
         snackbarHost = {
             // The Scaffold lifts the snackbar above a pinned bar. With none, it clears the navigation bar the
-            // way the body does: by the part the floating navigation bar's inset does not already cover.
+            // way the body does: by the part the floating navigation bar's inset does not already cover. Its sides clear
+            // a side navigation bar or cutout, as the body's do.
             val uncovered = if (bottomBarHeight > 0) dimensionResource(R.dimen.zero) else snackbarNavigationInset()
-            BingeSnackbarHost(snackbarHostState, Modifier.padding(bottom = uncovered))
+            BingeSnackbarHost(snackbarHostState, Modifier.windowInsetsPadding(paneSideInsets()).padding(bottom = uncovered))
         },
     ) { scaffoldPadding ->
         val padding = screenPadding(scaffoldPadding, hasBar = bar != ScreenBar.None, consumed = consumed)
