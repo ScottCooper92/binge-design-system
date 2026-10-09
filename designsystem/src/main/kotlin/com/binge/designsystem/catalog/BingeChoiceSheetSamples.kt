@@ -298,7 +298,7 @@ private val SampleSpokenLanguages =
 @Composable
 fun BingeMultiChoiceSheetSectionedSample() {
     ScreenshotTheme {
-        SheetFrame(docked = false, title = LANGUAGES_TITLE) {
+        SheetFrame(docked = false, title = LANGUAGES_TITLE, actions = true) {
             MultiChoiceList(
                 choices = BingeChoiceList.Ready(SampleSpokenLanguages),
                 chosen = setOf("ja", "ko"),

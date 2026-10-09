@@ -152,12 +152,17 @@ fun <T> BingeChoiceSheet(
 }
 
 /**
- * A pick of any number of values from a list. The choices are checkboxes, with the ones already chosen first. Ticks
- * collect in the sheet and apply only on [doneLabel], which hands back the new set; Clear empties it, and closing the
- * sheet any other way discards the change.
+ * A pick of any number of values from a list. The choices are checkboxes. Ticks collect in the sheet and apply only on
+ * [doneLabel], which hands back the new set; Clear empties it, and closing the sheet any other way discards the change.
+ *
+ * A list of [SECTIONS_THRESHOLD] or more, with no filter text, is sectioned: **Selected** (the [selected] values the
+ * sheet opened with, so a row does not jump when it is ticked), **Suggested** ([suggested], in order), then **All**. A
+ * value in Suggested and in All is ticked in both. From [INDEX_THRESHOLD] choices, All has a header per first letter and
+ * a [BingeLetterRail] down the edge. A shorter list reads whole, with the ones already chosen first.
  *
  * Pass [filterPlaceholder] for a list long enough to search, a hundred entries or more, say: a filter field then sits
- * under the header and narrows the rows by label. The sheet opens and docks as [BingeChoiceSheet] does.
+ * under the header and narrows the rows by label. [actions] adds buttons to the header, before Clear and Done. The
+ * sheet opens and docks as [BingeChoiceSheet] does.
  */
 @Composable
 fun <T> BingeMultiChoiceSheet(
