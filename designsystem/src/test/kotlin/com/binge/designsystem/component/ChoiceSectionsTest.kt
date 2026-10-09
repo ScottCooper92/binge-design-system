@@ -43,4 +43,11 @@ class ChoiceSectionsTest {
         assertEquals('B', sections.letterAt(7))
         assertEquals('C', sections.letterAt(10))
     }
+
+    @Test
+    fun `several chosen values lead together, in list order, and are not suggested again`() {
+        val sections = choiceSections(choices, current = listOf("Canada", "Albania"), suggested = listOf("Canada", "Chile"))
+        assertEquals(listOf("Canada", "Albania"), sections.current.map { it.value })
+        assertEquals(listOf("Chile"), sections.suggested.map { it.value })
+    }
 }

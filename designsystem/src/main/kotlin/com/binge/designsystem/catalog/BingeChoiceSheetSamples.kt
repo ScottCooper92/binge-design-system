@@ -274,3 +274,39 @@ fun BingeChoiceSheetSectionedSample() {
         }
     }
 }
+
+private val SampleSpokenLanguages =
+    listOf(
+        "ar" to "Arabic",
+        "zh" to "Chinese",
+        "nl" to "Dutch",
+        "en" to "English",
+        "fr" to "French",
+        "de" to "German",
+        "hi" to "Hindi",
+        "it" to "Italian",
+        "ja" to "Japanese",
+        "ko" to "Korean",
+        "pt" to "Portuguese",
+        "es" to "Spanish",
+    ).map { (code, name) -> BingeChoice(code, name, mark = code.uppercase()) }
+
+/**
+ * A long multi-choice list sectioned: Selected (what was chosen when the sheet opened), Suggested, then All, each row with
+ * its language code as a mark and its checkbox at the end. Clear and Done stay in the header.
+ */
+@Composable
+fun BingeMultiChoiceSheetSectionedSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = false, title = LANGUAGES_TITLE) {
+            MultiChoiceList(
+                choices = BingeChoiceList.Ready(SampleSpokenLanguages),
+                chosen = setOf("ja", "ko"),
+                leading = setOf("ja", "ko"),
+                filterPlaceholder = null,
+                onToggle = { _, _ -> },
+                suggested = listOf("en", "es", "fr"),
+            )
+        }
+    }
+}
