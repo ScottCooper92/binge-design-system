@@ -175,7 +175,11 @@ private fun ListItemView(
             Text(
                 text = row.label,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = if (row.destination == ListItemDestination.Action && !row.disabled) {
+                    row.iconTint ?: MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
             )
             if (!row.detail.isNullOrBlank()) {
                 Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
@@ -212,7 +216,7 @@ private fun ListItemView(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                interactive -> {
+                interactive && row.destination != ListItemDestination.Action -> {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,

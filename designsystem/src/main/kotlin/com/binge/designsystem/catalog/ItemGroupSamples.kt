@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Folder
@@ -14,8 +15,11 @@ import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Policy
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -168,6 +172,36 @@ fun ItemGroupExternalSample() {
                     icon = Icons.Filled.Policy,
                     label = "Privacy policy",
                     destination = ListItemDestination.External,
+                ),
+            ),
+        )
+    }
+}
+
+/**
+ * Rows that act where they are carry no chevron and read as buttons: an ordinary action in the primary colour, one
+ * running with its spinner, and a destructive one in its icon's red, beside an in-app row for contrast.
+ */
+@Composable
+fun ItemGroupActionSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Libraries",
+            rows = listOf(
+                ListItem(icon = Icons.Filled.Folder, label = "Library settings"),
+                ListItem(icon = Icons.Filled.Sync, label = "Sync libraries", destination = ListItemDestination.Action),
+                ListItem(
+                    icon = Icons.Filled.Refresh,
+                    label = "Start a full scan",
+                    detail = "Scanning 3 of 12",
+                    loading = true,
+                    destination = ListItemDestination.Action,
+                ),
+                ListItem(
+                    icon = Icons.Filled.Delete,
+                    iconTint = MaterialTheme.colorScheme.error,
+                    label = "Delete the library",
+                    destination = ListItemDestination.Action,
                 ),
             ),
         )
