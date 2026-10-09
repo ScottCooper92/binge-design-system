@@ -150,7 +150,14 @@ private fun ListItemView(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (row.connector != null) {
-            Spacer(Modifier.width(dimensionResource(R.dimen.item_group_icon_size) + dimensionResource(R.dimen.account_card_spacing)))
+            // Just past the connector's curve: half the parent's icon to its axis, the curve, then a small gap.
+            Spacer(
+                Modifier.width(
+                    dimensionResource(R.dimen.item_group_icon_size) / 2 +
+                        dimensionResource(R.dimen.item_group_connector_radius) +
+                        dimensionResource(R.dimen.padding_s),
+                ),
+            )
         }
         if (row.leadingContent != null) {
             row.leadingContent.invoke()
@@ -284,7 +291,8 @@ private fun listItemConnector(connector: ListItemConnector): Modifier {
     val axis = with(LocalDensity.current) {
         (dimensionResource(R.dimen.item_group_row_padding_h) + dimensionResource(R.dimen.item_group_icon_size) / 2).toPx()
     }
-    val reach = with(LocalDensity.current) { dimensionResource(R.dimen.item_group_icon_size).toPx() / 2 }
+    // The curve ends where it turns; the child's icon starts a small gap after it.
+    val reach = with(LocalDensity.current) { dimensionResource(R.dimen.item_group_connector_radius).toPx() }
     val radius = with(LocalDensity.current) { dimensionResource(R.dimen.item_group_connector_radius).toPx() }
     return Modifier.drawBehind {
         val rtl = layoutDirection == LayoutDirection.Rtl
