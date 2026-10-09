@@ -1,7 +1,12 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +48,11 @@ import kotlinx.coroutines.launch
  * bottom half and no row is bent across the hinge. Every other window reports no separating
  * horizontal fold and the cap is absent, so nothing else in the app changes height.
  *
- * No `contentWindowInsets` is passed, so this takes [ModalBottomSheet]'s default —
+ * [edgeToEdge] lets the content run under the navigation bar, as a long list does, padding its own end so the last
+ * row can scroll clear of the bar. The status bar, the sides and the IME are still inset, so a field in the sheet is
+ * not covered by the keyboard.
+ *
+ * Otherwise no `contentWindowInsets` is passed, so this takes [ModalBottomSheet]'s default —
  * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — which already includes
  * the IME (confirmed from `material3:1.5.0-alpha27` bytecode; issue #35). Adding `imePadding()` on
  * top would double-inset. A field that jumps the sheet on focus needs a scrollable ancestor in its
@@ -59,6 +68,7 @@ fun BingeBottomSheet(
     gesturesEnabled: Boolean = true,
     dismissOnClickOutside: Boolean = gesturesEnabled,
     dockable: Boolean = false,
+    edgeToEdge: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val foldSafeHeight = rememberFoldSafeBottomHeight()
@@ -89,6 +99,7 @@ fun BingeBottomSheet(
         // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
         modifier = foldSafeHeight?.let { modifier.heightIn(max = it) } ?: modifier,
         sheetState = sheetState,
+        contentWindowInsets = { if (edgeToEdge) edgeToEdgeInsets() else BottomSheetDefaults.modalWindowInsets },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         contentColor = MaterialTheme.colorScheme.onSurface,
         shape = if (dock != null) DockingSheetShape(dockFraction) else BingeShapes.HeroTop,
@@ -139,3 +150,9 @@ internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gestures
         confirmValueChange = confirmValueChange,
     )
 }
+
+/** An edge-to-edge sheet's insets: the default's top and sides, and the IME, without the navigation bar. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun edgeToEdgeInsets(): WindowInsets =
+    BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal).union(WindowInsets.ime)

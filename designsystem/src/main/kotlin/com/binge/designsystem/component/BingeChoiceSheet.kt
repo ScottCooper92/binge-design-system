@@ -7,11 +7,17 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -91,9 +97,16 @@ fun <T> BingeChoiceSheet(
     modifier: Modifier = Modifier,
 ) {
     val partWay = remember { choices.opensPartWay() }
-    BingeBottomSheet(onDismissRequest = onDismiss, modifier = modifier, skipPartiallyExpanded = !partWay, dockable = partWay) {
+    BingeBottomSheet(
+        onDismissRequest = onDismiss,
+        modifier = modifier,
+        skipPartiallyExpanded = !partWay,
+        dockable = partWay,
+        // A long list runs under the navigation bar and pads its own end for it.
+        edgeToEdge = partWay,
+    ) {
         ChoiceSheetTop(title = title)
-        SingleChoiceList(choices = choices, selected = selected) { value ->
+        SingleChoiceList(choices = choices, selected = selected, underNavigationBar = partWay) { value ->
             onSelect(value)
             onDismiss()
         }
@@ -123,7 +136,14 @@ fun <T> BingeMultiChoiceSheet(
     val partWay = remember { choices.opensPartWay() }
     // Plain remember: a generic T has no Saver, so a rotation reopens the sheet with the filter kept and the ticks reset.
     var draft by remember { mutableStateOf(selected) }
-    BingeBottomSheet(onDismissRequest = onDismiss, modifier = modifier, skipPartiallyExpanded = !partWay, dockable = partWay) {
+    BingeBottomSheet(
+        onDismissRequest = onDismiss,
+        modifier = modifier,
+        skipPartiallyExpanded = !partWay,
+        dockable = partWay,
+        // A long list runs under the navigation bar and pads its own end for it.
+        edgeToEdge = partWay,
+    ) {
         ChoiceSheetTop(title = title) {
             BingeTextButton(label = clearLabel, onClick = { draft = emptySet() }, enabled = draft.isNotEmpty())
             BingeTextButton(
@@ -140,6 +160,7 @@ fun <T> BingeMultiChoiceSheet(
             leading = selected,
             filterPlaceholder = filterPlaceholder,
             onToggle = { value, on -> draft = if (on) draft + value else draft - value },
+            underNavigationBar = partWay,
         )
     }
 }
@@ -268,9 +289,10 @@ internal fun <T> SingleChoiceList(
     choices: BingeChoiceList<T>,
     selected: T?,
     modifier: Modifier = Modifier,
+    underNavigationBar: Boolean = false,
     onSelect: (T) -> Unit,
 ) {
-    ChoiceListBody(choices, modifier.selectableGroup()) { ready ->
+    ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
         ready.forEach { choice -> RadioChoiceRow(choice, selected = choice.value == selected) { onSelect(choice.value) } }
     }
 }
@@ -291,6 +313,7 @@ internal fun <T> MultiChoiceList(
     modifier: Modifier = Modifier,
     initialQuery: String = "",
     imeVisible: Boolean = WindowInsets.isImeVisible,
+    underNavigationBar: Boolean = false,
 ) {
     var query by rememberSaveable { mutableStateOf(initialQuery) }
     // The sheet's keyboard inset pads the bottom of its content, which is off screen while it rests part-way, so the
@@ -316,7 +339,7 @@ internal fun <T> MultiChoiceList(
                     ),
             )
         }
-        ChoiceListBody(choices) { ready ->
+        ChoiceListBody(choices, underNavigationBar = underNavigationBar) { ready ->
             val matching = ready.filter { query.isBlank() || it.label.contains(query.trim(), ignoreCase = true) }
             val shown = matching.sortedBy { it.value !in leading }
             shown.forEachIndexed { index, choice ->
@@ -334,21 +357,29 @@ internal fun <T> MultiChoiceList(
 
 /**
  * A choice list's body: the rows for a ready list, scrolling on their own so the last of hundreds is reachable at any
- * sheet height; a loading indicator; or the failure's message with its retry.
+ * sheet height; a loading indicator; or the failure's message with its retry. [underNavigationBar] is for an
+ * edge-to-edge sheet: each of the three then also clears the navigation bar it runs under.
  */
 @Composable
 private fun <T> ChoiceListBody(
     choices: BingeChoiceList<T>,
     modifier: Modifier = Modifier,
+    underNavigationBar: Boolean = false,
     rows: @Composable ColumnScope.(List<BingeChoice<T>>) -> Unit,
 ) {
     val inset = dimensionResource(R.dimen.padding_l)
+    val clearBar =
+        if (underNavigationBar) {
+            Modifier.windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
+        } else {
+            Modifier
+        }
     when (choices) {
         BingeChoiceList.Loading ->
-            Box(modifier.fillMaxWidth().padding(inset), contentAlignment = Alignment.Center) { BingeLoadingIndicator() }
+            Box(modifier.fillMaxWidth().then(clearBar).padding(inset), contentAlignment = Alignment.Center) { BingeLoadingIndicator() }
         is BingeChoiceList.Failed ->
             Column(
-                modifier = modifier.fillMaxWidth().padding(inset),
+                modifier = modifier.fillMaxWidth().then(clearBar).padding(inset),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
             ) {
@@ -361,7 +392,10 @@ private fun <T> ChoiceListBody(
                 BingeTextButton(label = choices.retryLabel, onClick = choices.onRetry)
             }
         is BingeChoiceList.Ready ->
-            Column(modifier.verticalScroll(rememberScrollState()).padding(bottom = inset)) { rows(choices.choices) }
+            Column(modifier.verticalScroll(rememberScrollState()).padding(bottom = inset)) {
+                rows(choices.choices)
+                if (underNavigationBar) Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+            }
     }
 }
 
