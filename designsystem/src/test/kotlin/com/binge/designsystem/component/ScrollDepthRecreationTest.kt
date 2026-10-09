@@ -1,9 +1,6 @@
 package com.binge.designsystem.component
 
-import android.os.Bundle
-import android.os.Looper
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,58 +8,40 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import java.time.Duration
 
-private const val START_INDEX = 20
-private const val FRAME_WINDOW_MS = 500L
-
-/** A rotation mid-visit is not a leave: one visit reports once, with its depth (#401). */
+/**
+ * A rotation mid-visit is not a leave, so it reports nothing (#401). That a leave reports once, with its depth, is
+ * [ScrollDepthEffectTest]'s. This asks only whether the recreation reported at all, so it waits on no layout.
+ */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class ScrollDepthRecreationTest {
+    @get:Rule
+    val rule = createAndroidComposeRule<ComponentActivity>()
+
     @Test
-    fun `a recreation reports nothing, and the visit reports once when it ends`() {
-        reported.clear()
-        val host = Robolectric.buildActivity(DepthHost::class.java).setup()
-        idle()
-
-        host.recreate()
-        idle()
-        assertTrue("reported on recreation: $reported", reported.isEmpty())
-
-        host.pause().stop().destroy()
-        idle()
-        assertEquals("one report for the visit: $reported", 1, reported.size)
-        assertTrue("the depth reached: $reported", (reported.single() ?: -1) >= START_INDEX)
-    }
-
-    // Layout waits on choreographer frames, which only run once the paused looper's clock reaches them.
-    private fun idle() = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(FRAME_WINDOW_MS))
-
-    /** Hosts a list opened part-way down, so the visit has a depth before any recreation. */
-    class DepthHost : ComponentActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContent {
-                val listState = rememberLazyListState(initialFirstVisibleItemIndex = START_INDEX)
-                ScrollDepthEffect(listState) { reported += it }
-                LazyColumn(state = listState) {
-                    items(List(40) { "row $it" }) { row -> Text(row, Modifier.fillMaxWidth().height(40.dp)) }
-                }
+    fun `a recreation reports nothing`() {
+        val reported = mutableListOf<Int?>()
+        rule.setContent {
+            val listState = rememberLazyListState(initialFirstVisibleItemIndex = 20)
+            ScrollDepthEffect(listState) { reported += it }
+            LazyColumn(state = listState) {
+                items(List(40) { "row $it" }) { row -> Text(row, Modifier.fillMaxWidth().height(40.dp)) }
             }
         }
-    }
+        rule.waitForIdle()
 
-    private companion object {
-        val reported = mutableListOf<Int?>()
+        rule.activityRule.scenario.recreate()
+        rule.waitForIdle()
+
+        assertTrue("reported on recreation: $reported", reported.isEmpty())
     }
 }
