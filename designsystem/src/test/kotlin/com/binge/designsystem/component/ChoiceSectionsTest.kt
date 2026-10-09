@@ -26,6 +26,15 @@ class ChoiceSectionsTest {
     }
 
     @Test
+    fun `an accented first letter sits with its base letter and a non-Latin one goes under hash`() {
+        val labels = listOf("Égypte", "Équateur", "Espagne", "États-Unis", "Österreich", "Zambie", "日本")
+        val sections = choiceSections(labels.map { BingeChoice(it, it) }, selected = null, suggested = emptyList())
+        assertEquals(listOf('#', 'E', 'O', 'Z'), sections.byLetter.map { it.first })
+        val eRows = sections.byLetter.first { it.first == 'E' }.second
+        assertEquals(4, eRows.size)
+    }
+
+    @Test
     fun `the rail follows the item at the top of the list`() {
         val sections = choiceSections(choices, selected = "Brazil", suggested = listOf("Canada"))
         assertNull("still on Current and Suggested", sections.letterAt(3))

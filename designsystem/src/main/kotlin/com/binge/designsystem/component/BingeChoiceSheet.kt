@@ -614,6 +614,17 @@ internal class ChoiceSections<T>(
     }
 }
 
+/** [label]'s first letter folded to its base letter ("État" is E); anything that is not A–Z is '#'. */
+internal fun sectionLetter(label: String): Char {
+    val first = label.firstOrNull() ?: return '#'
+    val base =
+        java.text.Normalizer
+            .normalize(first.toString(), java.text.Normalizer.Form.NFD)
+            .firstOrNull()
+            ?.uppercaseChar()
+    return if (base != null && base in 'A'..'Z') base else '#'
+}
+
 internal fun <T> choiceSections(
     choices: List<BingeChoice<T>>,
     selected: T?,
@@ -625,7 +636,7 @@ internal fun <T> choiceSections(
         suggested = suggested.distinct().filter { it != selected }.mapNotNull { byValue[it] },
         byLetter =
             choices
-                .groupBy { it.label.firstOrNull()?.uppercaseChar() ?: '#' }
+                .groupBy { sectionLetter(it.label) }
                 .toSortedMap()
                 .toList(),
     )

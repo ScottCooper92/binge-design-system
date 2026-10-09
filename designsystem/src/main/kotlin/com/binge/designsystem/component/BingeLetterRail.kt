@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.PressGestureScope
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -50,13 +51,19 @@ fun BingeLetterRail(
             onLetter(letter)
         }
     }
+
+    suspend fun PressGestureScope.pressLetter(y: Float) {
+        pick(y)
+        tryAwaitRelease()
+        touched = null
+    }
     Column(
         modifier =
             modifier
                 .fillMaxHeight()
                 .width(dimensionResource(R.dimen.letter_rail_width))
                 .onSizeChanged { height = it.height }
-                .pointerInput(letters) { detectTapGestures { pick(it.y) } }
+                .pointerInput(letters) { detectTapGestures(onPress = { pressLetter(it.y) }) }
                 .pointerInput(letters) {
                     detectVerticalDragGestures(onDragEnd = { touched = null }, onDragCancel = { touched = null }) { change, _ ->
                         pick(change.position.y)
