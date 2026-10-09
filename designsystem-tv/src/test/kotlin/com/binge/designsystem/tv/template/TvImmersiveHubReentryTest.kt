@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
@@ -30,6 +33,7 @@ import org.robolectric.annotation.Config
 private const val RAIL = "rail"
 private const val SEE_ALL = "See all"
 private const val ITEMS_PER_ROW = 3
+private const val NEW_CARD = 99
 
 private val Rows =
     listOf(
@@ -40,6 +44,7 @@ private val Rows =
 /**
  * Focus that leaves the hub for the rail comes back where it left: on the card last focused in the row, or on
  * the row's see-all tile when that held focus. #308: no frame can show it, and the catalog hosts no rail.
+ * The row keeps a slot of its own, so the cases a card arrives in pin the hub's own memory, by id (#311).
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -48,6 +53,8 @@ class TvImmersiveHubReentryTest {
     val composeTestRule = createKeyboardComposeRule()
 
     private lateinit var focusManager: FocusManager
+
+    private var rows by mutableStateOf(Rows)
 
     @Test
     fun `re-entry from the rail lands on the card last focused`() {
@@ -78,6 +85,39 @@ class TvImmersiveHubReentryTest {
         composeTestRule.onNodeWithText(SEE_ALL).assertIsFocused()
     }
 
+    @Test
+    fun `re-entry finds the card last focused by its id when a card arrives before it`() {
+        setHub()
+        enterFromRail()
+        move(FocusDirection.Right, times = 2)
+        composeTestRule.onNodeWithTag("card-2").assertIsFocused()
+
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        // The row remembers a slot, and card-2 is now one slot further on: only the hub's memory knows the card.
+        rows = listOf(Rows[0].copy(items = listOf(NEW_CARD) + Rows[0].items), Rows[1])
+        composeTestRule.waitForIdle()
+        enterFromRail()
+
+        composeTestRule.onNodeWithTag("card-2").assertIsFocused()
+    }
+
+    @Test
+    fun `re-entry lands on the see-all tile when a card arrives in its row`() {
+        setHub()
+        enterFromRail()
+        move(FocusDirection.Down)
+        move(FocusDirection.Right, times = ITEMS_PER_ROW)
+        composeTestRule.onNodeWithText(SEE_ALL).assertIsFocused()
+
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        // The tile's old slot now holds a card, so the row alone would bring focus back to that card.
+        rows = listOf(Rows[0], Rows[1].copy(items = Rows[1].items + NEW_CARD))
+        composeTestRule.waitForIdle()
+        enterFromRail()
+
+        composeTestRule.onNodeWithText(SEE_ALL).assertIsFocused()
+    }
+
     private fun setHub() {
         composeTestRule.setContent {
             BingeTvTheme {
@@ -85,7 +125,7 @@ class TvImmersiveHubReentryTest {
                 Row {
                     Box(Modifier.size(48.dp).testTag(RAIL).focusable())
                     TvImmersiveHub(
-                        rows = Rows,
+                        rows = rows,
                         itemId = { it },
                         cardWidth = 96.dp,
                         onItemClick = {},
