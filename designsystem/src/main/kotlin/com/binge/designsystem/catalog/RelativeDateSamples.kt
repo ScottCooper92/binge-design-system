@@ -17,8 +17,8 @@ private const val FIXED_NOW_MILLIS = 1_718_000_000_000L
 
 /**
  * `formatRelativeOrAbsolute` is a string formatter, not a UI element, so the sample renders its
- * results as [Text], one per age it asks for: minutes, hours and days, a three-week age, then the absolute date once
- * the age passes the relative window, and for a time in the future. Each line names the age it was
+ * results as [Text], one per age it asks for: minutes, hours and days, a three-week age, the absolute date once the
+ * age passes the relative window, and a time in the future, which reads ahead ("in 2 days"). Each line names the age it was
  * given, so the sample says what it shows. A fixed [FIXED_NOW_MILLIS] keeps the spans stable, and UTC
  * keeps the absolute dates on the same day wherever the frame is rendered.
  */
