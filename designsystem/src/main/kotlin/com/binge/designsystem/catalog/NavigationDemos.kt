@@ -35,6 +35,7 @@ import com.binge.designsystem.component.BingeNavFloatingTone
 import com.binge.designsystem.component.BingeNavPresentation
 import com.binge.designsystem.component.BingeNavSuiteItem
 import com.binge.designsystem.component.BingeNavSuiteShell
+import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.navOverlayPadding
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -73,8 +74,10 @@ private fun NavDemoHost(
     tone: BingeNavFloatingTone = BingeNavFloatingTone.AlwaysDark,
     style: BingeNavFloatingStyle = BingeNavFloatingStyle.IconWithSelectedLabel,
     accountName: String? = "Ada Lovelace",
+    searchField: Boolean = false,
 ) {
     var selected by rememberSaveable { mutableStateOf(DemoTab.Movies) }
+    var query by rememberSaveable { mutableStateOf("") }
     ScreenshotTheme {
         BingeNavSuiteShell(
             items = demoTabs(accountName, showDiscover = presentation == BingeNavPresentation.CustomRail),
@@ -89,6 +92,16 @@ private fun NavDemoHost(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.list_row_spacing)),
                 contentPadding = navOverlayPadding(PaddingValues(dimensionResource(R.dimen.list_row_gap))),
             ) {
+                if (searchField) {
+                    item {
+                        BingeSearchField(
+                            query = query,
+                            onQueryChange = { query = it },
+                            onClear = { query = "" },
+                            placeholder = "Search",
+                        )
+                    }
+                }
                 items(DEMO_ROW_COUNT) { index ->
                     if (index % DEMO_ARTWORK_EVERY == 0) DemoArtworkBand() else DemoTextRow(index)
                 }
@@ -154,6 +167,12 @@ fun FloatingBarHighContrastDemo() {
 @Composable
 fun FloatingBarOutlinedDemo() {
     NavDemoHost(BingeNavPresentation.FloatingBar, tone = BingeNavFloatingTone.Outlined)
+}
+
+/** A search field over the floating pill: tap it, and the pill hides while the keyboard is up, as the docked bar does. */
+@Composable
+fun FloatingBarKeyboardDemo() {
+    NavDemoHost(BingeNavPresentation.FloatingBar, searchField = true)
 }
 
 /** The docked bottom bar, with the account as a signed-in initials avatar. */
