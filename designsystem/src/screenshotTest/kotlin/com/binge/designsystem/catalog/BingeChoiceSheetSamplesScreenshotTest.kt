@@ -29,6 +29,13 @@ class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun MultiChoiceApplied() {
+        BingeMultiChoiceSheetAppliedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun LoadingAndFailed() {
         BingeChoiceSheetStatesSample()
     }

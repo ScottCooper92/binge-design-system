@@ -168,6 +168,8 @@ fun <T> BingeChoiceSheet(
 /**
  * A pick of any number of values from a list. The choices are checkboxes. Ticks collect in the sheet and apply only on
  * [doneLabel], which hands back the new set; Clear empties it, and closing the sheet any other way discards the change.
+ * With [applyAsPicked], there is no Done: each tick and Clear call [onDone] at once, and closing keeps what was picked.
+ * That suits a setting saved as it changes; a filter that re-runs a query per tick keeps Done.
  *
  * A list of [LONG_LIST_THRESHOLD] or more, with no filter text, is sectioned: **Selected** (the [selected] values the
  * sheet opened with, so a row does not jump when it is ticked), **Suggested** ([suggested], in order), then **All**. A
@@ -181,7 +183,7 @@ fun <T> BingeChoiceSheet(
  *
  * Pass [draftSaver] to keep the ticks across a rotation or process death, as a sheet restored open should. A generic [T]
  * has no saver of its own, so without one the sheet reopens with the ticks reset to [selected]. For `String` values,
- * `Saver(save = { ArrayList(it) }, restore = { it.toSet() })` is enough.
+ * `Saver(save = { ArrayList(it) }, restore = { it.toSet() })` is enough. With [applyAsPicked] there is no draft to keep.
  */
 @Composable
 fun <T> BingeMultiChoiceSheet(
@@ -198,6 +200,7 @@ fun <T> BingeMultiChoiceSheet(
     pinned: List<T> = emptyList(),
     actions: @Composable RowScope.() -> Unit = {},
     draftSaver: Saver<Set<T>, out Any>? = null,
+    applyAsPicked: Boolean = false,
 ) {
     val partWay = remember { choices.opensPartWay() }
     // Without a saver, nothing is saved, so the ticks start again from [selected].
@@ -206,6 +209,12 @@ fun <T> BingeMultiChoiceSheet(
             null
         }, restore = { null }),
     ) { mutableStateOf(selected) }
+    // Pinned at open: with [applyAsPicked], [selected] follows each tick, and a row must not jump under the finger.
+    val openedWith = remember { selected }
+    val pick: (Set<T>) -> Unit = { picked ->
+        draft = picked
+        if (applyAsPicked) onDone(picked)
+    }
     BingeBottomSheet(
         onDismissRequest = onDismiss,
         modifier = modifier,
@@ -216,21 +225,23 @@ fun <T> BingeMultiChoiceSheet(
     ) {
         ChoiceSheetTop(title = title) {
             actions()
-            BingeTextButton(label = clearLabel, onClick = { draft = emptySet() }, enabled = draft.isNotEmpty())
-            BingeTextButton(
-                label = doneLabel,
-                onClick = {
-                    onDone(draft)
-                    onDismiss()
-                },
-            )
+            BingeTextButton(label = clearLabel, onClick = { pick(emptySet()) }, enabled = draft.isNotEmpty())
+            if (!applyAsPicked) {
+                BingeTextButton(
+                    label = doneLabel,
+                    onClick = {
+                        onDone(draft)
+                        onDismiss()
+                    },
+                )
+            }
         }
         MultiChoiceList(
             choices = choices,
             chosen = draft,
-            leading = selected,
+            leading = openedWith,
             filterPlaceholder = filterPlaceholder,
-            onToggle = { value, on -> draft = if (on) draft + value else draft - value },
+            onToggle = { value, on -> pick(if (on) draft + value else draft - value) },
             underNavigationBar = partWay,
             suggested = suggested,
             pinned = pinned,
@@ -281,7 +292,8 @@ fun <T> bingeChoiceItem(
 /**
  * [bingeChoiceItem] for several values: the chosen labels, in list order, as the detail, and a [BingeMultiChoiceSheet]
  * on tap. [onOpen] and [selectedLabel] work as they do there; [selectedLabel] is the whole detail for the selection.
- * [draftSaver] keeps the sheet's ticks across a rotation, as on [BingeMultiChoiceSheet].
+ * [draftSaver] keeps the sheet's ticks across a rotation, and [applyAsPicked] applies each tick at once, as on
+ * [BingeMultiChoiceSheet].
  */
 @Composable
 fun <T> bingeMultiChoiceItem(
@@ -298,6 +310,7 @@ fun <T> bingeMultiChoiceItem(
     onOpen: () -> Unit = {},
     selectedLabel: String? = null,
     draftSaver: Saver<Set<T>, out Any>? = null,
+    applyAsPicked: Boolean = false,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
@@ -314,6 +327,7 @@ fun <T> bingeMultiChoiceItem(
             clearLabel = clearLabel,
             filterPlaceholder = filterPlaceholder,
             draftSaver = draftSaver,
+            applyAsPicked = applyAsPicked,
         )
     }
     val chosen =
