@@ -600,7 +600,21 @@ private fun <T> SectionedChoiceList(
         }
         if (lettered) {
             val top by remember(sections) { derivedStateOf { sections.letterAt(listState.firstVisibleItemIndex) } }
-            Box(modifier = Modifier.matchParentSize().padding(bottom = end), contentAlignment = Alignment.CenterEnd) {
+            // The rail clears the bar as the list does, so the last letters stay reachable.
+            Box(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .padding(bottom = end)
+                        .then(
+                            if (underNavigationBar) {
+                                Modifier.windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Bottom))
+                            } else {
+                                Modifier
+                            },
+                        ),
+                contentAlignment = Alignment.CenterEnd,
+            ) {
                 BingeLetterRail(
                     letters = sections.byLetter.map { it.first },
                     onLetter = { letter -> sections.indexOf(letter)?.let { scope.launch { listState.scrollToItem(it) } } },
