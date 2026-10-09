@@ -1,16 +1,20 @@
 package com.binge.designsystem.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -116,7 +120,7 @@ enum class BingeNavFloatingStyle {
  * toolbar's minimum size, so the strip is known before first layout; the measurement is kept only as
  * an upward correction, should a style's items ever outgrow the default container.
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun BingeNavFloatingBarScaffold(
     items: List<BingeNavSuiteItem>,
@@ -136,30 +140,37 @@ internal fun BingeNavFloatingBarScaffold(
         }
         val colors = tone.resolve()
         val containerShape = FloatingToolbarDefaults.ContainerShape
-        HorizontalFloatingToolbar(
-            expanded = true,
-            colors = colors.toolbar,
-            shape = containerShape,
-            expandedShadowElevation = dimensionResource(R.dimen.nav_floating_shadow_elevation),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .onSizeChanged { measured = with(density) { it.height.toDp() } }
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(bottom = FloatingToolbarDefaults.ScreenOffset)
-                .then(
-                    colors.outline?.let {
-                        Modifier.border(dimensionResource(R.dimen.hairline_thickness), it, containerShape)
-                    } ?: Modifier,
-                ),
+        // Hidden under the keyboard, as the docked bar is: it would otherwise ride up between the field and its results.
+        AnimatedVisibility(
+            visible = !WindowInsets.isImeVisible,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = fadeIn(),
+            exit = fadeOut(),
         ) {
-            items.forEach { tab ->
-                NavFloatingItem(
-                    item = tab,
-                    selected = selectedKey == tab.key,
-                    onSelect = onSelect,
-                    style = style,
-                    colors = colors,
-                )
+            HorizontalFloatingToolbar(
+                expanded = true,
+                colors = colors.toolbar,
+                shape = containerShape,
+                expandedShadowElevation = dimensionResource(R.dimen.nav_floating_shadow_elevation),
+                modifier = Modifier
+                    .onSizeChanged { measured = with(density) { it.height.toDp() } }
+                    .windowInsetsPadding(navSafeDrawing())
+                    .padding(bottom = FloatingToolbarDefaults.ScreenOffset)
+                    .then(
+                        colors.outline?.let {
+                            Modifier.border(dimensionResource(R.dimen.hairline_thickness), it, containerShape)
+                        } ?: Modifier,
+                    ),
+            ) {
+                items.forEach { tab ->
+                    NavFloatingItem(
+                        item = tab,
+                        selected = selectedKey == tab.key,
+                        onSelect = onSelect,
+                        style = style,
+                        colors = colors,
+                    )
+                }
             }
         }
     }

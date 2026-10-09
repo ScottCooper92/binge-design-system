@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Badge
@@ -129,6 +131,13 @@ fun BingeNavSuiteShell(
     }
 }
 
+/**
+ * The safe area a navigation surface clears, less the keyboard. Every presentation hides under the keyboard rather than
+ * riding it, so neither the surface nor the overlay inset it publishes moves when one opens.
+ */
+@Composable
+internal fun navSafeDrawing(): WindowInsets = WindowInsets.safeDrawing.exclude(WindowInsets.ime)
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun BottomBarScaffold(
@@ -212,7 +221,7 @@ fun rememberBingeNavPresentation(): BingeNavPresentation =
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun rememberNavOverlayInsets(presentation: BingeNavPresentation): PaddingValues {
-    val safeInsets = WindowInsets.safeDrawing.asPaddingValues()
+    val safeInsets = navSafeDrawing().asPaddingValues()
     return when (presentation) {
         BingeNavPresentation.BottomBar -> PaddingValues()
         BingeNavPresentation.CustomRail ->
