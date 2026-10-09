@@ -19,15 +19,18 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeConfirmDialog
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.CreateListDialog
+import com.binge.designsystem.component.MonthYearPickerDialog
+import com.binge.designsystem.component.MonthYearPickerMode
 import com.binge.designsystem.preview.ScreenshotTheme
 import kotlinx.coroutines.delay
 
 private const val SUBMIT_DEMO_MILLIS = 2_000L
+private val DEMO_YEARS = 1990..2030
 
-private enum class OpenDialog { Confirm, Destructive, CreateList }
+private enum class OpenDialog { Confirm, Destructive, CreateList, MonthYear }
 
 /**
- * Every dialog in the design system, each opened for real from its own button, which a screenshot of
+ * Every dialog in the design system, the month and year picker among them, each opened for real from its own button, which a screenshot of
  * the dialog's body cannot show: the window, the scrim, and the ways out. The line below the buttons
  * reports how the last one closed. Creating a list runs its submitting state for two seconds first.
  */
@@ -50,6 +53,7 @@ fun DialogsDemo() {
             BingeOutlinedButton(label = "Confirm dialog", onClick = { open = OpenDialog.Confirm })
             BingeOutlinedButton(label = "Destructive confirm dialog", onClick = { open = OpenDialog.Destructive })
             BingeOutlinedButton(label = "Create list dialog", onClick = { open = OpenDialog.CreateList })
+            BingeOutlinedButton(label = "Month and year picker", onClick = { open = OpenDialog.MonthYear })
             Text(outcome)
         }
         when (open) {
@@ -87,6 +91,15 @@ fun DialogsDemo() {
                     }
                 }
             }
+            OpenDialog.MonthYear ->
+                MonthYearPickerDialog(
+                    title = "From",
+                    mode = MonthYearPickerMode.MonthAndYear,
+                    yearRange = DEMO_YEARS,
+                    onDismiss = { close("Cancelled") },
+                    onConfirm = { close("Picked ${it.month ?: "-"} ${it.year ?: "-"}") },
+                    defaultYear = DEMO_YEARS.last,
+                )
             null -> Unit
         }
     }

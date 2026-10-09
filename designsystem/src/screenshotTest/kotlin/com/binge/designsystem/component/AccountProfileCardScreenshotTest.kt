@@ -26,20 +26,4 @@ class AccountProfileCardScreenshotTest {
             }
         }
     }
-
-    /** Square, vertically-stacked form for the expanded two-pane left column. */
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun Square() {
-        ScreenshotTheme {
-            AccountProfileCard(
-                name = "Sam Rivera",
-                secondaryLine = "@sam.rivera",
-                initialsName = "Sam Rivera",
-                country = "🇬🇧 United Kingdom",
-                layout = AccountProfileCardLayout.Column,
-            )
-        }
-    }
 }

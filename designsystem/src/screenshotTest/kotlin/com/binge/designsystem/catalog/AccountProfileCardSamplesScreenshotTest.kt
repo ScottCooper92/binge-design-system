@@ -19,4 +19,11 @@ class AccountProfileCardSamplesScreenshotTest {
     fun Static() {
         AccountProfileCardStaticSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Column() {
+        AccountProfileCardColumnSample()
+    }
 }
