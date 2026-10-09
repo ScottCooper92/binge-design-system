@@ -39,4 +39,18 @@ class BingeChoiceSheetSamplesScreenshotTest {
     fun Rows() {
         BingeChoiceItemSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Lettered() {
+        BingeChoiceSheetLetteredSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Sectioned() {
+        BingeChoiceSheetSectionedSample()
+    }
 }

@@ -92,4 +92,7 @@
     <string name="month_year_picker_cancel">Cancel</string>
     <string name="month_year_picker_confirm">OK</string>
     <string name="month_year_picker_empty" translatable="false">—</string>
+    <string name="choice_section_current">Current</string>
+    <string name="choice_section_suggested">Suggested</string>
+    <string name="choice_section_all">All</string>
 </resources>
