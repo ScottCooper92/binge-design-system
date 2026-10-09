@@ -21,6 +21,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun screenScaffoldSmallBar() = BingeScreenScaffoldSmallBarSample()
 
+    /** With no bar the body reads the status bar inset directly, which a default frame renders as zero. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldNoBarUnderSystemBars() = PreviewSystemBarInsets { BingeScreenScaffoldNoBarSample() }
+
     @PreviewTest
     @ScreenStatePreview
     @Composable
