@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.testTag
  * rather than reviewable.
  */
 object TvLayoutAnchors {
+    private const val PREFIX = "tv-anchor:"
+
     /**
      * The anchor for one entry of a page — its hero or a content section — keyed by the entry's own key.
      *
@@ -34,7 +36,11 @@ object TvLayoutAnchors {
     /** The key for a page's hero entry, which its skeleton counterpart has to match. */
     const val HERO_KEY: String = "hero"
 
-    private const val PREFIX = "tv-anchor:"
+    /** An immersive hub's copy band above its rows, which the hub's skeleton reserves. */
+    const val HUB_COPY: String = "${PREFIX}hub-copy"
+
+    /** An immersive hub's row at [index] among the rows it lays out, which the hub's skeleton reserves. */
+    fun hubRow(index: Int): String = "${PREFIX}hub-row-$index"
 }
 
 /**

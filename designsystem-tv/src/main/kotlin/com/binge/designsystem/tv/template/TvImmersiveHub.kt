@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,6 +48,8 @@ import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
 import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
+import com.binge.designsystem.tv.layout.TvLayoutAnchors
+import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.LocalTvPaneShift
 import com.binge.designsystem.tv.nav.ReportTvRailArtwork
 import com.binge.designsystem.tv.nav.tvContentGutterStart
@@ -224,11 +226,13 @@ fun <T : Any> TvImmersiveHub(
                         Spacer(Modifier.fillMaxWidth().height(contentTop))
                     }
                 }
-                items(items = visibleRows, key = { it.key }) { row ->
+                itemsIndexed(items = visibleRows, key = { _, row -> row.key }) { index, row ->
                     TvCardRow(
                         items = row.items,
                         key = itemId,
                         cellWidth = cardWidth,
+                        // So the skeleton's promise to lay its rows out here is assertable; see TvLayoutAnchors.
+                        modifier = Modifier.tvLayoutAnchor(TvLayoutAnchors.hubRow(index)),
                         heading = row.title,
                         entryFocusRequester = hubEntry.takeIf { row.key == effectiveEntryKey },
                         initiallyFocusedKey = initialFocused?.takeIf { it.first == row.key }?.second,
@@ -319,7 +323,7 @@ private fun BoxScope.TvImmersiveCopyBand(copyTopInset: Dp, content: @Composable 
                     end = dimensionResource(DesR.dimen.padding_m),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset,
                     bottom = dimensionResource(DesR.dimen.padding_l),
-                ),
+                ).tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
         content = content,
     )
