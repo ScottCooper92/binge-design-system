@@ -36,6 +36,8 @@ private class DeepestIndex {
  *
  * A configuration change (a rotation, a theme or locale change) is not a leave: the disposal it causes reports
  * nothing, and the recreated effect carries on from the list's restored position. So one visit is one report.
+ * The deepest index is not carried across the change, though: the report is the deepest row seen since the
+ * recreation, so a visit that went deeper before a rotation and then scrolled back up under-reports.
  */
 @Composable
 fun ScrollDepthEffect(listState: LazyListState, onVisitEnded: (deepestIndex: Int?) -> Unit) {
