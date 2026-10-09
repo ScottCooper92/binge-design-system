@@ -20,8 +20,10 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import java.time.Duration
 
 private const val START_INDEX = 20
+private const val FRAME_WINDOW_MS = 500L
 
 /** A rotation mid-visit is not a leave: one visit reports once, with its depth (#401). */
 @RunWith(RobolectricTestRunner::class)
@@ -43,7 +45,8 @@ class ScrollDepthRecreationTest {
         assertTrue("the depth reached: $reported", (reported.single() ?: -1) >= START_INDEX)
     }
 
-    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
+    // Layout waits on choreographer frames, which only run once the paused looper's clock reaches them.
+    private fun idle() = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(FRAME_WINDOW_MS))
 
     /** Hosts a list opened part-way down, so the visit has a depth before any recreation. */
     class DepthHost : ComponentActivity() {
