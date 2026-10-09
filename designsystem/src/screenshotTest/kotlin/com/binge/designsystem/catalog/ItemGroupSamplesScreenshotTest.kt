@@ -41,6 +41,13 @@ class ItemGroupSamplesScreenshotTest {
         ItemGroupExternalSample()
     }
 
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun action() {
+        ItemGroupActionSample()
+    }
+
     /** [ListItem.loading] on the acting row and [ListItem.disabled] on the one it blocks. */
     @PreviewTest
     @ComponentPreviews

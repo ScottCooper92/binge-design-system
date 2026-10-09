@@ -13,6 +13,13 @@ enum class ListItemDestination {
 
     /** Leaves the app — a browser, another app. The row says so before it's tapped, not after. */
     External,
+
+    /**
+     * Does something where it is (runs a sync, clears a cache) and stays on this screen. No chevron, since nothing
+     * opens. The label takes the colour of a button: the icon's tint where the row has one (red for a delete), else
+     * the primary colour. A destructive action still confirms first; the row's look does not replace that.
+     */
+    Action,
 }
 
 /**
