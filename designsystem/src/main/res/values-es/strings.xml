@@ -83,4 +83,7 @@
     <string name="choice_section_suggested">Sugerencias</string>
     <string name="choice_section_all">Todos</string>
     <string name="choice_section_selected">Seleccionados</string>
+    <string name="number_slider_decrease">Reducir %1$s</string>
+    <string name="number_slider_increase">Aumentar %1$s</string>
+    <string name="range_slider_readout">%1$s – %2$s</string>
 </resources>

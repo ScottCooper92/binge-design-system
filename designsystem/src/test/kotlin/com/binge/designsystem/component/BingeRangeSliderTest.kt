@@ -30,7 +30,10 @@ class BingeRangeSliderTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private fun setSlider(values: ClosedFloatingPointRange<Float>) {
+    private fun setSlider(
+        values: ClosedFloatingPointRange<Float>,
+        openEndLabel: String? = null,
+    ) {
         composeTestRule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
                 BingeRangeSlider(
@@ -41,6 +44,7 @@ class BingeRangeSliderTest {
                     valueLabel = { "${it.toInt()} min" },
                     startThumbDescription = "Minimum runtime",
                     endThumbDescription = "Maximum runtime",
+                    openEndLabel = openEndLabel,
                 )
             }
         }
@@ -61,11 +65,28 @@ class BingeRangeSliderTest {
     }
 
     @Test
-    fun `both values are written above the track`() {
+    fun `the range reads as one line above the track, with the track's ends named under it`() {
         setSlider(60f..150f)
 
-        composeTestRule.onNodeWithText("60 min").assertExists()
-        composeTestRule.onNodeWithText("150 min").assertExists()
+        composeTestRule.onNodeWithText("60 min – 150 min").assertExists()
+        composeTestRule.onNodeWithText("0 min").assertExists()
+        composeTestRule.onNodeWithText("240 min").assertExists()
+    }
+
+    @Test
+    fun `a thumb on an open end reads the open end's label, and the track's top is not named as a number`() {
+        setSlider(90f..240f, openEndLabel = "240+ min")
+
+        composeTestRule.onNodeWithText("90 min – 240+ min").assertExists()
+        assertEquals("240+ min", stateOf("Maximum runtime"))
+        composeTestRule.onNodeWithText("240 min").assertDoesNotExist()
+    }
+
+    @Test
+    fun `thumbs on one value read it once`() {
+        setSlider(120f..120f)
+
+        composeTestRule.onNodeWithText("120 min").assertExists()
     }
 
     @Test
