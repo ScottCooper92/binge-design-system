@@ -285,4 +285,40 @@ class BingeChoiceSheetTest {
     fun a_multi_choice_sheet_without_a_draft_saver_reopens_from_the_selection() {
         assertEquals(setOf("a"), ticksAcrossRestore(draftSaver = null))
     }
+
+    @Test
+    fun a_multi_choice_sheet_that_applies_as_picked_reports_each_tick_and_clear_and_shows_no_done() {
+        val applied = mutableListOf<Set<String>>()
+        val choices = BingeChoiceList.Ready(listOf(BingeChoice("a", "Alpha"), BingeChoice("b", "Bravo")))
+        rule.setContent {
+            var selected by remember { mutableStateOf(setOf("a")) }
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeMultiChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Languages",
+                            choices = choices,
+                            selected = selected,
+                            emptyLabel = "None",
+                            doneLabel = "Done",
+                            clearLabel = "Clear",
+                            onDone = {
+                                applied += it
+                                selected = it
+                            },
+                            applyAsPicked = true,
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Languages").performClick()
+        assertTrue(rule.onAllNodesWithText("Done").fetchSemanticsNodes().isEmpty())
+        rule.onNodeWithText("Bravo").performClick()
+        rule.onNodeWithText("Clear").performClick()
+
+        assertEquals(listOf(setOf("a", "b"), emptySet<String>()), applied)
+    }
 }
