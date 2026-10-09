@@ -45,6 +45,7 @@ import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
+import com.binge.designsystem.tv.component.TRAILING_KEY
 import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
@@ -80,10 +81,10 @@ private const val SCRIM_BOTTOM_START_FRACTION = 0.38f
 private const val SCRIM_BOTTOM_ALPHA = 0.96f
 
 /** Row key -> the item id focus returns to in that row, saveable so Back from a drill-down retraces the path. */
-private val RowMemorySaver: Saver<SnapshotStateMap<String, Int>, Any> =
+private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
     mapSaver(
         save = { it.toMap() },
-        restore = { saved -> mutableStateMapOf<String, Int>().apply { saved.forEach { (key, id) -> put(key, id as Int) } } },
+        restore = { saved -> mutableStateMapOf<String, Any>().apply { saved.forEach { (key, id) -> if (id != null) put(key, id) } } },
     )
 
 /**
@@ -91,7 +92,8 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Int>, Any> =
  * scrolled to the top of an inset viewport, the rows above it are clipped away so the backdrop shows through,
  * and the backdrop's [copy] describes the focused item.
  *
- * Generic over the item: [itemId] is its stable id (focus memory is keyed on it), [cell] draws one focusable
+ * Generic over the item: [itemId] is its stable id (focus memory is keyed on it, and saved with the page, so it is a
+ * type a `Bundle` holds, as a lazy list's key is: a `String`, an `Int`, a `Long`), [cell] draws one focusable
  * card, [artwork] paints the backdrop and [copy] fills the text band above the rows. An optional [hero] sits
  * above the rows at rest and gives way to the backdrop once a card takes focus; without one the first row's
  * first item is the resting backdrop.
@@ -109,7 +111,7 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Int>, Any> =
 @Composable
 fun <T : Any> TvImmersiveHub(
     rows: List<TvHubRow<T>>,
-    itemId: (T) -> Int,
+    itemId: (T) -> Any,
     cardWidth: Dp,
     onItemClick: (T) -> Unit,
     artwork: @Composable (T) -> Unit,
@@ -119,7 +121,7 @@ fun <T : Any> TvImmersiveHub(
     // Where a caller aims focus to land it in the hub (the hero when there is one, else the first row).
     // Seeds the ring onto one card — a row's key and the item's id — for a screenshot, which runs no coroutines and
     // so dispatches no focus events. Production passes null.
-    initialFocused: Pair<String, Int>? = null,
+    initialFocused: Pair<String, Any>? = null,
     entryFocusRequester: FocusRequester? = null,
     hosting: TvPageHosting = currentTvPageHosting(),
     seeAllLabel: String? = null,
@@ -135,7 +137,7 @@ fun <T : Any> TvImmersiveHub(
     var bodyHasFocus by remember { mutableStateOf(false) }
     val rowMemory =
         rememberSaveable(saver = RowMemorySaver) {
-            mutableStateMapOf<String, Int>().apply { initialFocused?.let { (rowKey, id) -> put(rowKey, id) } }
+            mutableStateMapOf<String, Any>().apply { initialFocused?.let { (rowKey, id) -> put(rowKey, id) } }
         }
     val hubEntry = entryFocusRequester ?: remember { FocusRequester() }
     var entryRowKey by rememberSaveable { mutableStateOf(initialFocused?.first) }
@@ -245,9 +247,8 @@ fun <T : Any> TvImmersiveHub(
                         onCellFocused = { key ->
                             focusedRowKey = row.key
                             entryRowKey = row.key
-                            val id = key as? Int
-                            if (id != null) {
-                                rowMemory[row.key] = id
+                            if (key != TRAILING_KEY) {
+                                rowMemory[row.key] = key
                                 if (seeAllRowKey == row.key) seeAllRowKey = null
                             } else {
                                 seeAllRowKey = row.key

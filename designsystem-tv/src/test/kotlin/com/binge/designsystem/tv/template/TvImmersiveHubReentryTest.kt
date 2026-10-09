@@ -56,6 +56,8 @@ class TvImmersiveHubReentryTest {
 
     private var rows by mutableStateOf(Rows)
 
+    private var itemId: (Int) -> Any = { it }
+
     @Test
     fun `re-entry from the rail lands on the card last focused`() {
         setHub()
@@ -118,6 +120,18 @@ class TvImmersiveHubReentryTest {
         composeTestRule.onNodeWithText(SEE_ALL).assertIsFocused()
     }
 
+    @Test
+    fun `string ids keep the card last focused when a card arrives before it`() {
+        itemId = { "item-$it" }
+        `re-entry finds the card last focused by its id when a card arrives before it`()
+    }
+
+    @Test
+    fun `string ids keep the see-all tile apart from the cards`() {
+        itemId = { "item-$it" }
+        `re-entry lands on the see-all tile when a card arrives in its row`()
+    }
+
     private fun setHub() {
         composeTestRule.setContent {
             BingeTvTheme {
@@ -126,7 +140,7 @@ class TvImmersiveHubReentryTest {
                     Box(Modifier.size(48.dp).testTag(RAIL).focusable())
                     TvImmersiveHub(
                         rows = rows,
-                        itemId = { it },
+                        itemId = itemId,
                         cardWidth = 96.dp,
                         onItemClick = {},
                         artwork = {},
