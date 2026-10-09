@@ -91,7 +91,7 @@ internal fun BingeNavCustomRail(
     content: @Composable () -> Unit,
 ) {
     val railWidth = dimensionResource(R.dimen.nav_custom_rail_width)
-    val safeInsets = navSafeDrawing().asPaddingValues()
+    val safeInsets = navSurfaceInsets().asPaddingValues()
     val safeStart = safeInsets.calculateStartPadding(LocalLayoutDirection.current)
     Box(modifier.fillMaxSize()) {
         CompositionLocalProvider(
@@ -107,7 +107,7 @@ internal fun BingeNavCustomRail(
             // Vertical only. Left to its default the rail would also inset its content by the start safe area,
             // taking that space out of the item column while the scrim still spanned it — the column would sit
             // off-centre by the cutout's width. The start inset goes on the whole rail below, so the column stays [railWidth] and centred.
-            windowInsets = navSafeDrawing().only(WindowInsetsSides.Vertical),
+            windowInsets = navSurfaceInsets().only(WindowInsetsSides.Vertical),
             modifier = Modifier
                 .width(railWidth + safeStart)
                 .background(

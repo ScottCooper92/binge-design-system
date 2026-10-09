@@ -154,7 +154,7 @@ internal fun BingeNavFloatingBarScaffold(
                 expandedShadowElevation = dimensionResource(R.dimen.nav_floating_shadow_elevation),
                 modifier = Modifier
                     .onSizeChanged { measured = with(density) { it.height.toDp() } }
-                    .windowInsetsPadding(navSafeDrawing())
+                    .windowInsetsPadding(navSurfaceInsets())
                     .padding(bottom = FloatingToolbarDefaults.ScreenOffset)
                     .then(
                         colors.outline?.let {

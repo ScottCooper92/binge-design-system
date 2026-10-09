@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -132,11 +135,20 @@ fun BingeNavSuiteShell(
 }
 
 /**
- * The safe area a navigation surface clears, less the keyboard. Every presentation hides under the keyboard rather than
- * riding it, so neither the surface nor the overlay inset it publishes moves when one opens.
+ * The safe area a navigation surface clears for itself: the system bars and the display cutout, without the keyboard.
+ * Every presentation hides under the keyboard rather than riding it, and the navigation bar stays in this inset while
+ * the keyboard is up, so the surface does not move when one opens.
  */
 @Composable
-internal fun navSafeDrawing(): WindowInsets = WindowInsets.safeDrawing.exclude(WindowInsets.ime)
+internal fun navSurfaceInsets(): WindowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout)
+
+/**
+ * The safe area [rememberNavOverlayInsets] publishes: [WindowInsets.safeDrawing] less the keyboard. The keyboard inset
+ * already includes the navigation bar, so its bottom drops to zero while the keyboard is up. That is deliberate: a
+ * consumer's own `imePadding()` on top then counts the navigation bar once, not twice.
+ */
+@Composable
+private fun navOverlayDrawing(): WindowInsets = WindowInsets.safeDrawing.exclude(WindowInsets.ime)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -221,7 +233,7 @@ fun rememberBingeNavPresentation(): BingeNavPresentation =
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun rememberNavOverlayInsets(presentation: BingeNavPresentation): PaddingValues {
-    val safeInsets = navSafeDrawing().asPaddingValues()
+    val safeInsets = navOverlayDrawing().asPaddingValues()
     return when (presentation) {
         BingeNavPresentation.BottomBar -> PaddingValues()
         BingeNavPresentation.CustomRail ->

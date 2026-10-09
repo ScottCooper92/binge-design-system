@@ -10,9 +10,13 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
@@ -40,18 +44,23 @@ class BingeNavFloatingBarKeyboardTest {
     val rule = createComposeRule()
 
     private var overlay = PaddingValues()
+    private var keyboardHeight by mutableStateOf(0.dp)
 
-    private fun render(keyboard: Dp) {
+    private fun render(
+        keyboard: Dp,
+        navigationBar: Dp = 0.dp,
+        presentation: BingeNavPresentation = BingeNavPresentation.FloatingBar,
+    ) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                WithKeyboard(keyboard) {
+                WithKeyboard(if (keyboard > 0.dp) keyboard else keyboardHeight, navigationBar) {
                     BingeNavSuiteShell(
                         items = listOf(
                             BingeNavSuiteItem(key = "movies", label = "Movies", icon = Icons.Filled.Movie, testTag = MOVIES_TAG),
                         ),
                         selectedKey = "movies",
                         onSelect = {},
-                        presentation = BingeNavPresentation.FloatingBar,
+                        presentation = presentation,
                     ) {
                         overlay = LocalNavOverlayInsets.current
                     }
@@ -82,18 +91,38 @@ class BingeNavFloatingBarKeyboardTest {
 
         assertEquals(FloatingToolbarDefaults.ContainerSize + FloatingToolbarDefaults.ScreenOffset, overlay.calculateBottomPadding())
     }
+
+    @Test
+    fun `the rail does not shift when the keyboard opens over a navigation bar`() {
+        val bar = 48.dp
+        render(keyboard = 0.dp, navigationBar = bar, presentation = BingeNavPresentation.CustomRail)
+        val closed = rule.onNodeWithTag(MOVIES_TAG).getUnclippedBoundsInRoot().top
+
+        keyboardHeight = Keyboard
+        rule.waitForIdle()
+        val open = rule.onNodeWithTag(MOVIES_TAG).getUnclippedBoundsInRoot().top
+
+        assertEquals(closed, open)
+    }
 }
 
 /** Opens a keyboard [height] tall over the window, answering every insets dispatch at the parent. */
 @Composable
-private fun WithKeyboard(height: Dp, content: @Composable () -> Unit) {
+private fun WithKeyboard(
+    height: Dp,
+    navigationBar: Dp,
+    content: @Composable () -> Unit,
+) {
     val view = LocalView.current
     val px = with(LocalDensity.current) { height.roundToPx() }
+    val navPx = with(LocalDensity.current) { navigationBar.roundToPx() }
     val insets =
-        remember(px) {
+        remember(px, navPx) {
             WindowInsetsCompat
                 .Builder()
-                .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, px))
+                .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(0, 0, 0, navPx))
+                .setVisible(WindowInsetsCompat.Type.navigationBars(), navPx > 0)
+                .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, if (px > 0) maxOf(px, navPx) else 0))
                 .setVisible(WindowInsetsCompat.Type.ime(), px > 0)
                 .build()
         }
