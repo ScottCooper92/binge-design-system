@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.isImeVisible
@@ -57,7 +56,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 import kotlinx.coroutines.launch
@@ -75,8 +73,14 @@ data class BingeChoice<out T>(
     val mark: String? = null,
 )
 
-/** From this many choices a single-choice sheet lists them in sections: the current one, suggestions, then all. */
-internal const val SECTIONS_THRESHOLD = 8
+/**
+ * From this many choices a list is long: it is sectioned (the chosen, suggestions, then all), and its sheet opens
+ * part-way and docks. One rule for both, so a list is never sectioned in a sheet that treats it as short.
+ */
+internal const val LONG_LIST_THRESHOLD = 8
+
+/** Whether a list of [size] choices is long; see [LONG_LIST_THRESHOLD]. */
+internal fun isLongList(size: Int): Boolean = size >= LONG_LIST_THRESHOLD
 
 /** From this many choices the All section gets letter headers and a [BingeLetterRail]. */
 internal const val INDEX_THRESHOLD = 40
@@ -100,23 +104,20 @@ sealed interface BingeChoiceList<out T> {
 }
 
 /**
- * Lists longer than this open the sheet part-way, so the page behind stays in view, and let it dock at full height.
- * A shorter list fits a plain sheet, which opens to its own height.
+ * Whether a sheet showing this list opens part-way, so the page behind stays in view, and docks at full height. A long
+ * list does ([isLongList]); a short one fits a plain sheet. A list still loading is assumed long: short ones rarely load.
  */
-internal const val PEEK_THRESHOLD = 8
-
-/** Whether a sheet showing this list opens part-way. A list still loading is assumed long: short ones rarely load. */
 internal fun BingeChoiceList<*>.opensPartWay(): Boolean =
     when (this) {
         BingeChoiceList.Loading -> true
         is BingeChoiceList.Failed -> false
-        is BingeChoiceList.Ready -> choices.size > PEEK_THRESHOLD
+        is BingeChoiceList.Ready -> isLongList(choices.size)
     }
 
 /**
  * A pick of one value from a list. The choices are radio rows, and picking one applies it and closes the sheet.
  *
- * A list of [SECTIONS_THRESHOLD] or more is sectioned: **Current** (the [selected] choice), **Suggested** ([suggested],
+ * A list of [LONG_LIST_THRESHOLD] or more is sectioned: **Current** (the [selected] choice), **Suggested** ([suggested],
  * in order, where the consumer has a basis: the device's languages, a server's default), then **All**. From
  * [INDEX_THRESHOLD] choices, All has a header per first letter and a [BingeLetterRail] down the edge that jumps to one
  * and follows the scroll. A shorter list reads whole, in its own order.
@@ -156,7 +157,7 @@ fun <T> BingeChoiceSheet(
  * A pick of any number of values from a list. The choices are checkboxes. Ticks collect in the sheet and apply only on
  * [doneLabel], which hands back the new set; Clear empties it, and closing the sheet any other way discards the change.
  *
- * A list of [SECTIONS_THRESHOLD] or more, with no filter text, is sectioned: **Selected** (the [selected] values the
+ * A list of [LONG_LIST_THRESHOLD] or more, with no filter text, is sectioned: **Selected** (the [selected] values the
  * sheet opened with, so a row does not jump when it is ticked), **Suggested** ([suggested], in order), then **All**. A
  * value in Suggested and in All is ticked in both. From [INDEX_THRESHOLD] choices, All has a header per first letter and
  * a [BingeLetterRail] down the edge. A shorter list reads whole, with the ones already chosen first.
@@ -353,7 +354,7 @@ internal fun <T> SingleChoiceList(
     underNavigationBar: Boolean = false,
     onSelect: (T) -> Unit,
 ) {
-    if (choices is BingeChoiceList.Ready && choices.choices.size >= SECTIONS_THRESHOLD) {
+    if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size)) {
         SectionedChoiceList(
             choices = choices.choices,
             current = listOfNotNull(selected),
@@ -412,7 +413,7 @@ internal fun <T> MultiChoiceList(
                     ),
             )
         }
-        if (choices is BingeChoiceList.Ready && choices.choices.size >= SECTIONS_THRESHOLD && query.isBlank()) {
+        if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size) && query.isBlank()) {
             SectionedChoiceList(
                 choices = choices.choices,
                 current = choices.choices.map { it.value }.filter { it in leading },
@@ -579,8 +580,7 @@ private fun <T> SectionedChoiceList(
     val lettered = choices.size >= INDEX_THRESHOLD
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    val navigationBar = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val end = dimensionResource(R.dimen.padding_l) + if (underNavigationBar) navigationBar else 0.dp
+    val end = dimensionResource(R.dimen.padding_l)
     val suggestedLabel = stringResource(R.string.choice_section_suggested)
     val allLabel = stringResource(R.string.choice_section_all)
     Box(modifier = modifier.fillMaxWidth()) {
@@ -595,6 +595,8 @@ private fun <T> SectionedChoiceList(
             } else {
                 choiceSection("all", allLabel, choices, clearOfRail = false, row)
             }
+            // The same inset path as the plain list's: it respects a bar inset already consumed above the sheet.
+            if (underNavigationBar) item(key = "navigation-bar") { Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars)) }
         }
         if (lettered) {
             val top by remember(sections) { derivedStateOf { sections.letterAt(listState.firstVisibleItemIndex) } }

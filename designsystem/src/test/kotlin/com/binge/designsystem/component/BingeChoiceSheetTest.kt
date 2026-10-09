@@ -146,7 +146,9 @@ class BingeChoiceSheetTest {
     fun `a long or loading list opens part-way and a short or failed one does not`() {
         assertTrue(many.opensPartWay())
         assertTrue(BingeChoiceList.Loading.opensPartWay())
-        assertFalse(BingeChoiceList.Ready((1..PEEK_THRESHOLD).map { BingeChoice(it, "$it") }).opensPartWay())
+        assertFalse(BingeChoiceList.Ready((1 until LONG_LIST_THRESHOLD).map { BingeChoice(it, "$it") }).opensPartWay())
+        // The same count that sections a list opens its sheet part-way, so a sectioned list is never in a short sheet.
+        assertTrue(BingeChoiceList.Ready((1..LONG_LIST_THRESHOLD).map { BingeChoice(it, "$it") }).opensPartWay())
         assertFalse(BingeChoiceList.Failed("x", "y") {}.opensPartWay())
     }
 
