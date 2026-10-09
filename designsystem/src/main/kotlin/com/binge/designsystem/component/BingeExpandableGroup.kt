@@ -37,7 +37,10 @@ sealed interface BingeGroupContent {
         val onRetry: () -> Unit,
     ) : BingeGroupContent
 
-    /** The rows, joined to the header as its children. */
+    /**
+     * The rows, joined to the header as its children. An empty list draws an open group with nothing under its header;
+     * a read that returns nothing should be [Failed], or the caller's own copy.
+     */
     data class Ready(
         val rows: List<ListItem>,
     ) : BingeGroupContent

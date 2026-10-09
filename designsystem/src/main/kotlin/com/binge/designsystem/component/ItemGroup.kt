@@ -143,6 +143,7 @@ private fun ListItemView(
                 // icon, so a screen reader announces one node ("Watchlist, Opens in browser, Button")
                 // instead of reading the icon as a second stop.
                 if (external) stateDescription = externalDescription
+                // Deliberately replaces "In progress" on a loading header: the group shows its own loading body.
                 if (row.expanded != null) {
                     stateDescription = expandedDescription
                     if (interactive) {

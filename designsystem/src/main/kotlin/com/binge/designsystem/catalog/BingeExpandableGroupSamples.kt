@@ -35,23 +35,26 @@ private val DestinationRows =
         ListItem(icon = Icons.Filled.Folder, label = "Root folder", detail = "/media/movies"),
     )
 
-private val QualityRow = ListItem(icon = Icons.Filled.Movie, label = "Request in 4K", toggled = false)
+private fun qualityRow(toggled: Boolean, onToggle: () -> Unit) =
+    ListItem(icon = Icons.Filled.Movie, label = "Request in 4K", toggled = toggled, onClick = onToggle)
 
 /** Shut: the header's chevron points down and its detail hints at what opening it offers. */
 @Composable
 fun BingeExpandableGroupClosedSample() {
     ScreenshotTheme {
+        var expanded by remember { mutableStateOf(false) }
+        var fourK by remember { mutableStateOf(false) }
         BingeExpandableGroup(
             title = "Request",
             header = bingeExpandableItem(
                 Icons.Filled.Tune,
                 ADVANCED,
-                expanded = false,
-                onExpandedChange = {},
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
                 collapsedDetail = ADVANCED_HINT,
             ),
-            content = BingeGroupContent.Loading,
-            rowsAbove = listOf(QualityRow),
+            content = BingeGroupContent.Ready(DestinationRows),
+            rowsAbove = listOf(qualityRow(fourK) { fourK = !fourK }),
         )
     }
 }
@@ -60,17 +63,19 @@ fun BingeExpandableGroupClosedSample() {
 @Composable
 fun BingeExpandableGroupOpenSample() {
     ScreenshotTheme {
+        var expanded by remember { mutableStateOf(true) }
+        var fourK by remember { mutableStateOf(false) }
         BingeExpandableGroup(
             title = "Request",
             header = bingeExpandableItem(
                 Icons.Filled.Tune,
                 ADVANCED,
-                expanded = true,
-                onExpandedChange = {},
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
                 collapsedDetail = ADVANCED_HINT,
             ),
             content = BingeGroupContent.Ready(DestinationRows),
-            rowsAbove = listOf(QualityRow),
+            rowsAbove = listOf(qualityRow(fourK) { fourK = !fourK }),
         )
     }
 }
@@ -102,6 +107,7 @@ fun BingeExpandableGroupStatesSample() {
 fun BingeExpandableGroupDemo() {
     ScreenshotTheme {
         var expanded by remember { mutableStateOf(false) }
+        var fourK by remember { mutableStateOf(false) }
         var reads by remember { mutableIntStateOf(0) }
         var content by remember { mutableStateOf<BingeGroupContent>(BingeGroupContent.Loading) }
         LaunchedEffect(expanded, reads) {
@@ -126,7 +132,7 @@ fun BingeExpandableGroupDemo() {
                     collapsedDetail = ADVANCED_HINT,
                 ),
             content = content,
-            rowsAbove = listOf(QualityRow),
+            rowsAbove = listOf(qualityRow(fourK) { fourK = !fourK }),
         )
     }
 }
