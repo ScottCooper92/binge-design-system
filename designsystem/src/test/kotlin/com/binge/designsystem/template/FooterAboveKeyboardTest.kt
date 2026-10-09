@@ -2,12 +2,16 @@ package com.binge.designsystem.template
 
 import android.view.View
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
+import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -29,11 +34,13 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 private const val SAVE = "Save"
+private const val LAST_FIELD = "Last field"
 private const val NEXT = "Next"
 private const val TOLERANCE = 1f
 
 private val Window = 800.dp
 private val Keyboard = 300.dp
+private val Overlay = 400.dp
 
 /** A footer pinned under a form or a step rides above the keyboard rather than behind it (#375). */
 @RunWith(RobolectricTestRunner::class)
@@ -70,6 +77,29 @@ class FooterAboveKeyboardTest {
         }
 
         assertAboveKeyboard(NEXT)
+    }
+
+    @Test
+    fun `a form without a footer still clears the nav overlay with the keyboard up`() {
+        rule.setContent {
+            Theme {
+                CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(bottom = Overlay)) {
+                    WithKeyboard(Keyboard) {
+                        FormScreen(title = "Edit", primaryAction = FormAction(SAVE, onClick = {}), scrolling = false) { padding ->
+                            Spacer(Modifier.weight(1f))
+                            Text(LAST_FIELD, Modifier.fillMaxWidth().padding(padding).height(48.dp))
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.waitForIdle()
+        val body = rule.onNodeWithText(LAST_FIELD).getBoundsInRoot().bottom
+        assertTrue(
+            "the last field ends at $body, under the overlay from ${Window - Overlay}",
+            body.value <= (Window - Overlay).value + TOLERANCE,
+        )
     }
 
     private fun assertAboveKeyboard(text: String) {

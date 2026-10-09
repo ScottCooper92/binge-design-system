@@ -84,6 +84,7 @@ fun FormScreen(
     notReady: (@Composable (padding: PaddingValues) -> Unit)? = null,
     content: @Composable ColumnScope.(padding: PaddingValues) -> Unit,
 ) {
+    val showsFooter = placement == FormActionPlacement.Footer && primaryAction != null && notReady == null
     BingeScreenScaffold(
         title = title,
         modifier = modifier,
@@ -102,11 +103,12 @@ fun FormScreen(
             extraActions()
         },
         bottomBar = {
-            // The scaffold never lifts its bottomBar, so the footer rides the keyboard here; the body below
-            // consumes the taller bar, which leaves the fields' own imePadding nothing to add.
-            Column(Modifier.imePadding()) {
+            // The scaffold never lifts its bottomBar, so a footer rides the keyboard here; the body below
+            // consumes the taller bar, which leaves the fields' own imePadding nothing to add. Without a footer
+            // the bar stays unlifted, so the scaffold keeps clearing a floating nav overlay.
+            Column(if (showsFooter) Modifier.imePadding() else Modifier) {
                 bottomBar()
-                if (placement == FormActionPlacement.Footer && primaryAction != null && notReady == null) {
+                if (showsFooter && primaryAction != null) {
                     FormFooter(primary = primaryAction, secondary = secondaryAction)
                 }
             }
