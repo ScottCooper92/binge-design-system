@@ -80,6 +80,40 @@ class BingeChoiceSheetTest {
     }
 
     @Test
+    fun `a short list's marks show, and a pinned value leads even what was already chosen`() {
+        val choices =
+            BingeChoiceList.Ready(
+                listOf(
+                    BingeChoice("any", "Any language"),
+                    BingeChoice("de", "German", mark = "DE"),
+                    BingeChoice("ja", "Japanese", mark = "JA"),
+                ),
+            )
+        rule.setContent {
+            var chosen by remember { mutableStateOf(setOf("ja")) }
+            MultiChoiceList(
+                choices = choices,
+                chosen = chosen,
+                leading = setOf("ja"),
+                filterPlaceholder = null,
+                onToggle = { value, on -> chosen = if (on) chosen + value else chosen - value },
+                pinned = listOf("any"),
+            )
+        }
+        rule.onNodeWithText("DE", useUnmergedTree = true).assertIsDisplayed()
+        rule.onNodeWithText("German").performClick()
+
+        rule.onNodeWithText("German").assertIsOn()
+        val labels = listOf("Any language", "Japanese", "German").map {
+            rule
+                .onNodeWithText(it)
+                .fetchSemanticsNode()
+                .boundsInRoot.top
+        }
+        assertEquals(labels.sorted(), labels)
+    }
+
+    @Test
     fun `the filter narrows the rows by label`() {
         rule.setContent {
             MultiChoiceList(

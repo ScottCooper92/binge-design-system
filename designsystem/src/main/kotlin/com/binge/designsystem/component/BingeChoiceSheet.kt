@@ -63,7 +63,8 @@ import kotlinx.coroutines.launch
 /**
  * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle]. A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
- * language code. A row with one shows it first and its radio last.
+ * language code. In a list where any choice has one, every row keeps the mark's place, empty where it has none, and
+ * shows its radio or checkbox last, so the labels line up.
  */
 data class BingeChoice<out T>(
     val value: T,
@@ -122,6 +123,9 @@ internal fun BingeChoiceList<*>.opensPartWay(): Boolean =
  * [INDEX_THRESHOLD] choices, All has a header per first letter and a [BingeLetterRail] down the edge that jumps to one
  * and follows the scroll. A shorter list reads whole, in its own order.
  *
+ * [pinned] values lead the list at any length, in the order given, with no header: an option that stands apart from
+ * the rest, such as "Any region". They are left out of the sections below them.
+ *
  * The sheet scrolls, so a list of any length is reachable. A long list (or one still [loading][BingeChoiceList.Loading])
  * opens the sheet part-way, and dragged up it docks into a [BingeSheetTopBar] with a close button. That is decided
  * once, when the sheet opens, so a list arriving while it is open does not move it.
@@ -135,6 +139,7 @@ fun <T> BingeChoiceSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
 ) {
     val partWay = remember { choices.opensPartWay() }
     BingeBottomSheet(
@@ -146,7 +151,13 @@ fun <T> BingeChoiceSheet(
         edgeToEdge = partWay,
     ) {
         ChoiceSheetTop(title = title)
-        SingleChoiceList(choices = choices, selected = selected, suggested = suggested, underNavigationBar = partWay) { value ->
+        SingleChoiceList(
+            choices = choices,
+            selected = selected,
+            suggested = suggested,
+            pinned = pinned,
+            underNavigationBar = partWay,
+        ) { value ->
             onSelect(value)
             onDismiss()
         }
@@ -160,7 +171,8 @@ fun <T> BingeChoiceSheet(
  * A list of [LONG_LIST_THRESHOLD] or more, with no filter text, is sectioned: **Selected** (the [selected] values the
  * sheet opened with, so a row does not jump when it is ticked), **Suggested** ([suggested], in order), then **All**. A
  * value in Suggested and in All is ticked in both. From [INDEX_THRESHOLD] choices, All has a header per first letter and
- * a [BingeLetterRail] down the edge. A shorter list reads whole, with the ones already chosen first.
+ * a [BingeLetterRail] down the edge. A shorter list reads whole, with the ones already chosen first. [pinned] values
+ * lead at any length, as on [BingeChoiceSheet]. A choice's mark shows on its row whatever the list's length.
  *
  * Pass [filterPlaceholder] for a list long enough to search, a hundred entries or more, say: a filter field then sits
  * under the header and narrows the rows by label. [actions] adds buttons to the header, before Clear and Done. The
@@ -182,6 +194,7 @@ fun <T> BingeMultiChoiceSheet(
     modifier: Modifier = Modifier,
     filterPlaceholder: String? = null,
     suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
     actions: @Composable RowScope.() -> Unit = {},
     draftSaver: Saver<Set<T>, out Any>? = null,
 ) {
@@ -219,6 +232,7 @@ fun <T> BingeMultiChoiceSheet(
             onToggle = { value, on -> draft = if (on) draft + value else draft - value },
             underNavigationBar = partWay,
             suggested = suggested,
+            pinned = pinned,
         )
     }
 }
@@ -351,29 +365,33 @@ internal fun <T> SingleChoiceList(
     selected: T?,
     modifier: Modifier = Modifier,
     suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
     underNavigationBar: Boolean = false,
     onSelect: (T) -> Unit,
 ) {
+    val markSlot = choices is BingeChoiceList.Ready && choices.choices.any { it.isMarked() }
     if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size)) {
         SectionedChoiceList(
             choices = choices.choices,
             current = listOfNotNull(selected),
             currentLabel = stringResource(R.string.choice_section_current),
             suggested = suggested,
+            pinned = pinned,
             underNavigationBar = underNavigationBar,
             modifier = modifier.selectableGroup(),
-        ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, clearOfRail) { onSelect(choice.value) } }
+        ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
         return
     }
     ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
-        ready.forEach { choice -> RadioChoiceRow(choice, selected = choice.value == selected) { onSelect(choice.value) } }
+        for (choice in ready.pinnedFirst(pinned)) RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
     }
 }
 
 /**
  * [choices] as checkbox rows, ticked where in [chosen]. The values in [leading] come first, so what was already chosen
  * is at the top; [leading] is the selection the sheet opened with, not the live one, so a row does not jump when ticked.
- * With a [filterPlaceholder], a filter field above the rows narrows them by label.
+ * With a [filterPlaceholder], a filter field above the rows narrows them by label. [pinned] values come before both. A
+ * list with a mark on any choice draws the sectioned list's rows, mark first and checkbox last, at any length.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -388,6 +406,7 @@ internal fun <T> MultiChoiceList(
     imeVisible: Boolean = WindowInsets.isImeVisible,
     underNavigationBar: Boolean = false,
     suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
 ) {
     var query by rememberSaveable { mutableStateOf(initialQuery) }
     // The sheet's keyboard inset pads the bottom of its content, which is off screen while it rests part-way, so the
@@ -413,28 +432,46 @@ internal fun <T> MultiChoiceList(
                     ),
             )
         }
+        val markSlot = choices is BingeChoiceList.Ready && choices.choices.any { it.isMarked() }
         if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size) && query.isBlank()) {
             SectionedChoiceList(
                 choices = choices.choices,
                 current = choices.choices.map { it.value }.filter { it in leading },
                 currentLabel = stringResource(R.string.choice_section_selected),
                 suggested = suggested,
+                pinned = pinned,
                 underNavigationBar = underNavigationBar,
                 modifier = Modifier,
-            ) { choice, clearOfRail -> CheckChoiceRow(choice, choice.value in chosen, clearOfRail) { on -> onToggle(choice.value, on) } }
+            ) { choice, clearOfRail ->
+                CheckChoiceRow(
+                    choice,
+                    choice.value in chosen,
+                    markSlot,
+                    clearOfRail,
+                ) { on -> onToggle(choice.value, on) }
+            }
             return@Column
         }
         ChoiceListBody(choices, underNavigationBar = underNavigationBar) { ready ->
             val matching = ready.filter { query.isBlank() || it.label.contains(query.trim(), ignoreCase = true) }
-            val shown = matching.sortedBy { it.value !in leading }
+            val shown = matching.sortedBy { it.value !in leading }.pinnedFirst(pinned)
             shown.forEachIndexed { index, choice ->
-                CheckboxRow(
-                    label = choice.label,
-                    subtitle = choice.subtitle,
-                    checked = choice.value in chosen,
-                    onToggle = { on -> onToggle(choice.value, on) },
-                    showDivider = index < shown.lastIndex,
-                )
+                if (markSlot) {
+                    CheckChoiceRow(
+                        choice,
+                        choice.value in chosen,
+                        markSlot = true,
+                        clearOfRail = false,
+                    ) { on -> onToggle(choice.value, on) }
+                } else {
+                    CheckboxRow(
+                        label = choice.label,
+                        subtitle = choice.subtitle,
+                        checked = choice.value in chosen,
+                        onToggle = { on -> onToggle(choice.value, on) },
+                        showDivider = index < shown.lastIndex,
+                    )
+                }
             }
         }
     }
@@ -500,11 +537,15 @@ private fun <T> ChoiceListBody(
     }
 }
 
-/** One radio row: the row owns the selection semantics, so the radio button is a visual indicator only. */
+/**
+ * One radio row: the row owns the selection semantics, so the radio button is a visual indicator only. With [markSlot],
+ * the row of a list that has marks, the mark's place leads and the radio ends the row.
+ */
 @Composable
 private fun <T> RadioChoiceRow(
     choice: BingeChoice<T>,
     selected: Boolean,
+    markSlot: Boolean,
     clearOfRail: Boolean = false,
     onClick: () -> Unit,
 ) {
@@ -524,21 +565,31 @@ private fun <T> RadioChoiceRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
     ) {
-        val marked = choice.icon != null || choice.mark != null
-        if (marked) ChoiceMark(choice) else RadioButton(selected = selected, onClick = null)
+        if (markSlot) ChoiceMark(choice) else RadioButton(selected = selected, onClick = null)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
             choice.subtitle?.let {
                 Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        if (marked) RadioButton(selected = selected, onClick = null)
+        if (markSlot) RadioButton(selected = selected, onClick = null)
     }
 }
 
-/** A choice's [icon][BingeChoice.icon] or [mark][BingeChoice.mark] in the box a settings row draws its icon in. */
+/** Whether [this] has an [icon][BingeChoice.icon] or a [mark][BingeChoice.mark] to show. */
+internal fun BingeChoice<*>.isMarked(): Boolean = icon != null || mark != null
+
+/**
+ * A choice's [icon][BingeChoice.icon] or [mark][BingeChoice.mark] in the box a settings row draws its icon in. A choice
+ * with neither keeps the box's place, empty, so its label lines up with its neighbours'.
+ */
 @Composable
-private fun ChoiceMark(choice: BingeChoice<*>) =
+private fun ChoiceMark(choice: BingeChoice<*>) {
+    if (choice.isMarked()) ChoiceMarkBox(choice) else Spacer(Modifier.size(dimensionResource(R.dimen.item_group_icon_size)))
+}
+
+@Composable
+private fun ChoiceMarkBox(choice: BingeChoice<*>) =
     Box(
         modifier =
             Modifier
@@ -561,7 +612,8 @@ private fun ChoiceMark(choice: BingeChoice<*>) =
     }
 
 /**
- * A long choice list in sections: the current choices (Current for one, Selected for several), Suggested, then All. From
+ * A long choice list in sections: the [pinned] choices with no header, then the current choices (Current for one,
+ * Selected for several), Suggested, then All. From
  * [INDEX_THRESHOLD] choices All is lettered, with sticky headers and a [BingeLetterRail] that jumps to a letter and
  * lights the one at the top of the list. [row] draws one choice, told whether to end short of the rail.
  */
@@ -572,11 +624,12 @@ private fun <T> SectionedChoiceList(
     current: Collection<T>,
     currentLabel: String,
     suggested: List<T>,
+    pinned: List<T>,
     underNavigationBar: Boolean,
     modifier: Modifier,
     row: @Composable (BingeChoice<T>, Boolean) -> Unit,
 ) {
-    val sections = remember(choices, current, suggested) { choiceSections(choices, current, suggested) }
+    val sections = remember(choices, current, suggested, pinned) { choiceSections(choices, current, suggested, pinned) }
     val lettered = choices.size >= INDEX_THRESHOLD
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -585,6 +638,7 @@ private fun <T> SectionedChoiceList(
     val allLabel = stringResource(R.string.choice_section_all)
     Box(modifier = modifier.fillMaxWidth()) {
         LazyColumn(state = listState, contentPadding = PaddingValues(bottom = end)) {
+            sections.pinned.forEach { choice -> item(key = "pinned-${choice.value}") { row(choice, lettered) } }
             choiceSection("current", currentLabel, sections.current, lettered, row)
             choiceSection("suggested", suggestedLabel, sections.suggested, lettered, row)
             if (lettered) {
@@ -593,7 +647,7 @@ private fun <T> SectionedChoiceList(
                     rows.forEach { choice -> item(key = "all-${choice.value}") { row(choice, true) } }
                 }
             } else {
-                choiceSection("all", allLabel, choices, clearOfRail = false, row)
+                choiceSection("all", allLabel, sections.all, clearOfRail = false, row)
             }
             // The same inset path as the plain list's: it respects a bar inset already consumed above the sheet.
             if (underNavigationBar) item(key = "navigation-bar") { Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars)) }
@@ -637,11 +691,12 @@ private fun <T> LazyListScope.choiceSection(
     rows.forEach { choice -> item(key = "$key-${choice.value}") { row(choice, clearOfRail) } }
 }
 
-/** One checkbox row of a sectioned list: the choice's mark first, if it has one, and the checkbox at the end. */
+/** One checkbox row of a sectioned or marked list: the mark's place first, with [markSlot], and the checkbox at the end. */
 @Composable
 private fun <T> CheckChoiceRow(
     choice: BingeChoice<T>,
     checked: Boolean,
+    markSlot: Boolean,
     clearOfRail: Boolean,
     onToggle: (Boolean) -> Unit,
 ) {
@@ -660,7 +715,7 @@ private fun <T> CheckChoiceRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
     ) {
-        if (choice.icon != null || choice.mark != null) ChoiceMark(choice)
+        if (markSlot) ChoiceMark(choice)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
             choice.subtitle?.let {
@@ -689,13 +744,19 @@ private fun ChoiceSectionHeader(text: String) =
                 ),
     )
 
-/** What a sectioned list shows: the current choice, the suggestions, and every choice grouped by its first letter. */
+/**
+ * What a sectioned list shows: the pinned choices, the current choice, the suggestions, and [all] the others, also
+ * grouped by their first letter.
+ */
 internal class ChoiceSections<T>(
     val current: List<BingeChoice<T>>,
     val suggested: List<BingeChoice<T>>,
     val byLetter: List<Pair<Char, List<BingeChoice<T>>>>,
+    val pinned: List<BingeChoice<T>> = emptyList(),
+    val all: List<BingeChoice<T>> = byLetter.flatMap { it.second },
 ) {
-    private val lead = (if (current.isEmpty()) 0 else current.size + 1) + (if (suggested.isEmpty()) 0 else suggested.size + 1)
+    private val lead =
+        pinned.size + (if (current.isEmpty()) 0 else current.size + 1) + (if (suggested.isEmpty()) 0 else suggested.size + 1)
 
     /** The list index of [letter]'s header. */
     fun indexOf(letter: Char): Int? {
@@ -736,20 +797,34 @@ internal fun <T> choiceSections(
     suggested: List<T>,
 ): ChoiceSections<T> = choiceSections(choices, listOfNotNull(selected), suggested)
 
-/** [choiceSections] for any number of current values: a multi-choice list's chosen ones lead. */
+/**
+ * [choiceSections] for any number of current values: a multi-choice list's chosen ones lead. A [pinned] value is in
+ * none of the sections: it leads the list on its own.
+ */
 internal fun <T> choiceSections(
     choices: List<BingeChoice<T>>,
     current: Collection<T>,
     suggested: List<T>,
+    pinned: List<T> = emptyList(),
 ): ChoiceSections<T> {
     val byValue = choices.associateBy { it.value }
+    val rest = choices.filter { it.value !in pinned }
     return ChoiceSections(
-        current = current.mapNotNull { byValue[it] },
-        suggested = suggested.distinct().filter { it !in current }.mapNotNull { byValue[it] },
+        current = current.filter { it !in pinned }.mapNotNull { byValue[it] },
+        suggested = suggested.distinct().filter { it !in current && it !in pinned }.mapNotNull { byValue[it] },
         byLetter =
-            choices
+            rest
                 .groupBy { sectionLetter(it.label) }
                 .toSortedMap()
                 .toList(),
+        pinned = pinned.distinct().mapNotNull { byValue[it] },
+        all = rest,
     )
+}
+
+/** These choices with the [pinned] ones first, in the order given; the rest keep their own order. */
+internal fun <T> List<BingeChoice<T>>.pinnedFirst(pinned: List<T>): List<BingeChoice<T>> {
+    if (pinned.isEmpty()) return this
+    val byValue = associateBy { it.value }
+    return pinned.distinct().mapNotNull { byValue[it] } + filter { it.value !in pinned }
 }

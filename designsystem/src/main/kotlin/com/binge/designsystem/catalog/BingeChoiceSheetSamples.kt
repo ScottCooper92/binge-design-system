@@ -36,6 +36,8 @@ private const val DONE = "Done"
 private const val CLEAR = "Clear"
 private const val FILTER = "Filter languages"
 private const val NOT_SET = "Not set"
+private const val WORLDWIDE = "Worldwide"
+private val PINNED_SAMPLE_REGIONS = setOf("AU", "BR", "CA", "FR", "DE", "JP", "ES", "GB", "US")
 
 internal val SampleRegions =
     listOf("Australia", "Brazil", "Canada", "France", "Germany", "Japan", "Spain", "United Kingdom", "United States")
@@ -306,6 +308,51 @@ fun BingeMultiChoiceSheetSectionedSample() {
                 filterPlaceholder = null,
                 onToggle = { _, _ -> },
                 suggested = listOf("en", "es", "fr"),
+            )
+        }
+    }
+}
+
+/**
+ * A short multi-choice list whose choices carry marks: each row has its mark first and its checkbox at the end, as a
+ * sectioned list's do. "Original language" is pinned, so it leads even the language already chosen.
+ */
+@Composable
+fun BingeMultiChoiceSheetMarkedSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = false, title = LANGUAGES_TITLE, actions = true) {
+            MultiChoiceList(
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(BingeChoice("original", "Original language", icon = Icons.Filled.Language)) + SampleSpokenLanguages.take(5),
+                    ),
+                chosen = setOf("en", "original"),
+                leading = setOf("en", "original"),
+                filterPlaceholder = null,
+                onToggle = { _, _ -> },
+                pinned = listOf("original"),
+            )
+        }
+    }
+}
+
+/**
+ * A sectioned list with a pinned option: "Worldwide" leads with no header, ahead of Current, Suggested and All. It has no
+ * flag, so its mark's place is empty, and its label lines up with the flagged regions'.
+ */
+@Composable
+fun BingeChoiceSheetPinnedSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = false, title = REGION_TITLE) {
+            SingleChoiceList(
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(BingeChoice(WORLDWIDE, WORLDWIDE)) + SampleCountries.filter { it.value in PINNED_SAMPLE_REGIONS },
+                    ),
+                selected = "JP",
+                suggested = listOf("GB"),
+                pinned = listOf(WORLDWIDE),
+                onSelect = {},
             )
         }
     }
