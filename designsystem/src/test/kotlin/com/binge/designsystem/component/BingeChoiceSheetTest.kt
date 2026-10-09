@@ -10,13 +10,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
@@ -41,9 +43,10 @@ class BingeChoiceSheetTest {
         var picked: Int? = null
         rule.setContent { SingleChoiceList(choices = many, selected = 1, modifier = Modifier.heightIn(max = 300.dp)) { picked = it } }
 
+        // A long list is lazy, so the row is composed only once scrolled to.
+        rule.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Choice 100"))
         rule
             .onNodeWithText("Choice 100")
-            .performScrollTo()
             .assertIsDisplayed()
             .performClick()
 

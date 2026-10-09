@@ -51,6 +51,78 @@ internal val SampleLanguages =
         BingeChoice("pt", "Portuguese", "Português"),
     )
 
+/** A region's flag from its two-letter code, for the samples' marks. */
+private fun flag(code: String): String = code.map { String(Character.toChars(0x1F1E6 + (it - 'A'))) }.joinToString("")
+
+private val SampleCountryCodes =
+    listOf(
+        "AR",
+        "AU",
+        "AT",
+        "BE",
+        "BR",
+        "BG",
+        "CA",
+        "CL",
+        "CN",
+        "CO",
+        "HR",
+        "CZ",
+        "DK",
+        "EG",
+        "FI",
+        "FR",
+        "DE",
+        "GR",
+        "HK",
+        "HU",
+        "IS",
+        "IN",
+        "ID",
+        "IE",
+        "IL",
+        "IT",
+        "JP",
+        "KE",
+        "MX",
+        "NL",
+        "NZ",
+        "NG",
+        "NO",
+        "PE",
+        "PH",
+        "PL",
+        "PT",
+        "RO",
+        "SA",
+        "SG",
+        "ZA",
+        "KR",
+        "ES",
+        "SE",
+        "CH",
+        "TW",
+        "TH",
+        "TR",
+        "GB",
+        "US",
+    )
+
+/** Fifty regions, each with its flag as a mark: long enough for letter headers and the rail. */
+internal val SampleCountries =
+    SampleCountryCodes
+        .map { code ->
+            BingeChoice(
+                code,
+                java.util.Locale
+                    .Builder()
+                    .setRegion(code)
+                    .build()
+                    .getDisplayCountry(java.util.Locale.UK),
+                mark = flag(code),
+            )
+        }.sortedBy { it.label }
+
 /** A single-choice sheet as it opens part-way: the title over radio rows, the current pick marked. */
 @Composable
 fun BingeChoiceSheetSample() {
@@ -168,4 +240,37 @@ private fun SheetFrame(
 private fun SampleActions() {
     BingeTextButton(label = CLEAR, onClick = {})
     BingeTextButton(label = DONE, onClick = {})
+}
+
+/**
+ * A long list sectioned: Current, then Suggested (here the device's region and two popular ones), then All under a
+ * letter per header with the rail down the edge. Each region carries its flag as a mark, its radio at the row's end.
+ */
+@Composable
+fun BingeChoiceSheetLetteredSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = true, title = REGION_TITLE) {
+            SingleChoiceList(
+                choices = BingeChoiceList.Ready(SampleCountries),
+                selected = "JP",
+                suggested = listOf("GB", "US", "CA"),
+                onSelect = {},
+            )
+        }
+    }
+}
+
+/** A shorter list, sectioned without letters: Current, Suggested, then All in the list's own order, with icons. */
+@Composable
+fun BingeChoiceSheetSectionedSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = false, title = REGION_TITLE) {
+            SingleChoiceList(
+                choices = BingeChoiceList.Ready(SampleRegions.map { it.copy(icon = Icons.Filled.Public) }),
+                selected = "Japan",
+                suggested = listOf("United Kingdom", "Canada"),
+                onSelect = {},
+            )
+        }
+    }
 }

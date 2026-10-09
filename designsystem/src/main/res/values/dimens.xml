@@ -367,4 +367,8 @@
     <!-- BingePinField: one box per digit, and the thicker outline on the box being typed or on an error. -->
     <dimen name="pin_cell_size">56dp</dimen>
     <dimen name="pin_cell_border_focused">2dp</dimen>
+    <!-- BingeLetterRail: the rail's width beside a long list, and one letter's lit square -->
+    <dimen name="letter_rail_width">32dp</dimen>
+    <dimen name="letter_rail_letter">20dp</dimen>
+    <dimen name="letter_rail_sample_height">520dp</dimen>
 </resources>

@@ -79,4 +79,7 @@
     <string name="month_year_picker_cancel">Cancelar</string>
     <string name="month_year_picker_confirm">Aceptar</string>
     <string name="info_row_link_separated">%1$s,</string>
+    <string name="choice_section_current">Actual</string>
+    <string name="choice_section_suggested">Sugerencias</string>
+    <string name="choice_section_all">Todos</string>
 </resources>
