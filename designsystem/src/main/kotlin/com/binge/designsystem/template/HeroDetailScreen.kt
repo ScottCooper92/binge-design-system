@@ -4,6 +4,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,11 +29,14 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.DarkStatusBarEffect
@@ -48,7 +52,8 @@ import com.binge.designsystem.paneBackOrNull
  * [footer] sits below the scroll rather than over it, so the scroll always clears it. It reaches the true
  * edge of the window, so it clears the navigation bar itself, as `FormFooter` does. [inFlight] draws a thin
  * bar under the top bar without reflowing the page. [onBack] is dropped in a pane whose list already offers it.
- * The hero runs full-bleed; [content] centres at [contentMaxWidth] on a wide window.
+ * The hero runs full-bleed; [content] centres at [contentMaxWidth] on a wide window. A page whose rails bleed to the
+ * edge passes `Dp.Infinity`: [content] then fills the width, and pads each section by [LocalHeroReadingMargin].
  */
 @Composable
 fun HeroDetailScreen(
@@ -76,12 +81,41 @@ fun HeroDetailScreen(
                     .then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
         ) {
             hero()
+            HeroDetailContent(contentMaxWidth, content)
+        }
+        HeroDetailBar(title, onBack, heroHeight, horizontalInset, inFlight, actions) { scrollState.value.toFloat() }
+    }
+}
+
+/**
+ * The side margin that centres a reading column of `content_max_width` in the width a [HeroDetailScreen] page's
+ * content gets, after the window's side insets: zero on a phone. A page that passes `contentMaxWidth = Dp.Infinity`
+ * so its rails can bleed pads its other sections by this, rather than measuring the window outside the template,
+ * where a side cutout's inset is not yet taken off.
+ */
+val LocalHeroReadingMargin = compositionLocalOf { 0.dp }
+
+/**
+ * [content] at [contentMaxWidth], centred. Unbounded, it fills the width rather than wrapping its widest child, so
+ * narrow sections start at the edge instead of centring. Either way it provides [LocalHeroReadingMargin].
+ */
+@Composable
+private fun HeroDetailContent(contentMaxWidth: Dp, content: @Composable ColumnScope.() -> Unit) {
+    val readingWidth = dimensionResource(R.dimen.content_max_width)
+    val zero = dimensionResource(R.dimen.zero)
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val readingMargin = ((maxWidth - readingWidth) / 2).coerceAtLeast(zero)
+        CompositionLocalProvider(LocalHeroReadingMargin provides readingMargin) {
             Column(
-                modifier = Modifier.fillMaxWidth().wrapContentWidth().widthIn(max = contentMaxWidth),
+                modifier =
+                    if (contentMaxWidth == Dp.Infinity) {
+                        Modifier.fillMaxWidth()
+                    } else {
+                        Modifier.fillMaxWidth().wrapContentWidth().widthIn(max = contentMaxWidth)
+                    },
                 content = content,
             )
         }
-        HeroDetailBar(title, onBack, heroHeight, horizontalInset, inFlight, actions) { scrollState.value.toFloat() }
     }
 }
 
