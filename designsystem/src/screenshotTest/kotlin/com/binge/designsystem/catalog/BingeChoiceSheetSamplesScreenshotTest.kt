@@ -102,4 +102,18 @@ class BingeChoiceSheetSamplesScreenshotTest {
     fun LongLabel() {
         BingeChoiceSheetLongLabelSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Counts() {
+        BingeChoiceSheetCountsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiCounts() {
+        BingeMultiChoiceSheetCountsSample()
+    }
 }
