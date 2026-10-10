@@ -7,7 +7,7 @@
          side-pane affordances. Defaults (compact / portrait): off, so phones keep the single column. -->
     <bool name="binge_layout_expanded">false</bool>
     <!-- Landscape (wide-but-short) gate: drives layouts that place side by side what portrait stacks
-         (e.g. the onboarding watch-type choices). Default (portrait): off. -->
+         (a row of large choice cards, say). Default (portrait): off. -->
     <bool name="binge_landscape">false</bool>
     <!-- Adaptive nav shell tier selection (see BingeNavSuiteShell): a landscape tablet
          (values-sw600dp-w1000dp) keeps the bespoke side rail, every other bucket gets the floating
