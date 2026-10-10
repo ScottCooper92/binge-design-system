@@ -7,7 +7,9 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -79,6 +81,43 @@ class TvControlSemanticsTest {
         }
 
         rule.onNodeWithTag(NODE).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
+    }
+
+    private fun hasClickLabel(label: String) =
+        SemanticsMatcher("has the click label $label") { it.config.getOrNull(SemanticsActions.OnClick)?.label == label }
+
+    @Test
+    fun `tvClickable says what OK does when it is given a click label`() {
+        rule.setContent {
+            BingeTvTheme {
+                Box(Modifier.testTag(NODE).tvClickable(onFocusChanged = {}, onClickLabel = "read more", onClick = {}))
+            }
+        }
+
+        rule.onNodeWithTag(NODE).assert(hasClickLabel("read more"))
+    }
+
+    @Test
+    fun `a disabled tvClickable still carries its click label`() {
+        rule.setContent {
+            BingeTvTheme {
+                Box(Modifier.testTag(NODE).tvClickable(onFocusChanged = {}, enabled = false, onClickLabel = "read more", onClick = {}))
+            }
+        }
+
+        rule.onNodeWithTag(NODE).assert(hasClickLabel("read more"))
+    }
+
+    @Test
+    fun `tvClickable has no click label unless it is given one`() {
+        rule.setContent { BingeTvTheme { Box(Modifier.testTag(NODE).tvClickable(onFocusChanged = {}, onClick = {})) } }
+
+        rule.onNodeWithTag(NODE).assert(
+            SemanticsMatcher("has no click label") {
+                it.config.getOrNull(SemanticsActions.OnClick)?.label ==
+                    null
+            },
+        )
     }
 
     @Test
