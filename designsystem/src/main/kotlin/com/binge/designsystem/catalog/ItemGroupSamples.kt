@@ -416,3 +416,33 @@ fun ItemGroupLongLabelSample() {
         )
     }
 }
+
+/**
+ * A row that opens something below it ([ListItem.expanded]): it draws an expand or collapse chevron in
+ * place of the destination one and tells a screen reader which state it is in. The first row starts open
+ * and the second closed; tapping flips each.
+ */
+@Composable
+fun ItemGroupExpandedSample() {
+    var advancedOpen by remember { mutableStateOf(true) }
+    var notificationsOpen by remember { mutableStateOf(false) }
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Settings",
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.Tune,
+                    label = "Advanced",
+                    expanded = advancedOpen,
+                    onClick = { advancedOpen = !advancedOpen },
+                ),
+                ListItem(
+                    icon = Icons.Filled.Flag,
+                    label = "Notifications",
+                    expanded = notificationsOpen,
+                    onClick = { notificationsOpen = !notificationsOpen },
+                ),
+            ),
+        )
+    }
+}

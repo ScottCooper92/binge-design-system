@@ -2,6 +2,7 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.AccountProfileCard
+import com.binge.designsystem.component.AccountProfileCardLayout
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
@@ -32,6 +33,20 @@ fun AccountProfileCardStaticSample() {
             name = "Sam Rivera",
             secondaryLine = "sam.rivera@binge.app",
             initialsName = "Sam Rivera",
+        )
+    }
+}
+
+/** Square, vertically stacked form for the left column of an expanded two-pane screen. */
+@Composable
+fun AccountProfileCardColumnSample() {
+    ScreenshotTheme {
+        AccountProfileCard(
+            name = "Sam Rivera",
+            secondaryLine = "@sam.rivera",
+            initialsName = "Sam Rivera",
+            country = "🇬🇧 United Kingdom",
+            layout = AccountProfileCardLayout.Column,
         )
     }
 }

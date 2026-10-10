@@ -110,4 +110,12 @@ class ItemGroupSamplesScreenshotTest {
     fun longLabels() {
         ItemGroupLongLabelSample()
     }
+
+    /** [ListItem.expanded] rows: one open, one closed. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun expanded() {
+        ItemGroupExpandedSample()
+    }
 }

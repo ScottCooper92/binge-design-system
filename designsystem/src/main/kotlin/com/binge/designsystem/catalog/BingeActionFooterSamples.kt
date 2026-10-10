@@ -88,3 +88,14 @@ fun BingeActionFooterElevatedSample() {
         }
     }
 }
+
+/**
+ * The footer while its action runs: the label gives way to a spinner and the tap is ignored, so a
+ * second tap cannot start the same call twice.
+ */
+@Composable
+fun BingeActionFooterLoadingSample() {
+    ScreenshotTheme {
+        BingeActionFooter(label = "Show results", onClick = {}, loading = true)
+    }
+}

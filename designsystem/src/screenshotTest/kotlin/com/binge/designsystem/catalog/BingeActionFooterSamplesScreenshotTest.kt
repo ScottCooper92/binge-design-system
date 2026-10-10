@@ -39,4 +39,12 @@ class BingeActionFooterSamplesScreenshotTest {
     fun FooterElevated() {
         BingeActionFooterElevatedSample()
     }
+
+    /** The `loading` variant: spinner in place of the label. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun FooterLoading() {
+        BingeActionFooterLoadingSample()
+    }
 }
