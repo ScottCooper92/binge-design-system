@@ -94,7 +94,11 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
     TvOverlayArrivalFocusEffect(entryFocus)
 }
 
-/** The sheet's visible panel, with no scrim and no focus request, so a frame can render it. */
+/**
+ * The sheet's visible panel, with no scrim and no focus request of its own, so a frame can render it. A step
+ * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus], so it pulls focus to
+ * Cancel wherever it composes.
+ */
 @Composable
 fun TvSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
