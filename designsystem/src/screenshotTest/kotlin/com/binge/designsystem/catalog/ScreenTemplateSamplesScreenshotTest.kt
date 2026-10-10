@@ -97,6 +97,11 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenPreviews
     @Composable
+    fun decision() = DecisionScreenSample()
+
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
     fun filteredList() = FilteredListScreenSample()
 
     @PreviewTest
