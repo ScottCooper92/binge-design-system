@@ -22,6 +22,11 @@ class TvTemplateSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun decisionPage() = Frame { TvDecisionPageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun twoPanePageListDetail() = Frame { TvTwoPanePageListDetailSample() }
 
     @PreviewTest

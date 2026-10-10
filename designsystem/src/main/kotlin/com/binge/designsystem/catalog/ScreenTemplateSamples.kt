@@ -19,8 +19,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.R
 import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
@@ -47,6 +50,7 @@ import com.binge.designsystem.component.ListRow
 import com.binge.designsystem.component.ListRowSkeletonColumn
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.BingeScreenScaffold
+import com.binge.designsystem.template.DecisionScreen
 import com.binge.designsystem.template.FilteredListScreen
 import com.binge.designsystem.template.FormAction
 import com.binge.designsystem.template.FormActionPlacement
@@ -548,5 +552,25 @@ private fun SampleForm() {
     }
     FormSection(title = "Proxy") {
         OutlinedTextField(state = rememberTextFieldState(), label = { Text("Proxy address") }, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/** A question asked once before the app goes on: the hero, the copy, three points, and accept under decline. */
+@Composable
+fun DecisionScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        DecisionScreen(
+            copy =
+                DecisionCopy(
+                    kicker = "Usage data",
+                    title = "Help make the app better",
+                    subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                ),
+            points = SampleDecisionPoints,
+            accept = ScreenAction("Share usage data", onClick = {}),
+            decline = ScreenAction("Not now", onClick = {}),
+            hero = Icons.Filled.BarChart,
+            heroBadge = Icons.Filled.Lock,
+        )
     }
 }
