@@ -1,21 +1,15 @@
 package com.binge.designsystem.component
 
-import android.view.View
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -24,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalNavOverlayInsets
+import com.binge.designsystem.testing.WithWindowInsets
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -112,28 +107,17 @@ private fun WithKeyboard(
     height: Dp,
     navigationBar: Dp,
     content: @Composable () -> Unit,
-) {
-    val view = LocalView.current
-    val px = with(LocalDensity.current) { height.roundToPx() }
-    val navPx = with(LocalDensity.current) { navigationBar.roundToPx() }
-    val insets =
-        remember(px, navPx) {
-            WindowInsetsCompat
-                .Builder()
-                .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(0, 0, 0, navPx))
-                .setVisible(WindowInsetsCompat.Type.navigationBars(), navPx > 0)
-                .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, if (px > 0) maxOf(px, navPx) else 0))
-                .setVisible(WindowInsetsCompat.Type.ime(), px > 0)
-                .build()
-        }
-    // Read first, so Compose's own insets listener is installed on the view before the dispatch below.
-    WindowInsets.ime
-    DisposableEffect(view, insets) {
-        val host = view.parent as View
-        val platform = checkNotNull(insets.toWindowInsets())
-        host.setOnApplyWindowInsetsListener { _, _ -> platform }
-        host.dispatchApplyWindowInsets(platform)
-        onDispose { host.setOnApplyWindowInsetsListener(null) }
-    }
-    content()
-}
+) = WithWindowInsets(
+    {
+        val px = height.roundToPx()
+        val navPx = navigationBar.roundToPx()
+        WindowInsetsCompat
+            .Builder()
+            .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(0, 0, 0, navPx))
+            .setVisible(WindowInsetsCompat.Type.navigationBars(), navPx > 0)
+            .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, if (px > 0) maxOf(px, navPx) else 0))
+            .setVisible(WindowInsetsCompat.Type.ime(), px > 0)
+            .build()
+    },
+    content,
+)

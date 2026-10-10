@@ -1,6 +1,5 @@
 package com.binge.designsystem.template
 
-import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,12 +12,8 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -32,6 +27,7 @@ import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.FilterChipItem
+import com.binge.designsystem.testing.WithWindowInsets
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -129,19 +125,7 @@ private fun Theme(content: @Composable () -> Unit) = BingeExpressiveTheme(dynami
 
 /** Gives the window a navigation bar [width] wide down the start side, answering every insets dispatch at the parent. */
 @Composable
-private fun WithStartNavigationBar(width: Dp, content: @Composable () -> Unit) {
-    val view = LocalView.current
-    val px = with(LocalDensity.current) { width.roundToPx() }
-    val insets =
-        remember(px) { WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(px, 0, 0, 0)).build() }
-    // Read first, so Compose's own insets listener is installed on the view before the dispatch below.
-    WindowInsets.navigationBars
-    DisposableEffect(view, insets) {
-        val host = view.parent as View
-        val platform = checkNotNull(insets.toWindowInsets())
-        host.setOnApplyWindowInsetsListener { _, _ -> platform }
-        host.dispatchApplyWindowInsets(platform)
-        onDispose { host.setOnApplyWindowInsetsListener(null) }
-    }
-    content()
-}
+private fun WithStartNavigationBar(width: Dp, content: @Composable () -> Unit) =
+    WithWindowInsets({
+        WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(width.roundToPx(), 0, 0, 0)).build()
+    }, content)
