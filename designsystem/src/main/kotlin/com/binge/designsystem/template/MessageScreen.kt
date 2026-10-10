@@ -35,12 +35,16 @@ import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.navOverlayPadding
 import com.binge.designsystem.theme.BingeShapes
 
-/** One way out of a [MessageScreen]: what the button says, its icon, and what pressing it does. */
+/**
+ * One way out of a template screen: what the button says, its icon, and what pressing it does. A [modifier] is
+ * applied to the button itself, for a host that needs to find it, such as a test tag.
+ */
 @Immutable
 data class ScreenAction(
     val label: String,
     val onClick: () -> Unit,
     val leadingIcon: ImageVector? = null,
+    val modifier: Modifier = Modifier,
 )
 
 /**
@@ -111,8 +115,12 @@ fun MessageScreen(
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    secondary?.let { BingeTextButton(label = it.label, onClick = it.onClick, leadingIcon = it.leadingIcon) }
-                    primary?.let { BingeFilledButton(label = it.label, onClick = it.onClick, leadingIcon = it.leadingIcon) }
+                    secondary?.let {
+                        BingeTextButton(label = it.label, onClick = it.onClick, leadingIcon = it.leadingIcon, modifier = it.modifier)
+                    }
+                    primary?.let {
+                        BingeFilledButton(label = it.label, onClick = it.onClick, leadingIcon = it.leadingIcon, modifier = it.modifier)
+                    }
                 }
             }
         }

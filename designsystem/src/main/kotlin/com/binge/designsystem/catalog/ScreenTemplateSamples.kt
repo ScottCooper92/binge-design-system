@@ -57,6 +57,7 @@ import com.binge.designsystem.component.ListRowSkeletonColumn
 import com.binge.designsystem.component.MediaCardSkeleton
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.BingeScreenScaffold
+import com.binge.designsystem.template.DecisionBody
 import com.binge.designsystem.template.DecisionScreen
 import com.binge.designsystem.template.EmptyScreen
 import com.binge.designsystem.template.ErrorScreen
@@ -618,6 +619,32 @@ fun DecisionScreenSample() {
             hero = Icons.Filled.BarChart,
             heroBadge = Icons.Filled.Lock,
         )
+    }
+}
+
+/** The decision as one page of a step flow: the flow's bar and step read-out above it, its own footer pinned below. */
+@Composable
+fun DecisionBodyInStepFlowSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = 1,
+            onBack = {},
+            footer = {
+                BingeFilledButton(label = "Share usage data", onClick = {}, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Not now", onClick = {}, modifier = Modifier.fillMaxWidth())
+            },
+        ) {
+            DecisionBody(
+                copy =
+                    DecisionCopy(
+                        kicker = "Usage data",
+                        title = "Help make the app better",
+                        subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                    ),
+                points = SampleDecisionPoints,
+            )
+        }
     }
 }
 
