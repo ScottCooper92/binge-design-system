@@ -53,9 +53,9 @@ jobs:
         when you push.
 
         You cannot compile the consumers from here. This build is included by Binge
-        and by binge-seerr, so a change that is green here can still break theirs —
-        if a fix changes a public signature, say so rather than assuming green means
-        safe.
+        and by binge-seerr, so a change that is green here can still break theirs.
+        CI compiles binge-seerr informationally; Binge is not compiled. If a fix
+        changes a public signature, say so rather than assuming green means safe.
       gate_rules: |
         NEVER silence a gate instead of fixing it. Do not add a ktlint
         baseline, do not add `ktlint-disable` comments to make a file pass,

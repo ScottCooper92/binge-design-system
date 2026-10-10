@@ -151,8 +151,8 @@ fun BingeTvNavRail(
 ) {
     // The rail's entry point: whichever item is selected. Used for the three ways focus arrives here — the ←
     // redirect, an owner's [railFocusRequester] (which, when supplied, *is* this requester, so Back-to-rail
-    // lands on the selected item), and [TvFocusSink]'s own `leftEntry`, which shares the same node so ← still
-    // opens the rail while the sink holds focus.
+    // lands on the selected item), and [TvFocusSink]'s own `startEntry`, which shares the same node so the key
+    // toward the rail still opens it while the sink holds focus.
     val railEntry = railFocusRequester ?: remember { FocusRequester() }
     val contentFocus = contentFocusRequester ?: remember { FocusRequester() }
     var railHasFocus by remember { mutableStateOf(false) }
@@ -267,7 +267,7 @@ fun BingeTvNavRail(
             // including the sink's own: re-composing it forces Compose's own recovery search rather than
             // leaving a stale grant unable to yield to whatever the destination grows next (see the class
             // KDoc's fault-injection note on [TvFocusSink] usage).
-            if (!contentHasFocus) TvFocusSink(leftEntry = railEntry)
+            if (!contentHasFocus) TvFocusSink(startEntry = railEntry)
         }
         Column(
             modifier = Modifier
