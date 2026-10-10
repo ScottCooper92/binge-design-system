@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.DecisionCopy
+import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
 import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
@@ -51,6 +52,8 @@ import com.binge.designsystem.component.ListRowSkeletonColumn
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.BingeScreenScaffold
 import com.binge.designsystem.template.DecisionScreen
+import com.binge.designsystem.template.EmptyScreen
+import com.binge.designsystem.template.ErrorScreen
 import com.binge.designsystem.template.FilteredListScreen
 import com.binge.designsystem.template.FormAction
 import com.binge.designsystem.template.FormActionPlacement
@@ -571,6 +574,26 @@ fun DecisionScreenSample() {
             decline = ScreenAction("Not now", onClick = {}),
             hero = Icons.Filled.BarChart,
             heroBadge = Icons.Filled.Lock,
+        )
+    }
+}
+
+/** A failure drawn from its kind: the shared glyph and copy for no connection, and Try again. */
+@Composable
+fun ErrorScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        ErrorScreen(kind = ErrorKind.Network, onRetry = {})
+    }
+}
+
+/** An empty list with something to do about it: the default headline, and one action. */
+@Composable
+fun EmptyScreenActionSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        EmptyScreen(
+            message = "Requests you make show up here.",
+            icon = Icons.Filled.Inbox,
+            action = ScreenAction("Find something", onClick = {}),
         )
     }
 }

@@ -32,15 +32,18 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvButtonSurface
 import com.binge.designsystem.tv.component.TvCardRow
+import com.binge.designsystem.tv.component.TvErrorPlate
 import com.binge.designsystem.tv.component.TvExcludedMark
 import com.binge.designsystem.tv.component.TvIconButtonSurface
 import com.binge.designsystem.tv.component.TvMessagePlate
+import com.binge.designsystem.tv.component.TvPairingCard
 import com.binge.designsystem.tv.component.TvQrCode
 import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvSectionTitle
@@ -210,6 +213,18 @@ fun TvMessagePlateTopStartSample() {
         headline = "No results for \"kurosawa\"",
         body = "Check the spelling, or try a shorter search.",
     )
+}
+
+/** A failure drawn from its kind, centred as a full-screen state is, with Try again focused. */
+@Composable
+fun TvErrorPlateSample() {
+    TvErrorPlate(kind = ErrorKind.Server, onRetry = {}, alignment = Alignment.Center, retryInitiallyFocused = true)
+}
+
+/** A failure nothing can be done about here: no button, so nothing dead to land on. */
+@Composable
+fun TvErrorPlateNoRetrySample() {
+    TvErrorPlate(kind = ErrorKind.Forbidden, onRetry = null)
 }
 
 /** The focus ring, the lift and the overscan margin at TV scale, with focus as a flag. */
@@ -444,6 +459,33 @@ fun TvQrCodeSample() {
             content = "https://example.com/link?code=BINGE-1234",
             contentDescription = "Scan to finish signing in",
             modifier = Modifier.size(dimensionResource(DesR.dimen.card_height)),
+        )
+    }
+}
+
+/** The hand-off card: the code to scan, what to do with it, a PIN to type and the address to open by hand. */
+@Composable
+fun TvPairingCardSample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCard(
+            payload = "http://192.168.1.20:8080/link?code=4821",
+            qrDescription = "Scan to open the sign-in page on your phone",
+            instruction = "Scan with your phone, or open the address below",
+            code = "PIN 4 8 2 1",
+            codeDescription = "PIN 4, 8, 2, 1",
+            address = "http://192.168.1.20:8080",
+        )
+    }
+}
+
+/** The card at its barest: a code to scan and nothing to type. */
+@Composable
+fun TvPairingCardQrOnlySample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCard(
+            payload = "https://example.com/link?code=BINGE-1234",
+            qrDescription = "Scan to finish signing in",
+            instruction = "Scan with your phone to finish signing in",
         )
     }
 }

@@ -85,6 +85,16 @@ class ScreenTemplateSamplesScreenshotTest {
     fun messageLoading() = LoadingMessageScreenSample()
 
     @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun errorKind() = ErrorScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun emptyAction() = EmptyScreenActionSample()
+
+    @PreviewTest
     @ScreenPreviews
     @Composable
     fun decision() = DecisionScreenSample()

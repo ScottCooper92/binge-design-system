@@ -78,6 +78,13 @@ class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun MultiPeople() {
+        BingeMultiChoiceSheetPeopleSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun Pinned() {
         BingeChoiceSheetPinnedSample()
     }

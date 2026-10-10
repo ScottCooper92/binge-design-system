@@ -23,6 +23,9 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.testing.ANCHOR_COALESCE_WAIT_MILLIS
+import com.binge.designsystem.tv.testing.LeanbackRule
+import com.binge.designsystem.tv.testing.settle
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -49,7 +52,10 @@ private val Rows =
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvImmersiveHubReentryTest {
-    @get:Rule
+    @get:Rule(order = 0)
+    val leanback = LeanbackRule()
+
+    @get:Rule(order = 1)
     val composeTestRule = createKeyboardComposeRule()
 
     private lateinit var focusManager: FocusManager
@@ -97,7 +103,7 @@ class TvImmersiveHubReentryTest {
         composeTestRule.onNodeWithTag(RAIL).requestFocus()
         // The row remembers a slot, and card-2 is now one slot further on: only the hub's memory knows the card.
         rows = listOf(Rows[0].copy(items = listOf(NEW_CARD) + Rows[0].items), Rows[1])
-        composeTestRule.waitForIdle()
+        composeTestRule.settle(ANCHOR_COALESCE_WAIT_MILLIS)
         enterFromRail()
 
         composeTestRule.onNodeWithTag("card-2").assertIsFocused()
@@ -114,7 +120,7 @@ class TvImmersiveHubReentryTest {
         composeTestRule.onNodeWithTag(RAIL).requestFocus()
         // The tile's old slot now holds a card, so the row alone would bring focus back to that card.
         rows = listOf(Rows[0], Rows[1].copy(items = Rows[1].items + NEW_CARD))
-        composeTestRule.waitForIdle()
+        composeTestRule.settle(ANCHOR_COALESCE_WAIT_MILLIS)
         enterFromRail()
 
         composeTestRule.onNodeWithText(SEE_ALL).assertIsFocused()
