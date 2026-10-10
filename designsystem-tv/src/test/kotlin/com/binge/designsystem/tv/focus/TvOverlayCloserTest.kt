@@ -90,8 +90,8 @@ class TvOverlayCloserTest {
     }
 
     /**
-     * The close restores focus out of a **focus-trapped** overlay — the shape `TvSideSheet` and `TvFilterPanel`
-     * actually ship, and the one the frame wait inside [restoreTvOverlayFocus] exists for.
+     * The close restores focus out of a **focus-trapped** overlay — the shape a side sheet or filter panel
+     * ships, and the one the frame wait inside [restoreTvOverlayFocus] exists for.
      *
      * The other tests here open an untrapped overlay, where there is nothing to swallow a request and the wait is
      * therefore inert: both orderings pass, so none of them can fail if it is removed. Add [tvExitFocusGroup] and

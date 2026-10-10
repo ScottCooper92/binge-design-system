@@ -173,7 +173,7 @@ private fun Modifier.fadeBottom(heightPx: Float): Modifier =
  * inside the [TV_NAV_RAIL_COLLAPSED_ITEMS]-row collapsed band, the focused row is always still visible when the
  * rail collapses. Near the ends the container clamps the scroll, so the first/last rows sit at their natural
  * place. The spec fires on every focus move, so the rail's scroll must be resettable by the reachability
- * harness's arrival (`TvDpadReachability` replays key paths and needs a canonical start) — hence the hoisted
+ * harness's arrival (it replays key paths and needs a canonical start) — hence the hoisted
  * scroll state on `BingeTvNavRail`.
  */
 @OptIn(ExperimentalFoundationApi::class)

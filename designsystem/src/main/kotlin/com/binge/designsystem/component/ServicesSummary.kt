@@ -27,8 +27,8 @@ import com.binge.designsystem.theme.BingeShapes
 
 /**
  * Logos shown before the row folds the remainder into a [ServicesSummaryOverflowBadge]. Fixed
- * rather than measured against the available width: this renders in a settings-style row (Account's
- * watch-provider settings) and half-width onboarding panes alike, and a count this component picks
+ * rather than measured against the available width: this renders in a full-width settings-style row
+ * and in half-width panes alike, and a count this component picks
  * once is safe in the narrowest of those rather than depending on a caller-supplied max width.
  */
 private const val MAX_VISIBLE_LOGOS = 5
@@ -40,8 +40,7 @@ private const val MAX_VISIBLE_LOGOS = 5
  * stays free of any feature's string resources.
  *
  * A selection past [MAX_VISIBLE_LOGOS] stops rendering every logo — unbounded, that row overflows
- * its container — and folds the rest into a trailing "+N" badge instead, mirroring the count TV's
- * provider board shows once a region's full catalogue is selected.
+ * its container — and folds the rest into a trailing "+N" badge instead.
  */
 @Composable
 fun ServicesSummary(

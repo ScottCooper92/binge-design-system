@@ -136,7 +136,7 @@ private fun Modifier.focusRing(
  * [tvFocusIndicator], hoisting the focused flag into the caller's state so the appearance stays a parameter.
  *
  * **Do not put this in front of `clickable`, `selectable` or `toggleable`** — reach for [tvClickable],
- * or bare `onFocusChanged` as `TvProviderTile` and `TvChoicePanel` do. Each of those already installs a
+ * or bare `onFocusChanged`. Each of those already installs a
  * focus target, and the `focusable()` here adds a second, outer one that wins focus — leaving their
  * OK/Enter handler on a node that never holds it, so the element highlights and does nothing.
  */
@@ -158,10 +158,9 @@ fun Modifier.tvFocusTarget(onFocusChanged: (Boolean) -> Unit): Modifier =
  * too, which on a D-pad turns ↓ into a dead end rather than landing on a control that isn't ready yet.
  * So disabled falls back to a bare `focusable()`.
  *
- * **There is no long-press.** One existed as an "accelerator" into the library's action sheet
- * and was removed along with its last caller: a hold is an invisible affordance on a remote,
- * so an action reachable only that way is an action most users never find. Anything worth doing to a
- * card belongs on a visible surface — on the collections that had it, OK now opens the sheet itself.
+ * **There is no long-press.** A hold is an invisible affordance on a remote, so an action
+ * reachable only that way is an action most users never find. Anything worth doing to a card belongs
+ * on a visible surface, such as a sheet that OK opens.
  */
 @Composable
 fun Modifier.tvClickable(
@@ -179,7 +178,7 @@ fun Modifier.tvClickable(
  * navigation complaint.
  *
  * It restores on a directional re-entry but gives nothing on the *first* entry, having saved nothing until the
- * group has been left once (both pinned by `TvFocusSemanticsTest`). So a surface whose *arrival* must land
+ * group has been left once. So a surface whose *arrival* must land
  * somewhere specific needs [tvEntryFocusGroup]; one that only resumes where the user left needs this. Not for a
  * focus-is-selection surface — [tvSelectionFocusGroup] — nor a click-to-open one whose entry should land on a
  * specific child — [tvEntryFocusGroup], which a restorer silently will not do.
@@ -214,7 +213,7 @@ fun Modifier.tvEntryFocusGroup(entry: FocusRequester): Modifier =
  * only way out is the surface's own dismiss path (a ← handler, BACK). The exit mirror of [tvEntryFocusGroup]:
  * that routes arrival *in*, this refuses every drift *out*. A surface that does both composes both.
  *
- * For a **modal overlay laid over a still-composed screen** — [TvSideSheet] and [TvFilterPanel] both sit over a
+ * For a **modal overlay laid over a still-composed screen** — a side sheet or filter panel sits over a
  * grid the scrim only hides. Without the trap, ↑ from the first row escapes into the band behind the scrim, or a
  * press lands on a grid cell the user cannot see; ← is meant to dismiss, not to leak focus out a side.
  *
@@ -294,11 +293,10 @@ suspend fun restoreTvOverlayFocus(target: FocusRequester): Boolean {
 /**
  * One focus unit whose **entry is routed to the selected child** rather than left to a directional search.
  *
- * For a surface where **focus is the commit** — moving onto a thing selects it, no OK — as `BingeTvNavRail`,
- * `TvTabRow` and the TV Lists column all do. There an unrouted entry is not cosmetic: the geometric search picks
+ * For a surface where **focus is the commit** — moving onto a thing selects it, no OK — as `BingeTvNavRail`
+ * and a tab row do. There an unrouted entry is not cosmetic: the geometric search picks
  * whatever child sits nearest the beam, and arriving there *is* a selection change (the rail recorded it first —
- * "merely opening the menu navigated the user somewhere they hadn't asked to go"; since re-fixed on the tab row
- * and the lists column). This exists to stop the rediscovery.
+ * "merely opening the menu navigated the user somewhere they hadn't asked to go"; since re-fixed on the tab row). This exists to stop the rediscovery.
  *
  * Not [tvFocusGroup]: `focusRestorer` has nothing saved until the group has held focus once, the first-entry
  * case that breaks — and it is less correct even afterwards, since when focus is the commit the selected child
