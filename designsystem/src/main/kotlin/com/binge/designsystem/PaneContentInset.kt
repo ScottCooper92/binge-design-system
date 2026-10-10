@@ -126,6 +126,17 @@ internal fun paneContentPadding(
 fun paneSideInsets(): WindowInsets = paneSideInsets(WindowInsets.systemBars.union(WindowInsets.displayCutout), LocalPaneInnerEdge.current)
 
 /**
+ * The side insets a top bar clears: [paneSideInsets], and with no pane beside it the rail's start inset too, so the bar
+ * starts where the body below it does, the larger of the two on that side. Beside a pane the bar offsets its own title
+ * by the overlay, so it is not added here a second time.
+ */
+@Composable
+fun topBarSideInsets(): WindowInsets {
+    val sides = paneSideInsets()
+    return if (hasPaneBeside()) sides else sides.union(navOverlayStartInsets())
+}
+
+/**
  * What a bar in a `bottomBar` slot clears: the navigation bar below it, and the side insets on the pane's outer
  * edges. The slot sits outside the scaffold's padded body, so nothing above the bar has cleared a side cutout. Pad a
  * consumer's own `bottomBar` content by this, with `Modifier.windowInsetsPadding`, rather than `navigationBarsPadding()`.

@@ -1,13 +1,17 @@
 package com.binge.designsystem
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * How much of the window the navigation overlays rather than reserves.
@@ -68,3 +72,42 @@ fun navOverlayStart(): Dp = LocalNavOverlayInsets.current.calculateStartPadding(
  */
 @Composable
 fun navOverlayEnd(): Dp = LocalNavOverlayInsets.current.calculateEndPadding(LocalLayoutDirection.current)
+
+/**
+ * [navOverlayStart] as window insets on the start side only, for a bar whose own insets should clear the rail: unioned
+ * with the cutout and system-bar insets it gives the larger of the two on that side, so a cutout inside the rail
+ * counts once. Zero wherever no rail is mounted.
+ */
+@Composable
+fun navOverlayStartInsets(): WindowInsets {
+    val start = navOverlayStart()
+    return remember(start) { StartInsets(start) }
+}
+
+private class StartInsets(
+    private val start: Dp,
+) : WindowInsets {
+    override fun getLeft(density: Density, layoutDirection: LayoutDirection) =
+        if (layoutDirection ==
+            LayoutDirection.Ltr
+        ) {
+            px(density)
+        } else {
+            0
+        }
+
+    override fun getRight(density: Density, layoutDirection: LayoutDirection) =
+        if (layoutDirection ==
+            LayoutDirection.Rtl
+        ) {
+            px(density)
+        } else {
+            0
+        }
+
+    override fun getTop(density: Density) = 0
+
+    override fun getBottom(density: Density) = 0
+
+    private fun px(density: Density) = with(density) { start.roundToPx() }
+}

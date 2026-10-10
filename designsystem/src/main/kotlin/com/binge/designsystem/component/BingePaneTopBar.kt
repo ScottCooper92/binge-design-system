@@ -37,9 +37,9 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.hasPaneBeside
 import com.binge.designsystem.navOverlayStart
-import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeTheme
+import com.binge.designsystem.topBarSideInsets
 
 /**
  * The scroll behaviour to pair with [BingePaneTopBar]: exit-until-collapsed everywhere, since both of
@@ -114,7 +114,7 @@ fun BingePaneTopBar(
  * onto the content's own start — [resolvedContentPadding] plus any nav rail overlaying the pane — so a
  * title lines up with the rows under it. With a back button the collapsed title sits past it instead.
  *
- * The bar keeps M3's top inset but takes its side insets from [paneSideInsets], not M3's default.
+ * The bar keeps M3's top inset but takes its side insets from [topBarSideInsets], not M3's default.
  * The default reserves a side cutout on both edges, so a cutout beside the other pane pushed the
  * bar in from an edge that is nowhere near it.
  */
@@ -141,8 +141,10 @@ internal fun TwoRowTopBar(
     val glassBackgroundAlpha = 1f - foregroundScrimFraction
     val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
     val edgeInset = dimensionResource(R.dimen.medium_top_bar_edge_inset)
+    // Beside a pane the title offsets itself past the rail; alone, the bar's own insets do (topBarSideInsets).
     val contentStart =
-        resolvedContentPadding().calculateStartPadding(LocalLayoutDirection.current) + navOverlayStart()
+        resolvedContentPadding().calculateStartPadding(LocalLayoutDirection.current) +
+            if (hasPaneBeside()) navOverlayStart() else dimensionResource(R.dimen.zero)
     val onContentInset = contentStart - dimensionResource(R.dimen.pane_top_bar_title_inset)
     val contentEnd = resolvedContentPadding().calculateEndPadding(LocalLayoutDirection.current)
     val besideBackButton = dimensionResource(R.dimen.padding_s)
@@ -239,7 +241,7 @@ internal fun TwoRowTopBar(
                 }
             },
             expandedHeight = expandedHeight,
-            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
+            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(topBarSideInsets()),
             colors = bingeTopBarColors(containerColor),
             scrollBehavior = scrollBehavior,
         )
