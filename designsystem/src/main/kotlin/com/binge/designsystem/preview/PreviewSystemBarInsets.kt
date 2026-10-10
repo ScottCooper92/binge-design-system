@@ -16,10 +16,10 @@ import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 
 /** A 24dp status bar — the height most phones report. */
-val PreviewStatusBarHeight = 24.dp
+private val PreviewStatusBarHeight = 24.dp
 
 /** A 48dp navigation bar — three-button navigation, the tallest a phone reports at the bottom. */
-val PreviewNavigationBarHeight = 48.dp
+private val PreviewNavigationBarHeight = 48.dp
 
 /**
  * Renders [content] under a real-sized status bar and navigation bar, so a screenshot frame exercises
