@@ -23,13 +23,17 @@ name: Consumer check (binge-seerr)
 # pixels moves the consumer's baselines by intent, so that part is reported by the consumer's
 # own bump PR. It also runs on pushes to main, which is what writes the Gradle cache:
 # setup-gradle only saves on the default branch, so a job that ran on pull requests alone would
-# start cold every time. It runs only when something the consumer compiles can have changed.
+# start cold every time. It runs only when something the consumer compiles can have changed, and the
+# catalog modules count: Gradle configures every project of an included build, so a change to
+# `catalog-app` or `catalog-registry` can break the consumer's configuration phase (#407).
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'designsystem/**'
       - 'designsystem-tv/**'
+      - 'catalog-app/**'
+      - 'catalog-registry/**'
       - 'libs.versions.toml'
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
@@ -40,6 +44,8 @@ on:
     paths:
       - 'designsystem/**'
       - 'designsystem-tv/**'
+      - 'catalog-app/**'
+      - 'catalog-registry/**'
       - 'libs.versions.toml'
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
