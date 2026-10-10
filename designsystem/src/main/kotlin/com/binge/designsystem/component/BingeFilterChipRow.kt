@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.max
 import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.OverlaidHeaderContent
@@ -109,7 +110,7 @@ internal fun filterChipRowPadding(consumed: WindowInsets): PaddingValues {
     val edges = resolvedContentPadding()
     val sides = paneSideInsets().exclude(consumed).asPaddingValues()
     return PaddingValues(
-        start = edges.calculateStartPadding(layoutDirection) + navOverlayStart() + sides.calculateStartPadding(layoutDirection),
+        start = edges.calculateStartPadding(layoutDirection) + max(navOverlayStart(), sides.calculateStartPadding(layoutDirection)),
         top = vertical,
         end = edges.calculateEndPadding(layoutDirection) + sides.calculateEndPadding(layoutDirection),
         bottom = vertical,

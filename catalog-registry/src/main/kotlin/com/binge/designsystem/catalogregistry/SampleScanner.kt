@@ -66,7 +66,7 @@ object SampleScanner {
             val kind = EntryKind.entries.firstOrNull { function.endsWith(it.name) } ?: continue
             val where = "$fileName:${index + 1}"
             val above = annotationsAbove(lines, index)
-            val annotations = above + annotationToken.findAll(match.groupValues[1]).map { it.value }
+            val annotations = (above + match.groupValues[1]).flatMap { line -> annotationToken.findAll(line).map { it.value } }
             val parameters = parametersFrom(lines, index)
             when {
                 annotations.none { it.startsWith(COMPOSABLE) } ->
@@ -136,7 +136,9 @@ object SampleScanner {
         var end = firstAnnotationIndex - 1
         while (end >= 0 && lines[end].isBlank()) end--
         if (end < 0 || !lines[end].trim().endsWith("*/")) return emptyList()
-        val start = (end downTo 0).firstOrNull { lines[it].trim().startsWith("/**") } ?: return emptyList()
+        // The nearest comment opener is the one that ends here: a plain block comment is no KDoc, not a way past to an earlier one.
+        val start = (end downTo 0).firstOrNull { lines[it].trim().startsWith("/*") } ?: return emptyList()
+        if (!lines[start].trim().startsWith("/**")) return emptyList()
         return (start..end).map { row ->
             lines[row]
                 .trim()

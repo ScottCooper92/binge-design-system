@@ -18,10 +18,16 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.drawscope.clipRect
 import kotlinx.coroutines.delay
 
-/** How long focus must rest before the backdrop crossfade follows it; the scroll and clip never wait. */
+/**
+ * How long focus must rest before the backdrop crossfade follows it; the scroll and clip never wait. A test waits past it
+ * with the fixtures' `SETTLED_FOCUS_WAIT_MILLIS`, so a change here moves that constant too.
+ */
 private const val FOCUS_SETTLE_MILLIS = 90L
 
-/** Leading + trailing coalesce window for the anchor scroll, so a held D-pad sweep anchors only the row it lands on. */
+/**
+ * Leading + trailing coalesce window for the anchor scroll, so a held D-pad sweep anchors only the row it lands on. A
+ * test waits past it with the fixtures' `ANCHOR_COALESCE_WAIT_MILLIS`, so a change here moves that constant too.
+ */
 private const val ANCHOR_COALESCE_MILLIS = 200L
 
 /** The topmost of the candidate row tops, or infinity (clip everything) when the target row is not laid out. */

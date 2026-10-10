@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -64,8 +65,9 @@ import kotlinx.coroutines.launch
 /**
  * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle]. A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
- * language code. In a list where any choice has one, every row keeps the mark's place, empty where it has none, and
- * shows its radio or checkbox last, so the labels line up.
+ * language code. A choice that is a person carries [avatarName] instead, drawn as their avatar from [avatarUrl], with
+ * their initials while it loads or when there is none. In a list where any choice has a mark, every row keeps the mark's
+ * place, empty where it has none, and shows its radio or checkbox last, so the labels line up.
  */
 data class BingeChoice<out T>(
     val value: T,
@@ -73,6 +75,8 @@ data class BingeChoice<out T>(
     val subtitle: String? = null,
     val icon: ImageVector? = null,
     val mark: String? = null,
+    val avatarName: String? = null,
+    val avatarUrl: String? = null,
 )
 
 /**
@@ -355,6 +359,83 @@ fun <T> bingeMultiChoiceItem(
     )
 }
 
+/**
+ * A [BingeChoiceSheet]'s body without its modal window, as the sheet looks at rest: the drag handle and title over the
+ * radio rows, sectioned as the sheet sections them. Picking a row calls [onSelect]; nothing closes. Use it to frame a choice sheet in a `@PreviewTest`, where a
+ * modal window does not capture, or to show the list inside a sheet of the caller's own. It draws no surface of its own,
+ * so it takes the colour of whatever holds it, and its header does not dock. Pass `dragHandle = false` when the
+ * sheet holding it draws its own handle, as [BingeBottomSheet] does. It does not clear the navigation bar; a caller
+ * in an edge-to-edge sheet does that itself.
+ */
+@Composable
+fun <T> BingeChoiceSheetContent(
+    title: String,
+    choices: BingeChoiceList<T>,
+    selected: T?,
+    onSelect: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    dragHandle: Boolean = true,
+) {
+    Column(modifier) {
+        RestingSheetTop(dragHandle) { ChoiceSheetHeader(title) }
+        SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
+    }
+}
+
+/**
+ * A [BingeMultiChoiceSheet]'s body without its modal window, for a `@PreviewTest` frame or a sheet of the caller's own:
+ * the title with [clearLabel] (and [doneLabel], when given) at the end, an optional filter, then the checkbox rows ticked
+ * where in [chosen]. It holds no draft: each tick calls [onToggle], and Clear and Done call [onClear] and [onDone].
+ * [leading] is the selection that comes first, as on the sheet; it defaults to [chosen], which suits a frame. A live
+ * caller passes the selection the content opened with, so a row does not jump when ticked. Like
+ * [BingeChoiceSheetContent], it draws no surface, its header does not dock, and `dragHandle = false` drops the handle
+ * for a sheet that draws its own.
+ */
+@Composable
+fun <T> BingeMultiChoiceSheetContent(
+    title: String,
+    choices: BingeChoiceList<T>,
+    chosen: Set<T>,
+    onToggle: (value: T, ticked: Boolean) -> Unit,
+    clearLabel: String,
+    onClear: () -> Unit,
+    modifier: Modifier = Modifier,
+    doneLabel: String? = null,
+    onDone: () -> Unit = {},
+    filterPlaceholder: String? = null,
+    leading: Set<T> = chosen,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    actions: @Composable RowScope.() -> Unit = {},
+    dragHandle: Boolean = true,
+) {
+    Column(modifier) {
+        RestingSheetTop(dragHandle) {
+            ChoiceSheetHeader(title) {
+                actions()
+                BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
+                doneLabel?.let { BingeTextButton(label = it, onClick = onDone) }
+            }
+        }
+        MultiChoiceList(
+            choices = choices,
+            chosen = chosen,
+            leading = leading,
+            filterPlaceholder = filterPlaceholder,
+            onToggle = onToggle,
+            suggested = suggested,
+            pinned = pinned,
+        )
+    }
+}
+
+/** A choice sheet's top as it rests, undocked: the drag handle over [header]. */
+@Composable
+private fun RestingSheetTop(showHandle: Boolean, header: @Composable () -> Unit) =
+    DockingHeaderLayout(fraction = { 0f }, header = header, dockedTopBar = {}, showHandle = showHandle)
+
 /** A choice sheet's top: its title and [actions], docking into a [BingeSheetTopBar] in a sheet that docks. */
 @Composable
 internal fun ChoiceSheetTop(title: String, actions: @Composable RowScope.() -> Unit = {}) {
@@ -599,15 +680,27 @@ private fun <T> RadioChoiceRow(
 }
 
 /** Whether [this] has an [icon][BingeChoice.icon] or a [mark][BingeChoice.mark] to show. */
-internal fun BingeChoice<*>.isMarked(): Boolean = icon != null || mark != null
+internal fun BingeChoice<*>.isMarked(): Boolean = icon != null || mark != null || avatarName != null
 
 /**
- * A choice's [icon][BingeChoice.icon] or [mark][BingeChoice.mark] in the box a settings row draws its icon in. A choice
- * with neither keeps the box's place, empty, so its label lines up with its neighbours'.
+ * A choice's [icon][BingeChoice.icon] or [mark][BingeChoice.mark] in the box a settings row draws its icon in, or its
+ * avatar in the box's place. A choice with none keeps the box's place, empty, so its label lines up with its neighbours'.
  */
 @Composable
 private fun ChoiceMark(choice: BingeChoice<*>) {
-    if (choice.isMarked()) ChoiceMarkBox(choice) else Spacer(Modifier.size(dimensionResource(R.dimen.item_group_icon_size)))
+    val avatarName = choice.avatarName
+    when {
+        // The row's label already names the person, so the avatar's initials stay out of what a screen reader reads.
+        avatarName != null ->
+            BingeInitialsAvatar(
+                name = avatarName,
+                avatarUrl = choice.avatarUrl,
+                size = dimensionResource(R.dimen.item_group_icon_size),
+                modifier = Modifier.clearAndSetSemantics {},
+            )
+        choice.isMarked() -> ChoiceMarkBox(choice)
+        else -> Spacer(Modifier.size(dimensionResource(R.dimen.item_group_icon_size)))
+    }
 }
 
 @Composable

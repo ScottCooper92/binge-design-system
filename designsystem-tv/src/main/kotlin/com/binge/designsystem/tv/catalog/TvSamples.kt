@@ -44,6 +44,7 @@ import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.component.TvExcludedMark
 import com.binge.designsystem.tv.component.TvIconButtonSurface
 import com.binge.designsystem.tv.component.TvMessagePlate
+import com.binge.designsystem.tv.component.TvPairingCard
 import com.binge.designsystem.tv.component.TvQrCode
 import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvSectionTitle
@@ -485,6 +486,33 @@ fun TvSideSheetConfirmSample() {
                 cancelInitiallyFocused = true,
             )
         }
+    }
+}
+
+/** The hand-off card: the code to scan, what to do with it, a PIN to type and the address to open by hand. */
+@Composable
+fun TvPairingCardSample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCard(
+            payload = "http://192.168.1.20:8080/link?code=4821",
+            qrDescription = "Scan to open the sign-in page on your phone",
+            instruction = "Scan with your phone, or open the address below",
+            code = "PIN 4 8 2 1",
+            codeDescription = "PIN 4, 8, 2, 1",
+            address = "http://192.168.1.20:8080",
+        )
+    }
+}
+
+/** The card at its barest: a code to scan and nothing to type. */
+@Composable
+fun TvPairingCardQrOnlySample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCard(
+            payload = "https://example.com/link?code=BINGE-1234",
+            qrDescription = "Scan to finish signing in",
+            instruction = "Scan with your phone to finish signing in",
+        )
     }
 }
 
