@@ -102,6 +102,9 @@ fun DetailCinematicHeader(
     synopsisInitiallyOverflowing: Boolean = false,
     // An italic line under the genres, for a caller that shows the synopsis further down the page.
     tagline: String? = null,
+    // Replaces the text title, for a header that shows a title logo. The caller owns loading and tinting,
+    // and gives it a fixed height so text and logo swap without moving the layout.
+    titleContent: (@Composable () -> Unit)? = null,
 ) {
     val eyebrow = genres.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     var headerOrigin by remember { mutableStateOf(Offset.Zero) }
@@ -139,6 +142,7 @@ fun DetailCinematicHeader(
             posterUrl = posterUrl,
             synopsisInitiallyOverflowing = synopsisInitiallyOverflowing,
             copyBounds = copyBounds,
+            titleContent = titleContent,
             modifier = Modifier.align(Alignment.BottomStart),
         )
     }
@@ -154,6 +158,7 @@ private fun CinematicCopyRow(
     posterUrl: String?,
     synopsisInitiallyOverflowing: Boolean,
     copyBounds: CinematicCopyBounds,
+    titleContent: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -189,19 +194,23 @@ private fun CinematicCopyRow(
             Spacer(Modifier.onGloballyPositioned { copyBounds.copyTop = it.positionInRoot().y })
             val titleStyle = MaterialTheme.typography.displayMedium
             val lineGap = dimensionResource(R.dimen.padding_xs)
-            Text(
-                text = title,
-                modifier = reportsLineEnd(copyBounds, CopyLine.Title),
-                style = titleStyle,
-                color = MaterialTheme.colorScheme.onBackground,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                autoSize = OneLineOrWrapAutoSize(
-                    max = titleStyle.fontSize,
-                    min = CINEMATIC_TITLE_MIN_SIZE,
-                    step = HeroTitleSizeStep,
-                ),
-            )
+            if (titleContent != null) {
+                Box(reportsLineEnd(copyBounds, CopyLine.Title)) { titleContent() }
+            } else {
+                Text(
+                    text = title,
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Title),
+                    style = titleStyle,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    autoSize = OneLineOrWrapAutoSize(
+                        max = titleStyle.fontSize,
+                        min = CINEMATIC_TITLE_MIN_SIZE,
+                        step = HeroTitleSizeStep,
+                    ),
+                )
+            }
             if (!eyebrow.isNullOrBlank()) {
                 Spacer(Modifier.height(lineGap))
                 Text(

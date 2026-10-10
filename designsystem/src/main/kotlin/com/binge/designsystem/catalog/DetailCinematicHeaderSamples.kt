@@ -57,3 +57,24 @@ fun DetailCinematicHeaderTaglineSample() {
         )
     }
 }
+
+/** [DetailCinematicHeader.titleContent]: a fixed-height block standing in for a title logo. */
+@Composable
+fun DetailCinematicHeaderTitleContentSample() {
+    ScreenshotTheme {
+        DetailCinematicHeader(
+            title = "The Dark Knight",
+            genres = listOf("Action", "Crime", "Drama"),
+            synopsis = "Batman raises the stakes in his war on crime with the help of Lt. Jim Gordon " +
+                "and District Attorney Harvey Dent.",
+            stats = listOf(
+                DetailStat(Icons.Filled.Star, "9.0", "Rating"),
+                DetailStat(Icons.Filled.Star, "2008", "Released"),
+                DetailStat(Icons.Filled.Star, "2h 32m", "Runtime"),
+            ),
+            backdropUrl = null,
+            posterUrl = null,
+            titleContent = { TitleLogoStandIn() },
+        )
+    }
+}
