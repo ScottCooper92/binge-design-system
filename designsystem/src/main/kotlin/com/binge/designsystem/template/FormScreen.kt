@@ -43,6 +43,7 @@ import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.uppercaseLocalised
 
 /** A form's commit or its way out: what the button says, whether it is live, and whether it is working. */
 @Immutable
@@ -149,7 +150,7 @@ fun FormSection(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = title.uppercase(),
+            text = title.uppercaseLocalised(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier =

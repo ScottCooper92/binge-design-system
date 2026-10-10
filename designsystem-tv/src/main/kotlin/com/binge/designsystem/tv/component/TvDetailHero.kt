@@ -28,6 +28,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.tvContentGutterStart
+import com.binge.designsystem.uppercaseLocalised
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -149,7 +150,7 @@ private fun TvDetailHeroCopy(
         item.overline?.takeIf { it.isNotBlank() }?.let {
             Text(
                 // Upper-cased here, not by the caller: the case is typography, not data.
-                text = it.uppercase(),
+                text = it.uppercaseLocalised(),
                 style = MaterialTheme.typography.labelLarge.copy(letterSpacing = OVERLINE_TRACKING),
                 color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,

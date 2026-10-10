@@ -33,6 +33,7 @@
     <string name="hint_card_dismiss">Descartar</string>
     <string name="cd_hero_slide">Mostrar %1$s</string>
     <string name="hero_trending_today">N.º %1$d en tendencia hoy</string>
+    <string name="list_separator">", "</string>
     <string name="hero_meta_runtime">%1$d h %2$d min</string>
     <plurals name="hero_meta_seasons">
         <item quantity="one">%1$d temporada</item>

@@ -144,7 +144,7 @@ fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(T
 
 /**
  * The numbers joined for display, with each run of [MIN_COLLAPSED_RUN] or more consecutive values
- * collapsed to a range: `1, 2, 3, 5, 6` reads "1-3, 5, 6". Sorted and de-duplicated first, so order
+ * collapsed to a range with an en dash, as every other range in the app: `1, 2, 3, 5, 6` reads "1–3, 5, 6". Sorted and de-duplicated first, so order
  * and repeats do not matter; empty input gives "". The numbers only, with no label, so the caller
  * keeps its own plural resource around the text. Zero is an ordinary number.
  */
@@ -156,6 +156,6 @@ fun Collection<Int>.formatRanges(): String {
     }
     return runs.joinToString(", ") { run ->
         val size = run.last - run.first + 1
-        if (size >= MIN_COLLAPSED_RUN) "${run.first}-${run.last}" else run.joinToString(", ")
+        if (size >= MIN_COLLAPSED_RUN) "${run.first}\u2013${run.last}" else run.joinToString(", ")
     }
 }

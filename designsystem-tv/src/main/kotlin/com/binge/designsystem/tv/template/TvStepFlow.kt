@@ -23,6 +23,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvMessagePlate
+import com.binge.designsystem.uppercaseLocalised
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -110,7 +111,7 @@ fun TvStepHeading(
     ) {
         kicker?.let {
             Text(
-                text = it.uppercase(),
+                text = it.uppercaseLocalised(),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
