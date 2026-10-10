@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.IntSize
@@ -69,7 +70,7 @@ fun TvIconButton(
         enabled = enabled,
         isFocused = focused,
         modifier = modifier
-            .tvClickable(enabled = enabled, onFocusChanged = { focused = it }, onClick = onClick),
+            .tvClickable(enabled = enabled, role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick),
     )
 }
 
