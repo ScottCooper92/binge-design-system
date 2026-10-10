@@ -10,25 +10,30 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
@@ -70,7 +75,11 @@ enum class FormActionPlacement {
  * Until [notReady] is null the screen shows it instead (the record loading, or its load failing). [scrolling]
  * is off for a body that scrolls itself; it then folds the padding it is handed into its own list. Tag fields
  * with [formField] and a failed submit can bring the first problem into view through [FormFields].
+ *
+ * [bar] and [scrollBehavior] are [BingeScreenScaffold]'s. [capWidth] holds the fields to a reading column
+ * (`content_max_width`), centred, on a wide window.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormScreen(
     title: String,
@@ -81,6 +90,9 @@ fun FormScreen(
     secondaryAction: FormAction? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrolling: Boolean = true,
+    bar: ScreenBar = ScreenBar.Small,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    capWidth: Boolean = false,
     extraActions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     notReady: (@Composable (padding: PaddingValues) -> Unit)? = null,
@@ -91,7 +103,8 @@ fun FormScreen(
         title = title,
         modifier = modifier,
         onBack = onBack,
-        bar = ScreenBar.Small,
+        bar = bar,
+        scrollBehavior = scrollBehavior,
         snackbarHostState = snackbarHostState,
         actions = {
             if (placement == FormActionPlacement.TopBar && primaryAction != null && notReady == null) {
@@ -129,9 +142,18 @@ fun FormScreen(
                             .imePadding()
                             .then(if (scrolling) Modifier.verticalScroll(rememberScrollState()).padding(inner) else Modifier)
                             .padding(resolvedContentInset()),
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    content(if (scrolling) PaddingValues() else inner)
+                    Column(
+                        modifier =
+                            Modifier
+                                .then(if (capWidth) Modifier.widthIn(max = dimensionResource(R.dimen.content_max_width)) else Modifier)
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+                    ) {
+                        content(if (scrolling) PaddingValues() else inner)
+                    }
                 }
             }
         }

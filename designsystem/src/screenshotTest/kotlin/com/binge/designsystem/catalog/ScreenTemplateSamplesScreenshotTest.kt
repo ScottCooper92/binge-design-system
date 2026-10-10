@@ -132,6 +132,11 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenPreviews
     @Composable
+    fun formCapped() = FormScreenCappedSample()
+
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
     fun stepFlow() = StepFlowScreenSample()
 
     @PreviewTest
