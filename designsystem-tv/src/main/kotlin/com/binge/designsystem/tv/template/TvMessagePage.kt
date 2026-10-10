@@ -32,7 +32,9 @@ data class TvPageAction(
  *
  * Focus arrives on [primary] as [hosting] places it. With no action there is nothing to land on, so the page
  * holds a [TvFocusSink] and focus cannot fall through to whatever was behind it. [loading] shows the body
- * alone with no actions — the same plate, so the swap to the real message does not reflow the page.
+ * alone with no actions. The plate is centred and reserves nothing, so when the real message replaces it, an
+ * icon, a headline or an action row that arrives moves the copy. A page that resolves to its own content, not
+ * to a message, never sees that.
  */
 @Composable
 fun TvMessagePage(
