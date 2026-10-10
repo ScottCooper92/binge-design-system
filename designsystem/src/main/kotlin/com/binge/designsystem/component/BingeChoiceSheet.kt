@@ -500,9 +500,14 @@ internal fun ChoiceSheetHeader(
     }
 }
 
-/** [choices] as radio rows, [selected] marked; or the list's loading or failed body. */
+/**
+ * [choices] as radio rows with [selected] marked, or the list's loading or failed body: a [BingeChoiceSheet]'s list
+ * with no header. Use it where the screen or pane already names the choice in its own top bar, so the title is not
+ * drawn twice. A long list is sectioned and lettered as the sheet's is, with [suggested] and [pinned] as there. It
+ * scrolls itself. [underNavigationBar] pads its end clear of the navigation bar, for a list that runs to the window's foot.
+ */
 @Composable
-internal fun <T> SingleChoiceList(
+fun <T> SingleChoiceList(
     choices: BingeChoiceList<T>,
     selected: T?,
     modifier: Modifier = Modifier,
