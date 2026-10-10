@@ -90,4 +90,14 @@
     <string name="number_slider_decrease">Reducir %1$s</string>
     <string name="number_slider_increase">Aumentar %1$s</string>
     <string name="range_slider_readout">%1$s – %2$s</string>
+    <plurals name="download_eta_minutes">
+        <item quantity="one">Queda %1$d min aprox.</item>
+        <item quantity="many">Quedan %1$d min aprox.</item>
+        <item quantity="other">Quedan %1$d min aprox.</item>
+    </plurals>
+    <plurals name="download_eta_hours">
+        <item quantity="one">Queda %1$d h aprox.</item>
+        <item quantity="many">Quedan %1$d h aprox.</item>
+        <item quantity="other">Quedan %1$d h aprox.</item>
+    </plurals>
 </resources>

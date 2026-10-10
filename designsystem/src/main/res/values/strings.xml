@@ -104,4 +104,12 @@
     <string name="number_slider_decrease">Decrease %1$s</string>
     <string name="number_slider_increase">Increase %1$s</string>
     <string name="range_slider_readout">%1$s – %2$s</string>
+    <plurals name="download_eta_minutes">
+        <item quantity="one">About %1$d min left</item>
+        <item quantity="other">About %1$d min left</item>
+    </plurals>
+    <plurals name="download_eta_hours">
+        <item quantity="one">About %1$d hr left</item>
+        <item quantity="other">About %1$d hr left</item>
+    </plurals>
 </resources>
