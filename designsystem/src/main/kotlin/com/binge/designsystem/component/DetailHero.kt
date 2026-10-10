@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsControllerCompat
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
@@ -42,9 +44,6 @@ private const val HERO_SCRIM_TOP_ALPHA = 0.55f
 private const val HERO_SCRIM_CLEAR_STOP = 0.25f
 private const val HERO_TAGLINE_ALPHA = 0.85f
 private const val HERO_META_ALPHA = 0.80f
-
-/** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
-private val HERO_TITLE_MIN_SIZE = 28.sp
 
 /**
  * Sets the status bar to always-light icons for a screen whose content runs under it — [HeroScrim]
@@ -237,10 +236,15 @@ private fun HeroTextColumn(
             .heroCopyFade()
             .padding(resolvedContentPadding(bottom = dimensionResource(R.dimen.detail_hero_text_bottom_padding))),
     ) {
-        val titleStyle = MaterialTheme.typography.displaySmall
+        val titleStyle = DetailHeroDefaults.titleStyle()
         val lineGap = dimensionResource(R.dimen.padding_xs)
         if (titleContent != null) {
-            titleContent()
+            CompositionLocalProvider(
+                LocalTextStyle provides titleStyle,
+                LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+            ) {
+                titleContent()
+            }
         } else {
             Text(
                 text = title,
@@ -248,7 +252,7 @@ private fun HeroTextColumn(
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                autoSize = OneLineOrWrapAutoSize(max = titleStyle.fontSize, min = HERO_TITLE_MIN_SIZE, step = HeroTitleSizeStep),
+                autoSize = DetailHeroDefaults.titleAutoSize(),
             )
         }
         if (!eyebrowText.isNullOrBlank()) {
