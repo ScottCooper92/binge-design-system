@@ -599,13 +599,15 @@ private const val PAIRING_QR_SHARE = 0.6f
 
 /**
  * A long failure in a pane that is the limit: the code is sized from the pane's height, as a host does, and the message
- * runs to four lines. The glyph's box gives up height, so the message and Try again stay inside the card.
+ * runs to six lines. The glyph's box gives up height, so the message and Try again stay inside the card.
  */
 @Composable
 fun TvPairingCardErrorLongMessageSample() {
     BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         TvPairingCardError(
-            message = "This TV isn't on a Wi-Fi or wired home network, so a phone can't reach it. Type the address instead.",
+            message =
+                "This TV isn't on a Wi-Fi or wired home network, so a phone can't reach it. " +
+                    "Type the address instead, or connect this TV to your home network and try again.",
             retryLabel = "Try again",
             onRetry = {},
             retryInitiallyFocused = true,

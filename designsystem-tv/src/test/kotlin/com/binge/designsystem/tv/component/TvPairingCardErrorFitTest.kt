@@ -24,25 +24,32 @@ class TvPairingCardErrorFitTest {
     @get:Rule
     val rule = createKeyboardComposeRule()
 
-    private val paneHeight = 540.dp
+    private val paneHeight = 230.dp
 
     @Test
-    fun `the retry button stays inside a pane as tall as a TV, with a four line message and a code sized from the pane`() {
+    fun `retry keeps its height and stays inside a pane shorter than the code's box`() {
         rule.setContent {
             BingeTvTheme {
-                Box(modifier = Modifier.size(width = 960.dp, height = paneHeight), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.size(width = 600.dp, height = paneHeight), contentAlignment = Alignment.Center) {
                     TvPairingCardError(
-                        message = "This TV isn't on a Wi-Fi or wired home network, so a phone can't reach it. Type the address instead.",
+                        message = "This TV isn't on a home network, so a phone can't reach it.",
                         retryLabel = "Try again",
                         onRetry = {},
-                        qrSize = paneHeight * 0.6f,
+                        qrSize = 200.dp,
                     )
                 }
             }
         }
 
         val retry = rule.onNodeWithText("Try again").getUnclippedBoundsInRoot()
+        val message = rule.onNodeWithText("This TV isn't", substring = true).getUnclippedBoundsInRoot()
 
         assertTrue("Retry ends at ${retry.bottom}, below the $paneHeight pane", retry.bottom <= paneHeight)
+        assertTrue("Retry is squeezed to ${retry.bottom - retry.top}", retry.bottom - retry.top >= MIN_BUTTON_HEIGHT)
+        assertTrue("The message ends at ${message.bottom}, under Retry's top at ${retry.top}", message.bottom <= retry.top)
+    }
+
+    private companion object {
+        val MIN_BUTTON_HEIGHT = 40.dp
     }
 }
