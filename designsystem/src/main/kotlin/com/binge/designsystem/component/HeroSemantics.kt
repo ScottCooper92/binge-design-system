@@ -5,8 +5,6 @@ import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
 
-private const val SPOKEN_SEPARATOR = ", "
-
 /**
  * What a screen reader reads for the hub hero — the whole card, on the one node that opens it.
  *
@@ -22,12 +20,13 @@ private const val SPOKEN_SEPARATOR = ", "
  */
 @Composable
 internal fun heroContentDescription(item: HeroItem, rank: Int): String {
+    val separator = stringResource(R.string.list_separator)
     val trending = stringResource(R.string.hero_trending_today, rank)
     val rating = item.rating?.let { stringResource(R.string.cd_rating_out_of_ten, it.formatRating()) }
     val genres = item.genres
         .take(MAX_META_GENRES)
         .takeIf { it.isNotEmpty() }
-        ?.joinToString(SPOKEN_SEPARATOR)
+        ?.joinToString(separator)
     return listOfNotNull(
         item.title,
         trending,
@@ -36,5 +35,5 @@ internal fun heroContentDescription(item: HeroItem, rank: Int): String {
         item.year,
         heroRuntimeOrSeasons(item),
         genres,
-    ).joinToString(SPOKEN_SEPARATOR)
+    ).joinToString(separator)
 }

@@ -49,6 +49,7 @@ import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.isLandscape
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.LocalReduceMotion
+import com.binge.designsystem.uppercaseLocalised
 import kotlin.coroutines.cancellation.CancellationException
 
 /** How long a step takes to slide across: long enough to read as a direction, short enough not to wait on. */
@@ -116,7 +117,7 @@ fun StepHeading(
 ) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm))) {
         kicker?.let {
-            Text(text = it.uppercase(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Text(text = it.uppercaseLocalised(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         }
         Text(text = title, style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onSurface)
         subtitle?.let {

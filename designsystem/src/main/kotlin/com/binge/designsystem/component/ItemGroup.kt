@@ -52,6 +52,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.tonalContainer
+import com.binge.designsystem.uppercaseLocalised
 
 /**
  * A titled group of list items on one clipped surface, dividers between them. The title is
@@ -76,7 +77,7 @@ fun ItemGroup(
     Column(modifier = modifier.fillMaxWidth()) {
         if (!title.isNullOrBlank()) {
             Text(
-                text = title.uppercase(),
+                text = title.uppercaseLocalised(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 // 8dp inside the group renders 24dp from the screen edge, since the group sits

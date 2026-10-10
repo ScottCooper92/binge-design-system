@@ -19,6 +19,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
 import com.binge.designsystem.theme.labelSmallEmphasis
+import com.binge.designsystem.uppercaseLocalised
 
 /**
  * Theme-aware tint behind a tag's accent — paler in light (where the accents are darker for
@@ -77,7 +78,7 @@ fun BingeTag(
             )
         }
         Text(
-            text = if (uppercase) label.uppercase() else label,
+            text = if (uppercase) label.uppercaseLocalised() else label,
             style = MaterialTheme.typography.labelSmallEmphasis,
             color = content,
         )

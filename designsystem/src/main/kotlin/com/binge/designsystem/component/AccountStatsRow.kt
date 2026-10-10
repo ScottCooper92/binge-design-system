@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.uppercaseLocalised
 
 @Composable
 fun AccountStatsRow(stats: List<AccountStat>, modifier: Modifier = Modifier) {
@@ -53,7 +54,7 @@ private fun AccountStatTile(stat: AccountStat, modifier: Modifier = Modifier) {
         )
         Spacer(Modifier.height(dimensionResource(R.dimen.padding_xxs)))
         Text(
-            text = stat.label.uppercase(),
+            text = stat.label.uppercaseLocalised(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
