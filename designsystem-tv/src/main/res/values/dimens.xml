@@ -45,6 +45,8 @@
     <!-- Message plate and illustration -->
     <dimen name="tv_message_plate_max_width">520dp</dimen>
     <dimen name="tv_pairing_qr_size">200dp</dimen>
+    <!-- The failure glyph a pairing card draws in place of its code when asking for one failed. -->
+    <dimen name="tv_pairing_error_icon_size">48dp</dimen>
     <dimen name="tv_illustration_plate">128dp</dimen>
     <dimen name="tv_illustration_icon">64dp</dimen>
     <!-- Page templates. The heading band matches the rail header's avatar line (avatar plus its padding). -->

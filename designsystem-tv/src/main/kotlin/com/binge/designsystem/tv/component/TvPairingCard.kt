@@ -3,11 +3,16 @@ package com.binge.designsystem.tv.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,9 +23,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -43,17 +50,7 @@ fun TvPairingCard(
     address: String? = null,
     qrSize: Dp = dimensionResource(TvR.dimen.tv_pairing_qr_size),
 ) {
-    Column(
-        modifier =
-            modifier
-                .width(IntrinsicSize.Max)
-                .clip(BingeShapes.AccountCard)
-                .background(MaterialTheme.colorScheme.surface)
-                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeShapes.AccountCard)
-                .padding(dimensionResource(DesR.dimen.padding_l)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
-    ) {
+    PairingCardSurface(modifier) {
         TvQrCode(content = payload, contentDescription = qrDescription, modifier = Modifier.size(qrSize))
         instruction?.let {
             Text(
@@ -85,4 +82,77 @@ fun TvPairingCard(
             )
         }
     }
+}
+
+/**
+ * [TvPairingCard] before it has a code: the same card with a shimmering block where the code to scan goes, and a
+ * [message] such as "Getting a code". A sign-in panel keeps the card in place while it asks for one.
+ */
+@Composable
+fun TvPairingCardLoading(
+    message: String,
+    modifier: Modifier = Modifier,
+    qrSize: Dp = dimensionResource(TvR.dimen.tv_pairing_qr_size),
+) {
+    PairingCardSurface(modifier) {
+        TvSkeletonBlock(modifier = Modifier.size(qrSize))
+        PairingMessage(message, qrSize)
+    }
+}
+
+/**
+ * [TvPairingCard] when asking for a code failed: the same card with the failure's glyph where the code to scan goes,
+ * a [message], and [retryLabel] calling [onRetry]. [retryInitiallyFocused] takes focus as a parameter, so the focused
+ * state can be screenshotted.
+ */
+@Composable
+fun TvPairingCardError(
+    message: String,
+    retryLabel: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+    retryInitiallyFocused: Boolean = false,
+    qrSize: Dp = dimensionResource(TvR.dimen.tv_pairing_qr_size),
+) {
+    PairingCardSurface(modifier) {
+        Box(modifier = Modifier.size(qrSize), contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = Icons.Filled.ErrorOutline,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(dimensionResource(TvR.dimen.tv_pairing_error_icon_size)),
+            )
+        }
+        PairingMessage(message, qrSize)
+        TvButton(label = retryLabel, onClick = onRetry, style = TvButtonStyle.Primary, initiallyFocused = retryInitiallyFocused)
+    }
+}
+
+/** The card's chrome, shared by every state so the card keeps its shape as it changes state. */
+@Composable
+private fun PairingCardSurface(modifier: Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier =
+            modifier
+                .width(IntrinsicSize.Max)
+                .clip(BingeShapes.AccountCard)
+                .background(MaterialTheme.colorScheme.surface)
+                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeShapes.AccountCard)
+                .padding(dimensionResource(DesR.dimen.padding_l)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+        content = content,
+    )
+}
+
+/** Wraps at [width], the code's, so a long failure does not widen the card past the loading state's. */
+@Composable
+private fun PairingMessage(text: String, width: Dp) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.widthIn(max = width),
+    )
 }

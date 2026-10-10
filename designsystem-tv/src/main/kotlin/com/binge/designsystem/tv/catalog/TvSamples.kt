@@ -51,6 +51,8 @@ import com.binge.designsystem.tv.component.TvExcludedMark
 import com.binge.designsystem.tv.component.TvIconButtonSurface
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.component.TvPairingCard
+import com.binge.designsystem.tv.component.TvPairingCardError
+import com.binge.designsystem.tv.component.TvPairingCardLoading
 import com.binge.designsystem.tv.component.TvQrCode
 import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvSectionTitle
@@ -566,6 +568,27 @@ fun TvPairingCardQrOnlySample() {
             payload = "https://example.com/link?code=BINGE-1234",
             qrDescription = "Scan to finish signing in",
             instruction = "Scan with your phone to finish signing in",
+        )
+    }
+}
+
+/** The card asking for a code: the same chrome, a shimmer where the code goes, and what is happening. */
+@Composable
+fun TvPairingCardLoadingSample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCardLoading(message = "Getting a code to sign in with")
+    }
+}
+
+/** Asking for a code failed: the same chrome, the failure, and Try again focused. */
+@Composable
+fun TvPairingCardErrorSample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCardError(
+            message = "Couldn't get a code. Check the connection.",
+            retryLabel = "Try again",
+            onRetry = {},
+            retryInitiallyFocused = true,
         )
     }
 }

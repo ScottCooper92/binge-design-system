@@ -112,6 +112,16 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pairingCardLoading() = Frame { TvPairingCardLoadingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun pairingCardError() = Frame { TvPairingCardErrorSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun navRailExpanded() = Frame { TvNavRailSample(expanded = true) }
 
     @PreviewTest
