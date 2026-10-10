@@ -33,4 +33,25 @@ class RatingCardSamplesScreenshotTest {
     fun NotYetRateable() {
         RatingCardNotYetRateableSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun NoReviews() {
+        RatingCardNoReviewsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun RatedWithReviews() {
+        RatingCardRatedWithReviewsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun SignedOutNoAverage() {
+        RatingCardSignedOutNoAverageSample()
+    }
 }

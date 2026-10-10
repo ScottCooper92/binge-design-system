@@ -56,10 +56,23 @@ private fun RatingLine(rating: Float, stars: @Composable () -> Unit) {
 
 private fun Float.label(): String = if (this % 1f == 0f) roundToInt().toString() else toString()
 
-/** Interactive picker at the larger tap size — empty, with a half-star landing point. */
+/** Interactive picker at the larger tap size, on a half-star landing point. */
 @Composable
-fun StarRatingInteractiveSample() {
-    var rating by remember { mutableFloatStateOf(5f) }
+fun StarRatingInteractiveSample() = InteractiveLine(initial = 5f)
+
+/** The picker with nothing chosen yet. */
+@Composable
+fun StarRatingInteractiveEmptySample() = InteractiveLine(initial = 0f)
+
+/** The lowest rating TMDB accepts, in the picker: a half star rather than an empty row that reads as unrated. */
+@Composable
+fun StarRatingInteractiveLowestSample() = InteractiveLine(initial = LOWEST_RATING)
+
+private const val LOWEST_RATING = 0.5f
+
+@Composable
+private fun InteractiveLine(initial: Float) {
+    var rating by remember { mutableFloatStateOf(initial) }
     ScreenshotTheme {
         RatingLine(rating) {
             StarRating(
