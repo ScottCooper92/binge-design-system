@@ -10,7 +10,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
-class RuntimeTextTest {
+class FormatRuntimeTest {
     @get:Rule
     val rule = createComposeRule()
 

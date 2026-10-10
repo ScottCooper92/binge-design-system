@@ -41,7 +41,7 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── component/   the shared M3 components: the nav shell, buttons, chips, top bars, sheets, cards,
 │                rows, tiles, the hero carousel, the skeletons
 ├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel, the
-│                          relative-or-absolute date formatter and month names
+│                          relative-or-absolute date formatter, month names, formatRuntime
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state and the shared aspect ratios
 ├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders,

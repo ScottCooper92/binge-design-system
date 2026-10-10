@@ -2,6 +2,8 @@ package com.binge.designsystem
 
 import android.icu.text.RelativeDateTimeFormatter
 import android.text.format.DateUtils
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Instant
@@ -170,3 +172,14 @@ fun Collection<Int>.formatRanges(separator: String = ", "): String {
         if (size >= MIN_COLLAPSED_RUN) "${run.first}\u2013${run.last}" else run.joinToString(separator)
     }
 }
+
+private const val MINUTES_PER_HOUR = 60
+
+/**
+ * A runtime as hours and minutes in the shown language ("2h 15m", "2 h 15 min"). The one place the split into
+ * hours and minutes happens, so every screen and companion app that shows a runtime reads it the same way.
+ * A runtime under an hour reads "0h 45m", as the hero always has. [minutes] is not negative: a caller with an
+ * unknown runtime shows nothing rather than passing a sentinel.
+ */
+@Composable
+fun formatRuntime(minutes: Int): String = stringResource(R.string.hero_meta_runtime, minutes / MINUTES_PER_HOUR, minutes % MINUTES_PER_HOUR)
