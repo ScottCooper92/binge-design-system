@@ -511,7 +511,7 @@ fun StepFlowScreenLazyStepSample() {
 }
 
 @Composable
-private fun SampleRows(padding: PaddingValues) {
+internal fun SampleRows(padding: PaddingValues) {
     // Through ScreenBody, as a screen's own list goes: the side insets stay outside the scroll, so the rows clear a
     // side cutout or navigation bar.
     ScreenBody(padding) { inner ->

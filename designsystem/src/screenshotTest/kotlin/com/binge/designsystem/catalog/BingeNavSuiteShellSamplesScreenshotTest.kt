@@ -5,6 +5,9 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.PreviewCutout
+import com.binge.designsystem.preview.PreviewEdge
+import com.binge.designsystem.preview.PreviewSystemBarInsets
 
 /**
  * Screenshot coverage for the app shell's docked navigation tiers. Each tier is captured at
@@ -43,6 +46,17 @@ class BingeNavSuiteShellSamplesScreenshotTest {
     fun TabletRail() {
         BingeNavSuiteShellTabletRailSample()
     }
+
+    /**
+     * A screen under the rail with a camera cutout on the left: the cutout is counted once, inside the rail's overlay.
+     * The same screen with no rail keeps the cutout's width clear, in ScreenTemplateSamplesScreenshotTest's
+     * `screenScaffoldUnderSideInsets`.
+     */
+    @PreviewTest
+    @Preview(name = "rail-cutout", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun TabletRailScreenUnderSideCutout() =
+        PreviewSystemBarInsets(cutout = PreviewCutout(PreviewEdge.Left)) { BingeNavSuiteShellRailScreenSample() }
 
     @PreviewTest
     @Preview(name = "rail-art-light", widthDp = 1280, heightDp = 800, uiMode = UI_MODE_NIGHT_NO)

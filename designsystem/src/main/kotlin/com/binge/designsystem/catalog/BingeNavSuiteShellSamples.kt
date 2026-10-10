@@ -25,6 +25,8 @@ import com.binge.designsystem.component.BingeNavSuiteItem
 import com.binge.designsystem.component.BingeNavSuiteShell
 import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.template.BingeScreenScaffold
+import com.binge.designsystem.template.ScreenBar
 
 private enum class SampleTab {
     Movies,
@@ -112,6 +114,25 @@ fun BingeNavSuiteShellTabletPortraitBarSample() {
 @Composable
 fun BingeNavSuiteShellTabletRailSample() {
     ShellSample(BingeNavPresentation.CustomRail, accountName = "Ada Lovelace", showDiscover = true)
+}
+
+/**
+ * A screen under the tablet rail, on a window with a camera cutout on its left edge. The rail's overlay already holds
+ * the cutout, so the screen's rows start just past the rail, not a cutout's width further in. The bar's title does not
+ * clear the rail yet (#605).
+ */
+@Composable
+fun BingeNavSuiteShellRailScreenSample() {
+    ScreenshotTheme {
+        BingeNavSuiteShell(
+            items = sampleTabs(accountName = "Ada Lovelace", showDiscover = true),
+            selectedKey = SampleTab.Movies,
+            onSelect = {},
+            presentation = BingeNavPresentation.CustomRail,
+        ) {
+            BingeScreenScaffold(title = "Requests", bar = ScreenBar.Small) { padding -> SampleRows(padding) }
+        }
+    }
 }
 
 /**
