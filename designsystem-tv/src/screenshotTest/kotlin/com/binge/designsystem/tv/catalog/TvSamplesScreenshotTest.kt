@@ -52,7 +52,17 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheet() = Frame { TvSideSheetSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun errorPlate() = Frame { TvErrorPlateSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun sideSheetConfirm() = Frame { TvSideSheetConfirmSample() }
 
     @PreviewTest
     @TvPreviews

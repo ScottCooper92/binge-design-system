@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
@@ -27,11 +28,13 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
@@ -53,6 +56,10 @@ import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvSectionTitle
 import com.binge.designsystem.tv.component.TvSelectedTick
 import com.binge.designsystem.tv.component.TvSelectedTickBadge
+import com.binge.designsystem.tv.component.TvSideSheetConfirm
+import com.binge.designsystem.tv.component.TvSideSheetPanel
+import com.binge.designsystem.tv.component.TvSideSheetRow
+import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.component.TvVerticalDivider
 import com.binge.designsystem.tv.component.containerColor
 import com.binge.designsystem.tv.component.contentColor
@@ -488,6 +495,39 @@ fun TvQrCodeSample() {
             contentDescription = "Scan to finish signing in",
             modifier = Modifier.size(dimensionResource(DesR.dimen.card_height)),
         )
+    }
+}
+
+/** A row's actions on the end-edge sheet: the focused row filled, the current choice ticked, delete in red. */
+@Composable
+fun TvSideSheetSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Dune: Part Two")
+            TvSideSheetRow(label = "Approve", onClick = {}, icon = Icons.Filled.Check, initiallyFocused = true)
+            TvSideSheetRow(label = "4K", onClick = {}, selected = true)
+            TvSideSheetRow(label = "Not available", onClick = {}, enabled = false)
+            TvSideSheetRow(label = "Delete request", onClick = {}, icon = Icons.Filled.Delete, destructive = true)
+        }
+    }
+}
+
+/** The confirm step: what is about to happen, then the confirm row and Cancel, with focus on Cancel. */
+@Composable
+fun TvSideSheetConfirmSample() {
+    val entry = remember { FocusRequester() }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetConfirm(
+                title = "Delete this request?",
+                message = "It is removed from the server for everyone.",
+                confirmLabel = "Delete",
+                onConfirm = {},
+                onCancel = {},
+                entryFocus = entry,
+                cancelInitiallyFocused = true,
+            )
+        }
     }
 }
 
