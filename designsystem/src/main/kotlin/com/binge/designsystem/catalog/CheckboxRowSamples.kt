@@ -9,7 +9,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeInitialsAvatar
 import com.binge.designsystem.component.CheckboxRow
@@ -107,7 +109,14 @@ fun CheckboxRowPeopleSample() {
                     checked = checked[index],
                     onToggle = { checked[index] = it },
                     showDivider = index < people.lastIndex,
-                    leadingContent = { BingeInitialsAvatar(name = name, size = dimensionResource(R.dimen.item_group_icon_size)) },
+                    leadingContent = {
+                        // The label already names the person, so the initials stay out of what a screen reader reads.
+                        BingeInitialsAvatar(
+                            name = name,
+                            size = dimensionResource(R.dimen.item_group_icon_size),
+                            modifier = Modifier.clearAndSetSemantics {},
+                        )
+                    },
                 )
             }
         }
