@@ -23,8 +23,9 @@ default value that only makes sense for Binge's data.
 
 ## 2. What does this do to the consumers?
 
-**A green build here says nothing about Binge or binge-seerr.** Neither is compiled by this
-repository, and both include it directly.
+**A green build here says nothing about Binge or binge-seerr.** CI compiles
+binge-seerr informationally (`consumer-check`); Binge is private and is not compiled. Both include
+this repository directly.
 
 So on any change to a public signature — a parameter added or removed, a type changed, a component
 renamed or deleted — check that the PR body says what it means for them. A PR that changes the
@@ -60,8 +61,8 @@ Defer to documented intent. A trade-off the author flagged and explained is not 
 
 ## 5. Do not report a finding as though a gate caught it
 
-The gates are `./gradlew build` and `validateDebugScreenshotTest`. There is no coverage floor and no
-custom convention task. Do not write that one failed, and do not ask for one to be added as a
+The gates are `./gradlew build` and `validateDebugScreenshotTest`. There is no coverage floor, and the
+only custom task is `checkTvMaterialSeparation`. Do not write that any other failed, and do not ask for one to be added as a
 condition of merging — that is an issue, if it is anything. A screenshot failure is a real finding
 only when the diff image shows a change the PR did not intend; a frame the PR meant to change wants
 its re-recorded baseline in the same commit, not a comment.
