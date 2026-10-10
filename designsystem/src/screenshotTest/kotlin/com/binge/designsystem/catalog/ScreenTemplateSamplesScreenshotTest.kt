@@ -150,6 +150,13 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun screenScaffoldBottomBarUnderSystemBars() = PreviewSystemBarInsets { BingeScreenScaffoldBottomBarSample() }
 
+    /** The pinned bottom bar's button clears a side cutout as the rows above it do, not only the navigation bar. */
+    @PreviewTest
+    @Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun screenScaffoldBottomBarUnderSideCutout() =
+        PreviewSystemBarInsets(cutout = PreviewCutout(PreviewEdge.Left)) { BingeScreenScaffoldBottomBarSample() }
+
     /**
      * A landscape phone with three-button navigation: the camera cutout on the left, the navigation bar on the right.
      * The bar and the rows clear both, so neither edge's content sits under the hardware.

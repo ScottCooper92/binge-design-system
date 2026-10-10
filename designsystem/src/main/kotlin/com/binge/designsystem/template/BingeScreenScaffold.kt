@@ -78,7 +78,8 @@ enum class ScreenBar {
  * is ignored for [ScreenBar.None]. [subtitle] and [titleTrailing] are [ScreenBar.Large]'s, and show while it is
  * expanded; a caller whose action takes over once it collapses hoists [scrollBehavior] to fade it.
  *
- * [bottomBar] reaches the true edge of the window and clears the navigation bar itself, as `FormFooter` does.
+ * [bottomBar] reaches the true edge of the window and clears the navigation bar and a side cutout itself, by
+ * [com.binge.designsystem.bottomBarInsets], as `FormFooter` does.
  *
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
  * floating navigation bar. Split it with [screenOuterPadding] and [screenInnerPadding], or use [ScreenBody].

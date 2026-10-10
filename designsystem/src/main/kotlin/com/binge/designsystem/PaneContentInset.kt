@@ -116,10 +116,11 @@ fun paneSideInsets(): WindowInsets = paneSideInsets(WindowInsets.systemBars.unio
 
 /**
  * What a bar in a `bottomBar` slot clears: the navigation bar below it, and the side insets on the pane's outer
- * edges. The slot sits outside the scaffold's padded body, so nothing above the bar has cleared a side cutout.
+ * edges. The slot sits outside the scaffold's padded body, so nothing above the bar has cleared a side cutout. Pad a
+ * consumer's own `bottomBar` content by this, with `Modifier.windowInsetsPadding`, rather than `navigationBarsPadding()`.
  */
 @Composable
-internal fun bottomBarInsets(): WindowInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Bottom).union(paneSideInsets())
+fun bottomBarInsets(): WindowInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Bottom).union(paneSideInsets())
 
 /** [paneSideInsets]'s side selection, apart from the window and the composition locals it reads. */
 internal fun paneSideInsets(windowInsets: WindowInsets, innerEdge: PaneEdge?): WindowInsets =
