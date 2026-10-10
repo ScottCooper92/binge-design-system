@@ -52,6 +52,16 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun errorPlate() = Frame { TvErrorPlateSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun errorPlateNoRetry() = Frame { TvErrorPlateNoRetrySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun focusIndicator() = Frame { TvFocusIndicatorSample() }
 
     @PreviewTest
