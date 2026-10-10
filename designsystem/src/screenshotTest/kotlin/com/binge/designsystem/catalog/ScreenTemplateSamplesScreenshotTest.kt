@@ -107,6 +107,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun decision() = DecisionScreenSample()
 
+    /** A wide window's end pane is taller than wide, so the decision in it keeps its portrait layout. */
+    @PreviewTest
+    @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun decisionInPane() = DecisionScreenInPaneSample()
+
     @PreviewTest
     @ScreenPreviews
     @Composable

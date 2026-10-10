@@ -3,11 +3,14 @@ package com.binge.designsystem.template
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,7 +33,6 @@ import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DecisionHero
 import com.binge.designsystem.component.DecisionPointsCard
-import com.binge.designsystem.isLandscape
 import com.binge.designsystem.uppercaseLocalised
 
 /** Landscape's two panes: the heading and answers against the points card. */
@@ -41,8 +44,9 @@ private const val LANDSCAPE_CONTENT_WEIGHT = 3f
  * [hero] plate, the [copy], the [points] the choice rests on, and the two answers.
  *
  * Decline is a quiet text button above accept, so neither is a trap. In portrait the hero, copy and points
- * scroll together and the answers stay pinned below. A wide, short window drops the hero, puts the copy and
- * answers on the start side, and gives the points their own scroll on the end side.
+ * scroll together and the answers stay pinned below. A space wider than tall drops the hero, puts the copy and
+ * answers on the start side, and gives the points their own scroll on the end side. The space is the one the screen
+ * is given, so a pane of a wide window that is taller than wide stays in the portrait layout.
  */
 @Composable
 fun DecisionScreen(
@@ -54,11 +58,19 @@ fun DecisionScreen(
     hero: ImageVector? = null,
     heroBadge: ImageVector? = null,
 ) {
-    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).safeDrawingPadding()) {
-        if (isLandscape()) {
-            DecisionLandscape(copy, points, accept, decline)
-        } else {
-            DecisionPortrait(copy, points, accept, decline, hero, heroBadge)
+    // The space it is given, not the window: in a pane of a wide window it is often taller than wide.
+    BoxWithConstraints(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        // A keyboard shrinks the space a host pads for it; the layout must not flip while it shows.
+        val imeVisible = WindowInsets.isImeVisible
+        val memory = remember { SplitMemory() }
+        val wide = heldWhileIme(maxWidth > maxHeight, imeVisible, memory.last)
+        if (!imeVisible || memory.last == null) memory.last = wide
+        Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
+            if (wide) {
+                DecisionLandscape(copy, points, accept, decline)
+            } else {
+                DecisionPortrait(copy, points, accept, decline, hero, heroBadge)
+            }
         }
     }
 }
