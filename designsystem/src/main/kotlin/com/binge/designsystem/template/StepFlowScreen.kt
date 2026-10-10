@@ -133,7 +133,7 @@ internal fun splitsStep(
 ): Boolean = width > height || width >= expandedWidth
 
 /** The last split decision made without the keyboard. Not state: it is read and written within one composition. */
-private class SplitMemory {
+internal class SplitMemory {
     var last: Boolean? = null
 }
 

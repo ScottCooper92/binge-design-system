@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -575,6 +577,31 @@ fun DecisionScreenSample() {
             hero = Icons.Filled.BarChart,
             heroBadge = Icons.Filled.Lock,
         )
+    }
+}
+
+/** The same question in the end pane of a wide window: the pane is taller than wide, so it keeps the portrait layout. */
+@Composable
+fun DecisionScreenInPaneSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
+            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                DecisionScreen(
+                    copy =
+                        DecisionCopy(
+                            kicker = "Usage data",
+                            title = "Help make the app better",
+                            subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                        ),
+                    points = SampleDecisionPoints,
+                    accept = ScreenAction("Share usage data", onClick = {}),
+                    decline = ScreenAction("Not now", onClick = {}),
+                    hero = Icons.Filled.BarChart,
+                    heroBadge = Icons.Filled.Lock,
+                )
+            }
+        }
     }
 }
 
