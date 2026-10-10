@@ -3,9 +3,11 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.union
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import com.binge.designsystem.rememberFoldSafeBottomHeight
 import com.binge.designsystem.theme.BingeShapes
 import kotlinx.coroutines.launch
@@ -50,10 +54,11 @@ import kotlinx.coroutines.launch
  *
  * [edgeToEdge] lets the content run under the navigation bar, as a long list does, padding its own end so the last
  * row can scroll clear of the bar. The status bar and the IME are still inset, so a field in the sheet is not covered by the
- * keyboard. The default insets carry no horizontal side, so the sheet does not inset the sides itself.
+ * keyboard. Both forms also inset the window's sides where the sheet reaches them, so on a narrow landscape window
+ * the content clears a side cutout or a side navigation bar, and a wider window's centred sheet is not pushed off-centre.
  *
- * Otherwise no `contentWindowInsets` is passed, so this takes [ModalBottomSheet]'s default —
- * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — which already includes
+ * Otherwise the content insets are [ModalBottomSheet]'s default —
+ * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — plus those sides. The default already includes
  * the IME (confirmed from `material3:1.5.0-alpha27` bytecode; issue #35). Adding `imePadding()` on
  * top would double-inset. A field that jumps the sheet on focus needs a scrollable ancestor in its
  * own content instead, so the `bringIntoView` request has somewhere local to land — see
@@ -99,7 +104,7 @@ fun BingeBottomSheet(
         // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
         modifier = foldSafeHeight?.let { modifier.heightIn(max = it) } ?: modifier,
         sheetState = sheetState,
-        contentWindowInsets = { if (edgeToEdge) edgeToEdgeInsets() else BottomSheetDefaults.modalWindowInsets },
+        contentWindowInsets = { bingeSheetContentInsets(edgeToEdge) },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         contentColor = MaterialTheme.colorScheme.onSurface,
         shape = if (dock != null) DockingSheetShape(dockFraction) else BingeShapes.HeroTop,
@@ -151,8 +156,26 @@ internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gestures
     )
 }
 
-/** An edge-to-edge sheet's insets: the default's top and the IME, without the navigation bar. */
+/**
+ * A sheet's content insets: the default's, or for an [edgeToEdge] sheet the default's top and the IME without the
+ * navigation bar, and in both cases the part of the window's sides the sheet reaches. A sheet is at most
+ * `BottomSheetDefaults.SheetMaxWidth` wide and centred, so a side inset narrower than its margin never touches it.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun edgeToEdgeInsets(): WindowInsets =
-    BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal).union(WindowInsets.ime)
+internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
+    val vertical =
+        if (edgeToEdge) {
+            BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top).union(WindowInsets.ime)
+        } else {
+            BottomSheetDefaults.modalWindowInsets
+        }
+    val windowWidth = LocalWindowInfo.current.containerSize.width
+    val sheetMaxWidth = with(LocalDensity.current) { BottomSheetDefaults.SheetMaxWidth.roundToPx() }
+    val margin = sheetSideMargin(windowWidth, sheetMaxWidth)
+    val sides = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal).exclude(WindowInsets(left = margin, right = margin))
+    return vertical.union(sides)
+}
+
+/** The gap, in pixels, between a centred sheet at most [sheetMaxWidth] wide and each side of a [windowWidth] window. */
+internal fun sheetSideMargin(windowWidth: Int, sheetMaxWidth: Int): Int = ((windowWidth - sheetMaxWidth) / 2).coerceAtLeast(0)

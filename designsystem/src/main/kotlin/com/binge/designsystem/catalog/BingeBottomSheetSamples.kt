@@ -3,13 +3,20 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.binge.designsystem.component.TextEntrySurface
+import com.binge.designsystem.component.bingeSheetContentInsets
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -45,5 +52,43 @@ fun BingeBottomSheetSample() {
                 hint = SHEET_HINT,
             )
         }
+    }
+}
+
+/**
+ * The same sheet body padded by the insets `BingeBottomSheet` gives its content, so a frame with a side cutout shows
+ * the field kept clear of the part of it the sheet reaches. The modal window itself does not capture, so this is the
+ * body alone, capped and centred as the sheet is.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeBottomSheetSideInsetsSample() {
+    ScreenshotTheme {
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+            SideInsetsSheetBody()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SideInsetsSheetBody() {
+    Column(
+        modifier = Modifier
+            .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
+            .fillMaxWidth()
+            .clip(BingeShapes.HeroTop)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .windowInsetsPadding(bingeSheetContentInsets(edgeToEdge = false)),
+    ) {
+        TextEntrySurface(
+            title = SHEET_TITLE,
+            value = "",
+            onValueChange = {},
+            onSubmit = {},
+            onCancel = {},
+            submitLabel = SUBMIT_LABEL,
+            hint = SHEET_HINT,
+        )
     }
 }
