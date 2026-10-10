@@ -52,6 +52,16 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun errorPlate() = Frame { TvErrorPlateSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun errorPlateNoRetry() = Frame { TvErrorPlateNoRetrySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun focusIndicator() = Frame { TvFocusIndicatorSample() }
 
     @PreviewTest
@@ -73,6 +83,16 @@ class TvSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun qrCode() = Frame { TvQrCodeSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun pairingCard() = Frame { TvPairingCardSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun pairingCardQrOnly() = Frame { TvPairingCardQrOnlySample() }
 
     @PreviewTest
     @TvPreviews

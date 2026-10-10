@@ -112,4 +112,20 @@
         <item quantity="one">About %1$d hr left</item>
         <item quantity="other">About %1$d hr left</item>
     </plurals>
+    <string name="error_kind_network_title">No connection</string>
+    <string name="error_kind_network_message">Check your connection and try again.</string>
+    <string name="error_kind_server_title">Something went wrong</string>
+    <string name="error_kind_server_message">The server is having trouble. Try again shortly.</string>
+    <string name="error_kind_not_found_title">Not found</string>
+    <string name="error_kind_not_found_message">This is not available.</string>
+    <string name="error_kind_auth_title">Signed out</string>
+    <string name="error_kind_auth_message">Sign in again to continue.</string>
+    <string name="error_kind_rate_limited_title">Too many requests</string>
+    <string name="error_kind_rate_limited_message">Try again in a moment.</string>
+    <string name="error_kind_forbidden_title">Not allowed</string>
+    <string name="error_kind_forbidden_message">Your account does not have permission for this.</string>
+    <string name="error_kind_generic_title">Something went wrong</string>
+    <string name="error_kind_generic_message">An unexpected error occurred.</string>
+    <string name="error_kind_retry">Try again</string>
+    <string name="empty_screen_title">Nothing here yet</string>
 </resources>
