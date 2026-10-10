@@ -1,10 +1,17 @@
 package com.binge.designsystem.catalog
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.PreviewCutout
+import com.binge.designsystem.preview.PreviewEdge
 import com.binge.designsystem.preview.PreviewSystemBarInsets
 import com.binge.designsystem.preview.ScreenPreviews
 import com.binge.designsystem.preview.ScreenStatePreview
+
+/** [com.binge.designsystem.preview.ScreenPreviews]' `phone-land` cell, for a frame that adds side insets to it. */
+private const val PHONE_LANDSCAPE = "spec:width=411dp,height=891dp,orientation=landscape"
 
 /**
  * Screenshot coverage for the screen templates. Each template's layout frame takes the device matrix; its
@@ -142,6 +149,18 @@ class ScreenTemplateSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun screenScaffoldBottomBarUnderSystemBars() = PreviewSystemBarInsets { BingeScreenScaffoldBottomBarSample() }
+
+    /**
+     * A landscape phone with three-button navigation: the camera cutout on the left, the navigation bar on the right.
+     * The bar and the rows clear both, so neither edge's content sits under the hardware.
+     */
+    @PreviewTest
+    @Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun screenScaffoldUnderSideInsets() =
+        PreviewSystemBarInsets(navigationBarEdge = PreviewEdge.Right, cutout = PreviewCutout(PreviewEdge.Left)) {
+            BingeScreenScaffoldSample()
+        }
 
     @PreviewTest
     @ScreenPreviews

@@ -486,14 +486,18 @@ fun StepFlowScreenLazyStepSample() {
 
 @Composable
 private fun SampleRows(padding: PaddingValues) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = padding.screenListPadding(),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-    ) {
-        items(SAMPLE_ROWS) { index ->
-            ListRow { textModifier ->
-                Text(text = "Row ${index + 1}", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
+    // Through ScreenBody, as a screen's own list goes: the side insets stay outside the scroll, so the rows clear a
+    // side cutout or navigation bar.
+    ScreenBody(padding) { inner ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = inner.screenListPadding(),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            items(SAMPLE_ROWS) { index ->
+                ListRow { textModifier ->
+                    Text(text = "Row ${index + 1}", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
+                }
             }
         }
     }
