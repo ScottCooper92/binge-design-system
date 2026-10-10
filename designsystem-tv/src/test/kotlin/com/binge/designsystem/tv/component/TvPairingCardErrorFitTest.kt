@@ -2,7 +2,10 @@ package com.binge.designsystem.tv.component
 
 import android.app.Application
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
@@ -47,6 +50,26 @@ class TvPairingCardErrorFitTest {
         assertTrue("Retry ends at ${retry.bottom}, below the $paneHeight pane", retry.bottom <= paneHeight)
         assertTrue("Retry is squeezed to ${retry.bottom - retry.top}", retry.bottom - retry.top >= MIN_BUTTON_HEIGHT)
         assertTrue("The message ends at ${message.bottom}, under Retry's top at ${retry.top}", message.bottom <= retry.top)
+    }
+
+    @Test
+    fun `glyph keeps its full box in a scrolling host`() {
+        rule.setContent {
+            BingeTvTheme {
+                Column(modifier = Modifier.size(width = 600.dp, height = paneHeight).verticalScroll(rememberScrollState())) {
+                    TvPairingCardError(
+                        message = "This TV isn't on a home network, so a phone can't reach it.",
+                        retryLabel = "Try again",
+                        onRetry = {},
+                        qrSize = 200.dp,
+                    )
+                }
+            }
+        }
+
+        val message = rule.onNodeWithText("This TV isn't", substring = true).getUnclippedBoundsInRoot()
+
+        assertTrue("The message starts at ${message.top}, so the glyph box is under 200dp", message.top >= 200.dp)
     }
 
     private companion object {

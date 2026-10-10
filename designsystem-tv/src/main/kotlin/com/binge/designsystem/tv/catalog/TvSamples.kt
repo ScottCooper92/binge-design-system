@@ -599,7 +599,7 @@ private const val PAIRING_QR_SHARE = 0.6f
 
 /**
  * A long failure in a pane that is the limit: the code is sized from the pane's height, as a host does, and the message
- * runs to six lines. The glyph's box gives up height, so the message and Try again stay inside the card.
+ * runs to four lines. The glyph's box gives up height, so the message and Try again stay inside the card.
  */
 @Composable
 fun TvPairingCardErrorLongMessageSample() {

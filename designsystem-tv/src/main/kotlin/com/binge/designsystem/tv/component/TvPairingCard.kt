@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -108,8 +109,8 @@ fun TvPairingCardLoading(
  * state can be screenshotted.
  *
  * The glyph's box is [qrSize] square while the card has the height, and gives up height first when it does not: in a
- * card whose height is bounded, a long message and the retry button keep their room and the box shrinks to fit, down
- * to the glyph itself.
+ * card whose height is bounded, a long message and the retry button keep their room and the box shrinks to fit. A card
+ * measured with unbounded height, as in a scrolling pane, keeps the full [qrSize] box.
  */
 @Composable
 fun TvPairingCardError(
@@ -120,25 +121,27 @@ fun TvPairingCardError(
     retryInitiallyFocused: Boolean = false,
     qrSize: Dp = dimensionResource(TvR.dimen.tv_pairing_qr_size),
 ) {
-    PairingCardSurface(modifier) {
-        val iconSize = dimensionResource(TvR.dimen.tv_pairing_error_icon_size)
-        Box(
-            modifier = Modifier
-                .width(qrSize)
-                .weight(1f, fill = false)
-                .heightIn(min = iconSize)
-                .height(qrSize),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ErrorOutline,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(iconSize),
-            )
+    BoxWithConstraints(modifier = modifier, propagateMinConstraints = true) {
+        val bounded = constraints.hasBoundedHeight
+        PairingCardSurface(Modifier) {
+            val iconSize = dimensionResource(TvR.dimen.tv_pairing_error_icon_size)
+            Box(
+                modifier = Modifier
+                    .width(qrSize)
+                    .then(if (bounded) Modifier.weight(1f, fill = false).heightIn(min = iconSize) else Modifier)
+                    .height(qrSize),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ErrorOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(iconSize),
+                )
+            }
+            PairingMessage(message, qrSize)
+            TvButton(label = retryLabel, onClick = onRetry, style = TvButtonStyle.Primary, initiallyFocused = retryInitiallyFocused)
         }
-        PairingMessage(message, qrSize)
-        TvButton(label = retryLabel, onClick = onRetry, style = TvButtonStyle.Primary, initiallyFocused = retryInitiallyFocused)
     }
 }
 
