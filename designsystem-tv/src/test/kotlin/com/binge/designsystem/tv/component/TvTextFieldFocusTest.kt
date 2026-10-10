@@ -17,6 +17,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import com.binge.designsystem.testing.createKeyboardComposeRule
@@ -129,6 +130,37 @@ class TvTextFieldFocusTest {
 
         frame(SEARCH).assertIsFocused()
         assertEquals(1, actions)
+    }
+
+    /** The caret starts at the end when select opens the input, so typing into a field that holds text appends. */
+    @Test
+    fun `typing into a field that already holds text appends to it`() {
+        var name by mutableStateOf("dun")
+        var query by mutableStateOf("dun")
+        composeTestRule.setContent {
+            BingeTvTheme {
+                Column {
+                    TvTextField(value = name, onValueChange = { name = it }, label = NAME)
+                    TvSearchField(value = query, onValueChange = { query = it }, label = SEARCH, placeholder = "Films", onSearch = {})
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        frame(NAME).requestFocus()
+        composeTestRule.waitForIdle()
+        press(Key.DirectionCenter)
+        input(NAME).performTextInput("e")
+        composeTestRule.waitForIdle()
+
+        frame(SEARCH).requestFocus()
+        composeTestRule.waitForIdle()
+        press(Key.DirectionCenter)
+        input(SEARCH).performTextInput("e")
+        composeTestRule.waitForIdle()
+
+        assertEquals("dune", name)
+        assertEquals("dune", query)
     }
 
     @Test
