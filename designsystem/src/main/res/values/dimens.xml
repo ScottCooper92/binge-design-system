@@ -184,6 +184,12 @@
     <!-- BingeTag — tinted category/type/role tag (corner = BingeShapes.Tag; h-pad/icon-gap reuse the padding ramp) -->
     <dimen name="tag_padding_v">3dp</dimen>
     <dimen name="tag_icon_size">13dp</dimen>
+    <!-- StatusChip: the pill's padding, the solid dot, its halo, and the gap before the label -->
+    <dimen name="status_chip_padding_h">10dp</dimen>
+    <dimen name="status_chip_padding_v">4dp</dimen>
+    <dimen name="status_chip_dot_size">7dp</dimen>
+    <dimen name="status_chip_dot_halo_size">13dp</dimen>
+    <dimen name="status_chip_dot_spacing">6dp</dimen>
     <!-- BingeSnackbar — the floating pill (horizontal inset reuses padding_m) -->
     <dimen name="snackbar_elevation">6dp</dimen>
     <!-- M3's snackbar height: 48dp at one line, 68dp at two. The min holds the first, and the text's
