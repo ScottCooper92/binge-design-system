@@ -36,4 +36,4 @@ fun WithPreviewImage(
 }
 
 /** Opaque slate — a fixed stand-in for artwork, distinct from both scrim and the surfaceVariant plates. */
-const val PREVIEW_IMAGE_COLOR: Int = 0xFF6E7A8A.toInt()
+private const val PREVIEW_IMAGE_COLOR: Int = 0xFF6E7A8A.toInt()

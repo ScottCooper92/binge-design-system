@@ -32,7 +32,7 @@ import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /** The separator between facts on one line. */
-const val TV_DETAIL_META_SEPARATOR = "  ·  "
+private const val TV_DETAIL_META_SEPARATOR = "  ·  "
 
 /** Wide tracking makes the all-caps overline read as a label rather than shouting. */
 private val OVERLINE_TRACKING = 0.14.em
