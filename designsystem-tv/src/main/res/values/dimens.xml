@@ -47,6 +47,12 @@
     <dimen name="tv_pairing_qr_size">200dp</dimen>
     <!-- The failure glyph a pairing card draws in place of its code when asking for one failed. -->
     <dimen name="tv_pairing_error_icon_size">48dp</dimen>
+    <!-- Text and search fields: a form's field width, and the frame the remote lands on. -->
+    <dimen name="tv_text_field_width">520dp</dimen>
+    <dimen name="tv_text_field_height">56dp</dimen>
+    <dimen name="tv_text_field_padding_horizontal">20dp</dimen>
+    <dimen name="tv_text_field_border_width">1dp</dimen>
+    <dimen name="tv_search_field_icon">24dp</dimen>
     <dimen name="tv_illustration_plate">128dp</dimen>
     <dimen name="tv_illustration_icon">64dp</dimen>
     <!-- Page templates. The heading band matches the rail header's avatar line (avatar plus its padding). -->
