@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.tv.R as TvR
@@ -27,6 +29,9 @@ import com.binge.designsystem.tv.R as TvR
  * and a default is how selection vanishes — the accent drawn over the accent focus fill. Pass the item's own
  * focused content colour where a focus fill can land under the tick, the primary colour where none can. Over
  * imagery, use [TvSelectedTickBadge], which needs no tint.
+ *
+ * The glyph is decoration and says nothing to a screen reader. Mark the row that holds it with
+ * [Modifier.tvSelected], so the state is announced where the tick is drawn.
  */
 @Composable
 fun TvSelectedTick(tint: Color, modifier: Modifier = Modifier) {
@@ -81,3 +86,9 @@ fun TvSelectedTickBadge(modifier: Modifier = Modifier) {
         )
     }
 }
+
+/**
+ * Marks a row as chosen or not for a screen reader, beside the [TvSelectedTick] that marks it for the eye. Put
+ * it on the row that holds the tick, so the tick and the announced state cannot drift apart.
+ */
+fun Modifier.tvSelected(selected: Boolean): Modifier = semantics { this.selected = selected }
