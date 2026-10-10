@@ -400,6 +400,22 @@ fun FormScreenFooterSample() {
     }
 }
 
+/** A form under a large collapsing bar, its fields held to a reading column on a wide window. */
+@Composable
+fun FormScreenCappedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "Profile",
+            onBack = LocalDemoBack.current,
+            bar = ScreenBar.Large,
+            capWidth = true,
+            primaryAction = FormAction("Save", onClick = {}),
+        ) {
+            SampleForm()
+        }
+    }
+}
+
 /** The middle step of a flow: portrait stacks the art, heading and choices; a wide window splits them. */
 @Composable
 fun StepFlowScreenSample() {

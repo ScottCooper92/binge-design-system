@@ -47,6 +47,9 @@ private val SideBar = 48.dp
 /** What an expanded custom rail publishes as its overlay: its width plus the start inset it consumed. */
 private val RailWidth = 96.dp
 
+/** A cutout on the start edge, as a landscape phone's camera hole is. */
+private val Cutout = 32.dp
+
 /** The scaffold reserves a side inset once, whoever reserved it first (#371, #372). */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
@@ -114,6 +117,57 @@ class BingeScreenScaffoldSideInsetsTest {
         )
     }
 
+    @Test
+    fun `a start cutout under the rail counts once`() {
+        rule.setContent {
+            Theme {
+                WithStartCutout(Cutout) {
+                    // The rail's overlay already holds the cutout, and nothing consumed it.
+                    CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(start = RailWidth + Cutout)) {
+                        BingeScreenScaffold(title = "Requests", bar = ScreenBar.Small) { padding ->
+                            val start = padding.calculateStartPadding(LocalLayoutDirection.current)
+                            Box(Modifier.padding(start = start).testTag(BODY).fillMaxSize())
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertEquals(
+            (RailWidth + Cutout).value,
+            rule
+                .onNodeWithTag(BODY)
+                .getBoundsInRoot()
+                .left.value,
+            TOLERANCE,
+        )
+    }
+
+    @Test
+    fun `a start cutout with no rail is still reserved`() {
+        rule.setContent {
+            Theme {
+                WithStartCutout(Cutout) {
+                    BingeScreenScaffold(title = "Requests", bar = ScreenBar.Small) { padding ->
+                        val start = padding.calculateStartPadding(LocalLayoutDirection.current)
+                        Box(Modifier.padding(start = start).testTag(BODY).fillMaxSize())
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertEquals(
+            Cutout.value,
+            rule
+                .onNodeWithTag(BODY)
+                .getBoundsInRoot()
+                .left.value,
+            TOLERANCE,
+        )
+    }
+
     private fun contentInset(): Dp {
         val resources = RuntimeEnvironment.getApplication().resources
         return (resources.getDimension(R.dimen.screen_content_inset) / resources.displayMetrics.density).dp
@@ -128,4 +182,11 @@ private fun Theme(content: @Composable () -> Unit) = BingeExpressiveTheme(dynami
 private fun WithStartNavigationBar(width: Dp, content: @Composable () -> Unit) =
     WithWindowInsets({
         WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(width.roundToPx(), 0, 0, 0)).build()
+    }, content)
+
+/** Gives the window a display cutout [width] wide on the start edge. */
+@Composable
+private fun WithStartCutout(width: Dp, content: @Composable () -> Unit) =
+    WithWindowInsets({
+        WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.displayCutout(), Insets.of(width.roundToPx(), 0, 0, 0)).build()
     }, content)

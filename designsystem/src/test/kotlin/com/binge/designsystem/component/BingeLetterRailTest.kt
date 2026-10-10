@@ -64,32 +64,31 @@ class BingeLetterRailTest {
         }
 
     /**
-     * Every letter after the first fires once. The first one fires twice today, because the press that
-     * picked it is cancelled when the drag takes over and clears the dedupe (#466); this does not pin that.
+     * Each letter fires once per drag, the first included: the press that picked it is cancelled when the drag
+     * takes over, and that cancel must not clear the drag's dedupe (#466).
      */
-    private fun assertEachAfterFirstOnce(order: List<Char>, drags: Int = 1) {
-        assertEquals(order, picked.distinct())
-        order.drop(1).forEach { letter -> assertEquals("$letter", drags, picked.count { it == letter }) }
+    private fun assertEachOnce(order: List<Char>, drags: Int = 1) {
+        assertEquals(List(drags) { order }.flatten(), picked)
     }
 
     @Test
-    fun `dragging down the rail jumps to each letter in order, once each after the first`() {
+    fun `dragging down the rail jumps to each letter in order, once each`() {
         showRail()
 
         rule.onRoot().performTouchInput { swipeDown() }
         rule.waitForIdle()
 
-        assertEachAfterFirstOnce(listOf('A', 'B', 'C', 'D'))
+        assertEachOnce(listOf('A', 'B', 'C', 'D'))
     }
 
     @Test
-    fun `dragging back up the rail jumps to each letter in order, once each after the first`() {
+    fun `dragging back up the rail jumps to each letter in order, once each`() {
         showRail()
 
         rule.onRoot().performTouchInput { swipeUp() }
         rule.waitForIdle()
 
-        assertEachAfterFirstOnce(listOf('D', 'C', 'B', 'A'))
+        assertEachOnce(listOf('D', 'C', 'B', 'A'))
     }
 
     @Test
@@ -101,6 +100,6 @@ class BingeLetterRailTest {
         rule.onRoot().performTouchInput { swipeDown() }
         rule.waitForIdle()
 
-        assertEachAfterFirstOnce(listOf('A', 'B', 'C', 'D'), drags = 2)
+        assertEachOnce(listOf('A', 'B', 'C', 'D'), drags = 2)
     }
 }

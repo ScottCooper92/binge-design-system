@@ -16,6 +16,7 @@ private val heroSamples = listOf(
         year = "2010",
         runtimeMinutes = 148,
         tagline = "Your mind is the scene of the crime.",
+        rank = 1,
     ),
     HeroItem(
         id = 2,
@@ -23,6 +24,7 @@ private val heroSamples = listOf(
         title = "Interstellar",
         rating = 8.6f,
         genres = listOf("Sci-Fi", "Drama"),
+        rank = 2,
     ),
 )
 

@@ -40,8 +40,9 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── theme/       BingeColors, BingeShapes, the expressive theme, typography, contrast
 ├── component/   the shared M3 components: the nav shell, buttons, chips, top bars, sheets, cards,
 │                rows, tiles, the hero carousel, the skeletons
-├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel, the
-│                          relative-or-absolute date formatter and month names
+├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel,
+│                          formatRuntime, the relative-or-absolute date formatter and month
+│                          names
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state and the shared aspect ratios
 ├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders,
@@ -196,6 +197,19 @@ to `settings.gradle.kts` and nothing else.
 A submodule pins a commit, so a consumer updates deliberately — `git submodule update --remote` —
 rather than being moved by whatever landed here today. That is the property that makes source-level
 sharing survivable across three repositories.
+
+## Test fixtures
+
+Both modules ship `testFixtures` for a consumer's Robolectric tests. Depend on them with
+`testImplementation(testFixtures("com.binge:designsystem"))` and the same for `designsystem-tv`. They are the one copy:
+a consumer keeps no wrappers of its own.
+
+- `designsystem`: `createKeyboardComposeRule()`, for a test that drives focus with keys; the take-down rules
+  (`createTakeDownComposeRule()` and its keyboard and activity forms), for a suite that collects `LazyPagingItems`;
+  `ShadowMeshSpecification`; and the skeleton-geometry helpers.
+- `designsystem-tv`: `LeanbackRule`, which makes the device a TV so the pivot scroll applies; `settle()`, with
+  `SETTLED_FOCUS_WAIT_MILLIS` and `ANCHOR_COALESCE_WAIT_MILLIS` for the immersive pages' debounce and coalesce
+  windows; and `TvLateTarget`.
 
 ## Licence
 

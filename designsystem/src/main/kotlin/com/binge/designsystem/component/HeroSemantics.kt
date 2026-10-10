@@ -19,9 +19,9 @@ import com.binge.designsystem.formatRating
  * of which says what title it belongs to.
  */
 @Composable
-internal fun heroContentDescription(item: HeroItem, rank: Int): String {
+internal fun heroContentDescription(item: HeroItem): String {
     val separator = stringResource(R.string.list_separator)
-    val trending = stringResource(R.string.hero_trending_today, rank)
+    val trending = item.rank?.let { stringResource(R.string.hero_trending_today, it) }
     val rating = item.rating?.let { stringResource(R.string.cd_rating_out_of_ten, it.formatRating()) }
     val genres = item.genres
         .take(MAX_META_GENRES)

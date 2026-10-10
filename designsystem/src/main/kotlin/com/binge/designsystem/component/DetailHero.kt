@@ -102,6 +102,9 @@ fun DetailHero(
     // Drawn under the title (and under the tagline and meta line, when set), for a hero whose facts are
     // chips rather than the one line of text [metaText] takes.
     metaContent: (@Composable () -> Unit)? = null,
+    // Replaces the text title, for a hero that shows a title logo. The caller owns loading and tinting,
+    // and gives it a fixed height so text and logo swap without moving the layout.
+    titleContent: (@Composable () -> Unit)? = null,
 ) {
     val eyebrowText = eyebrow?.takeIf { it.isNotBlank() }
         ?: genres.takeIf { it.isNotEmpty() }?.joinToString(" · ")
@@ -147,6 +150,7 @@ fun DetailHero(
             metaText = metaText,
             eyebrowText = eyebrowText,
             metaContent = metaContent,
+            titleContent = titleContent,
             modifier = Modifier.align(Alignment.BottomStart),
         )
     }
@@ -224,6 +228,7 @@ private fun HeroTextColumn(
     metaText: String,
     eyebrowText: String?,
     metaContent: (@Composable () -> Unit)?,
+    titleContent: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -238,14 +243,18 @@ private fun HeroTextColumn(
     ) {
         val titleStyle = MaterialTheme.typography.displaySmall
         val lineGap = dimensionResource(R.dimen.padding_xs)
-        Text(
-            text = title,
-            style = titleStyle,
-            color = MaterialTheme.colorScheme.onBackground,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            autoSize = OneLineOrWrapAutoSize(max = titleStyle.fontSize, min = HERO_TITLE_MIN_SIZE, step = HeroTitleSizeStep),
-        )
+        if (titleContent != null) {
+            titleContent()
+        } else {
+            Text(
+                text = title,
+                style = titleStyle,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                autoSize = OneLineOrWrapAutoSize(max = titleStyle.fontSize, min = HERO_TITLE_MIN_SIZE, step = HeroTitleSizeStep),
+            )
+        }
         if (!eyebrowText.isNullOrBlank()) {
             Spacer(Modifier.height(lineGap))
             Text(

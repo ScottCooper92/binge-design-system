@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRuntime
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
@@ -48,7 +49,6 @@ private const val HERO_META_DOT_ALPHA = 0.45f
 
 /** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
 private val HERO_TITLE_MIN_SIZE = 28.sp
-private const val MINUTES_PER_HOUR = 60
 internal const val MAX_META_GENRES = 2
 
 /**
@@ -97,7 +97,7 @@ internal fun BoxScope.HeroCopyHuggingScrim(bounds: HeroCopyBounds) {
 }
 
 /**
- * Start-anchored cinematic copy: trending pill, title, optional tagline, meta row, actions slot. The
+ * Start-anchored cinematic copy: trending pill (for a ranked item), title, optional tagline, meta row, actions slot. The
  * still behind it runs to the panel edge under an overlaying rail; the copy does not, so it takes the
  * nav overlay's start inset on top of its own padding. [R.dimen.hero_copy_max_width] caps the copy
  * itself, inside those insets, so a wide rail inset does not squeeze the title.
@@ -107,7 +107,6 @@ internal fun BoxScope.HeroCopyHuggingScrim(bounds: HeroCopyBounds) {
 @Composable
 internal fun BoxScope.HeroCopyOverlay(
     item: HeroItem,
-    rank: Int,
     heroActions: @Composable (HeroItem) -> Unit,
     onCopyBounds: (HeroCopyBounds) -> Unit = {},
 ) {
@@ -126,7 +125,7 @@ internal fun BoxScope.HeroCopyOverlay(
         // The backdrop button behind it announces all of this copy (heroContentDescription), so the
         // copy stays visual-only. HeroActions is outside: those are controls, not the hero's name.
         Column(modifier = Modifier.clearAndSetSemantics {}) {
-            HeroTrendingPill(rank = rank)
+            item.rank?.let { HeroTrendingPill(rank = it) }
             HeroTitle(title = item.title)
             item.tagline?.let { HeroTagline(it) }
             HeroMetaRow(item = item)
@@ -247,11 +246,7 @@ private fun HeroMetaRow(item: HeroItem) {
 @Composable
 fun heroRuntimeOrSeasons(item: HeroItem): String? =
     when {
-        item.runtimeMinutes != null -> stringResource(
-            R.string.hero_meta_runtime,
-            item.runtimeMinutes / MINUTES_PER_HOUR,
-            item.runtimeMinutes % MINUTES_PER_HOUR,
-        )
+        item.runtimeMinutes != null -> formatRuntime(item.runtimeMinutes)
         item.seasons != null ->
             pluralStringResource(R.plurals.hero_meta_seasons, item.seasons, item.seasons)
         else -> null

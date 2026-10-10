@@ -29,4 +29,12 @@ class DetailCinematicHeaderSamplesScreenshotTest {
     fun Tagline() {
         DetailCinematicHeaderTaglineSample()
     }
+
+    @PreviewTest
+    @Preview(name = "logo-light", widthDp = CINEMATIC_PREVIEW_WIDTH_DP, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "logo-dark", widthDp = CINEMATIC_PREVIEW_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun TitleContent() {
+        DetailCinematicHeaderTitleContentSample()
+    }
 }
