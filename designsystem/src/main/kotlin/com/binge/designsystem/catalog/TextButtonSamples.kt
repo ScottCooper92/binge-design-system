@@ -16,7 +16,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
  * Every state of [BingeTextButton] in one list, each button labelled with the state it is in, so the
- * sample says what it shows without a caption: enabled, disabled, destructive, with a leading icon,
+ * sample says what it shows without a caption: enabled, disabled, loading, destructive, with a leading icon,
  * with a trailing one (the glyph for a destination outside the app), and the icon-only collapse that
  * `showLabel = false` switches to.
  */
@@ -28,6 +28,7 @@ fun TextButtonSample() {
         ) {
             BingeTextButton(label = "Enabled", onClick = {})
             BingeTextButton(label = "Disabled", onClick = {}, enabled = false)
+            BingeTextButton(label = "Loading", onClick = {}, loading = true)
             BingeTextButton(label = "Destructive", onClick = {}, destructive = true)
             BingeTextButton(label = "Leading icon", onClick = {}, leadingIcon = Icons.Filled.Block)
             BingeTextButton(label = "Trailing icon", onClick = {}, trailingIcon = Icons.AutoMirrored.Filled.OpenInNew)
