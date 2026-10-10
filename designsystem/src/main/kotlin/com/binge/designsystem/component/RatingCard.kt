@@ -48,6 +48,12 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.labelLargeEmphasis
 
 /**
+ * The alpha the card's secondary text takes over its content colour. 0.74 is the lowest that keeps it above 4.5:1 on
+ * both the rated and the unrated container in both themes; `TokenContrastTest` measures the composited pairs.
+ */
+internal const val RATING_CARD_SECONDARY_ALPHA = 0.74f
+
+/**
  * Condensed rate-this-title card. Shows an interactive star picker when unrated, the
  * user's score with an inline editor when rated, and — when the title has community
  * reviews — a footer that links through to the reviews screen.
@@ -199,7 +205,7 @@ private fun RatedBody(
                 Text(
                     text = stringResource(R.string.rating_card_your_rating),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = contentColor.copy(alpha = 0.7f),
+                    color = contentColor.copy(alpha = RATING_CARD_SECONDARY_ALPHA),
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
                 Row(
@@ -215,7 +221,7 @@ private fun RatedBody(
                         Text(
                             text = stringResource(R.string.rating_card_score_suffix),
                             style = MaterialTheme.typography.titleSmall,
-                            color = contentColor.copy(alpha = 0.6f),
+                            color = contentColor.copy(alpha = RATING_CARD_SECONDARY_ALPHA),
                         )
                     }
                     StarRating(rating = userRating)
@@ -250,7 +256,7 @@ private fun RatedBody(
                 Text(
                     text = stringResource(R.string.rating_card_change_title),
                     style = MaterialTheme.typography.labelMedium,
-                    color = contentColor.copy(alpha = 0.7f),
+                    color = contentColor.copy(alpha = RATING_CARD_SECONDARY_ALPHA),
                 )
                 StarRating(
                     rating = userRating,
@@ -318,7 +324,7 @@ private fun ReviewsFooter(
                         stringResource(subtitleNoAverage)
                     },
                 style = MaterialTheme.typography.bodySmall,
-                color = contentColor.copy(alpha = 0.66f),
+                color = contentColor.copy(alpha = RATING_CARD_SECONDARY_ALPHA),
             )
         }
         Icon(
