@@ -15,21 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeSentiment
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.accent
 import com.binge.designsystem.theme.fill
-
-/**
- * The wash behind a chip's label: the sentiment's own hue at low alpha. Lighter in a light theme, where the accents are
- * darker for contrast, so a paler wash keeps every label clear of WCAG AA.
- */
-private const val STATUS_CHIP_TINT_ALPHA_LIGHT = 0.12f
-private const val STATUS_CHIP_TINT_ALPHA_DARK = 0.16f
-private const val DARK_SURFACE_LUMINANCE = 0.5f
+import com.binge.designsystem.theme.tonalContainer
 
 /** The ring around the dot: the same fill at low alpha, so a solid dot nests in a soft halo. */
 private const val STATUS_CHIP_DOT_HALO_ALPHA = 0.30f
@@ -42,6 +34,8 @@ private const val STATUS_CHIP_DOT_HALO_ALPHA = 0.30f
  *
  * The consumer maps its own states onto [BingeSentiment], one line per state, so the same state reads the same in
  * every app.
+ *
+ * The wash is lighter in a light theme, where the accents are darker for contrast, so every label stays clear of WCAG AA.
  */
 @Composable
 fun StatusChip(
@@ -51,17 +45,11 @@ fun StatusChip(
     showDot: Boolean = true,
 ) {
     val accent = sentiment.accent()
-    val tintAlpha =
-        if (MaterialTheme.colorScheme.surface.luminance() < DARK_SURFACE_LUMINANCE) {
-            STATUS_CHIP_TINT_ALPHA_DARK
-        } else {
-            STATUS_CHIP_TINT_ALPHA_LIGHT
-        }
     Row(
         modifier =
             modifier
                 .clip(BingeShapes.Pill)
-                .background(accent.copy(alpha = tintAlpha))
+                .background(accent.tonalContainer())
                 .padding(
                     horizontal = dimensionResource(R.dimen.status_chip_padding_h),
                     vertical = dimensionResource(R.dimen.status_chip_padding_v),
