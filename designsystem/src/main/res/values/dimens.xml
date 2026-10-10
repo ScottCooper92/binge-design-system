@@ -135,11 +135,6 @@
     -->
     <dimen name="pane_inner_inset">8dp</dimen>
     <!--
-      The spacer a list-detail scene puts between its panes, in place of Material adaptive's own 24dp.
-      Added to both panes' pane_inner_inset, it is the whole visible gap between their content.
-    -->
-    <dimen name="pane_spacer">8dp</dimen>
-    <!--
       Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it
       (#819). Below this the crease is close enough to the bottom edge that honouring it would leave a
       sheet too short to use, so it is ignored and the sheet keeps its own height.
@@ -244,8 +239,6 @@
          it lands, not a chip row too high). -->
     <dimen name="skeleton_filter_chip_height">44dp</dimen>
     <dimen name="skeleton_filter_chip_width">88dp</dimen>
-    <!-- Hub screens layout rhythm -->
-    <dimen name="hub_content_spacing">24dp</dimen>
     <!-- Rating chip -->
     <dimen name="rating_chip_padding_h">8dp</dimen>
     <dimen name="rating_chip_padding_v">4dp</dimen>
@@ -283,22 +276,10 @@
     <dimen name="detail_cinematic_poster_width">196dp</dimen>
     <dimen name="detail_cinematic_poster_copy_spacing">28dp</dimen>
     <dimen name="detail_cinematic_copy_spacing">16dp</dimen>
-    <dimen name="cast_card_width">96dp</dimen>
     <dimen name="cast_avatar_size">80dp</dimen>
-    <!-- Person detail profile section -->
-    <dimen name="person_profile_poster_width">140dp</dimen>
-    <dimen name="person_profile_gap">16dp</dimen>
-    <dimen name="person_profile_padding_h">20dp</dimen>
-    <dimen name="person_profile_padding_top">8dp</dimen>
     <!-- Clears the floating glass back/share control row (top_bar_icon_size + 2*padding_s) so the
          bounded profile body isn't occluded by it; applied on top of the consumed status-bar inset. -->
     <dimen name="person_profile_top_bar_offset">64dp</dimen>
-    <!-- DetailOverlayTopBar's heroHeight for the person page: person_profile_top_bar_offset +
-         person_profile_padding_top + the profile poster's own height (person_profile_poster_width
-         at CARD_ASPECT_RATIO), rounded. The person page has no backdrop hero — this is the shortest
-         of the five DetailOverlayTopBar callers, so the title fades in as the name scrolls off
-         rather than at the media pages' much taller default. -->
-    <dimen name="person_detail_hero_height">280dp</dimen>
     <!-- Episode list row: the backdrop still's width (the rest of the chrome comes from ListRow). -->
     <dimen name="episode_row_still_width">132dp</dimen>
     <dimen name="icon_size_m">18dp</dimen>
@@ -327,9 +308,6 @@
     <!-- Between a row's text and a control at its end (a switch, a checkbox, a radio, a trailing slot): wider than the
          gap after a leading icon, so a long label does not run up to the control. A consumer's own rows can match it. -->
     <dimen name="row_trailing_control_gap">24dp</dimen>
-    <!-- Catalog samples — bounded height for full-screen samples (state/gate screens, skeletons) so a
-         fillMaxSize surface has a height to fill inside the wrap-content screenshot canvas. -->
-    <dimen name="catalog_screen_preview_height">640dp</dimen>
     <!-- Avatar diameter for the account item in the bottom bar / floating bar (matches the icon box). -->
     <dimen name="nav_item_avatar_size">26dp</dimen>
     <!-- Bespoke expanded rail (landscape tablet). M3's collapsed rail width, kept rather than

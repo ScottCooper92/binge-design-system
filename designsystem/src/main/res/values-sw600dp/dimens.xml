@@ -9,5 +9,4 @@
          faces are what the section is for. Width moves with the avatar so the name and character keep
          their measure, and the detail skeleton's plates follow it. -->
     <dimen name="cast_avatar_size">112dp</dimen>
-    <dimen name="cast_card_width">128dp</dimen>
 </resources>
