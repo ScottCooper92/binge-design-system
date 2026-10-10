@@ -217,6 +217,23 @@ class BingeChoiceSheetTest {
         assertEquals(1, opened)
     }
 
+    /** The restored sheet state was saved under the decision it opened with, so a recreation keeps it (#441). */
+    @Test
+    fun `the part-way decision survives a recreation after the list changes length`() {
+        val restoration = StateRestorationTester(rule)
+        var choices: BingeChoiceList<Int> by mutableStateOf(BingeChoiceList.Ready(listOf(BingeChoice(1, "One"))))
+        var partWay: Boolean? = null
+        restoration.setContent { partWay = rememberOpensPartWay(choices) }
+        rule.waitForIdle()
+        assertEquals(false, partWay)
+
+        choices = many
+        restoration.emulateSavedInstanceStateRestore()
+        rule.waitForIdle()
+
+        assertEquals(false, partWay)
+    }
+
     @Test
     fun a_row_restored_open_runs_onOpen_again() {
         val restoration = StateRestorationTester(rule)

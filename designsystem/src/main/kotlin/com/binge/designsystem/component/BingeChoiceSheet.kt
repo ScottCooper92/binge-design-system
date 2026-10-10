@@ -117,6 +117,13 @@ internal fun BingeChoiceList<*>.opensPartWay(): Boolean =
     }
 
 /**
+ * [opensPartWay] for the list a sheet opened with, kept across a recreation: the restored sheet state was saved under
+ * that decision, so recomputing it from a list that has since changed length would give flags that no longer match.
+ */
+@Composable
+internal fun rememberOpensPartWay(choices: BingeChoiceList<*>): Boolean = rememberSaveable { choices.opensPartWay() }
+
+/**
  * A pick of one value from a list. The choices are radio rows, and picking one applies it and closes the sheet.
  *
  * A list of [LONG_LIST_THRESHOLD] or more is sectioned: **Current** (the [selected] choice), **Suggested** ([suggested],
@@ -142,7 +149,7 @@ fun <T> BingeChoiceSheet(
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
 ) {
-    val partWay = remember { choices.opensPartWay() }
+    val partWay = rememberOpensPartWay(choices)
     BingeBottomSheet(
         onDismissRequest = onDismiss,
         modifier = modifier,
@@ -202,7 +209,7 @@ fun <T> BingeMultiChoiceSheet(
     draftSaver: Saver<Set<T>, out Any>? = null,
     applyAsPicked: Boolean = false,
 ) {
-    val partWay = remember { choices.opensPartWay() }
+    val partWay = rememberOpensPartWay(choices)
     // Without a saver, nothing is saved, so the ticks start again from [selected].
     var draft by rememberSaveable(
         stateSaver = draftSaver ?: Saver<Set<T>, Any>(save = {
