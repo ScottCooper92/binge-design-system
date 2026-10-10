@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.union
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
@@ -28,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeTheme
 
@@ -154,6 +158,8 @@ fun BingeMediumTopBar(
                     }
                 }
             },
+            // The sides the scaffold body clears, cutout included, so the title and actions line up with it.
+            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             // Only an explicit container overrides M3's medium-bar defaults. Routing an unspecified one
             // through bingeTopBarColors would restyle every existing caller: it resolves to `background`
             // and flattens the scrolled state, which is BingeTopBar's decision to make, not this bar's.
