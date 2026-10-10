@@ -545,6 +545,26 @@ fun TvSideSheetConfirmSample() {
     }
 }
 
+/** The confirm step for an action that asks first but destroys nothing: the confirm row is not in the error colour. */
+@Composable
+fun TvSideSheetConfirmNeutralSample() {
+    val entry = remember { FocusRequester() }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetConfirm(
+                title = "Retry this request?",
+                message = "It is sent to the server again.",
+                confirmLabel = "Retry",
+                onConfirm = {},
+                onCancel = {},
+                entryFocus = entry,
+                cancelInitiallyFocused = true,
+                destructive = false,
+            )
+        }
+    }
+}
+
 /** The hand-off card: the code to scan, what to do with it, a PIN to type and the address to open by hand. */
 @Composable
 fun TvPairingCardSample() {
