@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
@@ -44,13 +45,14 @@ fun SectionHeader(
     trailingContent: (@Composable () -> Unit)? = null,
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
     startPadding: Dp = horizontalPadding + navOverlayStart(),
+    endPadding: Dp = horizontalPadding + navOverlayEnd(),
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(
                 start = startPadding,
-                end = horizontalPadding,
+                end = endPadding,
                 top = dimensionResource(R.dimen.section_header_padding_v),
                 bottom = dimensionResource(R.dimen.section_header_padding_v),
             )
