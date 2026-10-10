@@ -20,8 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.shortMonthName
@@ -31,6 +33,38 @@ import java.util.Locale
 
 private const val MONTH_COLUMNS = 3
 private const val YEAR_COLUMNS = 3
+private const val MONTH_ROWS = 12 / MONTH_COLUMNS
+
+/**
+ * The height the grids share: four rows of month cells, never less than the design height. A cell is its
+ * label's line plus padding, or the touch target, whichever is taller, so the box grows with the font size
+ * instead of clipping the last row. Both grids get it, so the dialog does not resize when the years open.
+ */
+@Composable
+internal fun monthGridHeight(): Dp {
+    val lineHeight = with(LocalDensity.current) {
+        MaterialTheme.typography.bodyLarge.lineHeight
+            .toDp()
+    }
+    return monthGridHeight(
+        lineHeight = lineHeight,
+        cellMin = dimensionResource(R.dimen.min_touch_target),
+        cellPadding = dimensionResource(R.dimen.padding_s),
+        gap = dimensionResource(R.dimen.padding_s),
+        floor = dimensionResource(R.dimen.month_year_picker_grid_height),
+    )
+}
+
+internal fun monthGridHeight(
+    lineHeight: Dp,
+    cellMin: Dp,
+    cellPadding: Dp,
+    gap: Dp,
+    floor: Dp,
+): Dp {
+    val row = maxOf(cellMin, lineHeight + cellPadding * 2)
+    return maxOf(floor, row * MONTH_ROWS + gap * (MONTH_ROWS - 1))
+}
 
 @Composable
 internal fun MonthGrid(

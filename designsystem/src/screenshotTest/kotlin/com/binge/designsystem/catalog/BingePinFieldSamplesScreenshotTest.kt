@@ -3,8 +3,9 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.LargestFontPreview
 
-/** Screenshot coverage for the PIN field's catalog samples: part-typed, and marked after a wrong PIN. */
+/** Screenshot coverage for the PIN field's catalog samples: part-typed, marked after a wrong PIN, and at the largest font size. */
 class BingePinFieldSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
@@ -18,5 +19,12 @@ class BingePinFieldSamplesScreenshotTest {
     @Composable
     fun Wrong() {
         BingePinFieldErrorSample()
+    }
+
+    @PreviewTest
+    @LargestFontPreview
+    @Composable
+    fun TypingLargestFont() {
+        BingePinFieldSample()
     }
 }

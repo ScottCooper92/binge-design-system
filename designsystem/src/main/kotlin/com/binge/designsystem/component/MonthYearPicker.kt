@@ -140,7 +140,7 @@ internal fun MonthYearPickerContent(
                         onStep = { onSelectionChange(selection.stepYear(it, range, defaultYear)) },
                     )
                 }
-                Box(modifier = Modifier.fillMaxWidth().height(dimensionResource(R.dimen.month_year_picker_grid_height))) {
+                Box(modifier = Modifier.fillMaxWidth().height(monthGridHeight())) {
                     if (mode == MonthYearPickerMode.Month || (mode == MonthYearPickerMode.MonthAndYear && !yearsOpen)) {
                         MonthGrid(
                             selected = selection.month,

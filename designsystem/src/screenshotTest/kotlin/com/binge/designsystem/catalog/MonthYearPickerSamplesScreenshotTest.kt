@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.LargestFontPreview
 
 class MonthYearPickerSamplesScreenshotTest {
     @PreviewTest
@@ -23,6 +24,13 @@ class MonthYearPickerSamplesScreenshotTest {
     @ComponentPreviews
     @Composable
     fun Month() {
+        MonthYearPickerMonthSample()
+    }
+
+    @PreviewTest
+    @LargestFontPreview
+    @Composable
+    fun MonthLargestFont() {
         MonthYearPickerMonthSample()
     }
 
