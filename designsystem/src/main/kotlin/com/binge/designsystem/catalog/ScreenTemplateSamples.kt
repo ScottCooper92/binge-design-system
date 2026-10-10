@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -39,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
@@ -51,6 +54,7 @@ import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.ListRow
 import com.binge.designsystem.component.ListRowSkeletonColumn
+import com.binge.designsystem.component.MediaCardSkeleton
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.BingeScreenScaffold
 import com.binge.designsystem.template.DecisionScreen
@@ -65,6 +69,7 @@ import com.binge.designsystem.template.HeroDetailLazyScreen
 import com.binge.designsystem.template.HeroDetailScreen
 import com.binge.designsystem.template.HeroDetailStateScreen
 import com.binge.designsystem.template.LoadingMessageScreen
+import com.binge.designsystem.template.LocalHeroReadingMargin
 import com.binge.designsystem.template.MessageScreen
 import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.template.ScreenBar
@@ -83,6 +88,7 @@ private const val SAMPLE_ROWS = 14
 private const val SAMPLE_STEPS = 3
 private const val SAMPLE_GRID_COLUMNS = 3
 private const val SAMPLE_GRID_TILES = 24
+private const val BLEED_RAIL_CARDS = 10
 
 /** A collapsing-bar screen over a list: the bar scrims in as rows pass under it. */
 @Composable
@@ -286,6 +292,41 @@ fun HeroDetailScreenSample() {
             },
         ) {
             SampleCopy()
+        }
+    }
+}
+
+/**
+ * A page whose rail bleeds to the window's edge: unbounded content, the copy padded by the reading margin so it lines
+ * up with a bounded page's, and the rail starting at the same margin and running out past the window's end.
+ */
+@Composable
+fun HeroDetailScreenBleedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailScreen(
+            title = "A title",
+            onBack = LocalDemoBack.current,
+            contentMaxWidth = Dp.Infinity,
+            hero = {
+                DetailHero(
+                    title = "A title",
+                    backdropUrl = null,
+                    tagline = "The line a poster would carry.",
+                    metaText = "2026 · 1h 52m",
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            val margin = LocalHeroReadingMargin.current
+            Box(modifier = Modifier.padding(horizontal = margin)) { SampleCopy() }
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = margin + dimensionResource(R.dimen.padding_m)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
+                userScrollEnabled = false,
+            ) {
+                items(BLEED_RAIL_CARDS) { MediaCardSkeleton(Modifier.width(dimensionResource(R.dimen.card_width))) }
+            }
         }
     }
 }
