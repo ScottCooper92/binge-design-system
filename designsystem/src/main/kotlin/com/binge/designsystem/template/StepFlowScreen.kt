@@ -10,6 +10,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -44,11 +45,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.centredReadingColumn
-import com.binge.designsystem.isExpandedLayout
-import com.binge.designsystem.isLandscape
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.uppercaseLocalised
@@ -61,10 +63,13 @@ private const val STEP_SLIDE_MILLIS = 280
  * A multi-step flow on a phone, foldable or tablet: back and a step read-out at the top, the step below, and
  * its commit in a [footer] pinned under it. For onboarding, setup, and a consent prompt.
  *
- * Portrait stacks the [aside] (an illustration), the [heading] and the [content] in one scroll. A landscape or
- * expanded window has the width and not the height, so the aside, heading and footer go on one side and the
- * content scrolls on the other. Back shows from the second step, and BACK, predictive back included, steps
- * back too. [loading] replaces the step with a centred indicator. The read-out is hidden for a single-step flow.
+ * A tall space stacks the [aside] (an illustration), the [heading] and the [content] in one scroll. A space that is
+ * wider than it is tall, or expanded, puts the aside, heading and footer on one side and scrolls the content on the
+ * other. The choice reads the space the flow is given, not the window, so a flow in a narrow pane stacks.
+ *
+ * Back shows from the second step, and BACK, predictive back included, steps back too. A flow opened from inside the
+ * app passes [onExit], which gives the first step a Back that leaves, and a [title] for its bar, so the flow has one
+ * bar and one Back. [loading] replaces the step with a centred indicator. The read-out is hidden for a single-step flow.
  *
  * Each slot is handed the step it draws, and should branch on that rather than on [currentStep]: changing step
  * slides the whole step across, and the outgoing one must keep drawing itself while it leaves. A step whose
@@ -82,9 +87,11 @@ fun StepFlowScreen(
     heading: (@Composable (step: Int) -> Unit)? = null,
     aside: (@Composable ColumnScope.(step: Int) -> Unit)? = null,
     footer: (@Composable ColumnScope.(step: Int) -> Unit)? = null,
+    title: String? = null,
+    onExit: (() -> Unit)? = null,
     content: @Composable ColumnScope.(step: Int) -> Unit,
 ) {
-    val back = onBack.takeIf { currentStep > 0 }
+    val back = if (currentStep > 0) onBack else onExit
     StepBackHandler(back)
     // systemBars + displayCutout rather than safeDrawing, so a step raising the keyboard does not shift the
     // chrome: a step with a text field owns its own imePadding, and a footer rides above the keyboard.
@@ -95,19 +102,28 @@ fun StepFlowScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout)),
     ) {
-        StepChrome(stepCount = stepCount, currentStep = currentStep, onBack = back)
-        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+        StepChrome(stepCount = stepCount, currentStep = currentStep, onBack = back, title = title)
+        val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            val split = splitsStep(maxWidth, maxHeight, expandedWidth)
             if (loading) {
                 LoadingMessageScreen()
             } else {
                 StepTransition(currentStep) { step ->
                     val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
-                    if (isLandscape() || isExpandedLayout()) SplitStep(slots) else StackedStep(slots)
+                    if (split) SplitStep(slots) else StackedStep(slots)
                 }
             }
         }
     }
 }
+
+/** Whether a step given [width] by [height] splits: when the space is wider than tall, or at least [expandedWidth]. */
+internal fun splitsStep(
+    width: Dp,
+    height: Dp,
+    expandedWidth: Dp,
+): Boolean = width > height || width >= expandedWidth
 
 /** The kicker, title and subtitle a step opens with. */
 @Composable
@@ -236,12 +252,16 @@ private fun StepFooter(footer: @Composable ColumnScope.() -> Unit) {
     )
 }
 
-/** Back on the start edge, the dots centred, and an empty box on the end edge so the dots stay centred. */
+/**
+ * Back on the start edge, the dots centred, and an empty box on the end edge so the dots stay centred. With a
+ * [title], the title takes the middle and the dots move to the end.
+ */
 @Composable
 private fun StepChrome(
     stepCount: Int,
     currentStep: Int,
     onBack: (() -> Unit)?,
+    title: String?,
 ) {
     val slot = dimensionResource(R.dimen.step_chrome_height)
     Row(
@@ -259,16 +279,37 @@ private fun StepChrome(
                 }
             }
         }
-        val progress = stringResource(R.string.cd_step_progress, currentStep + 1, stepCount)
-        Row(
-            // The dots draw no text, so the row names the step for a screen reader in their place.
-            modifier = Modifier.weight(1f).then(if (stepCount > 1) Modifier.semantics { contentDescription = progress } else Modifier),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.step_dot_spacing), Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (stepCount > 1) repeat(stepCount) { index -> StepDot(reached = index <= currentStep, current = index == currentStep) }
+        if (title != null) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f).semantics { heading() },
+            )
+            StepDots(stepCount, currentStep)
+        } else {
+            StepDots(stepCount, currentStep, Modifier.weight(1f))
+            Box(Modifier.size(slot))
         }
-        Box(Modifier.size(slot))
+    }
+}
+
+@Composable
+private fun StepDots(
+    stepCount: Int,
+    currentStep: Int,
+    modifier: Modifier = Modifier,
+) {
+    val progress = stringResource(R.string.cd_step_progress, currentStep + 1, stepCount)
+    Row(
+        // The dots draw no text, so the row names the step for a screen reader in their place.
+        modifier = modifier.then(if (stepCount > 1) Modifier.semantics { contentDescription = progress } else Modifier),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.step_dot_spacing), Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (stepCount > 1) repeat(stepCount) { index -> StepDot(reached = index <= currentStep, current = index == currentStep) }
     }
 }
 
