@@ -26,9 +26,9 @@ import com.binge.designsystem.uppercaseLocalised
  * fixed classifications like media type, issue type, or a user role (distinct from
  * [StatusChip], which is the rounded *status* pill with a dot).
  *
- * [tint] paints a same-hue wash behind a saturated label + icon (pass one of the AA-tuned
- * `BingeTheme.colors.status*` accents); a null [tint] is neutral — a `surfaceContainerHigh` wash
- * with `onSurfaceVariant` text. [uppercase] (default) matches the design's type tags (MOVIE,
+ * [tint] paints a same-hue wash behind a saturated label + icon (pass a `BingeSentiment.accent()`
+ * for [tint], and its `fill()` for [fill]); a null [tint] is neutral — a `surfaceContainerHigh`
+ * wash with `onSurfaceVariant` text. [uppercase] (default) matches the design's type tags (MOVIE,
  * VIDEO…); pass `false` for cased labels such as roles (Owner / Admin).
  */
 @Composable
