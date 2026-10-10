@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -20,6 +21,8 @@ import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
@@ -35,6 +38,7 @@ import org.robolectric.annotation.Config
 private const val HOME = "home"
 private const val SETTINGS = "settings"
 private const val CONTENT = "content"
+private const val OVERLAY = "overlay"
 
 /** [TvShellScaffold]'s Back rule: content to the rail, the rail to home, home to the caller. */
 @RunWith(RobolectricTestRunner::class)
@@ -117,5 +121,19 @@ class TvShellScaffoldTest {
         show(selectedKey = HOME, overlay = { hostedAsOverlay = LocalTvHostedAsOverlay.current })
 
         assertTrue(hostedAsOverlay)
+    }
+
+    @Test
+    fun `an overlay holds directional focus`() {
+        show(selectedKey = HOME, overlay = {
+            Box(Modifier.size(40.dp).testTag(OVERLAY).focusable())
+        })
+        rule.onNodeWithTag(OVERLAY).requestFocus()
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(OVERLAY).performKeyInput { pressKey(Key.DirectionLeft) }
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(OVERLAY).assertIsFocused()
     }
 }

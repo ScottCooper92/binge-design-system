@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import com.binge.designsystem.tv.focus.tvExitFocusGroup
 import kotlinx.coroutines.delay
 
 /**
@@ -29,8 +30,9 @@ const val TV_SHELL_CONTENT_SETTLE_MILLIS = 220L
  *
  * Back with focus in the content moves focus onto the rail. Back on the rail, off [homeKey], selects home.
  * Back on the rail at home calls [onBackAtRoot], or leaves the app when that is null. An open [overlay], or
- * a handler composed inside [content] (a destination's own back stack), takes Back first. The overlay is
- * hosted with [LocalTvHostedAsOverlay] set, so its boards carry their own overscan.
+ * a handler composed inside [content] (a destination's own back stack), takes Back first. The overlay traps
+ * directional focus, so it cannot drift onto the rail or content beneath it; its own ← or Back handler is
+ * the way out. It is hosted with [LocalTvHostedAsOverlay] set, so its boards carry their own overscan.
  *
  * Keys are saved in a Bundle, so each item's key must be one: a String or an enum. [content] follows the
  * rail after [settleMillis], so walking the rail does not mount every destination it passes.
@@ -85,7 +87,7 @@ fun TvShellScaffold(
         }
         overlay?.let {
             CompositionLocalProvider(LocalTvHostedAsOverlay provides true) {
-                Box(modifier = Modifier.fillMaxSize(), content = it)
+                Box(modifier = Modifier.fillMaxSize().tvExitFocusGroup(), content = it)
             }
         }
     }
