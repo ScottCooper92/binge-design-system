@@ -45,6 +45,7 @@ private const val SYNOPSIS_LINES = 3
  * is placed by the loaded page when it replaces this one. [description] names the state for a screen reader.
  * [hosting] is the loaded hub's: an overlay or a pre-shell page lands focus on the first row at once, and the hub
  * anchors that row at the foot of the copy band rather than a row gap below it, so the skeleton's rows sit there too.
+ * It stands in for a hub with no hero only: a hero hub lands focus on the hero, so a hero hub shows its own loading state.
  */
 @Composable
 fun TvImmersiveHubSkeleton(
