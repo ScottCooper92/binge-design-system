@@ -3,15 +3,19 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.binge.designsystem.component.TextEntrySurface
-import com.binge.designsystem.component.bingeSheetContentInsets
+import com.binge.designsystem.component.bingeSheetSideInsets
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -51,28 +55,33 @@ fun BingeBottomSheetSample() {
 }
 
 /**
- * The same sheet body padded by the insets `BingeBottomSheet` gives its content, so a frame with a side cutout shows
- * the field kept clear of it. The modal window itself does not capture, so this is the body alone.
+ * The same sheet body laid out as `BingeBottomSheet` lays out its sheet: inside the window's safe sides, capped at the
+ * sheet's maximum width and centred. A frame narrower than that cap with a side cutout shows the sheet narrowing to
+ * clear it. The modal window itself does not capture, so this is the body alone.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingeBottomSheetSideInsetsSample() {
     ScreenshotTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(BingeShapes.HeroTop)
-                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                .windowInsetsPadding(bingeSheetContentInsets(edgeToEdge = false)),
-        ) {
-            TextEntrySurface(
-                title = SHEET_TITLE,
-                value = "",
-                onValueChange = {},
-                onSubmit = {},
-                onCancel = {},
-                submitLabel = SUBMIT_LABEL,
-                hint = SHEET_HINT,
-            )
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+            Column(
+                modifier = Modifier
+                    .bingeSheetSideInsets()
+                    .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
+                    .fillMaxWidth()
+                    .clip(BingeShapes.HeroTop)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            ) {
+                TextEntrySurface(
+                    title = SHEET_TITLE,
+                    value = "",
+                    onValueChange = {},
+                    onSubmit = {},
+                    onCancel = {},
+                    submitLabel = SUBMIT_LABEL,
+                    hint = SHEET_HINT,
+                )
+            }
         }
     }
 }

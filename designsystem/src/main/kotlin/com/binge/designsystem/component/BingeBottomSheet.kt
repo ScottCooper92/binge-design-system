@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.rememberFoldSafeBottomHeight
 import com.binge.designsystem.theme.BingeShapes
 import kotlinx.coroutines.launch
@@ -51,10 +53,10 @@ import kotlinx.coroutines.launch
  *
  * [edgeToEdge] lets the content run under the navigation bar, as a long list does, padding its own end so the last
  * row can scroll clear of the bar. The status bar and the IME are still inset, so a field in the sheet is not covered by the
- * keyboard. Both forms also inset the window's sides, so in landscape the content clears a side cutout or a side
+ * keyboard. Both forms lay the sheet out inside the window's safe sides, so in landscape the sheet clears a side cutout or a side
  * navigation bar.
  *
- * Otherwise no `contentWindowInsets` is passed, so this takes [ModalBottomSheet]'s default —
+ * Otherwise the content insets are [ModalBottomSheet]'s default —
  * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — which already includes
  * the IME (confirmed from `material3:1.5.0-alpha27` bytecode; issue #35). Adding `imePadding()` on
  * top would double-inset. A field that jumps the sheet on focus needs a scrollable ancestor in its
@@ -98,8 +100,7 @@ fun BingeBottomSheet(
     val dockFraction by remember(dock) { derivedStateOf { dock?.fraction ?: 0f } }
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
-        // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
-        modifier = foldSafeHeight?.let { modifier.heightIn(max = it) } ?: modifier,
+        modifier = bingeSheetOuterModifier(modifier, foldSafeHeight),
         sheetState = sheetState,
         contentWindowInsets = { bingeSheetContentInsets(edgeToEdge) },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -155,17 +156,28 @@ internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gestures
 
 /**
  * A sheet's content insets: the default's, or for an [edgeToEdge] sheet the default's top and the IME without the
- * navigation bar, and in both cases the window's sides. The sides are `safeDrawing`'s, so a side cutout or a side
- * navigation bar in landscape keeps its distance from the content.
+ * navigation bar. The sides are not here: see [bingeSheetSideInsets].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
-    val vertical =
-        if (edgeToEdge) {
-            BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top).union(WindowInsets.ime)
-        } else {
-            BottomSheetDefaults.modalWindowInsets
-        }
-    return vertical.union(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets =
+    if (edgeToEdge) {
+        BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top).union(WindowInsets.ime)
+    } else {
+        BottomSheetDefaults.modalWindowInsets
+    }
+
+/**
+ * Lays the sheet out inside the window's safe sides, so a side cutout or a side navigation bar in landscape stays clear
+ * of it. The sheet is capped at [BottomSheetDefaults.SheetMaxWidth] and centred, so where the window is wider than that
+ * plus the inset it keeps its width and nothing is padded; on a narrow landscape window it narrows to the safe width.
+ */
+@Composable
+internal fun Modifier.bingeSheetSideInsets(): Modifier = windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+
+@Composable
+private fun bingeSheetOuterModifier(modifier: Modifier, foldSafeHeight: Dp?): Modifier {
+    // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
+    val sided = modifier.bingeSheetSideInsets()
+    return foldSafeHeight?.let { sided.heightIn(max = it) } ?: sided
 }
