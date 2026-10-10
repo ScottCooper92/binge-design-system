@@ -1,10 +1,13 @@
 package com.binge.designsystem.catalog
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.AccountProfileCard
 import com.binge.designsystem.component.AccountProfileCardLayout
 import com.binge.designsystem.component.BingeTag
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeTheme
 
 /**
  * Public samples for [AccountProfileCard] (group `"Cards"`). See the convention KDoc on
@@ -61,7 +64,26 @@ fun AccountProfileCardTaggedSample() {
             secondaryLine = "sam.rivera@binge.app",
             initialsName = "Sam Rivera",
             onClick = {},
-            tag = { BingeTag(label = "Admin") },
+            tag = {
+                BingeTag(label = "Admin", icon = Icons.Filled.Shield, tint = BingeTheme.colors.info, uppercase = false)
+            },
+        )
+    }
+}
+
+/** The square column form with a role tag stacked under the name. */
+@Composable
+fun AccountProfileCardColumnTaggedSample() {
+    ScreenshotTheme {
+        AccountProfileCard(
+            name = "Sam Rivera",
+            secondaryLine = "@sam.rivera",
+            initialsName = "Sam Rivera",
+            country = "🇬🇧 United Kingdom",
+            layout = AccountProfileCardLayout.Column,
+            tag = {
+                BingeTag(label = "Admin", icon = Icons.Filled.Shield, tint = BingeTheme.colors.info, uppercase = false)
+            },
         )
     }
 }
