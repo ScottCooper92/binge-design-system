@@ -216,4 +216,44 @@ class SampleScannerTest {
         assertEquals(emptyList<SampleDeclaration>(), result.samples)
         assertEquals(1, result.problems.size)
     }
+
+    @Test
+    fun `lists a sample whose annotation sits on the same line as its function`() {
+        val result = scan("/** Doc. */\n@Composable fun InlineSample() {}")
+
+        assertTrue(result.problems.isEmpty(), result.problems.toString())
+        assertEquals("Doc", result.samples.single().description)
+    }
+
+    @Test
+    fun `a same-line annotation with arguments does not hide the composable or the parameters`() {
+        val result =
+            scan("/** Doc. */\n@OptIn(ExperimentalFoo::class) @Composable fun InlineSample() {}\n\n@Composable fun WideSample(a: Int) {}")
+
+        assertEquals(listOf("InlineSample"), result.samples.map { it.function })
+        assertTrue(result.problems.single().contains("takes parameters"), result.problems.toString())
+    }
+
+    @Test
+    fun `reports a same-line sample that is not composable`() {
+        val result = scan("@Preview fun PlainSample() {}")
+
+        assertTrue(result.samples.isEmpty())
+        assertTrue("not @Composable" in result.problems.single(), result.problems.toString())
+    }
+
+    @Test
+    fun `skips a same-line non-public declaration`() {
+        val result = scan("@Composable private fun HiddenSample() {}")
+
+        assertTrue(result.samples.isEmpty())
+        assertTrue(result.problems.isEmpty())
+    }
+
+    @Test
+    fun `a blank line between the KDoc and the annotations keeps the description`() {
+        val result = scan("/** Doc. */\n\n@Composable\nfun SpacedSample() {}")
+
+        assertEquals("Doc", result.samples.single().description)
+    }
 }
