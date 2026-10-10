@@ -25,6 +25,10 @@ import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +59,7 @@ import com.binge.designsystem.tv.component.contentColor
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.BingeTvNavRail
 import com.binge.designsystem.tv.nav.TvNavRailItem
+import com.binge.designsystem.tv.nav.TvShellScaffold
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -304,6 +309,28 @@ fun TvInitialsAvatarSample() {
         size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
     )
+}
+
+/** The shell with a detail page open over it: the overlay covers the rail and the content alike. */
+@Composable
+fun TvShellScaffoldOverlaySample() {
+    var selected by rememberSaveable { mutableStateOf<Any>("movies") }
+    TvShellScaffold(
+        header = NavRailSampleHeader,
+        items = NavRailSampleItems,
+        footer = NavRailSampleFooter,
+        selectedKey = selected,
+        homeKey = "movies",
+        onSelect = { selected = it },
+        overlay = {
+            TvMessagePlate(
+                headline = "Dune: Part Two",
+                body = "A detail page, opened over the shell, owns the screen and Back until it closes.",
+                alignment = Alignment.Center,
+                modifier = Modifier.background(MaterialTheme.colorScheme.background),
+            )
+        },
+    ) { NavRailSampleContent() }
 }
 
 private const val PINNED_FOOTER_SAMPLE_ITEMS = 3
