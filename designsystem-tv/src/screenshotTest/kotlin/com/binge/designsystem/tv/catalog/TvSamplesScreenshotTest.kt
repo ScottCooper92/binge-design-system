@@ -93,6 +93,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun shellScaffoldOverlay() = Frame { TvShellScaffoldOverlaySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun navRailExpandedPinnedFooter() = Frame { TvNavRailSample(expanded = true, pinFooter = true) }
 
     @PreviewTest
