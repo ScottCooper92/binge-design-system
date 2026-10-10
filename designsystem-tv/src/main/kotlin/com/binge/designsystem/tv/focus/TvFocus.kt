@@ -29,6 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
+import androidx.compose.ui.semantics.onClick as semanticsOnClick
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -166,6 +167,9 @@ fun Modifier.tvFocusTarget(onFocusChanged: (Boolean) -> Unit): Modifier =
  * one answer; a control that acts like a button passes [Role.Button]. A disabled control keeps its role and is
  * marked disabled, so it announces as an unavailable button rather than an enabled one that does nothing.
  *
+ * [onClickLabel] is what OK does, for a screen reader to say after the role ("Button, double tap to [label]"). It is
+ * null by default, because the control cannot know; pass one wherever the action is not obvious from the content.
+ *
  * **There is no long-press.** A hold is an invisible affordance on a remote, so an action
  * reachable only that way is an action most users never find. Anything worth doing to a card belongs
  * on a visible surface, such as a sheet that OK opens.
@@ -175,17 +179,19 @@ fun Modifier.tvClickable(
     onFocusChanged: (Boolean) -> Unit,
     enabled: Boolean = true,
     role: Role? = null,
+    onClickLabel: String? = null,
     onClick: () -> Unit,
 ): Modifier =
     this
         .onFocusChanged { onFocusChanged(it.isFocused) }
         .then(
             if (enabled) {
-                Modifier.clickable(role = role, onClick = onClick)
+                Modifier.clickable(role = role, onClickLabel = onClickLabel, onClick = onClick)
             } else {
                 // Still focusable, so it must say it is unavailable: focusable() alone announces an enabled control.
                 Modifier.focusable().semantics {
                     if (role != null) this.role = role
+                    if (onClickLabel != null) semanticsOnClick(label = onClickLabel, action = null)
                     disabled()
                 }
             },

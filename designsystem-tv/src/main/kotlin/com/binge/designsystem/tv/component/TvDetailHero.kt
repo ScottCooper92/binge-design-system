@@ -62,13 +62,15 @@ data class TvDetailHeroItem(
 /**
  * Makes the hero synopsis a focusable block whose OK runs [onClick]. Focus is a parameter ([isFocused] in,
  * [onFocusChanged] out) so the state is screenshot-testable. [focusRequester] is for a caller aiming page entry at
- * the synopsis when the band has no action row — the one focus stop such a band has.
+ * the synopsis when the band has no action row — the one focus stop such a band has. [onClickLabel] is what OK
+ * does, for a screen reader to say ("read more"); the caller owns the words.
  */
 data class TvHeroOverview(
     val isFocused: Boolean,
     val onFocusChanged: (Boolean) -> Unit,
     val onClick: () -> Unit,
     val focusRequester: FocusRequester? = null,
+    val onClickLabel: String? = null,
 )
 
 /**
@@ -191,7 +193,12 @@ private fun TvHeroSynopsis(
                 Modifier
                     .then(overview.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
                     .tvFocusIndicator(isFocused = overview.isFocused, shape = BingeShapes.Medium)
-                    .tvClickable(onFocusChanged = overview.onFocusChanged, role = Role.Button, onClick = overview.onClick)
+                    .tvClickable(
+                        onFocusChanged = overview.onFocusChanged,
+                        role = Role.Button,
+                        onClickLabel = overview.onClickLabel,
+                        onClick = overview.onClick,
+                    )
                     // Inside the ring, so the outline floats clear of the text rather than crowding it.
                     .padding(dimensionResource(TvR.dimen.tv_detail_page_synopsis_padding))
             },

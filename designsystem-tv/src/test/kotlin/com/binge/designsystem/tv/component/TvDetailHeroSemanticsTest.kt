@@ -2,7 +2,9 @@ package com.binge.designsystem.tv.component
 
 import android.app.Application
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.onNodeWithText
@@ -44,5 +46,23 @@ class TvDetailHeroSemanticsTest {
         }
 
         rule.onNodeWithText(SYNOPSIS).assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+    }
+
+    @Test
+    fun `a pressable synopsis says what OK does when it is given a label`() {
+        rule.setContent {
+            BingeTvTheme {
+                TvDetailHero(
+                    item = TvDetailHeroItem(title = "Dune", overview = SYNOPSIS),
+                    artwork = {},
+                    poster = {},
+                    overview = TvHeroOverview(isFocused = false, onFocusChanged = {}, onClick = {}, onClickLabel = "read more"),
+                ) {}
+            }
+        }
+
+        rule.onNodeWithText(SYNOPSIS).assert(
+            SemanticsMatcher("has the click label read more") { it.config.getOrNull(SemanticsActions.OnClick)?.label == "read more" },
+        )
     }
 }
