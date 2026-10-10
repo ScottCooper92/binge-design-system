@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -51,7 +52,7 @@ fun TvSeeAllTile(
                 .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
                 .clip(BingeShapes.MediaCard)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick)
+                .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
                 .semantics { contentDescription = label }
                 .padding(dimensionResource(DesR.dimen.padding_m)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.CenterVertically),

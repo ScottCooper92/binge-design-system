@@ -22,6 +22,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
@@ -158,6 +162,10 @@ fun Modifier.tvFocusTarget(onFocusChanged: (Boolean) -> Unit): Modifier =
  * too, which on a D-pad turns ↓ into a dead end rather than landing on a control that isn't ready yet.
  * So disabled falls back to a bare `focusable()`.
  *
+ * [role] is what a screen reader announces the control as. It defaults to none, because a tile or a card has no
+ * one answer; a control that acts like a button passes [Role.Button]. A disabled control keeps its role and is
+ * marked disabled, so it announces as an unavailable button rather than an enabled one that does nothing.
+ *
  * **There is no long-press.** A hold is an invisible affordance on a remote, so an action
  * reachable only that way is an action most users never find. Anything worth doing to a card belongs
  * on a visible surface, such as a sheet that OK opens.
@@ -166,11 +174,22 @@ fun Modifier.tvFocusTarget(onFocusChanged: (Boolean) -> Unit): Modifier =
 fun Modifier.tvClickable(
     onFocusChanged: (Boolean) -> Unit,
     enabled: Boolean = true,
+    role: Role? = null,
     onClick: () -> Unit,
 ): Modifier =
     this
         .onFocusChanged { onFocusChanged(it.isFocused) }
-        .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier.focusable())
+        .then(
+            if (enabled) {
+                Modifier.clickable(role = role, onClick = onClick)
+            } else {
+                // Still focusable, so it must say it is unavailable: focusable() alone announces an enabled control.
+                Modifier.focusable().semantics {
+                    if (role != null) this.role = role
+                    disabled()
+                }
+            },
+        )
 
 /**
  * Marks a row/grid as one focus unit so the D-pad restores the child that last held focus instead of snapping

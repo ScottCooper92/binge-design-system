@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
@@ -58,7 +59,7 @@ fun TvButton(
         isFocused = focused,
         icon = icon,
         modifier = modifier
-            .tvClickable(enabled = enabled, onFocusChanged = { focused = it }, onClick = onClick),
+            .tvClickable(enabled = enabled, role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick),
     )
 }
 
