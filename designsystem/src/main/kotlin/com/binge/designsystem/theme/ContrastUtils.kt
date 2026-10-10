@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
 
 /** WCAG AA minimum contrast ratio for normal-size body text (4.5:1). */
-const val WCAG_CONTRAST_NORMAL = 4.5
+internal const val WCAG_CONTRAST_NORMAL = 4.5
 
 /**
  * WCAG contrast ratio between this colour and [against], from 1.0 (identical) to 21.0

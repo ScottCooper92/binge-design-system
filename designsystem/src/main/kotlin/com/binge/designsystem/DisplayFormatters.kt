@@ -148,10 +148,10 @@ private fun relativeFuture(now: Long, distance: Long): String {
 }
 
 /** A month's short name in [locale] ("Jan", "ene"), in the standalone form a picker cell shows. */
-fun shortMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.SHORT_STANDALONE, locale)
+internal fun shortMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.SHORT_STANDALONE, locale)
 
 /** A month's full name in [locale] ("March", "marzo"), in the standalone form a picker headline shows. */
-fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.FULL_STANDALONE, locale)
+internal fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.FULL_STANDALONE, locale)
 
 /**
  * The numbers joined for display, with each run of [MIN_COLLAPSED_RUN] or more consecutive values

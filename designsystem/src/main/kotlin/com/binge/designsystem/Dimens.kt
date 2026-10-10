@@ -9,7 +9,7 @@ const val BACKDROP_ASPECT_RATIO = 16f / 9f
  * Fraction of an initials avatar's diameter reserved as padding around the initials, so the autosized text fills
  * the remaining circle proportionally regardless of the avatar's size.
  */
-const val AVATAR_INITIALS_PADDING_FRACTION = 0.22f
+internal const val AVATAR_INITIALS_PADDING_FRACTION = 0.22f
 
 /**
  * Material 3's opacity for disabled content, 38%. Every disabled control here dims by this one value, so a chip, a
