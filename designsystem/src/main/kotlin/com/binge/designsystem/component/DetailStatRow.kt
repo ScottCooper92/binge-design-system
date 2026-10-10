@@ -24,7 +24,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
-import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 @Composable
@@ -37,9 +37,9 @@ fun DetailStatRow(
     // that stay legible whichever theme is active, rather than a light theme's dark-on-dark text.
     valueColor: Color = Color.Unspecified,
     labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    // The screen's content inset by default, for a row that spans the page. A row inside something
-    // that already pads its content, such as a card, passes PaddingValues() so it is not indented twice.
-    contentPadding: PaddingValues = PaddingValues(horizontal = resolvedContentInset()),
+    // The screen's content padding by default, for a row that spans the page: the shared edge of a pane gets the
+    // pane's inner inset. A row inside something that already pads its content, such as a card, passes PaddingValues().
+    contentPadding: PaddingValues = resolvedContentPadding(),
 ) {
     if (stats.isEmpty()) return
 
