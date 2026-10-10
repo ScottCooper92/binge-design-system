@@ -355,6 +355,76 @@ fun <T> bingeMultiChoiceItem(
     )
 }
 
+/**
+ * A [BingeChoiceSheet]'s body without its modal window, as the sheet looks at rest: the drag handle and title over the
+ * radio rows, sectioned as the sheet sections them. Picking a row calls [onSelect]; nothing closes. Use it to frame a choice sheet in a `@PreviewTest`, where a
+ * modal window does not capture, or to show the list inside a sheet of the caller's own. It draws no surface of its own,
+ * so it takes the colour of whatever holds it, and its header does not dock.
+ */
+@Composable
+fun <T> BingeChoiceSheetContent(
+    title: String,
+    choices: BingeChoiceList<T>,
+    selected: T?,
+    onSelect: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+) {
+    Column(modifier) {
+        RestingSheetTop { ChoiceSheetHeader(title) }
+        SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
+    }
+}
+
+/**
+ * A [BingeMultiChoiceSheet]'s body without its modal window, for a `@PreviewTest` frame or a sheet of the caller's own:
+ * the title with [clearLabel] (and [doneLabel], when given) at the end, an optional filter, then the checkbox rows ticked
+ * where in [chosen]. It holds no draft: each tick calls [onToggle], and Clear and Done call [onClear] and [onDone].
+ * [leading] is the selection that comes first, as on the sheet; it defaults to [chosen]. Like
+ * [BingeChoiceSheetContent], it draws no surface and its header does not dock.
+ */
+@Composable
+fun <T> BingeMultiChoiceSheetContent(
+    title: String,
+    choices: BingeChoiceList<T>,
+    chosen: Set<T>,
+    onToggle: (value: T, ticked: Boolean) -> Unit,
+    clearLabel: String,
+    onClear: () -> Unit,
+    modifier: Modifier = Modifier,
+    doneLabel: String? = null,
+    onDone: () -> Unit = {},
+    filterPlaceholder: String? = null,
+    leading: Set<T> = chosen,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    actions: @Composable RowScope.() -> Unit = {},
+) {
+    Column(modifier) {
+        RestingSheetTop {
+            ChoiceSheetHeader(title) {
+                actions()
+                BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
+                doneLabel?.let { BingeTextButton(label = it, onClick = onDone) }
+            }
+        }
+        MultiChoiceList(
+            choices = choices,
+            chosen = chosen,
+            leading = leading,
+            filterPlaceholder = filterPlaceholder,
+            onToggle = onToggle,
+            suggested = suggested,
+            pinned = pinned,
+        )
+    }
+}
+
+/** A choice sheet's top as it rests, undocked: the drag handle over [header]. */
+@Composable
+private fun RestingSheetTop(header: @Composable () -> Unit) = DockingHeaderLayout(fraction = { 0f }, header = header, dockedTopBar = {})
+
 /** A choice sheet's top: its title and [actions], docking into a [BingeSheetTopBar] in a sheet that docks. */
 @Composable
 internal fun ChoiceSheetTop(title: String, actions: @Composable RowScope.() -> Unit = {}) {

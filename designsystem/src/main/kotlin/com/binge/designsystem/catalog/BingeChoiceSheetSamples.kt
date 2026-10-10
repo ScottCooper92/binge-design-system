@@ -18,6 +18,8 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeChoice
 import com.binge.designsystem.component.BingeChoiceList
+import com.binge.designsystem.component.BingeChoiceSheetContent
+import com.binge.designsystem.component.BingeMultiChoiceSheetContent
 import com.binge.designsystem.component.BingeSheetTopBar
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.ChoiceSheetHeader
@@ -129,8 +131,8 @@ internal val SampleCountries =
 @Composable
 fun BingeChoiceSheetSample() {
     ScreenshotTheme {
-        SheetFrame(docked = false, title = REGION_TITLE) {
-            SingleChoiceList(choices = BingeChoiceList.Ready(SampleRegions), selected = "Japan", onSelect = {})
+        SheetSurface {
+            BingeChoiceSheetContent(title = REGION_TITLE, choices = BingeChoiceList.Ready(SampleRegions), selected = "Japan", onSelect = {})
         }
     }
 }
@@ -174,13 +176,14 @@ fun BingeMultiChoiceSheetSample() {
 fun BingeMultiChoiceSheetAppliedSample() {
     ScreenshotTheme {
         val chosen = setOf("ja", "es")
-        SheetFrame(docked = false, title = LANGUAGES_TITLE, actions = true, withDone = false) {
-            MultiChoiceList(
+        SheetSurface {
+            BingeMultiChoiceSheetContent(
+                title = LANGUAGES_TITLE,
                 choices = BingeChoiceList.Ready(SampleLanguages),
                 chosen = chosen,
-                leading = chosen,
-                filterPlaceholder = null,
                 onToggle = { _, _ -> },
+                clearLabel = CLEAR,
+                onClear = {},
             )
         }
     }
@@ -191,11 +194,12 @@ fun BingeMultiChoiceSheetAppliedSample() {
 fun BingeChoiceSheetStatesSample() {
     ScreenshotTheme {
         Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
-            SheetFrame(docked = false, title = REGION_TITLE) {
-                SingleChoiceList<String>(choices = BingeChoiceList.Loading, selected = null, onSelect = {})
+            SheetSurface {
+                BingeChoiceSheetContent<String>(title = REGION_TITLE, choices = BingeChoiceList.Loading, selected = null, onSelect = {})
             }
-            SheetFrame(docked = false, title = REGION_TITLE) {
-                SingleChoiceList<String>(
+            SheetSurface {
+                BingeChoiceSheetContent<String>(
+                    title = REGION_TITLE,
                     choices = BingeChoiceList.Failed("The server didn't send its regions.", "Try again") {},
                     selected = null,
                     onSelect = {},
@@ -239,7 +243,6 @@ private fun SheetFrame(
     docked: Boolean,
     title: String,
     actions: Boolean = false,
-    withDone: Boolean = true,
     body: @Composable ColumnScope.() -> Unit,
 ) {
     val fraction = if (docked) 1f else 0f
@@ -252,17 +255,30 @@ private fun SheetFrame(
     ) {
         DockingHeaderLayout(
             fraction = { fraction },
-            header = { ChoiceSheetHeader(title) { if (actions) SampleActions(withDone) } },
-            dockedTopBar = { BingeSheetTopBar(title = title, onClose = {}, actions = { if (actions) SampleActions(withDone) }) },
+            header = { ChoiceSheetHeader(title) { if (actions) SampleActions() } },
+            dockedTopBar = { BingeSheetTopBar(title = title, onClose = {}, actions = { if (actions) SampleActions() }) },
         )
         body()
     }
 }
 
+/** The sheet's surface around a [BingeChoiceSheetContent] or [BingeMultiChoiceSheetContent] at rest, which draw none. */
 @Composable
-private fun SampleActions(withDone: Boolean) {
+private fun SheetSurface(content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(DockingSheetShape(0f))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+        content = content,
+    )
+}
+
+@Composable
+private fun SampleActions() {
     BingeTextButton(label = CLEAR, onClick = {})
-    if (withDone) BingeTextButton(label = DONE, onClick = {})
+    BingeTextButton(label = DONE, onClick = {})
 }
 
 /**
@@ -287,8 +303,9 @@ fun BingeChoiceSheetLetteredSample() {
 @Composable
 fun BingeChoiceSheetSectionedSample() {
     ScreenshotTheme {
-        SheetFrame(docked = false, title = REGION_TITLE) {
-            SingleChoiceList(
+        SheetSurface {
+            BingeChoiceSheetContent(
+                title = REGION_TITLE,
                 choices = BingeChoiceList.Ready(SampleRegions.map { it.copy(icon = Icons.Filled.Public) }),
                 selected = "Japan",
                 suggested = listOf("United Kingdom", "Canada"),
@@ -321,13 +338,15 @@ private val SampleSpokenLanguages =
 @Composable
 fun BingeMultiChoiceSheetSectionedSample() {
     ScreenshotTheme {
-        SheetFrame(docked = false, title = LANGUAGES_TITLE, actions = true) {
-            MultiChoiceList(
+        SheetSurface {
+            BingeMultiChoiceSheetContent(
+                title = LANGUAGES_TITLE,
                 choices = BingeChoiceList.Ready(SampleSpokenLanguages),
                 chosen = setOf("ja", "ko"),
-                leading = setOf("ja", "ko"),
-                filterPlaceholder = null,
                 onToggle = { _, _ -> },
+                clearLabel = CLEAR,
+                onClear = {},
+                doneLabel = DONE,
                 suggested = listOf("en", "es", "fr"),
             )
         }
@@ -341,16 +360,18 @@ fun BingeMultiChoiceSheetSectionedSample() {
 @Composable
 fun BingeMultiChoiceSheetMarkedSample() {
     ScreenshotTheme {
-        SheetFrame(docked = false, title = LANGUAGES_TITLE, actions = true) {
-            MultiChoiceList(
+        SheetSurface {
+            BingeMultiChoiceSheetContent(
+                title = LANGUAGES_TITLE,
                 choices =
                     BingeChoiceList.Ready(
                         listOf(BingeChoice("original", "Original language", icon = Icons.Filled.Language)) + SampleSpokenLanguages.take(5),
                     ),
                 chosen = setOf("en", "original"),
-                leading = setOf("en", "original"),
-                filterPlaceholder = null,
                 onToggle = { _, _ -> },
+                clearLabel = CLEAR,
+                onClear = {},
+                doneLabel = DONE,
                 pinned = listOf("original"),
             )
         }
@@ -364,8 +385,9 @@ fun BingeMultiChoiceSheetMarkedSample() {
 @Composable
 fun BingeChoiceSheetPinnedSample() {
     ScreenshotTheme {
-        SheetFrame(docked = false, title = REGION_TITLE) {
-            SingleChoiceList(
+        SheetSurface {
+            BingeChoiceSheetContent(
+                title = REGION_TITLE,
                 choices =
                     BingeChoiceList.Ready(
                         listOf(BingeChoice(WORLDWIDE, WORLDWIDE)) + SampleCountries.filter { it.value in PINNED_SAMPLE_REGIONS },
@@ -383,8 +405,9 @@ fun BingeChoiceSheetPinnedSample() {
 @Composable
 fun BingeChoiceSheetLongLabelSample() {
     ScreenshotTheme {
-        SheetFrame(docked = false, title = REGION_TITLE) {
-            SingleChoiceList(
+        SheetSurface {
+            BingeChoiceSheetContent(
+                title = REGION_TITLE,
                 choices =
                     BingeChoiceList.Ready(
                         listOf(
