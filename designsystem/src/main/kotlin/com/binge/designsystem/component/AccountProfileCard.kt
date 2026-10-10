@@ -1,7 +1,9 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,16 +24,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.component.AccountProfileCardLayout
-import com.binge.designsystem.component.ExpressiveIconButton
-import com.binge.designsystem.component.IconButtonTone
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
+/**
+ * An account as a card: avatar, name, a secondary line and an optional country.
+ *
+ * With [onClick] the whole card is one control: its rounded surface takes the press, the ripple stays inside the
+ * corners, and the trailing chevron is decoration. Without it the card is a plain header.
+ */
 @Composable
 fun AccountProfileCard(
     name: String,
@@ -53,6 +61,17 @@ fun AccountProfileCard(
                         MaterialTheme.colorScheme.surfaceContainer,
                     ),
                 ),
+            ).then(
+                if (onClick != null) {
+                    // After the clip, so the ripple follows the corners; one control, so one focus stop.
+                    Modifier.clickable(
+                        onClickLabel = stringResource(R.string.cd_open_named, name),
+                        role = Role.Button,
+                        onClick = onClick,
+                    )
+                } else {
+                    Modifier
+                },
             )
     when (layout) {
         AccountProfileCardLayout.Row ->
@@ -63,7 +82,7 @@ fun AccountProfileCard(
                 initialsName = initialsName,
                 avatarUrl = avatarUrl,
                 country = country,
-                onClick = onClick,
+                chevron = onClick != null,
             )
 
         AccountProfileCardLayout.Column ->
@@ -86,7 +105,7 @@ private fun AccountProfileCardRow(
     avatarUrl: String?,
     country: String?,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
+    chevron: Boolean = false,
 ) {
     Row(
         modifier = modifier,
@@ -125,14 +144,22 @@ private fun AccountProfileCardRow(
                 )
             }
         }
-        if (onClick != null) {
-            ExpressiveIconButton(
-                onClick = onClick,
-                icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = stringResource(R.string.cd_open_named, name),
-                tone = IconButtonTone.Tonal,
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
+        if (chevron) {
+            // Drawn like a tonal icon button, but not one: the card is the control, so this says only where it leads.
+            Box(
+                modifier =
+                    Modifier
+                        .size(dimensionResource(R.dimen.button_tonal_size))
+                        .clip(BingeShapes.Pill)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
         }
     }
 }
