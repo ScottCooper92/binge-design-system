@@ -73,7 +73,7 @@
     <dimen name="provider_tile_check_icon">13dp</dimen>
     <!-- The width the catalog samples pin a provider tile to, a typical grid cell. Not see_all_tile_width: that is the poster cell, and only matches by coincidence (#248). -->
     <dimen name="provider_tile_sample_width">120dp</dimen>
-    <!-- Selected-services summary, beside a provider-picking grid -->
+    <!-- Selected-services summary, with a provider-picking grid -->
     <dimen name="services_summary_logo">24dp</dimen>
     <!-- Fixed min height for the summary slot so the empty-hint and the lead+logos
          states are the same height and the grid above doesn't shift. -->

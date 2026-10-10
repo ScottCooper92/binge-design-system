@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Landscape (both phone and tablet): stack the watch-type choices as a row, not a column. -->
+    <!-- Landscape (both phone and tablet): place a row of large choice cards side by side, not stacked. -->
     <bool name="binge_landscape">true</bool>
     <!-- Landscape phone is wide-but-short: cap the hub hero off the window height (values-sw600dp
          overrides this back to false for tablets, which are tall enough; sw ranks above orientation). -->
