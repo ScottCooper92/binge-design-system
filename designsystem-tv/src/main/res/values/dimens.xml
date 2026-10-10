@@ -94,6 +94,8 @@
     <dimen name="tv_skeleton_meta_width">240dp</dimen>
     <dimen name="tv_skeleton_meta_height">18dp</dimen>
     <dimen name="tv_skeleton_heading_width">160dp</dimen>
+    <!-- A row heading's stand-in: TvSectionTitle's titleLarge line, so the rows under it sit where they will -->
+    <dimen name="tv_skeleton_heading_height">28dp</dimen>
     <dimen name="tv_skeleton_action_height">48dp</dimen>
     <dimen name="tv_skeleton_card_width">140dp</dimen>
     <!-- TvSideSheet: the end-edge panel's width -->

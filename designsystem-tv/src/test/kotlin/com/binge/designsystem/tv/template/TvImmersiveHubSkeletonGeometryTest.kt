@@ -19,6 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 
 private const val CARDS_PER_ROW = 8
 private val CardWidth = 120.dp
@@ -40,6 +41,8 @@ private val Anchors = listOf(TvLayoutAnchors.HUB_COPY, TvLayoutAnchors.hubRow(0)
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
+// The row anchors hold a TvSectionTitle, and legacy graphics measures text at one pixel per character.
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvImmersiveHubSkeletonGeometryTest {
     @get:Rule
     val composeTestRule = createKeyboardComposeRule()
