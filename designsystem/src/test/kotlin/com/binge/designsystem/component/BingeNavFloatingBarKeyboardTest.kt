@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalNavOverlayInsets
+import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
-import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -47,7 +47,7 @@ class BingeNavFloatingBarKeyboardTest {
         presentation: BingeNavPresentation = BingeNavPresentation.FloatingBar,
     ) {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 WithKeyboard(if (keyboard > 0.dp) keyboard else keyboardHeight, navigationBar) {
                     BingeNavSuiteShell(
                         items = listOf(

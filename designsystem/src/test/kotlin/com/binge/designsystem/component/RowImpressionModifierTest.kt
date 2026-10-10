@@ -12,7 +12,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -41,7 +41,7 @@ class RowImpressionModifierTest {
 
     private fun setColumn() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 Column(Modifier.height(200.dp).verticalScroll(rememberScrollState())) {
                     repeat(10) { index ->
                         val key = if (index == 9) LAST else "row $index"

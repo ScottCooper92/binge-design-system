@@ -12,7 +12,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalNavOverlayInsets
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -35,7 +35,7 @@ class SectionHeaderOverlayEndTest {
     @Test
     fun `the header's trailing content clears the published end inset`() {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(end = OverlayEnd)) {
                     SectionHeader(
                         title = "Trending",
@@ -64,7 +64,7 @@ class SectionHeaderOverlayEndTest {
     @Test
     fun `with no published end inset the header keeps its own gutter`() {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 SectionHeader(
                     title = "Trending",
                     horizontalPadding = Gutter,

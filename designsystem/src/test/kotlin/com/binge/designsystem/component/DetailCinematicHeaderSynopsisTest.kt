@@ -5,7 +5,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -26,7 +26,7 @@ class DetailCinematicHeaderSynopsisTest {
     fun `the full synopsis sheet survives a recreation`() {
         val restoration = StateRestorationTester(rule)
         restoration.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 // The synopsis on its own: the header's backdrop draws a mesh Robolectric cannot build.
                 CinematicSynopsis(SYNOPSIS, initiallyOverflowing = true)
             }

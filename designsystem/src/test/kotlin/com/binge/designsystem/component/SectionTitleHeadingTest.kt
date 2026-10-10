@@ -6,7 +6,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.template.StepHeading
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +21,7 @@ class SectionTitleHeadingTest {
     val rule = createComposeRule()
 
     private fun assertOneHeading(title: String, content: @Composable () -> Unit) {
-        rule.setContent { BingeExpressiveTheme(dynamicColor = false) { content() } }
+        rule.setContent { TestTheme { content() } }
         rule.onAllNodes(isHeading()).assertCountEquals(1)
         rule.onAllNodes(isHeading() and hasText(title)).assertCountEquals(1)
     }

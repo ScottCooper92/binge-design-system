@@ -14,7 +14,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -44,7 +44,7 @@ class StarRatingSemanticsTest {
 
     private fun setRating(rating: Float, onRatingChange: (Float) -> Unit = {}) {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 StarRating(rating = rating, interactive = true, onRatingChange = onRatingChange)
             }
         }
@@ -120,7 +120,7 @@ class StarRatingSemanticsTest {
         var density = Density(1f)
         composeTestRule.setContent {
             density = LocalDensity.current
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 StarRating(rating = 6f, interactive = true, onRatingChange = {})
             }
         }

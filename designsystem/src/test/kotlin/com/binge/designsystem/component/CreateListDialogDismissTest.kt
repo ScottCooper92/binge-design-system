@@ -1,7 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -24,7 +24,7 @@ class CreateListDialogDismissTest {
     private fun backPressDismisses(isSubmitting: Boolean): Int {
         var dismissed = 0
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 CreateListDialog(onDismiss = { dismissed++ }, onConfirm = {}, isSubmitting = isSubmitting)
             }
         }

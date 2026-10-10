@@ -16,8 +16,8 @@ import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
+import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
-import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,7 @@ class HeroDetailScreenPaneInsetsTest {
 
     private fun page(innerEdge: PaneEdge?) =
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 WithStartNavigationBar(SideBar) {
                     CompositionLocalProvider(LocalPaneInnerEdge provides innerEdge) {
                         HeroDetailScreen(

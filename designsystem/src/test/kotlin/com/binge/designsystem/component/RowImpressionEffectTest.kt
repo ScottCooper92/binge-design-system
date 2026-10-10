@@ -13,7 +13,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -42,7 +42,7 @@ class RowImpressionEffectTest {
 
     private fun setList() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 val listState = rememberLazyListState()
                 RowImpressionEffect(listState) { key -> seen += key }
                 LazyColumn(

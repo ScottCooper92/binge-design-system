@@ -18,7 +18,7 @@ import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -40,7 +40,7 @@ class ItemGroupSemanticsTest {
     @Test
     fun `a group's title is a heading`() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = "My library",
                     rows = listOf(ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist")),
@@ -55,7 +55,7 @@ class ItemGroupSemanticsTest {
     fun `a clickable row takes its tap and a non-clickable one is a disabled button`() {
         var clicked = false
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -75,7 +75,7 @@ class ItemGroupSemanticsTest {
     @Test
     fun `a long-press row exposes its label to the screen reader`() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -98,7 +98,7 @@ class ItemGroupSemanticsTest {
     @Test
     fun `an external row announces that it opens in browser`() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -122,7 +122,7 @@ class ItemGroupSemanticsTest {
     fun `a loading row announces it is in progress and takes no tap`() {
         var clicked = false
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -142,7 +142,7 @@ class ItemGroupSemanticsTest {
     fun `a disabled row is inert and does not claim to be in progress`() {
         var clicked = false
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -159,7 +159,7 @@ class ItemGroupSemanticsTest {
     fun `a connected row keeps its label and its tap`() {
         var clicked = false
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -181,7 +181,7 @@ class ItemGroupSemanticsTest {
     @Test
     fun `a switch row is one switch node that exposes its on and off state`() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -201,7 +201,7 @@ class ItemGroupSemanticsTest {
     fun `tapping a switch row calls onClick once and does not flip the state itself`() {
         var taps = 0
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -218,7 +218,7 @@ class ItemGroupSemanticsTest {
     fun `a disabled switch row is inert but still reports its state`() {
         var taps = 0
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -239,7 +239,7 @@ class ItemGroupSemanticsTest {
     fun `a mixed switch row is one switch node that reports neither on nor off, and takes its tap`() {
         var taps = 0
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(
@@ -267,7 +267,7 @@ class ItemGroupSemanticsTest {
     @Test
     fun `a plain row is still a button with no toggle state`() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows = listOf(ListItem(icon = Icons.Filled.Bookmark, label = "Watchlist")),

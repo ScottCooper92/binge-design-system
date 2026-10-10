@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +28,7 @@ class StateScreensTest {
     fun `an error shows its kind's copy, and Try again runs the retry`() {
         var retries = 0
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) { ErrorScreen(kind = ErrorKind.Network, onRetry = { retries++ }) }
+            TestTheme { ErrorScreen(kind = ErrorKind.Network, onRetry = { retries++ }) }
         }
 
         rule.onNodeWithText(string(R.string.error_kind_network_title)).assertExists()
@@ -40,7 +40,7 @@ class StateScreensTest {
     @Test
     fun `an error without a retry offers nothing to press`() {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) { ErrorScreen(kind = ErrorKind.Forbidden, onRetry = null) }
+            TestTheme { ErrorScreen(kind = ErrorKind.Forbidden, onRetry = null) }
         }
 
         rule.onAllNodes(hasClickAction()).assertCountEquals(0)
@@ -49,7 +49,7 @@ class StateScreensTest {
     @Test
     fun `the caller's copy replaces the kind's`() {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ErrorScreen(kind = ErrorKind.Server, onRetry = null, title = "Quota reached", message = "Try again tomorrow.")
             }
         }
@@ -63,7 +63,7 @@ class StateScreensTest {
     fun `an empty screen's action is pressable`() {
         var pressed = false
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 EmptyScreen(message = "No requests yet.", action = ScreenAction("Make one", onClick = { pressed = true }))
             }
         }

@@ -16,7 +16,7 @@ import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,7 @@ class TextEntrySurfaceBehaviourTest {
     ) = rule.setContent {
         var value by remember { mutableStateOf(initial) }
         current = value
-        BingeExpressiveTheme(dynamicColor = false) {
+        TestTheme {
             TextEntrySurface(
                 title = "Note",
                 value = value,

@@ -10,7 +10,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -30,7 +30,7 @@ class ReorderableHandleRowTest {
 
     private fun show(onMoveUp: (() -> Unit)?, onMoveDown: (() -> Unit)?) =
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ReorderableHandleRow(
                     handleModifier = Modifier,
                     onMoveUp = onMoveUp,
@@ -92,7 +92,7 @@ class ReorderableHandleRowTest {
     @Test
     fun `the Move actions sit on the label's own node`() {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ReorderableHandleRow(handleModifier = Modifier, onMoveUp = {}, onMoveDown = {}) { Text("Drama") }
             }
         }

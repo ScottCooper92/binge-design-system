@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -35,7 +35,7 @@ class BingeBottomSheetStateTest {
         var gesturesEnabled by mutableStateOf(true)
         val seen = mutableListOf<SheetState>()
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 seen += rememberLockableSheetState(skipPartiallyExpanded = true, gesturesEnabled = gesturesEnabled)
             }
         }
@@ -55,7 +55,7 @@ class BingeBottomSheetStateTest {
         var gesturesEnabled by mutableStateOf(false)
         val seen = mutableListOf<SheetState>()
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 seen += rememberLockableSheetState(skipPartiallyExpanded = true, gesturesEnabled = gesturesEnabled)
             }
         }

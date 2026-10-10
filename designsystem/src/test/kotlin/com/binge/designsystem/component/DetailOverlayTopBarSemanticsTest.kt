@@ -10,7 +10,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +29,7 @@ class DetailOverlayTopBarSemanticsTest {
     /** Shows the bar scrolled by [scrolledPast] of the hero's height in pixels; `0` is the hero untouched. */
     private fun show(scrolledPast: (heroHeightPx: Float) -> Float) =
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 val heroPx = with(LocalDensity.current) { HERO_HEIGHT.toPx() }
                 Box(Modifier.fillMaxSize()) {
                     DetailOverlayTopBar(

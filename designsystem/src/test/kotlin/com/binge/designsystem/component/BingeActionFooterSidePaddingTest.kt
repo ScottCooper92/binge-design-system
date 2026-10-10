@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.resolvedContentPadding
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +28,7 @@ class BingeActionFooterSidePaddingTest {
 
     private fun buttonLeft(innerEdge: PaneEdge?): Dp {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 CompositionLocalProvider(LocalPaneInnerEdge provides innerEdge) {
                     BingeActionFooter(label = LABEL, onClick = {}, sidePadding = resolvedContentPadding())
                 }

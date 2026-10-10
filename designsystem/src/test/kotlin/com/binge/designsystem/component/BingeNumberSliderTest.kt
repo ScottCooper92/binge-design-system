@@ -14,7 +14,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -35,7 +35,7 @@ class BingeNumberSliderTest {
     private fun setSlider(initial: Int?, openEndLabel: String? = "Unlimited") {
         value = initial
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 BingeNumberSlider(
                     value = value,
                     onValueChange = { value = it },
@@ -107,7 +107,7 @@ class BingeNumberSliderTest {
     @Test
     fun `the row shows its value and opens the slider in a sheet`() {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 ItemGroup(
                     title = null,
                     rows =
