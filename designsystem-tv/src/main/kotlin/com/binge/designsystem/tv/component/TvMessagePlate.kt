@@ -12,7 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.MaterialTheme
@@ -31,6 +33,9 @@ import com.binge.designsystem.tv.R as TvR
  * [icon] is the art above the copy. Optional and null by default, so a caller with nothing meaningful
  * to draw renders exactly what it did before rather than a shrug glyph. Art above short copy reads well at ten feet,
  * and this is the one anatomy every TV empty and failure state goes through.
+ *
+ * [announce] makes the whole plate a polite live region, merged, as `MessageScreen`'s is on the phone: for a failure
+ * that replaced what the user was reading, so a screen reader says the headline and body and not only the focused button.
  */
 @Composable
 fun TvMessagePlate(
@@ -39,10 +44,11 @@ fun TvMessagePlate(
     headline: String? = null,
     icon: ImageVector? = null,
     alignment: Alignment = Alignment.TopStart,
+    announce: Boolean = false,
     actions: @Composable (() -> Unit)? = null,
 ) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = alignment) {
-        PlateContent(headline = headline, body = body, icon = icon, actions = actions)
+        PlateContent(headline = headline, body = body, icon = icon, announce = announce, actions = actions)
     }
 }
 
@@ -56,6 +62,7 @@ private fun PlateContent(
     headline: String?,
     body: String,
     icon: ImageVector?,
+    announce: Boolean,
     actions: @Composable (() -> Unit)?,
 ) {
     // Centred on its own axis: one short block of text under a piece of art, with no
@@ -64,7 +71,8 @@ private fun PlateContent(
     Column(
         modifier = Modifier
             .padding(dimensionResource(TvR.dimen.tv_focus_ring_bleed))
-            .widthIn(max = dimensionResource(TvR.dimen.tv_message_plate_max_width)),
+            .widthIn(max = dimensionResource(TvR.dimen.tv_message_plate_max_width))
+            .then(if (announce) Modifier.semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite } else Modifier),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
