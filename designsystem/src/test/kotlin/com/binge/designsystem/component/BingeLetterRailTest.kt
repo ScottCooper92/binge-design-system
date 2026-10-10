@@ -12,6 +12,8 @@ import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -52,5 +54,53 @@ class BingeLetterRailTest {
         rule.waitForIdle()
 
         assertEquals(listOf('B', 'B'), picked)
+    }
+
+    private fun showRail() =
+        rule.setContent {
+            Box(Modifier.height(400.dp)) {
+                BingeLetterRail(letters = listOf('A', 'B', 'C', 'D'), onLetter = { picked += it })
+            }
+        }
+
+    /**
+     * Every letter after the first fires once. The first one fires twice today, because the press that
+     * picked it is cancelled when the drag takes over and clears the dedupe (#466); this does not pin that.
+     */
+    private fun assertEachAfterFirstOnce(order: List<Char>, drags: Int = 1) {
+        assertEquals(order, picked.distinct())
+        order.drop(1).forEach { letter -> assertEquals("$letter", drags, picked.count { it == letter }) }
+    }
+
+    @Test
+    fun `dragging down the rail jumps to each letter in order, once each after the first`() {
+        showRail()
+
+        rule.onRoot().performTouchInput { swipeDown() }
+        rule.waitForIdle()
+
+        assertEachAfterFirstOnce(listOf('A', 'B', 'C', 'D'))
+    }
+
+    @Test
+    fun `dragging back up the rail jumps to each letter in order, once each after the first`() {
+        showRail()
+
+        rule.onRoot().performTouchInput { swipeUp() }
+        rule.waitForIdle()
+
+        assertEachAfterFirstOnce(listOf('D', 'C', 'B', 'A'))
+    }
+
+    @Test
+    fun `a second drag starts fresh after the finger lifts`() {
+        showRail()
+
+        rule.onRoot().performTouchInput { swipeDown() }
+        rule.waitForIdle()
+        rule.onRoot().performTouchInput { swipeDown() }
+        rule.waitForIdle()
+
+        assertEachAfterFirstOnce(listOf('A', 'B', 'C', 'D'), drags = 2)
     }
 }
