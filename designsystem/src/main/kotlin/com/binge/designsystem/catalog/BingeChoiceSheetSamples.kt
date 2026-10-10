@@ -137,6 +137,30 @@ fun BingeChoiceSheetSample() {
     }
 }
 
+/** A pick that needs context: which copy is being marked under the title, and what the change reaches below it. */
+@Composable
+fun BingeChoiceSheetSubtitledSample() {
+    ScreenshotTheme {
+        SheetSurface {
+            BingeChoiceSheetContent(
+                title = "Mark as",
+                subtitle = "4K",
+                caption = "Changes the status for everyone on this server.",
+                choices = BingeChoiceList.Ready(
+                    listOf(
+                        BingeChoice("available", "Available"),
+                        BingeChoice("partial", "Partially available"),
+                        BingeChoice("processing", "Processing"),
+                        BingeChoice("unknown", "Unknown"),
+                    ),
+                ),
+                selected = "processing",
+                onSelect = {},
+            )
+        }
+    }
+}
+
 /** The same sheet dragged to full height: its header has docked into a top bar with a close button. */
 @Composable
 fun BingeChoiceSheetDockedSample() {
