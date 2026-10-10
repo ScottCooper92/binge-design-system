@@ -12,7 +12,6 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
@@ -102,10 +101,27 @@ class ClickableSemanticsTest {
     }
 
     @Test
-    fun `the profile card's chevron is named after the card`() {
-        show { AccountProfileCard(name = "Ana Lima", secondaryLine = "Member", initialsName = "Ana Lima", onClick = {}) }
+    fun `the profile card is one named button, and its chevron is not a second one`() {
+        var opened = 0
+        show { AccountProfileCard(name = "Ana Lima", secondaryLine = "Member", initialsName = "Ana Lima", onClick = { opened++ }) }
 
-        rule.onNodeWithContentDescription(string(R.string.cd_open_named, "Ana Lima")).assertExists()
+        val card = rule.onNode(hasText("Ana Lima") and button)
+        card.assert(
+            SemanticsMatcher("named after the card") {
+                it.config.getOrNull(SemanticsActions.OnClick)?.label ==
+                    string(R.string.cd_open_named, "Ana Lima")
+            },
+        )
+        card.performClick()
+        assertEquals(1, opened)
+        assertEquals(1, rule.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.OnClick)).fetchSemanticsNodes().size)
+    }
+
+    @Test
+    fun `a profile card with no onClick is not a control`() {
+        show { AccountProfileCard(name = "Ana Lima", secondaryLine = "Member", initialsName = "Ana Lima") }
+
+        assertEquals(0, rule.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.OnClick)).fetchSemanticsNodes().size)
     }
 
     @Test
