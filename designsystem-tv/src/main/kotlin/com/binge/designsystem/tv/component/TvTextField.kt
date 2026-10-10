@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.tvArrivalTarget
@@ -72,6 +73,7 @@ private const val SECRET_MASK = '•'
  * TV theme. The remote lands on a frame that wears the focus ring and never changes fill, so the text stays legible.
  * Select starts editing; focus alone never raises the keyboard. ↑ and ↓ leave the field, ← and → move the cursor, and
  * [imeAction] hands focus back to the frame before [onImeAction] runs. [placeholder] shows while the field is empty.
+ * A disabled field is dimmed by [DISABLED_ALPHA], label and frame alike.
  * [fillWidth] takes the parent's width rather than a form's. [initiallyFocused] seeds the ring for a frame.
  */
 @Composable
@@ -96,7 +98,12 @@ fun TvTextField(
         modifier = if (fillWidth) modifier else modifier.width(dimensionResource(TvR.dimen.tv_text_field_width)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_xs)),
     ) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
+        )
         TvFieldFrame(
             value = value,
             onValueChange = onValueChange,
@@ -194,6 +201,7 @@ private fun TvFieldFrame(
     Box(
         modifier =
             modifier
+                .alpha(if (enabled) 1f else DISABLED_ALPHA)
                 .fillMaxWidth()
                 .height(dimensionResource(TvR.dimen.tv_text_field_height))
                 .tvFocusIndicator(isFocused = focused || editing, shape = shape)
