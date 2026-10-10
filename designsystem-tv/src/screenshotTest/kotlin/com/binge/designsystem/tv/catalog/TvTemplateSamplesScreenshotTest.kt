@@ -32,6 +32,11 @@ class TvTemplateSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun twoPanePageBalanced() = Frame { TvTwoPanePageBalancedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun twoPanePageBoard() = Frame { TvTwoPanePageBoardSample() }
 
     @PreviewTest
