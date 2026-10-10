@@ -191,10 +191,11 @@ private fun TvFieldFrame(
     val focusManager = LocalFocusManager.current
     val input = remember { FocusRequester() }
     val frame = remember { FocusRequester() }
-    LaunchedEffect(editing) { if (editing) input.requestFocus() }
+    // A request can race a node that has just left composition; the field simply stays where it is.
+    LaunchedEffect(editing) { if (editing) runCatching { input.requestFocus() } }
     val finish = {
         // Back to the frame first: an input that gives up focus with nowhere to go sends it to the page's first stop.
-        frame.requestFocus()
+        runCatching { frame.requestFocus() }
         editing = false
         onImeAction?.invoke()
     }
