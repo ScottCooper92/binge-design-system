@@ -66,9 +66,9 @@ import kotlinx.coroutines.launch
  * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle]. A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
  * language code. A choice that is a person carries [avatarName] instead, drawn as their avatar from [avatarUrl], with
- * their initials while it loads or when there is none. A [trailingText] such as a count sits at the row's end in a
- * secondary style, before the radio or checkbox. In a list where any choice has a mark, every row keeps the mark's
- * place, empty where it has none, and shows its radio or checkbox last, so the labels line up.
+ * their initials while it loads or when there is none. A [trailingText] such as a count ends the row in a
+ * secondary style. In a list where any choice has a mark, every row keeps the mark's place, empty where it has
+ * none, and shows its radio or checkbox last, so the labels line up; there the text comes before the control.
  */
 data class BingeChoice<out T>(
     val value: T,

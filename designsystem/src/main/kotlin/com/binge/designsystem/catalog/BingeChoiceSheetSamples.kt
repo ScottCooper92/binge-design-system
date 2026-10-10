@@ -496,7 +496,7 @@ fun BingeChoiceSheetCountsSample() {
     }
 }
 
-/** The multi-choice sheet's rows with counts, ticked and unticked, with the count before each checkbox. */
+/** The multi-choice sheet's rows with counts, ticked and unticked, with the count at each row's end. */
 @Composable
 fun BingeMultiChoiceSheetCountsSample() {
     ScreenshotTheme {
