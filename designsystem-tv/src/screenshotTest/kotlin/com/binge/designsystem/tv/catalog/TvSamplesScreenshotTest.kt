@@ -52,6 +52,16 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheet() = Frame { TvSideSheetSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun sideSheetConfirm() = Frame { TvSideSheetConfirmSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun focusIndicator() = Frame { TvFocusIndicatorSample() }
 
     @PreviewTest
