@@ -25,6 +25,10 @@ import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -268,12 +272,13 @@ internal fun TvNavRailSample(
             if (it.key == badgedItemKey) it.copy(badge = NavSuiteBadge.Label("3")) else it
         }
     }
+    var selected by rememberSaveable { mutableStateOf<Any>(selectedKey) }
     BingeTvNavRail(
         header = NavRailSampleHeader,
         items = items,
         footer = NavRailSampleFooter,
-        selectedKey = selectedKey,
-        onSelect = {},
+        selectedKey = selected,
+        onSelect = { selected = it },
         expanded = expanded,
         artworkBehind = artworkBehind,
         pinFooter = pinFooter,
