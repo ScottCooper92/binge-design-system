@@ -75,6 +75,32 @@ fun DecisionScreen(
     }
 }
 
+/**
+ * The decision's content and nothing around it: the optional [hero] plate, the [copy] and the [points] card, stacked.
+ * It has no background, insets, scroll or pinned answers, so it can be a page inside a step flow that supplies its
+ * own chrome and footer. [DecisionScreen] lays out the same pieces around it.
+ */
+@Composable
+fun DecisionBody(
+    copy: DecisionCopy,
+    points: List<DecisionPoint>,
+    modifier: Modifier = Modifier,
+    hero: ImageVector? = null,
+    heroBadge: ImageVector? = null,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        hero?.let {
+            DecisionHero(
+                icon = it,
+                badge = heroBadge,
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s), bottom = dimensionResource(R.dimen.padding_l)),
+            )
+        }
+        DecisionHeading(copy)
+        DecisionPointsCard(points, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_l)))
+    }
+}
+
 @Composable
 private fun DecisionPortrait(
     copy: DecisionCopy,
@@ -91,15 +117,7 @@ private fun DecisionPortrait(
                 .padding(horizontal = dimensionResource(R.dimen.padding_l)),
     ) {
         Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            hero?.let {
-                DecisionHero(
-                    icon = it,
-                    badge = heroBadge,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s), bottom = dimensionResource(R.dimen.padding_l)),
-                )
-            }
-            DecisionHeading(copy)
-            DecisionPointsCard(points, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_l)))
+            DecisionBody(copy = copy, points = points, hero = hero, heroBadge = heroBadge)
         }
         DecisionFooter(accept, decline)
     }
@@ -178,13 +196,13 @@ private fun DecisionFooter(accept: ScreenAction, decline: ScreenAction) {
             onClick = decline.onClick,
             leadingIcon = decline.leadingIcon,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().then(decline.modifier),
         )
         BingeFilledButton(
             label = accept.label,
             onClick = accept.onClick,
             leadingIcon = accept.leadingIcon,
-            modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_xs)),
+            modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_xs)).then(accept.modifier),
         )
     }
 }
