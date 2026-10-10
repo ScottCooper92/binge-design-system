@@ -15,7 +15,8 @@ import com.binge.designsystem.R as DesR
  *
  * A failure the caller cannot retry renders no button, because a dead button is worse than none on a remote.
  * [retryInitiallyFocused] and [retryFocusRequester] take focus as parameters, so the focused state can be
- * screenshotted. [message] overrides the kind's copy, and [extraActions] follow Try again in the same row.
+ * screenshotted. [title] and [message] override the kind's copy, for a failure only the caller can name (a missing
+ * API key is not "Not allowed"), and [extraActions] follow Try again in the same row.
  */
 @Composable
 fun TvErrorPlate(
@@ -23,6 +24,7 @@ fun TvErrorPlate(
     onRetry: (() -> Unit)?,
     modifier: Modifier = Modifier,
     message: String? = null,
+    title: String? = null,
     alignment: Alignment = Alignment.TopStart,
     retryFocusRequester: FocusRequester? = null,
     retryInitiallyFocused: Boolean = false,
@@ -30,7 +32,7 @@ fun TvErrorPlate(
 ) {
     TvMessagePlate(
         body = message ?: stringResource(kind.messageRes),
-        headline = stringResource(kind.titleRes),
+        headline = title ?: stringResource(kind.titleRes),
         icon = kind.icon,
         modifier = modifier,
         alignment = alignment,

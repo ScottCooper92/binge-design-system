@@ -125,6 +125,8 @@
     <string name="error_kind_rate_limited_message">Try again in a moment.</string>
     <string name="error_kind_forbidden_title">Not allowed</string>
     <string name="error_kind_forbidden_message">Your account does not have permission for this.</string>
+    <string name="error_kind_configuration_title">Setup needed</string>
+    <string name="error_kind_configuration_message">A key this needs is missing or was refused. Check the app\'s settings.</string>
     <string name="error_kind_generic_title">Something went wrong</string>
     <string name="error_kind_generic_message">An unexpected error occurred.</string>
     <string name="error_kind_retry">Try again</string>
