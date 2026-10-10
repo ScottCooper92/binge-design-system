@@ -11,7 +11,8 @@ run-name: >-
 # Thin caller. The workflow itself lives in ScottCooper92/binge-ci.
 #
 # PUBLIC repository: the fork filter inside the scan is the control here, not a
-# formality. The `agent` label stays maintainers-only.
+# formality. The `agent` label grants an agent code execution with this repository's
+# secrets in scope, so never apply it to a PR from a fork (CLAUDE.md, Agent workflows).
 on:
   workflow_run:
     workflows: ["CI"]

@@ -49,8 +49,9 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 │                and the …Demo()s the catalog app runs live
 ├── modifier/    skeleton shimmer, selection lift
 ├── layout/      layout anchors
-├── template/    the whole-screen frames: the scaffold, the message screen, the filtered list, the
-│                hero detail page, the form, the step flow, the decision screen and the paged phase
+├── template/    the whole-screen frames: the scaffold, the message screen, the error and empty
+│                screens, the filtered list, the hero detail page, the form, the step flow, the
+│                decision screen and the paged phase
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
 
 designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
@@ -61,7 +62,8 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 │                avatar, the QR code, the selected tick, the row emphasis and the vertical divider
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
-│                flow, the message page, the detail page, the decision page and the immersive hub and grid
+│                flow, the message page, the detail page, the decision page, the immersive hub and
+│                grid, and the skeleton pages
 ├── Dimens.kt    the non-dp constants the TV components share, such as the nav rail's collapsed row cap
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme

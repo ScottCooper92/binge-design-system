@@ -10,6 +10,11 @@ name: Consumer check (binge-seerr)
 # protection too. The PR-body obligation to say what a change means for the consumers stays;
 # this supplies the evidence.
 #
+# Informational is not the same as no effect on merging. bot-review's auto-merge reads the PR's
+# merge state, and a failing or still-running check here holds it at UNSTABLE, so the bot holds
+# the merge of an approved PR and names this check. That includes an intentional signature
+# change. A maintainer then merges by hand, or re-runs CI once this job is green.
+#
 # Binge is the other consumer and is private, so it needs a token and is not covered here.
 #
 # It compiles the consumer's main and unit-test sources and nothing else: that is what catches a
