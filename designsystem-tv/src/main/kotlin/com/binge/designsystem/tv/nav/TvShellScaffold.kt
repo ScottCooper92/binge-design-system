@@ -53,13 +53,7 @@ fun TvShellScaffold(
     settleMillis: Long = TV_SHELL_CONTENT_SETTLE_MILLIS,
     content: @Composable (key: Any) -> Unit,
 ) {
-    var settled by rememberSaveable { mutableStateOf(selectedKey) }
-    LaunchedEffect(selectedKey) {
-        if (selectedKey != settled) {
-            delay(settleMillis)
-            settled = selectedKey
-        }
-    }
+    val settled = rememberSettledKey(selectedKey, settleMillis)
     val railFocus = remember { FocusRequester() }
     var railHasFocus by remember { mutableStateOf(false) }
     val atRoot = railHasFocus && selectedKey == homeKey
@@ -91,4 +85,20 @@ fun TvShellScaffold(
             }
         }
     }
+}
+
+/**
+ * [selectedKey] once it has held for [settleMillis]; until then, the key it replaced. Kept out of
+ * [TvShellScaffold] so the wait is not read as part of the Back handler's focus request.
+ */
+@Composable
+private fun rememberSettledKey(selectedKey: Any, settleMillis: Long): Any {
+    var settled by rememberSaveable { mutableStateOf(selectedKey) }
+    LaunchedEffect(selectedKey) {
+        if (selectedKey != settled) {
+            delay(settleMillis)
+            settled = selectedKey
+        }
+    }
+    return settled
 }
