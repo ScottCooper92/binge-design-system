@@ -45,8 +45,10 @@ fun hasPaneBeside(): Boolean = LocalPaneInnerEdge.current != null
  * one beside another pane, a fraction of that window. [LocalPaneWidth] null falls back to the window
  * value unchanged; set, the same three-step ramp applies to the pane's own width instead.
  *
- * The same value on both sides. A pane beside another wants less on the edge they share — read
- * [resolvedContentPadding] instead wherever the two sides can differ.
+ * It is symmetric: the same value on both sides, and no knowledge of any pane beside this one. A body that
+ * may sit in a pane beside another wants less on the edge they share, so it reads [resolvedContentPadding]
+ * instead, which gives each side its own value. Reach for this one only where a single [Dp] is genuinely
+ * wanted, such as the width of a centred column.
  */
 @Composable
 fun resolvedContentInset(): Dp {
@@ -66,15 +68,24 @@ fun resolvedContentInset(): Dp {
  * clear a bezel, and the edge beside another pane has none to clear. With no inner edge (a screen
  * alone in the window, or a single-pane scene) both sides are [resolvedContentInset], exactly as
  * before, so a screen can read this unconditionally without knowing how many panes are showing.
+ *
+ * This is the one to read for a body that may sit in a pane; [resolvedContentInset] is the symmetric single
+ * value and keeps the full window inset on the shared edge. [top] and [bottom] pad those edges. [vertical]
+ * adds the same amount to both, so a block with the inset above and below reads
+ * `padding(resolvedContentPadding(vertical = inset))`.
  */
 @Composable
-fun resolvedContentPadding(top: Dp = dimensionResource(R.dimen.zero), bottom: Dp = dimensionResource(R.dimen.zero)): PaddingValues =
+fun resolvedContentPadding(
+    top: Dp = dimensionResource(R.dimen.zero),
+    bottom: Dp = dimensionResource(R.dimen.zero),
+    vertical: Dp = dimensionResource(R.dimen.zero),
+): PaddingValues =
     paneContentPadding(
         innerEdge = LocalPaneInnerEdge.current,
         outer = resolvedContentInset(),
         inner = dimensionResource(R.dimen.pane_inner_inset),
-        top = top,
-        bottom = bottom,
+        top = top + vertical,
+        bottom = bottom + vertical,
     )
 
 /** [resolvedContentPadding]'s arithmetic, apart from the composition locals it reads. */
