@@ -27,8 +27,8 @@ import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.FilterChipItem
+import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
-import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -60,7 +60,7 @@ class BingeScreenScaffoldSideInsetsTest {
     @Test
     fun `a header's chip row does not add the side inset the scaffold already padded`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithStartNavigationBar(SideBar) {
                     BingeScreenScaffold(
                         title = "Requests",
@@ -91,7 +91,7 @@ class BingeScreenScaffoldSideInsetsTest {
     @Test
     fun `a start inset the rail already consumed is not reserved again`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithStartNavigationBar(SideBar) {
                     // As BingeNavCustomRail does: it publishes its width plus the start inset, and consumes that inset.
                     CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(start = RailWidth + SideBar)) {
@@ -120,7 +120,7 @@ class BingeScreenScaffoldSideInsetsTest {
     @Test
     fun `a start cutout under the rail counts once`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithStartCutout(Cutout) {
                     // The rail's overlay already holds the cutout, and nothing consumed it.
                     CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(start = RailWidth + Cutout)) {
@@ -147,7 +147,7 @@ class BingeScreenScaffoldSideInsetsTest {
     @Test
     fun `a start cutout with no rail is still reserved`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithStartCutout(Cutout) {
                     BingeScreenScaffold(title = "Requests", bar = ScreenBar.Small) { padding ->
                         val start = padding.calculateStartPadding(LocalLayoutDirection.current)
@@ -173,9 +173,6 @@ class BingeScreenScaffoldSideInsetsTest {
         return (resources.getDimension(R.dimen.screen_content_inset) / resources.displayMetrics.density).dp
     }
 }
-
-@Composable
-private fun Theme(content: @Composable () -> Unit) = BingeExpressiveTheme(dynamicColor = false, content = content)
 
 /** Gives the window a navigation bar [width] wide down the start side, answering every insets dispatch at the parent. */
 @Composable

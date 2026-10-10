@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalNavOverlayInsets
+import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
-import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -47,7 +47,7 @@ class FooterAboveKeyboardTest {
     @Test
     fun `a form's footer sits above the keyboard`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithKeyboard(Keyboard) {
                     FormScreen(title = "Edit", primaryAction = FormAction(SAVE, onClick = {}), placement = FormActionPlacement.Footer) {
                         Box(Modifier.fillMaxWidth().height(48.dp))
@@ -62,7 +62,7 @@ class FooterAboveKeyboardTest {
     @Test
     fun `a step's footer sits above the keyboard`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithKeyboard(Keyboard) {
                     StepFlowScreen(stepCount = 2, currentStep = 0, footer = { Text(NEXT) }) {
                         Box(Modifier.fillMaxWidth().height(48.dp))
@@ -77,7 +77,7 @@ class FooterAboveKeyboardTest {
     @Test
     fun `a form without a footer still clears the nav overlay with the keyboard up`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(bottom = Overlay)) {
                     WithKeyboard(Keyboard) {
                         FormScreen(title = "Edit", primaryAction = FormAction(SAVE, onClick = {}), scrolling = false) { padding ->
@@ -106,9 +106,6 @@ class FooterAboveKeyboardTest {
         )
     }
 }
-
-@Composable
-private fun Theme(content: @Composable () -> Unit) = BingeExpressiveTheme(dynamicColor = false, content = content)
 
 /** Opens a keyboard [height] tall over the window, answering every insets dispatch at the parent. */
 @Composable
