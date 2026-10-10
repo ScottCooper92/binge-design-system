@@ -7,8 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -16,6 +17,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 private class DeepestIndex {
     var value: Int? = null
 }
+
+/**
+ * Saves the deepest index only for a configuration change, the one save the same visit is restored from. A save
+ * returning null saves nothing, so any other restore starts a fresh visit.
+ */
+private fun deepestIndexSaver(isChangingConfigurations: () -> Boolean): Saver<DeepestIndex, Int> =
+    Saver(
+        save = { if (isChangingConfigurations()) it.value else null },
+        restore = { saved -> DeepestIndex().apply { value = saved } },
+    )
 
 /**
  * Tracks how far down a [LazyListState] list a visit got, and reports it **once, on leave**.
@@ -35,9 +46,9 @@ private class DeepestIndex {
  * depth to reach, which is not the same as a visit that opened it and scrolled nothing.
  *
  * A configuration change (a rotation, a theme or locale change) is not a leave: the disposal it causes reports
- * nothing, and the recreated effect carries on from the list's restored position. So one visit is one report.
- * The deepest index is not carried across the change, though: the report is the deepest row seen since the
- * recreation, so a visit that went deeper before a rotation and then scrolled back up under-reports.
+ * nothing, and the recreated effect carries on with the deepest index seen before it. So one visit is one report,
+ * and a visit that went deeper before a rotation and then scrolled back up still reports how deep it went. Any other
+ * save, such as the back stack's when the surface is left, carries nothing: that visit has already reported.
  */
 @Composable
 fun ScrollDepthEffect(listState: LazyListState, onVisitEnded: (deepestIndex: Int?) -> Unit) {
@@ -60,12 +71,23 @@ fun ScrollDepthEffect(gridState: LazyGridState, onVisitEnded: (deepestIndex: Int
 
 @Composable
 private fun ScrollDepthEffect(onVisitEnded: (Int?) -> Unit, lastVisibleIndex: () -> Int?) {
+    val activity = LocalActivity.current
+    ScrollDepthEffect(onVisitEnded, lastVisibleIndex) { activity?.isChangingConfigurations == true }
+}
+
+/** [ScrollDepthEffect] with the configuration-change check passed in, so a JVM test can stand in for the activity. */
+@Composable
+internal fun ScrollDepthEffect(
+    onVisitEnded: (Int?) -> Unit,
+    lastVisibleIndex: () -> Int?,
+    isChangingConfigurations: () -> Boolean,
+) {
     // The report happens in onDispose, after any recomposition that replaced the lambda.
     val currentOnVisitEnded by rememberUpdatedState(onVisitEnded)
-    val deepest = remember { DeepestIndex() }
+    val changing by rememberUpdatedState(isChangingConfigurations)
+    val deepest = rememberSaveable(saver = deepestIndexSaver { changing() }) { DeepestIndex() }
     // Keyed on Unit, so the effect runs for the surface's whole life holding whatever it first captured.
     val currentLastVisibleIndex by rememberUpdatedState(lastVisibleIndex)
-    val activity = LocalActivity.current
     LaunchedEffect(Unit) {
         snapshotFlow { currentLastVisibleIndex() }
             .distinctUntilChanged()
@@ -74,6 +96,6 @@ private fun ScrollDepthEffect(onVisitEnded: (Int?) -> Unit, lastVisibleIndex: ()
             }
     }
     DisposableEffect(Unit) {
-        onDispose { if (activity?.isChangingConfigurations != true) currentOnVisitEnded(deepest.value) }
+        onDispose { if (!changing()) currentOnVisitEnded(deepest.value) }
     }
 }
