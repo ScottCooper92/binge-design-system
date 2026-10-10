@@ -42,6 +42,8 @@ fun BingeLetterRail(
     if (letters.isEmpty()) return
     var height by remember { mutableIntStateOf(0) }
     var touched by remember { mutableStateOf<Char?>(null) }
+    // Set when a drag takes the gesture over from the press, so the cancelled press leaves the drag's dedupe alone.
+    var dragging by remember { mutableStateOf(false) }
 
     fun pick(y: Float) {
         if (height == 0) return
@@ -55,6 +57,11 @@ fun BingeLetterRail(
     suspend fun PressGestureScope.pressLetter(y: Float) {
         pick(y)
         tryAwaitRelease()
+        if (!dragging) touched = null
+    }
+
+    fun endDrag() {
+        dragging = false
         touched = null
     }
     Column(
@@ -65,7 +72,11 @@ fun BingeLetterRail(
                 .onSizeChanged { height = it.height }
                 .pointerInput(letters) { detectTapGestures(onPress = { pressLetter(it.y) }) }
                 .pointerInput(letters) {
-                    detectVerticalDragGestures(onDragEnd = { touched = null }, onDragCancel = { touched = null }) { change, _ ->
+                    detectVerticalDragGestures(
+                        onDragStart = { dragging = true },
+                        onDragEnd = ::endDrag,
+                        onDragCancel = ::endDrag,
+                    ) { change, _ ->
                         pick(change.position.y)
                     }
                 },
