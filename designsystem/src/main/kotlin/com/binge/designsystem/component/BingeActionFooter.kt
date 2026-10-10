@@ -1,5 +1,8 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -13,12 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.bottomBarInsets
-import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -45,10 +49,9 @@ import com.binge.designsystem.theme.BingeShapes
  * gesture area and the side insets on its pane's outer edges — the [Surface] itself stays unpadded so its
  * background still extends full-bleed behind it, edge to edge like the rest of the window.
  *
- * [horizontalPadding] defaults to the fixed spacing a sheet's own content already uses. A page whose
- * body reads [resolvedContentInset] passes that instead, so the button's edges land under its own
- * content's rather than a narrower fixed one — the two would otherwise visibly disagree the moment a
- * window is wide enough for [resolvedContentInset] to ramp past this default.
+ * [horizontalPadding] defaults to the fixed spacing a sheet's own content already uses. A page passes
+ * [sidePadding] instead, edge by edge: `resolvedContentPadding()`, so the button lines up with a body that
+ * pads the edge it shares with another pane less than the window's edge. Only its start and end are read.
  *
  * [leadingIcon] matches the same action rendered as a [BingeOutlinedButton]/[BingeTextButton] tile
  * elsewhere — a caller whose action promotes to this footer only once it is the sheet's sole primary
@@ -69,7 +72,9 @@ fun BingeActionFooter(
     bottomPadding: Dp = dimensionResource(R.dimen.padding_l),
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
     clearsNavigationBar: Boolean = false,
+    sidePadding: PaddingValues = PaddingValues(horizontal = horizontalPadding),
 ) {
+    val direction = LocalLayoutDirection.current
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = containerColor,
@@ -86,7 +91,7 @@ fun BingeActionFooter(
                 Modifier
                     .fillMaxWidth()
                     .then(if (clearsNavigationBar) Modifier.windowInsetsPadding(bottomBarInsets()) else Modifier)
-                    .padding(horizontal = horizontalPadding)
+                    .padding(start = sidePadding.calculateStartPadding(direction), end = sidePadding.calculateEndPadding(direction))
                     .padding(top = dimensionResource(R.dimen.padding_sm), bottom = bottomPadding),
         )
     }
@@ -121,8 +126,8 @@ private fun PreviewBingeActionFooterElevated() {
             onClick = {},
             shape = BingeShapes.HeroTop,
             shadowElevation = dimensionResource(R.dimen.snackbar_elevation),
-            horizontalPadding = resolvedContentInset(),
             clearsNavigationBar = true,
+            sidePadding = resolvedContentPadding(),
         )
     }
 }
