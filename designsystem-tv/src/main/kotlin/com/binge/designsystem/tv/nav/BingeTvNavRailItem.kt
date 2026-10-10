@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -144,8 +145,10 @@ internal fun RailItemSurface(
                     name = avatarName,
                     avatarUrl = item.avatarUrl,
                     size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
-                    // Decoration, as the icon is: the initials would otherwise be read in place of the label.
-                    modifier = Modifier.clearAndSetSemantics {},
+                    // Wider than a collapsed item's icon slot, so it is centred on the slot and overflows into the padding
+                    // rather than being squeezed to an oval. Decoration, as the icon is: the initials would otherwise
+                    // be read in place of the label.
+                    modifier = Modifier.wrapContentSize(unbounded = true).clearAndSetSemantics {},
                 )
             } else {
                 Icon(imageVector = item.icon, contentDescription = null, tint = contentColor)
