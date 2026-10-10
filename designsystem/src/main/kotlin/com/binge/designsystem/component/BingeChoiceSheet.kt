@@ -66,8 +66,9 @@ import kotlinx.coroutines.launch
  * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle]. A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
  * language code. A choice that is a person carries [avatarName] instead, drawn as their avatar from [avatarUrl], with
- * their initials while it loads or when there is none. In a list where any choice has a mark, every row keeps the mark's
- * place, empty where it has none, and shows its radio or checkbox last, so the labels line up.
+ * their initials while it loads or when there is none. A [trailingText] such as a count ends the row in a
+ * secondary style. In a list where any choice has a mark, every row keeps the mark's place, empty where it has
+ * none, and shows its radio or checkbox last, so the labels line up; there the text comes before the control.
  */
 data class BingeChoice<out T>(
     val value: T,
@@ -77,6 +78,7 @@ data class BingeChoice<out T>(
     val mark: String? = null,
     val avatarName: String? = null,
     val avatarUrl: String? = null,
+    val trailingText: String? = null,
 )
 
 /**
@@ -614,6 +616,7 @@ internal fun <T> MultiChoiceList(
                     CheckboxRow(
                         label = choice.label,
                         subtitle = choice.subtitle,
+                        trailingContent = choice.trailingText?.let { text -> { ChoiceTrailingText(text) } },
                         checked = choice.value in chosen,
                         onToggle = { on -> onToggle(choice.value, on) },
                         showDivider = index < shown.lastIndex,
@@ -719,9 +722,20 @@ private fun <T> RadioChoiceRow(
                 Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+        choice.trailingText?.let { ChoiceTrailingText(it) }
         if (markSlot) RadioButton(selected = selected, onClick = null, modifier = Modifier.padding(start = trailingControlExtra()))
     }
 }
+
+/** A choice's [trailing text][BingeChoice.trailingText]: one line in the secondary style, never wrapping the label away. */
+@Composable
+private fun ChoiceTrailingText(text: String) =
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+    )
 
 /** Whether [this] has an [icon][BingeChoice.icon] or a [mark][BingeChoice.mark] to show. */
 internal fun BingeChoice<*>.isMarked(): Boolean = icon != null || mark != null || avatarName != null
@@ -881,6 +895,7 @@ private fun <T> CheckChoiceRow(
                 Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+        choice.trailingText?.let { ChoiceTrailingText(it) }
         Checkbox(checked = checked, onCheckedChange = null, modifier = Modifier.padding(start = trailingControlExtra()))
     }
 }

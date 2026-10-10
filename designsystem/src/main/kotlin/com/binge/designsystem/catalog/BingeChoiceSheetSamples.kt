@@ -472,3 +472,51 @@ fun BingeChoiceSheetLongLabelSample() {
         }
     }
 }
+
+/** Choices that carry a count beside the label, as a filter sheet offers: a long label still leaves the count its room. */
+@Composable
+fun BingeChoiceSheetCountsSample() {
+    ScreenshotTheme {
+        SheetSurface {
+            BingeChoiceSheetContent(
+                title = "Images",
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(
+                            BingeChoice("all", "All images", trailingText = "128"),
+                            BingeChoice("backdrops", "Backdrops", trailingText = "24"),
+                            BingeChoice("posters", "Posters and promotional artwork from every region", trailingText = "1,024"),
+                            BingeChoice("logos", "Logos", subtitle = "Transparent PNG", trailingText = "6"),
+                        ),
+                    ),
+                selected = "backdrops",
+                onSelect = {},
+            )
+        }
+    }
+}
+
+/** The multi-choice sheet's rows with counts, ticked and unticked, with the count at each row's end. */
+@Composable
+fun BingeMultiChoiceSheetCountsSample() {
+    ScreenshotTheme {
+        SheetSurface {
+            BingeMultiChoiceSheetContent(
+                title = "Images",
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(
+                            BingeChoice("backdrops", "Backdrops", trailingText = "24"),
+                            BingeChoice("posters", "Posters and promotional artwork from every region", trailingText = "1,024"),
+                            BingeChoice("logos", "Logos", trailingText = "6"),
+                        ),
+                    ),
+                chosen = setOf("backdrops"),
+                onToggle = { _, _ -> },
+                clearLabel = CLEAR,
+                onClear = {},
+                doneLabel = DONE,
+            )
+        }
+    }
+}

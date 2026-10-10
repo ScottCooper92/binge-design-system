@@ -116,6 +116,31 @@ class BingeChoiceSheetTest {
     }
 
     @Test
+    fun `a trailing text shows once beside its choice in a single choice list`() {
+        val choices =
+            BingeChoiceList.Ready(listOf(BingeChoice("a", "Backdrops", trailingText = "24"), BingeChoice("b", "Logos")))
+        rule.setContent {
+            SingleChoiceList(choices = choices, selected = "a", onSelect = {})
+        }
+        rule.onNodeWithText("24").assertIsDisplayed()
+        assertEquals(1, rule.onAllNodesWithText("24").fetchSemanticsNodes().size)
+    }
+
+    @Test
+    fun `a trailing text shows in a multi choice list`() {
+        rule.setContent {
+            MultiChoiceList(
+                choices = BingeChoiceList.Ready(listOf(BingeChoice("a", "Backdrops", trailingText = "24"), BingeChoice("b", "Logos"))),
+                chosen = emptySet(),
+                leading = emptySet(),
+                filterPlaceholder = "Filter",
+                onToggle = { _, _ -> },
+            )
+        }
+        rule.onNodeWithText("24").assertIsDisplayed()
+    }
+
+    @Test
     fun `the filter narrows the rows by label`() {
         rule.setContent {
             MultiChoiceList(
