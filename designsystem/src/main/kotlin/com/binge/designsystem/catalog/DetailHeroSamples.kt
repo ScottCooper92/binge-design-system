@@ -3,9 +3,14 @@
 
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.DetailHero
@@ -54,4 +59,32 @@ fun DetailHeroMetaContentSample() {
             },
         )
     }
+}
+
+/** The [DetailHero.titleContent] slot, a fixed-height block standing in for a title logo. */
+@Composable
+fun DetailHeroTitleContentSample() {
+    ScreenshotTheme {
+        DetailHero(
+            title = "The Dark Knight",
+            backdropUrl = null,
+            tagline = "Why So Serious?",
+            metaText = "9.0 · 2008 · 2h 32m",
+            genres = listOf("Action", "Crime", "Drama"),
+            onBack = {},
+            titleContent = { TitleLogoStandIn() },
+        )
+    }
+}
+
+/** A stand-in for a title logo: a block of fixed height, as a consumer would pass. */
+@Composable
+internal fun TitleLogoStandIn() {
+    Box(
+        Modifier
+            .size(
+                width = dimensionResource(R.dimen.detail_title_logo_sample_width),
+                height = dimensionResource(R.dimen.detail_title_logo_sample_height),
+            ).background(MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small),
+    )
 }

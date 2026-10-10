@@ -19,4 +19,11 @@ class DetailHeroSamplesScreenshotTest {
     fun MetaContent() {
         DetailHeroMetaContentSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TitleContent() {
+        DetailHeroTitleContentSample()
+    }
 }

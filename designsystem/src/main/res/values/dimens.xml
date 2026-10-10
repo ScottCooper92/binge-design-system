@@ -46,6 +46,8 @@
     <!-- Image placeholder icon -->
     <dimen name="placeholder_icon_size">32dp</dimen>
     <!-- Detail components (DetailHero, CastSection, InfoRow) -->
+    <dimen name="detail_title_logo_sample_width">220dp</dimen>
+    <dimen name="detail_title_logo_sample_height">64dp</dimen>
     <dimen name="detail_hero_height">480dp</dimen>
     <!-- DetailOverlayTopBar: scroll band over which the bar crossfades transparent → opaque as the hero clears. -->
     <dimen name="detail_overlay_bar_fade_band">112dp</dimen>
