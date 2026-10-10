@@ -90,4 +90,20 @@
     <string name="number_slider_decrease">Reducir %1$s</string>
     <string name="number_slider_increase">Aumentar %1$s</string>
     <string name="range_slider_readout">%1$s – %2$s</string>
+    <string name="error_kind_network_title">Sin conexión</string>
+    <string name="error_kind_network_message">Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="error_kind_server_title">Algo ha salido mal</string>
+    <string name="error_kind_server_message">El servidor tiene problemas. Inténtalo dentro de un momento.</string>
+    <string name="error_kind_not_found_title">No encontrado</string>
+    <string name="error_kind_not_found_message">Esto no está disponible.</string>
+    <string name="error_kind_auth_title">Sesión cerrada</string>
+    <string name="error_kind_auth_message">Inicia sesión de nuevo para continuar.</string>
+    <string name="error_kind_rate_limited_title">Demasiadas peticiones</string>
+    <string name="error_kind_rate_limited_message">Inténtalo dentro de un momento.</string>
+    <string name="error_kind_forbidden_title">No permitido</string>
+    <string name="error_kind_forbidden_message">Tu cuenta no tiene permiso para esto.</string>
+    <string name="error_kind_generic_title">Algo ha salido mal</string>
+    <string name="error_kind_generic_message">Se ha producido un error inesperado.</string>
+    <string name="error_kind_retry">Reintentar</string>
+    <string name="empty_screen_title">Todavía no hay nada</string>
 </resources>
