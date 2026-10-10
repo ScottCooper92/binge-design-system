@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -29,9 +30,10 @@ private const val STEPS = 3
 private const val MID_SLIDE_MILLIS = 100L
 
 /**
- * What the flow does between steps, which no frame can show: BACK and its gesture step back from the second
- * step and fall through on the first, a changing step keeps the leaving one drawing itself while it slides,
- * and a step that scrolls itself can hold a lazy grid, which a forced outer scroll would refuse to measure.
+ * What the flow does that no frame can show: the dots name the step for a screen reader, BACK and its gesture
+ * step back from the second step and fall through on the first, a changing step keeps the leaving one drawing
+ * itself while it slides, and a step that scrolls itself can hold a lazy grid, which a forced outer scroll would
+ * refuse to measure.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -118,6 +120,14 @@ class StepFlowScreenTest {
 
         composeTestRule.onNodeWithText("Step 0").assertDoesNotExist()
         composeTestRule.onNodeWithText("Step 1").assertExists()
+    }
+
+    @Test
+    fun theDotsNameTheCurrentStepAndTheCount() {
+        step = 1
+        setFlow()
+
+        composeTestRule.onNodeWithContentDescription("Step 2 of 3").assertExists()
     }
 
     @Test
