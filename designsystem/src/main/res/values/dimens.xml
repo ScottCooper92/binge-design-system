@@ -326,7 +326,7 @@
          non-bleeding surface clears by, and that is space the content wants more than the glass does. -->
     <dimen name="nav_custom_rail_width">96dp</dimen>
     <!-- Larger account avatar for the wide custom rail (the bottom bar's 26dp reads undersized here). -->
-    <dimen name="nav_rail_account_avatar_size">40dp</dimen>
+    <dimen name="nav_rail_large_avatar_size">40dp</dimen>
     <!-- Floating nav prototype (M3 expressive FloatingToolbar used as the primary nav). The container's
          own size, shape and screen offset come from FloatingToolbarDefaults; these are the per-item
          insets, which the toolbar has no opinion about because it expects icon buttons, not tabs. -->
