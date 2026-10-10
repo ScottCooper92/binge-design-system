@@ -43,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
 import com.binge.designsystem.centredReadingColumn
 import com.binge.designsystem.isExpandedLayout
@@ -257,8 +259,10 @@ private fun StepChrome(
                 }
             }
         }
+        val progress = stringResource(R.string.cd_step_progress, currentStep + 1, stepCount)
         Row(
-            modifier = Modifier.weight(1f),
+            // The dots draw no text, so the row names the step for a screen reader in their place.
+            modifier = Modifier.weight(1f).then(if (stepCount > 1) Modifier.semantics { contentDescription = progress } else Modifier),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.step_dot_spacing), Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {

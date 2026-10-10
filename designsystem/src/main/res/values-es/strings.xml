@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="cd_step_progress">Paso %1$d de %2$d</string>
     <string name="cd_navigate_back">Volver</string>
     <string name="cd_close_sheet">Cerrar</string>
     <string name="cd_expand_sheet">Expandir</string>
