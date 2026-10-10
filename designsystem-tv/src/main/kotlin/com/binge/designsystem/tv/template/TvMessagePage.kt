@@ -63,9 +63,9 @@ fun TvMessagePage(
                 .then(arrival)
                 .padding(tvPagePadding(hosting)),
     ) {
-        // In a rail destination the sink is all there is to focus, so Left from it opens the rail (#368).
+        // In a rail destination the sink is all there is to focus, so the key toward the rail opens it (#368).
         val railEntry = LocalTvRailEntry.current.takeIf { hosting == TvPageHosting.RailDestination }
-        if (!hasAction) Box(Modifier.focusRequester(sinkEntry)) { TvFocusSink(leftEntry = railEntry) }
+        if (!hasAction) Box(Modifier.focusRequester(sinkEntry)) { TvFocusSink(startEntry = railEntry) }
         TvMessagePlate(
             body = body,
             headline = headline,
