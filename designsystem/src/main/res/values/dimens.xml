@@ -376,4 +376,12 @@
     <dimen name="letter_rail_width">32dp</dimen>
     <dimen name="letter_rail_letter">20dp</dimen>
     <dimen name="letter_rail_sample_height">520dp</dimen>
+    <!-- DecisionScreen: the hero plate and its badge, a point's icon plate, and the landscape points' drop -->
+    <dimen name="decision_content_max_width">600dp</dimen>
+    <dimen name="decision_hero_size">92dp</dimen>
+    <dimen name="decision_hero_icon_size">44dp</dimen>
+    <dimen name="decision_hero_badge_size">34dp</dimen>
+    <dimen name="decision_hero_badge_icon_size">16dp</dimen>
+    <dimen name="decision_point_icon_size">40dp</dimen>
+    <dimen name="decision_landscape_points_top">48dp</dimen>
 </resources>
