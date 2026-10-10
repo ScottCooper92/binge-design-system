@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
+import com.binge.designsystem.tv.preview.TvRtlPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
 /** Screenshot coverage for the TV catalog samples: one frame per sample, each on the TV panel. */
@@ -123,6 +124,17 @@ class TvSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun navRailExpanded() = Frame { TvNavRailSample(expanded = true) }
+
+    /** Right-to-left: the rail moves to the right edge and its labels read from the right. */
+    @PreviewTest
+    @TvRtlPreviews
+    @Composable
+    fun navRailExpandedRtl() = Frame { TvNavRailSample(expanded = true) }
+
+    @PreviewTest
+    @TvRtlPreviews
+    @Composable
+    fun navRailCollapsedRtl() = Frame { TvNavRailSample(expanded = false) }
 
     @PreviewTest
     @TvPreviews
