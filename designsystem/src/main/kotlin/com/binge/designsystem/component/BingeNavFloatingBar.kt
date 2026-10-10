@@ -39,6 +39,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalNavOverlayInsets
@@ -195,6 +197,7 @@ private fun NavFloatingItem(
         .clip(MaterialTheme.shapes.large)
         .then(if (selected) Modifier.background(colors.indicator) else Modifier)
         .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(item.key) })
+        .then(if (style.showsLabel(selected)) Modifier else Modifier.semantics { contentDescription = item.label })
         .then(item.testTag?.let { Modifier.testTag(it) } ?: Modifier)
     CompositionLocalProvider(LocalContentColor provides contentColor) {
         when (style) {
@@ -348,3 +351,6 @@ private fun BingeNavFloatingTone.resolve(): NavFloatingColors {
             )
     }
 }
+
+/** Whether [this] style draws the label text for an item, which then names it; otherwise the item names itself. */
+private fun BingeNavFloatingStyle.showsLabel(selected: Boolean): Boolean = this != BingeNavFloatingStyle.IconWithSelectedLabel || selected
