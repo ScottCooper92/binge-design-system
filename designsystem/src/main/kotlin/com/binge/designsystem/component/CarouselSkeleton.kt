@@ -1,6 +1,5 @@
 package com.binge.designsystem.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,18 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
-import com.binge.designsystem.theme.BingeShapes
 
 private const val SKELETON_CARD_COUNT = 6
 
@@ -43,7 +39,11 @@ fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CAR
                 ).height(dimensionResource(R.dimen.min_touch_target)),
             contentAlignment = Alignment.CenterStart,
         ) {
-            SkeletonBar(Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
+            SkeletonPlate(
+                Modifier
+                    .width(dimensionResource(R.dimen.skeleton_header_width))
+                    .height(dimensionResource(R.dimen.skeleton_header_height)),
+            )
         }
         LazyRow(
             contentPadding = PaddingValues(start = startPadding, end = inset),
@@ -57,16 +57,6 @@ fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CAR
             }
         }
     }
-}
-
-@Composable
-private fun SkeletonBar(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .height(dimensionResource(R.dimen.skeleton_header_height))
-            .clip(BingeShapes.ElementSmall)
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-    )
 }
 
 @Preview(showBackground = true)
