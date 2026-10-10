@@ -103,8 +103,8 @@ for Android TV.
 
 - A public, no-parameter `@Composable fun …Sample()` in `designsystem/…/catalog/` or
   `designsystem-tv/…/tv/catalog/` is listed as a sample.
-- A public, no-parameter `@Composable fun …Demo()` in `designsystem/…/catalog/` is listed as a demo.
-  It runs the real component with real state. Demos are never screenshot fixtures.
+- A public, no-parameter `@Composable fun …Demo()` in `designsystem/…/catalog/` or
+  `designsystem-tv/…/tv/catalog/` is listed as a demo. It runs the real component with real state. Demos are never screenshot fixtures.
 - The first sentence of its KDoc is its description, and the app's search reads it.
 - A public `…Sample` or `…Demo` that takes parameters, or is not composable, fails the build with its
   file and line. A private or internal one is ignored.
