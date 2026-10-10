@@ -79,11 +79,10 @@ fun CenteredContent(
  * Caps a non-lazy screen's content at [maxWidth] and centres the resulting column on a
  * tablet/foldable; below the cap (phones) it is a no-op.
  *
- * Order must stay exactly `fillMaxSize -> wrapContentWidth -> widthIn`: `wrapContentWidth` shrinks
- * and centres within the filled space, then `widthIn(max)` caps it. A `fillMaxSize`/`fillMaxWidth`
- * placed *after* `widthIn` would re-expand to the parent and defeat the cap, so callers must not
- * re-fill afterwards. Unlike [CenteredContent], this is a plain `Modifier` chain for a self-sizing
- * `Column`.
+ * Order must stay `fillMaxSize -> wrapContentWidth -> widthIn`: `wrapContentWidth` has to come before
+ * `widthIn(max)` so that it centres the capped column inside the filled space. A `fillMaxWidth` after
+ * `widthIn` is fine: it fills to the lowered max, not to the parent. Unlike [CenteredContent], this
+ * is a plain `Modifier` chain for a self-sizing `Column`.
  */
 @Composable
 fun Modifier.centredReadingColumn(maxWidth: Dp = dimensionResource(R.dimen.content_max_width)): Modifier =
