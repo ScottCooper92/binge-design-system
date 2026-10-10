@@ -107,6 +107,13 @@ class ItemGroupSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun mixedSwitches() {
+        ItemGroupMixedSwitchSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun longLabels() {
         ItemGroupLongLabelSample()
     }

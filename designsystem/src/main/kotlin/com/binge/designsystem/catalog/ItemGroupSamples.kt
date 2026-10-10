@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.state.ToggleableState
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeInitialsAvatar
 import com.binge.designsystem.component.ItemGroup
@@ -392,6 +393,37 @@ fun ItemGroupSwitchSample() {
                 ListItem(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = forceIpv4, onClick = { forceIpv4 = !forceIpv4 }),
                 ListItem(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, disabled = true),
                 ListItem(icon = Icons.Filled.Settings, label = "Set by the server", toggled = true, clickable = false),
+            ),
+        )
+    }
+}
+
+/**
+ * A bulk editor's switch rows ([ListItem.toggleState]): a setting every selected user has, one none has, and one only
+ * some have, drawn off with a dash. Tapping the mixed row cycles it on, off, and back to mixed.
+ */
+@Composable
+fun ItemGroupMixedSwitchSample() {
+    var requests by remember { mutableStateOf(ToggleableState.Indeterminate) }
+    ScreenshotTheme {
+        ItemGroup(
+            title = "3 users selected",
+            rows = listOf(
+                ListItem(icon = Icons.Filled.Dns, label = "Request", toggleState = ToggleableState.On),
+                ListItem(
+                    icon = Icons.Filled.Tune,
+                    label = "Auto-approve",
+                    detail = "Some of the selected users have this",
+                    toggleState = requests,
+                    onClick = {
+                        requests = when (requests) {
+                            ToggleableState.Indeterminate -> ToggleableState.On
+                            ToggleableState.On -> ToggleableState.Off
+                            ToggleableState.Off -> ToggleableState.Indeterminate
+                        }
+                    },
+                ),
+                ListItem(icon = Icons.Filled.Block, label = "Manage users", toggleState = ToggleableState.Off),
             ),
         )
     }

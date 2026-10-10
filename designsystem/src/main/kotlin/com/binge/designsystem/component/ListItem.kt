@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.state.ToggleableState
 
 /** Where a [ListItem] takes the user, and so which trailing glyph promises the right thing. */
 enum class ListItemDestination {
@@ -97,4 +98,14 @@ data class ListItem(
      * and is offered the expand or collapse action, which calls [onClick]. See [BingeExpandableGroup].
      */
     val expanded: Boolean? = null,
+    /**
+     * A switch row with a third state, for a bulk editor where only some of the items it edits have the setting:
+     * [ToggleableState.Indeterminate] draws the switch off with a dash on its thumb and is announced as neither on nor
+     * off. Read in place of [toggled] when set; the row is otherwise the same switch row.
+     */
+    val toggleState: ToggleableState? = null,
 )
+
+/** The row's switch state, from [ListItem.toggleState] or else [ListItem.toggled]; null for a row with no switch. */
+internal val ListItem.switchState: ToggleableState?
+    get() = toggleState ?: toggled?.let { ToggleableState(it) }

@@ -12,17 +12,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Badge
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,6 +47,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.DISABLED_ALPHA
@@ -128,7 +131,7 @@ private fun ListItemView(
     modifier: Modifier = Modifier,
 ) {
     val interactive = row.clickable && !row.loading && !row.disabled
-    val external = interactive && row.toggled == null && row.trailingContent == null && row.destination == ListItemDestination.External
+    val external = interactive && row.switchState == null && row.trailingContent == null && row.destination == ListItemDestination.External
     val externalDescription = stringResource(R.string.cd_list_item_external)
     val loadingDescription = stringResource(R.string.cd_list_item_loading)
     val expandedDescription = stringResource(if (row.expanded == true) R.string.cd_group_expanded else R.string.cd_group_collapsed)
@@ -226,7 +229,7 @@ private fun ListItemView(
                 (row.badgeCount ?: 0) > 0 ||
                 row.loading ||
                 row.trailingContent != null ||
-                row.toggled != null ||
+                row.switchState != null ||
                 row.expanded != null ||
                 external ||
                 chevron
@@ -239,18 +242,14 @@ private fun ListItemView(
                 CountBadge(count = row.badgeCount, tint = row.badgeTint)
                 Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
             }
+            val switchState = row.switchState
             when {
                 row.loading -> BingeLoadingIndicator(
                     modifier = Modifier.size(dimensionResource(R.dimen.item_group_loading_size)),
                 )
                 row.trailingContent != null -> row.trailingContent.invoke()
-                row.toggled != null -> Switch(
-                    checked = row.toggled,
-                    onCheckedChange = null,
-                    // The row is the control, so its switch looks enabled only when tapping the row would toggle it.
-                    enabled = interactive,
-                    colors = bingeSwitchColors(),
-                )
+                // The row is the control, so its switch looks enabled only when tapping the row would toggle it.
+                switchState != null -> RowSwitch(state = switchState, enabled = interactive)
                 row.expanded != null -> {
                     Icon(
                         imageVector = if (row.expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
@@ -282,13 +281,14 @@ private fun ListItemView(
  * other row keeps the `Role.Button` click and its long-press.
  */
 @OptIn(ExperimentalFoundationApi::class)
-private fun rowActionModifier(row: ListItem, interactive: Boolean): Modifier =
-    if (row.toggled != null) {
-        Modifier.toggleable(
-            value = row.toggled,
+private fun rowActionModifier(row: ListItem, interactive: Boolean): Modifier {
+    val switchState = row.switchState
+    return if (switchState != null) {
+        Modifier.triStateToggleable(
+            state = switchState,
             enabled = interactive,
             role = Role.Switch,
-            onValueChange = { row.onClick() },
+            onClick = row.onClick,
         )
     } else {
         Modifier.combinedClickable(
@@ -299,6 +299,24 @@ private fun rowActionModifier(row: ListItem, interactive: Boolean): Modifier =
             onLongClick = row.onLongClick,
         )
     }
+}
+
+/** A switch row's control: on or off as Material draws it, and indeterminate as off with a dash on its thumb. */
+@Composable
+private fun RowSwitch(state: ToggleableState, enabled: Boolean) {
+    Switch(
+        checked = state == ToggleableState.On,
+        onCheckedChange = null,
+        enabled = enabled,
+        colors = bingeSwitchColors(),
+        thumbContent =
+            if (state == ToggleableState.Indeterminate) {
+                { Icon(Icons.Filled.Remove, contentDescription = null, modifier = Modifier.size(SwitchDefaults.IconSize)) }
+            } else {
+                null
+            },
+    )
+}
 
 /** The row's count: a tonal pill in [tint] when given (matching the row's sentiment), else the default badge. */
 @Composable
