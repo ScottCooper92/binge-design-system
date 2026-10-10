@@ -29,7 +29,7 @@ data class ScanResult(
  * Finds the catalog's public samples and demos in Kotlin source text.
  *
  * Source scanning rather than reflection or KSP, by decision on the catalog epic: the samples are
- * top-level, annotated one per line and carry a KDoc, which a line scan reads exactly, and a
+ * top-level, annotated on the line above or the same line and carry a KDoc, which a line scan reads exactly, and a
  * reflection pass over Compose-rewritten signatures would not. A public function ending in `Sample` or
  * `Demo` that is not a no-argument composable is reported with its file and line, not skipped.
  *
@@ -37,8 +37,10 @@ data class ScanResult(
  * (and its `fullScreen = true`), `@file:CatalogGroup("…")`, `@file:SelfDescribing` and `@file:ScreenshotOnly`, whose file lists nothing.
  */
 object SampleScanner {
-    private val declaration = Regex("""^(public\s+)?fun\s+(\w+)\s*\(""")
-    private val hiddenDeclaration = Regex("""^(internal|private|protected)\s+""")
+    private val sameLineAnnotation = """(?:@\w+(?:\([^)]*\))?\s+)*"""
+    private val declaration = Regex("""^($sameLineAnnotation)(public\s+)?fun\s+(\w+)\s*\(""")
+    private val hiddenDeclaration = Regex("""^$sameLineAnnotation(internal|private|protected)\s+""")
+    private val annotationToken = Regex("""@\w+(?:\([^)]*\))?""")
     private val sentenceEnd = Regex("""(?<=[.!?])\s+(?=[A-Z])""")
     private val kdocLink = Regex("""\[([^\]]+)]""")
     private val onePerScreenMarker = Regex("""^@file:\s*([\w.]+\.)?OnePerScreen\b""")
@@ -59,10 +61,12 @@ object SampleScanner {
         val problems = mutableListOf<String>()
         for ((index, line) in lines.withIndex()) {
             if (hiddenDeclaration.containsMatchIn(line)) continue
-            val function = declaration.find(line)?.groupValues?.get(2) ?: continue
+            val match = declaration.find(line) ?: continue
+            val function = match.groupValues[3]
             val kind = EntryKind.entries.firstOrNull { function.endsWith(it.name) } ?: continue
             val where = "$fileName:${index + 1}"
-            val annotations = annotationsAbove(lines, index)
+            val above = annotationsAbove(lines, index)
+            val annotations = above + annotationToken.findAll(match.groupValues[1]).map { it.value }
             val parameters = parametersFrom(lines, index)
             when {
                 annotations.none { it.startsWith(COMPOSABLE) } ->
@@ -73,7 +77,7 @@ object SampleScanner {
                     function = function,
                     group = group,
                     name = displayName(function),
-                    description = firstSentence(kdocAbove(lines, index - annotations.size)),
+                    description = firstSentence(kdocAbove(lines, index - above.size)),
                     kind = kind,
                     onePerScreen = onePerScreen,
                     catalogGroup = catalogGroup,
@@ -115,7 +119,7 @@ object SampleScanner {
 
     private fun parametersFrom(lines: List<String>, declarationIndex: Int): String {
         val text = lines.drop(declarationIndex).joinToString("\n")
-        val open = text.indexOf('(')
+        val open = text.indexOf('(', text.indexOf("fun "))
         var depth = 0
         for (i in open until text.length) {
             when (text[i]) {
@@ -127,7 +131,8 @@ object SampleScanner {
     }
 
     private fun kdocAbove(lines: List<String>, firstAnnotationIndex: Int): List<String> {
-        val end = firstAnnotationIndex - 1
+        var end = firstAnnotationIndex - 1
+        while (end >= 0 && lines[end].isBlank()) end--
         if (end < 0 || !lines[end].trim().endsWith("*/")) return emptyList()
         val start = (end downTo 0).firstOrNull { lines[it].trim().startsWith("/**") } ?: return emptyList()
         return (start..end).map { row ->

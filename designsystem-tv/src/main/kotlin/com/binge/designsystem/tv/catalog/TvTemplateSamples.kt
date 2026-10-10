@@ -122,6 +122,26 @@ fun TvTwoPanePageListDetailSample() {
     }
 }
 
+/** The default split, copy and action sharing the page evenly — what a page gets when it names no split. */
+@Composable
+fun TvTwoPanePageBalancedSample() {
+    TvTwoPanePage(
+        split = TvTwoPaneSplit.Balanced,
+        hosting = TvPageHosting.PreShell,
+        copy = {
+            TvTwoPaneCopy(
+                headline = "Notification settings",
+                body = "Copy and choices sit side by side, each taking half the page.",
+            )
+        },
+        action = {
+            repeat(SAMPLE_ROWS) { index ->
+                TvButtonSurface("Option ${index + 1}", TvButtonStyle.Secondary, enabled = true, isFocused = index == 0)
+            }
+        },
+    )
+}
+
 /** A picker board: the heading and a running count top-aligned beside the grid, the divider halving the gap. */
 @Composable
 fun TvTwoPanePageBoardSample() {
