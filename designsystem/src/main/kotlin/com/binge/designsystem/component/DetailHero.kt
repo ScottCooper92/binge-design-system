@@ -27,6 +27,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -249,6 +251,7 @@ private fun HeroTextColumn(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 autoSize = OneLineOrWrapAutoSize(max = titleStyle.fontSize, min = HERO_TITLE_MIN_SIZE, step = HeroTitleSizeStep),
+                modifier = Modifier.semantics { heading() },
             )
         }
         if (!eyebrowText.isNullOrBlank()) {
