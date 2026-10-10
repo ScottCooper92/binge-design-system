@@ -30,6 +30,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.Icon
@@ -155,13 +156,19 @@ fun TvSideSheetRow(
             else -> MaterialTheme.colorScheme.onSurface
         }
     val content = tvFocusContentColor(isFocused = focused, resting = resting)
+    val clickable =
+        if (enabled) {
+            Modifier.tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick)
+        } else {
+            Modifier
+        }
     Row(
         modifier =
             modifier
                 .fillMaxWidth()
                 .clip(BingeShapes.TvListItem)
                 .tvFocusFill(isFocused = focused, shape = BingeShapes.TvListItem)
-                .then(if (enabled) Modifier.tvClickable(onFocusChanged = { focused = it }, onClick = onClick) else Modifier)
+                .then(clickable)
                 .then(if (selected) Modifier.semantics { this.selected = true } else Modifier)
                 .padding(
                     horizontal = dimensionResource(DesR.dimen.padding_l),
