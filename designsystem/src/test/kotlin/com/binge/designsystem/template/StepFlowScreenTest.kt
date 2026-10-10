@@ -193,6 +193,17 @@ class StepFlowScreenTest {
     }
 
     @Test
+    fun theSplitHoldsWhileTheKeyboardShrinksTheSpace() {
+        // A portrait flow whose height the keyboard cuts below its width would measure as split.
+        val measuredWithKeyboard = splitsStep(width = 690.dp, height = 470.dp, expandedWidth = 840.dp)
+        assertTrue(measuredWithKeyboard)
+        assertFalse(heldWhileIme(measured = measuredWithKeyboard, imeVisible = true, held = false))
+        assertTrue(heldWhileIme(measured = false, imeVisible = true, held = true))
+        assertTrue(heldWhileIme(measured = true, imeVisible = false, held = false))
+        assertTrue(heldWhileIme(measured = true, imeVisible = true, held = null))
+    }
+
+    @Test
     fun aStepThatScrollsItselfHoldsALazyGrid() {
         setFlow(contentScrolls = false) {
             LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.fillMaxSize()) {
