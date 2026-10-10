@@ -238,8 +238,8 @@
          top-right corner, sized to the button's own default touch target. -->
     <dimen name="hint_card_dismiss_end_inset">48dp</dimen>
     <!-- FilterChipRowSkeleton's pill: the chip's own height, so the pill plus BingeFilterChipRow's vertical
-         content padding is the band the resolved page puts above its grid (the gallery's and the library's
-         first tile is reserved where it lands, not a chip row too high). -->
+         content padding is the band the resolved page puts above its grid (its first tile is reserved where
+         it lands, not a chip row too high). -->
     <dimen name="skeleton_filter_chip_height">44dp</dimen>
     <dimen name="skeleton_filter_chip_width">88dp</dimen>
     <!-- Hub screens layout rhythm -->

@@ -14,12 +14,12 @@ data class DetailStat(
 )
 
 /**
- * The sub-label under a title's rating: the vote count when TMDB has one, and the bare word
+ * The sub-label under a title's rating: the vote count when there is one, and the bare word
  * "Rating" when it does not — a stat reading "8.2 / 0 votes" is worse than one that says nothing
  * about how many people rated it.
  *
- * Here rather than in each detail feature because the movie and TV screens built it identically,
- * off the same two designsystem resources, differing only in which model they read the count from.
+ * Shared so every detail screen builds it the same way, off the same two resources, whatever model
+ * the count is read from.
  */
 @Composable
 fun ratingSubLabel(voteCount: Int): String =

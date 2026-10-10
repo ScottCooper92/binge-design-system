@@ -49,8 +49,8 @@ import kotlinx.coroutines.launch
  * horizontal fold and the cap is absent, so nothing else in the app changes height.
  *
  * [edgeToEdge] lets the content run under the navigation bar, as a long list does, padding its own end so the last
- * row can scroll clear of the bar. The status bar, the sides and the IME are still inset, so a field in the sheet is
- * not covered by the keyboard.
+ * row can scroll clear of the bar. The status bar and the IME are still inset, so a field in the sheet is not covered by the
+ * keyboard. The default insets carry no horizontal side, so the sheet does not inset the sides itself.
  *
  * Otherwise no `contentWindowInsets` is passed, so this takes [ModalBottomSheet]'s default —
  * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — which already includes
@@ -151,7 +151,7 @@ internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gestures
     )
 }
 
-/** An edge-to-edge sheet's insets: the default's top and sides, and the IME, without the navigation bar. */
+/** An edge-to-edge sheet's insets: the default's top and the IME, without the navigation bar. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun edgeToEdgeInsets(): WindowInsets =

@@ -168,7 +168,7 @@ fun MediaCardSkeleton(modifier: Modifier = Modifier) {
 }
 
 /**
- * The stacked poster overlays: the TMDB [rating] bottom-start, the user's own [userRating] as an
+ * The stacked poster overlays: the community [rating] bottom-start, the user's own [userRating] as an
  * accent chip bottom-end, the [typeBadge] top-start (for mixed movie/TV grids), and the contextual
  * [topEndAction] top-end. Each is optional so a plain [MediaCard] renders an image alone.
  */
