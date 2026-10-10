@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -128,7 +129,7 @@ private fun AccountProfileCardRow(
             ExpressiveIconButton(
                 onClick = onClick,
                 icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.cd_open_named, name),
                 tone = IconButtonTone.Tonal,
                 tint = MaterialTheme.colorScheme.onSurface,
             )

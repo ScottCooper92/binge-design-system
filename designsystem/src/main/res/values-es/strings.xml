@@ -90,4 +90,5 @@
     <string name="number_slider_decrease">Reducir %1$s</string>
     <string name="number_slider_increase">Aumentar %1$s</string>
     <string name="range_slider_readout">%1$s – %2$s</string>
+    <string name="cd_open_named">Abrir %1$s</string>
 </resources>

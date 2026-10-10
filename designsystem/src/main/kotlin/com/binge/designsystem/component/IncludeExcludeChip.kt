@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextDecoration
@@ -38,6 +39,7 @@ fun IncludeExcludeChip(
     onTap: () -> Unit,
     onLongPress: () -> Unit,
     modifier: Modifier = Modifier,
+    onLongPressLabel: String? = null,
 ) {
     val shape = BingeShapes.Chip
     val errorTint = MaterialTheme.colorScheme.error.copy(alpha = 0.14f)
@@ -78,7 +80,7 @@ fun IncludeExcludeChip(
             .clip(shape)
             .background(chipColors.background)
             .border(BorderStroke(dimensionResource(R.dimen.hairline_thickness), chipColors.border), shape)
-            .combinedClickable(onClick = onTap, onLongClick = onLongPress)
+            .combinedClickable(role = Role.Button, onLongClickLabel = onLongPressLabel, onClick = onTap, onLongClick = onLongPress)
             .semantics { stateDescription = stateLabel }
             .padding(
                 horizontal = dimensionResource(R.dimen.discover_filter_chip_padding_h),
