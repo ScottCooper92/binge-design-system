@@ -63,7 +63,8 @@ private const val HERO_COMPACT_HEIGHT_FRACTION = 0.6f
 /**
  * A featured title in the hub [HeroCarousel]. [year], [runtimeMinutes], [seasons] and [tagline] are
  * optional: the cinematic meta row renders whatever the caller supplies — today the hub mappers pass
- * only rating + genres, so the richer fields are a future data-layer follow-up.
+ * only rating + genres, so the richer fields are a future data-layer follow-up. [rank] is the title's place
+ * in a trending list, drawn and announced as "#N trending today"; leave it null for a list that is not one.
  */
 data class HeroItem(
     val id: Int,
@@ -75,6 +76,7 @@ data class HeroItem(
     val runtimeMinutes: Int? = null,
     val seasons: Int? = null,
     val tagline: String? = null,
+    val rank: Int? = null,
 )
 
 /**
@@ -183,7 +185,6 @@ fun HeroCarousel(
         val currentItem = items[current]
         HeroCopyOverlay(
             item = currentItem,
-            rank = current + 1,
             heroActions = heroActions,
             onCopyBounds = { copyBounds[currentItem.id] = it },
         )
@@ -210,7 +211,7 @@ private fun BoxScope.HeroBackdrop(
         label = "hero-backdrop",
     ) { page ->
         val item = items[page]
-        val description = heroContentDescription(item, rank = page + 1)
+        val description = heroContentDescription(item)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -241,8 +242,8 @@ private fun BoxScope.HeroBackdrop(
  * screen reader heard "button, button, button" with nothing saying which one was current.
  *
  * Each dot is named for the title it goes to. The backdrop's own description cannot stand in: it names
- * the featured *title* including its trending rank, which is the item rather than the carousel's
- * position, and the two coincide only because the hub happens to feed the hero a ranked list.
+ * the featured *title* including any trending rank, which belongs to the item rather than to the carousel's
+ * position.
  */
 @Composable
 private fun BoxScope.HeroDots(
@@ -308,9 +309,10 @@ private val previewHeroItems = listOf(
         year = "2010",
         runtimeMinutes = 148,
         tagline = "Your mind is the scene of the crime.",
+        rank = 1,
     ),
-    HeroItem(id = 2, imageUrl = null, title = "The Dark Knight", rating = 9.0f, genres = listOf("Action", "Crime")),
-    HeroItem(id = 3, imageUrl = null, title = "Interstellar", rating = 8.6f, genres = listOf("Sci-Fi", "Drama")),
+    HeroItem(id = 2, imageUrl = null, title = "The Dark Knight", rating = 9.0f, genres = listOf("Action", "Crime"), rank = 2),
+    HeroItem(id = 3, imageUrl = null, title = "Interstellar", rating = 8.6f, genres = listOf("Sci-Fi", "Drama"), rank = 3),
 )
 
 @Preview(showBackground = true)
