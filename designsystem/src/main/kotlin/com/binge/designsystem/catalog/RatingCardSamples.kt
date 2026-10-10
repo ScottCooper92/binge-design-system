@@ -12,8 +12,8 @@ import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
  * Public samples for [RatingCard] (group `"Cards"`) — see the convention on [MediaCardRatedSample].
- * Covers the card's three states: signed-in prompt (no rating yet), a recorded rating, and the
- * signed-out variant whose footer surfaces the community review count.
+ * Covers the signed-in prompt (no rating yet), a recorded rating, and the signed-out variant whose
+ * footer surfaces the community review count, each with and without reviews to show.
  */
 @Composable
 fun RatingCardUnratedSample() {
@@ -73,6 +73,56 @@ fun RatingCardNotYetRateableSample() {
             isSignedIn = true,
             rateable = false,
             reviewCount = 0,
+            averageReviewRating = null,
+            onRate = {},
+            onRemoveRating = {},
+            onReviewsClick = {},
+        )
+    }
+}
+
+/** Signed in with nothing rated and no reviews yet: the star prompt alone, with no footer. */
+@Composable
+fun RatingCardNoReviewsSample() {
+    var rating by remember { mutableStateOf<Float?>(null) }
+    ScreenshotTheme {
+        RatingCard(
+            userRating = rating,
+            isSignedIn = true,
+            reviewCount = 0,
+            averageReviewRating = null,
+            onRate = { rating = it },
+            onRemoveRating = { rating = null },
+            onReviewsClick = {},
+        )
+    }
+}
+
+/** A recorded rating above the reviews footer, with no community average to show. */
+@Composable
+fun RatingCardRatedWithReviewsSample() {
+    var rating by remember { mutableStateOf<Float?>(9f) }
+    ScreenshotTheme {
+        RatingCard(
+            userRating = rating,
+            isSignedIn = true,
+            reviewCount = 12,
+            averageReviewRating = null,
+            onRate = { rating = it },
+            onRemoveRating = { rating = null },
+            onReviewsClick = {},
+        )
+    }
+}
+
+/** Signed out, with reviews but no average: the footer gives the count alone. */
+@Composable
+fun RatingCardSignedOutNoAverageSample() {
+    ScreenshotTheme {
+        RatingCard(
+            userRating = null,
+            isSignedIn = false,
+            reviewCount = 3,
             averageReviewRating = null,
             onRate = {},
             onRemoveRating = {},

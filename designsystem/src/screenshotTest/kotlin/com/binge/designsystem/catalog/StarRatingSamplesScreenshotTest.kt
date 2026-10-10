@@ -19,4 +19,18 @@ class StarRatingSamplesScreenshotTest {
     fun Interactive() {
         StarRatingInteractiveSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun InteractiveEmpty() {
+        StarRatingInteractiveEmptySample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun InteractiveLowest() {
+        StarRatingInteractiveLowestSample()
+    }
 }
