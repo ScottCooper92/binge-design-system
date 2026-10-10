@@ -55,14 +55,22 @@ private fun roundsToStep(value: Double, step: Double): Boolean = BigDecimal(valu
 /**
  * Up to two initials from a display name, split on whitespace and the separators commonly found in
  * usernames (".", "_", "-"). Returns [fallback] when no initials can be derived (empty or
- * delimiter-only strings).
+ * delimiter-only strings), which defaults to the first two characters.
+ *
+ * Cased by [locale], so a Turkish "ilker" gives "İ" and not "I". A composable passes the locale it shows,
+ * as [uppercaseLocalised] does; the default is the process locale.
  */
-fun String.toInitials(fallback: String = take(2).uppercase()): String =
+fun String.toInitials(fallback: String? = null, locale: Locale = Locale.getDefault()): String =
     split(" ", ".", "_", "-")
         .filter { it.isNotBlank() }
         .take(2)
-        .joinToString("") { it.first().uppercaseChar().toString() }
-        .ifBlank { fallback }
+        .joinToString("") {
+            it
+                .first()
+                .toString()
+                .uppercase(locale)
+                .take(1)
+        }.ifBlank { fallback ?: take(2).uppercase(locale) }
 
 /** Caps a badge count at "99+" so the pill stays compact. Shared by nav, tab and row badges. */
 fun badgeCountLabel(count: Int): String = if (count > MAX_BADGE_COUNT) "$MAX_BADGE_COUNT+" else count.toString()
@@ -147,15 +155,18 @@ fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(T
  * collapsed to a range with an en dash, as every other range in the app: `1, 2, 3, 5, 6` reads "1–3, 5, 6". Sorted and de-duplicated first, so order
  * and repeats do not matter; empty input gives "". The numbers only, with no label, so the caller
  * keeps its own plural resource around the text. Zero is an ordinary number.
+ *
+ * Items are joined with [separator], which a caller takes from a translatable string so a language with its own
+ * list punctuation can set it. The default is the English comma and space.
  */
-fun Collection<Int>.formatRanges(): String {
+fun Collection<Int>.formatRanges(separator: String = ", "): String {
     val runs = sorted().distinct().fold(mutableListOf<IntRange>()) { acc, n ->
         val last = acc.lastOrNull()
         if (last != null && last.last + 1 == n) acc[acc.lastIndex] = last.first..n else acc += n..n
         acc
     }
-    return runs.joinToString(", ") { run ->
+    return runs.joinToString(separator) { run ->
         val size = run.last - run.first + 1
-        if (size >= MIN_COLLAPSED_RUN) "${run.first}\u2013${run.last}" else run.joinToString(", ")
+        if (size >= MIN_COLLAPSED_RUN) "${run.first}\u2013${run.last}" else run.joinToString(separator)
     }
 }

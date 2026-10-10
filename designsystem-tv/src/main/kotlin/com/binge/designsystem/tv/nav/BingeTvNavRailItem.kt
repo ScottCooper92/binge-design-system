@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -77,6 +79,8 @@ internal fun RailItem(
             ).semantics {
                 role = Role.Tab
                 this.selected = selected
+                // Collapsed, the item draws no label, so it names itself; expanded, the label text names it.
+                if (!showLabel) contentDescription = item.label
             },
     )
 }
@@ -140,6 +144,8 @@ internal fun RailItemSurface(
                     name = avatarName,
                     avatarUrl = item.avatarUrl,
                     size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
+                    // Decoration, as the icon is: the initials would otherwise be read in place of the label.
+                    modifier = Modifier.clearAndSetSemantics {},
                 )
             } else {
                 Icon(imageVector = item.icon, contentDescription = null, tint = contentColor)

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -73,7 +74,7 @@ private fun InitialsAvatar(name: String, size: Dp) {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = name.toInitials(),
+            text = name.toInitials(locale = LocalConfiguration.current.locales[0]),
             modifier = Modifier.padding(size * AVATAR_INITIALS_PADDING_FRACTION),
             style = MaterialTheme.typography.labelSmall,
             color = ink,

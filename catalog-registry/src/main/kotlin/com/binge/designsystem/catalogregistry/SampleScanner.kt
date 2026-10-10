@@ -73,6 +73,8 @@ object SampleScanner {
                     problems += "$where: public $function is not @Composable; a catalog ${kind.noun} must be"
                 parameters.isNotBlank() ->
                     problems += "$where: $function takes parameters ($parameters); a ${kind.noun} takes none"
+                firstSentence(kdocAbove(lines, index - annotations.size)).isBlank() ->
+                    problems += "$where: $function has no KDoc; its first sentence is the description the catalog shows and searches"
                 else -> samples += SampleDeclaration(
                     function = function,
                     group = group,

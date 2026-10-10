@@ -8,10 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.tv.R as TvR
 
 /** Test tag baked into every [TvFocusSink] — there is no `Modifier` parameter for a caller to tag it with. */
@@ -31,9 +33,10 @@ const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
  *
  * **Never calls `requestFocus` itself.** It only receives what a group's own entry redirect, an explicit
  * request, or Compose's own recovery search hands it — a puller here would reproduce the rail collapsing under
- * a user still walking it. [leftEntry] is the one sanctioned way out by D-pad: the content pane passes
- * its rail's selected-item requester so ← still opens the rail; the overlay host leaves it `null`, since Back
- * is the only way out of an overlay. Every other direction is cancelled, so a stray press during a skeleton
+ * a user still walking it. [startEntry] is the one sanctioned way out by D-pad: the content pane passes
+ * its rail's selected-item requester so the key toward the layout's start edge still opens the rail — ← under
+ * LTR, → under RTL, where the rail is drawn on the right; the overlay host leaves it `null`, since Back is the
+ * only way out of an overlay. Every other direction is cancelled, so a stray press during a skeleton
  * does nothing rather than landing on a geometric pick behind the pane.
  *
  * 1dp and fully transparent rather than zero-size: some Compose versions drop zero-size nodes from directional
@@ -41,17 +44,20 @@ const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
  * are the whole contract, not something a call site should be able to override.
  */
 @Composable
-fun TvFocusSink(leftEntry: FocusRequester? = null) {
+fun TvFocusSink(startEntry: FocusRequester? = null) {
+    // Focus directions are physical, so the start edge's key is picked from the layout direction here.
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val exit = startEntry ?: FocusRequester.Cancel
     Box(
         Modifier
             .testTag(TV_FOCUS_SINK_TAG)
             .size(dimensionResource(TvR.dimen.tv_focus_sink_size))
             .alpha(0f)
             .focusProperties {
-                left = leftEntry ?: FocusRequester.Cancel
+                left = if (rtl) FocusRequester.Cancel else exit
                 up = FocusRequester.Cancel
                 down = FocusRequester.Cancel
-                right = FocusRequester.Cancel
+                right = if (rtl) exit else FocusRequester.Cancel
             }.focusable()
             .clearAndSetSemantics { hideFromAccessibility() },
     )

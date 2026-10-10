@@ -7,6 +7,7 @@ import com.binge.designsystem.component.HeroCarousel
 import com.binge.designsystem.component.HeroItem
 import com.binge.designsystem.preview.ScreenshotTheme
 
+/** The hero carousel with three featured titles, each with a rating and genres, paging sideways. */
 @Composable
 fun HeroCarouselSample() {
     ScreenshotTheme {

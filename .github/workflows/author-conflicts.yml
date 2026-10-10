@@ -39,8 +39,9 @@ jobs:
 
         A conflict over a public signature of a component must be handed
         back. This build is included by Binge and by binge-seerr, and you
-        cannot compile either from here, so you cannot tell whether a
-        resolution that compiles in this repository breaks a consumer. Leave
+        cannot compile either from here, and CI compiles only binge-seerr, so
+        you cannot tell whether a resolution that compiles in this repository
+        breaks a consumer. Leave
         it unresolved and say so in note.md.
     secrets:
       AUTHOR_APP_ID: ${{ secrets.AUTHOR_APP_ID }}

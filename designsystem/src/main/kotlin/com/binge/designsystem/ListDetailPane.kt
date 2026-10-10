@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
  */
 @Composable
 fun PaneContent(
-    innerEdge: PaneEdge? = null,
     modifier: Modifier = Modifier,
+    innerEdge: PaneEdge? = null,
     content: @Composable () -> Unit,
 ) {
     val sharedEdge = innerEdge.takeUnless { LocalIsSinglePaneNav.current }

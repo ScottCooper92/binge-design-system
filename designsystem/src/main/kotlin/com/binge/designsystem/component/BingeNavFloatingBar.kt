@@ -39,7 +39,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
@@ -134,8 +137,10 @@ internal fun BingeNavFloatingBarScaffold(
     val computed = rememberNavOverlayInsets(BingeNavPresentation.FloatingBar).calculateBottomPadding()
     var measured by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
+    // Only the pill is measured, so only its growth past the default container corrects the computed strip.
+    val correction = (measured - FloatingToolbarDefaults.ContainerSize).coerceAtLeast(0.dp)
     Box(modifier.fillMaxSize()) {
-        CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(bottom = maxOf(computed, measured))) {
+        CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(bottom = computed + correction)) {
             content()
         }
         val colors = tone.resolve()
@@ -152,10 +157,12 @@ internal fun BingeNavFloatingBarScaffold(
                 colors = colors.toolbar,
                 shape = containerShape,
                 expandedShadowElevation = dimensionResource(R.dimen.nav_floating_shadow_elevation),
+                // Measured after the insets and the offset, which `computed` already carries: measured before them,
+                // the top inset (the status bar) would count towards a bottom inset.
                 modifier = Modifier
-                    .onSizeChanged { measured = with(density) { it.height.toDp() } }
                     .windowInsetsPadding(navSurfaceInsets())
                     .padding(bottom = FloatingToolbarDefaults.ScreenOffset)
+                    .onSizeChanged { measured = with(density) { it.height.toDp() } }
                     .then(
                         colors.outline?.let {
                             Modifier.border(dimensionResource(R.dimen.hairline_thickness), it, containerShape)
@@ -195,6 +202,7 @@ private fun NavFloatingItem(
         .clip(MaterialTheme.shapes.large)
         .then(if (selected) Modifier.background(colors.indicator) else Modifier)
         .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(item.key) })
+        .then(if (style.showsLabel(selected)) Modifier else Modifier.semantics { contentDescription = item.label })
         .then(item.testTag?.let { Modifier.testTag(it) } ?: Modifier)
     CompositionLocalProvider(LocalContentColor provides contentColor) {
         when (style) {
@@ -348,3 +356,6 @@ private fun BingeNavFloatingTone.resolve(): NavFloatingColors {
             )
     }
 }
+
+/** Whether [this] style draws the label text for an item, which then names it; otherwise the item names itself. */
+private fun BingeNavFloatingStyle.showsLabel(selected: Boolean): Boolean = this != BingeNavFloatingStyle.IconWithSelectedLabel || selected
