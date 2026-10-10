@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.em
 import androidx.tv.material3.MaterialTheme
@@ -190,7 +191,7 @@ private fun TvHeroSynopsis(
                 Modifier
                     .then(overview.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
                     .tvFocusIndicator(isFocused = overview.isFocused, shape = BingeShapes.Medium)
-                    .tvClickable(onFocusChanged = overview.onFocusChanged, onClick = overview.onClick)
+                    .tvClickable(onFocusChanged = overview.onFocusChanged, role = Role.Button, onClick = overview.onClick)
                     // Inside the ring, so the outline floats clear of the text rather than crowding it.
                     .padding(dimensionResource(TvR.dimen.tv_detail_page_synopsis_padding))
             },
