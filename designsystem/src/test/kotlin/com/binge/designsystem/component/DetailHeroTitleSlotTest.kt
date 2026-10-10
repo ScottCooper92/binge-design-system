@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.text.TextStyle
 import com.binge.designsystem.testing.ShadowMeshSpecification
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +29,7 @@ class DetailHeroTitleSlotTest {
         var expectedStyle: TextStyle? = null
         var expectedColor: Color? = null
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 expectedStyle = DetailHeroDefaults.titleStyle()
                 expectedColor = MaterialTheme.colorScheme.onBackground
                 DetailHero(
@@ -56,7 +56,7 @@ class DetailHeroTitleSlotTest {
         var slotStyle: TextStyle? = null
         var expectedStyle: TextStyle? = null
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 expectedStyle = DetailHeroDefaults.cinematicTitleStyle()
                 DetailCinematicHeader(
                     title = "Title",

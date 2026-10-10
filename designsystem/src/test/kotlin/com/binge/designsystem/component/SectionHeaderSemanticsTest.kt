@@ -5,7 +5,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,14 +23,14 @@ class SectionHeaderSemanticsTest {
 
     @Test
     fun `a title-only header is a heading`() {
-        rule.setContent { BingeExpressiveTheme(dynamicColor = false) { SectionHeader(title = "Trending") } }
+        rule.setContent { TestTheme { SectionHeader(title = "Trending") } }
 
         rule.onNodeWithText("Trending").assert(isHeading)
     }
 
     @Test
     fun `a header with a more action is still a heading`() {
-        rule.setContent { BingeExpressiveTheme(dynamicColor = false) { SectionHeader(title = "Trending", onMoreClick = {}) } }
+        rule.setContent { TestTheme { SectionHeader(title = "Trending", onMoreClick = {}) } }
 
         rule.onNodeWithText("Trending").assert(isHeading)
     }

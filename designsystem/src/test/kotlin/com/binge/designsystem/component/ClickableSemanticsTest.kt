@@ -18,7 +18,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.paging.LoadState
 import com.binge.designsystem.R
 import com.binge.designsystem.template.PagedAppendFooter
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +38,7 @@ class ClickableSemanticsTest {
 
     private fun string(id: Int, vararg args: Any) = RuntimeEnvironment.getApplication().getString(id, *args)
 
-    private fun show(content: @Composable () -> Unit) = rule.setContent { BingeExpressiveTheme(dynamicColor = false) { content() } }
+    private fun show(content: @Composable () -> Unit) = rule.setContent { TestTheme { content() } }
 
     @Test
     fun `the chips are buttons`() {

@@ -4,7 +4,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +20,7 @@ class MessageScreenHeadingTest {
     @Test
     fun `the headline is the one heading, and the body is not`() {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 MessageScreen(headline = "Nothing here", body = "Add something to see it.")
             }
         }
@@ -32,7 +32,7 @@ class MessageScreenHeadingTest {
     @Test
     fun `a message without a headline has no heading`() {
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) { MessageScreen(body = "Add something to see it.") }
+            TestTheme { MessageScreen(body = "Add something to see it.") }
         }
 
         rule.onAllNodes(isHeading()).assertCountEquals(0)

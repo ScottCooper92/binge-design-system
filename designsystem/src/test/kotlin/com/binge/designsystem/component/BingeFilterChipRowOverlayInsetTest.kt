@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -42,7 +42,7 @@ class BingeFilterChipRowOverlayInsetTest {
 
     private fun chipRow(overlayStart: Dp) {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(start = overlayStart)) {
                     BingeFilterChipRow(items = ITEMS, selectedIndex = 0, onSelect = {})
                 }

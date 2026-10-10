@@ -12,7 +12,7 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +32,7 @@ class BingeRangeSliderTest {
 
     private fun setSlider(values: ClosedFloatingPointRange<Float>, openEndLabel: String? = null) {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 BingeRangeSlider(
                     values = values,
                     onValuesChange = {},
@@ -108,7 +108,7 @@ class BingeRangeSliderTest {
         val reported = mutableListOf<ClosedFloatingPointRange<Float>>()
         var values by mutableStateOf(6.3f..8f)
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 BingeRangeSlider(
                     values = values,
                     onValuesChange = {
@@ -138,7 +138,7 @@ class BingeRangeSliderTest {
         val reported = mutableListOf<ClosedFloatingPointRange<Float>>()
         var values by mutableStateOf(6f..8f)
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 BingeRangeSlider(
                     values = values,
                     onValuesChange = {
@@ -175,7 +175,7 @@ class BingeRangeSliderTest {
         val reported = mutableListOf<ClosedFloatingPointRange<Float>>()
         var values by mutableStateOf(6f..8f)
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 BingeRangeSlider(
                     values = values,
                     onValuesChange = {

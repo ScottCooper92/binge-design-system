@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +29,7 @@ class NavSuiteItemTestTagTest {
 
     private fun render(presentation: BingeNavPresentation) {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 BingeNavSuiteShell(
                     items = listOf(
                         BingeNavSuiteItem(key = "movies", label = "Movies", icon = Icons.Filled.Movie, testTag = "nav-movies"),

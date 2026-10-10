@@ -10,7 +10,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +38,7 @@ class BingeBottomSheetDismissTest {
     private fun showSheet(gesturesEnabled: Boolean, dismissOnClickOutside: Boolean = gesturesEnabled) {
         dismissed = 0
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 BingeBottomSheet(
                     onDismissRequest = { dismissed++ },
                     gesturesEnabled = gesturesEnabled,

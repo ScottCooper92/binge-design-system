@@ -20,7 +20,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.theme.BingeExpressiveTheme
+import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.theme.LocalReduceMotion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -55,7 +55,7 @@ class StepFlowScreenTest {
         content: @Composable (Int) -> Unit = { Text("Step $it") },
     ) {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 CompositionLocalProvider(LocalReduceMotion provides reduceMotion) {
                     StepFlowScreen(
                         stepCount = STEPS,
@@ -137,7 +137,7 @@ class StepFlowScreenTest {
 
     private fun setTitledFlow(onExit: () -> Unit) {
         composeTestRule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 StepFlowScreen(
                     stepCount = STEPS,
                     currentStep = step,

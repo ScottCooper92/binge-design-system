@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
+import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
-import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +41,7 @@ class ScaffoldSnackbarSideInsetsTest {
     fun `a start cutout moves the snackbar in by its width`() {
         var cutout by mutableStateOf(0.dp)
         rule.setContent {
-            BingeExpressiveTheme(dynamicColor = false) {
+            TestTheme {
                 WithStartCutout(cutout) {
                     val snackbar = remember { SnackbarHostState() }
                     LaunchedEffect(Unit) { snackbar.showSnackbar(MESSAGE) }
