@@ -50,6 +50,8 @@ import java.util.Locale
  * With no year chosen yet, the picker opens on [defaultYear] (clamped into the bounds), not on the
  * range's last year: a range reaching into the future would otherwise open years ahead of today.
  *
+ * [modifier] is applied to the dialog's content, so a caller can size or tag it.
+ *
  * The visible body is [MonthYearPickerContent], stateless so screenshot tests can render it: the
  * modal [Dialog] window does not capture in previews.
  */
@@ -60,6 +62,7 @@ fun MonthYearPickerDialog(
     yearRange: IntRange,
     onDismiss: () -> Unit,
     onConfirm: (MonthYearSelection) -> Unit,
+    modifier: Modifier = Modifier,
     initial: MonthYearSelection = MonthYearSelection(),
     minimum: YearMonth? = null,
     maximum: YearMonth? = null,
@@ -86,6 +89,7 @@ fun MonthYearPickerDialog(
             },
             onConfirm = { onConfirm(selection) },
             onDismiss = onDismiss,
+            modifier = modifier,
         )
     }
 }
