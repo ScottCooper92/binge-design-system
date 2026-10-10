@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
@@ -232,6 +233,35 @@ class ItemGroupSemanticsTest {
             .assertIsOn()
             .performClick()
         assertEquals(0, taps)
+    }
+
+    @Test
+    fun `a mixed switch row is one switch node that reports neither on nor off, and takes its tap`() {
+        var taps = 0
+        composeTestRule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                ItemGroup(
+                    title = null,
+                    rows = listOf(
+                        ListItem(
+                            icon = Icons.Filled.Bookmark,
+                            label = "Auto-approve",
+                            toggleState = ToggleableState.Indeterminate,
+                            onClick = { taps++ },
+                        ),
+                    ),
+                )
+            }
+        }
+        val isSwitch = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch)
+        val isMixed = SemanticsMatcher.expectValue(SemanticsProperties.ToggleableState, ToggleableState.Indeterminate)
+        composeTestRule
+            .onNode(hasText("Auto-approve"))
+            .assert(isSwitch)
+            .assert(isMixed)
+            .performClick()
+        assertEquals(1, taps)
+        composeTestRule.onAllNodes(isToggleable()).assertCountEquals(1)
     }
 
     @Test
