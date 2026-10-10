@@ -51,8 +51,8 @@ sealed interface NavSuiteBadge {
  * the profile image from [avatarUrl] when present, falling back to [avatarName]'s initials. [icon] is
  * the fallback when [avatarName] is null (signed out). [badge] overlays either rendering.
  *
- * [isAccount] marks the Account destination so the custom rail can give it the larger avatar it needs
- * at that width — by flag rather than list position, so appending or reordering tabs can't move it.
+ * [largeAvatar] gives this destination the larger avatar the custom rail needs for a profile picture at that
+ * width — by flag rather than list position, so appending or reordering tabs can't move it.
  *
  * [testTag], when set, tags the item's clickable node in every presentation, so a UI-automation
  * driver can find a destination by id rather than by its label. It is explicit rather than derived
@@ -65,7 +65,7 @@ data class BingeNavSuiteItem(
     val badge: NavSuiteBadge = NavSuiteBadge.None,
     val avatarName: String? = null,
     val avatarUrl: String? = null,
-    val isAccount: Boolean = false,
+    val largeAvatar: Boolean = false,
     val testTag: String? = null,
 )
 

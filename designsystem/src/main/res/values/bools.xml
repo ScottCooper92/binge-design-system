@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Discover is a tablet-only nav destination (smallest-width >=600dp, both orientations).
-         Independent of the rail/bar tier bools above: phones never show Discover as a tab. -->
-    <bool name="binge_nav_show_discover">false</bool>
     <!-- Expanded-width layout gate (>=840dp): drives the cinematic detail header and other
          side-pane affordances. Defaults (compact / portrait): off, so phones keep the single column. -->
     <bool name="binge_layout_expanded">false</bool>

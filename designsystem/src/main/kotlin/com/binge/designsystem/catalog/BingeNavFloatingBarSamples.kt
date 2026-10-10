@@ -82,7 +82,7 @@ private fun floatingSampleTab(
         icon = icon,
         badge = badge,
         avatarName = avatarName,
-        isAccount = tab == FloatingSampleTab.Account,
+        largeAvatar = tab == FloatingSampleTab.Account,
     )
 
 /**
