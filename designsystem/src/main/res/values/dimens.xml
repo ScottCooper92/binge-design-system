@@ -61,7 +61,7 @@
          column here too (the rails start-align to it but bleed past); Search caps its field/results here.
          Wider screens centre the column with gutters; a no-op on phones. -->
     <dimen name="content_max_width">640dp</dimen>
-    <!-- Watch-provider tile grid (onboarding services step + account settings) -->
+    <!-- Watch-provider tile grid, for a provider-picking screen -->
     <dimen name="provider_grid_spacing">12dp</dimen>
     <dimen name="provider_tile_border">2.5dp</dimen>
     <!-- Provider tile resting + lifted shadow (smaller than the choice panels'
@@ -73,7 +73,7 @@
     <dimen name="provider_tile_check_icon">13dp</dimen>
     <!-- The width the catalog samples pin a provider tile to, a typical grid cell. Not see_all_tile_width: that is the poster cell, and only matches by coincidence (#248). -->
     <dimen name="provider_tile_sample_width">120dp</dimen>
-    <!-- Selected-services summary (shared by onboarding + account watch providers) -->
+    <!-- Selected-services summary, beside a provider-picking grid -->
     <dimen name="services_summary_logo">24dp</dimen>
     <!-- Fixed min height for the summary slot so the empty-hint and the lead+logos
          states are the same height and the grid above doesn't shift. -->

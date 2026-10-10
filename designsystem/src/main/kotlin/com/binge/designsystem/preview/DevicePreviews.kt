@@ -36,7 +36,7 @@ annotation class ComponentPreviews
 
 /**
  * Default and large (1.5×) font scale, light + dark, at the standard phone width.
- * Use for text-dense surfaces (account, detail screens, onboarding analytics) to catch
+ * Use for text-dense surfaces (a profile page, a detail screen, a consent step) to catch
  * wrap/overflow regressions.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)

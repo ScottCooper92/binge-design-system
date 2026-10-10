@@ -21,7 +21,7 @@ fun isExpandedLayout(): Boolean = booleanResource(R.bool.binge_layout_expanded)
 
 /**
  * Whether the current window is landscape (wide-but-short). Drives layouts that place side by side
- * what portrait stacks vertically (e.g. onboarding watch-type choices). Independent of
+ * what portrait stacks vertically (a row of large choice cards, say). Independent of
  * [isExpandedLayout]: a landscape phone is short *and* unexpanded.
  */
 @Composable

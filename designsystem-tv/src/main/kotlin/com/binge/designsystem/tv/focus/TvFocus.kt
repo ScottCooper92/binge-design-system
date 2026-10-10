@@ -37,7 +37,7 @@ import com.binge.designsystem.tv.R as TvR
  * `docs/tv-foundation.md` > The accent model.
  *
  * **Nothing scales** — focus is colour, never geometry: a growing element pushes its outline into its neighbour
- * (on the ~424dp onboarding watch-type cards 16dp apart, an 8% lift overlapped them), and dropping the scale
+ * (on large choice cards ~424dp wide and 16dp apart, an 8% lift overlapped them), and dropping the scale
  * means focus needs only the outline's own 5.5dp.
  *
  * That 5.5dp is `tv_focus_ring_offset` + half of `tv_focus_ring_width`, not their sum: [focusRing] inflates the
