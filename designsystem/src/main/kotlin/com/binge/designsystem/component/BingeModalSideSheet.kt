@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +42,7 @@ private const val SIDE_SHEET_ANIMATION_MS = 250
  *
  * Built on [Dialog] (`usePlatformDefaultWidth = false`) so it owns the whole window for the scrim
  * and gets back-press handling for free. The slide is driven by an [AnimatedVisibility] toggled on
- * first composition, so opening animates in rather than snapping.
+ * first composition, so opening animates in rather than snapping, and only once: a recreation restores it open.
  */
 @Composable
 fun BingeModalSideSheet(
@@ -57,7 +59,7 @@ fun BingeModalSideSheet(
                 dismissOnClickOutside = false,
             ),
     ) {
-        var visible by remember { mutableStateOf(false) }
+        var visible by rememberSideSheetShown()
         LaunchedEffect(Unit) { visible = true }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -90,6 +92,13 @@ fun BingeModalSideSheet(
         }
     }
 }
+
+/**
+ * Whether the sheet has shown, saved so a sheet already open when the activity is recreated comes back open instead of
+ * sliding in again.
+ */
+@Composable
+internal fun rememberSideSheetShown(): MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 
 /**
  * The sheet's resting panel — container colour, start corners and width — apart from the [Dialog]
