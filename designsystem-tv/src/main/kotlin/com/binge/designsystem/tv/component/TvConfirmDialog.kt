@@ -60,6 +60,9 @@ fun TvConfirmDialog(
 /**
  * The dialog's visible card, apart from the modal window, so a screenshot can render it. [initiallyDismissFocused]
  * draws the dismiss button focused, the frame the user sees first: a static preview runs no arrival effect.
+ *
+ * The content runs the arrival effect itself, so rendered inline, outside a dialog window, it pulls focus to dismiss
+ * when it mounts.
  */
 @Composable
 fun TvConfirmDialogContent(
