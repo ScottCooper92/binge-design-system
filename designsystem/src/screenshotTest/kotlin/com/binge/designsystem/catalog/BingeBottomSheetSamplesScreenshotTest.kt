@@ -9,7 +9,7 @@ import com.binge.designsystem.preview.PreviewCutout
 import com.binge.designsystem.preview.PreviewEdge
 import com.binge.designsystem.preview.PreviewSystemBarInsets
 
-private const val PHONE_LANDSCAPE = "spec:width=411dp,height=600dp,orientation=landscape"
+private const val NARROW_LANDSCAPE = "spec:width=360dp,height=660dp,orientation=landscape"
 
 class BingeBottomSheetSamplesScreenshotTest {
     @PreviewTest
@@ -19,9 +19,9 @@ class BingeBottomSheetSamplesScreenshotTest {
         BingeBottomSheetSample()
     }
 
-    /** A landscape phone with the camera cutout on the left: the sheet, narrower than its cap here, clears it. */
+    /** A narrow landscape window with a camera cutout on the left. The 640dp sheet reaches into the cutout, so its content clears it. */
     @PreviewTest
-    @Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "narrow-land", device = NARROW_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun UnderSideCutout() {
         PreviewSystemBarInsets(cutout = PreviewCutout(PreviewEdge.Left)) { BingeBottomSheetSideInsetsSample() }
