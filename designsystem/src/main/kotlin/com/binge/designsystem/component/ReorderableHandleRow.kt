@@ -46,7 +46,8 @@ fun ReorderableHandleRow(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = dimensionResource(R.dimen.min_touch_target))
-            .semantics {
+            // Merged, so the Move actions sit on the label's own node rather than on a nameless stop beside it.
+            .semantics(mergeDescendants = true) {
                 customActions = listOfNotNull(
                     onMoveUp?.let { move ->
                         CustomAccessibilityAction(moveUpLabel) {

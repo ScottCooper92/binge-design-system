@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -8,6 +9,7 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -85,6 +87,25 @@ class ReorderableHandleRowTest {
         show(onMoveUp = { moves += "up" }, onMoveDown = { moves += "down" })
 
         rule.onNodeWithContentDescription("Drag to reorder").assertDoesNotExist()
+    }
+
+    @Test
+    fun `the Move actions sit on the label's own node`() {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                ReorderableHandleRow(handleModifier = Modifier, onMoveUp = {}, onMoveDown = {}) { Text("Drama") }
+            }
+        }
+
+        val labels =
+            rule
+                .onNodeWithText("Drama")
+                .fetchSemanticsNode()
+                .config
+                .getOrNull(SemanticsActions.CustomActions)
+                .orEmpty()
+                .map { it.label }
+        assertEquals(2, labels.size)
     }
 
     private companion object {
