@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.ToggleOff
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -18,11 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.DecisionCopy
+import com.binge.designsystem.DecisionPoint
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.tv.component.TvButtonSurface
 import com.binge.designsystem.tv.component.TvQrCode
 import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.template.TvBoard
+import com.binge.designsystem.tv.template.TvDecisionPage
 import com.binge.designsystem.tv.template.TvMessagePage
 import com.binge.designsystem.tv.template.TvPageAction
 import com.binge.designsystem.tv.template.TvPageHosting
@@ -354,4 +360,30 @@ private fun SampleField(
             TvButtonSurface(value, TvButtonStyle.Secondary, enabled = true, isFocused = focused)
         }
     }
+}
+
+/** The phone's decision on a television: the copy and a note beside the points, accept focused under them. */
+@Composable
+fun TvDecisionPageSample() {
+    TvDecisionPage(
+        copy =
+            DecisionCopy(
+                kicker = "Usage data",
+                title = "Help make the app better",
+                subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                note = "You can change this at any time in Settings.",
+            ),
+        points =
+            listOf(
+                DecisionPoint(Icons.Filled.BarChart, "What is shared", "Which screens you open and how long they take to load."),
+                DecisionPoint(Icons.Filled.VisibilityOff, "What never is", "Your server, your account and what you watch."),
+                DecisionPoint(Icons.Filled.ToggleOff, "Change it any time", "Press Settings, and it stops at once."),
+            ),
+        acceptLabel = "Share usage data",
+        declineLabel = "Not now",
+        onAccept = {},
+        onDecline = {},
+        hosting = TvPageHosting.PreShell,
+        acceptInitiallyFocused = true,
+    )
 }
