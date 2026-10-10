@@ -370,7 +370,10 @@ fun ItemGroupConnectorSample() {
     }
 }
 
-/** Switch rows ([ListItem.toggled]): on, off and disabled, each drawing its own switch and no chevron. */
+/**
+ * Switch rows ([ListItem.toggled]): on, off, disabled, and read-only, each drawing its own switch and no chevron. A
+ * read-only row (`clickable = false`) greys its switch without dimming the row, as a disabled one does.
+ */
 @Composable
 fun ItemGroupSwitchSample() {
     var trustProxy by remember { mutableStateOf(true) }
@@ -388,6 +391,7 @@ fun ItemGroupSwitchSample() {
                 ),
                 ListItem(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = forceIpv4, onClick = { forceIpv4 = !forceIpv4 }),
                 ListItem(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, disabled = true),
+                ListItem(icon = Icons.Filled.Settings, label = "Set by the server", toggled = true, clickable = false),
             ),
         )
     }

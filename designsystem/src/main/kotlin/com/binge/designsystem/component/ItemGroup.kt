@@ -247,7 +247,8 @@ private fun ListItemView(
                 row.toggled != null -> Switch(
                     checked = row.toggled,
                     onCheckedChange = null,
-                    enabled = !row.disabled,
+                    // The row is the control, so its switch looks enabled only when tapping the row would toggle it.
+                    enabled = interactive,
                     colors = bingeSwitchColors(),
                 )
                 row.expanded != null -> {

@@ -88,7 +88,7 @@ data class ListItem(
      * The whole row is then one `Role.Switch` node carrying a [androidx.compose.ui.state.ToggleableState], so a
      * screen reader announces "Label, Switch, On" rather than "Label, Button". A tap calls [onClick], which
      * should flip the state the caller owns. Unless [trailingContent] is set, the row draws the switch itself
-     * and no chevron. A switch row has no long-press; [onLongClick] is ignored.
+     * and no chevron, greyed when the row is not [clickable]. A switch row has no long-press; [onLongClick] is ignored.
      */
     val toggled: Boolean? = null,
     /**
