@@ -36,6 +36,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
 import com.binge.designsystem.tv.focus.tvClickable
@@ -47,7 +48,6 @@ import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 private const val SCRIM_ALPHA = 0.6f
-private const val DISABLED_ROW_ALPHA = 0.5f
 
 /**
  * An end-edge, focus-trapped sheet over a scrim: the ten-foot counterpart of a phone's bottom sheet, for a
@@ -155,7 +155,7 @@ fun TvSideSheetRow(
     var focused by remember { mutableStateOf(initiallyFocused) }
     val resting =
         when {
-            !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ROW_ALPHA)
+            !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ALPHA)
             destructive -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurface
         }
