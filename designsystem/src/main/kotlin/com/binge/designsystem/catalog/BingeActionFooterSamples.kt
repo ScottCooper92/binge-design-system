@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeActionFooter
 import com.binge.designsystem.preview.ScreenshotTheme
-import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeShapes
 
 /**
@@ -82,8 +82,8 @@ fun BingeActionFooterElevatedSample() {
                 onClick = {},
                 shape = BingeShapes.HeroTop,
                 shadowElevation = dimensionResource(R.dimen.snackbar_elevation),
-                horizontalPadding = resolvedContentInset(),
                 clearsNavigationBar = true,
+                sidePadding = resolvedContentPadding(),
             )
         }
     }

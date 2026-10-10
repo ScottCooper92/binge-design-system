@@ -47,6 +47,14 @@ annotation class ComponentPreviews
 annotation class FontScalePreviews
 
 /**
+ * The largest system font size, 2.0, dark, at the standard phone width: one cell for a component that sizes
+ * a container around its text, where the largest scale is what clips.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+annotation class LargestFontPreview
+
+/**
  * The locale axis, at the standard phone width, dark: one cell per locale that ships **other than
  * the source locale**. English is not a cell here because every surface that takes this annotation
  * also takes [FontScalePreviews], whose `font10-dark` cell is the same window, theme and locale — the

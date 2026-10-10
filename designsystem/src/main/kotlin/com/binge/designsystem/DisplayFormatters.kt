@@ -3,6 +3,7 @@ package com.binge.designsystem
 import android.icu.text.RelativeDateTimeFormatter
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -174,6 +175,25 @@ fun Collection<Int>.formatRanges(separator: String = ", "): String {
 }
 
 private const val MINUTES_PER_HOUR = 60
+private const val HALF_HOUR_MINUTES = 30
+
+/**
+ * A download's time left: "About 12 min left", then whole hours ("About 2 hr left") from an hour up, rounded to the
+ * nearest hour. In this module's strings, with their Spanish, so every app phrases it the same.
+ */
+@Composable
+fun downloadEtaLabel(etaMinutes: Int): String {
+    val hours = downloadEtaHours(etaMinutes)
+    return if (hours != null) {
+        pluralStringResource(R.plurals.download_eta_hours, hours, hours)
+    } else {
+        pluralStringResource(R.plurals.download_eta_minutes, etaMinutes, etaMinutes)
+    }
+}
+
+/** The whole hours [downloadEtaLabel] shows for [etaMinutes], to the nearest hour, or null below an hour. */
+internal fun downloadEtaHours(etaMinutes: Int): Int? =
+    if (etaMinutes >= MINUTES_PER_HOUR) (etaMinutes + HALF_HOUR_MINUTES) / MINUTES_PER_HOUR else null
 
 /**
  * A runtime as hours and minutes in the shown language ("2h 15m", "2 h 15 min"). The one place the split into

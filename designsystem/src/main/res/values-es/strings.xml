@@ -90,6 +90,16 @@
     <string name="number_slider_decrease">Reducir %1$s</string>
     <string name="number_slider_increase">Aumentar %1$s</string>
     <string name="range_slider_readout">%1$s – %2$s</string>
+    <plurals name="download_eta_minutes">
+        <item quantity="one">Queda %1$d min aprox.</item>
+        <item quantity="many">Quedan %1$d min aprox.</item>
+        <item quantity="other">Quedan %1$d min aprox.</item>
+    </plurals>
+    <plurals name="download_eta_hours">
+        <item quantity="one">Queda %1$d h aprox.</item>
+        <item quantity="many">Quedan %1$d h aprox.</item>
+        <item quantity="other">Quedan %1$d h aprox.</item>
+    </plurals>
     <string name="error_kind_network_title">Sin conexión</string>
     <string name="error_kind_network_message">Comprueba tu conexión e inténtalo de nuevo.</string>
     <string name="error_kind_server_title">Algo ha salido mal</string>
