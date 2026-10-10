@@ -49,8 +49,9 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 │                and the …Demo()s the catalog app runs live
 ├── modifier/    skeleton shimmer, selection lift
 ├── layout/      layout anchors
-├── template/    the whole-screen frames: the scaffold, the message screen, the filtered list, the
-│                hero detail page, the form, the step flow, the decision screen and the paged phase
+├── template/    the whole-screen frames: the scaffold, the message screen, the error and empty
+│                screens, the filtered list, the hero detail page, the form, the step flow, the
+│                decision screen and the paged phase
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
 
 designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/

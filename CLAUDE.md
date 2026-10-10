@@ -25,10 +25,11 @@ across the seam; the colour-scheme adapter in `BingeTvTokens.kt` is the one sanc
 Both modules also hold the screen templates, in a `template` package each: whole-screen frames
 that Binge and the companion build their pages from, so a screen of the same kind is laid out the
 same way in both apps. On the phone (`com.binge.designsystem.template`) they are the scaffold, the
-message screen, the filtered list, the hero detail page, the form, the step flow and the paged phase.
-On the TV (`com.binge.designsystem.tv.template`) they are the page hosting, the board, the two-pane
-page, the step flow, the message page, the detail page, the immersive hub and grid, and the skeleton
-pages that stand in for them while they load. `TvImmersiveScroll.kt` there is the scroll the hub and
+message screen, the error and empty screens, the filtered list, the hero detail page, the form, the
+step flow, the decision screen and the paged phase. On the TV (`com.binge.designsystem.tv.template`)
+they are the page hosting, the board, the two-pane page, the step flow, the message page, the detail
+page, the decision page, the immersive hub and grid, and the skeleton pages that stand in for them
+while they load. `TvImmersiveScroll.kt` there is the scroll the hub and
 grid share, not a template of its own. A template follows
 the one rule below like any component: it takes slots and callbacks, never a Binge type.
 
