@@ -352,7 +352,7 @@
     <!-- Lifts the pill off the content it overlays. FloatingToolbarDefaults' own elevation assumes a
          plain surface underneath; this bar sits over poster art, where a shadow is what separates it. -->
     <dimen name="nav_floating_shadow_elevation">6dp</dimen>
-    <!-- MonthYearPicker: fixed height of the month/year grid, four rows of min_touch_target with padding_s between, so switching grids does not resize the dialog -->
+    <!-- MonthYearPicker: minimum height of the month/year grid (it grows with the font size), four rows of min_touch_target with padding_s between, so switching grids does not resize the dialog -->
     <dimen name="month_year_picker_grid_height">216dp</dimen>
     <!-- MonthYearPicker: outline of the chosen month/year pill, and the horizontal padding that sizes the pill to its label inside the full-width touch cell -->
     <dimen name="month_year_picker_selected_border">2dp</dimen>

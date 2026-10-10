@@ -17,12 +17,14 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
@@ -42,9 +44,13 @@ private const val MONTH_ROWS = 12 / MONTH_COLUMNS
  */
 @Composable
 internal fun monthGridHeight(): Dp {
-    val lineHeight = with(LocalDensity.current) {
-        MaterialTheme.typography.bodyLarge.lineHeight
-            .toDp()
+    val style = MaterialTheme.typography.bodyLarge
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    // Measured, not read from the token: under nonlinear font scaling the real line is taller than lineHeight.toDp().
+    val lineHeight = remember(style, density) {
+        val measured = measurer.measure("0", style)
+        with(density) { measured.size.height.toDp() }
     }
     return monthGridHeight(
         lineHeight = lineHeight,
