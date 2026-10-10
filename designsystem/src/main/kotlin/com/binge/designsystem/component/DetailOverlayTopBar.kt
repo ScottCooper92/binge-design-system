@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.core.view.WindowInsetsControllerCompat
@@ -64,6 +66,8 @@ import com.binge.designsystem.theme.BingeTheme
  * header under it uses, or back and share float outboard of the content they belong to.
  *
  * A null [onBack] drops the back button, for a detail in a pane beside the list that already offers the way back.
+ *
+ * The title is invisible while the hero is untouched, so a screen reader skips it until the fade begins.
  */
 @Composable
 fun BoxScope.DetailOverlayTopBar(
@@ -150,7 +154,10 @@ fun BoxScope.DetailOverlayTopBar(
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = progress),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
+                // Drawn at alpha zero over the hero, so a screen reader would otherwise stop on text nobody can see.
+                modifier = Modifier
+                    .weight(1f)
+                    .then(if (progress <= 0f) Modifier.semantics { hideFromAccessibility() } else Modifier),
             )
             actions(glassBackgroundAlpha)
         }
