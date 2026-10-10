@@ -21,19 +21,31 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 
 private const val SECTION = "seasons"
+
+/** The skeleton's card: `tv_skeleton_card_width` wide at 4:3, so the loaded row's cards match it and only the heading can differ. */
+private val CardWidth = 140.dp
+private const val CARD_RATIO = 4f / 3f
 private val HeroAnchor = TvLayoutAnchors.entry(TvLayoutAnchors.HERO_KEY)
 
-/** [TvDetailPageSkeleton] reserves the hero band and puts the first row where [TvDetailPage] does (#369). */
+/**
+ * [TvDetailPageSkeleton] reserves the hero band and puts the first row where [TvDetailPage] does (#369). The row is held
+ * to its loaded height as well as its top edge: a heading stand-in shorter than the loaded `titleLarge` line leaves the
+ * first row's cards higher than they settle (#575).
+ */
 @RunWith(RobolectricTestRunner::class)
 @Config(
     sdk = [34],
     application = Application::class,
-    qualifiers = "w960dp-h540dp-television-xhdpi",
+    // Tall enough that the page's lower rows are not squeezed: the skeleton's row measures to the space it is given.
+    qualifiers = "w960dp-h1200dp-television-xhdpi",
     // The loaded hero draws its backdrop wash through MeshSpecification, which Robolectric has no native for.
     shadows = [ShadowMeshSpecification::class],
 )
+// The row's heading is a TvSectionTitle, and legacy graphics measures text at one pixel per character.
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvDetailPageSkeletonGeometryTest {
     @get:Rule
     val composeTestRule = createKeyboardComposeRule()
@@ -45,8 +57,11 @@ class TvDetailPageSkeletonGeometryTest {
         }
 
     @Test
-    fun `the skeleton's first row starts where the page's first section does`() =
-        composeTestRule.assertSkeletonReservesGeometry(listOf(HeroAnchor, TvLayoutAnchors.entry(SECTION))) { resolved ->
+    fun `the skeleton's first row is where the page's first section is, and as tall`() =
+        composeTestRule.assertSkeletonReservesGeometry(
+            listOf(HeroAnchor, TvLayoutAnchors.entry(SECTION)),
+            checkSize = true,
+        ) { resolved ->
             BingeTvTheme { if (resolved) Page() else TvDetailPageSkeleton(firstSectionKey = SECTION) }
         }
 }
@@ -65,11 +80,11 @@ private fun Page() {
                     it
                 },
                 key = { it },
-                cellWidth = 120.dp,
+                cellWidth = CardWidth,
                 heading = "Seasons",
                 onCellFocused = onFocused,
             ) { _, _, onFocusChanged, cellModifier ->
-                Box(cellModifier.aspectRatio(2f / 3f).tvClickable(onFocusChanged = onFocusChanged, onClick = {}))
+                Box(cellModifier.aspectRatio(CARD_RATIO).tvClickable(onFocusChanged = onFocusChanged, onClick = {}))
             }
         }
     }

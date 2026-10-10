@@ -211,7 +211,7 @@ private fun DetailRowSkeleton(modifier: Modifier = Modifier) {
             Modifier
                 .padding(start = tvContentGutterStart())
                 .width(dimensionResource(TvR.dimen.tv_skeleton_heading_width))
-                .height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
+                .height(dimensionResource(TvR.dimen.tv_skeleton_heading_height)),
         )
         LazyRow(
             contentPadding =
