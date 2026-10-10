@@ -1,7 +1,6 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
-import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -48,11 +46,11 @@ fun FilterChipRowSkeleton(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
         repeat(SKELETON_CHIP_COUNT) {
-            Box(
+            SkeletonPlate(
                 Modifier
                     .width(dimensionResource(R.dimen.skeleton_filter_chip_width))
-                    .height(dimensionResource(R.dimen.skeleton_filter_chip_height))
-                    .skeleton(visible = true, shape = BingeShapes.Pill),
+                    .height(dimensionResource(R.dimen.skeleton_filter_chip_height)),
+                shape = BingeShapes.Pill,
             )
         }
     }
