@@ -135,6 +135,11 @@
     -->
     <dimen name="pane_inner_inset">8dp</dimen>
     <!--
+      The spacer a list-detail scene puts between its panes, in place of Material adaptive's own 24dp.
+      Added to both panes' pane_inner_inset, it is the whole visible gap between their content.
+    -->
+    <dimen name="pane_spacer">8dp</dimen>
+    <!--
       Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it
       (#819). Below this the crease is close enough to the bottom edge that honouring it would leave a
       sheet too short to use, so it is ignored and the sheet keeps its own height.
