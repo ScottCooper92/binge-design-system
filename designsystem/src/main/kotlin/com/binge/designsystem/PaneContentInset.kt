@@ -20,8 +20,19 @@ import androidx.compose.ui.unit.Dp
  */
 val LocalPaneWidth = staticCompositionLocalOf<Dp?> { null }
 
-/** A pane's horizontal edge, in layout-direction terms so it mirrors under RTL along with the `Row` it sits in. */
-enum class PaneEdge { Start, End }
+/**
+ * The edge, or edges, a pane shares with another, in layout-direction terms so it mirrors under RTL along with the
+ * `Row` it sits in. [Both] is the middle pane of three side by side, which borders a pane on each side.
+ */
+enum class PaneEdge {
+    Start,
+    End,
+    Both,
+    ;
+
+    internal val sharesStart: Boolean get() = this == Start || this == Both
+    internal val sharesEnd: Boolean get() = this == End || this == Both
+}
 
 /**
  * The edge of this pane that borders another pane on screen — null (the default) for a screen alone
@@ -97,9 +108,9 @@ internal fun paneContentPadding(
     bottom: Dp,
 ): PaddingValues =
     PaddingValues(
-        start = if (innerEdge == PaneEdge.Start) inner else outer,
+        start = if (innerEdge?.sharesStart == true) inner else outer,
         top = top,
-        end = if (innerEdge == PaneEdge.End) inner else outer,
+        end = if (innerEdge?.sharesEnd == true) inner else outer,
         bottom = bottom,
     )
 
@@ -124,10 +135,10 @@ fun bottomBarInsets(): WindowInsets = WindowInsets.navigationBars.only(WindowIns
 
 /** [paneSideInsets]'s side selection, apart from the window and the composition locals it reads. */
 internal fun paneSideInsets(windowInsets: WindowInsets, innerEdge: PaneEdge?): WindowInsets =
-    windowInsets.only(
-        when (innerEdge) {
-            null -> WindowInsetsSides.Horizontal
-            PaneEdge.Start -> WindowInsetsSides.End
-            PaneEdge.End -> WindowInsetsSides.Start
-        },
-    )
+    when (innerEdge) {
+        null -> windowInsets.only(WindowInsetsSides.Horizontal)
+        PaneEdge.Start -> windowInsets.only(WindowInsetsSides.End)
+        PaneEdge.End -> windowInsets.only(WindowInsetsSides.Start)
+        // A middle pane has no outer edge: both of its sides sit mid-window.
+        PaneEdge.Both -> WindowInsets(0)
+    }
