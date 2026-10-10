@@ -40,16 +40,15 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── theme/       BingeColors, BingeShapes, the expressive theme, typography, contrast
 ├── component/   the shared M3 components: the nav shell, buttons, chips, top bars, sheets, cards,
 │                rows, tiles, the hero carousel, the skeletons
-├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel, the
-│                          relative-or-absolute date formatter, month names, formatRuntime
+├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel,
+│                          formatRuntime, the relative-or-absolute date formatter and month
+│                          names
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state and the shared aspect ratios
 ├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders,
 │                and the …Demo()s the catalog app runs live
 ├── modifier/    skeleton shimmer, selection lift
 ├── layout/      layout anchors
-├── template/    the whole-screen frames: the scaffold, the message screen, the filtered list, the
-│                hero detail page, the form, the step flow and the paged phase
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
 
 designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
@@ -59,9 +58,6 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── component/   the buttons, the card row, the section title, the message plate, the initials
 │                avatar, the QR code, the selected tick, the row emphasis and the vertical divider
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
-├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
-│                flow, the message page, the detail page and the immersive hub and grid
-├── Dimens.kt    the non-dp constants the TV components share, such as the nav rail's collapsed row cap
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme
 
@@ -72,12 +68,10 @@ docs/
 └── tv-foundation.md   why focus is a parameter, and the accent model the TV components share
 ```
 
-In each module every dp a component reads lives in `src/main/res/values/dimens.xml` (with the width and
-orientation qualifiers next to it), and the screenshot baselines are under
-`src/screenshotTestDebug/reference/`. Two things are exempt from the dimens rule: a literal in a private
-`@Preview`, and the corner radii in `BingeShapes`, which are theme tokens. In `designsystem`, every
-user-visible string is in `values/strings.xml` with its Spanish translation alongside; `designsystem-tv`
-has no strings, because its components take their copy as parameters. The baselines are the ones Binge
+In each module every dp lives in `src/main/res/values/dimens.xml` (with the width and orientation
+qualifiers next to it) and the screenshot baselines under `src/screenshotTestDebug/reference/`. In
+`designsystem`, every user-visible string is in `values/strings.xml` with its Spanish translation
+alongside; `designsystem-tv` has no strings, because its components take their copy as parameters. The baselines are the ones Binge
 recorded; each slice validated byte-identical against them before it landed.
 
 ## The catalog app
@@ -184,7 +178,6 @@ and in its `settings.gradle.kts`:
 includeBuild("design-system") {
     dependencySubstitution {
         substitute(module("com.binge:designsystem")).using(project(":designsystem"))
-        substitute(module("com.binge:designsystem-tv")).using(project(":designsystem-tv"))
     }
 }
 ```
