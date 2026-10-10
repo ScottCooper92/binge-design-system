@@ -2,7 +2,7 @@ package com.binge.designsystem.catalog
 
 import com.binge.designsystem.component.WatchProviderUi
 
-/** Static seed data for [WatchProviderGridSample]; the provider ids are TMDB provider ids. */
+/** Static seed data for [WatchProviderGridSample]; the ids are arbitrary sample values. */
 internal fun catalogSampleWatchProviders(): List<WatchProviderUi> =
     listOf(
         WatchProviderUi(id = 8, name = "Netflix", logoUrl = ""),

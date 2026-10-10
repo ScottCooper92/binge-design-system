@@ -22,8 +22,8 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * Not `provider_grid_columns`, which is keyed to the **screen** width: onboarding's services step
  * renders this grid inside a half-width pane in landscape, so a screen-derived 6 or 8 would size its
- * tiles against a measure they do not have. The one caller whose grid really is full-width — Account's
- * watch-provider settings — passes the resource in.
+ * tiles against a measure they do not have. A caller whose grid really is full-width passes the
+ * resource in.
  */
 private const val DEFAULT_GRID_COLUMNS = 4
 
@@ -67,11 +67,10 @@ fun WatchProviderGrid(
  * One row of up to [columns] tiles, trailing slots padded with `Spacer(weight 1f)` so a short last row's
  * tiles stay the width of the full rows above.
  *
- * Public because the grid is not the only shape this row appears in: Account's watch-provider settings
- * need a `LazyColumn` for the 50-70 tiles a region like the US produces, so they emit these rows as items
- * rather than composing [WatchProviderGrid]. That screen used to carry its own copy, and the pair drifting
- * is what made this shared — the spacing, the weight, the trailing spacers and the anchor below all have to agree
- * between the two, which they now do by construction rather than by review.
+ * Public because the grid is not the only shape this row appears in: a screen that needs a `LazyColumn`
+ * for a long list of tiles emits these rows as items rather than composing [WatchProviderGrid]. The spacing,
+ * the weight, the trailing spacers and the anchor below all have to agree between the two, which they do by
+ * construction rather than by review.
  *
  * [isFirstRow] puts the anchor `WatchProviderGridSkeleton`'s first plate carries on this row's first tile —
  * see [LayoutAnchors]. The grid is sized by its content, so anchoring the container would not say where the
@@ -111,10 +110,9 @@ fun WatchProviderGridRow(
  * Placeholder grid rendered while provider logos are loading — preserves the
  * heading + footer layout so the surface doesn't jump when the real grid arrives.
  *
- * [columns] has to be whatever the grid that replaces this one will use. Account's provider settings
- * build their own grid from `provider_grid_columns` rather than reusing [WatchProviderGrid] — they need
- * a `LazyColumn` for the 50-70 tiles a region like the US produces — and this reserved a flat four
- * against their six or eight.
+ * [columns] has to be whatever the grid that replaces this one will use. A screen that builds its own
+ * lazy grid from a screen-keyed column count would otherwise find this reserving a flat four against
+ * its six or eight.
  */
 @Composable
 fun WatchProviderGridSkeleton(modifier: Modifier = Modifier, columns: Int = DEFAULT_GRID_COLUMNS) {

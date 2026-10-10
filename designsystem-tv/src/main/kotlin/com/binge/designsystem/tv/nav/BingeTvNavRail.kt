@@ -140,7 +140,7 @@ fun BingeTvNavRail(
     onRailFocusChanged: (Boolean) -> Unit = {},
     contentFocusRequester: FocusRequester? = null,
     // Hoisted so a test can reset it: the pivot scrolls on every focus move, and the reachability harness's
-    // path replay needs a canonical scroll position at arrival (`TvDpadReachability` assumes one).
+    // path replay needs a canonical scroll position at arrival.
     itemsScrollState: ScrollState = rememberScrollState(),
     artworkBehind: Boolean? = null,
     overlayEpoch: Int = 0,
@@ -353,7 +353,7 @@ private fun contentHandoffInFlight(
         lastDepth = contentDepth
         // Sequenced, not raced: wait for the old screen's focus loss, then take focus back — the obvious race does nothing (see
         // [awaitContentFocusLost]). Bounded in wall-clock time, not frames: the handoff never succeeds against a nothing-focusable
-        // destination (`TvPlaceholderPane` — every detail route today), where frames barely advance with rail expansion suppressed.
+        // destination, where frames barely advance with rail expansion suppressed.
         inFlight = true
         try {
             withTimeoutOrNull(CONTENT_HANDOFF_TIMEOUT_MS) {

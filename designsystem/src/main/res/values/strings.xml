@@ -7,7 +7,7 @@
     <string name="cd_filter_state_included">Included</string>
     <string name="cd_filter_state_excluded">Excluded</string>
     <string name="cd_filter_state_neutral">Not set</string>
-    <!-- Shared media-type + filter labels, reused across feature modules (DesR.string.*). -->
+    <!-- Shared media-type + filter labels, reused across screens. -->
     <string name="media_type_movie">Movie</string>
     <string name="media_type_tv">TV</string>
     <string name="media_type_episode">Episode</string>
