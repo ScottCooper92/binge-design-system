@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.component.BingeActionFooter
+import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
-import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +43,7 @@ class FormFooterSideInsetsTest {
     @Test
     fun `a form's footer starts where its fields start`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithStartCutout(Cutout) {
                     FormScreen(
                         title = "Edit",
@@ -74,7 +74,7 @@ class FormFooterSideInsetsTest {
     @Test
     fun `an action footer that clears the navigation bar clears a side cutout too`() {
         rule.setContent {
-            Theme {
+            TestTheme {
                 WithStartCutout(Cutout) {
                     BingeActionFooter(label = SAVE, onClick = {}, horizontalPadding = 0.dp, clearsNavigationBar = true)
                 }
@@ -92,9 +92,6 @@ class FormFooterSideInsetsTest {
         )
     }
 }
-
-@Composable
-private fun Theme(content: @Composable () -> Unit) = BingeExpressiveTheme(dynamicColor = false, content = content)
 
 /** Gives the window a display cutout [width] wide down the start side, answering every insets dispatch at the parent. */
 @Composable
