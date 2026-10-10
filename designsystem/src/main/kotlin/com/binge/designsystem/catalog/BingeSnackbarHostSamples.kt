@@ -66,7 +66,7 @@ fun BingeSnackbarDismissSample() {
 private val snackbarSampleTabs = listOf(
     BingeNavSuiteItem(key = "movies", label = "Movies", icon = Icons.Default.Movie),
     BingeNavSuiteItem(key = "search", label = "Search", icon = Icons.Default.Search),
-    BingeNavSuiteItem(key = "account", label = "Account", icon = Icons.Default.Person, isAccount = true),
+    BingeNavSuiteItem(key = "account", label = "Account", icon = Icons.Default.Person, largeAvatar = true),
 )
 
 /**

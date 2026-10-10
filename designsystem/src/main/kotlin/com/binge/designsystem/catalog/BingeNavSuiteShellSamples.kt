@@ -40,7 +40,7 @@ private fun sampleTabs(accountName: String?, showDiscover: Boolean): List<BingeN
         sampleTab(SampleTab.TvShows, "TV shows", Icons.Default.Tv),
         if (showDiscover) sampleTab(SampleTab.Discover, "Discover", BingeIcons.Discover) else null,
         sampleTab(SampleTab.Search, "Search", Icons.Default.Search),
-        sampleTab(SampleTab.Account, "Account", Icons.Default.Person, NavSuiteBadge.Label("3"), accountName, isAccount = true),
+        sampleTab(SampleTab.Account, "Account", Icons.Default.Person, NavSuiteBadge.Label("3"), accountName, largeAvatar = true),
     )
 
 private fun sampleTab(
@@ -49,7 +49,7 @@ private fun sampleTab(
     icon: ImageVector,
     badge: NavSuiteBadge = NavSuiteBadge.None,
     avatarName: String? = null,
-    isAccount: Boolean = false,
+    largeAvatar: Boolean = false,
 ): BingeNavSuiteItem =
     BingeNavSuiteItem(
         key = tab,
@@ -57,7 +57,7 @@ private fun sampleTab(
         icon = icon,
         badge = badge,
         avatarName = avatarName,
-        isAccount = isAccount,
+        largeAvatar = largeAvatar,
     )
 
 @Composable

@@ -59,7 +59,7 @@ private fun demoTabs(accountName: String?, showDiscover: Boolean): List<BingeNav
             icon = Icons.Default.Person,
             badge = NavSuiteBadge.Label("3"),
             avatarName = accountName,
-            isAccount = true,
+            largeAvatar = true,
         ),
     )
 

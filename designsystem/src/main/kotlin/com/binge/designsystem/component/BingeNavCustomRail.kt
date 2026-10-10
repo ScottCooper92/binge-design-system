@@ -136,7 +136,7 @@ internal fun BingeNavCustomRail(
                         tab = tab,
                         selected = selectedKey == tab.key,
                         onSelect = onSelect,
-                        avatarSize = if (tab.isAccount) accountAvatarSize else itemAvatarSize,
+                        avatarSize = if (tab.largeAvatar) accountAvatarSize else itemAvatarSize,
                         // NavigationRailItem sizes itself from its widest content (80dp is a *minimum*),
                         // so "TV shows" and "Search" would claim different widths and centre on different
                         // gutters. Filling the column pins every row to the rail's width instead.

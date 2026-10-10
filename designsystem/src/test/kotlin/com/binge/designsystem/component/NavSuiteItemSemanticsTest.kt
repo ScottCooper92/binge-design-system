@@ -44,7 +44,7 @@ class NavSuiteItemSemanticsTest {
                             label = ACCOUNT,
                             icon = Icons.Filled.AccountCircle,
                             avatarName = "Ana Lima",
-                            isAccount = true,
+                            largeAvatar = true,
                             testTag = "account",
                         ),
                     ),

@@ -28,13 +28,6 @@ fun isExpandedLayout(): Boolean = booleanResource(R.bool.binge_layout_expanded)
 fun isLandscape(): Boolean = booleanResource(R.bool.binge_landscape)
 
 /**
- * Whether Discover is reachable as its own navigation destination (tablets). Hubs use this to drop
- * their in-content discover-entry tile where the nav tab makes it redundant; phones keep the tile.
- */
-@Composable
-fun isDiscoverInNav(): Boolean = booleanResource(R.bool.binge_nav_show_discover)
-
-/**
  * Number of columns for a poster/media grid: 2 (compact), 3 (>=600dp), 4 (>=840dp). Any width-driven
  * media grid reads it rather than hardcoding a column count.
  *
