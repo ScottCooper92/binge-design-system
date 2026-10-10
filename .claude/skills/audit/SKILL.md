@@ -105,7 +105,8 @@ an absent one.
 
 ## Dimension 5 — consumer impact and API drift
 
-A green build here does not mean a green build in Binge or binge-seerr — this repo cannot compile them.
+A green build here does not mean a green build in Binge or binge-seerr. `consumer-check` compiles binge-seerr's
+main and unit-test sources against a PR's head, informationally; Binge is private and is not compiled.
 
 - Compare the public surface against what the consumers use: look in the sibling checkouts
   (`../Binge`, `../binge-seerr`) for imports of `com.binge.designsystem` symbols that no longer exist,

@@ -5,14 +5,15 @@ name: CI
 # one, and author-conflicts on one completing against main. They match it by NAME,
 # so renaming this workflow silently unhooks all three.
 #
-# One job, deliberately. `./gradlew build` already runs the Kotlin compile, the unit
+# One build job, deliberately, beside the small `actionlint` and `nightly-report` jobs.
+# `./gradlew build` already runs the Kotlin compile, the unit
 # tests, ktlintCheck and Android lint, because the ktlint plugin and AGP both wire
 # themselves into `check` and `build` depends on `check`. The screenshot suite is the
 # one task named on top of it: the screenshot plugin does not hook `check`, and a
 # component library whose only visible contract is how it renders needs the baselines
-# compared on every run. Splitting into separate jobs would buy parallelism this build
-# is far too small to need, and would cost a second required status check to keep in
-# sync with branch protection.
+# compared on every run. Splitting the build into separate jobs would buy parallelism
+# this build is far too small to need, and would cost a second required status check
+# to keep in sync with branch protection.
 #
 # Deliberately NO paths-ignore, matching binge-companions. bot-review requires a
 # SUCCESSFUL run of this workflow against the head, so a skipped run means a PR that
