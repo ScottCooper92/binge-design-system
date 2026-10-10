@@ -8,6 +8,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.binge.designsystem.R
@@ -60,6 +66,7 @@ fun BingeModalSideSheet(
             ),
     ) {
         var visible by rememberSideSheetShown()
+        val closeLabel = stringResource(R.string.cd_close_sheet)
         LaunchedEffect(Unit) { visible = true }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -76,8 +83,9 @@ fun BingeModalSideSheet(
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
+                                role = Role.Button,
                                 onClick = onDismissRequest,
-                            ),
+                            ).semantics { contentDescription = closeLabel },
                 )
             }
 
@@ -113,12 +121,8 @@ internal fun BingeSideSheetPanel(modifier: Modifier = Modifier, content: @Compos
                 .width(dimensionResource(R.dimen.side_sheet_width))
                 .clip(BingeShapes.HeroStart)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                // Swallow taps on the panel so they don't fall through to the scrim.
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = {},
-                ),
+                // Swallow taps on the panel so they don't fall through to the scrim, with no semantics node of its own.
+                .pointerInput(Unit) { detectTapGestures {} },
         content = content,
     )
 }

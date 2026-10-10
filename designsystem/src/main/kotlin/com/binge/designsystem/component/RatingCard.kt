@@ -35,6 +35,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
@@ -185,6 +188,7 @@ private fun RatedBody(
     onRemoveRating: () -> Unit,
 ) {
     var editing by rememberSaveable { mutableStateOf(false) }
+    val editingState = stringResource(if (editing) R.string.cd_group_expanded else R.string.cd_group_collapsed)
 
     Column(modifier = Modifier.padding(dimensionResource(R.dimen.rating_card_padding))) {
         Row(
@@ -223,7 +227,8 @@ private fun RatedBody(
                         .size(dimensionResource(R.dimen.rating_card_edit_button))
                         .clip(CircleShape)
                         .background(contentColor.copy(alpha = 0.12f))
-                        .clickable { editing = !editing },
+                        .clickable(role = Role.Button) { editing = !editing }
+                        .semantics { stateDescription = editingState },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -279,7 +284,7 @@ private fun ReviewsFooter(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable(role = Role.Button, onClick = onClick)
                 .padding(dimensionResource(R.dimen.rating_card_footer_padding)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.rating_card_content_spacing)),
         verticalAlignment = Alignment.CenterVertically,

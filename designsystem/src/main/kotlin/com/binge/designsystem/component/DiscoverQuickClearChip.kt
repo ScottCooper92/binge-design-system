@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -61,7 +62,7 @@ fun DiscoverQuickClearChip(
             .clip(shape)
             .background(backgroundColor)
             .border(BorderStroke(dimensionResource(R.dimen.hairline_thickness), borderColor), shape)
-            .clickable(onClick = onClear)
+            .clickable(role = Role.Button, onClick = onClear)
             .padding(
                 start = dimensionResource(R.dimen.discover_quickclear_chip_padding_start),
                 end = dimensionResource(R.dimen.discover_quickclear_chip_padding_end),

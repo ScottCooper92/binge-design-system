@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
@@ -156,7 +157,7 @@ fun PagedAppendFooter(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
-                modifier = modifier.clickable(onClick = onRetry).then(padding),
+                modifier = modifier.clickable(role = Role.Button, onClick = onRetry).then(padding),
             )
         is LoadState.NotLoading -> Unit
     }

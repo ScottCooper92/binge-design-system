@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -41,7 +42,7 @@ fun TrendingSearchChip(
         modifier = modifier
             .clip(BingeShapes.Pill)
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(
                 horizontal = dimensionResource(R.dimen.trending_pill_padding_h),
                 vertical = dimensionResource(R.dimen.trending_pill_padding_v),
