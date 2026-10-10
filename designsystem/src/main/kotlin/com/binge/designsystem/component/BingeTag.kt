@@ -17,25 +17,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.theme.BingeTheme
 import com.binge.designsystem.theme.labelSmallEmphasis
+import com.binge.designsystem.theme.tonalContainer
 import com.binge.designsystem.uppercaseLocalised
-
-/**
- * Theme-aware tint behind a tag's accent — paler in light (where the accents are darker for
- * contrast) so the label stays clear of WCAG AA. Mirrors RequestStateChip.
- */
-private const val TAG_TINT_ALPHA_LIGHT = 0.12f
-private const val TAG_TINT_ALPHA_DARK = 0.16f
 
 /**
  * A compact category tag — a tinted rounded-rect with an optional leading [icon] and a label, for
  * fixed classifications like media type, issue type, or a user role (distinct from
- * [RequestStateChip], which is the rounded *status* pill with a dot).
+ * [StatusChip], which is the rounded *status* pill with a dot).
  *
- * [tint] paints a same-hue wash behind a saturated label + icon (pass one of the AA-tuned
- * `BingeTheme.colors.status*` accents); a null [tint] is neutral — a `surfaceContainerHigh` wash
- * with `onSurfaceVariant` text. [uppercase] (default) matches the design's type tags (MOVIE,
+ * [tint] paints a same-hue wash behind a saturated label + icon (pass a `BingeSentiment.accent()`
+ * for [tint], and its `fill()` for [fill]); a null [tint] is neutral — a `surfaceContainerHigh`
+ * wash with `onSurfaceVariant` text. [uppercase] (default) matches the design's type tags (MOVIE,
  * VIDEO…); pass `false` for cased labels such as roles (Owner / Admin).
  */
 @Composable
@@ -55,8 +48,7 @@ fun BingeTag(
         if (tint == null) {
             MaterialTheme.colorScheme.surfaceContainerHigh
         } else {
-            val alpha = if (BingeTheme.isDark) TAG_TINT_ALPHA_DARK else TAG_TINT_ALPHA_LIGHT
-            tint.copy(alpha = alpha)
+            tint.tonalContainer()
         }
     Row(
         modifier = modifier
