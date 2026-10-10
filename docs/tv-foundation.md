@@ -16,8 +16,9 @@ That is an API decision, and it is about coverage. A preview renders one frame. 
 depended on a real `FocusRequester` having fired by the time that frame was captured would be
 flaky, where a parameter is deterministic. So a focused appearance is testable by passing `true`.
 
-Acquiring focus is the caller's half. `Modifier.tvFocusTarget` — or `tvClickable`, which includes
-it — wires the real focus event and hoists the flag into the caller's own state.
+Acquiring focus is the caller's half. `Modifier.tvFocusTarget` for a plain element, or `tvClickable`
+for one that also takes OK, wires the real focus event and hoists the flag into the caller's own state.
+`tvClickable` is its own `onFocusChanged` plus `clickable`, so it is never combined with `tvFocusTarget`.
 
 The same trade shows up again in `TvLayoutAnchors`: a small, named affordance in production, so an
 invariant is checkable rather than reviewable.
@@ -51,8 +52,9 @@ This fails silently, which is what makes the class expensive — the fix looks a
 symptom is focus landing somewhere odd. `TvArrivalFocusEffect` and `TvOverlayArrivalFocusEffect`
 are the frame wait, so a caller does not re-derive it.
 
-Bound any such wait in wall-clock time rather than in frames. `withFrameNanos` resumes only on
-frames the app actually draws, so a frame budget against a static screen never expires.
+Bound any such wait. Prefer wall-clock time: `withFrameNanos` resumes only on frames the app
+actually draws, so a frame budget against a static screen never expires. The startup handoff to
+content counts frames instead, and stops early once focus is taken or the rail is yielded to.
 
 ## The accent model: the accent is focus, a tick is selection
 
@@ -71,7 +73,8 @@ Three rules follow, and they are the whole model.
    with the error colour, not the accent, so it stays dangerous exactly when the user is about to
    press it. Everything else fills with the accent. `TvButtonStyle.Destructive` is this rule.
 2. **No control carries the accent at rest, and emphasis is shape rather than colour.** A primary
-   control rests as a filled neutral; everything else rests as an outline. A screen still reads as
+   control rests as a filled neutral; everything else rests as an outline, except Destructive, which
+   rests as a red-tinted container with a red border. A screen still reads as
    one prominent action among quieter ones, in greys, and the accent appears only under the user's
    focus. Giving an accent back to a resting state re-opens the collision the rule exists to
    prevent: while the accent means both "primary" and "focused", an unfocused primary button looks

@@ -48,9 +48,10 @@ author with no knowledge of Binge could use it and have it mean something.
 Two builds include this one with `includeBuild`: Binge, and binge-seerr. There is no published
 artifact and no version negotiation, which buys a lot and costs one specific thing:
 
-**A green build here does not mean a green build there.** This repository cannot compile its
-consumers. A changed public signature is a change in two other codebases that will not notice until
-their next sync, so a PR that changes one says so in its body.
+**A green build here does not mean a green build there.** CI compiles binge-seerr's main and unit-test
+sources against a PR's head (`consumer-check`, informational), and that is the only consumer evidence.
+Binge is private and is not compiled. A changed public signature is a change in two other codebases
+that will not notice until their next sync, so a PR that changes one says so in its body.
 
 Corollary: the root `libs.versions.toml` is not a local decision. Compose and AGP versions have to
 agree with the consumers'.
@@ -90,8 +91,8 @@ re-record with `./gradlew updateDebugScreenshotTest`, look at the regenerated PN
 in the same commit as the code. Committing that output is the only way to accept a change; there is
 no override flag.
 
-There is no coverage floor and no custom convention task in this repository, so do not look for one
-and do not report a finding as though one had caught it.
+There is no coverage floor in this repository, and the one custom task is `checkTvMaterialSeparation`
+(wired into `check`). Do not look for any other, and do not report a finding as though one had caught it.
 
 **Never silence a gate instead of fixing it.** No ktlint baseline, no `ktlint-disable`, no
 `lint-baseline.xml`, no `abortOnError = false`. A baseline here is a finding suppressed in two
@@ -114,7 +115,7 @@ still an issue; a serious problem inside the diff is a change to make now.
 
 ## Agent workflows
 
-`.github/workflows/` holds a review bot and three author bots, called from
+`.github/workflows/` holds a review bot and four author bots (CI fix, comments, conflicts and retarget), called from
 [binge-ci](https://github.com/ScottCooper92/binge-ci). They act only on PRs carrying the `agent`
 label.
 

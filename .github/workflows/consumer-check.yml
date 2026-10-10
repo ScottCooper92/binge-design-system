@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      # binge-seerr includes `binge-integrations` and `design-system` as submodule composite
+      # binge-seerr includes `binge-companions` and `design-system` as submodule composite
       # builds (its settings.gradle.kts), so both must exist before Gradle evaluates settings.
       - name: Check out binge-seerr
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
