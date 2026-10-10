@@ -26,6 +26,7 @@ fun WatchProviderGridSample() {
     }
 }
 
+/** The provider grid while the services load: a grid of tile placeholders. */
 @Composable
 fun WatchProviderGridSkeletonSample() {
     ScreenshotTheme {

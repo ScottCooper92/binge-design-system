@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 
@@ -189,12 +190,19 @@ private fun BottomBarScaffold(
 
 @Composable
 internal fun NavSuiteItemIcon(item: BingeNavSuiteItem, avatarSize: Dp = dimensionResource(R.dimen.nav_item_avatar_size)) {
+    // The glyph is decoration: the item names itself, through its label text or its own description, so a
+    // description here would read the label twice and an avatar's initials would read in its place.
     val visual = @Composable {
         val avatarName = item.avatarName
         if (avatarName != null) {
-            BingeInitialsAvatar(name = avatarName, avatarUrl = item.avatarUrl, size = avatarSize)
+            BingeInitialsAvatar(
+                name = avatarName,
+                avatarUrl = item.avatarUrl,
+                size = avatarSize,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
         } else {
-            Icon(item.icon, contentDescription = item.label)
+            Icon(item.icon, contentDescription = null)
         }
     }
     when (val badge = item.badge) {
