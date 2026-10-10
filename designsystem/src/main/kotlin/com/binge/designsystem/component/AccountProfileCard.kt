@@ -37,7 +37,8 @@ import com.binge.designsystem.theme.BingeShapes
  * An account as a card: avatar, name, a secondary line and an optional country.
  *
  * With [onClick] the whole card is one control: its rounded surface takes the press, the ripple stays inside the
- * corners, and the trailing chevron is decoration. Without it the card is a plain header.
+ * corners, and the trailing chevron is decoration. Without it the card is a plain header. [tag] is drawn beside the
+ * name in a row card and under it in a column card, for a role such as Admin; pass a [BingeTag] to match elsewhere.
  */
 @Composable
 fun AccountProfileCard(
@@ -49,6 +50,7 @@ fun AccountProfileCard(
     country: String? = null,
     onClick: (() -> Unit)? = null,
     layout: AccountProfileCardLayout = AccountProfileCardLayout.Row,
+    tag: (@Composable () -> Unit)? = null,
 ) {
     val surface =
         modifier
@@ -83,6 +85,7 @@ fun AccountProfileCard(
                 avatarUrl = avatarUrl,
                 country = country,
                 chevron = onClick != null,
+                tag = tag,
             )
 
         AccountProfileCardLayout.Column ->
@@ -93,6 +96,7 @@ fun AccountProfileCard(
                 initialsName = initialsName,
                 avatarUrl = avatarUrl,
                 country = country,
+                tag = tag,
             )
     }
 }
@@ -106,6 +110,7 @@ private fun AccountProfileCardRow(
     country: String?,
     modifier: Modifier = Modifier,
     chevron: Boolean = false,
+    tag: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier,
@@ -118,13 +123,21 @@ private fun AccountProfileCardRow(
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.account_card_spacing)))
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    // Unfilled weight lets a short name sit beside the tag, and a long one ellipsise before it.
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                if (tag != null) {
+                    Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
+                    tag()
+                }
+            }
             Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
             Text(
                 text = secondaryLine,
@@ -172,6 +185,7 @@ private fun AccountProfileCardColumn(
     avatarUrl: String?,
     country: String?,
     modifier: Modifier = Modifier,
+    tag: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = modifier,
@@ -192,6 +206,10 @@ private fun AccountProfileCardColumn(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+        if (tag != null) {
+            Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
+            tag()
+        }
         Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
         Text(
             text = secondaryLine,

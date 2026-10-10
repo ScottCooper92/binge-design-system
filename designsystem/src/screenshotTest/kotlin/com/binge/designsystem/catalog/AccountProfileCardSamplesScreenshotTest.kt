@@ -26,4 +26,18 @@ class AccountProfileCardSamplesScreenshotTest {
     fun Column() {
         AccountProfileCardColumnSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Tagged() {
+        AccountProfileCardTaggedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ColumnTagged() {
+        AccountProfileCardColumnTaggedSample()
+    }
 }
