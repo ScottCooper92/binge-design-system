@@ -3,6 +3,7 @@ package com.binge.designsystem.tv.catalog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -589,6 +590,26 @@ fun TvPairingCardErrorSample() {
             retryLabel = "Try again",
             onRetry = {},
             retryInitiallyFocused = true,
+        )
+    }
+}
+
+/** A share of the pane's short side, as a host sizes the code. */
+private const val PAIRING_QR_SHARE = 0.6f
+
+/**
+ * A long failure in a pane that is the limit: the code is sized from the pane's height, as a host does, and the message
+ * runs to four lines. The glyph's box gives up height, so the message and Try again stay inside the card.
+ */
+@Composable
+fun TvPairingCardErrorLongMessageSample() {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvPairingCardError(
+            message = "This TV isn't on a Wi-Fi or wired home network, so a phone can't reach it. Type the address instead.",
+            retryLabel = "Try again",
+            onRetry = {},
+            retryInitiallyFocused = true,
+            qrSize = minOf(maxWidth, maxHeight) * PAIRING_QR_SHARE,
         )
     }
 }

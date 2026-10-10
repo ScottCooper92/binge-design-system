@@ -123,6 +123,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pairingCardErrorLongMessage() = Frame { TvPairingCardErrorLongMessageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun navRailExpanded() = Frame { TvNavRailSample(expanded = true) }
 
     /** Right-to-left: the rail moves to the right edge and its labels read from the right. */
