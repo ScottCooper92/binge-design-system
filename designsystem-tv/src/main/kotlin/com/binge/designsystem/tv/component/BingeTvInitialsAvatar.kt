@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -74,7 +75,7 @@ private fun TvInitialsAvatar(name: String, size: Dp) {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = name.toInitials(),
+            text = name.toInitials(locale = LocalConfiguration.current.locales[0]),
             style = MaterialTheme.typography.labelSmall,
             fontSize = fontSize,
             color = ink,

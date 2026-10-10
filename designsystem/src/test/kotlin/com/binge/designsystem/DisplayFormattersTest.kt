@@ -58,6 +58,13 @@ class DisplayFormattersTest {
         assertEquals(expected, input.toInitials())
     }
 
+    @Test
+    fun `toInitials cases by the locale it is given`() {
+        val turkish = Locale.forLanguageTag("tr")
+        assertEquals("\u0130Y", "ilker yilmaz".toInitials(locale = turkish))
+        assertEquals("IY", "ilker yilmaz".toInitials(locale = Locale.ENGLISH))
+    }
+
     @ParameterizedTest
     @CsvSource("'', AB, AB", "' ', ?, ?", "John Doe, XX, JD")
     fun `toInitials honours an explicit fallback only when no initials derive`(
