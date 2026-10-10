@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -64,8 +65,9 @@ import kotlinx.coroutines.launch
 /**
  * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle]. A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
- * language code. In a list where any choice has one, every row keeps the mark's place, empty where it has none, and
- * shows its radio or checkbox last, so the labels line up.
+ * language code. A choice that is a person carries [avatarName] instead, drawn as their avatar from [avatarUrl], with
+ * their initials while it loads or when there is none. In a list where any choice has a mark, every row keeps the mark's
+ * place, empty where it has none, and shows its radio or checkbox last, so the labels line up.
  */
 data class BingeChoice<out T>(
     val value: T,
@@ -73,6 +75,8 @@ data class BingeChoice<out T>(
     val subtitle: String? = null,
     val icon: ImageVector? = null,
     val mark: String? = null,
+    val avatarName: String? = null,
+    val avatarUrl: String? = null,
 )
 
 /**
@@ -599,15 +603,27 @@ private fun <T> RadioChoiceRow(
 }
 
 /** Whether [this] has an [icon][BingeChoice.icon] or a [mark][BingeChoice.mark] to show. */
-internal fun BingeChoice<*>.isMarked(): Boolean = icon != null || mark != null
+internal fun BingeChoice<*>.isMarked(): Boolean = icon != null || mark != null || avatarName != null
 
 /**
- * A choice's [icon][BingeChoice.icon] or [mark][BingeChoice.mark] in the box a settings row draws its icon in. A choice
- * with neither keeps the box's place, empty, so its label lines up with its neighbours'.
+ * A choice's [icon][BingeChoice.icon] or [mark][BingeChoice.mark] in the box a settings row draws its icon in, or its
+ * avatar in the box's place. A choice with none keeps the box's place, empty, so its label lines up with its neighbours'.
  */
 @Composable
 private fun ChoiceMark(choice: BingeChoice<*>) {
-    if (choice.isMarked()) ChoiceMarkBox(choice) else Spacer(Modifier.size(dimensionResource(R.dimen.item_group_icon_size)))
+    val avatarName = choice.avatarName
+    when {
+        // The row's label already names the person, so the avatar's initials stay out of what a screen reader reads.
+        avatarName != null ->
+            BingeInitialsAvatar(
+                name = avatarName,
+                avatarUrl = choice.avatarUrl,
+                size = dimensionResource(R.dimen.item_group_icon_size),
+                modifier = Modifier.clearAndSetSemantics {},
+            )
+        choice.isMarked() -> ChoiceMarkBox(choice)
+        else -> Spacer(Modifier.size(dimensionResource(R.dimen.item_group_icon_size)))
+    }
 }
 
 @Composable
