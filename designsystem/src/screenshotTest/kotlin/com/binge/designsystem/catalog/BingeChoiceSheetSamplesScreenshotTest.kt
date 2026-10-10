@@ -15,6 +15,13 @@ class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun Subtitled() {
+        BingeChoiceSheetSubtitledSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun SingleChoiceDocked() {
         BingeChoiceSheetDockedSample()
     }

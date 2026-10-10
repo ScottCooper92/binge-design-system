@@ -141,6 +141,9 @@ internal fun rememberOpensPartWay(choices: BingeChoiceList<*>): Boolean = rememb
  * The sheet scrolls, so a list of any length is reachable. A long list (or one still [loading][BingeChoiceList.Loading])
  * opens the sheet part-way, and dragged up it docks into a [BingeSheetTopBar] with a close button. That is decided
  * once, when the sheet opens, so a list arriving while it is open does not move it.
+ *
+ * For a pick that needs context, [subtitle] sits under the title (which copy is being marked, say) and [caption] across
+ * the header below it (what the change reaches). Docked, the bar keeps the title alone.
  */
 @Composable
 fun <T> BingeChoiceSheet(
@@ -152,6 +155,8 @@ fun <T> BingeChoiceSheet(
     modifier: Modifier = Modifier,
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
+    subtitle: String? = null,
+    caption: String? = null,
 ) {
     val partWay = rememberOpensPartWay(choices)
     BingeBottomSheet(
@@ -162,7 +167,7 @@ fun <T> BingeChoiceSheet(
         // A long list runs under the navigation bar and pads its own end for it.
         edgeToEdge = partWay,
     ) {
-        ChoiceSheetTop(title = title)
+        ChoiceSheetTop(title = title, subtitle = subtitle, caption = caption)
         SingleChoiceList(
             choices = choices,
             selected = selected,
@@ -195,6 +200,7 @@ fun <T> BingeChoiceSheet(
  * Pass [draftSaver] to keep the ticks across a rotation or process death, as a sheet restored open should. A generic [T]
  * has no saver of its own, so without one the sheet reopens with the ticks reset to [selected]. For `String` values,
  * `Saver(save = { ArrayList(it) }, restore = { it.toSet() })` is enough. With [applyAsPicked] there is no draft to keep.
+ * [subtitle] and [caption] add context to the header, as on [BingeChoiceSheet].
  */
 @Composable
 fun <T> BingeMultiChoiceSheet(
@@ -212,6 +218,8 @@ fun <T> BingeMultiChoiceSheet(
     actions: @Composable RowScope.() -> Unit = {},
     draftSaver: Saver<Set<T>, out Any>? = null,
     applyAsPicked: Boolean = false,
+    subtitle: String? = null,
+    caption: String? = null,
 ) {
     val partWay = rememberOpensPartWay(choices)
     // Without a saver, nothing is saved, so the ticks start again from [selected].
@@ -234,7 +242,7 @@ fun <T> BingeMultiChoiceSheet(
         // A long list runs under the navigation bar and pads its own end for it.
         edgeToEdge = partWay,
     ) {
-        ChoiceSheetTop(title = title) {
+        ChoiceSheetTop(title = title, subtitle = subtitle, caption = caption) {
             actions()
             BingeTextButton(label = clearLabel, onClick = { pick(emptySet()) }, enabled = draft.isNotEmpty())
             if (!applyAsPicked) {
@@ -365,7 +373,7 @@ fun <T> bingeMultiChoiceItem(
  * modal window does not capture, or to show the list inside a sheet of the caller's own. It draws no surface of its own,
  * so it takes the colour of whatever holds it, and its header does not dock. Pass `dragHandle = false` when the
  * sheet holding it draws its own handle, as [BingeBottomSheet] does. It does not clear the navigation bar; a caller
- * in an edge-to-edge sheet does that itself.
+ * in an edge-to-edge sheet does that itself. [subtitle] and [caption] are the sheet's.
  */
 @Composable
 fun <T> BingeChoiceSheetContent(
@@ -377,9 +385,11 @@ fun <T> BingeChoiceSheetContent(
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
     dragHandle: Boolean = true,
+    subtitle: String? = null,
+    caption: String? = null,
 ) {
     Column(modifier) {
-        RestingSheetTop(dragHandle) { ChoiceSheetHeader(title) }
+        RestingSheetTop(dragHandle) { ChoiceSheetHeader(title, subtitle, caption) }
         SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
     }
 }
@@ -391,7 +401,7 @@ fun <T> BingeChoiceSheetContent(
  * [leading] is the selection that comes first, as on the sheet; it defaults to [chosen], which suits a frame. A live
  * caller passes the selection the content opened with, so a row does not jump when ticked. Like
  * [BingeChoiceSheetContent], it draws no surface, its header does not dock, and `dragHandle = false` drops the handle
- * for a sheet that draws its own.
+ * for a sheet that draws its own. [subtitle] and [caption] are the sheet's.
  */
 @Composable
 fun <T> BingeMultiChoiceSheetContent(
@@ -410,10 +420,12 @@ fun <T> BingeMultiChoiceSheetContent(
     pinned: List<T> = emptyList(),
     actions: @Composable RowScope.() -> Unit = {},
     dragHandle: Boolean = true,
+    subtitle: String? = null,
+    caption: String? = null,
 ) {
     Column(modifier) {
         RestingSheetTop(dragHandle) {
-            ChoiceSheetHeader(title) {
+            ChoiceSheetHeader(title, subtitle, caption) {
                 actions()
                 BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
                 doneLabel?.let { BingeTextButton(label = it, onClick = onDone) }
@@ -436,28 +448,55 @@ fun <T> BingeMultiChoiceSheetContent(
 private fun RestingSheetTop(showHandle: Boolean, header: @Composable () -> Unit) =
     DockingHeaderLayout(fraction = { 0f }, header = header, dockedTopBar = {}, showHandle = showHandle)
 
-/** A choice sheet's top: its title and [actions], docking into a [BingeSheetTopBar] in a sheet that docks. */
+/**
+ * A choice sheet's top: its title and [actions], docking into a [BingeSheetTopBar] in a sheet that docks. The docked bar
+ * keeps the title alone.
+ */
 @Composable
-internal fun ChoiceSheetTop(title: String, actions: @Composable RowScope.() -> Unit = {}) {
+internal fun ChoiceSheetTop(
+    title: String,
+    subtitle: String? = null,
+    caption: String? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+) {
     BingeSheetDockingHeader(
-        header = { ChoiceSheetHeader(title, actions) },
+        header = { ChoiceSheetHeader(title, subtitle, caption, actions) },
         dockedTopBar = { onClose -> BingeSheetTopBar(title = title, onClose = onClose, actions = actions) },
     )
 }
 
-/** The header a choice sheet shows while it floats: the title, then [actions] at the end. */
+/**
+ * The header a choice sheet shows while it floats: the title with an optional [subtitle] under it, [actions] at the end,
+ * and an optional [caption] across the full width below. The subtitle says what is being chosen for, such as which copy
+ * of a title, and the caption what the choice will change.
+ */
 @Composable
-internal fun ChoiceSheetHeader(title: String, actions: @Composable RowScope.() -> Unit = {}) {
-    Row(
+internal fun ChoiceSheetHeader(
+    title: String,
+    subtitle: String? = null,
+    caption: String? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+) {
+    Column(
         modifier =
             Modifier.fillMaxWidth().padding(
                 horizontal = dimensionResource(R.dimen.padding_m),
                 vertical = dimensionResource(R.dimen.padding_s),
             ),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
     ) {
-        Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-        actions()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                subtitle?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            actions()
+        }
+        caption?.let {
+            Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
