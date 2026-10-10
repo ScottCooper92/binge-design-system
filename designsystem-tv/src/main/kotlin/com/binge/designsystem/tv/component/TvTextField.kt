@@ -49,9 +49,11 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.Icon
@@ -191,8 +193,16 @@ private fun TvFieldFrame(
     val focusManager = LocalFocusManager.current
     val input = remember { FocusRequester() }
     val frame = remember { FocusRequester() }
-    // A request can race a node that has just left composition; the field simply stays where it is.
-    LaunchedEffect(editing) { if (editing) runCatching { input.requestFocus() } }
+    // Owned here, not left to the String overload, so the caret can start at the end: re-opening a field that holds
+    // text must append, not insert at the start.
+    var edit by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+    // Guarded as the TV focus lint asks: a requester with no node returns false, and focus stays where it is.
+    LaunchedEffect(editing) {
+        if (editing) {
+            edit = TextFieldValue(value, TextRange(value.length))
+            runCatching { input.requestFocus() }
+        }
+    }
     val finish = {
         // Back to the frame first: an input that gives up focus with nowhere to go sends it to the page's first stop.
         runCatching { frame.requestFocus() }
@@ -217,8 +227,11 @@ private fun TvFieldFrame(
                 .semantics { contentDescription = name },
     ) {
         BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
+            value = edit.copy(text = value),
+            onValueChange = { next ->
+                edit = next
+                if (next.text != value) onValueChange(next.text)
+            },
             enabled = enabled,
             singleLine = true,
             textStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface),
