@@ -1,6 +1,8 @@
 package com.binge.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import com.binge.designsystem.component.RATING_CARD_SECONDARY_ALPHA
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
@@ -23,7 +25,8 @@ import kotlin.math.pow
  *   (yellow legitimately measures ~1.2:1 on the light container);
  * - `onSurfaceVariant`/`surfaceVariant` — a medium-emphasis M3 role, not a guaranteed 4.5:1 body pair;
  * - text over a low-alpha sentiment tint or over imagery — the composited background depends on the
- *   call-site alpha, so those need a rendered surface (out of scope for a JVM token test).
+ *   call-site alpha, so those need a rendered surface (out of scope for a JVM token test). Text dimmed by a
+ *   fixed alpha over an opaque container is in scope: it is composited here before it is measured.
  */
 class TokenContrastTest {
     /** WCAG 2.1 contrast ratio (1..21), order-independent, from two opaque sRGB colours. */
@@ -71,6 +74,19 @@ class TokenContrastTest {
             Pair("$theme inverseOnSurface/inverseSurface", scheme.inverseOnSurface, scheme.inverseSurface, text),
             Pair("$theme onPrimaryFixed/primaryFixed", scheme.onPrimaryFixed, scheme.primaryFixed, text),
             Pair("$theme onPrimaryFixed/primaryFixedDim", scheme.onPrimaryFixed, scheme.primaryFixedDim, text),
+            // RatingCard's secondary text, dimmed at the call site, composited over the container it sits on.
+            Pair(
+                "$theme RatingCard secondary/secondaryContainer",
+                scheme.onSecondaryContainer.copy(alpha = RATING_CARD_SECONDARY_ALPHA).compositeOver(scheme.secondaryContainer),
+                scheme.secondaryContainer,
+                text,
+            ),
+            Pair(
+                "$theme RatingCard secondary/surfaceContainer",
+                scheme.onSurface.copy(alpha = RATING_CARD_SECONDARY_ALPHA).compositeOver(scheme.surfaceContainer),
+                scheme.surfaceContainer,
+                text,
+            ),
         )
         return pairs
     }
