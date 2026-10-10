@@ -95,6 +95,11 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenStatePreview
     @Composable
+    fun errorKindConfiguration() = ErrorScreenConfigurationSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
     fun emptyAction() = EmptyScreenActionSample()
 
     @PreviewTest

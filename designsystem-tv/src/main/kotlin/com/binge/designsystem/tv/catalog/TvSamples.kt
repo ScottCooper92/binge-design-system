@@ -239,6 +239,18 @@ fun TvErrorPlateNoRetrySample() {
     TvErrorPlate(kind = ErrorKind.Forbidden, onRetry = null)
 }
 
+/** A failure in the app's own words: its title and message over the configuration kind's glyph, with Try again. */
+@Composable
+fun TvErrorPlateTitledSample() {
+    TvErrorPlate(
+        kind = ErrorKind.Configuration,
+        onRetry = {},
+        title = "No API key",
+        message = "Add an API key in Settings, then try again.",
+        alignment = Alignment.Center,
+    )
+}
+
 /** The focus ring, the lift and the overscan margin at TV scale, with focus as a flag. */
 @Composable
 fun TvFocusIndicatorSample() {

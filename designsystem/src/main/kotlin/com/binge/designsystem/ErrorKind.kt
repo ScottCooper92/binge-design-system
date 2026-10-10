@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.WifiOff
@@ -29,5 +30,8 @@ enum class ErrorKind(
     Auth(Icons.Filled.Lock, R.string.error_kind_auth_title, R.string.error_kind_auth_message),
     RateLimited(Icons.Filled.HourglassEmpty, R.string.error_kind_rate_limited_title, R.string.error_kind_rate_limited_message),
     Forbidden(Icons.Filled.Block, R.string.error_kind_forbidden_title, R.string.error_kind_forbidden_message),
+
+    /** A key or credential the app needs is missing or was refused: not something signing in fixes. */
+    Configuration(Icons.Filled.Key, R.string.error_kind_configuration_title, R.string.error_kind_configuration_message),
     Generic(Icons.Filled.ErrorOutline, R.string.error_kind_generic_title, R.string.error_kind_generic_message),
 }

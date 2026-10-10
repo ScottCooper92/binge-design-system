@@ -586,6 +586,14 @@ fun ErrorScreenSample() {
     }
 }
 
+/** A missing or refused key: the configuration kind's glyph and copy, with nothing to retry. */
+@Composable
+fun ErrorScreenConfigurationSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        ErrorScreen(kind = ErrorKind.Configuration, onRetry = null)
+    }
+}
+
 /** An empty list with something to do about it: the default headline, and one action. */
 @Composable
 fun EmptyScreenActionSample() {
