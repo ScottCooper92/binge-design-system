@@ -16,16 +16,33 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 /** The deepest index seen so far, held outside snapshot state: nothing composes on it. */
 private class DeepestIndex {
     var value: Int? = null
+
+    /** The list the last save handed to the registry, which a leave empties; see [deepestIndexSaver]. */
+    var lastSaved: ArrayList<Int>? = null
+
+    /** Set once the visit has reported, so a save made after that carries nothing. */
+    var reported = false
 }
 
 /**
- * Saves the deepest index only for a configuration change, the one save the same visit is restored from. A save
- * returning null saves nothing, so any other restore starts a fresh visit.
+ * Saves the deepest index of a visit that has not reported, as a one-element list; an empty one restores nothing.
+ *
+ * It saves a live visit whatever the cause. The platform saves one when the activity stops, and a configuration change
+ * that reaches the stopped activity restores from that save, so the save cannot wait for the change. But a surface
+ * that is left saves its state *before* its effect reports, so that save would carry a visit that is already over into
+ * the next one. The report empties the list the last save handed out, so a restore from it starts a fresh visit.
  */
-private fun deepestIndexSaver(isChangingConfigurations: () -> Boolean): Saver<DeepestIndex, Int> =
+private fun deepestIndexSaver(): Saver<DeepestIndex, ArrayList<Int>> =
     Saver(
-        save = { if (isChangingConfigurations()) it.value else null },
-        restore = { saved -> DeepestIndex().apply { value = saved } },
+        save = { deepest ->
+            val index = deepest.value
+            if (deepest.reported || index == null) {
+                null
+            } else {
+                arrayListOf(index).also { deepest.lastSaved = it }
+            }
+        },
+        restore = { saved -> DeepestIndex().apply { value = saved.firstOrNull() } },
     )
 
 /**
@@ -47,8 +64,9 @@ private fun deepestIndexSaver(isChangingConfigurations: () -> Boolean): Saver<De
  *
  * A configuration change (a rotation, a theme or locale change) is not a leave: the disposal it causes reports
  * nothing, and the recreated effect carries on with the deepest index seen before it. So one visit is one report,
- * and a visit that went deeper before a rotation and then scrolled back up still reports how deep it went. Any other
- * save, such as the back stack's when the surface is left, carries nothing: that visit has already reported.
+ * and a visit that went deeper before a rotation and then scrolled back up still reports how deep it went. That holds
+ * when the change reaches an activity that is already stopped, because a live visit is saved at the stop. A visit that
+ * has reported carries nothing, such as the one the back stack saves when the surface is left.
  */
 @Composable
 fun ScrollDepthEffect(listState: LazyListState, onVisitEnded: (deepestIndex: Int?) -> Unit) {
@@ -85,7 +103,7 @@ internal fun ScrollDepthEffect(
     // The report happens in onDispose, after any recomposition that replaced the lambda.
     val currentOnVisitEnded by rememberUpdatedState(onVisitEnded)
     val changing by rememberUpdatedState(isChangingConfigurations)
-    val deepest = rememberSaveable(saver = deepestIndexSaver { changing() }) { DeepestIndex() }
+    val deepest = rememberSaveable(saver = deepestIndexSaver()) { DeepestIndex() }
     // Keyed on Unit, so the effect runs for the surface's whole life holding whatever it first captured.
     val currentLastVisibleIndex by rememberUpdatedState(lastVisibleIndex)
     LaunchedEffect(Unit) {
@@ -96,6 +114,12 @@ internal fun ScrollDepthEffect(
             }
     }
     DisposableEffect(Unit) {
-        onDispose { if (!changing()) currentOnVisitEnded(deepest.value) }
+        onDispose {
+            if (!changing()) {
+                deepest.reported = true
+                deepest.lastSaved?.clear()
+                currentOnVisitEnded(deepest.value)
+            }
+        }
     }
 }
