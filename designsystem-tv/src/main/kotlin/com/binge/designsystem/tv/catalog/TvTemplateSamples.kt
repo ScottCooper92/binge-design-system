@@ -11,6 +11,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.ToggleOff
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -377,6 +380,34 @@ fun TvDecisionPageSample() {
             listOf(
                 DecisionPoint(Icons.Filled.BarChart, "What is shared", "Which screens you open and how long they take to load."),
                 DecisionPoint(Icons.Filled.VisibilityOff, "What never is", "Your server, your account and what you watch."),
+                DecisionPoint(Icons.Filled.ToggleOff, "Change it any time", "Press Settings, and it stops at once."),
+            ),
+        acceptLabel = "Share usage data",
+        declineLabel = "Not now",
+        onAccept = {},
+        onDecline = {},
+        hosting = TvPageHosting.PreShell,
+        acceptInitiallyFocused = true,
+    )
+}
+
+/** A decision whose points run past the panel: the card scrolls under the answers, and ↑ walks it point by point. */
+@Composable
+fun TvDecisionPageTallSample() {
+    TvDecisionPage(
+        copy =
+            DecisionCopy(
+                kicker = "Usage data",
+                title = "Help make the app better",
+                subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+            ),
+        points =
+            listOf(
+                DecisionPoint(Icons.Filled.BarChart, "What is shared", "Which screens you open and how long they take to load."),
+                DecisionPoint(Icons.Filled.Speed, "How fast it is", "How long the server takes to answer, so a slow one shows up."),
+                DecisionPoint(Icons.Filled.ErrorOutline, "What goes wrong", "Which requests fail, and with what error."),
+                DecisionPoint(Icons.Filled.VisibilityOff, "What never is", "Your server, your account and what you watch."),
+                DecisionPoint(Icons.Filled.Schedule, "How long it is kept", "Ninety days, then it is deleted."),
                 DecisionPoint(Icons.Filled.ToggleOff, "Change it any time", "Press Settings, and it stops at once."),
             ),
         acceptLabel = "Share usage data",
