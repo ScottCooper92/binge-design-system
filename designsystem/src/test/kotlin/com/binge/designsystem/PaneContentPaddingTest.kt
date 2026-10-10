@@ -29,6 +29,13 @@ class PaneContentPaddingTest {
     }
 
     @Test
+    fun `a middle pane narrows both edges`() {
+        val padding = paneContentPadding(innerEdge = PaneEdge.Both, outer = OUTER, inner = INNER, top = TOP, bottom = BOTTOM)
+        assertEquals(INNER, padding.calculateLeftPadding(LayoutDirection.Ltr))
+        assertEquals(INNER, padding.calculateRightPadding(LayoutDirection.Ltr))
+    }
+
+    @Test
     fun `the narrowed edge mirrors with the layout direction`() {
         // Under RTL the list pane sits on the physical right, so its end edge — the one facing the
         // detail pane — is its physical left.
