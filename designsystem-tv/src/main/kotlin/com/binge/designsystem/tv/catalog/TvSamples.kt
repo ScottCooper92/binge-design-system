@@ -288,12 +288,13 @@ internal fun TvNavRailSample(
             if (it.key == badgedItemKey) it.copy(badge = NavSuiteBadge.Label("3")) else it
         }
     }
+    var selected by rememberSaveable { mutableStateOf<Any>(selectedKey) }
     BingeTvNavRail(
         header = NavRailSampleHeader,
         items = items,
         footer = NavRailSampleFooter,
-        selectedKey = selectedKey,
-        onSelect = {},
+        selectedKey = selected,
+        onSelect = { selected = it },
         expanded = expanded,
         artworkBehind = artworkBehind,
         pinFooter = pinFooter,
