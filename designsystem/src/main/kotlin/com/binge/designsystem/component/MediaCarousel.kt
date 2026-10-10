@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.SectionHeader
 import com.binge.designsystem.component.SeeAllTile
+import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
@@ -40,12 +41,19 @@ fun <T> MediaCarousel(
     // A caller whose own parent already applied the overlay inset (e.g. a grid's navOverlayPadding)
     // passes its own value to avoid adding it twice.
     startPadding: Dp = horizontalPadding + navOverlayStart(),
+    endPadding: Dp = horizontalPadding + navOverlayEnd(),
     itemContent: @Composable (index: Int, item: T) -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        SectionHeader(title = title, onMoreClick = onMoreClick, horizontalPadding = horizontalPadding, startPadding = startPadding)
+        SectionHeader(
+            title = title,
+            onMoreClick = onMoreClick,
+            horizontalPadding = horizontalPadding,
+            startPadding = startPadding,
+            endPadding = endPadding,
+        )
         LazyRow(
-            contentPadding = PaddingValues(start = startPadding, end = horizontalPadding),
+            contentPadding = PaddingValues(start = startPadding, end = endPadding),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
         ) {
             itemsIndexed(items, key = { _, item -> itemKey(item) }) { index, item -> itemContent(index, item) }

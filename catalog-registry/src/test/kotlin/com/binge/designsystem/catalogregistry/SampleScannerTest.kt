@@ -261,4 +261,20 @@ class SampleScannerTest {
 
         assertEquals("Doc", result.samples.single().description)
     }
+
+    @Test
+    fun `a block comment is not a KDoc, and does not borrow an earlier sample's`() {
+        val result = scan("/** A. */\n@Composable\nfun ASample() {}\n\n/* note */\n@Composable\nfun BSample() {}")
+
+        assertEquals(listOf("ASample"), result.samples.map { it.function })
+        assertTrue("BSample has no KDoc" in result.problems.single(), result.problems.toString())
+    }
+
+    @Test
+    fun `finds @Composable after another annotation on a line above`() {
+        val result = scan("/** Doc. */\n@Preview @Composable\nfun PairSample() {}")
+
+        assertTrue(result.problems.isEmpty(), result.problems.toString())
+        assertEquals("Doc", result.samples.single().description)
+    }
 }

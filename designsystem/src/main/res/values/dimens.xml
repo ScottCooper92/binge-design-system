@@ -61,7 +61,7 @@
          column here too (the rails start-align to it but bleed past); Search caps its field/results here.
          Wider screens centre the column with gutters; a no-op on phones. -->
     <dimen name="content_max_width">640dp</dimen>
-    <!-- Watch-provider tile grid (onboarding services step + account settings) -->
+    <!-- Watch-provider tile grid, for a provider-picking screen -->
     <dimen name="provider_grid_spacing">12dp</dimen>
     <dimen name="provider_tile_border">2.5dp</dimen>
     <!-- Provider tile resting + lifted shadow (smaller than the choice panels'
@@ -73,7 +73,7 @@
     <dimen name="provider_tile_check_icon">13dp</dimen>
     <!-- The width the catalog samples pin a provider tile to, a typical grid cell. Not see_all_tile_width: that is the poster cell, and only matches by coincidence (#248). -->
     <dimen name="provider_tile_sample_width">120dp</dimen>
-    <!-- Selected-services summary (shared by onboarding + account watch providers) -->
+    <!-- Selected-services summary, with a provider-picking grid -->
     <dimen name="services_summary_logo">24dp</dimen>
     <!-- Fixed min height for the summary slot so the empty-hint and the lead+logos
          states are the same height and the grid above doesn't shift. -->
@@ -184,6 +184,12 @@
     <!-- BingeTag — tinted category/type/role tag (corner = BingeShapes.Tag; h-pad/icon-gap reuse the padding ramp) -->
     <dimen name="tag_padding_v">3dp</dimen>
     <dimen name="tag_icon_size">13dp</dimen>
+    <!-- StatusChip: the pill's padding, the solid dot, its halo, and the gap before the label -->
+    <dimen name="status_chip_padding_h">10dp</dimen>
+    <dimen name="status_chip_padding_v">4dp</dimen>
+    <dimen name="status_chip_dot_size">7dp</dimen>
+    <dimen name="status_chip_dot_halo_size">13dp</dimen>
+    <dimen name="status_chip_dot_spacing">6dp</dimen>
     <!-- BingeSnackbar — the floating pill (horizontal inset reuses padding_m) -->
     <dimen name="snackbar_elevation">6dp</dimen>
     <!-- M3's snackbar height: 48dp at one line, 68dp at two. The min holds the first, and the text's
@@ -352,7 +358,7 @@
     <!-- Lifts the pill off the content it overlays. FloatingToolbarDefaults' own elevation assumes a
          plain surface underneath; this bar sits over poster art, where a shadow is what separates it. -->
     <dimen name="nav_floating_shadow_elevation">6dp</dimen>
-    <!-- MonthYearPicker: fixed height of the month/year grid, four rows of min_touch_target with padding_s between, so switching grids does not resize the dialog -->
+    <!-- MonthYearPicker: minimum height of the month/year grid (it grows with the font size), four rows of min_touch_target with padding_s between, so switching grids does not resize the dialog -->
     <dimen name="month_year_picker_grid_height">216dp</dimen>
     <!-- MonthYearPicker: outline of the chosen month/year pill, and the horizontal padding that sizes the pill to its label inside the full-width touch cell -->
     <dimen name="month_year_picker_selected_border">2dp</dimen>
@@ -376,4 +382,12 @@
     <dimen name="letter_rail_width">32dp</dimen>
     <dimen name="letter_rail_letter">20dp</dimen>
     <dimen name="letter_rail_sample_height">520dp</dimen>
+    <!-- DecisionScreen: the hero plate and its badge, a point's icon plate, and the landscape points' drop -->
+    <dimen name="decision_content_max_width">600dp</dimen>
+    <dimen name="decision_hero_size">92dp</dimen>
+    <dimen name="decision_hero_icon_size">44dp</dimen>
+    <dimen name="decision_hero_badge_size">34dp</dimen>
+    <dimen name="decision_hero_badge_icon_size">16dp</dimen>
+    <dimen name="decision_point_icon_size">40dp</dimen>
+    <dimen name="decision_landscape_points_top">48dp</dimen>
 </resources>

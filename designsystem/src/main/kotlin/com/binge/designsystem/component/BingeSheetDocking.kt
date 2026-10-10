@@ -246,13 +246,14 @@ internal fun DockingHeaderLayout(
     dockedTopBar: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     handleModifier: Modifier = Modifier,
+    showHandle: Boolean = true,
 ) {
     Layout(
         contents =
             listOf(
                 {
                     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(handleModifier) { BottomSheetDefaults.DragHandle() }
+                        if (showHandle) Box(handleModifier) { BottomSheetDefaults.DragHandle() }
                         header()
                     }
                 },

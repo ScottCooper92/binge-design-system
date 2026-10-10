@@ -104,21 +104,27 @@ val LocalHeroReadingMargin = compositionLocalOf { 0.dp }
  */
 @Composable
 private fun HeroDetailContent(contentMaxWidth: Dp, content: @Composable ColumnScope.() -> Unit) {
+    ProvideHeroReadingMargin(Modifier.fillMaxWidth()) {
+        Column(
+            modifier =
+                if (contentMaxWidth == Dp.Infinity) {
+                    Modifier.fillMaxWidth()
+                } else {
+                    Modifier.fillMaxWidth().wrapContentWidth().widthIn(max = contentMaxWidth)
+                },
+            content = content,
+        )
+    }
+}
+
+/** Measures the width [content] gets, and provides the [LocalHeroReadingMargin] that centres a reading column in it. */
+@Composable
+private fun ProvideHeroReadingMargin(modifier: Modifier, content: @Composable () -> Unit) {
     val readingWidth = dimensionResource(R.dimen.content_max_width)
     val zero = dimensionResource(R.dimen.zero)
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+    BoxWithConstraints(modifier = modifier) {
         val readingMargin = ((maxWidth - readingWidth) / 2).coerceAtLeast(zero)
-        CompositionLocalProvider(LocalHeroReadingMargin provides readingMargin) {
-            Column(
-                modifier =
-                    if (contentMaxWidth == Dp.Infinity) {
-                        Modifier.fillMaxWidth()
-                    } else {
-                        Modifier.fillMaxWidth().wrapContentWidth().widthIn(max = contentMaxWidth)
-                    },
-                content = content,
-            )
-        }
+        CompositionLocalProvider(LocalHeroReadingMargin provides readingMargin, content = content)
     }
 }
 
@@ -126,7 +132,8 @@ private fun HeroDetailContent(contentMaxWidth: Dp, content: @Composable ColumnSc
  * [HeroDetailScreen] for a long page that stays lazy: [content] adds items after the [hero] item, and the bar
  * fades on how far the hero has scrolled out of [listState]. [verticalArrangement], [horizontalAlignment] and
  * [contentPadding] are the list's own, and apply to the hero item too: a spacing between every row, rows
- * capped and centred on a wide window, a gap under the last one.
+ * capped and centred on a wide window, a gap under the last one. Its items read [LocalHeroReadingMargin] as an
+ * eager page's sections do, measured inside the page.
  */
 @Composable
 fun HeroDetailLazyScreen(
@@ -148,15 +155,17 @@ fun HeroDetailLazyScreen(
     content: LazyListScope.() -> Unit,
 ) {
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize().then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
-            contentPadding = contentPadding,
-            verticalArrangement = verticalArrangement,
-            horizontalAlignment = horizontalAlignment,
-        ) {
-            item(key = HERO_ITEM_KEY) { hero() }
-            content()
+        ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize().then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
+                contentPadding = contentPadding,
+                verticalArrangement = verticalArrangement,
+                horizontalAlignment = horizontalAlignment,
+            ) {
+                item(key = HERO_ITEM_KEY) { hero() }
+                content()
+            }
         }
         HeroDetailBar(title, onBack, heroHeight, horizontalInset, inFlight, actions) {
             // Past the hero item the offset is unknown and no longer matters: the bar is fully in.

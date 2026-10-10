@@ -50,7 +50,7 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── modifier/    skeleton shimmer, selection lift
 ├── layout/      layout anchors
 ├── template/    the whole-screen frames: the scaffold, the message screen, the filtered list, the
-│                hero detail page, the form, the step flow and the paged phase
+│                hero detail page, the form, the step flow, the decision screen and the paged phase
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
 
 designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
@@ -61,7 +61,7 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 │                avatar, the QR code, the selected tick, the row emphasis and the vertical divider
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
-│                flow, the message page, the detail page and the immersive hub and grid
+│                flow, the message page, the detail page, the decision page and the immersive hub and grid
 ├── Dimens.kt    the non-dp constants the TV components share, such as the nav rail's collapsed row cap
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme
@@ -197,6 +197,19 @@ to `settings.gradle.kts` and nothing else.
 A submodule pins a commit, so a consumer updates deliberately — `git submodule update --remote` —
 rather than being moved by whatever landed here today. That is the property that makes source-level
 sharing survivable across three repositories.
+
+## Test fixtures
+
+Both modules ship `testFixtures` for a consumer's Robolectric tests. Depend on them with
+`testImplementation(testFixtures("com.binge:designsystem"))` and the same for `designsystem-tv`. They are the one copy:
+a consumer keeps no wrappers of its own.
+
+- `designsystem`: `createKeyboardComposeRule()`, for a test that drives focus with keys; the take-down rules
+  (`createTakeDownComposeRule()` and its keyboard and activity forms), for a suite that collects `LazyPagingItems`;
+  `ShadowMeshSpecification`; and the skeleton-geometry helpers.
+- `designsystem-tv`: `LeanbackRule`, which makes the device a TV so the pivot scroll applies; `settle()`, with
+  `SETTLED_FOCUS_WAIT_MILLIS` and `ANCHOR_COALESCE_WAIT_MILLIS` for the immersive pages' debounce and coalesce
+  windows; and `TvLateTarget`.
 
 ## Licence
 

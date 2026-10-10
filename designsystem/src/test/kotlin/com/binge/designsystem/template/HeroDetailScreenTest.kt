@@ -70,6 +70,23 @@ class HeroDetailScreenTest {
         // (1000 - 100 - 640) / 2, not (1000 - 640) / 2 measured from the whole window.
         assertEquals((WINDOW - INSET - READING_WIDTH) / 2, margin)
     }
+
+    @Test
+    fun `a lazy page hands its items the same margin, measured inside the page`() {
+        var margin = 0.dp
+        rule.setContent {
+            BingeExpressiveTheme {
+                Box(Modifier.padding(start = INSET)) {
+                    HeroDetailLazyScreen(title = "Title", onBack = null, hero = { Box(Modifier.height(HERO)) }) {
+                        item { margin = LocalHeroReadingMargin.current }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertEquals((WINDOW - INSET - READING_WIDTH) / 2, margin)
+    }
 }
 
 private val HERO = 200.dp

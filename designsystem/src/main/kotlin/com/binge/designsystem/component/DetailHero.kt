@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowInsetsControllerCompat
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
-import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
 
@@ -235,11 +235,7 @@ private fun HeroTextColumn(
         modifier = modifier
             .fillMaxWidth()
             .heroCopyFade()
-            .padding(
-                start = resolvedContentInset(),
-                end = resolvedContentInset(),
-                bottom = dimensionResource(R.dimen.detail_hero_text_bottom_padding),
-            ),
+            .padding(resolvedContentPadding(bottom = dimensionResource(R.dimen.detail_hero_text_bottom_padding))),
     ) {
         val titleStyle = MaterialTheme.typography.displaySmall
         val lineGap = dimensionResource(R.dimen.padding_xs)

@@ -6,7 +6,7 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -111,7 +111,7 @@ private fun PinCell(
     Box(
         modifier =
             Modifier
-                .size(dimensionResource(R.dimen.pin_cell_size))
+                .defaultMinSize(minWidth = dimensionResource(R.dimen.pin_cell_size), minHeight = dimensionResource(R.dimen.pin_cell_size))
                 .border(thickness, outline, BingeShapes.ElementSmall),
         contentAlignment = Alignment.Center,
     ) {

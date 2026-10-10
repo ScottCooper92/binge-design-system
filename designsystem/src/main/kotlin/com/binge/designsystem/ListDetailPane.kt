@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
  * placed this entry's content at tells one pane's own width from another's.
  *
  * Also provides [LocalPaneInnerEdge] as [innerEdge] — the edge this pane shares with the one beside
- * it, [PaneEdge.End] for a list pane and [PaneEdge.Start] for its detail — but only while
+ * it, [PaneEdge.End] for a list pane, [PaneEdge.Start] for its detail and [PaneEdge.Both] for a middle pane — but only while
  * [LocalIsSinglePaneNav] says both are on screen. Below the breakpoint the same entry fills the
  * window alone and has no inner edge, so the caller passes its role once and never checks.
  */

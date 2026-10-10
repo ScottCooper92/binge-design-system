@@ -52,6 +52,26 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheet() = Frame { TvSideSheetSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun errorPlate() = Frame { TvErrorPlateSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun sideSheetConfirm() = Frame { TvSideSheetConfirmSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun errorPlateNoRetry() = Frame { TvErrorPlateNoRetrySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun focusIndicator() = Frame { TvFocusIndicatorSample() }
 
     @PreviewTest
@@ -77,6 +97,16 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pairingCard() = Frame { TvPairingCardSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun pairingCardQrOnly() = Frame { TvPairingCardQrOnlySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun navRailExpanded() = Frame { TvNavRailSample(expanded = true) }
 
     @PreviewTest
@@ -89,6 +119,11 @@ class TvSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun navRailCollapsedPinnedFooter() = Frame { TvNavRailSample(expanded = false, pinFooter = true) }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun shellScaffoldOverlay() = Frame { TvShellScaffoldOverlaySample() }
 
     @PreviewTest
     @TvPreviews

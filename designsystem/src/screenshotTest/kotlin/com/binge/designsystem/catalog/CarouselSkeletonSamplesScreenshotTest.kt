@@ -11,4 +11,11 @@ class CarouselSkeletonSamplesScreenshotTest {
     fun CarouselSkeleton() {
         CarouselSkeletonSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun SkeletonPlates() {
+        SkeletonPlateSample()
+    }
 }

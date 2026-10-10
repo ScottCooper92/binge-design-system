@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
@@ -25,33 +26,47 @@ import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvButtonSurface
 import com.binge.designsystem.tv.component.TvCardRow
+import com.binge.designsystem.tv.component.TvErrorPlate
 import com.binge.designsystem.tv.component.TvExcludedMark
 import com.binge.designsystem.tv.component.TvIconButtonSurface
 import com.binge.designsystem.tv.component.TvMessagePlate
+import com.binge.designsystem.tv.component.TvPairingCard
 import com.binge.designsystem.tv.component.TvQrCode
 import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvSectionTitle
 import com.binge.designsystem.tv.component.TvSelectedTick
 import com.binge.designsystem.tv.component.TvSelectedTickBadge
+import com.binge.designsystem.tv.component.TvSideSheetConfirm
+import com.binge.designsystem.tv.component.TvSideSheetPanel
+import com.binge.designsystem.tv.component.TvSideSheetRow
+import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.component.TvVerticalDivider
 import com.binge.designsystem.tv.component.containerColor
 import com.binge.designsystem.tv.component.contentColor
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.BingeTvNavRail
 import com.binge.designsystem.tv.nav.TvNavRailItem
+import com.binge.designsystem.tv.nav.TvShellScaffold
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -212,6 +227,18 @@ fun TvMessagePlateTopStartSample() {
     )
 }
 
+/** A failure drawn from its kind, centred as a full-screen state is, with Try again focused. */
+@Composable
+fun TvErrorPlateSample() {
+    TvErrorPlate(kind = ErrorKind.Server, onRetry = {}, alignment = Alignment.Center, retryInitiallyFocused = true)
+}
+
+/** A failure nothing can be done about here: no button, so nothing dead to land on. */
+@Composable
+fun TvErrorPlateNoRetrySample() {
+    TvErrorPlate(kind = ErrorKind.Forbidden, onRetry = null)
+}
+
 /** The focus ring, the lift and the overscan margin at TV scale, with focus as a flag. */
 @Composable
 fun TvFocusIndicatorSample() {
@@ -268,12 +295,13 @@ internal fun TvNavRailSample(
             if (it.key == badgedItemKey) it.copy(badge = NavSuiteBadge.Label("3")) else it
         }
     }
+    var selected by rememberSaveable { mutableStateOf<Any>(selectedKey) }
     BingeTvNavRail(
         header = NavRailSampleHeader,
         items = items,
         footer = NavRailSampleFooter,
-        selectedKey = selectedKey,
-        onSelect = {},
+        selectedKey = selected,
+        onSelect = { selected = it },
         expanded = expanded,
         artworkBehind = artworkBehind,
         pinFooter = pinFooter,
@@ -289,6 +317,28 @@ fun TvInitialsAvatarSample() {
         size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
     )
+}
+
+/** The shell with a detail page open over it: the overlay covers the rail and the content alike. */
+@Composable
+fun TvShellScaffoldOverlaySample() {
+    var selected by rememberSaveable { mutableStateOf<Any>("movies") }
+    TvShellScaffold(
+        header = NavRailSampleHeader,
+        items = NavRailSampleItems,
+        footer = NavRailSampleFooter,
+        selectedKey = selected,
+        homeKey = "movies",
+        onSelect = { selected = it },
+        overlay = {
+            TvMessagePlate(
+                headline = "Dune: Part Two",
+                body = "A detail page, opened over the shell, owns the screen and Back until it closes.",
+                alignment = Alignment.Center,
+                modifier = Modifier.background(MaterialTheme.colorScheme.background),
+            )
+        },
+    ) { NavRailSampleContent() }
 }
 
 private const val PINNED_FOOTER_SAMPLE_ITEMS = 3
@@ -444,6 +494,66 @@ fun TvQrCodeSample() {
             content = "https://example.com/link?code=BINGE-1234",
             contentDescription = "Scan to finish signing in",
             modifier = Modifier.size(dimensionResource(DesR.dimen.card_height)),
+        )
+    }
+}
+
+/** A row's actions on the end-edge sheet: the focused row filled, the current choice ticked, delete in red. */
+@Composable
+fun TvSideSheetSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Dune: Part Two")
+            TvSideSheetRow(label = "Approve", onClick = {}, icon = Icons.Filled.Check, initiallyFocused = true)
+            TvSideSheetRow(label = "4K", onClick = {}, selected = true)
+            TvSideSheetRow(label = "Not available", onClick = {}, enabled = false)
+            TvSideSheetRow(label = "Delete request", onClick = {}, icon = Icons.Filled.Delete, destructive = true)
+        }
+    }
+}
+
+/** The confirm step: what is about to happen, then the confirm row and Cancel, with focus on Cancel. */
+@Composable
+fun TvSideSheetConfirmSample() {
+    val entry = remember { FocusRequester() }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetConfirm(
+                title = "Delete this request?",
+                message = "It is removed from the server for everyone.",
+                confirmLabel = "Delete",
+                onConfirm = {},
+                onCancel = {},
+                entryFocus = entry,
+                cancelInitiallyFocused = true,
+            )
+        }
+    }
+}
+
+/** The hand-off card: the code to scan, what to do with it, a PIN to type and the address to open by hand. */
+@Composable
+fun TvPairingCardSample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCard(
+            payload = "http://192.168.1.20:8080/link?code=4821",
+            qrDescription = "Scan to open the sign-in page on your phone",
+            instruction = "Scan with your phone, or open the address below",
+            code = "PIN 4 8 2 1",
+            codeDescription = "PIN 4, 8, 2, 1",
+            address = "http://192.168.1.20:8080",
+        )
+    }
+}
+
+/** The card at its barest: a code to scan and nothing to type. */
+@Composable
+fun TvPairingCardQrOnlySample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvPairingCard(
+            payload = "https://example.com/link?code=BINGE-1234",
+            qrDescription = "Scan to finish signing in",
+            instruction = "Scan with your phone to finish signing in",
         )
     }
 }

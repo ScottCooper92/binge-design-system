@@ -31,6 +31,13 @@ class PaneSideInsetsTest {
     }
 
     @Test
+    fun `a middle pane keeps neither side`() {
+        val insets = paneSideInsets(WINDOW, innerEdge = PaneEdge.Both)
+        assertEquals(0, insets.getLeft(DENSITY, LayoutDirection.Ltr))
+        assertEquals(0, insets.getRight(DENSITY, LayoutDirection.Ltr))
+    }
+
+    @Test
     fun `the dropped side mirrors with the layout direction`() {
         // Under RTL the detail pane sits on the physical left, so its start edge, the one facing the
         // list pane, is its physical right.

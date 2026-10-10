@@ -20,9 +20,9 @@ import com.binge.designsystem.theme.BingeShapes
 /**
  * The column count both halves of this pair default to.
  *
- * Not `provider_grid_columns`, which is keyed to the **screen** width: onboarding's services step
- * renders this grid inside a half-width pane in landscape, so a screen-derived 6 or 8 would size its
- * tiles against a measure they do not have. A caller whose grid really is full-width passes the
+ * Not `provider_grid_columns`, which is keyed to the **screen** width: a caller that renders this grid
+ * inside a half-width pane in landscape would get a screen-derived 6 or 8, sizing its tiles against a
+ * measure they do not have. A caller whose grid really is full-width passes the
  * resource in.
  */
 private const val DEFAULT_GRID_COLUMNS = 4

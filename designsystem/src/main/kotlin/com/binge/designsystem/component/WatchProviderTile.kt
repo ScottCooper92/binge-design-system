@@ -41,7 +41,7 @@ private const val CHECK_POP_INITIAL_SCALE = 0.7f
 
 /**
  * Square watch-provider tile with logo, selection border, and a pop-in check badge.
- * Shared between the onboarding services step and the account settings provider grid.
+ * One cell of a provider-picking screen's grid.
  *
  * [provider] supplies id/name/logo metadata. Toggle semantics use [Role.Checkbox].
  * Reduce-motion safe: the check badge fades rather than scales and the selection

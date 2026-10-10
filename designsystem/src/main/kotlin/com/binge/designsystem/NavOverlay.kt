@@ -60,3 +60,11 @@ fun navOverlayPadding(base: PaddingValues = PaddingValues(), bleedStart: Boolean
  */
 @Composable
 fun navOverlayStart(): Dp = LocalNavOverlayInsets.current.calculateStartPadding(LocalLayoutDirection.current)
+
+/**
+ * Just the end inset from [LocalNavOverlayInsets], the counterpart of [navOverlayStart]: what a child of a
+ * full-bleed surface pads its last column by. It reads zero unless a shell or hub publishes an end term, such as an
+ * end cutout.
+ */
+@Composable
+fun navOverlayEnd(): Dp = LocalNavOverlayInsets.current.calculateEndPadding(LocalLayoutDirection.current)

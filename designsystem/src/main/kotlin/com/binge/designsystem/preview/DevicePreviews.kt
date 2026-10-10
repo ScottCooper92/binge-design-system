@@ -36,7 +36,7 @@ annotation class ComponentPreviews
 
 /**
  * Default and large (1.5×) font scale, light + dark, at the standard phone width.
- * Use for text-dense surfaces (account, detail screens, onboarding analytics) to catch
+ * Use for text-dense surfaces (a profile page, a detail screen, a consent step) to catch
  * wrap/overflow regressions.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
@@ -45,6 +45,14 @@ annotation class ComponentPreviews
 @Preview(name = "font10-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.0f, uiMode = UI_MODE_NIGHT_YES)
 @Preview(name = "font15-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.5f, uiMode = UI_MODE_NIGHT_YES)
 annotation class FontScalePreviews
+
+/**
+ * The largest system font size, 2.0, dark, at the standard phone width: one cell for a component that sizes
+ * a container around its text, where the largest scale is what clips.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+annotation class LargestFontPreview
 
 /**
  * The locale axis, at the standard phone width, dark: one cell per locale that ships **other than

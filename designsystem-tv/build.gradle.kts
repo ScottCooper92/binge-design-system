@@ -185,4 +185,6 @@ dependencies {
     testFixturesImplementation(composeBom)
     testFixturesImplementation(libs.compose.ui)
     testFixturesImplementation(libs.compose.ui.test.junit4)
+    // LeanbackRule sets a system feature through Robolectric's package-manager shadow.
+    testFixturesImplementation(libs.robolectric)
 }
