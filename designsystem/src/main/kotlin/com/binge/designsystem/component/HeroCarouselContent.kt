@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import com.binge.designsystem.R
 import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRuntime
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
@@ -48,7 +49,6 @@ private const val HERO_META_DOT_ALPHA = 0.45f
 
 /** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
 private val HERO_TITLE_MIN_SIZE = 28.sp
-private const val MINUTES_PER_HOUR = 60
 internal const val MAX_META_GENRES = 2
 
 /**
@@ -247,11 +247,7 @@ private fun HeroMetaRow(item: HeroItem) {
 @Composable
 fun heroRuntimeOrSeasons(item: HeroItem): String? =
     when {
-        item.runtimeMinutes != null -> stringResource(
-            R.string.hero_meta_runtime,
-            item.runtimeMinutes / MINUTES_PER_HOUR,
-            item.runtimeMinutes % MINUTES_PER_HOUR,
-        )
+        item.runtimeMinutes != null -> formatRuntime(item.runtimeMinutes)
         item.seasons != null ->
             pluralStringResource(R.plurals.hero_meta_seasons, item.seasons, item.seasons)
         else -> null
