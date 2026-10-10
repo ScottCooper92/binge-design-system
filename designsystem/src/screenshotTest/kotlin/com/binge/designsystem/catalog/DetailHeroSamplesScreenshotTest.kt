@@ -26,4 +26,11 @@ class DetailHeroSamplesScreenshotTest {
     fun TitleContent() {
         DetailHeroTitleContentSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TitleFallback() {
+        DetailHeroTitleFallbackSample()
+    }
 }

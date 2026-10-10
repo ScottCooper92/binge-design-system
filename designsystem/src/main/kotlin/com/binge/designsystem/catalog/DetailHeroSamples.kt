@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.DetailHero
+import com.binge.designsystem.component.DetailHeroDefaults
 import com.binge.designsystem.component.RatingChip
 import com.binge.designsystem.component.RatingChipTone
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -73,6 +75,25 @@ fun DetailHeroTitleContentSample() {
             genres = listOf("Action", "Crime", "Drama"),
             onBack = {},
             titleContent = { TitleLogoStandIn() },
+        )
+    }
+}
+
+/**
+ * A [DetailHero.titleContent] slot that falls back to text, as a title logo does with no logo to show. The plain `Text`
+ * inherits the hero's title style and colour from the slot, and takes its shrink from [DetailHeroDefaults].
+ */
+@Composable
+fun DetailHeroTitleFallbackSample() {
+    ScreenshotTheme {
+        DetailHero(
+            title = "The Dark Knight",
+            backdropUrl = null,
+            tagline = "Why So Serious?",
+            metaText = "9.0 · 2008 · 2h 32m",
+            genres = listOf("Action", "Crime", "Drama"),
+            onBack = {},
+            titleContent = { Text(text = "The Dark Knight", maxLines = 2, autoSize = DetailHeroDefaults.titleAutoSize()) },
         )
     }
 }

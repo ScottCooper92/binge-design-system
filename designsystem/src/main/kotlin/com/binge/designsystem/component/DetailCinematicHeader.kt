@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -42,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.R
@@ -54,9 +56,6 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
 
 private const val CINEMATIC_SYNOPSIS_ALPHA = 0.85f
-
-/** The smallest the title shrinks to stay on one line, before it wraps at full size instead. */
-private val CINEMATIC_TITLE_MIN_SIZE = 34.sp
 
 // The poster (196dp wide, 2:3) runs ~294dp tall against a 460dp header. The copy column now fills
 // that same height and pins the facts row to its bottom edge, so this clamp is a safety cap for
@@ -192,10 +191,15 @@ private fun CinematicCopyRow(
             // and the art above it stays raw.
             Spacer(Modifier.weight(1f))
             Spacer(Modifier.onGloballyPositioned { copyBounds.copyTop = it.positionInRoot().y })
-            val titleStyle = MaterialTheme.typography.displayMedium
+            val titleStyle = DetailHeroDefaults.cinematicTitleStyle()
             val lineGap = dimensionResource(R.dimen.padding_xs)
             if (titleContent != null) {
-                Box(reportsLineEnd(copyBounds, CopyLine.Title)) { titleContent() }
+                Box(reportsLineEnd(copyBounds, CopyLine.Title)) {
+                    CompositionLocalProvider(
+                        LocalTextStyle provides titleStyle,
+                        LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+                    ) { titleContent() }
+                }
             } else {
                 Text(
                     text = title,
@@ -204,11 +208,7 @@ private fun CinematicCopyRow(
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    autoSize = OneLineOrWrapAutoSize(
-                        max = titleStyle.fontSize,
-                        min = CINEMATIC_TITLE_MIN_SIZE,
-                        step = HeroTitleSizeStep,
-                    ),
+                    autoSize = DetailHeroDefaults.cinematicTitleAutoSize(),
                 )
             }
             if (!eyebrow.isNullOrBlank()) {
