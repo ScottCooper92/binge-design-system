@@ -52,7 +52,8 @@ import com.binge.designsystem.paneSideInsets
  * [hero] is the header the page uses (`DetailHero`, `DetailCinematicHeader`, or a person's own); [heroHeight]
  * is where the bar's fade starts, and [horizontalInset] lines the bar's controls up with the hero's copy. A
  * [footer] sits below the scroll rather than over it, so the scroll always clears it. It reaches the true
- * edge of the window, so it clears the navigation bar itself, as `FormFooter` does. [inFlight] draws a thin
+ * edge of the window, so it clears the navigation bar and a side cutout itself, by
+ * [com.binge.designsystem.bottomBarInsets], as `FormFooter` does. [inFlight] draws a thin
  * bar under the top bar without reflowing the page. [onBack] is dropped in a pane whose list already offers it.
  * The hero runs full-bleed; [content] centres at [contentMaxWidth] on a wide window. A page whose rails bleed to the
  * edge passes `Dp.Infinity`: [content] then fills the width, and pads each section by [LocalHeroReadingMargin].

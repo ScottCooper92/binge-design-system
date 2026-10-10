@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
+import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.component.BingeOutlinedButton
@@ -145,7 +146,7 @@ fun BingeScreenScaffoldBottomBarSample() {
                         label = "Add slider",
                         onClick = {},
                         modifier = Modifier
-                            .navigationBarsPadding()
+                            .windowInsetsPadding(bottomBarInsets())
                             .fillMaxWidth()
                             .padding(dimensionResource(R.dimen.padding_m)),
                     )
@@ -347,7 +348,7 @@ fun HeroDetailScreenFooterSample() {
                         label = "Approve",
                         onClick = {},
                         modifier = Modifier
-                            .navigationBarsPadding()
+                            .windowInsetsPadding(bottomBarInsets())
                             .fillMaxWidth()
                             .padding(dimensionResource(R.dimen.padding_m)),
                     )
