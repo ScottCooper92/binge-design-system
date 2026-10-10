@@ -30,6 +30,7 @@ import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DecisionHero
 import com.binge.designsystem.component.DecisionPointsCard
 import com.binge.designsystem.isLandscape
+import com.binge.designsystem.uppercaseLocalised
 
 /** Landscape's two panes: the heading and answers against the points card. */
 private const val LANDSCAPE_HEADER_WEIGHT = 2f
@@ -127,7 +128,7 @@ private fun DecisionHeading(copy: DecisionCopy, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_m))) {
         copy.kicker?.let {
             Text(
-                text = it.uppercase(),
+                text = it.uppercaseLocalised(),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_sm)),
