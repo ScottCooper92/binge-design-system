@@ -118,7 +118,7 @@ internal fun BingeNavCustomRail(
                     ),
                 ).windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Start)),
         ) {
-            val accountAvatarSize = dimensionResource(R.dimen.nav_rail_account_avatar_size)
+            val largeAvatarSize = dimensionResource(R.dimen.nav_rail_large_avatar_size)
             val itemAvatarSize = dimensionResource(R.dimen.nav_item_avatar_size)
             Column(
                 modifier = Modifier
@@ -136,7 +136,7 @@ internal fun BingeNavCustomRail(
                         tab = tab,
                         selected = selectedKey == tab.key,
                         onSelect = onSelect,
-                        avatarSize = if (tab.largeAvatar) accountAvatarSize else itemAvatarSize,
+                        avatarSize = if (tab.largeAvatar) largeAvatarSize else itemAvatarSize,
                         // NavigationRailItem sizes itself from its widest content (80dp is a *minimum*),
                         // so "TV shows" and "Search" would claim different widths and centre on different
                         // gutters. Filling the column pins every row to the rail's width instead.

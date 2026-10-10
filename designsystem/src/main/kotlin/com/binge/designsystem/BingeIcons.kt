@@ -6,6 +6,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 /** Single source of truth for Binge's shared glyphs, so a shape can change in one place. */
 object BingeIcons {
-    /** The "Discover" glyph used on the nav tab, entry tile, and Discover screen actions. */
+    /** The explore glyph: a compass mark. */
     val Discover: ImageVector = Icons.Filled.Explore
 }
