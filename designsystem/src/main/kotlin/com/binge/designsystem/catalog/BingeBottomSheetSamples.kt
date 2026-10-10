@@ -5,11 +5,13 @@ package com.binge.designsystem.catalog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.binge.designsystem.component.TextEntrySurface
+import com.binge.designsystem.component.bingeSheetContentInsets
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -34,6 +36,33 @@ fun BingeBottomSheetSample() {
                 .fillMaxWidth()
                 .clip(BingeShapes.HeroTop)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+        ) {
+            TextEntrySurface(
+                title = SHEET_TITLE,
+                value = "",
+                onValueChange = {},
+                onSubmit = {},
+                onCancel = {},
+                submitLabel = SUBMIT_LABEL,
+                hint = SHEET_HINT,
+            )
+        }
+    }
+}
+
+/**
+ * The same sheet body padded by the insets `BingeBottomSheet` gives its content, so a frame with a side cutout shows
+ * the field kept clear of it. The modal window itself does not capture, so this is the body alone.
+ */
+@Composable
+fun BingeBottomSheetSideInsetsSample() {
+    ScreenshotTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(BingeShapes.HeroTop)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .windowInsetsPadding(bingeSheetContentInsets(edgeToEdge = false)),
         ) {
             TextEntrySurface(
                 title = SHEET_TITLE,

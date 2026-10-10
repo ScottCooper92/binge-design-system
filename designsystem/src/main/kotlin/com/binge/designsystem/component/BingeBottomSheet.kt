@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.union
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,7 +51,8 @@ import kotlinx.coroutines.launch
  *
  * [edgeToEdge] lets the content run under the navigation bar, as a long list does, padding its own end so the last
  * row can scroll clear of the bar. The status bar and the IME are still inset, so a field in the sheet is not covered by the
- * keyboard. The default insets carry no horizontal side, so the sheet does not inset the sides itself.
+ * keyboard. Both forms also inset the window's sides, so in landscape the content clears a side cutout or a side
+ * navigation bar.
  *
  * Otherwise no `contentWindowInsets` is passed, so this takes [ModalBottomSheet]'s default —
  * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — which already includes
@@ -99,7 +101,7 @@ fun BingeBottomSheet(
         // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
         modifier = foldSafeHeight?.let { modifier.heightIn(max = it) } ?: modifier,
         sheetState = sheetState,
-        contentWindowInsets = { if (edgeToEdge) edgeToEdgeInsets() else BottomSheetDefaults.modalWindowInsets },
+        contentWindowInsets = { bingeSheetContentInsets(edgeToEdge) },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         contentColor = MaterialTheme.colorScheme.onSurface,
         shape = if (dock != null) DockingSheetShape(dockFraction) else BingeShapes.HeroTop,
@@ -151,8 +153,19 @@ internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gestures
     )
 }
 
-/** An edge-to-edge sheet's insets: the default's top and the IME, without the navigation bar. */
+/**
+ * A sheet's content insets: the default's, or for an [edgeToEdge] sheet the default's top and the IME without the
+ * navigation bar, and in both cases the window's sides. The sides are `safeDrawing`'s, so a side cutout or a side
+ * navigation bar in landscape keeps its distance from the content.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun edgeToEdgeInsets(): WindowInsets =
-    BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal).union(WindowInsets.ime)
+internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
+    val vertical =
+        if (edgeToEdge) {
+            BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top).union(WindowInsets.ime)
+        } else {
+            BottomSheetDefaults.modalWindowInsets
+        }
+    return vertical.union(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+}
