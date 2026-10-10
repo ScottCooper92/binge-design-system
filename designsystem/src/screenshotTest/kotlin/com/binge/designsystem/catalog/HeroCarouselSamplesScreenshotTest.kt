@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
-private const val HERO_RTL_PREVIEW_WIDTH_DP = 412
+private const val HERO_ONE_CELL_WIDTH_DP = 412
 
 class HeroCarouselSamplesScreenshotTest {
     @PreviewTest
@@ -17,6 +17,14 @@ class HeroCarouselSamplesScreenshotTest {
     @Composable
     fun HeroCarousel() {
         HeroCarouselSample()
+    }
+
+    /** A list that is not a ranking draws no trending pill. One cell: the pill's absence is the whole frame. */
+    @PreviewTest
+    @Preview(name = "unranked", widthDp = HERO_ONE_CELL_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun HeroCarouselUnranked() {
+        HeroCarouselUnrankedSample()
     }
 
     /**
@@ -28,7 +36,7 @@ class HeroCarouselSamplesScreenshotTest {
      * exactly.
      */
     @PreviewTest
-    @Preview(name = "rtl", widthDp = HERO_RTL_PREVIEW_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "rtl", widthDp = HERO_ONE_CELL_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
     @Composable
     fun HeroCarouselRtl() {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {

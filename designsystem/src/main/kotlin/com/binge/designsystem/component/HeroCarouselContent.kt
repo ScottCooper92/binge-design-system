@@ -97,7 +97,7 @@ internal fun BoxScope.HeroCopyHuggingScrim(bounds: HeroCopyBounds) {
 }
 
 /**
- * Start-anchored cinematic copy: trending pill, title, optional tagline, meta row, actions slot. The
+ * Start-anchored cinematic copy: trending pill (for a ranked item), title, optional tagline, meta row, actions slot. The
  * still behind it runs to the panel edge under an overlaying rail; the copy does not, so it takes the
  * nav overlay's start inset on top of its own padding. [R.dimen.hero_copy_max_width] caps the copy
  * itself, inside those insets, so a wide rail inset does not squeeze the title.
@@ -107,7 +107,6 @@ internal fun BoxScope.HeroCopyHuggingScrim(bounds: HeroCopyBounds) {
 @Composable
 internal fun BoxScope.HeroCopyOverlay(
     item: HeroItem,
-    rank: Int,
     heroActions: @Composable (HeroItem) -> Unit,
     onCopyBounds: (HeroCopyBounds) -> Unit = {},
 ) {
@@ -126,7 +125,7 @@ internal fun BoxScope.HeroCopyOverlay(
         // The backdrop button behind it announces all of this copy (heroContentDescription), so the
         // copy stays visual-only. HeroActions is outside: those are controls, not the hero's name.
         Column(modifier = Modifier.clearAndSetSemantics {}) {
-            HeroTrendingPill(rank = rank)
+            item.rank?.let { HeroTrendingPill(rank = it) }
             HeroTitle(title = item.title)
             item.tagline?.let { HeroTagline(it) }
             HeroMetaRow(item = item)
