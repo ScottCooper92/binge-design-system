@@ -359,7 +359,9 @@ fun <T> bingeMultiChoiceItem(
  * A [BingeChoiceSheet]'s body without its modal window, as the sheet looks at rest: the drag handle and title over the
  * radio rows, sectioned as the sheet sections them. Picking a row calls [onSelect]; nothing closes. Use it to frame a choice sheet in a `@PreviewTest`, where a
  * modal window does not capture, or to show the list inside a sheet of the caller's own. It draws no surface of its own,
- * so it takes the colour of whatever holds it, and its header does not dock.
+ * so it takes the colour of whatever holds it, and its header does not dock. Pass `dragHandle = false` when the
+ * sheet holding it draws its own handle, as [BingeBottomSheet] does. It does not clear the navigation bar; a caller
+ * in an edge-to-edge sheet does that itself.
  */
 @Composable
 fun <T> BingeChoiceSheetContent(
@@ -370,9 +372,10 @@ fun <T> BingeChoiceSheetContent(
     modifier: Modifier = Modifier,
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
+    dragHandle: Boolean = true,
 ) {
     Column(modifier) {
-        RestingSheetTop { ChoiceSheetHeader(title) }
+        RestingSheetTop(dragHandle) { ChoiceSheetHeader(title) }
         SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
     }
 }
@@ -381,8 +384,10 @@ fun <T> BingeChoiceSheetContent(
  * A [BingeMultiChoiceSheet]'s body without its modal window, for a `@PreviewTest` frame or a sheet of the caller's own:
  * the title with [clearLabel] (and [doneLabel], when given) at the end, an optional filter, then the checkbox rows ticked
  * where in [chosen]. It holds no draft: each tick calls [onToggle], and Clear and Done call [onClear] and [onDone].
- * [leading] is the selection that comes first, as on the sheet; it defaults to [chosen]. Like
- * [BingeChoiceSheetContent], it draws no surface and its header does not dock.
+ * [leading] is the selection that comes first, as on the sheet; it defaults to [chosen], which suits a frame. A live
+ * caller passes the selection the content opened with, so a row does not jump when ticked. Like
+ * [BingeChoiceSheetContent], it draws no surface, its header does not dock, and `dragHandle = false` drops the handle
+ * for a sheet that draws its own.
  */
 @Composable
 fun <T> BingeMultiChoiceSheetContent(
@@ -400,9 +405,10 @@ fun <T> BingeMultiChoiceSheetContent(
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
     actions: @Composable RowScope.() -> Unit = {},
+    dragHandle: Boolean = true,
 ) {
     Column(modifier) {
-        RestingSheetTop {
+        RestingSheetTop(dragHandle) {
             ChoiceSheetHeader(title) {
                 actions()
                 BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
@@ -423,7 +429,8 @@ fun <T> BingeMultiChoiceSheetContent(
 
 /** A choice sheet's top as it rests, undocked: the drag handle over [header]. */
 @Composable
-private fun RestingSheetTop(header: @Composable () -> Unit) = DockingHeaderLayout(fraction = { 0f }, header = header, dockedTopBar = {})
+private fun RestingSheetTop(showHandle: Boolean, header: @Composable () -> Unit) =
+    DockingHeaderLayout(fraction = { 0f }, header = header, dockedTopBar = {}, showHandle = showHandle)
 
 /** A choice sheet's top: its title and [actions], docking into a [BingeSheetTopBar] in a sheet that docks. */
 @Composable
