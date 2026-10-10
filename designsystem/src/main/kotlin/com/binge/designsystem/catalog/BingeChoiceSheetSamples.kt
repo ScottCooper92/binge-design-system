@@ -358,6 +358,32 @@ fun BingeMultiChoiceSheetMarkedSample() {
 }
 
 /**
+ * A pick of people: each row shows the person's avatar where a mark goes, and their initials where there is no image, as
+ * a list of users does. A frame cannot load the images, so here every avatar shows its initials.
+ */
+@Composable
+fun BingeMultiChoiceSheetPeopleSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = false, title = "Requested by", actions = true) {
+            MultiChoiceList(
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(
+                            BingeChoice(1, "Ana Lima", avatarName = "Ana Lima", avatarUrl = "https://example.com/ana.png"),
+                            BingeChoice(2, "Bo Diaz", avatarName = "Bo Diaz", avatarUrl = "https://example.com/bo.png"),
+                            BingeChoice(3, "Cy Ng", avatarName = "Cy Ng"),
+                        ),
+                    ),
+                chosen = setOf(2),
+                leading = setOf(2),
+                filterPlaceholder = null,
+                onToggle = { _, _ -> },
+            )
+        }
+    }
+}
+
+/**
  * A sectioned list with a pinned option: "Worldwide" leads with no header, ahead of Current, Suggested and All. It has no
  * flag, so its mark's place is empty, and its label lines up with the flagged regions'.
  */
