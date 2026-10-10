@@ -9,6 +9,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeInitialsAvatar
 import com.binge.designsystem.component.CheckboxRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -87,5 +90,26 @@ fun CheckboxRowLongLabelSample() {
                 Text(text = "Available", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             },
         )
+    }
+}
+
+/** A checklist of people: each row carries the person's avatar between the checkbox and the name. */
+@Composable
+fun CheckboxRowPeopleSample() {
+    val people = listOf("Noah Kim" to "noah@example.com", "Sana Ito" to "sana@example.com", "Raj Patel" to "raj@example.com")
+    val checked = remember { mutableStateListOf(true, false, true) }
+    ScreenshotTheme {
+        Column {
+            people.forEachIndexed { index, (name, email) ->
+                CheckboxRow(
+                    label = name,
+                    subtitle = email,
+                    checked = checked[index],
+                    onToggle = { checked[index] = it },
+                    showDivider = index < people.lastIndex,
+                    leadingContent = { BingeInitialsAvatar(name = name, size = dimensionResource(R.dimen.item_group_icon_size)) },
+                )
+            }
+        }
     }
 }

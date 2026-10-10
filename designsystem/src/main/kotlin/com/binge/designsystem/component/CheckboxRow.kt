@@ -20,8 +20,9 @@ import androidx.compose.ui.semantics.Role
 import com.binge.designsystem.R
 
 /**
- * One row of a checklist — a leading [Checkbox], a [label] with an optional [subtitle], and an
- * optional [trailingContent] slot (a status chip, say) — sized and spaced for a long, scannable
+ * One row of a checklist — a leading [Checkbox], an optional [leadingContent] (a person's avatar, say), a [label]
+ * with an optional [subtitle], and an optional [trailingContent] slot (a status chip, say) — sized and spaced for a
+ * long, scannable
  * list (a season picker, a candidate list) rather than a one-off toggle. Reach for this instead of
  * hand-rolling a checkbox [Row] per screen.
  *
@@ -44,6 +45,7 @@ fun CheckboxRow(
     enabled: Boolean = true,
     showDivider: Boolean = false,
     trailingContent: (@Composable () -> Unit)? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -60,6 +62,7 @@ fun CheckboxRow(
         ) {
             // The Row owns the toggle semantics; the checkbox is a visual indicator only.
             Checkbox(checked = checked, onCheckedChange = null, enabled = enabled)
+            leadingContent?.invoke()
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = label,

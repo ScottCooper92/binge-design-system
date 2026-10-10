@@ -26,4 +26,11 @@ class CheckboxRowSamplesScreenshotTest {
     fun longLabel() {
         CheckboxRowLongLabelSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun people() {
+        CheckboxRowPeopleSample()
+    }
 }
