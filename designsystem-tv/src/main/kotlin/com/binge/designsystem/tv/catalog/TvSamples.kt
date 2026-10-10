@@ -293,7 +293,7 @@ fun TvInitialsAvatarSample() {
 
 private const val PINNED_FOOTER_SAMPLE_ITEMS = 3
 
-val NavRailSampleHeader: TvNavRailItem =
+private val NavRailSampleHeader: TvNavRailItem =
     TvNavRailItem(
         key = "account",
         label = "Alexander Hamilton-Montgomery",
@@ -301,7 +301,7 @@ val NavRailSampleHeader: TvNavRailItem =
         displayName = "Alexander Hamilton-Montgomery",
     )
 
-val NavRailSampleItems: List<TvNavRailItem> =
+private val NavRailSampleItems: List<TvNavRailItem> =
     listOf(
         TvNavRailItem(key = "search", label = "Search", icon = Icons.Filled.Search),
         TvNavRailItem(key = "movies", label = "Movies", icon = Icons.Filled.Movie),
@@ -310,7 +310,7 @@ val NavRailSampleItems: List<TvNavRailItem> =
         TvNavRailItem(key = "lists", label = "Lists", icon = Icons.AutoMirrored.Filled.FormatListBulleted),
     )
 
-val NavRailSampleFooter: TvNavRailItem = TvNavRailItem(key = "settings", label = "Settings", icon = Icons.Filled.Settings)
+private val NavRailSampleFooter: TvNavRailItem = TvNavRailItem(key = "settings", label = "Settings", icon = Icons.Filled.Settings)
 
 @Composable
 private fun NavRailSampleContent(artworkBehind: Boolean = false) {

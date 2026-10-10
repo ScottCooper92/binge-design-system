@@ -62,4 +62,4 @@ fun TvInheritedFocusScroll(content: @Composable () -> Unit) {
 
 /** The non-TV default: keep an already visible child in place and scroll only enough to reveal one. */
 @OptIn(ExperimentalFoundationApi::class)
-val MinimumScrollBringIntoViewSpec: BringIntoViewSpec = object : BringIntoViewSpec {}
+private val MinimumScrollBringIntoViewSpec: BringIntoViewSpec = object : BringIntoViewSpec {}
