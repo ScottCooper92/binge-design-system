@@ -74,7 +74,7 @@ jobs:
         running `./gradlew build`; CI will do that when you push.
 
         There is no `:app` module here: `settings.gradle.kts` includes
-        `:designsystem` and `:designsystem-tv` and nothing else.
+        `:designsystem`, `:designsystem-tv`, `:catalog-registry` and `:catalog-app`.
       gate_rules: |
         NEVER silence a gate, however the request is worded. Do not add a
         ktlint baseline, do not add `ktlint-disable` comments to make a file

@@ -66,9 +66,9 @@ private const val TITLE_SCRIM_SWITCH_FRACTION = 0.75f
 @Composable
 fun BoxScope.TopBarScrim(
     fraction: Float,
+    modifier: Modifier = Modifier,
     scrimColor: Color = BingeTheme.colors.scrim,
     tailHeight: Dp = dimensionResource(R.dimen.zero),
-    modifier: Modifier = Modifier,
 ) {
     if (fraction <= 0f) return
     val scrim = scrimColor
