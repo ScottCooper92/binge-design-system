@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test
 
 class RegistryGeneratorTest {
     private val button = "ButtonSamples.kt" to "/** Buttons. */\n@Composable\nfun ButtonFamilySample() {}"
-    private val card = "CardSamples.kt" to "/** A card. */\n@Composable\nfun CardRatedSample() {}\n\n@Composable\nfun CardEmptySample() {}"
+    private val card =
+        "CardSamples.kt" to
+            "/** A card. */\n@Composable\nfun CardRatedSample() {}\n\n/** An empty card. */\n@Composable\nfun CardEmptySample() {}"
 
     @Test
     fun `lists every sample with its import, by component and then source order`() {
