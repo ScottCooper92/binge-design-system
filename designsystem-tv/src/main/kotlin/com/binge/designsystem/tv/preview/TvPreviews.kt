@@ -48,6 +48,20 @@ const val TV_PREVIEW_HEIGHT_DP = 540
 annotation class TvPreviews
 
 /**
+ * [TvPreviews] under a right-to-left locale (`ar`), for a frame that checks a layout mirrors: a rail on the right edge,
+ * arrows and chevrons flipped. A real locale rather than a pseudolocale, because the screenshot renderer does not apply
+ * the latter. A single cell, as [TvPreviews] is; put it on a component or a screen whose start edge matters.
+ */
+@PreviewWrapper(TvScreenshotThemeWrapper::class)
+@Preview(
+    name = "tv-rtl",
+    device = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PREVIEW_HEIGHT_DP}dp,orientation=landscape",
+    locale = "ar",
+    uiMode = UI_MODE_NIGHT_YES,
+)
+annotation class TvRtlPreviews
+
+/**
  * [TvPreviews]' pair, baking [TvScreenshotThemeOnBlack] — the **window's** black canvas — for a
  * **screen-root** frame.
  *
