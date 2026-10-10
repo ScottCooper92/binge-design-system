@@ -13,6 +13,9 @@ import com.binge.designsystem.preview.ScreenStatePreview
 /** [com.binge.designsystem.preview.ScreenPreviews]' `phone-land` cell, for a frame that adds side insets to it. */
 private const val PHONE_LANDSCAPE = "spec:width=411dp,height=891dp,orientation=landscape"
 
+/** [com.binge.designsystem.preview.ScreenPreviews]' `tablet` cell, for a frame that splits it into panes. */
+private const val TABLET = "spec:width=800dp,height=1280dp,orientation=landscape"
+
 /**
  * Screenshot coverage for the screen templates. Each template's layout frame takes the device matrix; its
  * other states take the single phone cell, since they change content within a layout the matrix settled.
@@ -163,6 +166,18 @@ class ScreenTemplateSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun stepFlowLazyStep() = StepFlowScreenLazyStepSample()
+
+    /** A flow opened from inside the app: one bar, with a title and a Back on the first step. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowTitled() = StepFlowScreenTitledSample()
+
+    /** A wide window's end pane is taller than wide, so the flow in it stacks rather than splitting. */
+    @PreviewTest
+    @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun stepFlowInPane() = StepFlowScreenInPaneSample()
 
     /** The insets a default frame cannot see: the bottom bar clears the nav bar, the rows clear the bar. */
     @PreviewTest
