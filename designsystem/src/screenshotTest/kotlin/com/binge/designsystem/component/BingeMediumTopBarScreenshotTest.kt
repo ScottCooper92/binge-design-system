@@ -29,15 +29,6 @@ class BingeMediumTopBarScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun TitleAndBack() {
-        ScreenshotTheme {
-            BingeMediumTopBar(title = "Popular Movies", onBack = {})
-        }
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
     fun Collapsed() {
         ScreenshotTheme {
             BingeMediumTopBar(

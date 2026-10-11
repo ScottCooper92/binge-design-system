@@ -13,3 +13,11 @@ fun GridScreenHeaderSample() {
         GridScreenHeader(title = "Action", onBack = {})
     }
 }
+
+/** A title too long for one line, which is where the header's width matters. */
+@Composable
+fun GridScreenHeaderLongTitleSample() {
+    ScreenshotTheme {
+        GridScreenHeader(title = "Science Fiction & Fantasy Adventures", onBack = {})
+    }
+}
