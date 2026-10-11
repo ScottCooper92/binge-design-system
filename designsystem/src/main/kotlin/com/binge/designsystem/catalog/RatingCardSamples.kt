@@ -11,7 +11,7 @@ import com.binge.designsystem.component.RatingCard
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public samples for [RatingCard] (group `"Cards"`) — see the convention on [MediaCardRatedSample].
+ * Public samples for [RatingCard] — see the convention on [MediaCardRatedSample].
  * Covers the signed-in prompt (no rating yet), a recorded rating, and the signed-out variant whose
  * footer surfaces the community review count, each with and without reviews to show.
  */

@@ -14,7 +14,7 @@ import com.binge.designsystem.component.WatchProviderUi
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public samples for [WatchProviderTile] (group `"Tiles"`) — see the convention on
+ * Public samples for [WatchProviderTile] — see the convention on
  * [MediaCardRatedSample]. The tile is a square grid cell, so each sample pins its width rather than
  * stretching to the canvas; with no network image the logo falls back to the provider name, keeping
  * the render deterministic. Tapping a tile toggles it, starting from the state the frame shows.
