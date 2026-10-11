@@ -26,7 +26,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -52,6 +52,8 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * An end-edge, focus-trapped sheet over a scrim, at [TV_OVERLAY_SCRIM_ALPHA]: the ten-foot counterpart of a phone's bottom sheet, for a
  * row's actions or a choice. Back, and the key pointing away from the panel, both call [onDismissRequest].
+ * The key is read as the event bubbles up, so a control inside that uses it itself, a stepper that lowers a value
+ * or a text field moving its cursor, consumes it first and the sheet stays open.
  *
  * [content] gets the entry requester. Each step it shows pins the requester to its first row and pulls it
  * there with [TvSideSheetStepFocus]. The caller owns the visibility flag, and returns focus to what opened
@@ -71,7 +73,7 @@ fun TvSideSheet(
             modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background.copy(alpha = TV_OVERLAY_SCRIM_ALPHA))
-                .onPreviewKeyEvent { event ->
+                .onKeyEvent { event ->
                     if (event.type == KeyEventType.KeyDown && event.key == dismissKey) {
                         onDismissRequest()
                         true

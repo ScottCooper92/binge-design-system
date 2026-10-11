@@ -62,6 +62,32 @@ class TvSideSheetTest {
     }
 
     @Test
+    fun `a control inside the sheet that consumes the start key keeps the sheet open`() {
+        var dismissed = 0
+        var value by mutableStateOf(5)
+        composeTestRule.setContent {
+            BingeTvTheme {
+                TvSideSheet(onDismissRequest = { dismissed++ }) { entry ->
+                    TvRatingStepper(
+                        value = value,
+                        onValueChange = { value = it },
+                        valueLabel = "$value / 10",
+                        modifier = Modifier.focusRequester(entry),
+                    )
+                    TvSideSheetStepFocus(entry)
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(isFocused()).performKeyInput { pressKey(Key.DirectionLeft) }
+        composeTestRule.waitForIdle()
+
+        assertEquals(4, value)
+        assertEquals(0, dismissed)
+    }
+
+    @Test
     fun `the confirm step lands on Cancel, and Cancel brings the rows back focused`() {
         composeTestRule.setContent {
             BingeTvTheme {
