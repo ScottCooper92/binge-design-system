@@ -35,6 +35,10 @@ data class TvPageAction(
  * alone with no actions. The plate is centred and reserves nothing, so when the real message replaces it, an
  * icon, a headline or an action row that arrives moves the copy. A page that resolves to its own content, not
  * to a message, never sees that.
+ *
+ * [announce] makes the plate one polite live region carrying the headline and body, as `TvErrorPlate` is and the
+ * phone's `MessageScreen` can be. Set it for a screen-wide failure: otherwise a screen reader hears only the focused
+ * button, or, with no action, nothing at all (#596).
  */
 @Composable
 fun TvMessagePage(
@@ -46,6 +50,7 @@ fun TvMessagePage(
     primary: TvPageAction? = null,
     secondary: TvPageAction? = null,
     loading: Boolean = false,
+    announce: Boolean = false,
 ) {
     val entry = remember { FocusRequester() }
     val sinkEntry = remember { FocusRequester() }
@@ -73,6 +78,7 @@ fun TvMessagePage(
             headline = headline,
             icon = icon,
             alignment = Alignment.Center,
+            announce = announce,
             actions =
                 if (hasAction && primary != null) {
                     {
