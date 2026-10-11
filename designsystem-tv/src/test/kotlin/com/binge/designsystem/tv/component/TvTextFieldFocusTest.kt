@@ -101,6 +101,30 @@ class TvTextFieldFocusTest {
         assertEquals(1, actions)
     }
 
+    /**
+     * A hardware Enter submits on its key-down (#598). The frame takes focus back before the key-up arrives, and that
+     * key-up belongs to the press that submitted, so it must not start editing again and raise the keyboard. Down and
+     * up go in separately, with a recomposition between them, which is when the frame's gate would read open.
+     */
+    @Test
+    fun `a hardware Enter that submits does not start editing again on its key-up`() {
+        setFields()
+        frame(ADDRESS).requestFocus()
+        composeTestRule.waitForIdle()
+        press(Key.DirectionCenter)
+        input(ADDRESS).assertIsFocused()
+
+        composeTestRule.onRoot().performKeyInput { keyDown(Key.Enter) }
+        composeTestRule.waitForIdle()
+        composeTestRule.onRoot().performKeyInput { keyUp(Key.Enter) }
+        composeTestRule.waitForIdle()
+        composeTestRule.waitForIdle()
+
+        frame(ADDRESS).assertIsFocused()
+        input(ADDRESS).assertIsNotFocused()
+        assertEquals(1, actions)
+    }
+
     @Test
     fun `the search field edits on select and searches from the keyboard`() {
         composeTestRule.setContent {
