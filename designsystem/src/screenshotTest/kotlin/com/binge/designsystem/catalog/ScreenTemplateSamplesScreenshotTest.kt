@@ -112,6 +112,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun decisionBodyInStepFlow() = DecisionBodyInStepFlowSample()
 
+    /** The decision's hero and heading in the flow's aside, so the landscape cells split it beside the points (#638). */
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
+    fun decisionInStepFlowSplit() = DecisionInStepFlowSplitSample()
+
     /** A wide window's end pane is taller than wide, so the decision in it keeps its portrait layout. */
     @PreviewTest
     @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
