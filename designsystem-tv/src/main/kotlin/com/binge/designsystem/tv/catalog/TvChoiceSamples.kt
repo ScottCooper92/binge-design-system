@@ -2,17 +2,22 @@
 
 package com.binge.designsystem.tv.catalog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvChoiceRow
@@ -150,15 +155,35 @@ fun TvRatingStepperFocusedSample() {
     SampleRatingStepper(initial = RATING_HALF, initiallyFocused = true)
 }
 
+/** A rated stepper in the room a side sheet leaves it: the plate is the room, and the stars and the whole "8 / 10" sit inside it on one line. */
 @Composable
-private fun SampleRatingStepper(initial: Int, initiallyFocused: Boolean) {
+fun TvRatingStepperInSheetSample() {
+    Box(Modifier.wrapContentSize(Alignment.TopStart).padding(dimensionResource(DesR.dimen.padding_l))) {
+        SampleRatingStepper(
+            initial = RATING_WHOLE,
+            initiallyFocused = false,
+            modifier = Modifier
+                .width(dimensionResource(TvR.dimen.tv_rating_stepper_sheet_room))
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            padded = false,
+        )
+    }
+}
+
+@Composable
+private fun SampleRatingStepper(
+    initial: Int,
+    initiallyFocused: Boolean,
+    modifier: Modifier = Modifier,
+    padded: Boolean = true,
+) {
     var value by remember { mutableStateOf(initial) }
     TvRatingStepper(
         value = value,
         onValueChange = { value = it },
         valueLabel = "$value / $RATING_MAX",
         initiallyFocused = initiallyFocused,
-        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
+        modifier = if (padded) modifier.padding(dimensionResource(DesR.dimen.padding_l)) else modifier,
     )
 }
 
