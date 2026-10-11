@@ -22,6 +22,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetRowLongLabel() = Frame { TvSideSheetRowLongLabelSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun confirmDialog() = Frame { TvConfirmDialogSample() }
 
     @PreviewTest

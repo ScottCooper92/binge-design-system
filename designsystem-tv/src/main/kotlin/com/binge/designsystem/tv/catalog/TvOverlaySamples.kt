@@ -62,6 +62,23 @@ fun TvSideSheetRowReservedLineSample() {
     }
 }
 
+/** A row whose label is longer than the sheet is wide: it stops on one line with an ellipsis, beside its tick. */
+@Composable
+fun TvSideSheetRowLongLabelSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Add to a list")
+            TvSideSheetRow(
+                label = "The extended director's cut of the complete first season, remastered",
+                onClick = {},
+                selected = true,
+                initiallyFocused = true,
+            )
+            TvSideSheetRow(label = "Watch later", onClick = {})
+        }
+    }
+}
+
 /** Rows about one title each: a poster thumbnail and a second line, the first row focused and the second at rest. */
 @Composable
 fun TvSideSheetRowThumbnailSample() {

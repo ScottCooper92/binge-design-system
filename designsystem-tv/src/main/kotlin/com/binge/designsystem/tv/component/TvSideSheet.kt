@@ -148,7 +148,7 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * reached. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false renders a read-out
  * that stays out of the focus order. [initiallyFocused] draws the focused state, for a frame.
  *
- * [supportingText] is a second line under the label, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
+ * The [label] holds to one line with an ellipsis, as every TV row's does. [supportingText] is a second line under it, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
  * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
  * An [icon] sits on its tinted plate, in the error colour for a [destructive] row and dimmed for a disabled one.
  * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
@@ -217,7 +217,13 @@ fun TvSideSheetRow(
                 )
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, style = MaterialTheme.typography.titleMedium, color = content)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+                color = content,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             when {
                 supportingText != null ->
                     Text(
