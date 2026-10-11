@@ -123,7 +123,7 @@ fun FormScreen(
             // the bar stays unlifted, so the scaffold keeps clearing a floating nav overlay.
             Column(if (showsFooter) Modifier.imePadding() else Modifier) {
                 bottomBar()
-                if (showsFooter && primaryAction != null) {
+                if (showsFooter) {
                     FormFooter(primary = primaryAction, secondary = secondaryAction)
                 }
             }

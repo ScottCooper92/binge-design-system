@@ -60,7 +60,7 @@ fun TvMessagePage(
             hosting = hosting,
             entry = if (hasAction) entry else sinkEntry,
             enabled = true,
-            key = if (hasAction) primary?.label else null,
+            key = if (hasAction) primary.label else null,
         )
     Box(
         modifier =
@@ -80,7 +80,7 @@ fun TvMessagePage(
             alignment = Alignment.Center,
             announce = announce,
             actions =
-                if (hasAction && primary != null) {
+                if (hasAction) {
                     {
                         TvButton(
                             label = primary.label,

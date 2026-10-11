@@ -14,11 +14,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -73,11 +76,20 @@ fun BingeNumberSlider(
             IconButton(onClick = { pick(position - 1) }, enabled = enabled && position > range.first) {
                 Icon(Icons.Filled.Remove, contentDescription = stringResource(R.string.number_slider_decrease, description))
             }
+            // The state follows the position below, and every drag or key step is handed to the caller rather than kept,
+            // as it was with the value-and-callback overload: the position stays the one truth.
+            val sliderState =
+                remember(range.first, top) {
+                    SliderState(
+                        position.toFloat(),
+                        (top - range.first - 1).coerceAtLeast(0),
+                        range.first.toFloat()..top.toFloat(),
+                    )
+                }
+            SideEffect { sliderState.value = position.toFloat() }
             Slider(
-                value = position.toFloat(),
+                state = sliderState,
                 onValueChange = { picked -> picked.roundToInt().let { if (it != position) pick(it) } },
-                valueRange = range.first.toFloat()..top.toFloat(),
-                steps = (top - range.first - 1).coerceAtLeast(0),
                 enabled = enabled,
                 // A hundred stops' tick marks blur into a dotted texture; the steppers are what land on one.
                 colors =
