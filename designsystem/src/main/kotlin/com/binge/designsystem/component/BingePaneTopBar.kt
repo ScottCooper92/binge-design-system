@@ -35,11 +35,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.clearNavRail
 import com.binge.designsystem.hasPaneBeside
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeTheme
-import com.binge.designsystem.topBarSideInsets
 
 /**
  * The scroll behaviour to pair with [BingePaneTopBar]: exit-until-collapsed everywhere, since both of
@@ -114,7 +115,7 @@ fun BingePaneTopBar(
  * onto the content's own start — [resolvedContentPadding] plus any nav rail overlaying the pane — so a
  * title lines up with the rows under it. With a back button the collapsed title sits past it instead.
  *
- * The bar keeps M3's top inset but takes its side insets from [topBarSideInsets], not M3's default.
+ * The bar keeps M3's top inset but takes its side insets from [paneSideInsets], not M3's default.
  * The default reserves a side cutout on both edges, so a cutout beside the other pane pushed the
  * bar in from an edge that is nowhere near it.
  */
@@ -211,7 +212,7 @@ internal fun TwoRowTopBar(
                     )
                 }
             },
-            modifier = modifier,
+            modifier = modifier.clearNavRail(),
             navigationIcon = {
                 if (onBack != null) {
                     Box(modifier = Modifier.padding(start = edgeInset)) {
@@ -241,7 +242,7 @@ internal fun TwoRowTopBar(
                 }
             },
             expandedHeight = expandedHeight,
-            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(topBarSideInsets()),
+            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             colors = bingeTopBarColors(containerColor),
             scrollBehavior = scrollBehavior,
         )

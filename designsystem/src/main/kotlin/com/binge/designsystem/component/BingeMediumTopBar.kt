@@ -31,9 +31,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.clearNavRail
+import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeTheme
-import com.binge.designsystem.topBarSideInsets
 
 /**
  * Binge's medium top bar with a collapsing title — the collapsing sibling of [BingeTopBar], for
@@ -129,7 +130,7 @@ fun BingeMediumTopBar(
                     modifier = Modifier.padding(start = titleStartInset),
                 )
             },
-            modifier = modifier,
+            modifier = modifier.clearNavRail(),
             navigationIcon = {
                 if (onBack != null) {
                     Box(modifier = Modifier.padding(start = edgeInset)) {
@@ -159,7 +160,7 @@ fun BingeMediumTopBar(
                 }
             },
             // The sides the scaffold body clears, cutout included, so the title and actions line up with it.
-            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(topBarSideInsets()),
+            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             // Only an explicit container overrides M3's medium-bar defaults. Routing an unspecified one
             // through bingeTopBarColors would restyle every existing caller: it resolves to `background`
             // and flattens the scrolled state, which is BingeTopBar's decision to make, not this bar's.

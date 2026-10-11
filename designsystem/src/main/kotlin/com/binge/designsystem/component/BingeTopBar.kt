@@ -35,11 +35,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.clearNavRail
 import com.binge.designsystem.hasPaneBeside
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeTheme
-import com.binge.designsystem.topBarSideInsets
 
 /**
  * Binge's standard top bar: the single-row, non-collapsing title variant. For screens whose chrome
@@ -143,7 +144,7 @@ fun BingeTopBar(
                     modifier = titleModifier,
                 )
             },
-            modifier = modifier,
+            modifier = modifier.clearNavRail(),
             navigationIcon = {
                 if (onBack != null) {
                     Box(modifier = Modifier.padding(start = edgeInset)) {
@@ -173,7 +174,7 @@ fun BingeTopBar(
                 }
             },
             // The sides the scaffold body clears, cutout included, so the title and actions line up with it.
-            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(topBarSideInsets()),
+            windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             colors = bingeTopBarColors(containerColor),
             scrollBehavior = scrollBehavior,
         )
