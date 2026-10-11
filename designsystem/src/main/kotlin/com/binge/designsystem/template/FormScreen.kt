@@ -61,7 +61,7 @@ data class FormAction(
 
 /** Where a [FormScreen]'s [FormAction]s sit. */
 enum class FormActionPlacement {
-    /** The primary action as a text button in the top bar: a short form that saves in place. */
+    /** The primary action as a text button in the top bar: a short create or submit form. */
     TopBar,
 
     /** A bar pinned under the form, with the secondary action beside the primary: a long form, or a submit. */
@@ -75,6 +75,11 @@ enum class FormActionPlacement {
  * Until [notReady] is null the screen shows it instead (the record loading, or its load failing). [scrolling]
  * is off for a body that scrolls itself; it then folds the padding it is handed into its own list. Tag fields
  * with [formField] and a failed submit can bring the first problem into view through [FormFields].
+ *
+ * An edit screen saves each change as it is made and has no commit: pass its [saveStatus] and leave
+ * [primaryAction] out. "Saving…" and "Saved" show in the bar, and a failed write keeps the change and shows a
+ * snackbar with Retry until the next write succeeds (see [FormSaveStatus]). [primaryAction] is for the cases that
+ * do commit: a create flow, a connection the server must test, a submit, or a destructive step.
  *
  * [bar] and [scrollBehavior] are [BingeScreenScaffold]'s. [capWidth] holds the fields to a reading column
  * (`content_max_width`), centred, on a wide window.
@@ -93,12 +98,14 @@ fun FormScreen(
     bar: ScreenBar = ScreenBar.Small,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     capWidth: Boolean = false,
+    saveStatus: FormSaveStatus? = null,
     extraActions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     notReady: (@Composable (padding: PaddingValues) -> Unit)? = null,
     content: @Composable ColumnScope.(padding: PaddingValues) -> Unit,
 ) {
     val showsFooter = placement == FormActionPlacement.Footer && primaryAction != null && notReady == null
+    if (saveStatus != null && notReady == null) FormSaveFailureSnackbar(saveStatus, snackbarHostState)
     BingeScreenScaffold(
         title = title,
         modifier = modifier,
@@ -107,6 +114,7 @@ fun FormScreen(
         scrollBehavior = scrollBehavior,
         snackbarHostState = snackbarHostState,
         actions = {
+            if (saveStatus != null && notReady == null) FormSaveStatusText(saveStatus)
             if (placement == FormActionPlacement.TopBar && primaryAction != null && notReady == null) {
                 BingeTextButton(
                     label = primaryAction.label,
