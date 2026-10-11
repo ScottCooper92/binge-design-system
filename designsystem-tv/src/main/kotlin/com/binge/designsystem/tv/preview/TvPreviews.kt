@@ -6,10 +6,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewWrapper
+import androidx.tv.material3.ColorScheme
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import com.binge.designsystem.preview.SOURCE_LOCALE
+import com.binge.designsystem.tv.theme.BingeTvColorScheme
 import com.binge.designsystem.tv.theme.BingeTvTheme
 
 /*
@@ -24,6 +26,12 @@ import com.binge.designsystem.tv.theme.BingeTvTheme
 /** 1920x1080 at xhdpi, the reference Android TV panel. */
 const val TV_PREVIEW_WIDTH_DP = 960
 const val TV_PREVIEW_HEIGHT_DP = 540
+
+/**
+ * That panel as a device spec, the one every TV cell renders on. Public so an app that binds its own wrapper (see
+ * [TvScreenshotThemeWrapper]) declares its annotations on the same window rather than copying the string.
+ */
+const val TV_PREVIEW_SPEC = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PREVIEW_HEIGHT_DP}dp,orientation=landscape"
 
 /**
  * The TV screen matrix — a single cell, because TV has one device class and one theme. Stack it on a
@@ -43,7 +51,7 @@ const val TV_PREVIEW_HEIGHT_DP = 540
 @PreviewWrapper(TvScreenshotThemeWrapper::class)
 @Preview(
     name = "tv",
-    device = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PREVIEW_HEIGHT_DP}dp,orientation=landscape",
+    device = TV_PREVIEW_SPEC,
     locale = SOURCE_LOCALE,
     uiMode = UI_MODE_NIGHT_YES,
 )
@@ -57,7 +65,7 @@ annotation class TvPreviews
 @PreviewWrapper(TvScreenshotThemeWrapper::class)
 @Preview(
     name = "tv-rtl",
-    device = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PREVIEW_HEIGHT_DP}dp,orientation=landscape",
+    device = TV_PREVIEW_SPEC,
     locale = "ar",
     uiMode = UI_MODE_NIGHT_YES,
 )
@@ -78,7 +86,7 @@ annotation class TvRtlPreviews
 @PreviewWrapper(TvScreenshotThemeOnBlackWrapper::class)
 @Preview(
     name = "tv",
-    device = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PREVIEW_HEIGHT_DP}dp,orientation=landscape",
+    device = TV_PREVIEW_SPEC,
     locale = SOURCE_LOCALE,
     uiMode = UI_MODE_NIGHT_YES,
 )
@@ -100,8 +108,12 @@ annotation class TvPreviewsOnBlack
  * frames want this readable canvas; a **screen-root** frame should use the other one.
  */
 @Composable
-fun TvScreenshotTheme(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    TvScreenshotCanvas(modifier = modifier, canvas = null, content = content)
+fun TvScreenshotTheme(
+    modifier: Modifier = Modifier,
+    colorScheme: ColorScheme = BingeTvColorScheme,
+    content: @Composable () -> Unit,
+) {
+    TvScreenshotCanvas(modifier = modifier, canvas = null, colorScheme = colorScheme, content = content)
 }
 
 /**
@@ -117,17 +129,22 @@ fun TvScreenshotTheme(modifier: Modifier = Modifier, content: @Composable () -> 
  * harness. That is the whole test: it cannot be asserted, only rendered.
  */
 @Composable
-fun TvScreenshotThemeOnBlack(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    TvScreenshotCanvas(modifier = modifier, canvas = Color.Black, content = content)
+fun TvScreenshotThemeOnBlack(
+    modifier: Modifier = Modifier,
+    colorScheme: ColorScheme = BingeTvColorScheme,
+    content: @Composable () -> Unit,
+) {
+    TvScreenshotCanvas(modifier = modifier, canvas = Color.Black, colorScheme = colorScheme, content = content)
 }
 
 @Composable
 private fun TvScreenshotCanvas(
     canvas: Color?,
+    colorScheme: ColorScheme,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    BingeTvTheme(reduceMotion = true) {
+    BingeTvTheme(reduceMotion = true, colorScheme = colorScheme) {
         Surface(
             modifier = modifier,
             colors = SurfaceDefaults.colors(
