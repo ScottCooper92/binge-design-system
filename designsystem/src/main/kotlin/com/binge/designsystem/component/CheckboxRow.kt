@@ -15,8 +15,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 
 /**
@@ -24,6 +29,9 @@ import com.binge.designsystem.R
  * with an optional [subtitle], and an optional [trailingContent] slot (a status chip, say) — sized and spaced for a
  * long, scannable list (a season picker, a candidate list) rather than a one-off toggle. Reach for this instead of
  * hand-rolling a checkbox [Row] per screen.
+ *
+ * An [icon] leads the label on the same tinted plate a settings row uses, tinted [iconTint] or `primary`. A
+ * [leadingContent] replaces it when the row needs something else, such as an avatar.
  *
  * The row merges its descendants' semantics, so a decorative [leadingContent] such as an avatar should clear its own
  * (`Modifier.clearAndSetSemantics {}`) when the [label] already names what it shows.
@@ -46,6 +54,8 @@ fun CheckboxRow(
     subtitle: String? = null,
     enabled: Boolean = true,
     showDivider: Boolean = false,
+    icon: ImageVector? = null,
+    iconTint: Color? = null,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
@@ -64,7 +74,15 @@ fun CheckboxRow(
         ) {
             // The Row owns the toggle semantics; the checkbox is a visual indicator only.
             Checkbox(checked = checked, onCheckedChange = null, enabled = enabled)
-            leadingContent?.invoke()
+            if (leadingContent != null) {
+                leadingContent()
+            } else if (icon != null) {
+                BingeIconPlate(
+                    painter = rememberVectorPainter(icon),
+                    tint = iconTint,
+                    modifier = Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
+                )
+            }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = label,
