@@ -399,7 +399,7 @@ fun <T> BingeChoiceSheetContent(
     caption: String? = null,
 ) {
     Column(modifier) {
-        RestingSheetTop(dragHandle) { ChoiceSheetHeader(title, subtitle, caption) }
+        RestingSheetTop(dragHandle) { BingeSheetHeader(title, subtitle = subtitle, caption = caption) }
         SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
     }
 }
@@ -435,7 +435,7 @@ fun <T> BingeMultiChoiceSheetContent(
 ) {
     Column(modifier) {
         RestingSheetTop(dragHandle) {
-            ChoiceSheetHeader(title, subtitle, caption) {
+            BingeSheetHeader(title, subtitle = subtitle, caption = caption) {
                 actions()
                 BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
                 doneLabel?.let { BingeTextButton(label = it, onClick = onDone) }
@@ -470,26 +470,31 @@ internal fun ChoiceSheetTop(
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     BingeSheetDockingHeader(
-        header = { ChoiceSheetHeader(title, subtitle, caption, actions) },
+        header = { BingeSheetHeader(title, subtitle = subtitle, caption = caption, actions = actions) },
         dockedTopBar = { onClose -> BingeSheetTopBar(title = title, onClose = onClose, actions = actions) },
     )
 }
 
 /**
- * The header a choice sheet shows while it floats: the title with an optional [subtitle] under it, [actions] at the end,
- * and an optional [caption] across the full width below. The subtitle says what is being chosen for, such as which copy
- * of a title, and the caption what the choice will change.
+ * The header block a docking list sheet shows while it floats: the [title] with an optional [subtitle] under it,
+ * [actions] at the end, and an optional [caption] across the full width below. The choice sheets draw it, and any
+ * `BingeBottomSheet` content, such as a peeking list of items, can draw the same one rather than a lookalike.
+ *
+ * It is the part that scrolls away. Pair it with a `BingeSheetTopBar` through `BingeSheetDockingHeader`, which swaps
+ * this block for the bar as the sheet docks. The subtitle says what the sheet is for, and the caption what acting on
+ * it will change.
  */
 @Composable
-internal fun ChoiceSheetHeader(
+fun BingeSheetHeader(
     title: String,
+    modifier: Modifier = Modifier,
     subtitle: String? = null,
     caption: String? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Column(
         modifier =
-            Modifier.fillMaxWidth().padding(
+            modifier.fillMaxWidth().padding(
                 horizontal = dimensionResource(R.dimen.padding_m),
                 vertical = dimensionResource(R.dimen.padding_s),
             ),
