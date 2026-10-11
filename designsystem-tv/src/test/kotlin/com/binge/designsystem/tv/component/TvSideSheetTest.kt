@@ -1,18 +1,32 @@
 package com.binge.designsystem.tv.component
 
 import android.app.Application
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
+import androidx.compose.ui.test.isFocused
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
@@ -85,4 +99,85 @@ class TvSideSheetTest {
 
         composeTestRule.onNodeWithText("Not available").assertHasNoClickAction()
     }
+
+    @Test
+    fun `under a right-to-left layout the start key is right, and it dismisses the sheet`() {
+        var dismissed = 0
+        setRows(LayoutDirection.Rtl) { dismissed++ }
+
+        composeTestRule.onNodeWithText(FIRST).assertIsFocused().performKeyInput { pressKey(Key.DirectionRight) }
+
+        assertEquals(1, dismissed)
+    }
+
+    @Test
+    fun `under a right-to-left layout left is the end key, and it leaves the sheet open`() {
+        var dismissed = 0
+        setRows(LayoutDirection.Rtl) { dismissed++ }
+
+        composeTestRule.onNodeWithText(FIRST).assertIsFocused().performKeyInput { pressKey(Key.DirectionLeft) }
+
+        assertEquals(0, dismissed)
+    }
+
+    @Test
+    fun `up, down, the end key and OK leave the sheet open`() {
+        var dismissed = 0
+        setRows(LayoutDirection.Ltr) { dismissed++ }
+
+        listOf(Key.DirectionDown, Key.DirectionUp, Key.DirectionRight, Key.DirectionCenter).forEach { key ->
+            composeTestRule.onNode(isFocused()).performKeyInput { pressKey(key) }
+            composeTestRule.waitForIdle()
+        }
+
+        assertEquals(0, dismissed)
+    }
+
+    @Test
+    fun `focus cannot leave the sheet for the content behind it`() {
+        setRows(LayoutDirection.Ltr, behind = true) {}
+        composeTestRule.onNodeWithText(FIRST).assertIsFocused()
+
+        listOf(FocusDirection.Left, FocusDirection.Up, FocusDirection.Right).forEach { direction ->
+            composeTestRule.runOnIdle { focusManager.moveFocus(direction) }
+            composeTestRule.waitForIdle()
+            composeTestRule.onNodeWithText(FIRST).assertIsFocused()
+        }
+        composeTestRule.runOnIdle { focusManager.moveFocus(FocusDirection.Down) }
+        composeTestRule.runOnIdle { focusManager.moveFocus(FocusDirection.Down) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(SECOND).assertIsFocused()
+        composeTestRule.onNodeWithTag(BEHIND).assertIsNotFocused()
+    }
+
+    private lateinit var focusManager: FocusManager
+
+    /** A two-row sheet; with [behind], a focusable control under the scrim at the screen's start edge. */
+    private fun setRows(
+        direction: LayoutDirection,
+        behind: Boolean = false,
+        onDismiss: () -> Unit,
+    ) {
+        composeTestRule.setContent {
+            BingeTvTheme {
+                CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                    focusManager = LocalFocusManager.current
+                    Box {
+                        if (behind) Box(Modifier.size(48.dp).testTag(BEHIND).focusable())
+                        TvSideSheet(onDismiss = onDismiss) { entry ->
+                            TvSideSheetRow(label = FIRST, onClick = {}, modifier = Modifier.focusRequester(entry))
+                            TvSideSheetRow(label = SECOND, onClick = {})
+                            TvSideSheetStepFocus(entry)
+                        }
+                    }
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
 }
+
+private const val FIRST = "Approve"
+private const val SECOND = "Decline"
+private const val BEHIND = "behind"
