@@ -1,6 +1,5 @@
 package com.binge.designsystem.tv.component
 
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -17,13 +16,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
@@ -34,12 +33,10 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvEndDirectionKey
 import com.binge.designsystem.tv.focus.tvFocusIndicator
+import com.binge.designsystem.tv.focus.tvFocusTarget
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
-
-/** The default top of a [TvRatingStepper]'s scale: ten whole points, which the five-star read-out shows in halves. */
-const val TV_RATING_STEPPER_MAX = 10
 
 /**
  * A rating a D-pad can set: **one focus stop** whose ← and → step the value by one, with a five-star read-out
@@ -47,7 +44,7 @@ const val TV_RATING_STEPPER_MAX = 10
  *
  * The stars are display only. Five focusable stars would make ← → mean "move" rather than "adjust", and OK on
  * a star would be the phone's tap smuggled onto a remote. Here the stepper is the whole control: [value] runs
- * from 0 (unrated) to [max], two points to a star, so an odd value draws a half star. At either end the press
+ * from 0 (unrated) to 10, two points to a star, so an odd value draws a half star. At either end the press
  * is consumed and does nothing, so focus does not escape the control past the last step. Direction follows the
  * layout, so → raises the value under LTR and ← under RTL.
  *
@@ -61,13 +58,12 @@ fun TvRatingStepper(
     onValueChange: (Int) -> Unit,
     valueLabel: String,
     modifier: Modifier = Modifier,
-    max: Int = TV_RATING_STEPPER_MAX,
     initiallyFocused: Boolean = false,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val lowerKey = tvStartDirectionKey()
     val raiseKey = tvEndDirectionKey()
-    val current = value.coerceIn(0, max)
+    val current = value.coerceIn(0, MAX)
     Box(modifier = modifier) {
         Row(
             modifier =
@@ -84,20 +80,19 @@ fun TvRatingStepper(
                         if (step == null) {
                             false
                         } else {
-                            val next = (current + step).coerceIn(0, max)
+                            val next = (current + step).coerceIn(0, MAX)
                             if (next != current) onValueChange(next)
                             true
                         }
-                    }.onFocusChanged { focused = it.isFocused }
-                    .focusable()
+                    }.tvFocusTarget { focused = it }
                     .padding(
                         horizontal = dimensionResource(DesR.dimen.padding_m),
                         vertical = dimensionResource(DesR.dimen.padding_s),
                     ).semantics(mergeDescendants = true) {
                         stateDescription = valueLabel
-                        progressBarRangeInfo = ProgressBarRangeInfo(current.toFloat(), 0f..max.toFloat(), steps = max - 1)
+                        progressBarRangeInfo = ProgressBarRangeInfo(current.toFloat(), 0f..MAX.toFloat(), steps = MAX - 1)
                         setProgress { target ->
-                            val next = target.toInt().coerceIn(0, max)
+                            val next = target.toInt().coerceIn(0, MAX)
                             if (next != current) onValueChange(next)
                             true
                         }
@@ -108,7 +103,12 @@ fun TvRatingStepper(
             Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_rating_stepper_star_gap))) {
                 repeat(STARS) { index -> StarGlyph(points = (current - index * POINTS_PER_STAR).coerceIn(0, POINTS_PER_STAR)) }
             }
-            Text(text = valueLabel, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = valueLabel,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.clearAndSetSemantics {},
+            )
         }
     }
 }
@@ -130,5 +130,6 @@ private fun StarGlyph(points: Int) {
     )
 }
 
+private const val MAX = 10
 private const val STARS = 5
 private const val POINTS_PER_STAR = 2
