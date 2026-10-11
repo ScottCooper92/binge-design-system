@@ -2,7 +2,7 @@ package com.binge.designsystem.catalog
 
 import com.binge.designsystem.component.WatchProviderUi
 
-/** Static seed data for [WatchProviderGridSample]; the ids are arbitrary sample values. */
+/** Static seed data for [WatchProviderGridSample]; the ids here and below are arbitrary sample values. */
 internal fun catalogSampleWatchProviders(): List<WatchProviderUi> =
     listOf(
         WatchProviderUi(id = 8, name = "Netflix", logoUrl = ""),
@@ -14,3 +14,12 @@ internal fun catalogSampleWatchProviders(): List<WatchProviderUi> =
     )
 
 internal fun catalogSelectedWatchProviderIds(): Set<Int> = setOf(8, 337)
+
+/** Two providers, too few to fill a row, for [WatchProviderGridPartialRowSample]. */
+internal fun catalogPartialRowWatchProviders(): List<WatchProviderUi> =
+    listOf(
+        WatchProviderUi(id = 1, name = "Netflix", logoUrl = ""),
+        WatchProviderUi(id = 2, name = "Disney+", logoUrl = ""),
+    )
+
+internal fun catalogPartialRowSelectedIds(): Set<Int> = setOf(1)

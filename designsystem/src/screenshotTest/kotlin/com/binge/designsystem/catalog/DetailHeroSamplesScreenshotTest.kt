@@ -50,4 +50,26 @@ class DetailHeroSamplesScreenshotTest {
     fun FullCopy() {
         DetailHeroFullCopySample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun RichBackdrop() {
+        DetailHeroRichBackdropSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun EyebrowWithActions() {
+        DetailHeroEyebrowWithActionsSample()
+    }
+
+    /** A 840dp window, the two-pane breakpoint, with the hero in a 360dp pane: side padding stays at the compact band. */
+    @PreviewTest
+    @Preview(name = "pane360", device = "spec:width=840dp,height=1180dp,orientation=portrait", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun AtPaneWidth() {
+        DetailHeroAtPaneWidthSample()
+    }
 }

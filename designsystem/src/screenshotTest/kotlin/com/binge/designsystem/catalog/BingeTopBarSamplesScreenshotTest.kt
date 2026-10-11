@@ -25,4 +25,32 @@ class BingeTopBarSamplesScreenshotTest {
     fun ThemeFollowingScrim() {
         BingeTopBarThemeFollowingScrimSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Scrimmed() {
+        BingeTopBarScrimmedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TitleBeforeScrimSwitch() {
+        BingeTopBarTitleBeforeScrimSwitchSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TitleAfterScrimSwitch() {
+        BingeTopBarTitleAfterScrimSwitchSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ScrimTailFade() {
+        BingeTopBarScrimTailFadeSample()
+    }
 }

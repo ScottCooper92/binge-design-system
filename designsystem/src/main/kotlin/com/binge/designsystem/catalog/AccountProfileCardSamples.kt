@@ -7,6 +7,7 @@ import com.binge.designsystem.component.AccountProfileCard
 import com.binge.designsystem.component.AccountProfileCardLayout
 import com.binge.designsystem.component.BingeTag
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.preview.WithPreviewAvatarImage
 import com.binge.designsystem.theme.BingeTheme
 
 /**
@@ -85,5 +86,22 @@ fun AccountProfileCardColumnTaggedSample() {
                 BingeTag(label = "Admin", icon = Icons.Filled.Shield, tint = BingeTheme.colors.info, uppercase = false)
             },
         )
+    }
+}
+
+/** The avatar drawn from an image rather than initials; the preview image stands in for the loaded URL. */
+@Composable
+fun AccountProfileCardWithImageSample() {
+    ScreenshotTheme {
+        WithPreviewAvatarImage {
+            AccountProfileCard(
+                name = "Sam Rivera",
+                secondaryLine = "sam.rivera@binge.app · Member since 2024",
+                initialsName = "Sam Rivera",
+                avatarUrl = "https://example.invalid/avatar.jpg",
+                country = "🇬🇧 United Kingdom",
+                onClick = {},
+            )
+        }
     }
 }

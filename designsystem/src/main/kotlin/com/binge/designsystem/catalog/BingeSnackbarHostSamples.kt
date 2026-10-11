@@ -63,6 +63,75 @@ fun BingeSnackbarDismissSample() {
     }
 }
 
+/** Message only, one line, no trailing control: the pill at its 48dp minimum with nothing governing it but the text. */
+@Composable
+fun BingeSnackbarMessageOnlySample() {
+    ScreenshotTheme {
+        BingeSnackbar(
+            message = "Added to watchlist",
+            actionLabel = null,
+            onActionClick = {},
+            showDismissAction = false,
+            onDismiss = {},
+        )
+    }
+}
+
+/**
+ * Two lines, the most the pill allows. The text's own vertical inset carries the pill past its 48dp
+ * minimum to M3's 68dp, so this is the sample that holds that number.
+ */
+@Composable
+fun BingeSnackbarTwoLineSample() {
+    ScreenshotTheme {
+        BingeSnackbar(
+            message = TWO_LINE_MESSAGE,
+            actionLabel = null,
+            onActionClick = {},
+            showDismissAction = false,
+            onDismiss = {},
+        )
+    }
+}
+
+/**
+ * Two lines and a text action. The message carries the pill to 68dp while the button keeps its own
+ * 48dp, so this shows what `CenterVertically` does with the two of them.
+ */
+@Composable
+fun BingeSnackbarTwoLineWithActionSample() {
+    ScreenshotTheme {
+        BingeSnackbar(
+            message = TWO_LINE_MESSAGE,
+            actionLabel = "Sign in",
+            onActionClick = {},
+            showDismissAction = false,
+            onDismiss = {},
+        )
+    }
+}
+
+/** Two lines against the dismiss icon, whose 48dp target is squarer than the text button's. */
+@Composable
+fun BingeSnackbarTwoLineWithDismissSample() {
+    var visible by remember { mutableStateOf(true) }
+    ScreenshotTheme {
+        if (visible) {
+            BingeSnackbar(
+                message = TWO_LINE_MESSAGE,
+                actionLabel = null,
+                onActionClick = {},
+                showDismissAction = true,
+                onDismiss = { visible = false },
+            )
+        } else {
+            TextButton(onClick = { visible = true }) { Text("Show the snackbar again") }
+        }
+    }
+}
+
+private const val TWO_LINE_MESSAGE = "Couldn't add that to your watchlist because your session has expired. Sign in again."
+
 private val snackbarSampleTabs = listOf(
     BingeNavSuiteItem(key = "movies", label = "Movies", icon = Icons.Default.Movie),
     BingeNavSuiteItem(key = "search", label = "Search", icon = Icons.Default.Search),
