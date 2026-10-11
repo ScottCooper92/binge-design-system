@@ -57,12 +57,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import kotlinx.coroutines.launch
 
 /**
- * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle]. A
+ * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle], one line of what the choice does. A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
  * language code. The mark sits on a plate tinted [iconTint], `primary` when it is null. A choice that is a person
  * carries [avatarName] instead, drawn as their avatar from [avatarUrl], with their initials while it loads or when
@@ -733,7 +734,13 @@ private fun <T> RadioChoiceRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
             choice.subtitle?.let {
-                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
         choice.trailingText?.let { ChoiceTrailingText(it) }
@@ -899,7 +906,13 @@ private fun <T> CheckChoiceRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
             choice.subtitle?.let {
-                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
         choice.trailingText?.let { ChoiceTrailingText(it) }

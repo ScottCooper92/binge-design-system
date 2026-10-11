@@ -47,6 +47,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.DISABLED_ALPHA
@@ -209,6 +210,8 @@ private fun ListItemView(
                     text = row.detail,
                     style = MaterialTheme.typography.bodySmall,
                     color = row.detailColor ?: MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
