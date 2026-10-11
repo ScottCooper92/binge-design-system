@@ -153,8 +153,14 @@ private fun DecisionLandscape(
     }
 }
 
+/**
+ * A decision's kicker, title, subtitle and note, as [DecisionScreen] and [DecisionBody] head theirs. Public for a
+ * decision that is one step of a [StepFlowScreen]: it goes in the flow's heading slot, [DecisionHero] in its aside and
+ * [com.binge.designsystem.component.DecisionPointsCard] in its content, so a split step puts the hero and heading on
+ * the start side and the points on the end (#638).
+ */
 @Composable
-private fun DecisionHeading(copy: DecisionCopy, modifier: Modifier = Modifier) {
+fun DecisionHeading(copy: DecisionCopy, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_m))) {
         copy.kicker?.let {
             Text(
