@@ -13,31 +13,26 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -51,7 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.centredReadingColumn
@@ -64,8 +58,9 @@ import kotlin.coroutines.cancellation.CancellationException
 private const val STEP_SLIDE_MILLIS = 280
 
 /**
- * A multi-step flow on a phone, foldable or tablet: back and a step read-out at the top, the step below, and
- * its commit in a [footer] pinned under it. For onboarding, setup, and a consent prompt.
+ * A multi-step flow on a phone, foldable or tablet: the default screen chrome at the top (a transparent bar that
+ * scrims in as the step passes under it), the step read-out under the bar, the step below, and its commit in a
+ * [footer] pinned under it. For onboarding, setup, and a consent prompt.
  *
  * A tall space stacks the [aside] (an illustration), the [heading] and the [content] in one scroll. A space that is
  * wider than it is tall, or expanded, puts the aside, heading and footer on one side and scrolls the content on the
@@ -75,13 +70,15 @@ private const val STEP_SLIDE_MILLIS = 280
  *
  * Back shows from the second step, and BACK, predictive back included, steps back too. A flow opened from inside the
  * app passes [onExit], which gives the first step a Back that leaves, and a [title] for its bar, so the flow has one
- * bar and one Back. [loading] replaces the step with a centred indicator. The read-out is hidden for a single-step flow.
+ * bar and one Back. With a [title] the bar is the collapsing one; without, it is a single line that holds Back, so
+ * the bar does not change kind as Back comes and goes. [loading] replaces the step with a centred indicator. The read-out is hidden for a single-step flow.
  *
  * Each slot is handed the step it draws, and should branch on that rather than on [currentStep]: changing step
  * slides the whole step across, and the outgoing one must keep drawing itself while it leaves. A step whose
  * content scrolls itself, a lazy grid, returns false from [contentScrolls] and gets the remaining height instead.
- * The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
+ * [scrollBehavior] is [BingeScreenScaffold]'s, for a caller that owns the bar's state. The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StepFlowScreen(
     stepCount: Int,
@@ -95,33 +92,40 @@ fun StepFlowScreen(
     footer: (@Composable ColumnScope.(step: Int) -> Unit)? = null,
     title: String? = null,
     onExit: (() -> Unit)? = null,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
     content: @Composable ColumnScope.(step: Int) -> Unit,
 ) {
     val back = if (currentStep > 0) onBack else onExit
     StepBackHandler(back)
-    // systemBars + displayCutout rather than safeDrawing, so a step raising the keyboard does not shift the
-    // chrome: a step with a text field owns its own imePadding, and a footer rides above the keyboard.
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout)),
-    ) {
-        StepChrome(stepCount = stepCount, currentStep = currentStep, onBack = back, title = title)
-        val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            // A keyboard shrinks the space a host pads for it; the layout must not flip under a focused field.
-            val keyboardUp = keyboardUp()
-            val memory = remember { SplitMemory() }
-            val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), keyboardUp, memory.last)
-            if (!keyboardUp || memory.last == null) memory.last = split
-            if (loading) {
-                LoadingMessageScreen()
-            } else {
-                StepTransition(currentStep) { step ->
-                    val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
-                    if (split) SplitStep(slots) else StackedStep(slots)
+    // The scaffold's bar is the chrome: a collapsing bar when the flow has a title, a single line when it has none, so
+    // the bar does not change kind as Back comes and goes. The read-out sits under it as the scaffold's header, and a
+    // step scrolls under both. The scaffold does not consume the keyboard, so a step with a text field owns its own
+    // imePadding and a footer rides above the keyboard, as before.
+    BingeScreenScaffold(
+        title = title.orEmpty(),
+        modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        onBack = back,
+        bar = if (title != null) ScreenBar.Collapsing else ScreenBar.Small,
+        scrollBehavior = scrollBehavior,
+        header = if (stepCount > 1) ({ StepReadOut(stepCount, currentStep) }) else null,
+    ) { padding ->
+        ScreenBody(padding) { inner ->
+            val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
+            // The bottom clears the navigation bar here, and is consumed so a footer's imePadding adds only the excess.
+            val bottom = PaddingValues(bottom = inner.calculateBottomPadding())
+            BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(bottom).consumeWindowInsets(bottom)) {
+                // A keyboard shrinks the space a host pads for it; the layout must not flip under a focused field.
+                val keyboardUp = keyboardUp()
+                val memory = remember { SplitMemory() }
+                val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), keyboardUp, memory.last)
+                if (!keyboardUp || memory.last == null) memory.last = split
+                if (loading) {
+                    Box(Modifier.padding(top = inner.calculateTopPadding())) { LoadingMessageScreen() }
+                } else {
+                    StepTransition(currentStep) { step ->
+                        val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
+                        if (split) SplitStep(slots, inner.calculateTopPadding()) else StackedStep(slots, inner.calculateTopPadding())
+                    }
                 }
             }
         }
@@ -225,8 +229,13 @@ private fun StepBackHandler(onBack: (() -> Unit)?) {
     }
 }
 
+/**
+ * The step stacked in one column. A scrolling step carries [top], the bar and read-out's height, as a spacer inside
+ * its scroll, so it passes under them; a step that scrolls itself has nothing to scroll under, and is padded.
+ */
 @Composable
-private fun StackedStep(slots: StepSlots) {
+private fun StackedStep(slots: StepSlots, top: Dp) {
+    val gap = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l))
     Column(
         modifier =
             Modifier
@@ -234,15 +243,19 @@ private fun StackedStep(slots: StepSlots) {
                 .then(if (slots.footer != null) Modifier.imePadding() else Modifier)
                 .padding(horizontal = dimensionResource(R.dimen.padding_l)),
     ) {
-        Column(
-            modifier = Modifier.weight(1f).then(if (slots.scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
-        ) {
-            slots.aside?.invoke(this, slots.step)
-            slots.heading?.invoke(slots.step)
-            if (slots.scrolls) {
-                slots.content(this, slots.step)
-            } else {
+        if (slots.scrolls) {
+            Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                Spacer(Modifier.height(top))
+                Column(verticalArrangement = gap) {
+                    slots.aside?.invoke(this, slots.step)
+                    slots.heading?.invoke(slots.step)
+                    slots.content(this, slots.step)
+                }
+            }
+        } else {
+            Column(modifier = Modifier.weight(1f).padding(top = top), verticalArrangement = gap) {
+                slots.aside?.invoke(this, slots.step)
+                slots.heading?.invoke(slots.step)
                 Column(modifier = Modifier.fillMaxWidth().weight(1f)) { slots.content(this, slots.step) }
             }
         }
@@ -251,29 +264,33 @@ private fun StackedStep(slots: StepSlots) {
 }
 
 @Composable
-private fun SplitStep(slots: StepSlots) {
+private fun SplitStep(slots: StepSlots, top: Dp) {
+    val gap = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l))
     Row(
         modifier = Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.padding_l)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
+        horizontalArrangement = gap,
     ) {
         Column(modifier = Modifier.weight(1f).fillMaxHeight().then(if (slots.footer != null) Modifier.imePadding() else Modifier)) {
-            Column(
-                modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
-            ) {
-                slots.aside?.invoke(this, slots.step)
-                slots.heading?.invoke(slots.step)
+            Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                Spacer(Modifier.height(top))
+                Column(verticalArrangement = gap) {
+                    slots.aside?.invoke(this, slots.step)
+                    slots.heading?.invoke(slots.step)
+                }
             }
             slots.footer?.let { footer -> StepFooter { footer(slots.step) } }
         }
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .then(if (slots.scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l)),
-        ) { slots.content(this, slots.step) }
+        if (slots.scrolls) {
+            Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                Spacer(Modifier.height(top))
+                Column(verticalArrangement = gap) { slots.content(this, slots.step) }
+            }
+        } else {
+            Column(
+                modifier = Modifier.weight(1f).fillMaxHeight().padding(top = top),
+                verticalArrangement = gap,
+            ) { slots.content(this, slots.step) }
+        }
     }
 }
 
@@ -286,48 +303,14 @@ private fun StepFooter(footer: @Composable ColumnScope.() -> Unit) {
     )
 }
 
-/**
- * Back on the start edge, the dots centred, and an empty box on the end edge so the dots stay centred. With a
- * [title], the title takes the middle and the dots move to the end.
- */
+/** The step dots, centred under the bar: the scaffold's header, so one scrim spans the bar and the read-out. */
 @Composable
-private fun StepChrome(
-    stepCount: Int,
-    currentStep: Int,
-    onBack: (() -> Unit)?,
-    title: String?,
-) {
-    val slot = dimensionResource(R.dimen.step_chrome_height)
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .heightIn(min = slot)
-                .padding(horizontal = dimensionResource(R.dimen.step_chrome_padding_h), vertical = dimensionResource(R.dimen.padding_sm)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(Modifier.size(slot)) {
-            onBack?.let {
-                IconButton(onClick = it) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_navigate_back))
-                }
-            }
-        }
-        if (title != null) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f).semantics { heading() },
-            )
-            StepDots(stepCount, currentStep)
-        } else {
-            StepDots(stepCount, currentStep, Modifier.weight(1f))
-            Box(Modifier.size(slot))
-        }
-    }
+private fun StepReadOut(stepCount: Int, currentStep: Int) {
+    StepDots(
+        stepCount,
+        currentStep,
+        Modifier.fillMaxWidth().padding(bottom = dimensionResource(R.dimen.padding_sm)),
+    )
 }
 
 @Composable

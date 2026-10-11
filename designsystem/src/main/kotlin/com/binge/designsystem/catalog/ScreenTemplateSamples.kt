@@ -92,6 +92,7 @@ private const val SAMPLE_ROWS = 14
 private const val SAMPLE_STEPS = 3
 private const val SAMPLE_GRID_COLUMNS = 3
 private const val SAMPLE_GRID_TILES = 24
+private const val SAMPLE_SCROLLED_ROWS = 6
 private const val BLEED_RAIL_CARDS = 10
 
 /** A collapsing-bar screen over a list: the bar scrims in as rows pass under it. */
@@ -556,6 +557,38 @@ fun StepFlowScreenSample() {
                 icon = Icons.Filled.Shield,
                 modifier = Modifier.height(dimensionResource(R.dimen.detail_hero_height)),
             )
+        }
+    }
+}
+
+/**
+ * A step long enough to scroll, with the bar collapsed and the step passing under it: the transparent bar scrims in
+ * as the step scrolls, and the read-out stays pinned under it. The collapsed bar is forced through
+ * [collapsedTopBarScrollBehavior], since a frame cannot scroll.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StepFlowScreenScrolledSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = 1,
+            onBack = {},
+            title = "Edit connection",
+            scrollBehavior = collapsedTopBarScrollBehavior(),
+            heading = { StepHeading(kicker = "Privacy", title = "Share usage data?", subtitle = "Counts of which screens are opened.") },
+            footer = { BingeFilledButton(label = "Share", onClick = {}, modifier = Modifier.fillMaxWidth()) },
+        ) {
+            repeat(SAMPLE_SCROLLED_ROWS) { index ->
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.state_icon_container_size))
+                            .clip(BingeShapes.Medium)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                ) { Text("Point ${index + 1}", modifier = Modifier.padding(dimensionResource(R.dimen.padding_m))) }
+            }
         }
     }
 }
