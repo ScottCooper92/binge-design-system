@@ -40,7 +40,8 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * One option in a row's pane: a label, a tick when [selected], and the call that commits it. [focusRequester] is
- * set when an overlay this option opens needs to hand focus back to it on close.
+ * set when an overlay this option opens needs to hand focus back to it on close. [icon] leads the option when one
+ * fits the choice itself (a glyph per option, not one for the whole row).
  */
 @Immutable
 data class TvPaneOption(
@@ -48,6 +49,7 @@ data class TvPaneOption(
     val selected: Boolean = false,
     val onSelect: () -> Unit = {},
     val focusRequester: FocusRequester? = null,
+    val icon: ImageVector? = null,
 )
 
 /**

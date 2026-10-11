@@ -115,6 +115,7 @@ private fun PaneOptions(
                 selected = option.selected,
                 onClick = option.onSelect,
                 initiallyFocused = option.label == initialFocusedOptionLabel,
+                icon = option.icon,
                 modifier = option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier,
             )
         }
