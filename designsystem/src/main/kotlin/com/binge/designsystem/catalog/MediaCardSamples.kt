@@ -23,14 +23,14 @@ import com.binge.designsystem.preview.ScreenshotTheme
  * (`tools/screenshot-gallery`).
  *
  * The convention:
- * 1. **One `<Component>Samples.kt` per component** in this `catalog/` package — keeps files under the
- *    400-line gate.
+ * 1. **One `<Component>Samples.kt` per component** in this `catalog/` package, so a component's samples
+ *    sit in one place.
  * 2. **No-arg public `@Composable` samples**, one representative state each, so every consumer calls
  *    them identically. Add one per visually distinct variant.
  * 3. **Wrap in [ScreenshotTheme]** for deterministic render; the light/dark axis is the caller's
  *    `@Preview(uiMode = …)` (the screenshot test stacks both).
  * 4. **Fold `*PreviewData` builders in** as the data source; inline a single literal rather than
- *    inventing a builder. Sample files are preview tooling (kover/detekt exempt).
+ *    inventing a builder. Sample files are preview tooling.
  * 5. **Compact, space-free `name` tokens** on the screenshot `@Preview` (see `DevicePreviews.kt`).
  *
  * A media card is a fixed [R.dimen.card_width] poster cell, so the sample bounds its own width to
