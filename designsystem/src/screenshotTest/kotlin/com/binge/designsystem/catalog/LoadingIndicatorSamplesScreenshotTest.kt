@@ -11,4 +11,11 @@ class LoadingIndicatorSamplesScreenshotTest {
     fun LoadingIndicator() {
         LoadingIndicatorSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun CustomColor() {
+        LoadingIndicatorCustomColorSample()
+    }
 }

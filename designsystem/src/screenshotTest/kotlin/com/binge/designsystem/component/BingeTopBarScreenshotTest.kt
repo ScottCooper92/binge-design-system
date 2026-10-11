@@ -22,15 +22,6 @@ class BingeTopBarScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun TitleAndBack() {
-        ScreenshotTheme {
-            BingeTopBar(title = "Popular Movies", onBack = {})
-        }
-    }
-
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
     fun Scrimmed() {
         ScreenshotTheme {
             TransparentBingeTopBarSample(scrimFraction = 1f)
