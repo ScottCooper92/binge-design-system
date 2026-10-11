@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.ToggleOff
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -26,9 +28,12 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.tv.component.TvButtonSurface
+import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvQrCode
+import com.binge.designsystem.tv.component.TvSaveStatus
 import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.template.TvBoard
 import com.binge.designsystem.tv.template.TvDecisionPage
@@ -54,6 +59,8 @@ import com.binge.designsystem.tv.R as TvR
 private const val SAMPLE_STEP_COUNT = 3
 private const val SAMPLE_ROWS = 5
 private const val SAMPLE_GRID_COLUMNS = 3
+
+private val SampleNotifications = listOf("New episodes", "Requests approved", "Downloads finished")
 
 /** Sign-in on a television: the pitch on the left, a fixed-width panel carrying the QR hand-off on the right. */
 @Composable
@@ -187,6 +194,31 @@ fun TvTwoPanePageBoardSample() {
                         }
                     }
                 }
+            }
+        },
+    )
+}
+
+/** Settings that save as made: no Save button, and the copy pane saying the last change was saved. */
+@Composable
+fun TvTwoPanePageSaveAsMadeSample() {
+    val settings = remember { mutableStateListOf(true, false, true) }
+    TvTwoPanePage(
+        split = TvTwoPaneSplit.Balanced,
+        style = TvTwoPaneStyle.Board,
+        hosting = TvPageHosting.Overlay,
+        copy = {
+            TvTwoPaneCopy(headline = "Notification settings", body = "Each change saves as you make it.")
+            TvSaveStatus(status = SaveStatus.Saved, onRetry = {})
+        },
+        action = {
+            SampleNotifications.forEachIndexed { index, label ->
+                TvCheckboxRow(
+                    label = label,
+                    checked = settings[index],
+                    onCheckedChange = { settings[index] = it },
+                    initiallyFocused = index == 0,
+                )
             }
         },
     )

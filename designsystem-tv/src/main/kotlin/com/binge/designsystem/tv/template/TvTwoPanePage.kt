@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.tv.component.TvIllustration
+import com.binge.designsystem.tv.component.TvSaveStatus
 import com.binge.designsystem.tv.component.TvVerticalDivider
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.R as DesR
@@ -80,10 +81,11 @@ enum class TvTwoPaneStyle {
  * through. The template for sign-in, setup, settings and onboarding steps.
  *
  * The action pane scrolls when [actionScrolls] (a column of fields), or hands its whole height to a lazy
- * child that scrolls itself when not. [pinnedAction] sits under the action pane as its unweighted child, so a
- * commit stays reachable however long the pane gets. [actionFirst] mirrors the panes for a page whose
- * choices lead (a grid of services, then why). [style] picks the form or the board shape. Focus entry lands
- * on [entry]; see [TvBoard] for [hosting].
+ * child that scrolls itself when not. [pinnedAction] sits under the action pane as its unweighted child, so an
+ * explicit commit stays reachable however long the pane gets: create, submit, or a step's Continue. Settings
+ * take no pinned Save: they save as made, and a [TvSaveStatus] in the copy says how it went. [actionFirst]
+ * mirrors the panes for a page whose choices lead (a grid of services, then why). [style] picks the form or
+ * the board shape. Focus entry lands on [entry]; see [TvBoard] for [hosting].
  */
 @Composable
 fun TvTwoPanePage(
