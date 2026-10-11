@@ -135,6 +135,11 @@ class ScreenTemplateSamplesScreenshotTest {
     fun filteredListNotReady() = FilteredListScreenNotReadySample()
 
     @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun filteredListScrim() = FilteredListScreenScrimSample()
+
+    @PreviewTest
     @ScreenPreviews
     @Composable
     fun heroDetail() = HeroDetailScreenSample()
