@@ -60,6 +60,20 @@ class StateScreensTest {
     }
 
     @Test
+    fun `an error's secondary action sits beside Try again`() {
+        var opened = false
+        rule.setContent {
+            TestTheme {
+                ErrorScreen(kind = ErrorKind.Auth, onRetry = {}, secondary = ScreenAction("Open settings", { opened = true }))
+            }
+        }
+
+        rule.onNodeWithText(string(R.string.error_kind_retry)).assertExists()
+        rule.onNodeWithText("Open settings").performClick()
+        assertEquals(true, opened)
+    }
+
+    @Test
     fun `an empty screen's action is pressable`() {
         var pressed = false
         rule.setContent {

@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
@@ -41,10 +42,8 @@ class TvDecisionPageFocusTest {
                 TvDecisionPage(
                     copy = DecisionCopy(title = "Title", subtitle = "Subtitle"),
                     points = (1..POINT_COUNT).map { DecisionPoint(Icons.Filled.BarChart, "Point $it", "Detail of point $it.") },
-                    acceptLabel = ACCEPT,
-                    declineLabel = "Decline",
-                    onAccept = {},
-                    onDecline = {},
+                    accept = ScreenAction(ACCEPT, {}),
+                    decline = ScreenAction("Decline", {}),
                     hosting = TvPageHosting.PreShell,
                 )
             }

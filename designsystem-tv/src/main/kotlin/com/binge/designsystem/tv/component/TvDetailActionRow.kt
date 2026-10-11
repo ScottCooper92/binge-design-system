@@ -45,7 +45,7 @@ fun TvDetailActionRow(
                     label = action.label,
                     onClick = action.onClick,
                     style = TvButtonStyle.Primary,
-                    icon = action.icon,
+                    leadingIcon = action.icon,
                     initiallyFocused = action.initiallyFocused,
                     modifier = target.widthIn(min = dimensionResource(TvR.dimen.tv_detail_page_action_primary_min_width)),
                 )
@@ -53,7 +53,7 @@ fun TvDetailActionRow(
                 TvButton(
                     label = action.label,
                     onClick = action.onClick,
-                    icon = action.icon,
+                    leadingIcon = action.icon,
                     initiallyFocused = action.initiallyFocused,
                     modifier = target,
                 )

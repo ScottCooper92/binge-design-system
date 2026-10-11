@@ -35,8 +35,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
@@ -51,16 +51,53 @@ import com.binge.designsystem.tv.R as TvR
  * the [points], and the two answers pinned under it. Each point takes focus too, so ↑ from the answers walks a
  * card taller than the panel into view a point at a time rather than leaving its end unreachable.
  *
- * Accept is the primary and takes the page's entry focus. Decline sits beside it, one press away. [hosting]
- * says whether the page claims that focus on arrival (see [TvPageHosting]). [acceptInitiallyFocused] draws
- * accept focused, for a frame. [acceptModifier] and [declineModifier] go on the answers, for a test tag a device lane
- * finds them by, as `ScreenAction.modifier` does on the phone.
+ * [accept] is the primary and takes the page's entry focus. [decline] sits beside it, one press away. They are the
+ * phone's `ScreenAction`, so a decision ports between form factors with the same two values; each one's modifier goes
+ * on its button, for a test tag a device lane finds it by. [hosting] says whether the page claims that focus on
+ * arrival (see [TvPageHosting]). [acceptInitiallyFocused] draws accept focused, for a frame. The phone's hero has no
+ * TV twin: the board's two panes leave no room for one.
  *
  * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour (#673). It sits
  * where the note does, under the heading with the copy's gap, and its paragraphs are spaced as the heading's lines are.
  * A bare `Text` in it reads as the note would: the slot provides the note's style and colour, so only a paragraph that
  * differs names its own.
  */
+@Composable
+fun TvDecisionPage(
+    copy: DecisionCopy,
+    points: List<DecisionPoint>,
+    accept: ScreenAction,
+    decline: ScreenAction,
+    modifier: Modifier = Modifier,
+    hosting: TvPageHosting = currentTvPageHosting(),
+    acceptInitiallyFocused: Boolean = false,
+    noteContent: (@Composable ColumnScope.() -> Unit)? = null,
+) {
+    val entry = remember { FocusRequester() }
+    TvTwoPanePage(
+        modifier = modifier,
+        style = TvTwoPaneStyle.Board,
+        hosting = hosting,
+        entry = entry,
+        divider = false,
+        pinnedAction = {
+            TvActionButton(accept, TvButtonStyle.Primary, Modifier.focusRequester(entry), initiallyFocused = acceptInitiallyFocused)
+            TvActionButton(decline, TvButtonStyle.Secondary)
+        },
+        copy = { DecisionCopyColumn(copy, noteContent) },
+        action = { DecisionPointsCard(points) },
+    )
+}
+
+/** [TvDecisionPage] with its answers as loose labels and callbacks, from before both platforms shared `ScreenAction`. */
+@Deprecated(
+    "Pass the answers as ScreenAction, as the phone's DecisionScreen takes them.",
+    ReplaceWith(
+        "TvDecisionPage(copy, points, ScreenAction(acceptLabel, onAccept, modifier = acceptModifier), " +
+            "ScreenAction(declineLabel, onDecline, modifier = declineModifier), modifier, hosting, acceptInitiallyFocused, noteContent)",
+        "com.binge.designsystem.template.ScreenAction",
+    ),
+)
 @Composable
 fun TvDecisionPage(
     copy: DecisionCopy,
@@ -76,25 +113,15 @@ fun TvDecisionPage(
     declineModifier: Modifier = Modifier,
     noteContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
-    val accept = remember { FocusRequester() }
-    TvTwoPanePage(
+    TvDecisionPage(
+        copy = copy,
+        points = points,
+        accept = ScreenAction(acceptLabel, onAccept, modifier = acceptModifier),
+        decline = ScreenAction(declineLabel, onDecline, modifier = declineModifier),
         modifier = modifier,
-        style = TvTwoPaneStyle.Board,
         hosting = hosting,
-        entry = accept,
-        divider = false,
-        pinnedAction = {
-            TvButton(
-                label = acceptLabel,
-                onClick = onAccept,
-                style = TvButtonStyle.Primary,
-                initiallyFocused = acceptInitiallyFocused,
-                modifier = Modifier.focusRequester(accept).then(acceptModifier),
-            )
-            TvButton(label = declineLabel, onClick = onDecline, modifier = declineModifier)
-        },
-        copy = { DecisionCopyColumn(copy, noteContent) },
-        action = { DecisionPointsCard(points) },
+        acceptInitiallyFocused = acceptInitiallyFocused,
+        noteContent = noteContent,
     )
 }
 

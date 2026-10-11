@@ -31,6 +31,9 @@ import com.binge.designsystem.tv.R as TvR
  * A centred confirm dialog for the 10-foot screen: a title, a message, and a dismiss and confirm pair. Focus arrives
  * on dismiss, so a stray OK does nothing. [destructive] draws the confirm button in the error colour.
  *
+ * [extraContent] sits between the message and the buttons, as on the phone's confirm dialog: an option the confirm
+ * applies, say. Focus still arrives on dismiss, whatever the slot holds.
+ *
  * For an action already inside a [TvSideSheet], its own confirm step reads better: see `TvSideSheetConfirm`.
  */
 @Composable
@@ -43,6 +46,7 @@ fun TvConfirmDialog(
     modifier: Modifier = Modifier,
     dismissLabel: String = stringResource(DesR.string.action_cancel),
     destructive: Boolean = false,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
     Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         TvConfirmDialogContent(
@@ -54,6 +58,7 @@ fun TvConfirmDialog(
             onConfirm = onConfirm,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
+            extraContent = extraContent,
         )
     }
 }
@@ -76,6 +81,7 @@ fun TvConfirmDialogContent(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     initiallyDismissFocused: Boolean = false,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
     val dismissFocus = remember { FocusRequester() }
     TvOverlayArrivalFocusEffect(dismissFocus)
@@ -91,6 +97,7 @@ fun TvConfirmDialogContent(
     ) {
         Text(text = title, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
         Text(text = message, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        extraContent?.invoke()
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(DesR.dimen.padding_s)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m), Alignment.End),
