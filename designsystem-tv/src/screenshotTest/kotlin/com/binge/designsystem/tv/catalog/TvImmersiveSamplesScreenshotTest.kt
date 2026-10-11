@@ -42,6 +42,11 @@ class TvImmersiveSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun gridOverlay() = Frame { TvImmersiveGridOverlaySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun gridUnloaded() = Frame { TvImmersiveGridUnloadedSample() }
 
     @PreviewTest
