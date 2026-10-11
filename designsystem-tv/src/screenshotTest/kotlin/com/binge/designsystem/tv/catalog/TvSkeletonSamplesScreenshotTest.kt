@@ -17,6 +17,11 @@ class TvSkeletonSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun hubOverlay() = Frame { TvImmersiveHubSkeletonOverlaySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun detail() = Frame { TvDetailPageSkeletonSample() }
 
     @Composable

@@ -52,6 +52,9 @@ private val SampleHeroItem =
         certification = "12A",
     )
 
+/** A title the data says little about: no synopsis, no facts and no certification. */
+private val BareHeroItem = TvDetailHeroItem(title = "A title with nothing else known", overline = "Movie")
+
 /** Stands a page in for an overlay above the rail: nothing is cleared beside it, so every edge takes the overscan. */
 @Composable
 private fun OverlayHosted(content: @Composable () -> Unit) {
@@ -68,9 +71,13 @@ private fun sampleActions(): List<TvDetailAction> =
     )
 
 @Composable
-private fun SampleHero(entryFocus: FocusRequester, synopsisFocused: Boolean = false) {
+private fun SampleHero(
+    entryFocus: FocusRequester,
+    synopsisFocused: Boolean = false,
+    item: TvDetailHeroItem = SampleHeroItem,
+) {
     TvDetailHero(
-        item = SampleHeroItem,
+        item = item,
         artwork = {
             Box(
                 modifier =
@@ -93,11 +100,15 @@ private fun SampleHero(entryFocus: FocusRequester, synopsisFocused: Boolean = fa
 }
 
 @Composable
-private fun SampleDetailPage(initialFocusedSectionKey: String? = null, synopsisFocused: Boolean = false) {
+private fun SampleDetailPage(
+    initialFocusedSectionKey: String? = null,
+    synopsisFocused: Boolean = false,
+    item: TvDetailHeroItem = SampleHeroItem,
+) {
     val entryFocus = remember { FocusRequester() }
     OverlayHosted {
         TvDetailPage(entryFocus = entryFocus, initialFocusedSectionKey = initialFocusedSectionKey) {
-            hero { SampleHero(entryFocus, synopsisFocused) }
+            hero { SampleHero(entryFocus, synopsisFocused, item) }
             section(SECTION_KEY) { onFocused ->
                 SampleCardRow(heading = "Seasons requested", onFocused = onFocused)
             }
@@ -147,6 +158,12 @@ fun TvDetailPageFocusedSample() {
 @Composable
 fun TvDetailPageSynopsisFocusedSample() {
     SampleDetailPage(synopsisFocused = true)
+}
+
+/** A hero with no synopsis and no facts: the band keeps its reserved lines, so the action row stays where it rests. */
+@Composable
+fun TvDetailPageBareHeroSample() {
+    SampleDetailPage(item = BareHeroItem)
 }
 
 /** The action row: one labelled primary, labelled secondary actions where a bare glyph would not name them, and icons. */
