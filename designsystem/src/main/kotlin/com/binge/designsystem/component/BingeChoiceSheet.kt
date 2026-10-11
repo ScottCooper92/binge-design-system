@@ -63,7 +63,7 @@ import com.binge.designsystem.R
 import kotlinx.coroutines.launch
 
 /**
- * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [subtitle], one line of what the choice does. A
+ * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [supportingText], one line of what the choice does. A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
  * language code. The mark sits on a plate tinted [iconTint], `primary` when it is null. A choice that is a person
  * carries [avatarName] instead, drawn as their avatar from [avatarUrl], with their initials while it loads or when
@@ -74,14 +74,38 @@ import kotlinx.coroutines.launch
 data class BingeChoice<out T>(
     val value: T,
     val label: String,
-    val subtitle: String? = null,
+    val supportingText: String? = null,
     val icon: ImageVector? = null,
     val mark: String? = null,
     val avatarName: String? = null,
     val avatarUrl: String? = null,
     val trailingText: String? = null,
     val iconTint: Color? = null,
-)
+) {
+    /**
+     * [BingeChoice] built with its old `subtitle` name. Required, and last, because Kotlin cannot hold a second
+     * constructor that differs from the primary only in a parameter's name.
+     */
+    @Deprecated(
+        message = "Renamed: subtitle is supportingText.",
+        replaceWith = ReplaceWith("BingeChoice(value, label, supportingText = subtitle)"),
+    )
+    constructor(
+        value: T,
+        label: String,
+        icon: ImageVector? = null,
+        mark: String? = null,
+        avatarName: String? = null,
+        avatarUrl: String? = null,
+        trailingText: String? = null,
+        iconTint: Color? = null,
+        subtitle: String?,
+    ) : this(value, label, subtitle, icon, mark, avatarName, avatarUrl, trailingText, iconTint)
+
+    /** The old name of [supportingText]. */
+    @Deprecated("Renamed to supportingText.", ReplaceWith("supportingText"))
+    val subtitle: String? get() = supportingText
+}
 
 /**
  * From this many choices a list is long: it is sectioned (the chosen, suggestions, then all), and its sheet opens
@@ -630,10 +654,10 @@ internal fun <T> MultiChoiceList(
                 } else {
                     CheckboxRow(
                         label = choice.label,
-                        subtitle = choice.subtitle,
+                        supportingText = choice.supportingText,
                         trailingContent = choice.trailingText?.let { text -> { ChoiceTrailingText(text) } },
                         checked = choice.value in chosen,
-                        onToggle = { on -> onToggle(choice.value, on) },
+                        onCheckedChange = { on -> onToggle(choice.value, on) },
                         showDivider = index < shown.lastIndex,
                     )
                 }
@@ -733,7 +757,7 @@ private fun <T> RadioChoiceRow(
         if (markSlot) ChoiceMark(choice) else RadioButton(selected = selected, onClick = null)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-            choice.subtitle?.let {
+            choice.supportingText?.let {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
@@ -905,7 +929,7 @@ private fun <T> CheckChoiceRow(
         if (markSlot) ChoiceMark(choice)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-            choice.subtitle?.let {
+            choice.supportingText?.let {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,

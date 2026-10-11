@@ -20,20 +20,20 @@ import com.binge.designsystem.component.CheckboxRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public sample for [CheckboxRow] — a single row, unchecked, no subtitle. See the convention KDoc
+ * Public sample for [CheckboxRow] — a single row, unchecked, no supporting line. See the convention KDoc
  * on [MediaCardRatedSample].
  */
 @Composable
 fun CheckboxRowSample() {
     var checked by remember { mutableStateOf(false) }
     ScreenshotTheme {
-        CheckboxRow(label = "Season 1", checked = checked, onToggle = { checked = it }, icon = Icons.Filled.Tv)
+        CheckboxRow(label = "Season 1", checked = checked, onCheckedChange = { checked = it }, icon = Icons.Filled.Tv)
     }
 }
 
 /**
  * A checklist long enough to show why [CheckboxRow] exists at all: dividers between rows, a
- * subtitle on one, and a checked-but-disabled row with a trailing status — the "already have this
+ * supporting line on one, and a checked-but-disabled row with a trailing status — the "already have this
  * one" case a season picker or a candidate list both need.
  */
 @Composable
@@ -48,10 +48,10 @@ fun CheckboxRowListSample() {
                     1 ->
                         CheckboxRow(
                             label = label,
-                            subtitle = "10 episodes",
+                            supportingText = "10 episodes",
                             icon = Icons.Filled.Tv,
                             checked = checked[index],
-                            onToggle = { checked[index] = it },
+                            onCheckedChange = { checked[index] = it },
                             showDivider = index < labels.lastIndex,
                         )
                     3 ->
@@ -60,7 +60,7 @@ fun CheckboxRowListSample() {
                             checked = true,
                             enabled = false,
                             icon = Icons.Filled.Tv,
-                            onToggle = {},
+                            onCheckedChange = {},
                             showDivider = index < labels.lastIndex,
                             trailingContent = {
                                 Text(
@@ -74,7 +74,7 @@ fun CheckboxRowListSample() {
                         CheckboxRow(
                             label = label,
                             checked = checked[index],
-                            onToggle = { checked[index] = it },
+                            onCheckedChange = { checked[index] = it },
                             showDivider = index < labels.lastIndex,
                             icon = Icons.Filled.Tv,
                         )
@@ -91,9 +91,9 @@ fun CheckboxRowLongLabelSample() {
     ScreenshotTheme {
         CheckboxRow(
             label = "Season 12: the one with the longest title in the list",
-            subtitle = "Includes every episode, special and extra released so far, not only the main run",
+            supportingText = "Includes every episode, special and extra released so far, not only the main run",
             checked = checked,
-            onToggle = { checked = it },
+            onCheckedChange = { checked = it },
             icon = Icons.Filled.Tv,
             trailingContent = {
                 Text(text = "Available", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
@@ -112,9 +112,9 @@ fun CheckboxRowPeopleSample() {
             people.forEachIndexed { index, (name, email) ->
                 CheckboxRow(
                     label = name,
-                    subtitle = email,
+                    supportingText = email,
                     checked = checked[index],
-                    onToggle = { checked[index] = it },
+                    onCheckedChange = { checked[index] = it },
                     showDivider = index < people.lastIndex,
                     leadingContent = {
                         // The label already names the person, so the initials stay out of what a screen reader reads.
