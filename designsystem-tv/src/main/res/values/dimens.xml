@@ -118,4 +118,23 @@
     <dimen name="tv_side_sheet_thumbnail_width">40dp</dimen>
     <dimen name="tv_side_sheet_thumbnail_height">60dp</dimen>
     <dimen name="tv_confirm_dialog_width">560dp</dimen>
+    <!-- List rows in the tv-material ListItem form: a list-and-pane board's column, the options in its pane, and the
+         rows' own marks. tv_list_item_height mirrors ListItem's one-line minimum height, which the library keeps
+         private, so a skeleton can reserve a row's footprint. -->
+    <dimen name="tv_list_item_height">48dp</dimen>
+    <dimen name="tv_list_pane_row_gap">2dp</dimen>
+    <!-- ListItem's own start padding, so a group header lines up with the labels under it -->
+    <dimen name="tv_list_pane_row_padding_horizontal">16dp</dimen>
+    <dimen name="tv_list_pane_group_gap">12dp</dimen>
+    <dimen name="tv_list_pane_header_bottom_gap">8dp</dimen>
+    <!-- A group header's labelMedium line, which the skeleton's header plate stands in for -->
+    <dimen name="tv_list_pane_group_header_height">16dp</dimen>
+    <dimen name="tv_list_pane_option_width">280dp</dimen>
+    <dimen name="tv_list_pane_skeleton_line_height">28dp</dimen>
+    <dimen name="tv_option_row_gap">7dp</dimen>
+    <dimen name="tv_checkbox_size">28dp</dimen>
+    <dimen name="tv_checkbox_border">2dp</dimen>
+    <!-- Pill choices and tabs: the label's inset in its pill, and the floor width of a tab's count -->
+    <dimen name="tv_choice_padding_horizontal">20dp</dimen>
+    <dimen name="tv_tab_count_min_width">28dp</dimen>
 </resources>
