@@ -84,7 +84,7 @@ fun BingePinField(
                 repeat(length) { index ->
                     PinCell(
                         digit = value.getOrNull(index),
-                        current = focused && enabled && index == value.length.coerceAtMost(length - 1),
+                        current = index == currentPinCell(focused = focused, enabled = enabled, filled = value.length, length = length),
                         error = error != null,
                     )
                 }
@@ -92,6 +92,17 @@ fun BingePinField(
         },
     )
 }
+
+/**
+ * The box the next digit goes into, which is outlined while the field has focus: the first empty one, or the last
+ * once all are full. Null while the field is unfocused or disabled, when no box is outlined.
+ */
+internal fun currentPinCell(
+    focused: Boolean,
+    enabled: Boolean,
+    filled: Int,
+    length: Int,
+): Int? = if (focused && enabled) filled.coerceAtMost(length - 1) else null
 
 /** One box: its digit if it has one, outlined in the primary colour while it is the one being typed. */
 @Composable
