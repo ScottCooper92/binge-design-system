@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
+import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -23,20 +24,15 @@ private const val SKELETON_CARD_COUNT = 6
 
 @Composable
 fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CARD_COUNT) {
-    val inset = resolvedContentInset()
-    // Matches the loaded MediaCarousel: full-bleed row, first column clear of an overlaying rail.
-    val startPadding = inset + navOverlayStart()
+    val sides = carouselSkeletonSidePadding()
     Column(modifier = modifier.fillMaxWidth()) {
         // Reserve the loaded SectionHeader's row height: its content is floored at the touch target
         // (SectionHeader), so this reserves the same token rather than a line height of its own.
         Box(
             modifier = Modifier
-                .padding(
-                    start = startPadding,
-                    end = inset,
-                    top = dimensionResource(R.dimen.section_header_padding_v),
-                    bottom = dimensionResource(R.dimen.section_header_padding_v),
-                ).height(dimensionResource(R.dimen.min_touch_target)),
+                .padding(sides)
+                .padding(vertical = dimensionResource(R.dimen.section_header_padding_v))
+                .height(dimensionResource(R.dimen.min_touch_target)),
             contentAlignment = Alignment.CenterStart,
         ) {
             SkeletonPlate(
@@ -46,7 +42,7 @@ fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CAR
             )
         }
         LazyRow(
-            contentPadding = PaddingValues(start = startPadding, end = inset),
+            contentPadding = sides,
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
             userScrollEnabled = false,
         ) {
@@ -57,6 +53,16 @@ fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CAR
             }
         }
     }
+}
+
+/**
+ * The skeleton's side padding, as the loaded MediaCarousel and SectionHeader take theirs: the content inset, plus an
+ * overlay a shell or hub publishes on either side, so the first and last columns clear it as the loaded row's do.
+ */
+@Composable
+internal fun carouselSkeletonSidePadding(): PaddingValues {
+    val inset = resolvedContentInset()
+    return PaddingValues(start = inset + navOverlayStart(), end = inset + navOverlayEnd())
 }
 
 @Preview(showBackground = true)
