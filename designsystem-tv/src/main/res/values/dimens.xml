@@ -115,4 +115,7 @@
     <dimen name="tv_decision_point_badge">48dp</dimen>
     <dimen name="tv_decision_point_icon">24dp</dimen>
     <dimen name="tv_decision_point_text_gap">6dp</dimen>
+    <dimen name="tv_side_sheet_thumbnail_width">40dp</dimen>
+    <dimen name="tv_side_sheet_thumbnail_height">60dp</dimen>
+    <dimen name="tv_confirm_dialog_width">560dp</dimen>
 </resources>
