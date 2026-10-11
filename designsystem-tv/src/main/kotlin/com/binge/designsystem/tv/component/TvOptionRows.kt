@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -28,6 +29,7 @@ import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemColors
 import androidx.tv.material3.ListItemDefaults
@@ -102,6 +104,7 @@ fun TvOptionRow(
     modifier: Modifier = Modifier,
     initiallyFocused: Boolean = false,
     trailing: (@Composable () -> Unit)? = null,
+    icon: ImageVector? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     ListItem(
@@ -112,6 +115,17 @@ fun TvOptionRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
+        leadingContent =
+            icon?.let {
+                {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null,
+                        tint = LocalContentColor.current,
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
+                    )
+                }
+            },
         trailingContent =
             if (selected || trailing != null) {
                 { OptionTrailing(selected = selected, trailing = trailing) }

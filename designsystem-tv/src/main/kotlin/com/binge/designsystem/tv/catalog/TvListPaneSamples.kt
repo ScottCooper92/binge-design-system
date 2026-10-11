@@ -3,6 +3,7 @@
 package com.binge.designsystem.tv.catalog
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Hd
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.runtime.Composable
@@ -69,8 +70,13 @@ private fun SampleBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel:
                             icon = Icons.Filled.HighQuality,
                             detail = quality,
                             options =
-                                listOf(QUALITY_HD, QUALITY_UHD).map { option ->
-                                    TvPaneOption(label = option, selected = quality == option, onSelect = { quality = option })
+                                listOf(QUALITY_HD to Icons.Filled.Hd, QUALITY_UHD to Icons.Filled.HighQuality).map { (option, glyph) ->
+                                    TvPaneOption(
+                                        label = option,
+                                        selected = quality == option,
+                                        onSelect = { quality = option },
+                                        icon = glyph,
+                                    )
                                 },
                         ),
                         TvPaneRow(
