@@ -15,12 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 
 /**
@@ -76,7 +78,11 @@ fun CheckboxRow(
             if (leadingContent != null) {
                 leadingContent()
             } else if (icon != null) {
-                BingeIconPlate(painter = rememberVectorPainter(icon), tint = iconTint)
+                BingeIconPlate(
+                    painter = rememberVectorPainter(icon),
+                    tint = iconTint,
+                    modifier = Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
+                )
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(

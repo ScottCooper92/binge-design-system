@@ -22,6 +22,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.ListRow
 import com.binge.designsystem.component.ListRowPoster
 import com.binge.designsystem.formatRating
+import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
 
@@ -133,10 +134,14 @@ private fun EpisodeRowSubtitle(rating: Float, airDate: String?) {
     }
 }
 
+/**
+ * Loading placeholder for an [EpisodeListRow]: the still plate and the row's two text lines, blank.
+ * [description] names the loading state for a screen reader; without one it stays silent.
+ */
 @Composable
-fun EpisodeListRowSkeleton(modifier: Modifier = Modifier) {
+fun EpisodeListRowSkeleton(modifier: Modifier = Modifier, description: String? = null) {
     ListRow(
-        modifier = modifier,
+        modifier = modifier.describedAs(description),
         leading = { EpisodeStill(stillUrl = null, contentDescription = null) },
     ) { contentModifier ->
         Column(modifier = contentModifier) {
