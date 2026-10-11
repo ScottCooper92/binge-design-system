@@ -88,7 +88,10 @@ data class BingeChoice<out T>(
      */
     @Deprecated(
         message = "Renamed: subtitle is supportingText.",
-        replaceWith = ReplaceWith("BingeChoice(value, label, supportingText = subtitle)"),
+        replaceWith = ReplaceWith(
+            "BingeChoice(value, label, supportingText = subtitle, icon = icon, mark = mark, avatarName = avatarName, " +
+                "avatarUrl = avatarUrl, trailingText = trailingText, iconTint = iconTint)",
+        ),
     )
     constructor(
         value: T,

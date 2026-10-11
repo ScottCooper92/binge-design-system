@@ -1,5 +1,9 @@
 package com.binge.designsystem.component
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -49,6 +53,35 @@ class RowTwinNamesTest {
         rule.onNodeWithText("Old").performClick()
 
         assertEquals(true, checked)
+    }
+
+    @Test
+    fun `a checkbox row called by its old names still takes an icon and an icon tint`() {
+        var checked: Boolean? = null
+        rule.setContent {
+            CheckboxRow(
+                label = "Old",
+                checked = false,
+                onToggle = { checked = it },
+                icon = Icons.Filled.Tv,
+                iconTint = Color.Red,
+                showDivider = true,
+                enabled = true,
+            )
+        }
+
+        rule.onNodeWithText("Old").performClick()
+
+        assertEquals(true, checked)
+    }
+
+    @Test
+    fun `a checkbox row called by its old names binds a trailing lambda to its trailing content`() {
+        rule.setContent {
+            CheckboxRow(label = "Old", checked = false, onToggle = {}) { Text("Available") }
+        }
+
+        rule.onNodeWithText("Available").assertIsDisplayed()
     }
 
     @Test
