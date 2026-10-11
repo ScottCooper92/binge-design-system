@@ -44,7 +44,7 @@ data class ListItem(
      * another package's resources, say — so the row shows it without this module knowing its source.
      */
     val iconPainter: (@Composable () -> Painter)? = null,
-    /** Tint for the icon box wash and glyph; defaults to the accent on a neutral box. */
+    /** Tint for the icon plate's wash and glyph; defaults to `primary`. */
     val iconTint: Color? = null,
     val label: String,
     val detail: String? = null,
