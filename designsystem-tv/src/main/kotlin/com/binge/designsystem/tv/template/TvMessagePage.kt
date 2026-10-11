@@ -39,7 +39,7 @@ internal fun TvActionButton(
         onClick = action.onClick,
         modifier = modifier.then(action.modifier),
         style = style,
-        icon = action.leadingIcon,
+        leadingIcon = action.leadingIcon,
         initiallyFocused = initiallyFocused,
     )
 }
