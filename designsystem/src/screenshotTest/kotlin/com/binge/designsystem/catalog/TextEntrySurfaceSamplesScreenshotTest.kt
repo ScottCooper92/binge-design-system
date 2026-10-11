@@ -36,4 +36,46 @@ class TextEntrySurfaceSamplesScreenshotTest {
     fun Masked() {
         TextEntrySurfaceMaskedSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Empty() {
+        TextEntrySurfaceEmptySample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Submitting() {
+        TextEntrySurfaceSubmittingSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun LongContent() {
+        TextEntrySurfaceLongContentSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun WithTypePicker() {
+        TextEntrySurfaceWithTypePickerSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Collapsible() {
+        TextEntrySurfaceCollapsibleSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Expanded() {
+        TextEntrySurfaceExpandedSample()
+    }
 }

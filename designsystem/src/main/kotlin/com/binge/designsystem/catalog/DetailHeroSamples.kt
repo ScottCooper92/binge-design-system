@@ -8,17 +8,25 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.LocalPaneWidth
 import com.binge.designsystem.R
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.DetailHeroDefaults
+import com.binge.designsystem.component.ExpressiveIconButton
+import com.binge.designsystem.component.IconButtonTone
 import com.binge.designsystem.component.RatingChip
 import com.binge.designsystem.component.RatingChipTone
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeTheme
 
 /**
  * Public sample for [DetailHero]. See the convention KDoc on
@@ -114,6 +122,76 @@ fun DetailHeroFullCopySample() {
             genres = listOf("Adventure", "Fantasy", "Action"),
             onBack = {},
         )
+    }
+}
+
+/**
+ * The title hero with the MeshGradientPainter tonal wash on. The mesh sits under the scrim, so the sample shows the
+ * enrichment while the copy stays legible over it.
+ */
+@Composable
+fun DetailHeroRichBackdropSample() {
+    ScreenshotTheme {
+        DetailHero(
+            title = "The Dark Knight",
+            backdropUrl = null,
+            tagline = "Why So Serious?",
+            metaText = "9.0 · 2008 · 2h 32m",
+            genres = listOf("Action", "Crime", "Drama", "Thriller"),
+            onBack = {},
+            richBackdrop = true,
+        )
+    }
+}
+
+/**
+ * The immersive-chrome variant shared by movie, TV and person detail: an explicit [DetailHero.eyebrow] with a glass
+ * back button and a [DetailHero.topRightActions] slot, here a lone share, the person-detail shape.
+ */
+@Composable
+fun DetailHeroEyebrowWithActionsSample() {
+    ScreenshotTheme {
+        DetailHero(
+            title = "Jane Performer",
+            backdropUrl = null,
+            tagline = null,
+            metaText = "",
+            eyebrow = "Acting",
+            onBack = {},
+            topRightActions = {
+                ExpressiveIconButton(
+                    onClick = {},
+                    icon = Icons.Filled.Share,
+                    contentDescription = null,
+                    tint = BingeTheme.colors.onScrim,
+                    tone = IconButtonTone.Glass,
+                    size = dimensionResource(R.dimen.top_bar_icon_size),
+                )
+            },
+        )
+    }
+}
+
+/**
+ * The hero inside a narrow pane rather than alone in the window. [LocalPaneWidth] set to the pane's own width is what
+ * keeps its side padding at the compact band, whatever the window's width.
+ */
+@Composable
+fun DetailHeroAtPaneWidthSample() {
+    val paneWidth = dimensionResource(R.dimen.detail_hero_sample_pane_width)
+    ScreenshotTheme {
+        CompositionLocalProvider(LocalPaneWidth provides paneWidth) {
+            Box(modifier = Modifier.width(paneWidth)) {
+                DetailHero(
+                    title = "The Dark Knight",
+                    backdropUrl = null,
+                    tagline = "Why So Serious?",
+                    metaText = "9.0 · 2008 · 2h 32m",
+                    genres = listOf("Action", "Crime", "Drama", "Thriller"),
+                    onBack = {},
+                )
+            }
+        }
     }
 }
 

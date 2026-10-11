@@ -1,20 +1,16 @@
-package com.binge.designsystem.component
+package com.binge.designsystem.catalog
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
-import com.binge.designsystem.catalog.MediaCardLibrarySample
-import com.binge.designsystem.catalog.MediaCardRatedSample
-import com.binge.designsystem.catalog.MediaCardSkeletonSample
-import com.binge.designsystem.catalog.MediaCardUnratedSample
 
 /**
- * Atomic poster card — colour axis only. Renders the shared public `catalog` samples, the card's one
- * public fixture. The samples bound their own card width, so no `widthDp` is needed here.
+ * Screenshot coverage for the poster-card catalog samples, on the colour axis only. The samples bound their own card
+ * width, so no `widthDp` is needed here.
  */
-class MediaCardScreenshotTest {
+class MediaCardSamplesScreenshotTest {
     @PreviewTest
     @Preview(name = "rated", uiMode = UI_MODE_NIGHT_NO)
     @Preview(name = "rated-dark", uiMode = UI_MODE_NIGHT_YES)

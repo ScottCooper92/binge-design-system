@@ -30,6 +30,20 @@ fun BingePaneTopBarAloneSample() {
     }
 }
 
+/**
+ * The alone form scrolled past its title, at its default (unspecified) `containerColor` — the exact
+ * case #121 regressed: the alone form delegates to `BingeMediumTopBar`, which only pins its scrolled
+ * colour when given an explicit `containerColor`. Nothing drove `collapsedFraction` above 0 here, so
+ * the regression shipped with CI green throughout (#122).
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingePaneTopBarAloneScrolledSample() {
+    ScreenshotTheme {
+        BingePaneTopBar(title = "Settings", onBack = {}, scrollBehavior = collapsedTopBarScrollBehavior())
+    }
+}
+
 /** A list pane with a detail pane beside it: the large, expanded title on the list's content inset. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

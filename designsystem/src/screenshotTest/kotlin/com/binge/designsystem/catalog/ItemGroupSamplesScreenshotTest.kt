@@ -125,4 +125,27 @@ class ItemGroupSamplesScreenshotTest {
     fun expanded() {
         ItemGroupExpandedSample()
     }
+
+    /** [ItemGroup]'s `belowRows` slot on the same surface as the rows. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun BelowRows() {
+        ItemGroupBelowRowsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun UntitledNonClickable() {
+        ItemGroupUntitledNonClickableSample()
+    }
+
+    /** [ListItem.iconPainter] drawn in place of [ListItem.icon]. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun PainterIcon() {
+        ItemGroupPainterIconSample()
+    }
 }
