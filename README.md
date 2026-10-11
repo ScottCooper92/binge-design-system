@@ -59,11 +59,12 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── focus/       the focus groups, the indicator, arrival and scroll units
 ├── nav/         the navigation rail shell
 ├── component/   the buttons, the card row, the section title, the message plate, the initials
-│                avatar, the QR code, the selected tick, the row emphasis and the vertical divider
+│                avatar, the QR code, the selected tick, the row emphasis, the option rows, the
+│                choice row, the tab row and the vertical divider
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
-│                flow, the message page, the detail page, the decision page, the immersive hub and
-│                grid, and the skeleton pages
+│                flow, the message page, the detail page, the decision page, the list-and-pane board,
+│                the immersive hub and grid, and the skeleton pages
 ├── Dimens.kt    the non-dp constants the TV components share, such as the nav rail's collapsed row cap
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme
