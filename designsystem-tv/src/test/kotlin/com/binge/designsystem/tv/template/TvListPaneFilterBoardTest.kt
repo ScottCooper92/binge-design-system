@@ -1,6 +1,8 @@
 package com.binge.designsystem.tv.template
 
 import android.app.Application
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,6 +81,7 @@ class TvListPaneFilterBoardTest {
                                                         label = genre,
                                                         selected = genre in genres,
                                                         onSelect = { genres = if (genre in genres) genres - genre else genres + genre },
+                                                        icon = Icons.Filled.Movie,
                                                     )
                                                 },
                                             clear = TvPaneAction(CLEAR_GENRE, onClick = { clearedGenre++ }, enabled = genres.isNotEmpty()),

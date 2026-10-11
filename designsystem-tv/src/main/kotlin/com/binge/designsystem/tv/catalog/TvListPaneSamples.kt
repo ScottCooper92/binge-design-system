@@ -3,9 +3,13 @@
 package com.binge.designsystem.tv.catalog
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Hd
 import androidx.compose.material.icons.filled.HighQuality
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material.icons.filled.Subtitles
+import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,7 +90,13 @@ private fun SampleFilterBoard(initialListHasFocus: Boolean, initialFocusedOption
     fun toggle(current: Set<String>, value: String) = if (value in current) current - value else current + value
 
     fun detail(selected: Set<String>, any: String) = if (selected.isEmpty()) any else "${selected.size} selected"
-    val genreOptions = listOf(GENRE_DRAMA, GENRE_COMEDY, GENRE_SCIENCE_FICTION, GENRE_THRILLER)
+    val genreOptions =
+        listOf(
+            GENRE_DRAMA to Icons.Filled.Theaters,
+            GENRE_COMEDY to Icons.Filled.SentimentSatisfied,
+            GENRE_SCIENCE_FICTION to Icons.Filled.RocketLaunch,
+            GENRE_THRILLER to Icons.Filled.Bolt,
+        )
     val languageOptions = listOf(LANGUAGE_ENGLISH, LANGUAGE_SPANISH, LANGUAGE_FRENCH)
     TvListPaneBoard(
         title = "Filters",
@@ -101,12 +111,15 @@ private fun SampleFilterBoard(initialListHasFocus: Boolean, initialFocusedOption
                                 label = "Genre",
                                 detail = detail(genres, "Any"),
                                 multiSelect = true,
-                                options = genreOptions.map {
-                                    TvPaneOption(it, selected = it in genres, onSelect = {
-                                        genres =
-                                            toggle(genres, it)
-                                    })
-                                },
+                                options =
+                                    genreOptions.map { (genre, genreIcon) ->
+                                        TvPaneOption(
+                                            label = genre,
+                                            selected = genre in genres,
+                                            onSelect = { genres = toggle(genres, genre) },
+                                            icon = genreIcon,
+                                        )
+                                    },
                                 clear = TvPaneAction(
                                     label = "Clear genre",
                                     onClick = { genres = emptySet() },

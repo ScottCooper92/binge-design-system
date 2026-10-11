@@ -29,7 +29,6 @@ import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import androidx.tv.material3.Icon
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemColors
 import androidx.tv.material3.ListItemDefaults
@@ -115,17 +114,7 @@ fun TvOptionRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
-        leadingContent =
-            icon?.let {
-                {
-                    Icon(
-                        imageVector = it,
-                        contentDescription = null,
-                        tint = LocalContentColor.current,
-                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
-                    )
-                }
-            },
+        leadingContent = icon?.let { { TvRowIcon(icon = it, isFocused = focused) } },
         trailingContent =
             if (selected || trailing != null) {
                 { OptionTrailing(selected = selected, trailing = trailing) }
@@ -156,7 +145,8 @@ fun TvOptionRow(
  * One yes-or-no setting as a row the remote can reach: a box that takes a tick when [checked], then its [label].
  * OK flips it through [onCheckedChange].
  *
- * Not [enabled], it is dimmed and OK does nothing, but it keeps focus so the remote does not lose its place.
+ * Not [enabled], it is dimmed and OK does nothing, but it keeps focus so the remote does not lose its place. An [icon]
+ * follows the box on its tinted plate.
  * [initiallyFocused] paints the row focused for a frame; production passes false.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -168,6 +158,7 @@ fun TvCheckboxRow(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     initiallyFocused: Boolean = false,
+    icon: ImageVector? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     ListItem(
@@ -177,7 +168,15 @@ fun TvCheckboxRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
-        leadingContent = { CheckboxMark(checked = checked) },
+        leadingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+            ) {
+                CheckboxMark(checked = checked)
+                icon?.let { TvRowIcon(icon = it, isFocused = focused) }
+            }
+        },
         shape = ListItemDefaults.shape(shape = BingeShapes.TvListItem),
         colors =
             tvRowListItemColors(
