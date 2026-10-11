@@ -39,7 +39,7 @@ fun LocalisedStringsDemo() {
                 message = "This removes the list and everything in it.",
                 confirmLabel = "Delete",
                 onConfirm = {},
-                onDismiss = {},
+                onDismissRequest = {},
             )
         }
     }

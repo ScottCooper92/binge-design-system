@@ -27,14 +27,14 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * create→add round trip and drives [isSubmitting] from the in-flight signal, so the confirm action
  * shows a spinner instead of dismissing immediately — the caller dismisses on the success event.
  * While it runs, nothing else dismisses the dialog either: Cancel is disabled, and back or a tap
- * outside is ignored, so [onDismiss] is never called mid-submit.
+ * outside is ignored, so [onDismissRequest] is never called mid-submit.
  *
  * The visible body is delegated to [CreateListDialogContent] so it can be rendered directly in
  * screenshot tests, since the modal [AlertDialog] window itself does not capture in previews.
  */
 @Composable
 fun CreateListDialog(
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     onConfirm: (String) -> Unit,
     modifier: Modifier = Modifier,
     isSubmitting: Boolean = false,
@@ -43,7 +43,7 @@ fun CreateListDialog(
     AlertDialog(
         modifier = modifier,
         // Back and a tap outside both arrive here, and Cancel is already off while submitting.
-        onDismissRequest = { if (!isSubmitting) onDismiss() },
+        onDismissRequest = { if (!isSubmitting) onDismissRequest() },
         title = { Text(stringResource(R.string.create_list_title)) },
         text = {
             CreateListNameField(
@@ -57,7 +57,7 @@ fun CreateListDialog(
                 name = name,
                 isSubmitting = isSubmitting,
                 onConfirm = onConfirm,
-                onDismiss = onDismiss,
+                onDismissRequest = onDismissRequest,
             )
         },
     )
@@ -69,7 +69,7 @@ internal fun CreateListDialogContent(
     name: String,
     onNameChange: (String) -> Unit,
     onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     isSubmitting: Boolean = false,
 ) {
     Column(
@@ -91,7 +91,7 @@ internal fun CreateListDialogContent(
             name = name,
             isSubmitting = isSubmitting,
             onConfirm = onConfirm,
-            onDismiss = onDismiss,
+            onDismissRequest = onDismissRequest,
         )
     }
 }
@@ -116,7 +116,7 @@ private fun CreateListActions(
     name: String,
     isSubmitting: Boolean,
     onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     val trimmed = name.trim()
     val canSubmit = trimmed.isNotEmpty() && !isSubmitting
@@ -130,7 +130,7 @@ private fun CreateListActions(
     ) {
         BingeTextButton(
             label = stringResource(R.string.create_list_cancel),
-            onClick = onDismiss,
+            onClick = onDismissRequest,
             enabled = !isSubmitting,
         )
         BingeTextButton(
@@ -146,7 +146,7 @@ private fun CreateListActions(
 @Composable
 private fun PreviewCreateListDialog() {
     BingeExpressiveTheme {
-        CreateListDialogContent(name = "", onNameChange = {}, onConfirm = {}, onDismiss = {})
+        CreateListDialogContent(name = "", onNameChange = {}, onConfirm = {}, onDismissRequest = {})
     }
 }
 
@@ -158,7 +158,7 @@ private fun PreviewCreateListDialogSubmitting() {
             name = "Weekend watchlist",
             onNameChange = {},
             onConfirm = {},
-            onDismiss = {},
+            onDismissRequest = {},
             isSubmitting = true,
         )
     }

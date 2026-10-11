@@ -85,7 +85,7 @@ class MonthYearPickerWiringTest {
                     onYearsOpenChange = { yearsOpen = it },
                     onSelectionChange = { selection = it },
                     onConfirm = { confirmed += selection },
-                    onDismiss = { dismissals++ },
+                    onDismissRequest = { dismissals++ },
                     locale = Locale.US,
                 )
             }

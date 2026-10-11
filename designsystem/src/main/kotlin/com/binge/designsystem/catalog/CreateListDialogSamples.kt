@@ -17,7 +17,7 @@ fun CreateListDialogSample() {
             name = "",
             onNameChange = {},
             onConfirm = {},
-            onDismiss = {},
+            onDismissRequest = {},
         )
     }
 }
@@ -30,7 +30,7 @@ fun CreateListDialogSubmittingSample() {
             name = "Weekend watchlist",
             onNameChange = {},
             onConfirm = {},
-            onDismiss = {},
+            onDismissRequest = {},
             isSubmitting = true,
         )
     }

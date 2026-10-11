@@ -153,7 +153,7 @@ fun <T> BingeChoiceSheet(
     choices: BingeChoiceList<T>,
     selected: T?,
     onSelect: (T) -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
@@ -162,7 +162,7 @@ fun <T> BingeChoiceSheet(
 ) {
     val partWay = rememberOpensPartWay(choices)
     BingeBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismissRequest,
         modifier = modifier,
         skipPartiallyExpanded = !partWay,
         dockable = partWay,
@@ -178,7 +178,7 @@ fun <T> BingeChoiceSheet(
             underNavigationBar = partWay,
         ) { value ->
             onSelect(value)
-            onDismiss()
+            onDismissRequest()
         }
     }
 }
@@ -210,7 +210,7 @@ fun <T> BingeMultiChoiceSheet(
     choices: BingeChoiceList<T>,
     selected: Set<T>,
     onDone: (Set<T>) -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     doneLabel: String,
     clearLabel: String,
     modifier: Modifier = Modifier,
@@ -237,7 +237,7 @@ fun <T> BingeMultiChoiceSheet(
         if (applyAsPicked) onDone(picked)
     }
     BingeBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismissRequest,
         modifier = modifier,
         skipPartiallyExpanded = !partWay,
         dockable = partWay,
@@ -252,7 +252,7 @@ fun <T> BingeMultiChoiceSheet(
                     label = doneLabel,
                     onClick = {
                         onDone(draft)
-                        onDismiss()
+                        onDismissRequest()
                     },
                 )
             }
@@ -297,7 +297,15 @@ fun <T> bingeChoiceItem(
     LaunchedEffect(enabled) { if (!enabled) open = false }
     val currentOnOpen by rememberUpdatedState(onOpen)
     LaunchedEffect(open) { if (open) currentOnOpen() }
-    if (open) BingeChoiceSheet(title = title, choices = choices, selected = selected, onSelect = onSelect, onDismiss = { open = false })
+    if (open) {
+        BingeChoiceSheet(
+            title = title,
+            choices = choices,
+            selected = selected,
+            onSelect = onSelect,
+            onDismissRequest = { open = false },
+        )
+    }
     val chosen = (choices as? BingeChoiceList.Ready)?.choices?.firstOrNull { it.value == selected }
     val detail = if (choices is BingeChoiceList.Ready) chosen?.label ?: emptyLabel else selectedLabel ?: emptyLabel
     return ListItem(
@@ -343,7 +351,7 @@ fun <T> bingeMultiChoiceItem(
             choices = choices,
             selected = selected,
             onDone = onDone,
-            onDismiss = { open = false },
+            onDismissRequest = { open = false },
             doneLabel = doneLabel,
             clearLabel = clearLabel,
             filterPlaceholder = filterPlaceholder,

@@ -20,7 +20,7 @@ import androidx.compose.ui.focus.FocusRequester
  * copy is another place to forget a teardown path, or to leave a latch armed to fire a stale request later.
  * This is that latch, once.
  *
- * Call [TvOverlayCloser.close] from every dismissal path — the `BackHandler`, the sheet `onDismiss`, a
+ * Call [TvOverlayCloser.close] from every dismissal path — the `BackHandler`, the sheet `onDismissRequest`, a
  * navigate-away. It is idempotent within one close (a second [TvOverlayCloser.close] mid-flight is a no-op) and
  * re-armable across opens (the latch resets so the next open closes too).
  *
@@ -43,7 +43,7 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
         // re-fires (a stuck close) or fires a stale request on a later recomposition.
         closing = false
     }
-    // Stable identity so a `BackHandler`/`onDismiss` holding [TvOverlayCloser.close] is not re-armed every
+    // Stable identity so a `BackHandler`/`onDismissRequest` holding [TvOverlayCloser.close] is not re-armed every
     // recomposition; it wraps the one latch setter above.
     return remember { TvOverlayCloser { closing = true } }
 }

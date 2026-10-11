@@ -41,7 +41,7 @@ fun TweaksSheet(
     onFontScaleChange: (Float) -> Unit,
     onRtlChange: (Boolean) -> Unit,
     onLocaleChange: (SampleLocale) -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     variants: List<CatalogEntry> = emptyList(),
     selected: CatalogEntry? = null,
     onVariantChange: (CatalogEntry) -> Unit = {},
@@ -50,9 +50,9 @@ fun TweaksSheet(
         TweakControls(overrides, onDarkChange, onFontScaleChange, onRtlChange, onLocaleChange, variants, selected, onVariantChange)
     }
     if (booleanResource(R.bool.catalog_tweaks_side_sheet)) {
-        BingeModalSideSheet(onDismissRequest = onDismiss) { controls() }
+        BingeModalSideSheet(onDismissRequest = onDismissRequest) { controls() }
     } else {
-        BingeBottomSheet(onDismissRequest = onDismiss) { controls() }
+        BingeBottomSheet(onDismissRequest = onDismissRequest) { controls() }
     }
 }
 

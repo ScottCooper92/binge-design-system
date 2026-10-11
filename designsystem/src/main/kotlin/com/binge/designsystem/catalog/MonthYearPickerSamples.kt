@@ -41,7 +41,7 @@ private fun MonthYearPickerSampleFrame(
             onYearsOpenChange = { open = it },
             onSelectionChange = { current = it },
             onConfirm = {},
-            onDismiss = {},
+            onDismissRequest = {},
             locale = Locale.UK,
         )
     }

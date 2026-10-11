@@ -37,7 +37,7 @@ internal fun BingeSnackbar(
     actionLabel: String?,
     onActionClick: () -> Unit,
     showDismissAction: Boolean,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasTrailing = actionLabel != null || showDismissAction
@@ -83,7 +83,7 @@ internal fun BingeSnackbar(
                     }
 
                 showDismissAction ->
-                    IconButton(onClick = onDismiss) {
+                    IconButton(onClick = onDismissRequest) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = stringResource(R.string.binge_snackbar_dismiss),
@@ -109,7 +109,7 @@ fun BingeSnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifie
             actionLabel = data.visuals.actionLabel,
             onActionClick = { data.performAction() },
             showDismissAction = data.visuals.withDismissAction,
-            onDismiss = { data.dismiss() },
+            onDismissRequest = { data.dismiss() },
             modifier = Modifier.padding(
                 start = dimensionResource(R.dimen.padding_m),
                 end = dimensionResource(R.dimen.padding_m),

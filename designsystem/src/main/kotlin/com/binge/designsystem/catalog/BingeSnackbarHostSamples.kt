@@ -39,7 +39,7 @@ fun BingeSnackbarSample() {
             actionLabel = "Undo",
             onActionClick = {},
             showDismissAction = false,
-            onDismiss = {},
+            onDismissRequest = {},
         )
     }
 }
@@ -55,7 +55,7 @@ fun BingeSnackbarDismissSample() {
                 actionLabel = null,
                 onActionClick = {},
                 showDismissAction = true,
-                onDismiss = { visible = false },
+                onDismissRequest = { visible = false },
             )
         } else {
             TextButton(onClick = { visible = true }) { Text("Show the snackbar again") }
@@ -72,7 +72,7 @@ fun BingeSnackbarMessageOnlySample() {
             actionLabel = null,
             onActionClick = {},
             showDismissAction = false,
-            onDismiss = {},
+            onDismissRequest = {},
         )
     }
 }
@@ -89,7 +89,7 @@ fun BingeSnackbarTwoLineSample() {
             actionLabel = null,
             onActionClick = {},
             showDismissAction = false,
-            onDismiss = {},
+            onDismissRequest = {},
         )
     }
 }
@@ -106,7 +106,7 @@ fun BingeSnackbarTwoLineWithActionSample() {
             actionLabel = "Sign in",
             onActionClick = {},
             showDismissAction = false,
-            onDismiss = {},
+            onDismissRequest = {},
         )
     }
 }
@@ -122,7 +122,7 @@ fun BingeSnackbarTwoLineWithDismissSample() {
                 actionLabel = null,
                 onActionClick = {},
                 showDismissAction = true,
-                onDismiss = { visible = false },
+                onDismissRequest = { visible = false },
             )
         } else {
             TextButton(onClick = { visible = true }) { Text("Show the snackbar again") }
@@ -160,7 +160,7 @@ fun BingeSnackbarOverFloatingBarSample() {
                     actionLabel = "Undo",
                     onActionClick = {},
                     showDismissAction = false,
-                    onDismiss = {},
+                    onDismissRequest = {},
                     modifier = Modifier.padding(
                         start = dimensionResource(R.dimen.padding_m),
                         end = dimensionResource(R.dimen.padding_m),

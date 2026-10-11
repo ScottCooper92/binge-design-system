@@ -31,7 +31,7 @@ import com.binge.designsystem.theme.tonalContainer
  * reads as help rather than as one more setting. The icon is decorative; [text] carries the meaning.
  *
  * Not dismissible by default: it states something true for as long as the screen is open. Pass
- * [onDismiss] to add a close control — [HintCard] only reports the tap; the caller decides what
+ * [onDismissRequest] to add a close control — [HintCard] only reports the tap; the caller decides what
  * "dismissed" means and whether to stop rendering the card at all.
  *
  * Pass [actionLabel] and [onAction] to add a centred text button beneath the text, for guidance that
@@ -43,7 +43,7 @@ fun HintCard(
     text: String,
     modifier: Modifier = Modifier,
     icon: ImageVector = Icons.Filled.Lightbulb,
-    onDismiss: (() -> Unit)? = null,
+    onDismissRequest: (() -> Unit)? = null,
     actionLabel: String? = null,
     onAction: (() -> Unit)? = null,
     actionIcon: ImageVector? = null,
@@ -64,7 +64,7 @@ fun HintCard(
                         .padding(
                             start = dimensionResource(R.dimen.item_group_row_padding_h),
                             top = dimensionResource(R.dimen.item_group_row_padding_v),
-                            end = if (onDismiss != null) {
+                            end = if (onDismissRequest != null) {
                                 dimensionResource(R.dimen.hint_card_dismiss_end_inset)
                             } else {
                                 dimensionResource(R.dimen.item_group_row_padding_h)
@@ -95,8 +95,8 @@ fun HintCard(
                 BingeTextButton(label = actionLabel, onClick = onAction, trailingIcon = actionIcon)
             }
         }
-        if (onDismiss != null) {
-            IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd)) {
+        if (onDismissRequest != null) {
+            IconButton(onClick = onDismissRequest, modifier = Modifier.align(Alignment.TopEnd)) {
                 Icon(
                     imageVector = Icons.Filled.Close,
                     contentDescription = stringResource(R.string.hint_card_dismiss),

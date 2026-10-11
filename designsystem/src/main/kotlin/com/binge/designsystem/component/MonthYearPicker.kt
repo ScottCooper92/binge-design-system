@@ -60,7 +60,7 @@ fun MonthYearPickerDialog(
     title: String,
     mode: MonthYearPickerMode,
     yearRange: IntRange,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     onConfirm: (MonthYearSelection) -> Unit,
     modifier: Modifier = Modifier,
     initial: MonthYearSelection = MonthYearSelection(),
@@ -72,7 +72,7 @@ fun MonthYearPickerDialog(
     var monthValue by rememberSaveable { mutableStateOf(initial.month?.value) }
     var yearsOpen by rememberSaveable { mutableStateOf(false) }
     val selection = MonthYearSelection(year, monthValue?.let(Month::of))
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = onDismissRequest) {
         MonthYearPickerContent(
             title = title,
             mode = mode,
@@ -88,7 +88,7 @@ fun MonthYearPickerDialog(
                 monthValue = it.month?.value
             },
             onConfirm = { onConfirm(selection) },
-            onDismiss = onDismiss,
+            onDismissRequest = onDismissRequest,
             modifier = modifier,
         )
     }
@@ -109,7 +109,7 @@ internal fun MonthYearPickerContent(
     onYearsOpenChange: (Boolean) -> Unit,
     onSelectionChange: (MonthYearSelection) -> Unit,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     minimum: YearMonth? = null,
     maximum: YearMonth? = null,
@@ -163,7 +163,7 @@ internal fun MonthYearPickerContent(
                 PickerActions(
                     canConfirm = selection.isCompleteFor(mode) && selection.isWithin(mode, minimum, maximum),
                     onConfirm = onConfirm,
-                    onDismiss = onDismiss,
+                    onDismissRequest = onDismissRequest,
                 )
             }
         }
@@ -238,7 +238,7 @@ private fun YearStepper(
 private fun PickerActions(
     canConfirm: Boolean,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -247,7 +247,7 @@ private fun PickerActions(
     ) {
         BingeTextButton(
             label = stringResource(R.string.month_year_picker_cancel),
-            onClick = onDismiss,
+            onClick = onDismissRequest,
             contentColor = MaterialTheme.colorScheme.onSurface,
         )
         BingeTextButton(label = stringResource(R.string.month_year_picker_confirm), onClick = onConfirm, enabled = canConfirm)

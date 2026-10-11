@@ -63,7 +63,7 @@ fun DialogsDemo() {
                     message = "This title will be removed from the list. You can add it again later.",
                     confirmLabel = "Remove",
                     onConfirm = { close("Confirmed") },
-                    onDismiss = { close("Cancelled") },
+                    onDismissRequest = { close("Cancelled") },
                 )
             OpenDialog.Destructive ->
                 BingeConfirmDialog(
@@ -72,11 +72,11 @@ fun DialogsDemo() {
                     confirmLabel = "Delete",
                     destructive = true,
                     onConfirm = { close("Confirmed") },
-                    onDismiss = { close("Cancelled") },
+                    onDismissRequest = { close("Cancelled") },
                 )
             OpenDialog.CreateList -> {
                 CreateListDialog(
-                    onDismiss = { close("Cancelled") },
+                    onDismissRequest = { close("Cancelled") },
                     onConfirm = { name ->
                         submitting = true
                         outcome = "Creating “$name”"
@@ -96,7 +96,7 @@ fun DialogsDemo() {
                     title = "From",
                     mode = MonthYearPickerMode.MonthAndYear,
                     yearRange = DEMO_YEARS,
-                    onDismiss = { close("Cancelled") },
+                    onDismissRequest = { close("Cancelled") },
                     onConfirm = { close("Picked ${it.month ?: "-"} ${it.year ?: "-"}") },
                     defaultYear = DEMO_YEARS.last,
                 )

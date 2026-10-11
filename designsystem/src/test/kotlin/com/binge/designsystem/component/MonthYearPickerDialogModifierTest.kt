@@ -24,7 +24,7 @@ class MonthYearPickerDialogModifierTest {
                 title = "From",
                 mode = MonthYearPickerMode.MonthAndYear,
                 yearRange = 1990..2030,
-                onDismiss = {},
+                onDismissRequest = {},
                 onConfirm = {},
                 modifier = Modifier.testTag(DIALOG_TAG),
                 defaultYear = 2030,
