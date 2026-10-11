@@ -22,6 +22,11 @@ class TvChoiceSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun optionRowSupporting() = Frame { TvOptionRowSupportingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun choiceRow() = Frame { TvChoiceRowSample() }
 
     @PreviewTest

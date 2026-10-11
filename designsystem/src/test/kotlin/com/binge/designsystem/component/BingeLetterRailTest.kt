@@ -92,6 +92,23 @@ class BingeLetterRailTest {
     }
 
     @Test
+    fun `a cancelled drag still lets the next one start on the same letter`() {
+        showRail()
+
+        // A drag that stays within A, then is cancelled rather than lifted.
+        rule.onRoot().performTouchInput {
+            down(Offset(width / 2f, height * 0.02f))
+            moveTo(Offset(width / 2f, height * 0.2f))
+            cancel()
+        }
+        rule.waitForIdle()
+        rule.onRoot().performTouchInput { swipeDown() }
+        rule.waitForIdle()
+
+        assertEquals(listOf('A', 'A', 'B', 'C', 'D'), picked)
+    }
+
+    @Test
     fun `a second drag starts fresh after the finger lifts`() {
         showRail()
 

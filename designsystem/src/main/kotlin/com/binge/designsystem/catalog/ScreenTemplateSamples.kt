@@ -33,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,8 +41,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.ErrorKind
@@ -52,6 +51,7 @@ import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.component.BingeOutlinedButton
+import com.binge.designsystem.component.BingeSnackbar
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.FilterChipItem
@@ -67,6 +67,7 @@ import com.binge.designsystem.template.ErrorScreen
 import com.binge.designsystem.template.FilteredListScreen
 import com.binge.designsystem.template.FormAction
 import com.binge.designsystem.template.FormActionPlacement
+import com.binge.designsystem.template.FormSaveStatus
 import com.binge.designsystem.template.FormScreen
 import com.binge.designsystem.template.FormSection
 import com.binge.designsystem.template.HeroDetailLazyScreen
@@ -260,22 +261,19 @@ fun FilteredListScreenSample() {
 }
 
 /**
- * The same list with a collapsing bar whose state the caller owns, and a transparent header: one scrim ramps in
- * over bar and chips together as the bar collapses, with the rows visible behind it.
+ * The same list scrolled past the title: the bar collapsed, and the one scrim over bar and chips faded in, with the
+ * rows visible behind it. Nothing is passed for the chrome: the transparent collapsing bar and header are the
+ * template's default, and the scrim follows the bar's own collapse.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilteredListScreenScrimSample() {
     var selected by remember { mutableIntStateOf(0) }
-    val behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FilteredListScreen(
             title = "Requests",
             onBack = LocalDemoBack.current,
-            bar = ScreenBar.Collapsing,
-            scrollBehavior = behavior,
-            headerBackground = Color.Transparent,
-            scrimFraction = behavior.state.collapsedFraction,
+            scrollBehavior = collapsedTopBarScrollBehavior(),
             filters = listOf(FilterChipItem("All", 42), FilterChipItem("Pending", 3), FilterChipItem("Approved", 39)),
             selectedFilter = selected,
             onFilterChange = { selected = it },
@@ -477,29 +475,90 @@ fun HeroDetailScreenFooterSample() {
     }
 }
 
-/** A short editor that saves from the bar. */
+/** A short editor that saves each change as it is made: "Saved" in the bar, and no Save button. */
 @Composable
 fun FormScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FormScreen(
             title = "General",
             onBack = LocalDemoBack.current,
-            primaryAction = FormAction("Save", onClick = {}),
+            saveStatus = FormSaveStatus.Saved,
         ) {
             SampleForm()
         }
     }
 }
 
-/** A long editor with Cancel and Save pinned below it. */
+/** A form scrolled past the title: the default collapsing bar collapsed, its scrim faded in over the fields. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FormScreenScrolledSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "General",
+            onBack = LocalDemoBack.current,
+            scrollBehavior = collapsedTopBarScrollBehavior(),
+            saveStatus = FormSaveStatus.Saved,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/** [FormScreenSample] while a change is on its way: "Saving…" in the bar. */
+@Composable
+fun FormScreenSavingSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "General",
+            onBack = LocalDemoBack.current,
+            saveStatus = FormSaveStatus.Saving,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/**
+ * [FormScreenSample] after a write failed: the change stays on screen, and a snackbar offers Retry until a save
+ * succeeds. The pill is drawn directly, because a snackbar host is empty at frame 0 (see [BingeSnackbarSample]);
+ * [FormScreenSaveAsMadeDemo] shows the real one.
+ */
+@Composable
+fun FormScreenSaveFailedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize()) {
+            FormScreen(
+                title = "General",
+                onBack = LocalDemoBack.current,
+                saveStatus = FormSaveStatus.Failed(onRetry = {}),
+            ) {
+                SampleForm()
+            }
+            BingeSnackbar(
+                message = stringResource(R.string.form_save_failed),
+                actionLabel = stringResource(R.string.form_save_retry),
+                onActionClick = {},
+                showDismissAction = false,
+                onDismissRequest = {},
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = dimensionResource(R.dimen.padding_m), vertical = dimensionResource(R.dimen.padding_s)),
+            )
+        }
+    }
+}
+
+/** A long create form with Cancel and Create pinned below it: a create flow commits, so it keeps its button. */
 @Composable
 fun FormScreenFooterSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FormScreen(
-            title = "Network",
+            title = "New network",
             onBack = LocalDemoBack.current,
             placement = FormActionPlacement.Footer,
-            primaryAction = FormAction("Save", onClick = {}),
+            primaryAction = FormAction("Create", onClick = {}),
             secondaryAction = FormAction("Cancel", onClick = {}),
         ) {
             SampleForm()
@@ -507,7 +566,7 @@ fun FormScreenFooterSample() {
     }
 }
 
-/** A form under a large collapsing bar, its fields held to a reading column on a wide window. */
+/** An editor under a large collapsing bar that saves as it goes, its fields held to a reading column on a wide window. */
 @Composable
 fun FormScreenCappedSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
@@ -516,7 +575,7 @@ fun FormScreenCappedSample() {
             onBack = LocalDemoBack.current,
             bar = ScreenBar.Large,
             capWidth = true,
-            primaryAction = FormAction("Save", onClick = {}),
+            saveStatus = FormSaveStatus.Saved,
         ) {
             SampleForm()
         }

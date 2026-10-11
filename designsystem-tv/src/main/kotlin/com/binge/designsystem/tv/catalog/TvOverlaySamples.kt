@@ -4,6 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +37,7 @@ fun TvSideSheetRowReservedLineSample() {
             TvSideSheetTitle("Show requests")
             TvSideSheetRow(
                 label = "Pending",
+                icon = Icons.Filled.Schedule,
                 supportingText = "12 requests",
                 onClick = { selected = "Pending" },
                 selected = selected == "Pending",
@@ -40,12 +45,14 @@ fun TvSideSheetRowReservedLineSample() {
             )
             TvSideSheetRow(
                 label = "Approved",
+                icon = Icons.Filled.CheckCircle,
                 supportingText = "48 requests",
                 onClick = { selected = "Approved" },
                 selected = selected == "Approved",
             )
             TvSideSheetRow(
                 label = "All",
+                icon = Icons.AutoMirrored.Filled.List,
                 onClick = { selected = "All" },
                 selected = selected == "All",
                 reserveSupportingLine = true,
@@ -75,7 +82,7 @@ fun TvSideSheetRowThumbnailSample() {
             )
             TvSideSheetRow(
                 label = "Remove from this list",
-                supportingText = "It stays in your other lists.",
+                supportingText = "It stays in your other lists, and keeps its place in each of them.",
                 onClick = {},
                 destructive = true,
             )
