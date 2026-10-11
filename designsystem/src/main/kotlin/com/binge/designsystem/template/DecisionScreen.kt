@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
@@ -61,7 +59,7 @@ fun DecisionScreen(
     // The space it is given, not the window: in a pane of a wide window it is often taller than wide.
     BoxWithConstraints(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // A keyboard shrinks the space a host pads for it; the layout must not flip while it shows.
-        val imeVisible = WindowInsets.isImeVisible
+        val imeVisible = keyboardUp()
         val memory = remember { SplitMemory() }
         val wide = heldWhileIme(maxWidth > maxHeight, imeVisible, memory.last)
         if (!imeVisible || memory.last == null) memory.last = wide
