@@ -157,7 +157,7 @@ class TvSideSheetTest {
     private fun setRows(
         direction: LayoutDirection,
         behind: Boolean = false,
-        onDismiss: () -> Unit,
+        onDismissRequest: () -> Unit,
     ) {
         composeTestRule.setContent {
             BingeTvTheme {
@@ -165,7 +165,7 @@ class TvSideSheetTest {
                     focusManager = LocalFocusManager.current
                     Box {
                         if (behind) Box(Modifier.size(48.dp).testTag(BEHIND).focusable())
-                        TvSideSheet(onDismiss = onDismiss) { entry ->
+                        TvSideSheet(onDismissRequest = onDismissRequest) { entry ->
                             TvSideSheetRow(label = FIRST, onClick = {}, modifier = Modifier.focusRequester(entry))
                             TvSideSheetRow(label = SECOND, onClick = {})
                             TvSideSheetStepFocus(entry)
