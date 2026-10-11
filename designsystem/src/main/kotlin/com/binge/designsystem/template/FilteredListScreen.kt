@@ -25,7 +25,8 @@ import com.binge.designsystem.component.FilterChipItem
  * Until [ready], the chips have nothing to count, so the screen shows [notReady] (loading, or the error the
  * first load hit) and the bar scrims itself. Once ready, the chips' header draws one opaque ground under the
  * bar and the chips together. [search], when given, sits above the chips in that header. Each [page] is handed
- * its filter's index and the padding its list folds into `contentPadding`; pair a page with
+ * its filter's index and the padding its list folds into `contentPadding`: the header's height above, and below it
+ * the content inset plus the navigation bar, so the list ends one inset clear of the bar like [screenListPadding]'s; pair a page with
  * [rememberPagedPhase] and [PagedPhaseContent] rather than writing the paging `when` again. The filters either
  * side of the selected one stay composed ([beyondViewportPageCount]), so their rows are loading before the
  * swipe reaches them.
@@ -85,7 +86,10 @@ fun FilteredListScreen(
                 scrimFraction = scrimFraction,
                 beyondViewportPageCount = beyondViewportPageCount,
             ) { pagePadding, index ->
-                page(index, PaddingValues(top = pagePadding.calculateTopPadding(), bottom = padding.calculateBottomPadding()))
+                page(
+                    index,
+                    PaddingValues(top = pagePadding.calculateTopPadding(), bottom = padding.screenListPadding().calculateBottomPadding()),
+                )
             }
         }
     }
