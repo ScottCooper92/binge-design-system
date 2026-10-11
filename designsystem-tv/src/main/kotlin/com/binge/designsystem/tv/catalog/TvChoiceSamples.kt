@@ -150,15 +150,29 @@ fun TvRatingStepperFocusedSample() {
     SampleRatingStepper(initial = RATING_HALF, initiallyFocused = true)
 }
 
+/** A rated stepper in the room a side sheet leaves it: the stars and the whole "8 / 10" on one line. */
 @Composable
-private fun SampleRatingStepper(initial: Int, initiallyFocused: Boolean) {
+fun TvRatingStepperInSheetSample() {
+    SampleRatingStepper(
+        initial = RATING_WHOLE,
+        initiallyFocused = false,
+        modifier = Modifier.width(dimensionResource(TvR.dimen.tv_rating_stepper_sheet_room)),
+    )
+}
+
+@Composable
+private fun SampleRatingStepper(
+    initial: Int,
+    initiallyFocused: Boolean,
+    modifier: Modifier = Modifier,
+) {
     var value by remember { mutableStateOf(initial) }
     TvRatingStepper(
         value = value,
         onValueChange = { value = it },
         valueLabel = "$value / $RATING_MAX",
         initiallyFocused = initiallyFocused,
-        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
+        modifier = modifier.padding(dimensionResource(DesR.dimen.padding_l)),
     )
 }
 

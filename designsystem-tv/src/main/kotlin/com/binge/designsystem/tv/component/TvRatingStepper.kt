@@ -107,6 +107,7 @@ fun TvRatingStepper(
                 text = valueLabel,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
+                softWrap = false,
                 modifier = Modifier.clearAndSetSemantics {},
             )
         }
