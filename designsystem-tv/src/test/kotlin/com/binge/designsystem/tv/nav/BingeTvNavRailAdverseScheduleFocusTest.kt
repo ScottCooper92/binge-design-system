@@ -68,10 +68,8 @@ private const val SETTLE_FRAMES = 10
  * `offerTvArrivalFocus`'s direct `SystemClock.uptimeMillis()` read. A frame is 16ms of that virtual time
  * (`TestMonotonicFrameClock`'s default), so 250 frames (4000ms) crosses [CONTENT_HANDOFF_TIMEOUT_MS] (3000ms)
  * while [CONTENT_HANDOFF_FRAMES]'s own 600-frame budget (9600ms) is nowhere close to exhausted — only the
- * timeout explains giving up. Confirmed empirically (not just derived): once the loop gives up, Compose's own
- * disposal-triggered recovery search (the same mechanism [BingeTvNavRailFocusSinkTest] documents) settles on
- * the rail item and stays there — a real, stable focusable, not [TvFocusSink]'s churn — so the replacement
- * composing later never gets a look-in even once it exists.
+ * timeout explains giving up. Giving up no longer strands focus: the handoff's first offer lands on the content
+ * pane's [TvFocusSink], which holds focus without being disposed and hands it to the replacement once it composes.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -126,14 +124,13 @@ class BingeTvNavRailAdverseScheduleFocusTest {
         assertDrillDownConverges(170)
 
     /**
-     * The wall-clock deadline's own give-up case: 250 frames (4000ms) is past [CONTENT_HANDOFF_TIMEOUT_MS]
-     * (3000ms) but nowhere near exhausting [CONTENT_HANDOFF_FRAMES]'s 600-frame (9600ms) budget on its own — so
-     * only the timeout can explain the loop giving up. Pumping the remaining frames afterward and finding the
-     * replacement still unfocused once it finally composes is the proof: nothing was left retrying to claim it.
+     * Past the wall-clock deadline: 250 frames (4000ms) is past [CONTENT_HANDOFF_TIMEOUT_MS] (3000ms), so the
+     * handoff itself has long since given up. The replacement is still reached, because focus waited on the content
+     * pane's sink rather than resting on the rail, and the sink hands it on once the replacement composes.
      */
     @Test
-    fun `the drill-down handoff gives up once its wall-clock deadline passes, never claiming a later replacement`() =
-        assertDrillDownTimesOut(250)
+    fun `a replacement composed after the drill-down handoff's deadline is still reached, through the content sink`() =
+        assertDrillDownReachedAfterDeadline(250)
 
     /** No sibling: the cold-start offer competes against nothing composed at all, the adversary this loop names. */
     private fun assertColdStartConverges(delayFrames: Int) {
@@ -231,7 +228,7 @@ class BingeTvNavRailAdverseScheduleFocusTest {
      * to settle — the target [TvLateTarget] rules out by construction is a target that never shows up at all,
      * not one the loop was right to have stopped waiting for.
      */
-    private fun assertDrillDownTimesOut(delayFrames: Int) {
+    private fun assertDrillDownReachedAfterDeadline(delayFrames: Int) {
         var contentDepth by mutableIntStateOf(1)
         var dispose by mutableStateOf(false)
         composeTestRule.mainClock.autoAdvance = false
@@ -253,9 +250,8 @@ class BingeTvNavRailAdverseScheduleFocusTest {
         repeat(delayFrames + SETTLE_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag(TARGET).assertExists()
-        composeTestRule.onNodeWithTag(TARGET).assertIsNotFocused()
-        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsFocused()
+        composeTestRule.onNodeWithTag(TARGET).assertIsFocused()
+        composeTestRule.onNodeWithText(RAIL_ITEM).assertIsNotFocused()
     }
 
     @Composable

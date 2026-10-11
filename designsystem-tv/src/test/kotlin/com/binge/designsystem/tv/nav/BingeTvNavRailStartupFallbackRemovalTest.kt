@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -25,20 +26,14 @@ private const val PROBE_FRAMES = 200
 
 /**
  * The startup `LaunchedEffect`'s `if (!contentHasFocus && !railHasFocus) railEntry.requestFocus()`
- * fallback (from before [TvFocusSink], when a destination could be target-less) is deleted here. This is the evidence it was safe to delete
- * — driven through [BingeTvNavRail] rather than in isolation, exactly the destination the fallback existed for:
- * one that composes nothing focusable at all, ever.
+ * fallback (from before [TvFocusSink], when a destination could be target-less) is deleted here. This is the evidence it
+ * was safe to delete, driven through [BingeTvNavRail] with exactly the destination the fallback existed for: one that
+ * composes nothing focusable at all, ever.
  *
- * With [TvFocusSink] mounted, that destination is no longer target-less: the sink claims the content group's
- * entry on its first frame, satisfying the startup loop's `taken()` check before the deleted line could ever
- * run. What happens *after* is an oscillation that was measured and accepted when the sink was introduced (a sink that holds
- * focus is itself "the pane has focus", so it disposes itself the next frame, and Compose's own disposal-
- * triggered recovery search — not this rail's code — lands the frame in between): sink and rail alternate every
- * other frame, indefinitely, for a destination this pathological. The fallback's guard needed *both*
- * `contentHasFocus` and `railHasFocus` false at once to fire, and that never happens — one of the two is always
- * true, every single frame, confirmed here across a window well past the startup budget. Deleting the line
- * changes nothing observable (full module suite green before and after); this test is what backs that claim
- * rather than asserting it in a PR description alone.
+ * With [TvFocusSink] mounted, that destination is no longer target-less: the sink claims the content group's entry on
+ * its first frame and keeps it, since the rail no longer disposes a sink that holds focus. So the content side holds
+ * focus every frame, and the rail never does. The rail once held it every other frame here, which on a device read as
+ * the rail flicking for as long as a cold first screen loaded.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -47,7 +42,7 @@ class BingeTvNavRailStartupFallbackRemovalTest {
     val composeTestRule = createKeyboardComposeRule()
 
     @Test
-    fun `content or rail holds focus every frame for a destination with nothing focusable, ever`() {
+    fun `the sink holds focus every frame for a destination with nothing focusable, ever, and the rail never does`() {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
             BingeTvTheme {
@@ -65,11 +60,8 @@ class BingeTvNavRailStartupFallbackRemovalTest {
             val sinkFocused = composeTestRule.onAllNodesWithTag(TV_FOCUS_SINK_TAG).fetchSemanticsNodes().any {
                 it.config.getOrElse(SemanticsProperties.Focused) { false }
             }
-            assertTrue(
-                "neither the rail nor the sink held focus at frame $it — the deleted fallback would have " +
-                    "been reachable here",
-                railFocused || sinkFocused,
-            )
+            assertTrue("the sink did not hold focus at frame $it", sinkFocused)
+            assertFalse("the rail held focus at frame $it", railFocused)
         }
     }
 
