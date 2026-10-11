@@ -33,13 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,6 +44,9 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.DarkStatusBarEffect
 import com.binge.designsystem.component.DetailOverlayTopBar
+import com.binge.designsystem.component.MeasuredHeroHeight
+import com.binge.designsystem.component.measuredHeroHeight
+import com.binge.designsystem.component.rememberMeasuredHeroHeight
 import com.binge.designsystem.paneBackOrNull
 import com.binge.designsystem.paneSideInsets
 
@@ -81,7 +81,7 @@ fun HeroDetailScreen(
     hero: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val measured = remember { MeasuredHeroHeight() }
+    val measured = rememberMeasuredHeroHeight()
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         Column(
             modifier =
@@ -161,7 +161,7 @@ fun HeroDetailLazyScreen(
     hero: @Composable () -> Unit,
     content: LazyListScope.() -> Unit,
 ) {
-    val measured = remember { MeasuredHeroHeight() }
+    val measured = rememberMeasuredHeroHeight()
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
             LazyColumn(
@@ -209,19 +209,10 @@ fun HeroDetailStateScreen(
     }
 }
 
-/** The hero's height as last laid out, in pixels; zero until it has been. */
-private class MeasuredHeroHeight {
-    var px by mutableIntStateOf(0)
-
-    /** The measured height, or [fallback] before the hero has been laid out. */
-    @Composable
-    fun height(fallback: Dp): Dp = if (px > 0) with(LocalDensity.current) { px.toDp() } else fallback
-}
-
 /** [hero], reporting its laid-out height to [measured]. */
 @Composable
 private fun MeasuredHero(measured: MeasuredHeroHeight, hero: @Composable () -> Unit) {
-    Box(modifier = Modifier.onSizeChanged { measured.px = it.height }) { hero() }
+    Box(modifier = Modifier.measuredHeroHeight(measured)) { hero() }
 }
 
 private const val HERO_ITEM_KEY = "hero-detail-hero"

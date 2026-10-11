@@ -2,6 +2,7 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -63,7 +64,44 @@ class DetailOverlayTopBarSemanticsTest {
         rule.onNodeWithText("Alpha").assert(!hidden)
     }
 
+    /**
+     * A hero that has grown past the floor the bar is given. Scrolled to where the floor's own fade would have begun,
+     * the bar given the measured height is still clear, and the one left on the floor is not.
+     */
+    private fun showOverGrownHero(useMeasured: Boolean) =
+        rule.setContent {
+            TestTheme {
+                val measured = rememberMeasuredHeroHeight()
+                val scrolledPx = with(LocalDensity.current) { GROWN_SCROLL.toPx() }
+                Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.measuredHeroHeight(measured).height(GROWN_HERO_HEIGHT))
+                    DetailOverlayTopBar(
+                        title = "Alpha",
+                        scrollOffsetPx = { scrolledPx },
+                        onBack = null,
+                        heroHeight = if (useMeasured) measured.height(HERO_HEIGHT) else HERO_HEIGHT,
+                    )
+                }
+            }
+        }
+
+    @Test
+    fun `a bar given the measured height of a grown hero stays clear where the floor would fade it`() {
+        showOverGrownHero(useMeasured = true)
+
+        rule.onNodeWithText("Alpha").assert(hidden)
+    }
+
+    @Test
+    fun `a bar left on the floor height fades early over a grown hero`() {
+        showOverGrownHero(useMeasured = false)
+
+        rule.onNodeWithText("Alpha").assert(!hidden)
+    }
+
     private companion object {
         val HERO_HEIGHT = 300.dp
+        val GROWN_HERO_HEIGHT = 400.dp
+        val GROWN_SCROLL = 250.dp
     }
 }
