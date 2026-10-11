@@ -205,18 +205,16 @@ fun BingeTopBarGlassDemo() {
     }
 }
 
-/** [BingeMediumTopBar] collapsing from its large title as the list scrolls, scrim following the collapse. */
+/** [BingeMediumTopBar] collapsing from its large title as the list scrolls, with its default scrim following the collapse. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingeMediumTopBarDemo() {
     val behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    ScrollingBarDemoHost(behavior) { fraction ->
+    ScrollingBarDemoHost(behavior) {
         BingeMediumTopBar(
             title = DEMO_TITLE,
             onBack = LocalDemoBack.current,
             scrollBehavior = behavior,
-            containerColor = Color.Transparent,
-            scrimFraction = fraction,
             actions = { SearchAction(it) },
         )
     }

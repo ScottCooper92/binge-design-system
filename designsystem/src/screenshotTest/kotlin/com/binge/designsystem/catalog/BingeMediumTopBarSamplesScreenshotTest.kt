@@ -17,6 +17,20 @@ class BingeMediumTopBarSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun Defaults() {
+        BingeMediumTopBarDefaultsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun DefaultsCollapsed() {
+        BingeMediumTopBarDefaultsCollapsedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun Transparent() {
         BingeMediumTopBarTransparentSample()
     }

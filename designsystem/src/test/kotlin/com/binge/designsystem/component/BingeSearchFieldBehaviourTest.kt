@@ -15,6 +15,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.text.input.ImeAction
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -56,6 +57,27 @@ class BingeSearchFieldBehaviourTest {
 
         assertEquals("", query)
         rule.onNodeWithContentDescription(clear).assertDoesNotExist()
+    }
+
+    @Test
+    fun `the keyboard's done action submits too, for a field that asks for it`() {
+        var submits = 0
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeSearchField(
+                    query = "dune",
+                    onQueryChange = {},
+                    onClear = {},
+                    placeholder = PLACEHOLDER,
+                    imeAction = ImeAction.Done,
+                    onSubmit = { submits++ },
+                )
+            }
+        }
+
+        rule.onNode(hasSetTextAction()).performImeAction()
+
+        assertEquals(1, submits)
     }
 
     @Test
