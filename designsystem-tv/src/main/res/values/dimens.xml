@@ -122,6 +122,8 @@
          rows' own marks. tv_list_item_height mirrors ListItem's one-line minimum height, which the library keeps
          private, so a skeleton can reserve a row's footprint. -->
     <dimen name="tv_list_item_height">48dp</dimen>
+    <!-- The same minimum with a supporting line under the headline -->
+    <dimen name="tv_list_item_two_line_height">64dp</dimen>
     <dimen name="tv_list_pane_row_gap">2dp</dimen>
     <!-- ListItem's own start padding, so a group header lines up with the labels under it -->
     <dimen name="tv_list_pane_row_padding_horizontal">16dp</dimen>
@@ -131,6 +133,8 @@
     <dimen name="tv_list_pane_group_header_height">16dp</dimen>
     <dimen name="tv_list_pane_option_width">280dp</dimen>
     <dimen name="tv_list_pane_skeleton_line_height">28dp</dimen>
+    <!-- A row's supporting line, which the skeleton's second bar stands in for -->
+    <dimen name="tv_list_pane_skeleton_detail_height">16dp</dimen>
     <dimen name="tv_option_row_gap">7dp</dimen>
     <!-- A row's leading icon plate: the tinted box behind the glyph, which is tv_button_icon -->
     <dimen name="tv_row_icon_plate">40dp</dimen>

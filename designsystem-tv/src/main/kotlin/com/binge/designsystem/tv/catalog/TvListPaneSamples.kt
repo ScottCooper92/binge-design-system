@@ -65,6 +65,12 @@ fun TvListPaneBoardSkeletonSample() {
     TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay)
 }
 
+/** The skeleton for a board whose rows show a value under their name: each placeholder is two lines, as the rows will be. */
+@Composable
+fun TvListPaneBoardSkeletonRowDetailSample() {
+    TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay, rowDetail = true)
+}
+
 /**
  * A filter panel on the same board: filters in the list, each showing what it has applied under its name, and the values of
  * the described filter beside it as checkboxes with no description above them. A clear button sits under the

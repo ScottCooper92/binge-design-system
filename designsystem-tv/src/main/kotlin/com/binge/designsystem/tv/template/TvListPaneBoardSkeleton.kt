@@ -23,6 +23,7 @@ import com.binge.designsystem.tv.R as TvR
 
 private const val GROUP_TITLE_WIDTH_FRACTION = 0.35f
 private const val ROW_LABEL_WIDTH_FRACTION = 0.7f
+private const val ROW_DETAIL_WIDTH_FRACTION = 0.4f
 private const val PANE_TITLE_WIDTH_FRACTION = 0.6f
 
 /**
@@ -32,7 +33,8 @@ private const val PANE_TITLE_WIDTH_FRACTION = 0.6f
  * It is built on the same two-pane page as the board, so the title band, insets, split and divider cannot drift. The
  * column reserves what the board puts above its first row (the focus-ring bleed and the first group's title), so the
  * first of [rows] sits where the board's first row will and carries the same layout anchor. [hosting] is the board's.
- * [description] names the state for a screen reader.
+ * [description] names the state for a screen reader. [rowDetail] makes each row two lines, for a board whose rows show a
+ * current value under their name: a row with one is taller, so a one-line skeleton would move the rows when it resolves.
  */
 @Composable
 fun TvListPaneBoardSkeleton(
@@ -42,6 +44,7 @@ fun TvListPaneBoardSkeleton(
     rows: Int = 9,
     options: Int = 2,
     description: String? = null,
+    rowDetail: Boolean = false,
 ) {
     TvTwoPanePage(
         title = title,
@@ -50,14 +53,14 @@ fun TvListPaneBoardSkeleton(
         style = TvTwoPaneStyle.Board,
         hosting = hosting,
         actionScrolls = false,
-        copy = { ListSkeleton(rows = rows) },
+        copy = { ListSkeleton(rows = rows, rowDetail = rowDetail) },
         action = { PaneSkeleton(options = options) },
     )
 }
 
 /** The column, with the board's vertical padding and row gap, so each placeholder sits on its row. */
 @Composable
-private fun ListSkeleton(rows: Int) {
+private fun ListSkeleton(rows: Int, rowDetail: Boolean) {
     Column(
         modifier =
             Modifier
@@ -69,20 +72,28 @@ private fun ListSkeleton(rows: Int) {
         repeat(rows) { index ->
             // A label bar in the row's full footprint rather than a plate filling it: the board's rows are transparent
             // until focused, so a filled plate would read as a dense block.
-            Box(
+            Column(
                 modifier =
                     Modifier
                         .tvListPaneFirstRowAnchor(index == 0)
                         .fillMaxWidth()
-                        .height(dimensionResource(TvR.dimen.tv_list_item_height)),
-                contentAlignment = Alignment.CenterStart,
+                        .height(
+                            dimensionResource(if (rowDetail) TvR.dimen.tv_list_item_two_line_height else TvR.dimen.tv_list_item_height),
+                        ).padding(start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_gap), Alignment.CenterVertically),
             ) {
                 TvSkeletonBlock(
                     Modifier
-                        .padding(start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal))
                         .fillMaxWidth(ROW_LABEL_WIDTH_FRACTION)
                         .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_line_height)),
                 )
+                if (rowDetail) {
+                    TvSkeletonBlock(
+                        Modifier
+                            .fillMaxWidth(ROW_DETAIL_WIDTH_FRACTION)
+                            .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_detail_height)),
+                    )
+                }
             }
         }
     }
