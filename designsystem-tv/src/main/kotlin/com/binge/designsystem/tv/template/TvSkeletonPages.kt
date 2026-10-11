@@ -19,10 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
+import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
@@ -108,7 +107,8 @@ fun TvImmersiveHubSkeleton(
  * the overline, title, facts and synopsis lines and the action pills at its foot, then one row of cards. Not
  * focusable. Every block sits where the loaded page puts it, so nothing moves when the content arrives.
  *
- * The detail page pads the same in every [hosting], so the skeleton does too; the parameter matches the page's.
+ * The detail page pads the same in every [hosting], so the skeleton ignores it; it takes the parameter anyway so it
+ * has the same parameters as the page it stands in for, and swapping one for the other is a one-line change.
  * [firstSectionKey] is the key of the page's first section, so the row stands in for it as a layout anchor.
  */
 @Composable
@@ -267,7 +267,3 @@ private fun PosterRowSkeleton(
         }
     }
 }
-
-/** Names the loading state for a screen reader when [description] is given; otherwise leaves the page silent. */
-private fun Modifier.describedAs(description: String?): Modifier =
-    if (description == null) this else semantics { contentDescription = description }

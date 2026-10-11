@@ -15,6 +15,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchorIf
+import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeShapes
 
 /**
@@ -113,13 +114,19 @@ fun WatchProviderGridRow(
  * [columns] has to be whatever the grid that replaces this one will use. A screen that builds its own
  * lazy grid from a screen-keyed column count would otherwise find this reserving a flat four against
  * its six or eight.
+ *
+ * [description] names the loading state for a screen reader; without one it stays silent.
  */
 @Composable
-fun WatchProviderGridSkeleton(modifier: Modifier = Modifier, columns: Int = DEFAULT_GRID_COLUMNS) {
+fun WatchProviderGridSkeleton(
+    modifier: Modifier = Modifier,
+    columns: Int = DEFAULT_GRID_COLUMNS,
+    description: String? = null,
+) {
     val tileShape = BingeShapes.Large
     val spacing = dimensionResource(R.dimen.provider_grid_spacing)
     Column(
-        modifier = modifier,
+        modifier = modifier.describedAs(description),
         verticalArrangement = Arrangement.spacedBy(spacing),
     ) {
         repeat(SKELETON_ROW_COUNT) { rowIndex ->

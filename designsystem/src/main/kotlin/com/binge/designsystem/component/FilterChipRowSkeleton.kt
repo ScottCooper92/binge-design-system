@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
+import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -34,15 +35,18 @@ private const val SKELETON_CHIP_COUNT = 3
  *
  * The pill's height is a dimen rather than a derived value because a chip is a composed component with its
  * own padding and label, not a line of text; the geometry checks on both screens are what keep it honest.
+ *
+ * [description] names the loading state for a screen reader; without one it stays silent.
  */
 @Composable
-fun FilterChipRowSkeleton(modifier: Modifier = Modifier) {
+fun FilterChipRowSkeleton(modifier: Modifier = Modifier, description: String? = null) {
     var consumedInsets by remember { mutableStateOf(NoInsets) }
     Row(
         modifier = modifier
             .onConsumedWindowInsetsChanged { consumedInsets = it }
             .fillMaxWidth()
-            .padding(filterChipRowPadding(consumedInsets)),
+            .padding(filterChipRowPadding(consumedInsets))
+            .describedAs(description),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
         repeat(SKELETON_CHIP_COUNT) {
