@@ -61,7 +61,7 @@ fun TvListPaneBoardSkeletonSample() {
 }
 
 /**
- * A filter panel on the same board: filters in the list, each with what it has applied at its end, and the values of
+ * A filter panel on the same board: filters in the list, each showing what it has applied under its name, and the values of
  * the described filter beside it as checkboxes with no description above them. A clear button sits under the
  * values and another under the list.
  */
