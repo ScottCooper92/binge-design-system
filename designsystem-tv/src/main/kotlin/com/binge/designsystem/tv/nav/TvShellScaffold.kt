@@ -11,6 +11,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -45,6 +46,11 @@ const val TV_SHELL_CONTENT_SETTLE_MILLIS = 220L
  * moves to the rail after it. An overlay hosted above this scaffold rather than in [overlay] sets [overlayOpen], so
  * the scaffold leaves Back to it. [contentFocusRequester] and [overlayEpoch] pass through to [BingeTvNavRail], for a
  * shell that restores focus into the content when such an overlay closes.
+ *
+ * [keyContentByDestination] true composes each destination under its own saved-state key, so a swap disposes the
+ * old destination's tree as the new one mounts. Pass false for a shell that keeps destination state itself and
+ * animates between destinations inside [content]: the content then stays one tree, with both panes present while
+ * it animates. A destination that leaves the rail has its saved state dropped.
  */
 @Composable
 fun TvShellScaffold(
@@ -66,6 +72,7 @@ fun TvShellScaffold(
     overlayOpen: Boolean = overlay != null,
     contentFocusRequester: FocusRequester? = null,
     overlayEpoch: Int = 0,
+    keyContentByDestination: Boolean = true,
     content: @Composable (key: Any) -> Unit,
 ) {
     SettleOn(settle, selectedKey, settleMillis)
@@ -73,6 +80,8 @@ fun TvShellScaffold(
     val railFocus = remember { FocusRequester() }
     var railHasFocus by remember { mutableStateOf(false) }
     val atRoot = railHasFocus && selectedKey == homeKey
+    val holder = rememberSaveableStateHolder()
+    ForgetDepartedDestinations(holder, railKeys(header, items, footer))
     BackHandler(enabled = !overlayOpen && (!atRoot || onBackAtRoot != null)) {
         when {
             !railHasFocus && contentDepth > 1 && onPop != null -> onPop()
@@ -99,8 +108,11 @@ fun TvShellScaffold(
             overlayEpoch = overlayEpoch,
             pinFooter = pinFooter,
         ) {
-            val holder = rememberSaveableStateHolder()
-            holder.SaveableStateProvider(settled) { content(settled) }
+            if (keyContentByDestination) {
+                holder.SaveableStateProvider(settled) { content(settled) }
+            } else {
+                content(settled)
+            }
         }
         overlay?.let {
             CompositionLocalProvider(LocalTvHostedAsOverlay provides true) {
@@ -152,5 +164,21 @@ private fun SettleOn(
             delay(settleMillis)
             settle.settledKey = selectedKey
         }
+    }
+}
+
+private fun railKeys(
+    header: TvNavRailItem?,
+    items: List<TvNavRailItem>,
+    footer: TvNavRailItem?,
+): Set<Any> = (listOfNotNull(header) + items + listOfNotNull(footer)).mapTo(mutableSetOf()) { it.key }
+
+/** Drops [holder]'s saved state for a destination once it leaves the rail, so it does not outlive the destination. */
+@Composable
+private fun ForgetDepartedDestinations(holder: SaveableStateHolder, keys: Set<Any>) {
+    val previous = remember { mutableStateOf(keys) }
+    LaunchedEffect(keys) {
+        (previous.value - keys).forEach(holder::removeState)
+        previous.value = keys
     }
 }
