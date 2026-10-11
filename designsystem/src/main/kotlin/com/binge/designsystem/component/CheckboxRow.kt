@@ -27,11 +27,11 @@ import com.binge.designsystem.R
 
 /**
  * One row of a checklist — a leading [Checkbox], an optional [leadingContent] (a person's avatar, say), a [label]
- * with an optional [subtitle], and an optional [trailingContent] slot (a status chip, say) — sized and spaced for a
+ * with an optional [supportingText], and an optional [trailingContent] slot (a status chip, say) — sized and spaced for a
  * long, scannable list (a season picker, a candidate list) rather than a one-off toggle. Reach for this instead of
  * hand-rolling a checkbox [Row] per screen.
  *
- * The [subtitle] is one line, ellipsized: say what ticking the row does, in a few words. An [icon] leads the label on the same tinted plate a settings row uses, tinted [iconTint] or `primary`. A
+ * The [supportingText] is one line, ellipsized: say what ticking the row does, in a few words. An [icon] leads the label on the same tinted plate a settings row uses, tinted [iconTint] or `primary`. A
  * [leadingContent] replaces it when the row needs something else, such as an avatar.
  *
  * The row merges its descendants' semantics, so a decorative [leadingContent] such as an avatar should clear its own
@@ -50,9 +50,9 @@ import com.binge.designsystem.R
 fun CheckboxRow(
     label: String,
     checked: Boolean,
-    onToggle: (Boolean) -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    subtitle: String? = null,
+    supportingText: String? = null,
     enabled: Boolean = true,
     showDivider: Boolean = false,
     icon: ImageVector? = null,
@@ -65,7 +65,7 @@ fun CheckboxRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = dimensionResource(R.dimen.min_touch_target))
-                .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onToggle)
+                .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
                 .padding(
                     horizontal = dimensionResource(R.dimen.checkbox_row_padding_h),
                     vertical = dimensionResource(R.dimen.checkbox_row_padding_v),
@@ -90,9 +90,9 @@ fun CheckboxRow(
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (!subtitle.isNullOrBlank()) {
+                if (!supportingText.isNullOrBlank()) {
                     Text(
-                        text = subtitle,
+                        text = supportingText,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -114,3 +114,45 @@ fun CheckboxRow(
         }
     }
 }
+
+/**
+ * [CheckboxRow] under its old names, `onToggle` and `subtitle`. Its second line and callback are `supportingText` and
+ * `onCheckedChange` now, the names the TV rows use. Kotlin cannot hold two overloads that differ only in parameter
+ * names, nor tell them apart for a call that passes three arguments by position, so this one takes `subtitle` where
+ * `onCheckedChange` sits and `onToggle` late, ahead of the trailing slot. Call it by name, as the old signature was.
+ */
+@Deprecated(
+    message = "Renamed: onToggle is onCheckedChange and subtitle is supportingText.",
+    replaceWith = ReplaceWith(
+        "CheckboxRow(label, checked, onCheckedChange = onToggle, modifier = modifier, supportingText = subtitle, " +
+            "enabled = enabled, showDivider = showDivider, icon = icon, iconTint = iconTint, " +
+            "leadingContent = leadingContent, trailingContent = trailingContent)",
+    ),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun CheckboxRow(
+    label: String,
+    checked: Boolean,
+    subtitle: String? = null,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    showDivider: Boolean = false,
+    icon: ImageVector? = null,
+    iconTint: Color? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
+    onToggle: (Boolean) -> Unit,
+    trailingContent: (@Composable () -> Unit)? = null,
+) = CheckboxRow(
+    label = label,
+    checked = checked,
+    onCheckedChange = onToggle,
+    modifier = modifier,
+    supportingText = subtitle,
+    enabled = enabled,
+    showDivider = showDivider,
+    icon = icon,
+    iconTint = iconTint,
+    leadingContent = leadingContent,
+    trailingContent = trailingContent,
+)

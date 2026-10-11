@@ -485,7 +485,7 @@ fun BingeChoiceSheetLongLabelSample() {
                             BingeChoice(
                                 "SH",
                                 "Saint Helena, Ascension and Tristan da Cunha",
-                                subtitle = "Sets the region used for release dates, certificates and where to watch",
+                                supportingText = "Sets the region used for release dates, certificates and where to watch",
                                 mark = "SH",
                             ),
                             BingeChoice("JP", "Japan", mark = "JP"),
@@ -516,7 +516,13 @@ fun BingeChoiceSheetCountsSample() {
                                 icon = Icons.Filled.Image,
                                 trailingText = "1,024",
                             ),
-                            BingeChoice("logos", "Logos", subtitle = "Transparent PNG", icon = Icons.Filled.Brush, trailingText = "6"),
+                            BingeChoice(
+                                "logos",
+                                "Logos",
+                                supportingText = "Transparent PNG",
+                                icon = Icons.Filled.Brush,
+                                trailingText = "6",
+                            ),
                         ),
                     ),
                 selected = "backdrops",
