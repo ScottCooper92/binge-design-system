@@ -8,8 +8,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Landscape
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,6 +40,8 @@ import com.binge.designsystem.component.SingleChoiceList
 import com.binge.designsystem.component.bingeChoiceItem
 import com.binge.designsystem.component.bingeMultiChoiceItem
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeSentiment
+import com.binge.designsystem.theme.accent
 
 private const val REGION_TITLE = "Region"
 private const val LANGUAGES_TITLE = "Languages"
@@ -42,17 +53,26 @@ private const val WORLDWIDE = "Worldwide"
 private val PINNED_SAMPLE_REGIONS = setOf("AU", "BR", "CA", "FR", "DE", "JP", "ES", "GB", "US")
 
 internal val SampleRegions =
-    listOf("Australia", "Brazil", "Canada", "France", "Germany", "Japan", "Spain", "United Kingdom", "United States")
-        .map { BingeChoice(it, it) }
+    listOf(
+        "Australia" to "AU",
+        "Brazil" to "BR",
+        "Canada" to "CA",
+        "France" to "FR",
+        "Germany" to "DE",
+        "Japan" to "JP",
+        "Spain" to "ES",
+        "United Kingdom" to "GB",
+        "United States" to "US",
+    ).map { (name, code) -> BingeChoice(name, name, mark = flag(code)) }
 
 internal val SampleLanguages =
     listOf(
-        BingeChoice("de", "German", "Deutsch"),
-        BingeChoice("en", "English"),
-        BingeChoice("es", "Spanish", "Español"),
-        BingeChoice("fr", "French", "Français"),
-        BingeChoice("ja", "Japanese", "日本語"),
-        BingeChoice("pt", "Portuguese", "Português"),
+        BingeChoice("de", "German", "Deutsch", icon = Icons.Filled.Translate),
+        BingeChoice("en", "English", icon = Icons.Filled.Translate),
+        BingeChoice("es", "Spanish", "Español", icon = Icons.Filled.Translate),
+        BingeChoice("fr", "French", "Français", icon = Icons.Filled.Translate),
+        BingeChoice("ja", "Japanese", "日本語", icon = Icons.Filled.Translate),
+        BingeChoice("pt", "Portuguese", "Português", icon = Icons.Filled.Translate),
     )
 
 /** A region's flag from its two-letter code, for the samples' marks. */
@@ -148,10 +168,10 @@ fun BingeChoiceSheetSubtitledSample() {
                 caption = "Changes the status for everyone on this server.",
                 choices = BingeChoiceList.Ready(
                     listOf(
-                        BingeChoice("available", "Available"),
-                        BingeChoice("partial", "Partially available"),
-                        BingeChoice("processing", "Processing"),
-                        BingeChoice("unknown", "Unknown"),
+                        BingeChoice("available", "Available", icon = Icons.Filled.CheckCircle, iconTint = BingeSentiment.Positive.accent()),
+                        BingeChoice("partial", "Partially available", icon = Icons.Filled.Timelapse),
+                        BingeChoice("processing", "Processing", icon = Icons.Filled.Sync),
+                        BingeChoice("unknown", "Unknown", icon = Icons.AutoMirrored.Filled.Help),
                     ),
                 ),
                 selected = "processing",
@@ -483,10 +503,15 @@ fun BingeChoiceSheetCountsSample() {
                 choices =
                     BingeChoiceList.Ready(
                         listOf(
-                            BingeChoice("all", "All images", trailingText = "128"),
-                            BingeChoice("backdrops", "Backdrops", trailingText = "24"),
-                            BingeChoice("posters", "Posters and promotional artwork from every region", trailingText = "1,024"),
-                            BingeChoice("logos", "Logos", subtitle = "Transparent PNG", trailingText = "6"),
+                            BingeChoice("all", "All images", icon = Icons.Filled.PhotoLibrary, trailingText = "128"),
+                            BingeChoice("backdrops", "Backdrops", icon = Icons.Filled.Landscape, trailingText = "24"),
+                            BingeChoice(
+                                "posters",
+                                "Posters and promotional artwork from every region",
+                                icon = Icons.Filled.Image,
+                                trailingText = "1,024",
+                            ),
+                            BingeChoice("logos", "Logos", subtitle = "Transparent PNG", icon = Icons.Filled.Brush, trailingText = "6"),
                         ),
                     ),
                 selected = "backdrops",
@@ -506,9 +531,14 @@ fun BingeMultiChoiceSheetCountsSample() {
                 choices =
                     BingeChoiceList.Ready(
                         listOf(
-                            BingeChoice("backdrops", "Backdrops", trailingText = "24"),
-                            BingeChoice("posters", "Posters and promotional artwork from every region", trailingText = "1,024"),
-                            BingeChoice("logos", "Logos", trailingText = "6"),
+                            BingeChoice("backdrops", "Backdrops", icon = Icons.Filled.Landscape, trailingText = "24"),
+                            BingeChoice(
+                                "posters",
+                                "Posters and promotional artwork from every region",
+                                icon = Icons.Filled.Image,
+                                trailingText = "1,024",
+                            ),
+                            BingeChoice("logos", "Logos", icon = Icons.Filled.Brush, trailingText = "6"),
                         ),
                     ),
                 chosen = setOf("backdrops"),

@@ -48,7 +48,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -59,7 +59,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
-import com.binge.designsystem.theme.BingeShapes
 import kotlinx.coroutines.launch
 
 /**
@@ -67,7 +66,7 @@ import kotlinx.coroutines.launch
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
  * language code. A choice that is a person carries [avatarName] instead, drawn as their avatar from [avatarUrl], with
  * their initials while it loads or when there is none. A [trailingText] such as a count ends the row in a
- * secondary style. In a list where any choice has a mark, every row keeps the mark's place, empty where it has
+ * secondary style. The mark sits on a plate tinted [iconTint], `primary` when it is null. In a list where any choice has a mark, every row keeps the mark's place, empty where it has
  * none, and shows its radio or checkbox last, so the labels line up; there the text comes before the control.
  */
 data class BingeChoice<out T>(
@@ -79,6 +78,7 @@ data class BingeChoice<out T>(
     val avatarName: String? = null,
     val avatarUrl: String? = null,
     val trailingText: String? = null,
+    val iconTint: Color? = null,
 )
 
 /**
@@ -776,24 +776,17 @@ private fun ChoiceMark(choice: BingeChoice<*>) {
 
 @Composable
 private fun ChoiceMarkBox(choice: BingeChoice<*>) =
-    Box(
-        modifier =
-            Modifier
-                .size(dimensionResource(R.dimen.item_group_icon_size))
-                .clip(BingeShapes.MoreCard)
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-        contentAlignment = Alignment.Center,
-    ) {
+    BingeIconPlate(tint = choice.iconTint) { accent ->
         val icon = choice.icon
         if (icon != null) {
             Icon(
                 icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = accent,
                 modifier = Modifier.size(dimensionResource(R.dimen.item_group_icon_glyph)),
             )
         } else {
-            Text(choice.mark.orEmpty(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(choice.mark.orEmpty(), style = MaterialTheme.typography.labelLarge, color = accent)
         }
     }
 

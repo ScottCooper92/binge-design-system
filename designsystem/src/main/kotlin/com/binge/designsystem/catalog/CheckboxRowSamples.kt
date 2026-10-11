@@ -1,6 +1,8 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +27,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 fun CheckboxRowSample() {
     var checked by remember { mutableStateOf(false) }
     ScreenshotTheme {
-        CheckboxRow(label = "Season 1", checked = checked, onToggle = { checked = it })
+        CheckboxRow(label = "Season 1", checked = checked, onToggle = { checked = it }, icon = Icons.Filled.Tv)
     }
 }
 
@@ -47,6 +49,7 @@ fun CheckboxRowListSample() {
                         CheckboxRow(
                             label = label,
                             subtitle = "10 episodes",
+                            icon = Icons.Filled.Tv,
                             checked = checked[index],
                             onToggle = { checked[index] = it },
                             showDivider = index < labels.lastIndex,
@@ -56,6 +59,7 @@ fun CheckboxRowListSample() {
                             label = label,
                             checked = true,
                             enabled = false,
+                            icon = Icons.Filled.Tv,
                             onToggle = {},
                             showDivider = index < labels.lastIndex,
                             trailingContent = {
@@ -72,6 +76,7 @@ fun CheckboxRowListSample() {
                             checked = checked[index],
                             onToggle = { checked[index] = it },
                             showDivider = index < labels.lastIndex,
+                            icon = Icons.Filled.Tv,
                         )
                 }
             }
@@ -88,6 +93,7 @@ fun CheckboxRowLongLabelSample() {
             label = "Season 12: the one with the longest title in the list",
             checked = checked,
             onToggle = { checked = it },
+            icon = Icons.Filled.Tv,
             trailingContent = {
                 Text(text = "Available", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             },
