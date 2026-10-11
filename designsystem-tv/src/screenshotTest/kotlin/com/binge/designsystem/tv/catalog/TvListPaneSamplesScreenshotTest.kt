@@ -8,7 +8,8 @@ import com.binge.designsystem.tv.preview.TvPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
 /**
- * Screenshot coverage for the list-and-pane board: focus in the list, focus in the pane, and the board's skeleton.
+ * Screenshot coverage for the list-and-pane board: focus in the list, focus in the pane, the same two as a filter
+ * panel, and the board's skeleton.
  * The pair worth diffing is the first two, where the described row moves from the full fill to the dim accent.
  */
 class TvListPaneSamplesScreenshotTest {
@@ -21,6 +22,16 @@ class TvListPaneSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun boardPaneFocused() = Frame { TvListPaneBoardPaneFocusedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun filterBoard() = Frame { TvListPaneFilterBoardSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun filterBoardPaneFocused() = Frame { TvListPaneFilterBoardPaneFocusedSample() }
 
     @PreviewTest
     @TvPreviews

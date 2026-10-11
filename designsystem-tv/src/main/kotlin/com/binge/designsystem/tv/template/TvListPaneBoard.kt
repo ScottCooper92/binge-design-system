@@ -20,6 +20,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.ListItem
@@ -62,18 +65,33 @@ data class TvPaneOption(
  *
  * [detail] is the row's current value on its line in the list, for a row whose value is a choice (the chosen option,
  * On or Off), so the list can be read without moving into each pane. Null leaves the row one line.
+ *
+ * A row can serve as a filter. [multiSelect] makes the options checkboxes, announced with their toggled state, and
+ * [TvPaneOption.onSelect] then toggles; the default keeps them mutually exclusive, as radio rows. [clear] puts a button
+ * under the options. An empty [body] draws no description, so the options sit directly under the name. A filter shows
+ * what it has applied through [detail], such as "3 selected" or "Any".
  */
 @Immutable
 data class TvPaneRow(
     val key: String,
     val label: String,
-    val body: String,
+    val body: String = "",
     val note: String? = null,
     val options: List<TvPaneOption> = emptyList(),
     val icon: ImageVector? = null,
     val hero: (@Composable () -> Unit)? = null,
     val announceNote: Boolean = false,
     val detail: String? = null,
+    val multiSelect: Boolean = false,
+    val clear: TvPaneAction? = null,
+)
+
+/** A button the board draws for an action that is not an option: what it says, what it does, and whether it is live. */
+@Immutable
+data class TvPaneAction(
+    val label: String,
+    val onClick: () -> Unit,
+    val enabled: Boolean = true,
 )
 
 /** A titled block of a [TvListPaneBoard]'s rows. The title is a read-out and never takes focus. */
@@ -95,7 +113,8 @@ data class TvPaneGroup(
  * Focus entering the list from outside lands on the described row, so ← from an option returns to the row it
  * belongs to. [initialListHasFocus] and [initialFocusedOptionLabel] seed the two focus observers for a frame, which
  * fires no focus events; production passes neither. The first row carries [TvLayoutAnchors.LIST_PANE_FIRST_ROW],
- * which [TvListPaneBoardSkeleton] reserves.
+ * which [TvListPaneBoardSkeleton] reserves. [clearAll] adds a button under the last row that acts on the board as a
+ * whole; it takes focus without changing the described row.
  */
 @Composable
 fun TvListPaneBoard(
@@ -107,6 +126,7 @@ fun TvListPaneBoard(
     hosting: TvPageHosting = currentTvPageHosting(),
     initialListHasFocus: Boolean = false,
     initialFocusedOptionLabel: String? = null,
+    clearAll: TvPaneAction? = null,
 ) {
     val describedRow = groups.firstNotNullOfOrNull { group -> group.rows.firstOrNull { it.key == focusedKey } }
     // Follows the described row even while focus is in the pane, which makes it the right target from anywhere there.
@@ -125,6 +145,7 @@ fun TvListPaneBoard(
                 onFocusRow = onFocusRow,
                 describedRowFocus = describedRowFocus,
                 initialColumnHasFocus = initialListHasFocus,
+                clearAll = clearAll,
             )
         },
         action = {
@@ -149,6 +170,7 @@ private fun TvPaneList(
     describedRowFocus: FocusRequester,
     modifier: Modifier = Modifier,
     initialColumnHasFocus: Boolean = false,
+    clearAll: TvPaneAction? = null,
 ) {
     var columnHasFocus by remember { mutableStateOf(initialColumnHasFocus) }
     val firstRowKey =
@@ -186,6 +208,12 @@ private fun TvPaneList(
                                 .then(if (described) Modifier.focusRequester(describedRowFocus) else Modifier),
                     )
                 }
+            }
+            clearAll?.let { action ->
+                TvPaneListAction(
+                    action = action,
+                    modifier = Modifier.padding(top = dimensionResource(TvR.dimen.tv_list_pane_group_gap)),
+                )
             }
         }
     }
@@ -240,6 +268,29 @@ private fun TvPaneListRow(
             ),
         scale = ListItemScale.None,
         modifier = modifier.fillMaxWidth().onFocusChanged { if (it.isFocused) onFocused() },
+    )
+}
+
+/** The board-wide action under the list: a row in the list's own shape, which never describes anything. */
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun TvPaneListAction(action: TvPaneAction, modifier: Modifier = Modifier) {
+    ListItem(
+        selected = false,
+        onClick = action.onClick,
+        enabled = action.enabled,
+        headlineContent = {
+            Text(text = action.label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        },
+        shape = ListItemDefaults.shape(shape = BingeShapes.TvListItem),
+        colors =
+            tvRowListItemColors(
+                emphasis = TvRowEmphasis.Resting,
+                restingContainer = Color.Transparent,
+                restingContent = MaterialTheme.colorScheme.primary,
+            ),
+        scale = ListItemScale.None,
+        modifier = modifier.fillMaxWidth().semantics { role = Role.Button },
     )
 }
 
