@@ -90,7 +90,7 @@ internal val LocalTvRailArtwork = compositionLocalOf<TvRailArtworkPresence?> { n
 
 /**
  * Registers this composition as painting artwork behind the rail for as long as it stays composed — the signal
- * [TvRailArtworkPresence] counts. Call it only where a backdrop genuinely has something to paint.
+ * the rail counts to decide between glass and a solid panel. Call it only where a backdrop genuinely has something to paint.
  */
 @Composable
 fun ReportTvRailArtwork() {
