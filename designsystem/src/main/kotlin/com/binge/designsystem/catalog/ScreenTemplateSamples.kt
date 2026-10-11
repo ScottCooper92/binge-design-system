@@ -870,6 +870,14 @@ fun ErrorScreenConfigurationSample() {
     }
 }
 
+/** A refused sign-in with two ways out: Try again, and the settings page where the user fixes it. */
+@Composable
+fun ErrorScreenSecondarySample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        ErrorScreen(kind = ErrorKind.Auth, onRetry = {}, secondary = ScreenAction("Open settings", {}))
+    }
+}
+
 /** An empty list with something to do about it: the default headline, and one action. */
 @Composable
 fun EmptyScreenActionSample() {

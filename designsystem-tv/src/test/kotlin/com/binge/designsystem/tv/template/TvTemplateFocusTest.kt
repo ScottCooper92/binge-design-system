@@ -24,6 +24,7 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
@@ -143,8 +144,8 @@ class TvTemplateFocusTest {
                 TvMessagePage(
                     body = "Body",
                     hosting = TvPageHosting.Overlay,
-                    primary = TvPageAction("Retry") {},
-                    secondary = TvPageAction("Close") {},
+                    primary = ScreenAction("Retry", {}),
+                    secondary = ScreenAction("Close", {}),
                 )
             }
         }
@@ -201,7 +202,7 @@ class TvTemplateFocusTest {
                 TvMessagePage(
                     body = "Body",
                     hosting = TvPageHosting.Overlay,
-                    primary = TvPageAction("Retry") {},
+                    primary = ScreenAction("Retry", {}),
                     loading = true,
                 )
             }

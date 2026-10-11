@@ -30,6 +30,7 @@ import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
 import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.catalog.CatalogGroup
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.tv.component.TvButtonSurface
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvQrCode
@@ -38,7 +39,6 @@ import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.template.TvBoard
 import com.binge.designsystem.tv.template.TvDecisionPage
 import com.binge.designsystem.tv.template.TvMessagePage
-import com.binge.designsystem.tv.template.TvPageAction
 import com.binge.designsystem.tv.template.TvPageHosting
 import com.binge.designsystem.tv.template.TvScreenHeading
 import com.binge.designsystem.tv.template.TvStepFlow
@@ -282,7 +282,7 @@ fun TvStepFlowLoadingSample() {
         stepCount = SAMPLE_STEP_COUNT,
         currentStep = 0,
         progressLabel = "Step 1 of 3",
-        loading = "Loading your choices…",
+        loadingLabel = "Loading your choices…",
     ) {}
 }
 
@@ -352,8 +352,8 @@ fun TvMessagePageSample() {
         body = "This version can no longer reach the server. Update from the Play Store to carry on.",
         icon = Icons.Filled.SystemUpdate,
         hosting = TvPageHosting.PreShell,
-        primary = TvPageAction("Update") {},
-        secondary = TvPageAction("Not now") {},
+        primary = ScreenAction("Update", {}),
+        secondary = ScreenAction("Not now", {}),
     )
 }
 
@@ -414,10 +414,8 @@ fun TvDecisionPageSample() {
                 DecisionPoint(Icons.Filled.VisibilityOff, "What never is", "Your server, your account and what you watch."),
                 DecisionPoint(Icons.Filled.ToggleOff, "Change it any time", "Press Settings, and it stops at once."),
             ),
-        acceptLabel = "Share usage data",
-        declineLabel = "Not now",
-        onAccept = {},
-        onDecline = {},
+        accept = ScreenAction("Share usage data", {}),
+        decline = ScreenAction("Not now", {}),
         hosting = TvPageHosting.PreShell,
         acceptInitiallyFocused = true,
     )
@@ -439,10 +437,8 @@ fun TvDecisionPageNoteContentSample() {
                 DecisionPoint(Icons.Filled.VisibilityOff, "What never is", "Your server, your account and what you watch."),
                 DecisionPoint(Icons.Filled.ToggleOff, "Change it any time", "Press Settings, and it stops at once."),
             ),
-        acceptLabel = "Share usage data",
-        declineLabel = "Not now",
-        onAccept = {},
-        onDecline = {},
+        accept = ScreenAction("Share usage data", {}),
+        decline = ScreenAction("Not now", {}),
         hosting = TvPageHosting.PreShell,
         acceptInitiallyFocused = true,
         noteContent = {
@@ -474,10 +470,8 @@ fun TvDecisionPageTallSample() {
                 DecisionPoint(Icons.Filled.Schedule, "How long it is kept", "Ninety days, then it is deleted."),
                 DecisionPoint(Icons.Filled.ToggleOff, "Change it any time", "Press Settings, and it stops at once."),
             ),
-        acceptLabel = "Share usage data",
-        declineLabel = "Not now",
-        onAccept = {},
-        onDecline = {},
+        accept = ScreenAction("Share usage data", {}),
+        decline = ScreenAction("Not now", {}),
         hosting = TvPageHosting.PreShell,
         acceptInitiallyFocused = true,
     )

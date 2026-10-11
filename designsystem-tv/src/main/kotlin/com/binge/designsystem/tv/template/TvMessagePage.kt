@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,18 +12,37 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.tv.material3.MaterialTheme
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.focus.TvFocusSink
 import com.binge.designsystem.tv.nav.LocalTvRailEntry
 import com.binge.designsystem.tv.theme.TvButtonStyle
 
-/** One way out of a [TvMessagePage]: what the button says, and what pressing it does. */
-@Immutable
-data class TvPageAction(
-    val label: String,
-    val onClick: () -> Unit,
-)
+/**
+ * The phone's [ScreenAction] under the name the TV templates first gave it. Both platforms now take the one type,
+ * so a page's actions port between form factors unchanged, icon and modifier included.
+ */
+@Deprecated("The TV templates take the phone's ScreenAction.", ReplaceWith("ScreenAction", "com.binge.designsystem.template.ScreenAction"))
+typealias TvPageAction = ScreenAction
+
+/** An [action] as a TV button: its label, icon and modifier, with [modifier] added for the page's own focus wiring. */
+@Composable
+internal fun TvActionButton(
+    action: ScreenAction,
+    style: TvButtonStyle,
+    modifier: Modifier = Modifier,
+    initiallyFocused: Boolean = false,
+) {
+    TvButton(
+        label = action.label,
+        onClick = action.onClick,
+        modifier = modifier.then(action.modifier),
+        style = style,
+        icon = action.leadingIcon,
+        initiallyFocused = initiallyFocused,
+    )
+}
 
 /**
  * A whole page that says one thing: a gate, a first-run blocker, a screen-wide failure, or the frame shown
@@ -39,6 +57,10 @@ data class TvPageAction(
  * [announce] makes the plate one polite live region carrying the headline and body, as `TvErrorPlate` is and the
  * phone's `MessageScreen` can be. Set it for a screen-wide failure: otherwise a screen reader hears only the focused
  * button, or, with no action, nothing at all (#596).
+ *
+ * Two shapes differ from the phone's `MessageScreen` on purpose. [loading] is a flag here, not a separate page,
+ * because the page must keep holding focus while it loads. And there is no free `actions` slot: focus has to land
+ * on a known [primary], so a TV message offers at most the two.
  */
 @Composable
 fun TvMessagePage(
@@ -47,8 +69,8 @@ fun TvMessagePage(
     hosting: TvPageHosting = currentTvPageHosting(),
     headline: String? = null,
     icon: ImageVector? = null,
-    primary: TvPageAction? = null,
-    secondary: TvPageAction? = null,
+    primary: ScreenAction? = null,
+    secondary: ScreenAction? = null,
     loading: Boolean = false,
     announce: Boolean = false,
 ) {
@@ -82,15 +104,8 @@ fun TvMessagePage(
             actions =
                 if (hasAction) {
                     {
-                        TvButton(
-                            label = primary.label,
-                            onClick = primary.onClick,
-                            modifier = Modifier.focusRequester(entry),
-                            style = TvButtonStyle.Primary,
-                        )
-                        secondary?.let {
-                            TvButton(label = it.label, onClick = it.onClick, style = TvButtonStyle.Secondary)
-                        }
+                        TvActionButton(primary, TvButtonStyle.Primary, Modifier.focusRequester(entry))
+                        secondary?.let { TvActionButton(it, TvButtonStyle.Secondary) }
                     }
                 } else {
                     null
