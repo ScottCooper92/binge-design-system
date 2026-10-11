@@ -52,19 +52,20 @@ import com.binge.designsystem.theme.BingeTheme
  * to [IconButtonTone.Glass] (a scrim-backed circle) where the container is load-bearing over imagery.
  * Actions read that tone from [LocalTopBarActionTone], provided around the [actions] slot.
  *
- * [containerColor] defaults to [Color.Unspecified], which resolves to the app background rather than
- * M3's `surface` — the bar, the screen body (a Scaffold is `background` too) and the expanded nav
- * rail beside it then read as one continuous surface instead of stepping at each seam. Pass
- * [Color.Transparent] to let a hero screen's imagery show through: the override drives both resting
- * and scrolled container, so the bar stays transparent on scroll and nav + actions go Glass.
+ * The defaults are the gallery chrome, as on [BingeMediumTopBar]: a [Color.Transparent] bar the content scrolls
+ * under, so nav + actions go Glass, with its scrim fading in on the [scrollBehavior]'s `overlappedFraction`
+ * (zero without one). The transparent colour drives both resting and scrolled container, so the bar stays
+ * transparent on scroll. Pass `containerColor = Color.Unspecified` for an opaque bar, which resolves to the app
+ * background rather than M3's `surface`: the bar, the screen body (a Scaffold is `background` too) and the
+ * expanded nav rail beside it then read as one continuous surface instead of stepping at each seam.
  *
  * A transparent bar draws nothing behind itself, so [scrimFraction] puts a [TopBarScrim] behind it.
- * Drive it with how much of the bar the scrolled content overlaps: the same [scrollBehavior]'s
+ * It is how much of the bar the scrolled content overlaps: the same [scrollBehavior]'s
  * `collapsedFraction` for a collapsing behaviour (`exitUntilCollapsed`), and its `overlappedFraction`
  * for one that hides the bar (`enterAlwaysScrollBehavior`) or pins it. On an enter-always bar
  * `collapsedFraction` measures how far the bar has slid off screen, the inverse of what the scrim
  * needs, so the scrim would vanish exactly when the bar is showing over content. A screen whose
- * bar and header want *one* scrim across both (Gallery) leaves this at 0 and scrims the header
+ * bar and header want *one* scrim across both (Gallery) passes 0 and scrims the header
  * instead. That scrim tapers past this bar's own bottom edge into the content scrolling under it,
  * rather than cutting off at the bar's boundary (#94).
  *
@@ -100,8 +101,8 @@ fun BingeTopBar(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    containerColor: Color = Color.Unspecified,
-    scrimFraction: Float = 0f,
+    containerColor: Color = Color.Transparent,
+    scrimFraction: Float = scrollBehavior?.state?.overlappedFraction ?: 0f,
     foregroundScrimFraction: Float = scrimFraction,
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,

@@ -65,23 +65,38 @@ fun BingeMediumTopBarDefaultsCollapsedSample() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DefaultsOverContent(behavior: TopAppBarScrollBehavior) {
+    TopBarOverContent {
+        BingeMediumTopBar(title = "Popular Movies", onBack = {}, scrollBehavior = behavior) { TopBarShareAction(it) }
+    }
+}
+
+/**
+ * A bar at its defaults over a coloured band standing in for content, so a frame shows what the transparent bar
+ * lets through and what its scrim covers. Shared by each top bar's Defaults samples.
+ */
+@Composable
+internal fun TopBarOverContent(bar: @Composable () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer),
     ) {
-        BingeMediumTopBar(title = "Popular Movies", onBack = {}, scrollBehavior = behavior) { glassBackgroundAlpha ->
-            ExpressiveIconButton(
-                onClick = {},
-                icon = Icons.Filled.Share,
-                contentDescription = null,
-                tint = LocalTopBarActionTint.current,
-                tone = LocalTopBarActionTone.current,
-                size = dimensionResource(R.dimen.top_bar_icon_size),
-                glassBackgroundAlpha = glassBackgroundAlpha,
-            )
-        }
+        bar()
     }
+}
+
+/** A Share action that follows the bar's tone, tint and glass hand-off, as a real action does. */
+@Composable
+internal fun TopBarShareAction(glassBackgroundAlpha: Float) {
+    ExpressiveIconButton(
+        onClick = {},
+        icon = Icons.Filled.Share,
+        contentDescription = null,
+        tint = LocalTopBarActionTint.current,
+        tone = LocalTopBarActionTone.current,
+        size = dimensionResource(R.dimen.top_bar_icon_size),
+        glassBackgroundAlpha = glassBackgroundAlpha,
+    )
 }
 
 /** Hero treatment — a transparent medium bar with Glass nav/action buttons over imagery. */
@@ -235,19 +250,36 @@ private fun SearchAction() {
 private const val BEFORE_SCRIM_SWITCH_FRACTION = 0.5f
 private const val AFTER_SCRIM_SWITCH_FRACTION = 0.9f
 private const val COLLAPSED_HEIGHT_OFFSET_LIMIT = -200f
+private const val OVERLAPPED_CONTENT_OFFSET = -10_000f
 
 /**
  * A scroll behavior fully scrolled past the title, so a collapsing bar renders collapsed: with
  * `heightOffset == heightOffsetLimit`, `collapsedFraction == 1f`. Also used by
- * [BingePaneTopBarAloneScrolledSample].
+ * [BingePaneTopBarAloneScrolledSample]. A bar that collapses further than [offsetLimit] pixels passes its own.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun collapsedTopBarScrollBehavior(): TopAppBarScrollBehavior =
+internal fun collapsedTopBarScrollBehavior(offsetLimit: Float = COLLAPSED_HEIGHT_OFFSET_LIMIT): TopAppBarScrollBehavior =
     TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         TopAppBarState(
-            initialHeightOffsetLimit = COLLAPSED_HEIGHT_OFFSET_LIMIT,
-            initialHeightOffset = COLLAPSED_HEIGHT_OFFSET_LIMIT,
+            initialHeightOffsetLimit = offsetLimit,
+            initialHeightOffset = offsetLimit,
             initialContentOffset = 0f,
+        ),
+    )
+
+/**
+ * A pinned scroll behavior whose content has scrolled well under the bar, so a single-row bar renders overlapped:
+ * `overlappedFraction == 1f` once the content offset passes the height offset limit. Used by
+ * [BingeTopBarDefaultsOverlappedSample].
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun overlappedTopBarScrollBehavior(): TopAppBarScrollBehavior =
+    TopAppBarDefaults.pinnedScrollBehavior(
+        TopAppBarState(
+            initialHeightOffsetLimit = COLLAPSED_HEIGHT_OFFSET_LIMIT,
+            initialHeightOffset = 0f,
+            initialContentOffset = OVERLAPPED_CONTENT_OFFSET,
         ),
     )

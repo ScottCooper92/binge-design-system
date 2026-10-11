@@ -53,4 +53,18 @@ class BingeTopBarSamplesScreenshotTest {
     fun ScrimTailFade() {
         BingeTopBarScrimTailFadeSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Defaults() {
+        BingeTopBarDefaultsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun DefaultsOverlapped() {
+        BingeTopBarDefaultsOverlappedSample()
+    }
 }

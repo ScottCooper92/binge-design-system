@@ -32,4 +32,18 @@ class BingePaneTopBarSamplesScreenshotTest {
     fun DetailPane() {
         BingePaneTopBarDetailPaneSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Defaults() {
+        BingePaneTopBarDefaultsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun DefaultsCollapsed() {
+        BingePaneTopBarDefaultsCollapsedSample()
+    }
 }
