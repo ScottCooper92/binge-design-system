@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +23,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
@@ -69,15 +72,19 @@ internal fun TvListPane(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
             )
-            Text(
-                text = row.body,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
+            if (row.body.isNotEmpty()) {
+                Text(
+                    text = row.body,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
             if (row.options.isNotEmpty()) {
                 PaneOptions(
                     options = row.options,
+                    multiSelect = row.multiSelect,
+                    clear = row.clear,
                     backToListFocus = backToListFocus,
                     initialFocusedOptionLabel = initialFocusedOptionLabel,
                 )
@@ -96,6 +103,8 @@ internal fun TvListPane(
 @Composable
 private fun PaneOptions(
     options: List<TvPaneOption>,
+    multiSelect: Boolean,
+    clear: TvPaneAction?,
     backToListFocus: FocusRequester,
     initialFocusedOptionLabel: String?,
 ) {
@@ -106,16 +115,35 @@ private fun PaneOptions(
                 .padding(top = dimensionResource(DesR.dimen.padding_s))
                 .focusProperties { left = backToListFocus }
                 .tvFocusGroup()
-                .selectableGroup(),
+                .then(if (multiSelect) Modifier else Modifier.selectableGroup()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
     ) {
         options.forEach { option ->
-            TvOptionRow(
-                label = option.label,
-                selected = option.selected,
-                onClick = option.onSelect,
-                initiallyFocused = option.label == initialFocusedOptionLabel,
-                modifier = option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier,
+            val optionModifier = option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier
+            if (multiSelect) {
+                TvCheckboxRow(
+                    label = option.label,
+                    checked = option.selected,
+                    onCheckedChange = { option.onSelect() },
+                    initiallyFocused = option.label == initialFocusedOptionLabel,
+                    modifier = optionModifier,
+                )
+            } else {
+                TvOptionRow(
+                    label = option.label,
+                    selected = option.selected,
+                    onClick = option.onSelect,
+                    initiallyFocused = option.label == initialFocusedOptionLabel,
+                    modifier = optionModifier,
+                )
+            }
+        }
+        clear?.let { action ->
+            TvButton(
+                label = action.label,
+                onClick = action.onClick,
+                enabled = action.enabled,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

@@ -14,6 +14,7 @@ import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.tv.template.TvListPaneBoard
 import com.binge.designsystem.tv.template.TvListPaneBoardSkeleton
 import com.binge.designsystem.tv.template.TvPageHosting
+import com.binge.designsystem.tv.template.TvPaneAction
 import com.binge.designsystem.tv.template.TvPaneGroup
 import com.binge.designsystem.tv.template.TvPaneOption
 import com.binge.designsystem.tv.template.TvPaneRow
@@ -26,6 +27,15 @@ import com.binge.designsystem.tv.template.TvPaneRow
 private const val KEY_QUALITY = "quality"
 private const val KEY_SUBTITLES = "subtitles"
 private const val KEY_SERVER = "server"
+private const val KEY_GENRE = "genre"
+private const val KEY_LANGUAGE = "language"
+private const val GENRE_DRAMA = "Drama"
+private const val GENRE_COMEDY = "Comedy"
+private const val GENRE_SCIENCE_FICTION = "Science fiction"
+private const val GENRE_THRILLER = "Thriller"
+private const val LANGUAGE_ENGLISH = "English"
+private const val LANGUAGE_SPANISH = "Spanish"
+private const val LANGUAGE_FRENCH = "French"
 private const val QUALITY_HD = "1080p"
 private const val QUALITY_UHD = "4K"
 
@@ -48,6 +58,90 @@ fun TvListPaneBoardPaneFocusedSample() {
 @Composable
 fun TvListPaneBoardSkeletonSample() {
     TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay)
+}
+
+/**
+ * A filter panel on the same board: filters in the list, each with what it has applied at its end, and the values of
+ * the described filter beside it as checkboxes with no description above them. A clear button sits under the
+ * values and another under the list.
+ */
+@Composable
+fun TvListPaneFilterBoardSample() {
+    SampleFilterBoard(initialListHasFocus = true, initialFocusedOptionLabel = null)
+}
+
+/** The filter panel with focus on a value that is off: the focused checkbox takes the fill, the ticked ones keep their tick. */
+@Composable
+fun TvListPaneFilterBoardPaneFocusedSample() {
+    SampleFilterBoard(initialListHasFocus = false, initialFocusedOptionLabel = GENRE_COMEDY)
+}
+
+@Composable
+private fun SampleFilterBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel: String?) {
+    var focusedKey by remember { mutableStateOf(KEY_GENRE) }
+    var genres by remember { mutableStateOf(setOf(GENRE_DRAMA, GENRE_SCIENCE_FICTION)) }
+    var languages by remember { mutableStateOf(emptySet<String>()) }
+
+    fun toggle(current: Set<String>, value: String) = if (value in current) current - value else current + value
+
+    fun summary(selected: Set<String>, any: String) = if (selected.isEmpty()) any else "${selected.size} selected"
+    val genreOptions = listOf(GENRE_DRAMA, GENRE_COMEDY, GENRE_SCIENCE_FICTION, GENRE_THRILLER)
+    val languageOptions = listOf(LANGUAGE_ENGLISH, LANGUAGE_SPANISH, LANGUAGE_FRENCH)
+    TvListPaneBoard(
+        title = "Filters",
+        groups =
+            listOf(
+                TvPaneGroup(
+                    title = "Refine",
+                    rows =
+                        listOf(
+                            TvPaneRow(
+                                key = KEY_GENRE,
+                                label = "Genre",
+                                summary = summary(genres, "Any"),
+                                multiSelect = true,
+                                options = genreOptions.map {
+                                    TvPaneOption(it, selected = it in genres, onSelect = {
+                                        genres =
+                                            toggle(genres, it)
+                                    })
+                                },
+                                clear = TvPaneAction(
+                                    label = "Clear genre",
+                                    onClick = { genres = emptySet() },
+                                    enabled = genres.isNotEmpty(),
+                                ),
+                            ),
+                            TvPaneRow(
+                                key = KEY_LANGUAGE,
+                                label = "Language",
+                                summary = summary(languages, "Any"),
+                                multiSelect = true,
+                                options = languageOptions.map {
+                                    TvPaneOption(it, selected = it in languages, onSelect = {
+                                        languages =
+                                            toggle(languages, it)
+                                    })
+                                },
+                                clear = TvPaneAction(
+                                    label = "Clear language",
+                                    onClick = { languages = emptySet() },
+                                    enabled = languages.isNotEmpty(),
+                                ),
+                            ),
+                        ),
+                ),
+            ),
+        focusedKey = focusedKey,
+        onFocusRow = { focusedKey = it },
+        hosting = TvPageHosting.Overlay,
+        initialListHasFocus = initialListHasFocus,
+        initialFocusedOptionLabel = initialFocusedOptionLabel,
+        clearAll = TvPaneAction(label = "Clear all", onClick = {
+            genres = emptySet()
+            languages = emptySet()
+        }),
+    )
 }
 
 @Composable
