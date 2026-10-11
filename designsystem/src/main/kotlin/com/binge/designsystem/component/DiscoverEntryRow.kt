@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.BingeIcons
 import com.binge.designsystem.R
+import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -38,9 +39,9 @@ import com.binge.designsystem.theme.titleMediumEmphasis
  * `containerColor` cannot express, so it arrives through `containerBrush`; the corner is the shape
  * scale's `large`, not a bespoke radius.
  *
- * [startPadding] is the nav-overlay inset and sits **outside** the row's clip, so it stays a caller
- * concern — a caller whose own parent already applied it (e.g. a grid's `navOverlayPadding`) passes
- * its own value to avoid adding it twice. See `SectionHeader`'s `startPadding`.
+ * [startPadding] and [endPadding] are the nav-overlay insets and sit **outside** the row's clip, so they stay a
+ * caller concern — a caller whose own parent already applied them (e.g. a grid's `navOverlayPadding`) passes
+ * its own value to avoid adding them twice. See `SectionHeader`'s `startPadding` and `endPadding`.
  */
 @Composable
 fun DiscoverEntryRow(
@@ -49,11 +50,12 @@ fun DiscoverEntryRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     startPadding: Dp = resolvedContentInset() + navOverlayStart(),
+    endPadding: Dp = resolvedContentInset() + navOverlayEnd(),
 ) {
     ListRow(
         modifier = modifier.padding(
             start = startPadding,
-            end = resolvedContentInset(),
+            end = endPadding,
         ),
         onClick = onClick,
         verticalAlignment = Alignment.CenterVertically,
