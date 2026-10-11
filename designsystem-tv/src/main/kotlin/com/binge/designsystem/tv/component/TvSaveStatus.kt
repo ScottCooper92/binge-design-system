@@ -10,8 +10,10 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -33,7 +35,8 @@ import com.binge.designsystem.tv.R as TvR
  * the line does not jump between them. A failure keeps the change on screen and puts Retry, calling [onRetry],
  * in the line itself. This is the TV form of the phone's permanent Retry snackbar, since the TV module has no
  * snackbar. Retry is reachable on the D-pad but does not take focus, so a failure never pulls the user out of
- * the field they are on. The line is a polite live region, so each change of state is announced.
+ * the field they are on. Pressing Retry moves focus up and away from it before calling [onRetry], so the button
+ * leaving the line when the status moves on does not send focus to the top of the page. The line is a polite live region, so each change of state is announced.
  */
 @Composable
 fun TvSaveStatus(
@@ -59,7 +62,16 @@ fun TvSaveStatus(
             SaveStatus.Failed -> {
                 StatusGlyph(Icons.Filled.ErrorOutline, MaterialTheme.colorScheme.error)
                 StatusText(stringResource(DesR.string.save_status_failed), MaterialTheme.colorScheme.error)
-                TvButton(label = stringResource(DesR.string.save_status_retry), onClick = onRetry)
+                val focusManager = LocalFocusManager.current
+                TvButton(
+                    label = stringResource(DesR.string.save_status_retry),
+                    onClick = {
+                        // Retry leaves the line once the status moves on, and a focused node that leaves sends
+                        // focus to the page's first item. Step off it first, back towards the content.
+                        if (!focusManager.moveFocus(FocusDirection.Up)) focusManager.moveFocus(FocusDirection.Previous)
+                        onRetry()
+                    },
+                )
             }
         }
     }

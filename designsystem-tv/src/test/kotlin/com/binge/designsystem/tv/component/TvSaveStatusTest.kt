@@ -109,6 +109,33 @@ class TvSaveStatusTest {
         field().assertIsFocused()
     }
 
+    @Test
+    fun `Retry moving to Saving does not send focus to the first item`() = retryLeavesTheLine(SaveStatus.Saving)
+
+    @Test
+    fun `Retry moving to Saved does not send focus to the first item`() = retryLeavesTheLine(SaveStatus.Saved)
+
+    private fun retryLeavesTheLine(next: SaveStatus) {
+        var status by mutableStateOf<SaveStatus>(SaveStatus.Failed)
+        composeTestRule.setContent {
+            BingeTvTheme {
+                Column {
+                    TvButton(label = "First", onClick = {})
+                    TvButton(label = FIELD, onClick = {})
+                    TvSaveStatus(status = status, onRetry = { status = next })
+                }
+            }
+        }
+        retry().requestFocus()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNode(isFocused()).performKeyInput { pressKey(Key.DirectionCenter) }
+        composeTestRule.waitForIdle()
+
+        retry().assertDoesNotExist()
+        field().assertIsFocused()
+    }
+
     private fun retry() = composeTestRule.onNode(hasText(RETRY) and isFocusable())
 
     private fun field() = composeTestRule.onNode(hasText(FIELD) and isFocusable())
