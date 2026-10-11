@@ -704,6 +704,39 @@ fun DecisionBodyInStepFlowSample() {
     }
 }
 
+/** The step-flow body with a note in two paragraphs through the note slot: the second reads quieter, in the variant colour. */
+@Composable
+fun DecisionBodyNoteContentSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = 1,
+            onBack = {},
+            footer = {
+                BingeFilledButton(label = "Share usage data", onClick = {}, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Not now", onClick = {}, modifier = Modifier.fillMaxWidth())
+            },
+        ) {
+            DecisionBody(
+                copy =
+                    DecisionCopy(
+                        kicker = "Usage data",
+                        title = "Help make the app better",
+                        subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                    ),
+                points = SampleDecisionPoints,
+                noteContent = {
+                    Text(text = "You can change this at any time in Settings.")
+                    Text(
+                        text = "Nothing is sent until you say yes, and nothing is kept for longer than ninety days.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+            )
+        }
+    }
+}
+
 /** The same question in the end pane of a wide window: the pane is taller than wide, so it keeps the portrait layout. */
 @Composable
 fun DecisionScreenInPaneSample() {

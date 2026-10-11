@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,7 +80,8 @@ fun DecisionScreen(
 /**
  * The decision's content and nothing around it: the optional [hero] plate, the [copy] and the [points] card, stacked.
  * It has no background, insets, scroll or pinned answers, so it can be a page inside a step flow that supplies its
- * own chrome and footer. [DecisionScreen] lays out the same pieces around it.
+ * own chrome and footer. [DecisionScreen] lays out the same pieces around it. [noteContent] replaces `copy.note`, as
+ * [DecisionHeading] says.
  */
 @Composable
 fun DecisionBody(
@@ -85,6 +90,7 @@ fun DecisionBody(
     modifier: Modifier = Modifier,
     hero: ImageVector? = null,
     heroBadge: ImageVector? = null,
+    noteContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         hero?.let {
@@ -94,7 +100,7 @@ fun DecisionBody(
                 modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s), bottom = dimensionResource(R.dimen.padding_l)),
             )
         }
-        DecisionHeading(copy)
+        DecisionHeading(copy, noteContent = noteContent)
         DecisionPointsCard(points, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_l)))
     }
 }
@@ -156,9 +162,17 @@ private fun DecisionLandscape(
  * decision that is one step of a [StepFlowScreen]: it goes in the flow's heading slot, [DecisionHero] in its aside and
  * [com.binge.designsystem.component.DecisionPointsCard] in its content, so a split step puts the hero and heading on
  * the start side and the points on the end (#638).
+ *
+ * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour (#673). It sits
+ * where the note does, and its paragraphs are spaced as the heading's lines are. A bare `Text` in it reads as the note
+ * would: the slot provides the note's style and colour, so only a paragraph that differs names its own.
  */
 @Composable
-fun DecisionHeading(copy: DecisionCopy, modifier: Modifier = Modifier) {
+fun DecisionHeading(
+    copy: DecisionCopy,
+    modifier: Modifier = Modifier,
+    noteContent: (@Composable ColumnScope.() -> Unit)? = null,
+) {
     Column(modifier = modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_m))) {
         copy.kicker?.let {
             Text(
@@ -175,13 +189,26 @@ fun DecisionHeading(copy: DecisionCopy, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_sm)).semantics { heading() },
         )
         Text(text = copy.subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        copy.note?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_sm)),
-            )
+        if (noteContent != null) {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodyMedium,
+                LocalContentColor provides MaterialTheme.colorScheme.onSurface,
+            ) {
+                Column(
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_sm)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
+                    content = noteContent,
+                )
+            }
+        } else {
+            copy.note?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_sm)),
+                )
+            }
         }
     }
 }

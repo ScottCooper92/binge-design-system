@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +29,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.Icon
+import androidx.tv.material3.LocalContentColor
+import androidx.tv.material3.LocalTextStyle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DecisionCopy
@@ -51,6 +55,11 @@ import com.binge.designsystem.tv.R as TvR
  * says whether the page claims that focus on arrival (see [TvPageHosting]). [acceptInitiallyFocused] draws
  * accept focused, for a frame. [acceptModifier] and [declineModifier] go on the answers, for a test tag a device lane
  * finds them by, as `ScreenAction.modifier` does on the phone.
+ *
+ * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour (#673). It sits
+ * where the note does, under the heading with the copy's gap, and its paragraphs are spaced as the heading's lines are.
+ * A bare `Text` in it reads as the note would: the slot provides the note's style and colour, so only a paragraph that
+ * differs names its own.
  */
 @Composable
 fun TvDecisionPage(
@@ -65,6 +74,7 @@ fun TvDecisionPage(
     acceptInitiallyFocused: Boolean = false,
     acceptModifier: Modifier = Modifier,
     declineModifier: Modifier = Modifier,
+    noteContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val accept = remember { FocusRequester() }
     TvTwoPanePage(
@@ -83,7 +93,7 @@ fun TvDecisionPage(
             )
             TvButton(label = declineLabel, onClick = onDecline, modifier = declineModifier)
         },
-        copy = { DecisionCopyColumn(copy) },
+        copy = { DecisionCopyColumn(copy, noteContent) },
         action = { DecisionPointsCard(points) },
     )
 }
@@ -92,19 +102,20 @@ fun TvDecisionPage(
  * [TvDecisionPage]'s content without the page around it (#638): the [copy] beside the read-out card of the [points],
  * for a decision that is one step of a [TvStepFlow]. The flow supplies the chrome, the hosting and the footer that
  * carries the answers. The points scroll on their own side, and each takes focus, so ↑ from the footer walks a card
- * taller than the space into view.
+ * taller than the space into view. [noteContent] replaces `copy.note`, as [TvDecisionPage] says.
  */
 @Composable
 fun TvDecisionBody(
     copy: DecisionCopy,
     points: List<DecisionPoint>,
     modifier: Modifier = Modifier,
+    noteContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_two_pane_board_gap)),
     ) {
-        Box(modifier = Modifier.weight(1f)) { DecisionCopyColumn(copy) }
+        Box(modifier = Modifier.weight(1f)) { DecisionCopyColumn(copy, noteContent) }
         Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
             TvStableFocusScroll {
                 Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) { DecisionPointsCard(points) }
@@ -114,7 +125,7 @@ fun TvDecisionBody(
 }
 
 @Composable
-private fun DecisionCopyColumn(copy: DecisionCopy) {
+private fun DecisionCopyColumn(copy: DecisionCopy, noteContent: (@Composable ColumnScope.() -> Unit)?) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_decision_copy_gap))) {
         Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_decision_heading_gap))) {
             copy.kicker?.let {
@@ -123,8 +134,20 @@ private fun DecisionCopyColumn(copy: DecisionCopy) {
             Text(text = copy.title, style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onSurface)
             Text(text = copy.subtitle, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        copy.note?.let {
-            Text(text = it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+        if (noteContent != null) {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodyLarge,
+                LocalContentColor provides MaterialTheme.colorScheme.onSurface,
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_decision_heading_gap)),
+                    content = noteContent,
+                )
+            }
+        } else {
+            copy.note?.let {
+                Text(text = it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            }
         }
     }
 }

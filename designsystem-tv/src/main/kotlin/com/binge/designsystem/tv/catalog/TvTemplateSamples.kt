@@ -391,6 +391,38 @@ fun TvDecisionPageSample() {
     )
 }
 
+/** A note in two paragraphs through the note slot: a reassurance in the note's colour, then a quieter follow-up. */
+@Composable
+fun TvDecisionPageNoteContentSample() {
+    TvDecisionPage(
+        copy =
+            DecisionCopy(
+                kicker = "Usage data",
+                title = "Help make the app better",
+                subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+            ),
+        points =
+            listOf(
+                DecisionPoint(Icons.Filled.BarChart, "What is shared", "Which screens you open and how long they take to load."),
+                DecisionPoint(Icons.Filled.VisibilityOff, "What never is", "Your server, your account and what you watch."),
+                DecisionPoint(Icons.Filled.ToggleOff, "Change it any time", "Press Settings, and it stops at once."),
+            ),
+        acceptLabel = "Share usage data",
+        declineLabel = "Not now",
+        onAccept = {},
+        onDecline = {},
+        hosting = TvPageHosting.PreShell,
+        acceptInitiallyFocused = true,
+        noteContent = {
+            Text(text = "You can change this at any time in Settings.")
+            Text(
+                text = "Nothing is sent until you say yes, and nothing is kept for longer than ninety days.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+    )
+}
+
 /** A decision whose points run past the panel: the card scrolls under the answers, and ↑ walks it point by point. */
 @Composable
 fun TvDecisionPageTallSample() {
