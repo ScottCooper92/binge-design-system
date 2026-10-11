@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
@@ -26,7 +27,7 @@ import com.binge.designsystem.component.TransparentBingeMediumTopBarSample
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
 
-/** Medium collapsing top bar — the expanded (uncollapsed) title with a trailing plain action. */
+/** Medium collapsing top bar, opaque in M3's colours (the explicit `Color.Unspecified`): the expanded title with a trailing plain action. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingeMediumTopBarSample() {
@@ -34,8 +35,52 @@ fun BingeMediumTopBarSample() {
         BingeMediumTopBar(
             title = "Popular Movies",
             onBack = {},
+            containerColor = Color.Unspecified,
             actions = { SearchAction() },
         )
+    }
+}
+
+/**
+ * The bar with nothing but a title and a behaviour: transparent over the content, at rest, so no scrim yet. This is
+ * the gallery chrome by default; see [BingeMediumTopBarDefaultsCollapsedSample] for it scrolled.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeMediumTopBarDefaultsSample() {
+    ScreenshotTheme {
+        DefaultsOverContent(TopAppBarDefaults.exitUntilCollapsedScrollBehavior())
+    }
+}
+
+/** [BingeMediumTopBarDefaultsSample] scrolled past the title: the scrim has faded in with the bar's own collapse. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeMediumTopBarDefaultsCollapsedSample() {
+    ScreenshotTheme {
+        DefaultsOverContent(collapsedTopBarScrollBehavior())
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DefaultsOverContent(behavior: TopAppBarScrollBehavior) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primaryContainer),
+    ) {
+        BingeMediumTopBar(title = "Popular Movies", onBack = {}, scrollBehavior = behavior) { glassBackgroundAlpha ->
+            ExpressiveIconButton(
+                onClick = {},
+                icon = Icons.Filled.Share,
+                contentDescription = null,
+                tint = LocalTopBarActionTint.current,
+                tone = LocalTopBarActionTone.current,
+                size = dimensionResource(R.dimen.top_bar_icon_size),
+                glassBackgroundAlpha = glassBackgroundAlpha,
+            )
+        }
     }
 }
 

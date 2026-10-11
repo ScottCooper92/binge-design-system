@@ -40,6 +40,12 @@ import com.binge.designsystem.theme.BingeTheme
  * Binge's medium top bar with a collapsing title — the collapsing sibling of [BingeTopBar], for
  * screens whose scrollable body passes a [scrollBehavior].
  *
+ * The defaults are the gallery chrome: a [Color.Transparent] bar the content scrolls under, with its scrim fading in
+ * as the bar collapses. [scrimFraction] defaults to the [scrollBehavior]'s `collapsedFraction` (zero without one), so
+ * a screen that passes only a behaviour gets the whole look. [BingeScreenScaffold][com.binge.designsystem.template.BingeScreenScaffold]
+ * sets the same two values on this bar for its own. Pass `containerColor = Color.Unspecified` for an opaque bar in M3's
+ * colours, or a colour to paint it.
+ *
  * Icon tone tracks the bar's transparency, as it does on [BingeTopBar]: an opaque bar keeps plain
  * [IconButtonTone.Default] glyphs (the M3-idiomatic treatment), while [Color.Transparent] promotes
  * nav + [actions] to [IconButtonTone.Glass], for a bar the content scrolls under. Actions read that
@@ -47,11 +53,11 @@ import com.binge.designsystem.theme.BingeTheme
  * hardcode it.
  *
  * A transparent bar draws nothing behind itself, so [scrimFraction] puts a [TopBarScrim] behind it.
- * Drive it with how much of the bar the scrolled content overlaps: `collapsedFraction` for the
- * collapsing behaviours this bar is used with (`exitUntilCollapsed`), where a high fraction means
- * content is under the bar. A behaviour that hides the bar instead would want `overlappedFraction`,
- * since `collapsedFraction` then measures bar visibility. A screen whose bar and header need *one*
- * scrim across both (the chip-filtered screens) leaves this at 0 and scrims the header instead.
+ * It is how much of the bar the scrolled content overlaps: `collapsedFraction` for the collapsing
+ * behaviours this bar is used with (`exitUntilCollapsed`), where a high fraction means content is
+ * under the bar. A behaviour that hides the bar instead would want `overlappedFraction`, since
+ * `collapsedFraction` then measures bar visibility. A screen whose bar and header need *one*
+ * scrim across both (the chip-filtered screens) passes 0 and scrims the header instead.
  * That scrim tapers past this bar's own bottom edge into the content scrolling under it, rather
  * than cutting off at the bar's boundary (#94).
  *
@@ -88,8 +94,8 @@ fun BingeMediumTopBar(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    containerColor: Color = Color.Unspecified,
-    scrimFraction: Float = 0f,
+    containerColor: Color = Color.Transparent,
+    scrimFraction: Float = scrollBehavior?.state?.collapsedFraction ?: 0f,
     foregroundScrimFraction: Float = scrimFraction,
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
