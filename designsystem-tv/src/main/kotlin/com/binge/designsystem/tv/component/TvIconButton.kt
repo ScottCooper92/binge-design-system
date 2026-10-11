@@ -49,8 +49,7 @@ import com.binge.designsystem.tv.R as TvR
  * [TvButtonStyle.Destructive]) exactly like every other control.
  *
  * [initiallyFocused] seeds the focus flag so a screenshot can show the revealed frame (a baseline runs no
- * coroutines, so no real focus event lands); production leaves it false. Reach for [TvIconButtonSurface]
- * when the caller owns the flag outright.
+ * coroutines, so no real focus event lands); production leaves it false.
  */
 @Composable
 fun TvIconButton(
