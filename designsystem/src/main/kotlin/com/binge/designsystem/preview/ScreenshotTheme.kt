@@ -17,8 +17,8 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  *
  * [brand] is a plain parameter, not a composition local: the multipreview annotations bind [ScreenshotThemeWrapper] by
  * class, which takes no arguments and is the outermost composable, so nothing a consumer writes could provide a local
- * to it. A consumer with its own [BingeBrand] writes a two-line `PreviewWrapperProvider` that calls this with it, and
- * binds that wrapper on annotations of its own, so one brand is set in one place.
+ * to it. A consumer with its own [BingeBrand] subclasses [ScreenshotThemeWrapper] to override its brand, and binds the
+ * subclass on annotations of its own, so one brand is set in one place.
  *
  * - `dynamicColor = false` keeps colours deterministic across machines (CI gate).
  * - `reduceMotion = true` disables animation so a single frame is stable.

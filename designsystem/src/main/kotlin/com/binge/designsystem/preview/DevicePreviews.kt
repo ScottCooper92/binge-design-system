@@ -13,7 +13,8 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
  * dark), [FontScalePreviews] adds the font-scale axis.
  *
  * Each carries [ScreenshotTheme] via `@PreviewWrapper`, so a preview does not wrap it by hand and cannot
- * forget to: the `uiMode` axis switches light/dark and colours stay deterministic either way. Wrapping
+ * forget to. An app with its own brand cannot take these annotations, because they bind this module's wrapper; it
+ * subclasses [ScreenshotThemeWrapper] and declares its own from the public specs below. With the wrapper in place: the `uiMode` axis switches light/dark and colours stay deterministic either way. Wrapping
  * anyway is harmless — the nested theme resolves to the same colours — so the manual calls still in the
  * tree render identically and can be removed as they are touched.
  *
@@ -30,11 +31,26 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
  */
 const val SOURCE_LOCALE = "en-rGB"
 
-private const val TALL_COMPONENT_HEIGHT_DP = 1600
-private const val PHONE_PORTRAIT = "spec:width=411dp,height=891dp,orientation=portrait"
-private const val PHONE_LANDSCAPE = "spec:width=411dp,height=891dp,orientation=landscape"
-private const val FOLDABLE_PORTRAIT = "spec:width=840dp,height=1180dp,orientation=portrait"
-private const val TABLET_LANDSCAPE = "spec:width=800dp,height=1280dp,orientation=landscape"
+/*
+ * The device specs every cell below is built from. Public so an app that binds its own wrapper (see
+ * [ScreenshotThemeWrapper]) declares its annotations from the same windows rather than copying the strings: a cell's
+ * spec is part of its baseline's file name, so two copies drift into two sets of baselines.
+ */
+
+/** The height [TallComponentPreviews] renders at: past the renderer's default cap, so a long section is not clipped. */
+const val TALL_COMPONENT_HEIGHT_DP = 1600
+
+/** A phone held upright, 411×891: the `phone` and `phone-light` cells. */
+const val PHONE_PORTRAIT_SPEC = "spec:width=411dp,height=891dp,orientation=portrait"
+
+/** The same phone on its side, 891×411: the `phone-land` cell, the short-height stress. */
+const val PHONE_LANDSCAPE_SPEC = "spec:width=411dp,height=891dp,orientation=landscape"
+
+/** An unfolded foldable, 840×1180: the `foldable` and `pane` cells, past the two-pane breakpoint. */
+const val FOLDABLE_PORTRAIT_SPEC = "spec:width=840dp,height=1180dp,orientation=portrait"
+
+/** A tablet on its side, 1280×800: the `tablet` cell, the widest window. */
+const val TABLET_LANDSCAPE_SPEC = "spec:width=800dp,height=1280dp,orientation=landscape"
 
 /** Standard phone — the de-facto Pixel-class width the wrap-content previews render at. */
 const val STANDARD_PHONE_WIDTH_DP = 412
@@ -100,7 +116,7 @@ annotation class LocalePreviews
  * counterpart is `TvRtlPreviews`.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "ar-rtl", device = PHONE_PORTRAIT, locale = "ar", uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "ar-rtl", device = PHONE_PORTRAIT_SPEC, locale = "ar", uiMode = UI_MODE_NIGHT_YES)
 annotation class RtlPreview
 
 /**
@@ -121,12 +137,29 @@ annotation class RtlPreview
  * A hardcoded `darkTheme = …` inside the content still pins every cell to one theme.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "phone", device = PHONE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
-@Preview(name = "phone-light", device = PHONE_PORTRAIT, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
-@Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
-@Preview(name = "foldable", device = FOLDABLE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
-@Preview(name = "tablet", device = TABLET_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "phone", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "phone-light", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
+@Preview(name = "phone-land", device = PHONE_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "foldable", device = FOLDABLE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "tablet", device = TABLET_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class ScreenPreviews
+
+/**
+ * [ScreenPreviews] without its `tablet` cell, for a screen whose layouts have no breakpoint above the foldable's: the
+ * tablet cell would only re-render the foldable's layout wider. The four cells are [ScreenPreviews]' own, spec for
+ * spec, so a frame that moves between the two keeps its baselines. [TabletScreenPreview] is the cell this leaves out.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "phone", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "phone-light", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
+@Preview(name = "phone-land", device = PHONE_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "foldable", device = FOLDABLE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+annotation class ScreenPreviewsWithoutTablet
+
+/** [ScreenPreviews]' `tablet` cell alone: the one [ScreenPreviewsWithoutTablet] leaves out. */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "tablet", device = TABLET_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+annotation class TabletScreenPreview
 
 /**
  * One cell — [ScreenPreviews]' `phone` cell, dark, byte-for-byte the same spec — for a **state** of a
@@ -144,7 +177,7 @@ annotation class ScreenPreviews
  * type in a grid, content sized to overflow the window) stays on [ScreenPreviews].
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "phone", device = PHONE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "phone", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class ScreenStatePreview
 
 /**
@@ -155,7 +188,7 @@ annotation class ScreenStatePreview
  * window, the foldable's, which is past the two-pane breakpoint.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "pane", device = FOLDABLE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "pane", device = FOLDABLE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class ListPanePreview
 
 /**
@@ -164,7 +197,7 @@ annotation class ListPanePreview
  * `phone-land` cell.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "phone-land", device = PHONE_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class LandscapePanesPreview
 
 /**
