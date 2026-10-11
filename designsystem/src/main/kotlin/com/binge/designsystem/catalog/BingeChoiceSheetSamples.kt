@@ -350,7 +350,7 @@ fun BingeChoiceSheetSectionedSample() {
         SheetSurface {
             BingeChoiceSheetContent(
                 title = REGION_TITLE,
-                choices = BingeChoiceList.Ready(SampleRegions.map { it.copy(icon = Icons.Filled.Public) }),
+                choices = BingeChoiceList.Ready(SampleRegions.map { it.copy(mark = null, icon = Icons.Filled.Public) }),
                 selected = "Japan",
                 suggested = listOf("United Kingdom", "Canada"),
                 onSelect = {},
