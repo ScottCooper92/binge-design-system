@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -31,10 +30,11 @@ import com.binge.designsystem.component.FilterChipItem
  * side of the selected one stay composed ([beyondViewportPageCount]), so their rows are loading before the
  * swipe reaches them.
  *
- * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state. By
- * default the header is an opaque ground. Pass a transparent [headerBackground] and a [scrimFraction] ramped
- * with the bar's collapse for [BingeScreenScaffold]'s look: one scrim over bar and header together, with the
- * rows visible behind it.
+ * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state. The
+ * default is [BingeScreenScaffold]'s look: a transparent collapsing bar and header with the rows visible behind
+ * them, and one scrim over both that fades in as the bar collapses ([scrimFraction] null follows the bar; pass a
+ * fraction to drive it yourself). Pass an opaque [headerBackground] and a [scrimFraction] of zero for a header
+ * that is a solid ground, and [ScreenBar.Small] for a single-line bar.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,10 +45,10 @@ fun FilteredListScreen(
     onFilterChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    bar: ScreenBar = ScreenBar.Small,
+    bar: ScreenBar = ScreenBar.Collapsing,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    headerBackground: Color = MaterialTheme.colorScheme.background,
-    scrimFraction: Float = 0f,
+    headerBackground: Color = Color.Transparent,
+    scrimFraction: Float? = null,
     ready: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     search: (@Composable () -> Unit)? = null,
@@ -58,12 +58,15 @@ fun FilteredListScreen(
     notReady: @Composable (padding: PaddingValues) -> Unit = { LoadingMessageScreen(Modifier.padding(it)) },
     page: @Composable (index: Int, contentPadding: PaddingValues) -> Unit,
 ) {
+    // Held here, not left to the scaffold, so the header's scrim can follow the bar's own collapse.
+    val behavior = scrollBehavior ?: rememberScreenBarScrollBehavior(bar)
+    val scrim = scrimFraction ?: screenBarScrim(bar, behavior)
     BingeScreenScaffold(
         title = title,
         modifier = modifier,
         onBack = onBack,
         bar = bar,
-        scrollBehavior = scrollBehavior,
+        scrollBehavior = behavior,
         snackbarHostState = snackbarHostState,
         barScrim = !ready,
         actions = actions,
@@ -83,7 +86,7 @@ fun FilteredListScreen(
                     search?.invoke()
                 },
                 headerBackground = headerBackground,
-                scrimFraction = scrimFraction,
+                scrimFraction = scrim,
                 beyondViewportPageCount = beyondViewportPageCount,
             ) { pagePadding, index ->
                 page(
