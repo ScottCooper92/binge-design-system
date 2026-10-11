@@ -21,7 +21,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 import kotlin.math.roundToInt
 
 /**
- * Public samples for [StarRating] (group `"Ratings"`). See the convention KDoc on
+ * Public samples for [StarRating]. See the convention KDoc on
  * [MediaCardRatedSample].
  *
  * Two variants: the compact read-only display row across the scale, and the larger interactive picker.

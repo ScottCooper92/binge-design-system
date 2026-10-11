@@ -10,7 +10,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
 
 /**
- * Public samples for [AccountProfileCard] (group `"Cards"`). See the convention KDoc on
+ * Public samples for [AccountProfileCard]. See the convention KDoc on
  * [MediaCardRatedSample].
  *
  * The card has two forms: tappable (an `onClick` is wired, so it shows the trailing chevron)
