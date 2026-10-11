@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -20,11 +21,14 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
 import androidx.tv.material3.ListItemScale
@@ -32,6 +36,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvRowEmphasis
+import com.binge.designsystem.tv.component.TvRowStatus
+import com.binge.designsystem.tv.component.hasTvRowStatus
 import com.binge.designsystem.tv.component.tvRowEmphasis
 import com.binge.designsystem.tv.component.tvRowListItemColors
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
@@ -39,6 +45,7 @@ import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.uppercaseLocalised
+import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -60,7 +67,7 @@ data class TvPaneOption(
  * [note]. No options makes the row a read-out: the value lives in [body], and [note] says where to change it.
  *
  * The pane leads with [hero] when there is one (a code to scan, say), otherwise with [icon] on its plate, otherwise
- * with neither. [announceNote] makes the note a polite live region, for a note that reports an outcome rather than
+ * with neither. [icon] also leads the row's name in the list, plain, in the row's content colour. [announceNote] makes the note a polite live region, for a note that reports an outcome rather than
  * a static hint, which would otherwise be read again every time focus reached the row.
  *
  * [body] and [note] are the pane's description, so they wrap to as many lines as they need. The list's labels and details
@@ -73,6 +80,9 @@ data class TvPaneOption(
  * [TvPaneOption.onSelect] then toggles; the default keeps them mutually exclusive, as radio rows. [clear] puts a button
  * under the options. An empty [body] draws no description, so the options sit directly under the name. A filter shows
  * what it has applied through [detail], such as "3 selected" or "Any".
+ *
+ * The row's end can carry a status: [loading] while its value is on its way, else [badgeAlert] when it needs the user,
+ * else [badgeCount] when something is waiting. Each takes width from the label, which ellipsizes rather than wraps.
  */
 @Immutable
 data class TvPaneRow(
@@ -87,6 +97,9 @@ data class TvPaneRow(
     val detail: String? = null,
     val multiSelect: Boolean = false,
     val clear: TvPaneAction? = null,
+    val badgeCount: Int? = null,
+    val badgeAlert: Boolean = false,
+    val loading: Boolean = false,
 )
 
 /** A button the board draws for an action that is not an option: what it says, what it does, and whether it is live. */
@@ -201,8 +214,7 @@ private fun TvPaneList(
                 group.rows.forEach { row ->
                     val described = row.key == describedKey
                     TvPaneListRow(
-                        label = row.label,
-                        detail = row.detail,
+                        row = row,
                         emphasis = tvRowEmphasis(isDescribedRow = described, columnHasFocus = columnHasFocus),
                         onFocused = { onFocusRow(row.key) },
                         modifier =
@@ -239,28 +251,44 @@ private fun TvPaneGroupTitle(title: String) {
 }
 
 /**
- * A tv-material `ListItem`: the row's name, and its current [detail] under it when it has one. No leading icon, because
- * every row in the column is the same kind of thing. Focus is colour, never scale.
+ * A tv-material `ListItem`: the row's icon, its name, its current detail under the name when it has one, and its status
+ * at the end. The icon is plain, in the content colour, so it inverts with the focus fill. Focus is colour, never scale.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun TvPaneListRow(
-    label: String,
-    detail: String?,
+    row: TvPaneRow,
     emphasis: TvRowEmphasis,
     onFocused: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val loadingDescription = stringResource(DesR.string.cd_list_item_loading)
     ListItem(
         // The described row is marked by its emphasis, not by `selected`, which would give it a container of its own.
         selected = false,
         onClick = onFocused,
         headlineContent = {
-            Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = row.label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
         supportingContent =
-            detail?.let {
+            row.detail?.let {
                 { Text(text = it, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            },
+        leadingContent =
+            row.icon?.let { icon ->
+                {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)),
+                    )
+                }
+            },
+        trailingContent =
+            if (hasTvRowStatus(row.badgeCount, row.badgeAlert, row.loading)) {
+                { TvRowStatus(badgeCount = row.badgeCount, badgeAlert = row.badgeAlert, loading = row.loading) }
+            } else {
+                null
             },
         shape = ListItemDefaults.shape(shape = BingeShapes.TvListItem),
         colors =
@@ -270,7 +298,11 @@ private fun TvPaneListRow(
                 restingContent = MaterialTheme.colorScheme.onSurface,
             ),
         scale = ListItemScale.None,
-        modifier = modifier.fillMaxWidth().onFocusChanged { if (it.isFocused) onFocused() },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (it.isFocused) onFocused() }
+                .semantics { if (row.loading) stateDescription = loadingDescription },
     )
 }
 

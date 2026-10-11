@@ -16,9 +16,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.theme.LocalReduceMotion
-import com.binge.designsystem.tv.R as TvR
 
 private const val SPINNER_SWEEP_DEGREES = 270f
 private const val SPINNER_START_DEGREES = -90f
@@ -26,17 +25,22 @@ private const val SPINNER_PERIOD_MS = 1_000
 private const val FULL_TURN_DEGREES = 360f
 
 /**
- * The indeterminate spinner a loading [TvButton] or [TvIconButton] draws in its icon's box, at its content colour.
+ * The indeterminate spinner a busy control draws in place of its icon or trailing mark, at its content colour: a
+ * loading [TvButton] or [TvIconButton], or a [com.binge.designsystem.tv.template.TvPaneRow] whose value is loading.
  *
  * tv-material ships no progress indicator, and the Material 3 one is on the other side of the seam, so the arc is
- * drawn here. It carries no semantics of its own: the button it sits in says it is busy, on the node that carries its
- * name, so a screen reader hears one control rather than a button and a separate progress bar. Under [LocalReduceMotion] the arc holds still: it still reads as busy, and a baseline stays stable.
+ * drawn here. It carries no semantics of its own: the control it sits in says it is busy, on the node that carries its
+ * name, so a screen reader hears one control rather than a second stop. Under [LocalReduceMotion] the arc holds still.
  */
 @Composable
-internal fun TvButtonSpinner(color: Color, modifier: Modifier = Modifier) {
-    val stroke = dimensionResource(TvR.dimen.tv_button_spinner_stroke)
+internal fun TvSpinner(
+    color: Color,
+    diameter: Dp,
+    stroke: Dp,
+    modifier: Modifier = Modifier,
+) {
     val rotation = spinnerRotation()
-    Canvas(modifier.size(dimensionResource(TvR.dimen.tv_button_icon))) {
+    Canvas(modifier.size(diameter)) {
         val strokePx = stroke.toPx()
         val inset = strokePx / 2
         drawArc(
@@ -54,7 +58,7 @@ internal fun TvButtonSpinner(color: Color, modifier: Modifier = Modifier) {
 @Composable
 private fun spinnerRotation(): Float {
     if (LocalReduceMotion.current) return 0f
-    val transition = rememberInfiniteTransition(label = "tv-button-spinner")
+    val transition = rememberInfiniteTransition(label = "tv-spinner")
     val rotation by transition.animateFloat(
         initialValue = 0f,
         targetValue = FULL_TURN_DEGREES,
@@ -62,7 +66,7 @@ private fun spinnerRotation(): Float {
             animation = tween(durationMillis = SPINNER_PERIOD_MS, easing = LinearEasing),
             repeatMode = RepeatMode.Restart,
         ),
-        label = "tv-button-spinner-rotation",
+        label = "tv-spinner-rotation",
     )
     return rotation
 }

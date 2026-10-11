@@ -132,6 +132,12 @@ fun TvButtonSurface(
                 textAlign = TextAlign.Center,
             )
         }
-        if (loading) TvButtonSpinner(color = palette.content)
+        if (loading) {
+            TvSpinner(
+                color = palette.content,
+                diameter = dimensionResource(TvR.dimen.tv_button_icon),
+                stroke = dimensionResource(TvR.dimen.tv_button_spinner_stroke),
+            )
+        }
     }
 }
