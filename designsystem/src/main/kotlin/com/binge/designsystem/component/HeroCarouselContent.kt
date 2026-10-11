@@ -244,7 +244,7 @@ private fun HeroMetaRow(item: HeroItem) {
 }
 
 @Composable
-fun heroRuntimeOrSeasons(item: HeroItem): String? =
+internal fun heroRuntimeOrSeasons(item: HeroItem): String? =
     when {
         item.runtimeMinutes != null -> formatRuntime(item.runtimeMinutes)
         item.seasons != null ->
