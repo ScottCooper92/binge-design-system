@@ -121,3 +121,47 @@ class PagedPhaseTest {
         )
     }
 }
+
+private val skeleton = PagedPhase.Skeleton
+private val empty = PagedPhase.Empty
+private val failed = PagedPhase.Failed(failure)
+
+/** How the phases of several paged sources read as one list. */
+class MergedPagedPhaseTest {
+    @Test
+    fun `no sources is empty`() {
+        assertEquals(empty, mergedPagedPhase(emptyList()))
+    }
+
+    @Test
+    fun `a source still on its first load holds the whole list on the skeleton`() {
+        assertEquals(skeleton, mergedPagedPhase(listOf(rows, skeleton)))
+        assertEquals(skeleton, mergedPagedPhase(listOf(skeleton, empty)))
+    }
+
+    @Test
+    fun `without the hold, rows show as soon as any source has them`() {
+        assertEquals(rows, mergedPagedPhase(listOf(rows, skeleton), holdUntilAllResolved = false))
+        assertEquals(skeleton, mergedPagedPhase(listOf(empty, skeleton), holdUntilAllResolved = false))
+    }
+
+    @Test
+    fun `rows win over a source that is empty or failed`() {
+        assertEquals(rows, mergedPagedPhase(listOf(rows, empty)))
+        assertEquals(rows, mergedPagedPhase(listOf(failed, rows)))
+    }
+
+    @Test
+    fun `the flags of the sources with rows are combined`() {
+        val broken = PagedPhase.Rows(refreshing = false, refreshError = failure)
+
+        assertEquals(refreshingRows, mergedPagedPhase(listOf(rows, refreshingRows)))
+        assertEquals(PagedPhase.Rows(refreshing = true, refreshError = failure), mergedPagedPhase(listOf(refreshingRows, broken)))
+    }
+
+    @Test
+    fun `no rows anywhere is failed when a source failed, else empty`() {
+        assertEquals(failed, mergedPagedPhase(listOf(empty, failed)))
+        assertEquals(empty, mergedPagedPhase(listOf(empty, empty)))
+    }
+}

@@ -119,6 +119,61 @@ fun rememberPagedPhase(
     return tracker.phase(loadState, itemCount, lastRefresh)
 }
 
+/**
+ * One paged source of a merged list: its load states, how many rows it holds, and its recorded refresh (see
+ * [rememberPagedPhase] for the last).
+ */
+@Immutable
+data class PagedSourceState(
+    val loadState: CombinedLoadStates,
+    val itemCount: Int,
+    val lastRefresh: PagedRefresh? = null,
+)
+
+/**
+ * The one phase for a list built from several paged sources, such as a grid merging movies and shows.
+ *
+ * Rows win over every other arm, so a source that is empty or failed does not hide the others' rows; the
+ * flags of the sources that have rows are combined (refreshing if any is, the first error). With no rows
+ * anywhere, a failed source makes the list [PagedPhase.Failed], so an error is not read as empty, and
+ * otherwise it is [PagedPhase.Empty].
+ *
+ * [holdUntilAllResolved] decides what a source still on its first load does. True (the default) holds the
+ * list on [PagedPhase.Skeleton] until every source has resolved, so a merged grid does not draw one source's
+ * rows and then shuffle the others in. False shows the rows as soon as any source has them.
+ */
+fun mergedPagedPhase(phases: List<PagedPhase>, holdUntilAllResolved: Boolean = true): PagedPhase {
+    val withRows = phases.filterIsInstance<PagedPhase.Rows>()
+    val loading = phases.any { it == PagedPhase.Skeleton }
+    return when {
+        loading && (holdUntilAllResolved || withRows.isEmpty()) -> PagedPhase.Skeleton
+        withRows.isNotEmpty() ->
+            PagedPhase.Rows(
+                refreshing = withRows.any { it.refreshing },
+                refreshError = withRows.firstNotNullOfOrNull { it.refreshError },
+            )
+        else -> phases.filterIsInstance<PagedPhase.Failed>().firstOrNull() ?: PagedPhase.Empty
+    }
+}
+
+/**
+ * [rememberPagedPhase] for a list merged from several sources: each source is tracked on its own, then
+ * [mergedPagedPhase] combines them. [key] is the merged list's identity; changing it, or the number of
+ * [sources], starts every tracker afresh.
+ */
+@Composable
+fun rememberMergedPagedPhase(
+    key: Any?,
+    sources: List<PagedSourceState>,
+    holdUntilAllResolved: Boolean = true,
+): PagedPhase {
+    val trackers = remember(key, sources.size) { List(sources.size) { PagedPhaseTracker() } }
+    return mergedPagedPhase(
+        phases = sources.mapIndexed { index, source -> trackers[index].phase(source.loadState, source.itemCount, source.lastRefresh) },
+        holdUntilAllResolved = holdUntilAllResolved,
+    )
+}
+
 /** One arm per [PagedPhase], so a screen fills slots rather than copying the `when`. */
 @Composable
 fun PagedPhaseContent(
