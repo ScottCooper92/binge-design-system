@@ -38,6 +38,11 @@ class TvListPaneSamplesScreenshotTest {
     @Composable
     fun boardSkeleton() = Frame { TvListPaneBoardSkeletonSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun boardSkeletonRowDetail() = Frame { TvListPaneBoardSkeletonRowDetailSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {

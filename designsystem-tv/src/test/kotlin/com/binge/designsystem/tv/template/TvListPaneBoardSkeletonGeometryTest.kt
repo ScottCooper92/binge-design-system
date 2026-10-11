@@ -35,12 +35,22 @@ class TvListPaneBoardSkeletonGeometryTest {
         ) { resolved ->
             BingeTvTheme { if (resolved) Board() else TvListPaneBoardSkeleton(title = TITLE) }
         }
+
+    @Test
+    fun `a skeleton for rows with a value reserves their taller first row`() =
+        composeTestRule.assertSkeletonReservesGeometry(
+            listOf(TvLayoutAnchors.LIST_PANE_FIRST_ROW),
+            checkStartEdge = true,
+            checkSize = true,
+        ) { resolved ->
+            BingeTvTheme { if (resolved) Board(detail = "High") else TvListPaneBoardSkeleton(title = TITLE, rowDetail = true) }
+        }
 }
 
 private const val TITLE = "Settings"
 
 @Composable
-private fun Board() {
+private fun Board(detail: String? = null) {
     TvListPaneBoard(
         title = TITLE,
         groups =
@@ -49,7 +59,12 @@ private fun Board() {
                     title = "Playback",
                     rows =
                         listOf(
-                            TvPaneRow(key = "quality", label = "Default quality", body = "The quality a new request asks for."),
+                            TvPaneRow(
+                                key = "quality",
+                                label = "Default quality",
+                                body = "The quality a new request asks for.",
+                                detail = detail,
+                            ),
                             TvPaneRow(key = "subtitles", label = "Subtitles", body = "Whether titles start with subtitles on."),
                         ),
                 ),
