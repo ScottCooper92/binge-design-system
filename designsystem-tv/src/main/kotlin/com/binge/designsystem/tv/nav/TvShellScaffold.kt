@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,8 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.platform.LocalInputModeManager
 import com.binge.designsystem.tv.focus.tvExitFocusGroup
 import kotlinx.coroutines.delay
 
@@ -51,6 +54,11 @@ const val TV_SHELL_CONTENT_SETTLE_MILLIS = 220L
  * old destination's tree as the new one mounts. Pass false for a shell that keeps destination state itself and
  * animates between destinations inside [content]: the content then stays one tree, with both panes present while
  * it animates. A destination that leaves the rail has its saved state dropped.
+ *
+ * The scaffold puts the window in keyboard input mode as it first composes. A launch by `am start`, an instrumentation
+ * or some launchers leaves a TV app in touch mode, where `clickable` refuses focus, so the rail's startup offer would
+ * find nothing to land on and the first D-pad press would carry focus into the rail. A TV has no touchscreen, so touch
+ * mode here is only ever an artefact of how the app was started.
  */
 @Composable
 fun TvShellScaffold(
@@ -75,6 +83,7 @@ fun TvShellScaffold(
     keyContentByDestination: Boolean = true,
     content: @Composable (key: Any) -> Unit,
 ) {
+    LeaveTouchModeOnLaunch()
     SettleOn(settle, selectedKey, settleMillis)
     val settled = settle.settledKey
     val railFocus = remember { FocusRequester() }
@@ -148,6 +157,17 @@ class TvShellSettle internal constructor(
 /** A [TvShellSettle] starting on [initialKey], saved across recreation. The key must fit in a Bundle. */
 @Composable
 fun rememberTvShellSettle(initialKey: Any): TvShellSettle = rememberSaveable(saver = TvShellSettle.Saver) { TvShellSettle(initialKey) }
+
+/**
+ * Requests keyboard input mode if the window starts in touch mode. A `SideEffect`, not a `LaunchedEffect`: it runs as
+ * the first composition applies, before the rail's startup offer gets its first frame, so that offer is made in
+ * keyboard mode rather than spent in touch mode.
+ */
+@Composable
+private fun LeaveTouchModeOnLaunch() {
+    val inputModeManager = LocalInputModeManager.current
+    SideEffect { if (inputModeManager.inputMode == InputMode.Touch) inputModeManager.requestInputMode(InputMode.Keyboard) }
+}
 
 /**
  * Moves [settle] onto [selectedKey] once it has held for [settleMillis]. Kept out of [TvShellScaffold] so the

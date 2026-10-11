@@ -20,16 +20,17 @@ import com.binge.designsystem.tv.R as TvR
 const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
 
 /**
- * A passive, inert focus target for a pane with nothing else focusable yet. A caller composes it
- * conditionally — `if (!paneHasFocus) TvFocusSink(...)` — as a sibling of the pane's real content, never inside
- * a scrollable, so the pane's own entry requester always has *something* to land on from its first frame
- * instead of racing the destination's first focusable child. **Gate presence on the pane's own `hasFocus`, not
- * on a flag scoped to the sink alone**: the sink holding focus is itself "the pane has focus", so the next
- * recomposition removes it — and removing an already-focused node runs Compose's own recovery search, which is
- * exactly how the loop that placed the sink gets a fresh, unsatisfied entry to retry into once the destination
- * grows something real. Gating out that removal (tried, then reverted — see git history) leaves the sink an
- * inert focus the destination's own content can never displace, since re-requesting the pane's entry while a
- * descendant already holds it is a no-op, not a re-evaluation.
+ * A passive, inert focus target for a pane with nothing else focusable yet. A caller composes it as a sibling of the
+ * pane's real content, never inside a scrollable, so the pane's own entry requester always has *something* to land on
+ * from its first frame instead of racing the destination's first focusable child.
+ *
+ * **Keep it mounted while it holds focus, and hand focus on explicitly.** Gate its presence on the pane's *real*
+ * content having focus, not on the pane's own `hasFocus`, which the sink itself satisfies. Removing a sink that holds
+ * focus leaves Compose's recovery search to place it, and with nothing else in the pane that is whatever sits beside
+ * it: in a TV shell, the rail, every other frame for as long as the pane stays empty. Instead, while the sink holds
+ * focus, offer it to a group around the real content: a request into a group with nothing focusable fails quietly and
+ * leaves focus where it is, so the offer can repeat until the content grows a target. `BingeTvNavRail` does exactly
+ * this for its content pane.
  *
  * **Never calls `requestFocus` itself.** It only receives what a group's own entry redirect, an explicit
  * request, or Compose's own recovery search hands it — a puller here would reproduce the rail collapsing under
