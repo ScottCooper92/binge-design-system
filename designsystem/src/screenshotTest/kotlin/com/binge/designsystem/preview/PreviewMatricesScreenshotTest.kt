@@ -28,6 +28,11 @@ class PreviewMatricesScreenshotTest {
     @Composable
     fun TallComponent() = Window("tall component: 1600dp high, so a long section is not clipped")
 
+    @PreviewTest
+    @RtlPreview
+    @Composable
+    fun Rtl() = Window("ar-rtl: starts at the right")
+
     @Composable
     private fun Window(label: String) {
         ScreenshotTheme(Modifier.fillMaxSize()) {

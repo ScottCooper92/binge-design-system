@@ -93,6 +93,17 @@ annotation class LargestFontPreview
 annotation class LocalePreviews
 
 /**
+ * One phone cell under a right-to-left locale, for a frame that establishes a layout (a hub, a detail hero, a list row).
+ * The mirroring regression it catches is a layout one, so it earns one frame per layout and not a cell on
+ * [ScreenPreviews], which would re-record every baseline. A real `ar` locale flips the layout direction and leaves the
+ * strings English. Not a pseudolocale: the screenshot renderer does not apply those (see [LocalePreviews]). The TV
+ * counterpart is `TvRtlPreviews`.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "ar-rtl", device = PHONE_PORTRAIT, locale = "ar", uiMode = UI_MODE_NIGHT_YES)
+annotation class RtlPreview
+
+/**
  * Full-screen matrix: one cell per **device class** (phone / foldable / tablet), dark by default
  * (Binge is dark-first) with a single light spot-check. Stack on a **fillMaxSize** content preview so
  * the device spec — not a fixed frame — drives the layout.
