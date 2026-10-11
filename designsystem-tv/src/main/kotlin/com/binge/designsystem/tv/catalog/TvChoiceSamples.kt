@@ -9,6 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +29,7 @@ import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvChoiceRow
 import com.binge.designsystem.tv.component.TvChoiceUi
 import com.binge.designsystem.tv.component.TvOptionGroup
+import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.component.TvRatingStepper
 import com.binge.designsystem.tv.component.TvTabCount
 import com.binge.designsystem.tv.component.TvTabRow
@@ -68,9 +75,50 @@ fun TvCheckboxRowSample() {
                 .width(dimensionResource(TvR.dimen.tv_text_field_width)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
     ) {
-        TvCheckboxRow(label = "Allow plain HTTP", checked = agreed, onCheckedChange = { agreed = it }, initiallyFocused = true)
-        TvCheckboxRow(label = "Remember this server", checked = keepServer, onCheckedChange = { keepServer = it })
-        TvCheckboxRow(label = "Not available here", checked = false, onCheckedChange = {}, enabled = false)
+        TvCheckboxRow(
+            label = "Allow plain HTTP",
+            checked = agreed,
+            onCheckedChange = { agreed = it },
+            initiallyFocused = true,
+            icon = Icons.Filled.Lock,
+            supportingText = "Connects without encryption",
+        )
+        TvCheckboxRow(
+            label = "Remember this server",
+            checked = keepServer,
+            onCheckedChange = { keepServer = it },
+            icon = Icons.Filled.Dns,
+        )
+        TvCheckboxRow(label = "Not available here", checked = false, onCheckedChange = {}, enabled = false, icon = Icons.Filled.Block)
+    }
+}
+
+/** Option rows with an icon and a one-line effect under the label, the chosen one ticked and another focused. */
+@Composable
+fun TvOptionRowSupportingSample() {
+    var selected by remember { mutableStateOf(KEY_MOVIES) }
+    Column(
+        modifier =
+            Modifier
+                .padding(dimensionResource(DesR.dimen.padding_l))
+                .width(dimensionResource(TvR.dimen.tv_text_field_width)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
+    ) {
+        TvOptionRow(
+            label = "Movies",
+            selected = selected == KEY_MOVIES,
+            onClick = { selected = KEY_MOVIES },
+            icon = Icons.Filled.Movie,
+            supportingText = "Lists every film in the library",
+        )
+        TvOptionRow(
+            label = "TV shows",
+            selected = selected == KEY_TV,
+            onClick = { selected = KEY_TV },
+            initiallyFocused = true,
+            icon = Icons.Filled.Tv,
+            supportingText = "Lists every series, with its seasons grouped under it",
+        )
     }
 }
 

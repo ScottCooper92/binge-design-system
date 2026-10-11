@@ -81,7 +81,9 @@ enum class FormActionPlacement {
  * snackbar with Retry until the next write succeeds (see [FormSaveStatus]). [primaryAction] is for the cases that
  * do commit: a create flow, a connection the server must test, a submit, or a destructive step.
  *
- * [bar] and [scrollBehavior] are [BingeScreenScaffold]'s. [capWidth] holds the fields to a reading column
+ * [bar] and [scrollBehavior] are [BingeScreenScaffold]'s, and the bar is its default: a transparent collapsing bar the
+ * fields scroll under, its scrim fading in as it collapses. Pass [ScreenBar.Small] for a single-line bar that slides
+ * away as the form scrolls. [capWidth] holds the fields to a reading column
  * (`content_max_width`), centred, on a wide window.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +97,7 @@ fun FormScreen(
     secondaryAction: FormAction? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrolling: Boolean = true,
-    bar: ScreenBar = ScreenBar.Small,
+    bar: ScreenBar = ScreenBar.Collapsing,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     capWidth: Boolean = false,
     saveStatus: FormSaveStatus? = null,

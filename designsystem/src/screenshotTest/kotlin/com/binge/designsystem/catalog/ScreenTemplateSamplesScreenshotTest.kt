@@ -208,6 +208,11 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenStatePreview
     @Composable
+    fun formScrolled() = FormScreenScrolledSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
     fun formSaving() = FormScreenSavingSample()
 
     @PreviewTest

@@ -1,5 +1,6 @@
 package com.binge.designsystem.template
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +14,10 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.component.FilterChipItem
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -60,5 +64,29 @@ class FilteredListScreenTest {
         rule.waitForIdle()
 
         assertTrue("expected the bar to collapse, was ${behavior.state.collapsedFraction}", behavior.state.collapsedFraction > 0f)
+    }
+
+    @Test
+    fun `a page ends one content inset above the navigation bar`() {
+        var pageBottom = Dp.Unspecified
+        var listBottom = Dp.Unspecified
+        rule.setContent {
+            TestTheme {
+                FilteredListScreen(
+                    title = "Requests",
+                    filters = listOf(FilterChipItem("All", 3)),
+                    selectedFilter = 0,
+                    onFilterChange = {},
+                    beyondViewportPageCount = 0,
+                ) { _, padding ->
+                    pageBottom = padding.calculateBottomPadding()
+                    // What a list screen gets from the same scaffold, for the same inset.
+                    listBottom = PaddingValues(bottom = resolvedContentInset()).calculateBottomPadding()
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertTrue("expected at least the content inset ($listBottom), was $pageBottom", pageBottom >= listBottom && listBottom > 0.dp)
     }
 }
