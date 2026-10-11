@@ -42,6 +42,7 @@ import com.binge.designsystem.component.ImagePlaceholder
 import com.binge.designsystem.component.MediaCardAction
 import com.binge.designsystem.component.MediaTypeTag
 import com.binge.designsystem.component.MediaTypeTagType
+import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
@@ -153,10 +154,12 @@ private fun MediaCardTitle(title: String) {
  * it, and a grid's first cell keeps its corner whatever its height — so the check that compares positions
  * passed while every row below the first dropped on resolve — the same shape found next door in the
  * carousel skeleton.
+ *
+ * [description] names the loading state for a screen reader; without one it stays silent.
  */
 @Composable
-fun MediaCardSkeleton(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth()) {
+fun MediaCardSkeleton(modifier: Modifier = Modifier, description: String? = null) {
+    Column(modifier = modifier.fillMaxWidth().describedAs(description)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

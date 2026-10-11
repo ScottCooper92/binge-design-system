@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchorIf
+import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
@@ -25,14 +26,20 @@ private const val DEFAULT_LIST_ROW_SKELETON_COUNT = 8
  * Loading placeholder for the shared full-width [ListRow] — a shimmer clipped to the row's `large`
  * corner. [height] defaults to a poster-leading row so the loading→content swap doesn't reflow;
  * pass a shorter one for a row shape that resolves shorter, such as an avatar-leading row.
+ * [description] names the loading state for a screen reader; without one it stays silent.
  */
 @Composable
-fun ListRowSkeleton(modifier: Modifier = Modifier, height: Dp = dimensionResource(R.dimen.list_row_skeleton_height)) {
+fun ListRowSkeleton(
+    modifier: Modifier = Modifier,
+    height: Dp = dimensionResource(R.dimen.list_row_skeleton_height),
+    description: String? = null,
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .skeleton(visible = true, shape = BingeShapes.Large),
+            .skeleton(visible = true, shape = BingeShapes.Large)
+            .describedAs(description),
     )
 }
 
@@ -47,6 +54,8 @@ fun ListRowSkeleton(modifier: Modifier = Modifier, height: Dp = dimensionResourc
  * screen's name-and-count block. Without it the first row arrived 128dp below where it was reserved.
  * A subtitle that sits *above* the column instead (the Lists screen's) is the caller's own to place, since
  * this column's content padding would otherwise be applied on the wrong side of it.
+ *
+ * [description] names the loading state for a screen reader, once for the column rather than per row.
  */
 @Composable
 fun ListRowSkeletonColumn(
@@ -54,10 +63,11 @@ fun ListRowSkeletonColumn(
     modifier: Modifier = Modifier,
     count: Int = DEFAULT_LIST_ROW_SKELETON_COUNT,
     height: Dp = dimensionResource(R.dimen.list_row_skeleton_height),
+    description: String? = null,
     header: (@Composable () -> Unit)? = null,
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().describedAs(description),
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.list_row_spacing)),
         userScrollEnabled = false,
