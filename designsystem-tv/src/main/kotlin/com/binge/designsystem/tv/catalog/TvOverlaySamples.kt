@@ -17,6 +17,22 @@ import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.R as TvR
 
+/**
+ * A choice whose rows carry a count, and one that has none: that row reserves the supporting line, so all three stand
+ * at one height and the list reads as one set.
+ */
+@Composable
+fun TvSideSheetRowReservedLineSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Show requests")
+            TvSideSheetRow(label = "Pending", supportingText = "12 requests", onClick = {}, selected = true, initiallyFocused = true)
+            TvSideSheetRow(label = "Approved", supportingText = "48 requests", onClick = {})
+            TvSideSheetRow(label = "All", onClick = {}, reserveSupportingLine = true)
+        }
+    }
+}
+
 /** Rows about one title each: a poster thumbnail and a second line, the first row focused and the second at rest. */
 @Composable
 fun TvSideSheetRowThumbnailSample() {

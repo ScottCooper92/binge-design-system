@@ -31,6 +31,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.Icon
@@ -44,13 +45,12 @@ import com.binge.designsystem.tv.focus.tvExitFocusGroup
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
+import com.binge.designsystem.tv.theme.TV_OVERLAY_SCRIM_ALPHA
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
-private const val SCRIM_ALPHA = 0.6f
-
 /**
- * An end-edge, focus-trapped sheet over a scrim: the ten-foot counterpart of a phone's bottom sheet, for a
+ * An end-edge, focus-trapped sheet over a scrim, at [TV_OVERLAY_SCRIM_ALPHA]: the ten-foot counterpart of a phone's bottom sheet, for a
  * row's actions or a choice. Back, and the key pointing away from the panel, both call [onDismissRequest].
  *
  * [content] gets the entry requester. Each step it shows pins the requester to its first row and pulls it
@@ -70,7 +70,7 @@ fun TvSideSheet(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background.copy(alpha = SCRIM_ALPHA))
+                .background(MaterialTheme.colorScheme.background.copy(alpha = TV_OVERLAY_SCRIM_ALPHA))
                 .onPreviewKeyEvent { event ->
                     if (event.type == KeyEventType.KeyDown && event.key == dismissKey) {
                         onDismissRequest()
@@ -143,6 +143,8 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  *
  * [supportingText] is a second line under the label. [leading] replaces [icon] with a visual of the caller's, such
  * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
+ * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
+ * stays as tall as neighbours that have something, such as a count.
  */
 @Composable
 fun TvSideSheetRow(
@@ -156,6 +158,7 @@ fun TvSideSheetRow(
     initiallyFocused: Boolean = false,
     supportingText: String? = null,
     leading: (@Composable () -> Unit)? = null,
+    reserveSupportingLine: Boolean = false,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val resting =
@@ -203,7 +206,13 @@ fun TvSideSheetRow(
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(text = label, style = MaterialTheme.typography.titleMedium, color = content)
-            supportingText?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium, color = supporting) }
+            when {
+                supportingText != null ->
+                    Text(text = supportingText, style = MaterialTheme.typography.bodyMedium, color = supporting)
+                // An empty line at the supporting style is that line's height, and nothing for a screen reader to read.
+                reserveSupportingLine ->
+                    Text(text = "", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.clearAndSetSemantics {})
+            }
         }
         if (selected) TvSelectedTick(tint = content)
     }
