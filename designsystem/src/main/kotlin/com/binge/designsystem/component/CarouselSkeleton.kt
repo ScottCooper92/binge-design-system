@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
+import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.resolvedContentInset
@@ -22,10 +23,20 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 
 private const val SKELETON_CARD_COUNT = 6
 
+/**
+ * Loading placeholder for a [MediaCarousel] under its [SectionHeader]: the heading plate, then [numCards] card
+ * plates on the loaded row's insets.
+ *
+ * [description] names the loading state for a screen reader; without one it stays silent.
+ */
 @Composable
-fun CarouselSkeleton(modifier: Modifier = Modifier, numCards: Int = SKELETON_CARD_COUNT) {
+fun CarouselSkeleton(
+    modifier: Modifier = Modifier,
+    numCards: Int = SKELETON_CARD_COUNT,
+    description: String? = null,
+) {
     val sides = carouselSkeletonSidePadding()
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().describedAs(description)) {
         // Reserve the loaded SectionHeader's row height: its content is floored at the touch target
         // (SectionHeader), so this reserves the same token rather than a line height of its own.
         Box(
