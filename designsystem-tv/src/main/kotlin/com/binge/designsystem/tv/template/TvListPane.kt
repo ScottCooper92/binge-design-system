@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -88,7 +89,9 @@ internal fun TvListPane(
 
 /**
  * The options, at one fixed width and centred: a pane-wide row would split each label from its tick, and one width
- * for the set makes the options scan as a set. → back into the pane resumes on the option last focused.
+ * for the set makes the options scan as a set. → back into the pane resumes on the option last focused. The column
+ * is a selectable group, as [com.binge.designsystem.tv.component.TvOptionGroup]'s is, so a screen reader announces
+ * the options as one set and their position in it (#678).
  */
 @Composable
 private fun PaneOptions(
@@ -102,7 +105,8 @@ private fun PaneOptions(
                 .width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
                 .padding(top = dimensionResource(DesR.dimen.padding_s))
                 .focusProperties { left = backToListFocus }
-                .tvFocusGroup(),
+                .tvFocusGroup()
+                .selectableGroup(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
     ) {
         options.forEach { option ->
