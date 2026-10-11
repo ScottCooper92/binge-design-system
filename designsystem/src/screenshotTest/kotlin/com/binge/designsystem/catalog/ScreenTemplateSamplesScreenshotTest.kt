@@ -113,6 +113,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun decisionBodyInStepFlow() = DecisionBodyInStepFlowSample()
 
+    /** A note in two paragraphs, the second in the variant colour (#673). */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun decisionBodyNoteContent() = DecisionBodyNoteContentSample()
+
     /** The decision's hero and heading in the flow's aside, so the landscape cells split it beside the points (#638). */
     @PreviewTest
     @ScreenPreviews

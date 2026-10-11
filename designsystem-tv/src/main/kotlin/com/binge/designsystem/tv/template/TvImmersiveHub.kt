@@ -279,7 +279,9 @@ fun <T : Any> TvImmersiveHub(
  * The backdrop layer: [artwork] full-bleed under a scrim, with [copy] in the band above the rows.
  *
  * [copyTopInset] reserves space at the top of the copy's band for a caller drawing over it, such as the grid's
- * heading. The copy is bottom-anchored, so without it a tall block would overflow up into the heading.
+ * heading. The copy is bottom-anchored, so without it a tall block would overflow up into the heading. [copyStart] is
+ * where the copy starts: the content gutter by default, or a page's own start edge ([tvPagePadding]) for one that pads its
+ * heading and cards by that.
  */
 @Composable
 fun <T : Any> TvImmersiveBackdrop(
@@ -288,6 +290,7 @@ fun <T : Any> TvImmersiveBackdrop(
     copy: @Composable ColumnScope.(T) -> Unit,
     modifier: Modifier = Modifier,
     copyTopInset: Dp = Dp.Hairline,
+    copyStart: Dp = tvContentGutterStart(),
 ) {
     Crossfade(
         targetState = item,
@@ -304,7 +307,7 @@ fun <T : Any> TvImmersiveBackdrop(
                     TvImmersiveScrim()
                 }
                 ReportTvRailArtwork()
-                TvImmersiveCopyBand(copyTopInset) { copy(focused) }
+                TvImmersiveCopyBand(copyTopInset, copyStart) { copy(focused) }
             }
         }
     }
@@ -312,7 +315,11 @@ fun <T : Any> TvImmersiveBackdrop(
 
 /** The text band above the rows, bottom-anchored so the copy does not shift as a title wraps. */
 @Composable
-private fun BoxScope.TvImmersiveCopyBand(copyTopInset: Dp, content: @Composable ColumnScope.() -> Unit) {
+private fun BoxScope.TvImmersiveCopyBand(
+    copyTopInset: Dp,
+    start: Dp,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier =
             Modifier
@@ -320,7 +327,7 @@ private fun BoxScope.TvImmersiveCopyBand(copyTopInset: Dp, content: @Composable 
                 .height(dimensionResource(TvR.dimen.tv_immersive_content_top))
                 .fillMaxWidth(COPY_WIDTH_FRACTION)
                 .padding(
-                    start = tvContentGutterStart(),
+                    start = start,
                     end = dimensionResource(DesR.dimen.padding_m),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset,
                     bottom = dimensionResource(DesR.dimen.padding_l),

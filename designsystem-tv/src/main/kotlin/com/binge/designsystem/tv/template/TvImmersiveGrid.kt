@@ -90,6 +90,7 @@ fun <T : Any> TvImmersiveGrid(
             artwork = artwork,
             copy = copy,
             copyTopInset = dimensionResource(TvR.dimen.tv_screen_heading_height),
+            copyStart = padding.calculateStartPadding(direction),
         )
         TvScreenHeading(
             title = heading,

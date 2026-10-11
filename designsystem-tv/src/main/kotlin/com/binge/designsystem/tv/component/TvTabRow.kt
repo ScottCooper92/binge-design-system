@@ -64,6 +64,10 @@ internal const val TAB_COUNT_SCRIM_ALPHA = 0.18f
  * has moved on to what the tab shows. The row scrolls, and brings the selected tab into view when the selection
  * arrives from elsewhere. [initiallyFocused] seeds the row as focused for a frame; production passes false.
  * [entryFocusRequester] and [arrival] let a page aim focus at the row, landing on the selected tab either way.
+ *
+ * Put the row on the page's `background` tone. A resting tab is transparent, and a count's sub-pill is tinted towards its
+ * own text, so on a lighter ground such as `surface` the count drops below WCAG AA (about 3.95:1 against 5.40:1 on
+ * `background`). `TvTabCountContrastTest` pins both numbers.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
