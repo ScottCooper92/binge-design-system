@@ -32,9 +32,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -49,8 +54,9 @@ import com.binge.designsystem.paneSideInsets
  * A detail page under a hero: the [hero] runs full-bleed to the top of the window, a bar fades in over it as
  * the page scrolls past it, and [content] follows in one scroll. For a title, an episode, a person, a request.
  *
- * [hero] is the header the page uses (`DetailHero`, `DetailCinematicHeader`, or a person's own); [heroHeight]
- * is where the bar's fade starts, and [horizontalInset] lines the bar's controls up with the hero's copy. A
+ * [hero] is the header the page uses (`DetailHero`, `DetailCinematicHeader`, or a person's own). The bar's fade
+ * starts at the hero's measured height, so a hero that grows at a large font scale fades it on time; [heroHeight]
+ * stands in until the hero has been measured. [horizontalInset] lines the bar's controls up with the hero's copy. A
  * [footer] sits below the scroll rather than over it, so the scroll always clears it. It reaches the true
  * edge of the window, so it clears the navigation bar and a side cutout itself, by
  * [com.binge.designsystem.bottomBarInsets], as `FormFooter` does. [inFlight] draws a thin
@@ -75,6 +81,7 @@ fun HeroDetailScreen(
     hero: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val measured = remember { MeasuredHeroHeight() }
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         Column(
             modifier =
@@ -83,10 +90,10 @@ fun HeroDetailScreen(
                     .verticalScroll(scrollState)
                     .then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
         ) {
-            hero()
+            MeasuredHero(measured, hero)
             HeroDetailContent(contentMaxWidth, content)
         }
-        HeroDetailBar(title, onBack, heroHeight, horizontalInset, inFlight, actions) { scrollState.value.toFloat() }
+        HeroDetailBar(title, onBack, measured.height(heroHeight), horizontalInset, inFlight, actions) { scrollState.value.toFloat() }
     }
 }
 
@@ -154,6 +161,7 @@ fun HeroDetailLazyScreen(
     hero: @Composable () -> Unit,
     content: LazyListScope.() -> Unit,
 ) {
+    val measured = remember { MeasuredHeroHeight() }
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
             LazyColumn(
@@ -163,11 +171,11 @@ fun HeroDetailLazyScreen(
                 verticalArrangement = verticalArrangement,
                 horizontalAlignment = horizontalAlignment,
             ) {
-                item(key = HERO_ITEM_KEY) { hero() }
+                item(key = HERO_ITEM_KEY) { MeasuredHero(measured, hero) }
                 content()
             }
         }
-        HeroDetailBar(title, onBack, heroHeight, horizontalInset, inFlight, actions) {
+        HeroDetailBar(title, onBack, measured.height(heroHeight), horizontalInset, inFlight, actions) {
             // Past the hero item the offset is unknown and no longer matters: the bar is fully in.
             if (listState.firstVisibleItemIndex == 0) listState.firstVisibleItemScrollOffset.toFloat() else Float.MAX_VALUE
         }
@@ -199,6 +207,21 @@ fun HeroDetailStateScreen(
             actions = {},
         ) { 0f }
     }
+}
+
+/** The hero's height as last laid out, in pixels; zero until it has been. */
+private class MeasuredHeroHeight {
+    var px by mutableIntStateOf(0)
+
+    /** The measured height, or [fallback] before the hero has been laid out. */
+    @Composable
+    fun height(fallback: Dp): Dp = if (px > 0) with(LocalDensity.current) { px.toDp() } else fallback
+}
+
+/** [hero], reporting its laid-out height to [measured]. */
+@Composable
+private fun MeasuredHero(measured: MeasuredHeroHeight, hero: @Composable () -> Unit) {
+    Box(modifier = Modifier.onSizeChanged { measured.px = it.height }) { hero() }
 }
 
 private const val HERO_ITEM_KEY = "hero-detail-hero"

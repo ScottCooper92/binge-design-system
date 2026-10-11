@@ -7,6 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.PreviewCutout
 import com.binge.designsystem.preview.PreviewEdge
 import com.binge.designsystem.preview.PreviewSystemBarInsets
+import com.binge.designsystem.preview.SOURCE_LOCALE
 import com.binge.designsystem.preview.ScreenPreviews
 import com.binge.designsystem.preview.ScreenStatePreview
 
@@ -143,6 +144,18 @@ class ScreenTemplateSamplesScreenshotTest {
     @ScreenPreviews
     @Composable
     fun heroDetail() = HeroDetailScreenSample()
+
+    /** Font scale 2.0 on a landscape phone: the hero grows to hold its copy, which sits below the overlay bar (#655). */
+    @PreviewTest
+    @Preview(
+        name = "land-font20",
+        device = PHONE_LANDSCAPE,
+        fontScale = 2.0f,
+        uiMode = UI_MODE_NIGHT_YES,
+        locale = SOURCE_LOCALE,
+    )
+    @Composable
+    fun heroDetailFullCopyUnderSystemBars() = PreviewSystemBarInsets { HeroDetailScreenFullCopySample() }
 
     @PreviewTest
     @ScreenStatePreview

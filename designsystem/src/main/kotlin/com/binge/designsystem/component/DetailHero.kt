@@ -156,18 +156,18 @@ fun DetailHero(
             eyebrowText = eyebrowText,
             metaContent = metaContent,
             titleContent = titleContent,
-            // With the chrome drawn, the copy keeps clear of the back button: a title and tagline too tall for
-            // the band at a large font scale grow the band instead of running up under the button.
+            // The copy keeps clear of the back button over it, the hero's own or the overlay bar's: a title and
+            // tagline too tall for the band at a large font scale grow the band instead of running under it.
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .then(
-                    if (showChrome) {
-                        Modifier
-                            .statusBarsPadding()
-                            .padding(top = dimensionResource(R.dimen.top_bar_icon_size) + dimensionResource(R.dimen.padding_m) * 2)
-                    } else {
-                        Modifier
-                    },
+                .statusBarsPadding()
+                .padding(
+                    top =
+                        if (showChrome) {
+                            dimensionResource(R.dimen.top_bar_icon_size) + dimensionResource(R.dimen.padding_m) * 2
+                        } else {
+                            detailOverlayBarHeight()
+                        },
                 ),
         )
     }
