@@ -11,7 +11,7 @@ import com.binge.designsystem.component.DetailStat
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public sample for [DetailCinematicHeader] (group `"Media"`) — see the convention on
+ * Public sample for [DetailCinematicHeader] — see the convention on
  * [MediaCardRatedSample]. The header is the expanded-width counterpart to [DetailHero]; the
  * catalog screenshot test renders this at an expanded (~900dp) canvas, since the shared
  * wrap-content multipreviews don't reach that width.

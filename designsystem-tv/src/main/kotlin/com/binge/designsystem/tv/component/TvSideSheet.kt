@@ -140,6 +140,9 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * One row. Focus is the fill. A [destructive] row rests in the error colour, so it reads as one before it is
  * reached. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false renders a read-out
  * that stays out of the focus order. [initiallyFocused] draws the focused state, for a frame.
+ *
+ * [supportingText] is a second line under the label. [leading] replaces [icon] with a visual of the caller's, such
+ * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
  */
 @Composable
 fun TvSideSheetRow(
@@ -151,6 +154,8 @@ fun TvSideSheetRow(
     destructive: Boolean = false,
     enabled: Boolean = true,
     initiallyFocused: Boolean = false,
+    supportingText: String? = null,
+    leading: (@Composable () -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val resting =
@@ -160,6 +165,11 @@ fun TvSideSheetRow(
             else -> MaterialTheme.colorScheme.onSurface
         }
     val content = tvFocusContentColor(isFocused = focused, resting = resting)
+    val supporting =
+        tvFocusContentColor(
+            isFocused = focused,
+            resting = if (enabled && !destructive) MaterialTheme.colorScheme.onSurfaceVariant else resting,
+        )
     val clickable =
         if (enabled) {
             Modifier.tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick)
@@ -181,15 +191,20 @@ fun TvSideSheetRow(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        icon?.let {
-            Icon(
-                imageVector = it,
-                contentDescription = null,
-                tint = content,
-                modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
-            )
+        when {
+            leading != null -> leading()
+            icon != null ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = content,
+                    modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
+                )
         }
-        Text(text = label, style = MaterialTheme.typography.titleMedium, color = content, modifier = Modifier.weight(1f))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, style = MaterialTheme.typography.titleMedium, color = content)
+            supportingText?.let { Text(text = it, style = MaterialTheme.typography.bodyMedium, color = supporting) }
+        }
         if (selected) TvSelectedTick(tint = content)
     }
 }

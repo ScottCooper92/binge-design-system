@@ -5,7 +5,7 @@ import com.binge.designsystem.component.DiscoverEntryRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public sample for [DiscoverEntryRow] (group `"Rows"`). See the convention KDoc on
+ * Public sample for [DiscoverEntryRow]. See the convention KDoc on
  * [MediaCardRatedSample].
  *
  * A full-width entry row (icon + title/subtitle + trailing chevron) — it spans its parent, so the

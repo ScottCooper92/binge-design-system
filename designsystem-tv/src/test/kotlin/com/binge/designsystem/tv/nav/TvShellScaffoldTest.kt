@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.nav
 
 import android.app.Application
 import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -135,5 +136,89 @@ class TvShellScaffoldTest {
         rule.waitForIdle()
 
         rule.onNodeWithTag(OVERLAY).assertIsFocused()
+    }
+
+    private var pops = 0
+    private var goHomes = 0
+    private var outerBacks = 0
+
+    /** The scaffold with #617's inputs, under an outer Back handler that only hears what the scaffold lets through. */
+    private fun showHooked(
+        selectedKey: Any,
+        settle: (@Composable () -> TvShellSettle)? = null,
+        contentDepth: Int = 1,
+        overlayOpen: Boolean = false,
+    ) = rule.setContent {
+        back = requireNotNull(LocalOnBackPressedDispatcherOwner.current).onBackPressedDispatcher
+        BackHandler { outerBacks++ }
+        BingeTvTheme {
+            val state = settle?.invoke() ?: rememberTvShellSettle(selectedKey)
+            TvShellScaffold(
+                header = null,
+                items = listOf(TvNavRailItem(key = HOME, label = "Home", icon = Icons.Filled.Home)),
+                footer = TvNavRailItem(key = SETTINGS, label = "Settings", icon = Icons.Filled.Settings),
+                selectedKey = selectedKey,
+                homeKey = HOME,
+                onSelect = { selected += it },
+                onBackAtRoot = { rootBacks++ },
+                contentDepth = contentDepth,
+                settle = state,
+                onPop = { pops++ },
+                onGoHome = { goHomes++ },
+                overlayOpen = overlayOpen,
+            ) { key ->
+                Box(Modifier.size(40.dp).testTag("$CONTENT-$key").focusable())
+            }
+        }
+    }
+
+    @Test
+    fun `jumpTo settles the content at once`() {
+        lateinit var settle: TvShellSettle
+        showHooked(selectedKey = HOME, settle = { rememberTvShellSettle(HOME).also { settle = it } })
+        rule.onNodeWithTag("$CONTENT-$HOME").assertExists()
+
+        rule.runOnIdle { settle.jumpTo(SETTINGS) }
+        rule.waitForIdle()
+
+        rule.onNodeWithTag("$CONTENT-$SETTINGS").assertExists()
+        assertEquals(SETTINGS, settle.settledKey)
+    }
+
+    @Test
+    fun `Back in the content pops while the destination is deeper than one`() {
+        showHooked(selectedKey = SETTINGS, contentDepth = 2)
+        rule.onNodeWithTag("$CONTENT-$SETTINGS").requestFocus()
+        rule.waitForIdle()
+
+        pressBack()
+
+        assertEquals(1, pops)
+        rule.onNodeWithTag("$CONTENT-$SETTINGS").assertIsFocused()
+    }
+
+    @Test
+    fun `Back on the rail off home goes home through the caller, and focus stays on the rail`() {
+        showHooked(selectedKey = SETTINGS)
+        rule.onNode(item("Settings")).requestFocus()
+        rule.waitForIdle()
+
+        pressBack()
+
+        assertEquals(1, goHomes)
+        assertEquals(emptyList<Any>(), selected)
+        rule.onNode(item("Settings")).assertIsFocused()
+    }
+
+    @Test
+    fun `an overlay hosted outside the scaffold takes Back when it says it is open`() {
+        showHooked(selectedKey = SETTINGS, overlayOpen = true)
+        rule.onNodeWithTag("$CONTENT-$SETTINGS").requestFocus()
+        rule.waitForIdle()
+
+        pressBack()
+
+        assertEquals(1, outerBacks)
+        assertEquals(0, pops + goHomes)
     }
 }

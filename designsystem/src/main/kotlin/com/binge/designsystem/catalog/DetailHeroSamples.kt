@@ -21,7 +21,7 @@ import com.binge.designsystem.component.RatingChipTone
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public sample for [DetailHero] (group `"Media"`). See the convention KDoc on
+ * Public sample for [DetailHero]. See the convention KDoc on
  * [MediaCardRatedSample].
  *
  * The hero fixes its own height (`R.dimen.detail_hero_height`), so the sample passes no height

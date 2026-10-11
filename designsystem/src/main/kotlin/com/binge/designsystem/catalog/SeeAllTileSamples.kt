@@ -10,7 +10,7 @@ import com.binge.designsystem.component.SeeAllTile
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public samples for [SeeAllTile] (group `"Tiles"`) — see the convention on [MediaCardRatedSample].
+ * Public samples for [SeeAllTile] — see the convention on [MediaCardRatedSample].
  * The trailing "see all" tile is sized like a poster cell, so each sample pins a poster width and 2:3
  * aspect ratio rather than stretching to the canvas.
  */
