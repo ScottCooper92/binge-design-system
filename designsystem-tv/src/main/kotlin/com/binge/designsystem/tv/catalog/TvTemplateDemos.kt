@@ -14,12 +14,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.component.TvCheckboxRow
+import com.binge.designsystem.tv.component.TvSaveStatus
 import com.binge.designsystem.tv.template.TvMessagePage
 import com.binge.designsystem.tv.template.TvPageAction
 import com.binge.designsystem.tv.template.TvPageHosting
@@ -28,6 +32,7 @@ import com.binge.designsystem.tv.template.TvStepHeading
 import com.binge.designsystem.tv.template.TvTwoPaneCopy
 import com.binge.designsystem.tv.template.TvTwoPanePage
 import com.binge.designsystem.tv.template.TvTwoPaneSplit
+import com.binge.designsystem.tv.template.TvTwoPaneStyle
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import kotlinx.coroutines.delay
 import com.binge.designsystem.R as DesR
@@ -35,6 +40,7 @@ import com.binge.designsystem.R as DesR
 private const val DEMO_STEP_COUNT = 3
 private const val DEMO_LOAD_MILLIS = 1_500L
 private const val DEMO_FIELD_COUNT = 12
+private const val DEMO_SAVE_MILLIS = 800L
 
 private val DemoStepTitles = listOf("What do you watch most?", "Where do you watch?", "Share usage data?")
 
@@ -91,21 +97,67 @@ fun TvMessagePageDemo() {
     )
 }
 
-/** A form longer than the pane: the fields scroll under focus and Save stays one press below whichever is focused. */
+/**
+ * A create form longer than the pane: the fields scroll under focus and Add server stays one press below whichever
+ * is focused. A pinned action is for a commit like this one, never for saving settings.
+ */
 @Composable
 fun TvTwoPanePagePinnedActionDemo() {
     TvTwoPanePage(
         split = TvTwoPaneSplit.Balanced,
         hosting = TvPageHosting.Overlay,
-        pinnedAction = { TvButton(label = "Save", onClick = {}, style = TvButtonStyle.Primary) },
+        pinnedAction = { TvButton(label = "Add server", onClick = {}, style = TvButtonStyle.Primary) },
         copy = {
             TvTwoPaneCopy(
-                headline = "Notification settings",
-                body = "Move down through the fields: the pane scrolls, and Save stays where it is.",
+                headline = "Add a server",
+                body = "Move down through the fields: the pane scrolls, and Add server stays where it is.",
             )
         },
         action = {
             repeat(DEMO_FIELD_COUNT) { index -> TvButton(label = "Field ${index + 1}", onClick = {}) }
+        },
+    )
+}
+
+/**
+ * Settings that save as they are made, with no Save button: each change shows Saving…, then Saved, in the copy
+ * pane. Tick "Make saves fail" and the next change fails, keeps its tick, and offers Retry.
+ */
+@Composable
+fun TvTwoPanePageSaveAsMadeDemo() {
+    val settings = remember { List(DEMO_FIELD_COUNT) { it % 2 == 0 }.toMutableStateList() }
+    var failing by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf<SaveStatus>(SaveStatus.Idle) }
+    var saves by remember { mutableIntStateOf(0) }
+    LaunchedEffect(saves) {
+        if (saves == 0) return@LaunchedEffect
+        status = SaveStatus.Saving
+        delay(DEMO_SAVE_MILLIS)
+        status = if (failing) SaveStatus.Failed else SaveStatus.Saved
+    }
+    TvTwoPanePage(
+        split = TvTwoPaneSplit.Balanced,
+        style = TvTwoPaneStyle.Board,
+        hosting = TvPageHosting.Overlay,
+        copy = {
+            TvTwoPaneCopy(
+                headline = "Notification settings",
+                body = "Each change saves as you make it. Untick Make saves fail, then Retry, to save a failed change.",
+            )
+            TvSaveStatus(status = status, onRetry = { saves++ })
+        },
+        action = {
+            TvCheckboxRow(label = "Make saves fail", checked = failing, onCheckedChange = { failing = it })
+            settings.forEachIndexed { index, on ->
+                TvCheckboxRow(
+                    label = "Notification ${index + 1}",
+                    checked = on,
+                    onCheckedChange = {
+                        settings[index] = it
+                        saves++
+                    },
+                )
+            }
         },
     )
 }

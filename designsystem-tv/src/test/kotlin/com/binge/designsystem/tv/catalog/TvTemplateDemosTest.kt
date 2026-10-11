@@ -2,10 +2,15 @@ package com.binge.designsystem.tv.catalog
 
 import android.app.Application
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.requestFocus
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
@@ -46,7 +51,39 @@ class TvTemplateDemosTest {
         composeTestRule.onNodeWithText("Retry").assertIsFocused()
     }
 
+    @Test
+    fun `the save-as-made demo saves a change with no button, and offers Retry when the save fails`() {
+        composeTestRule.setContent { BingeTvTheme { TvTwoPanePageSaveAsMadeDemo() } }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Save").assertDoesNotExist()
+        composeTestRule.mainClock.autoAdvance = false
+
+        press(row("Notification 1"))
+        composeTestRule.onNodeWithText("Saving…").assertExists()
+        composeTestRule.mainClock.advanceTimeBy(DEMO_WAIT_MILLIS)
+        composeTestRule.onNodeWithText("Saved").assertExists()
+
+        press(row("Make saves fail"))
+        press(row("Notification 2"))
+        composeTestRule.mainClock.advanceTimeBy(DEMO_WAIT_MILLIS)
+        composeTestRule.onNodeWithText("Couldn't save your change").assertExists()
+        row("Notification 2").assertIsOn()
+        row("Retry").assertExists()
+    }
+
+    private fun row(label: String) = composeTestRule.onNode(hasText(label) and isFocusable())
+
+    private fun press(node: SemanticsNodeInteraction) {
+        node.requestFocus()
+        composeTestRule.mainClock.advanceTimeByFrame()
+        node.performKeyInput { pressKey(Key.DirectionCenter) }
+        composeTestRule.mainClock.advanceTimeBy(SETTLE_MILLIS)
+    }
+
     private companion object {
         const val DEMO_WAIT_MILLIS = 2_000L
+
+        /** Long enough for a press to recompose and start its save, short of the demo's save delay. */
+        const val SETTLE_MILLIS = 100L
     }
 }

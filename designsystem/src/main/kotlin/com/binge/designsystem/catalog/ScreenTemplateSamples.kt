@@ -33,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -95,6 +93,7 @@ private const val SAMPLE_ROWS = 14
 private const val SAMPLE_STEPS = 3
 private const val SAMPLE_GRID_COLUMNS = 3
 private const val SAMPLE_GRID_TILES = 24
+private const val SAMPLE_SCROLLED_ROWS = 6
 private const val BLEED_RAIL_CARDS = 10
 
 /** A collapsing-bar screen over a list: the bar scrims in as rows pass under it. */
@@ -263,22 +262,19 @@ fun FilteredListScreenSample() {
 }
 
 /**
- * The same list with a collapsing bar whose state the caller owns, and a transparent header: one scrim ramps in
- * over bar and chips together as the bar collapses, with the rows visible behind it.
+ * The same list scrolled past the title: the bar collapsed, and the one scrim over bar and chips faded in, with the
+ * rows visible behind it. Nothing is passed for the chrome: the transparent collapsing bar and header are the
+ * template's default, and the scrim follows the bar's own collapse.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilteredListScreenScrimSample() {
     var selected by remember { mutableIntStateOf(0) }
-    val behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FilteredListScreen(
             title = "Requests",
             onBack = LocalDemoBack.current,
-            bar = ScreenBar.Collapsing,
-            scrollBehavior = behavior,
-            headerBackground = Color.Transparent,
-            scrimFraction = behavior.state.collapsedFraction,
+            scrollBehavior = collapsedTopBarScrollBehavior(),
             filters = listOf(FilterChipItem("All", 42), FilterChipItem("Pending", 3), FilterChipItem("Approved", 39)),
             selectedFilter = selected,
             onFilterChange = { selected = it },
@@ -494,6 +490,22 @@ fun FormScreenSample() {
     }
 }
 
+/** A form scrolled past the title: the default collapsing bar collapsed, its scrim faded in over the fields. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FormScreenScrolledSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "General",
+            onBack = LocalDemoBack.current,
+            scrollBehavior = collapsedTopBarScrollBehavior(),
+            saveStatus = FormSaveStatus.Saved,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
 /** [FormScreenSample] while a change is on its way: "Saving…" in the bar. */
 @Composable
 fun FormScreenSavingSample() {
@@ -604,6 +616,38 @@ fun StepFlowScreenSample() {
                 icon = Icons.Filled.Shield,
                 modifier = Modifier.height(dimensionResource(R.dimen.detail_hero_height)),
             )
+        }
+    }
+}
+
+/**
+ * A step long enough to scroll, with the bar collapsed and the step passing under it: the transparent bar scrims in
+ * as the step scrolls, and the read-out stays pinned under it. The collapsed bar is forced through
+ * [collapsedTopBarScrollBehavior], since a frame cannot scroll.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StepFlowScreenScrolledSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = 1,
+            onBack = {},
+            title = "Edit connection",
+            scrollBehavior = collapsedTopBarScrollBehavior(),
+            heading = { StepHeading(kicker = "Privacy", title = "Share usage data?", subtitle = "Counts of which screens are opened.") },
+            footer = { BingeFilledButton(label = "Share", onClick = {}, modifier = Modifier.fillMaxWidth()) },
+        ) {
+            repeat(SAMPLE_SCROLLED_ROWS) { index ->
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.state_icon_container_size))
+                            .clip(BingeShapes.Medium)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                ) { Text("Point ${index + 1}", modifier = Modifier.padding(dimensionResource(R.dimen.padding_m))) }
+            }
         }
     }
 }

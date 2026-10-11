@@ -63,6 +63,11 @@ class TvTemplateSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun twoPanePageSaveAsMade() = Frame { TvTwoPanePageSaveAsMadeSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun stepFlow() = Frame { TvStepFlowSample() }
 
     @PreviewTest

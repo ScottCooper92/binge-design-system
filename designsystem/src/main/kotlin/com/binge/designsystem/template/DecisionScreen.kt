@@ -50,6 +50,10 @@ private const val LANDSCAPE_CONTENT_WEIGHT = 3f
  * answers on the start side, and gives the points their own scroll on the end side. The space is the one the screen
  * is given, so a pane of a wide window that is taller than wide stays in the portrait layout.
  *
+ * It has no top bar, deliberately: a decision is one question that must be answered, so there is no title to
+ * collapse and no Back that skips it. The page clears the system bars and the keyboard itself. A decision inside a
+ * flow takes the flow's bar instead, as [StepFlowScreen] draws it.
+ *
  * [noteContent] replaces `copy.note` in both layouts, as [DecisionHeading] says.
  */
 @Composable

@@ -220,6 +220,9 @@ private const val HERO_ITEM_KEY = "hero-detail-hero"
 /**
  * The outer frame both forms share: no bar of the Scaffold's own, since the overlay bar clears the status bar
  * itself; the page's outer sides clear a cutout in landscape, and the footer reaches the true edge.
+ *
+ * The overlay bar over the hero, rather than [BingeScreenScaffold]'s transparent medium bar, is deliberate: a
+ * hero page wants its artwork to reach the top edge and its bar to fade in over it as the page scrolls.
  */
 @Composable
 private fun HeroDetailFrame(
@@ -236,7 +239,8 @@ private fun HeroDetailFrame(
         bottomBar = { footer?.invoke() },
         contentWindowInsets = WindowInsets(0),
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+        // Only the footer's height: the page owns its top and sides, so a bar added later cannot push the hero down.
+        Column(modifier = Modifier.fillMaxSize().padding(bottom = padding.calculateBottomPadding())) {
             Box(
                 modifier =
                     Modifier
