@@ -45,26 +45,12 @@ fun StepFlowScreenTitledSample() {
     }
 }
 
-/** The same flow in the end pane of a wide window. The pane is taller than wide, so the step stacks. */
-@Composable
-fun StepFlowScreenInPaneSample() {
-    var step by remember { mutableIntStateOf(0) }
-    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
-            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                ConnectionFlow(step = step, onStep = { step = it }, onExit = LocalDemoBack.current)
-            }
-        }
-    }
-}
-
 /**
- * The flow beside a list pane, on its second step: the pane rule hides the first step's Back there, but a step back
- * stays, so the user can always go to the previous step.
+ * The same flow in the end pane of a wide window, with the list pane beside it, on its second step. The pane is taller
+ * than wide, so the step stacks. Back steps to the first step even with the list beside; there, Back would leave.
  */
 @Composable
-fun StepFlowScreenBesideHubSample() {
+fun StepFlowScreenInPaneSample() {
     var step by remember { mutableIntStateOf(1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         CompositionLocalProvider(LocalIsSinglePaneNav provides false) {
