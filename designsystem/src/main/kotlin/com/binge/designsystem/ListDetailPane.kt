@@ -74,7 +74,7 @@ val LocalPaneDepth = staticCompositionLocalOf { 1 }
  * beside it is a parent screen, not a way back to itself, so depth alone tells a nested screen it
  * need not opt in — replacing the old marker-interface opt-out.
  */
-internal fun paneShowsBack(hubBeside: Boolean, paneDepth: Int): Boolean = !hubBeside || paneDepth > 1
+fun paneShowsBack(hubBeside: Boolean, paneDepth: Int): Boolean = !hubBeside || paneDepth > 1
 
 /**
  * [onBack] where [paneShowsBack] says this entry should carry its own Back, `null` where the list
