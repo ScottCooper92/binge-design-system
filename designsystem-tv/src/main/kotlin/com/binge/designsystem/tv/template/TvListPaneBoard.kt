@@ -63,6 +63,9 @@ data class TvPaneOption(
  * with neither. [announceNote] makes the note a polite live region, for a note that reports an outcome rather than
  * a static hint, which would otherwise be read again every time focus reached the row.
  *
+ * [body] and [note] are the pane's description, so they wrap to as many lines as they need. The list's labels and details
+ * are one line each, ellipsized.
+ *
  * [detail] is the row's current value on its line in the list, for a row whose value is a choice (the chosen option,
  * On or Off), so the list can be read without moving into each pane. Null leaves the row one line.
  *
