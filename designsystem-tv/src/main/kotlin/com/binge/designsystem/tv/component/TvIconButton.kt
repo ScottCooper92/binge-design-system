@@ -89,7 +89,7 @@ fun TvIconButton(
  * double-announce it.
  */
 @Composable
-fun TvIconButtonSurface(
+internal fun TvIconButtonSurface(
     icon: ImageVector,
     label: String,
     style: TvButtonStyle,

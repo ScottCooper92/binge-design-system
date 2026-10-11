@@ -70,7 +70,7 @@ fun tvContentGutterStart(): Dp = LocalTvContentInset.current + dimensionResource
  * for a frame.
  */
 @Stable
-class TvRailArtworkPresence {
+internal class TvRailArtworkPresence {
     private var sources by mutableIntStateOf(0)
 
     /** True while at least one backdrop is full-bleed behind the rail. */
@@ -86,7 +86,7 @@ class TvRailArtworkPresence {
 }
 
 /** Null wherever no rail hosts the content — an overlay-hosted screen, or a preview rendering a surface alone. */
-val LocalTvRailArtwork = compositionLocalOf<TvRailArtworkPresence?> { null }
+internal val LocalTvRailArtwork = compositionLocalOf<TvRailArtworkPresence?> { null }
 
 /**
  * Registers this composition as painting artwork behind the rail for as long as it stays composed — the signal
