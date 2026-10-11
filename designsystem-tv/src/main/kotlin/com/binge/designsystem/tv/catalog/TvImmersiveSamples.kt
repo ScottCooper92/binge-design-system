@@ -29,6 +29,7 @@ import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvContentInset
+import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.template.TvHubRow
 import com.binge.designsystem.tv.template.TvImmersiveGrid
@@ -245,8 +246,18 @@ private val SampleGridTitles =
     }
 
 @Composable
-private fun SampleGrid(titles: List<SampleTitle> = SampleGridTitles, initialFocusedIndex: Int? = null) {
-    RailHosted {
+private fun SampleGrid(
+    titles: List<SampleTitle> = SampleGridTitles,
+    initialFocusedIndex: Int? = null,
+    asOverlay: Boolean = false,
+) {
+    val host: @Composable (@Composable () -> Unit) -> Unit =
+        if (asOverlay) {
+            { content -> CompositionLocalProvider(LocalTvHostedAsOverlay provides true, content = content) }
+        } else {
+            { content -> RailHosted(content) }
+        }
+    host {
         TvImmersiveGrid(
             heading = "All titles (${titles.size})",
             count = titles.size,
@@ -265,6 +276,12 @@ private fun SampleGrid(titles: List<SampleTitle> = SampleGridTitles, initialFocu
 @Composable
 fun TvImmersiveGridSample() {
     SampleGrid()
+}
+
+/** The grid as an overlay, how a see-all page is shown: no rail beside it, so the copy starts at the overscan margin with the heading and cards. */
+@Composable
+fun TvImmersiveGridOverlaySample() {
+    SampleGrid(asOverlay = true)
 }
 
 /** Focus on the second row: the row is anchored under the heading and the first is clipped away. */
