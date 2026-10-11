@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -58,6 +59,7 @@ fun TvChoiceRow(
                 selected = isSelected,
                 initiallyFocused = choice.key == initialFocusedKey,
                 onSelect = { if (!isSelected) onSelect(choice.key) },
+                icon = choice.icon,
             )
         }
     }
@@ -71,11 +73,13 @@ fun TvChoiceRow(
 data class TvChoiceUi(
     val key: String,
     val label: String,
+    val icon: ImageVector? = null,
 )
 
 /**
  * One option's pill. Focus fills it; being chosen adds the tick, and the two are independent. The tick takes the
  * label's colour, so it inverts with the fill rather than vanishing into it. Selection is announced as well as drawn.
+ * An [icon] leads the label on its tinted plate.
  */
 @Composable
 private fun TvChoice(
@@ -83,6 +87,7 @@ private fun TvChoice(
     selected: Boolean,
     initiallyFocused: Boolean,
     onSelect: () -> Unit,
+    icon: ImageVector? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val contentColor = tvFocusContentColor(isFocused = focused, resting = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -101,6 +106,7 @@ private fun TvChoice(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
+        icon?.let { TvRowIcon(icon = it, isFocused = focused) }
         Text(
             text = label,
             style = MaterialTheme.typography.titleMedium,

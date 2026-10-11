@@ -132,6 +132,8 @@
     <dimen name="tv_list_pane_option_width">280dp</dimen>
     <dimen name="tv_list_pane_skeleton_line_height">28dp</dimen>
     <dimen name="tv_option_row_gap">7dp</dimen>
+    <!-- A row's leading icon plate: the tinted box behind the glyph, which is tv_button_icon -->
+    <dimen name="tv_row_icon_plate">40dp</dimen>
     <dimen name="tv_checkbox_size">28dp</dimen>
     <dimen name="tv_checkbox_border">2dp</dimen>
     <!-- Pill choices and tabs: the label's inset in its pill, and the floor width of a tab's count -->

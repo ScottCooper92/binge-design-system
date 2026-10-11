@@ -126,6 +126,7 @@ private fun PaneOptions(
                     checked = option.selected,
                     onCheckedChange = { option.onSelect() },
                     initiallyFocused = option.label == initialFocusedOptionLabel,
+                    icon = option.icon,
                     modifier = optionModifier,
                 )
             } else {
