@@ -65,19 +65,23 @@ fun TvSideSheetRowReservedLineSample() {
 /** A row whose label is longer than the sheet is wide: it stops on one line with an ellipsis, beside its tick. */
 @Composable
 fun TvSideSheetRowLongLabelSample() {
+    var selected by remember { mutableStateOf(LONG_LABEL) }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Add to a list")
             TvSideSheetRow(
-                label = "The extended director's cut of the complete first season, remastered",
-                onClick = {},
-                selected = true,
+                label = LONG_LABEL,
+                onClick = { selected = LONG_LABEL },
+                selected = selected == LONG_LABEL,
                 initiallyFocused = true,
             )
-            TvSideSheetRow(label = "Watch later", onClick = {})
+            TvSideSheetRow(label = WATCH_LATER, onClick = { selected = WATCH_LATER }, selected = selected == WATCH_LATER)
         }
     }
 }
+
+private const val LONG_LABEL = "The extended director's cut of the complete first season, remastered"
+private const val WATCH_LATER = "Watch later"
 
 /** Rows about one title each: a poster thumbnail and a second line, the first row focused and the second at rest. */
 @Composable
