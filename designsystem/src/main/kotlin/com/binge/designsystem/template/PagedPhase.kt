@@ -140,16 +140,24 @@ data class PagedSourceState(
  *
  * [holdUntilAllResolved] decides what a source still on its first load does. True (the default) holds the
  * list on [PagedPhase.Skeleton] until every source has resolved, so a merged grid does not draw one source's
- * rows and then shuffle the others in. False shows the rows as soon as any source has them.
+ * rows and then shuffle the others in. False shows the rows as soon as any source has them. The hold ends
+ * once [resolved] is true, which says every source has resolved once: this function cannot see history, so
+ * the caller passes it (see [rememberMergedPagedPhase]). With the hold off, a source back on
+ * [PagedPhase.Skeleton] while others have rows counts as refreshing.
  */
-fun mergedPagedPhase(phases: List<PagedPhase>, holdUntilAllResolved: Boolean = true): PagedPhase {
+fun mergedPagedPhase(
+    phases: List<PagedPhase>,
+    holdUntilAllResolved: Boolean = true,
+    resolved: Boolean = false,
+): PagedPhase {
     val withRows = phases.filterIsInstance<PagedPhase.Rows>()
     val loading = phases.any { it == PagedPhase.Skeleton }
+    val holding = holdUntilAllResolved && !resolved
     return when {
-        loading && (holdUntilAllResolved || withRows.isEmpty()) -> PagedPhase.Skeleton
+        loading && (holding || withRows.isEmpty()) -> PagedPhase.Skeleton
         withRows.isNotEmpty() ->
             PagedPhase.Rows(
-                refreshing = withRows.any { it.refreshing },
+                refreshing = loading || withRows.any { it.refreshing },
                 refreshError = withRows.firstNotNullOfOrNull { it.refreshError },
             )
         else -> phases.filterIsInstance<PagedPhase.Failed>().firstOrNull() ?: PagedPhase.Empty
@@ -159,7 +167,8 @@ fun mergedPagedPhase(phases: List<PagedPhase>, holdUntilAllResolved: Boolean = t
 /**
  * [rememberPagedPhase] for a list merged from several sources: each source is tracked on its own, then
  * [mergedPagedPhase] combines them. [key] is the merged list's identity; changing it, or the number of
- * [sources], starts every tracker afresh.
+ * [sources], starts every tracker afresh and the hold again. The hold is a first-load hold: once a frame
+ * has had no source on the skeleton, rows already on screen stay up while a source refreshes.
  */
 @Composable
 fun rememberMergedPagedPhase(
@@ -168,10 +177,10 @@ fun rememberMergedPagedPhase(
     holdUntilAllResolved: Boolean = true,
 ): PagedPhase {
     val trackers = remember(key, sources.size) { List(sources.size) { PagedPhaseTracker() } }
-    return mergedPagedPhase(
-        phases = sources.mapIndexed { index, source -> trackers[index].phase(source.loadState, source.itemCount, source.lastRefresh) },
-        holdUntilAllResolved = holdUntilAllResolved,
-    )
+    val resolvedOnce = remember(key, sources.size) { booleanArrayOf(false) }
+    val phases = sources.mapIndexed { index, source -> trackers[index].phase(source.loadState, source.itemCount, source.lastRefresh) }
+    if (phases.none { it == PagedPhase.Skeleton }) resolvedOnce[0] = true
+    return mergedPagedPhase(phases, holdUntilAllResolved, resolved = resolvedOnce[0])
 }
 
 /** One arm per [PagedPhase], so a screen fills slots rather than copying the `when`. */

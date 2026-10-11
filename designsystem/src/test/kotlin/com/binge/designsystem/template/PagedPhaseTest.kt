@@ -141,8 +141,14 @@ class MergedPagedPhaseTest {
 
     @Test
     fun `without the hold, rows show as soon as any source has them`() {
-        assertEquals(rows, mergedPagedPhase(listOf(rows, skeleton), holdUntilAllResolved = false))
+        assertEquals(refreshingRows, mergedPagedPhase(listOf(rows, skeleton), holdUntilAllResolved = false))
         assertEquals(skeleton, mergedPagedPhase(listOf(empty, skeleton), holdUntilAllResolved = false))
+    }
+
+    @Test
+    fun `once resolved, an empty source refreshing keeps the rows up as refreshing`() {
+        assertEquals(refreshingRows, mergedPagedPhase(listOf(rows, skeleton), resolved = true))
+        assertEquals(skeleton, mergedPagedPhase(listOf(empty, skeleton), resolved = true))
     }
 
     @Test
