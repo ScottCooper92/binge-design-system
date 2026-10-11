@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
  */
 const val SOURCE_LOCALE = "en-rGB"
 
+private const val TALL_COMPONENT_HEIGHT_DP = 1600
 private const val PHONE_PORTRAIT = "spec:width=411dp,height=891dp,orientation=portrait"
 private const val PHONE_LANDSCAPE = "spec:width=411dp,height=891dp,orientation=landscape"
 private const val FOLDABLE_PORTRAIT = "spec:width=840dp,height=1180dp,orientation=portrait"
@@ -134,3 +135,44 @@ annotation class ScreenPreviews
 @PreviewWrapper(ScreenshotThemeWrapper::class)
 @Preview(name = "phone", device = PHONE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class ScreenStatePreview
+
+/**
+ * One cell on a **wide** window, for a screen rendered inside a pane rather than across the window.
+ *
+ * The window is what a resource qualifier resolves against, so this is the only cell where a pane's own width and the
+ * qualifier's answer disagree. The frame constrains the composable to the pane's width itself; this only supplies the
+ * window, the foldable's, which is past the two-pane breakpoint.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "pane", device = FOLDABLE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+annotation class ListPanePreview
+
+/**
+ * The phone-landscape window alone, for a frame that lays out two panes side by side itself: the narrowest window that
+ * puts one beside another, where the gap between them is easiest to get wrong. The same spec as [ScreenPreviews]'
+ * `phone-land` cell.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+annotation class LandscapePanesPreview
+
+/**
+ * [ComponentPreviews] at a phone's width and 1600dp tall, for a section longer than the renderer's default cap, which
+ * would clip it mid-row.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(
+    name = "dark",
+    widthDp = STANDARD_PHONE_WIDTH_DP,
+    heightDp = TALL_COMPONENT_HEIGHT_DP,
+    uiMode = UI_MODE_NIGHT_YES,
+    locale = SOURCE_LOCALE,
+)
+@Preview(
+    name = "light",
+    widthDp = STANDARD_PHONE_WIDTH_DP,
+    heightDp = TALL_COMPONENT_HEIGHT_DP,
+    uiMode = UI_MODE_NIGHT_NO,
+    locale = SOURCE_LOCALE,
+)
+annotation class TallComponentPreviews
