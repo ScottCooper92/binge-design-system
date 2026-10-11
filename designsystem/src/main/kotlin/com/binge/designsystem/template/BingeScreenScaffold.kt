@@ -103,7 +103,7 @@ fun BingeScreenScaffold(
 ) {
     val ownBehavior = rememberScreenBarScrollBehavior(bar)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
-    val scrim = behavior?.let { if (bar == ScreenBar.Small) it.state.overlappedFraction else it.state.collapsedFraction } ?: 0f
+    val scrim = screenBarScrim(bar, behavior)
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
     // What an ancestor already reserved, such as the custom rail's start inset, is not reserved again (#372).
@@ -230,9 +230,17 @@ fun PaddingValues.screenListPadding(): PaddingValues {
     )
 }
 
+/**
+ * How far a [bar]'s scrim has faded in under [behavior]: with the body's collapse for the collapsing and large bars,
+ * and with the content passing under it for the small one.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun screenBarScrim(bar: ScreenBar, behavior: TopAppBarScrollBehavior?): Float =
+    behavior?.let { if (bar == ScreenBar.Small) it.state.overlappedFraction else it.state.collapsedFraction } ?: 0f
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun rememberScreenBarScrollBehavior(bar: ScreenBar): TopAppBarScrollBehavior? =
+internal fun rememberScreenBarScrollBehavior(bar: ScreenBar): TopAppBarScrollBehavior? =
     when (bar) {
         ScreenBar.Collapsing, ScreenBar.Large -> TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
         ScreenBar.Small -> TopAppBarDefaults.enterAlwaysScrollBehavior()
