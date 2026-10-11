@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,12 +27,29 @@ import com.binge.designsystem.tv.R as TvR
  */
 @Composable
 fun TvSideSheetRowReservedLineSample() {
+    var selected by remember { mutableStateOf("Pending") }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Show requests")
-            TvSideSheetRow(label = "Pending", supportingText = "12 requests", onClick = {}, selected = true, initiallyFocused = true)
-            TvSideSheetRow(label = "Approved", supportingText = "48 requests", onClick = {})
-            TvSideSheetRow(label = "All", onClick = {}, reserveSupportingLine = true)
+            TvSideSheetRow(
+                label = "Pending",
+                supportingText = "12 requests",
+                onClick = { selected = "Pending" },
+                selected = selected == "Pending",
+                initiallyFocused = true,
+            )
+            TvSideSheetRow(
+                label = "Approved",
+                supportingText = "48 requests",
+                onClick = { selected = "Approved" },
+                selected = selected == "Approved",
+            )
+            TvSideSheetRow(
+                label = "All",
+                onClick = { selected = "All" },
+                selected = selected == "All",
+                reserveSupportingLine = true,
+            )
         }
     }
 }
