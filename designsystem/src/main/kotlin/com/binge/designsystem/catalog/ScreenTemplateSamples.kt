@@ -327,6 +327,33 @@ fun HeroDetailScreenSample() {
 }
 
 /**
+ * A detail page whose hero carries every line of copy at its longest. At a large font scale on a landscape phone the
+ * hero grows past its fixed height, and the copy stays below the overlay bar while the bar's fade follows the hero.
+ */
+@Composable
+fun HeroDetailScreenFullCopySample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailScreen(
+            title = "The Lord of the Rings: The Return of the King, Extended Edition",
+            onBack = LocalDemoBack.current,
+            hero = {
+                DetailHero(
+                    title = "The Lord of the Rings: The Return of the King, Extended Edition",
+                    backdropUrl = null,
+                    tagline = "There can be no triumph without loss. No victory without suffering. No freedom without sacrifice.",
+                    metaText = "8.9 · 2003 · 4h 23m",
+                    genres = listOf("Adventure", "Fantasy", "Action"),
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            SampleCopy()
+        }
+    }
+}
+
+/**
  * A page whose rail bleeds to the window's edge: unbounded content, the copy padded by the reading margin so it lines
  * up with a bounded page's, and the rail starting at the same margin and running out past the window's end.
  */
