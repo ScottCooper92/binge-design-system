@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetRow
@@ -116,6 +117,27 @@ fun TvConfirmDialogSample() {
             onConfirm = {},
             onDismissRequest = {},
             initiallyDismissFocused = true,
+        )
+    }
+}
+
+/** A confirm with an option it applies, between the message and the buttons: focus still arrives on Cancel. */
+@Composable
+fun TvConfirmDialogExtraContentSample() {
+    var alsoBlock by remember { mutableStateOf(true) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvConfirmDialogContent(
+            title = "Delete this request?",
+            message = "It is removed from the server for everyone.",
+            confirmLabel = "Delete",
+            dismissLabel = "Cancel",
+            destructive = true,
+            onConfirm = {},
+            onDismissRequest = {},
+            initiallyDismissFocused = true,
+            extraContent = {
+                TvCheckboxRow(label = "Also block this title", checked = alsoBlock, onCheckedChange = { alsoBlock = it })
+            },
         )
     }
 }
