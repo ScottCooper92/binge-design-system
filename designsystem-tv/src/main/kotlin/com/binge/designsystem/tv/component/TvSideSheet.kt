@@ -51,7 +51,7 @@ private const val SCRIM_ALPHA = 0.6f
 
 /**
  * An end-edge, focus-trapped sheet over a scrim: the ten-foot counterpart of a phone's bottom sheet, for a
- * row's actions or a choice. Back, and the key pointing away from the panel, both call [onDismiss].
+ * row's actions or a choice. Back, and the key pointing away from the panel, both call [onDismissRequest].
  *
  * [content] gets the entry requester. Each step it shows pins the requester to its first row and pulls it
  * there with [TvSideSheetStepFocus]. The caller owns the visibility flag, and returns focus to what opened
@@ -59,13 +59,13 @@ private const val SCRIM_ALPHA = 0.6f
  */
 @Composable
 fun TvSideSheet(
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.(entryFocus: FocusRequester) -> Unit,
 ) {
     val entryFocus = remember { FocusRequester() }
     val dismissKey = tvStartDirectionKey()
-    BackHandler(onBack = onDismiss)
+    BackHandler(onBack = onDismissRequest)
     Box(
         modifier =
             modifier
@@ -73,7 +73,7 @@ fun TvSideSheet(
                 .background(MaterialTheme.colorScheme.background.copy(alpha = SCRIM_ALPHA))
                 .onPreviewKeyEvent { event ->
                     if (event.type == KeyEventType.KeyDown && event.key == dismissKey) {
-                        onDismiss()
+                        onDismissRequest()
                         true
                     } else {
                         false

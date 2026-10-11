@@ -18,7 +18,7 @@ fun BingeConfirmDialogSample() {
             message = "This title will be removed from the list. You can add it again later.",
             confirmLabel = "Remove",
             onConfirm = {},
-            onDismiss = {},
+            onDismissRequest = {},
         )
     }
 }
@@ -32,7 +32,7 @@ fun BingeConfirmDialogDestructiveSample() {
             message = "You'll need to sign in again to access your account.",
             confirmLabel = "Sign out",
             onConfirm = {},
-            onDismiss = {},
+            onDismissRequest = {},
             destructive = true,
         )
     }

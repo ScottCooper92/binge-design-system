@@ -13,7 +13,7 @@ import org.robolectric.shadows.ShadowDialog
 /**
  * The caller keeps the dialog open for the whole create→add round trip. A back press that dismissed
  * it mid-submit would close it with the request still running, so every caller would have to guard
- * [CreateListDialog]'s `onDismiss` itself (#227).
+ * [CreateListDialog]'s `onDismissRequest` itself (#227).
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
@@ -25,7 +25,7 @@ class CreateListDialogDismissTest {
         var dismissed = 0
         composeTestRule.setContent {
             TestTheme {
-                CreateListDialog(onDismiss = { dismissed++ }, onConfirm = {}, isSubmitting = isSubmitting)
+                CreateListDialog(onDismissRequest = { dismissed++ }, onConfirm = {}, isSubmitting = isSubmitting)
             }
         }
         composeTestRule.waitForIdle()

@@ -24,7 +24,7 @@ class BingeSnackbarHostScreenshotTest {
                 actionLabel = null,
                 onActionClick = {},
                 showDismissAction = false,
-                onDismiss = {},
+                onDismissRequest = {},
             )
         }
     }
@@ -43,7 +43,7 @@ class BingeSnackbarHostScreenshotTest {
                 actionLabel = null,
                 onActionClick = {},
                 showDismissAction = false,
-                onDismiss = {},
+                onDismissRequest = {},
             )
         }
     }
@@ -63,7 +63,7 @@ class BingeSnackbarHostScreenshotTest {
                 actionLabel = "Sign in",
                 onActionClick = {},
                 showDismissAction = false,
-                onDismiss = {},
+                onDismissRequest = {},
             )
         }
     }
@@ -79,7 +79,7 @@ class BingeSnackbarHostScreenshotTest {
                 actionLabel = null,
                 onActionClick = {},
                 showDismissAction = true,
-                onDismiss = {},
+                onDismissRequest = {},
             )
         }
     }
@@ -94,7 +94,7 @@ class BingeSnackbarHostScreenshotTest {
                 actionLabel = "View list",
                 onActionClick = {},
                 showDismissAction = false,
-                onDismiss = {},
+                onDismissRequest = {},
             )
         }
     }

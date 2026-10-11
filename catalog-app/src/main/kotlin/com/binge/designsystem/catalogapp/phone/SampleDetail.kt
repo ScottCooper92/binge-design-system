@@ -108,7 +108,7 @@ fun SampleDetail(
             onFontScaleChange = onFontScaleChange,
             onRtlChange = onRtlChange,
             onLocaleChange = onLocaleChange,
-            onDismiss = { showTweaks = false },
+            onDismissRequest = { showTweaks = false },
             variants = if (onePerScreen && variants.size > 1) variants else emptyList(),
             selected = entry,
             onVariantChange = onVariantChange,
@@ -195,7 +195,7 @@ private fun SingleVariant(
         if (dismissedFor != entry.id) {
             VariantDescription(
                 entry,
-                onDismiss = { dismissedFor = entry.id },
+                onDismissRequest = { dismissedFor = entry.id },
                 modifier = Modifier.align(Alignment.TopCenter).padding(top = dimensionResource(R.dimen.catalog_padding_small)),
             )
         }
@@ -242,13 +242,13 @@ private fun VariantList(
 private fun VariantDescription(
     entry: CatalogEntry,
     modifier: Modifier = Modifier,
-    onDismiss: (() -> Unit)? = null,
+    onDismissRequest: (() -> Unit)? = null,
 ) {
     if (entry.description.isBlank() || entry.selfDescribing) return
     HintCard(
         text = entry.description,
         icon = Icons.Outlined.Info,
-        onDismiss = onDismiss,
+        onDismissRequest = onDismissRequest,
         modifier = modifier.padding(horizontal = dimensionResource(R.dimen.catalog_padding)),
     )
 }

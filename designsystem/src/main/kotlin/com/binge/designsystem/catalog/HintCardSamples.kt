@@ -43,7 +43,7 @@ fun HintCardDismissibleSample() {
             HintCard(
                 text = "Dismissible: the close button in the corner hides the card, and longer text wraps clear " +
                     "of it.",
-                onDismiss = { visible = false },
+                onDismissRequest = { visible = false },
             )
         } else {
             TextButton(onClick = { visible = true }) { Text("Show the hint again") }
@@ -59,7 +59,7 @@ fun HintCardActionSample() {
         if (visible) {
             HintCard(
                 text = "Action: a button under the text, here with the glyph for a destination outside the app.",
-                onDismiss = { visible = false },
+                onDismissRequest = { visible = false },
                 actionLabel = "Open Binge",
                 onAction = {},
                 actionIcon = Icons.AutoMirrored.Filled.OpenInNew,
