@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.ToggleOff
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
+import com.binge.designsystem.LocalIsSinglePaneNav
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DecisionHero
@@ -52,6 +54,25 @@ fun StepFlowScreenInPaneSample() {
             Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
             Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                 ConnectionFlow(step = step, onStep = { step = it }, onExit = LocalDemoBack.current)
+            }
+        }
+    }
+}
+
+/**
+ * The flow beside a list pane, on its second step: the pane rule hides the first step's Back there, but a step back
+ * stays, so the user can always go to the previous step.
+ */
+@Composable
+fun StepFlowScreenBesideHubSample() {
+    var step by remember { mutableIntStateOf(1) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        CompositionLocalProvider(LocalIsSinglePaneNav provides false) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    ConnectionFlow(step = step, onStep = { step = it }, onExit = LocalDemoBack.current)
+                }
             }
         }
     }

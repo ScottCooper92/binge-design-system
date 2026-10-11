@@ -32,8 +32,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -47,6 +49,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.LocalPaneDepth
 import com.binge.designsystem.R
 import com.binge.designsystem.centredReadingColumn
 import com.binge.designsystem.theme.BingeShapes
@@ -76,7 +79,8 @@ private const val STEP_SLIDE_MILLIS = 280
  * Each slot is handed the step it draws, and should branch on that rather than on [currentStep]: changing step
  * slides the whole step across, and the outgoing one must keep drawing itself while it leaves. A step whose
  * content scrolls itself, a lazy grid, returns false from [contentScrolls] and gets the remaining height instead.
- * [scrollBehavior] is [BingeScreenScaffold]'s, for a caller that owns the bar's state. The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
+ * [scrollBehavior] is [BingeScreenScaffold]'s, for a caller that owns the bar's state; an untitled flow's bar is
+ * pinned by default. Beside a list pane the first step's Back is dropped, as the scaffold does, but a step back always shows. The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,34 +101,42 @@ fun StepFlowScreen(
 ) {
     val back = if (currentStep > 0) onBack else onExit
     StepBackHandler(back)
-    // The scaffold's bar is the chrome: a collapsing bar when the flow has a title, a single line when it has none, so
-    // the bar does not change kind as Back comes and goes. The read-out sits under it as the scaffold's header, and a
-    // step scrolls under both. The scaffold does not consume the keyboard, so a step with a text field owns its own
-    // imePadding and a footer rides above the keyboard, as before.
-    BingeScreenScaffold(
-        title = title.orEmpty(),
-        modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-        onBack = back,
-        bar = if (title != null) ScreenBar.Collapsing else ScreenBar.Small,
-        scrollBehavior = scrollBehavior,
-        header = if (stepCount > 1) ({ StepReadOut(stepCount, currentStep) }) else null,
-    ) { padding ->
-        ScreenBody(padding) { inner ->
-            val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
-            // The bottom clears the navigation bar here, and is consumed so a footer's imePadding adds only the excess.
-            val bottom = PaddingValues(bottom = inner.calculateBottomPadding())
-            BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(bottom).consumeWindowInsets(bottom)) {
-                // A keyboard shrinks the space a host pads for it; the layout must not flip under a focused field.
-                val keyboardUp = keyboardUp()
-                val memory = remember { SplitMemory() }
-                val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), keyboardUp, memory.last)
-                if (!keyboardUp || memory.last == null) memory.last = split
-                if (loading) {
-                    Box(Modifier.padding(top = inner.calculateTopPadding())) { LoadingMessageScreen() }
-                } else {
-                    StepTransition(currentStep) { step ->
-                        val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
-                        if (split) SplitStep(slots, inner.calculateTopPadding()) else StackedStep(slots, inner.calculateTopPadding())
+    // Back to the previous step is not "pop this screen": the scaffold hides a Back where a list pane beside it already
+    // offers one, which is right for the first step's exit and wrong for a step back. From the second step the flow's
+    // own Back is kept by presenting the entry as past the first one.
+    val paneDepth = if (currentStep > 0) maxOf(LocalPaneDepth.current, 2) else LocalPaneDepth.current
+    // An untitled flow has a single-line bar that stays put, so Back and the read-out do not scroll away with the step.
+    val ownBehavior = if (title == null) TopAppBarDefaults.pinnedScrollBehavior() else null
+    CompositionLocalProvider(LocalPaneDepth provides paneDepth) {
+        // The scaffold's bar is the chrome: a collapsing bar when the flow has a title, a single line when it has none, so
+        // the bar does not change kind as Back comes and goes. The read-out sits under it as the scaffold's header, and a
+        // step scrolls under both. The scaffold does not consume the keyboard, so a step with a text field owns its own
+        // imePadding and a footer rides above the keyboard, as before.
+        BingeScreenScaffold(
+            title = title.orEmpty(),
+            modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+            onBack = back,
+            bar = if (title != null) ScreenBar.Collapsing else ScreenBar.Small,
+            scrollBehavior = scrollBehavior ?: ownBehavior,
+            header = if (stepCount > 1) ({ StepReadOut(stepCount, currentStep) }) else null,
+        ) { padding ->
+            ScreenBody(padding) { inner ->
+                val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
+                // The bottom clears the navigation bar here, and is consumed so a footer's imePadding adds only the excess.
+                val bottom = PaddingValues(bottom = inner.calculateBottomPadding())
+                BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(bottom).consumeWindowInsets(bottom)) {
+                    // A keyboard shrinks the space a host pads for it; the layout must not flip under a focused field.
+                    val keyboardUp = keyboardUp()
+                    val memory = remember { SplitMemory() }
+                    val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), keyboardUp, memory.last)
+                    if (!keyboardUp || memory.last == null) memory.last = split
+                    if (loading) {
+                        Box(Modifier.padding(top = inner.calculateTopPadding())) { LoadingMessageScreen() }
+                    } else {
+                        StepTransition(currentStep) { step ->
+                            val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
+                            if (split) SplitStep(slots, inner.calculateTopPadding()) else StackedStep(slots, inner.calculateTopPadding())
+                        }
                     }
                 }
             }

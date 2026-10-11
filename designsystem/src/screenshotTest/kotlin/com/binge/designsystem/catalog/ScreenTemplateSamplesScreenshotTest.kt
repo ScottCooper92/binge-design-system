@@ -247,6 +247,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun stepFlowInPane() = StepFlowScreenInPaneSample()
 
+    /** Beside a list pane the first step's Back is hidden, but a step back stays. */
+    @PreviewTest
+    @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun stepFlowBesideHub() = StepFlowScreenBesideHubSample()
+
     /** The insets a default frame cannot see: the bottom bar clears the nav bar, the rows clear the bar. */
     @PreviewTest
     @ScreenStatePreview
