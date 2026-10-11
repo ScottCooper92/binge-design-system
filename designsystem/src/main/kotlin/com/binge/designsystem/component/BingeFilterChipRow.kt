@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.max
 import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.OverlaidHeaderContent
+import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
@@ -100,6 +101,9 @@ fun BingeFilterChipRow(
  * side cutout would otherwise cover the leading chip while the content below clears it. A screen whose
  * scaffold already padded and consumed those insets gets nothing added, so they are not reserved twice.
  *
+ * The end side takes [navOverlayEnd] the same way, so the trailing chips clear an end inset a shell publishes, as the
+ * carousels and section headers do (#512).
+ *
  * [FilterChipRowSkeleton] reads the same function, so the plate and the row it stands in for cannot
  * disagree about where the first chip starts.
  */
@@ -112,7 +116,7 @@ internal fun filterChipRowPadding(consumed: WindowInsets): PaddingValues {
     return PaddingValues(
         start = edges.calculateStartPadding(layoutDirection) + max(navOverlayStart(), sides.calculateStartPadding(layoutDirection)),
         top = vertical,
-        end = edges.calculateEndPadding(layoutDirection) + sides.calculateEndPadding(layoutDirection),
+        end = edges.calculateEndPadding(layoutDirection) + max(navOverlayEnd(), sides.calculateEndPadding(layoutDirection)),
         bottom = vertical,
     )
 }
