@@ -20,9 +20,9 @@ import com.binge.designsystem.component.BingeChoice
 import com.binge.designsystem.component.BingeChoiceList
 import com.binge.designsystem.component.BingeChoiceSheetContent
 import com.binge.designsystem.component.BingeMultiChoiceSheetContent
+import com.binge.designsystem.component.BingeSheetHeader
 import com.binge.designsystem.component.BingeSheetTopBar
 import com.binge.designsystem.component.BingeTextButton
-import com.binge.designsystem.component.ChoiceSheetHeader
 import com.binge.designsystem.component.DockingHeaderLayout
 import com.binge.designsystem.component.DockingSheetShape
 import com.binge.designsystem.component.ItemGroup
@@ -279,7 +279,7 @@ private fun SheetFrame(
     ) {
         DockingHeaderLayout(
             fraction = { fraction },
-            header = { ChoiceSheetHeader(title) { if (actions) SampleActions() } },
+            header = { BingeSheetHeader(title) { if (actions) SampleActions() } },
             dockedTopBar = { BingeSheetTopBar(title = title, onClose = {}, actions = { if (actions) SampleActions() }) },
         )
         body()
