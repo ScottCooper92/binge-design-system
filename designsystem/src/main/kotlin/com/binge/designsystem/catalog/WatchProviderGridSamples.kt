@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.WatchProviderGrid
+import com.binge.designsystem.component.WatchProviderGridRow
 import com.binge.designsystem.component.WatchProviderGridSkeleton
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -31,5 +32,24 @@ fun WatchProviderGridSample() {
 fun WatchProviderGridSkeletonSample() {
     ScreenshotTheme {
         WatchProviderGridSkeleton()
+    }
+}
+
+private const val PARTIAL_ROW_COLUMNS = 4
+
+/**
+ * A short last row: two tiles in a four-column row, one selected. The trailing spacers keep its tiles the width of a
+ * full row's. Tapping a tile toggles it; the first frame always starts from the same one.
+ */
+@Composable
+fun WatchProviderGridPartialRowSample() {
+    var selected by remember { mutableStateOf(catalogPartialRowSelectedIds()) }
+    ScreenshotTheme {
+        WatchProviderGridRow(
+            providers = catalogPartialRowWatchProviders(),
+            columns = PARTIAL_ROW_COLUMNS,
+            selectedWatchProviderIds = selected,
+            onToggle = { id -> selected = if (id in selected) selected - id else selected + id },
+        )
     }
 }

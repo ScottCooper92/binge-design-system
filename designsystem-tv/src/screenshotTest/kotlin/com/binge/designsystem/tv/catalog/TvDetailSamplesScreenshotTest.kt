@@ -27,6 +27,11 @@ class TvDetailSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pageBareHero() = Frame { TvDetailPageBareHeroSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun actionRow() = Frame { TvDetailActionRowSample() }
 
     @Composable

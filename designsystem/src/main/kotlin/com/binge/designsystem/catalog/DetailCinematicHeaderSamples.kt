@@ -78,3 +78,30 @@ fun DetailCinematicHeaderTitleContentSample() {
         )
     }
 }
+
+/**
+ * [DetailCinematicHeader] with a synopsis long enough to overflow, seeded as overflowing so the "Show more" toggle
+ * shows on the first frame rather than only after a measure pass.
+ */
+@Composable
+fun DetailCinematicHeaderSynopsisOverflowSample() {
+    ScreenshotTheme {
+        DetailCinematicHeader(
+            title = "The Dark Knight",
+            genres = listOf("Action", "Crime", "Drama"),
+            synopsis = "Batman raises the stakes in his war on crime with the help of Lt. Jim " +
+                "Gordon and District Attorney Harvey Dent, as they team up to dismantle the " +
+                "remaining criminal organizations that plague the city streets. However, they " +
+                "soon find themselves prey to a reign of chaos unleashed by a rising criminal " +
+                "mastermind known to the terrified citizens of Gotham as the Joker.",
+            stats = listOf(
+                DetailStat(Icons.Filled.Star, "9.0", "Rating"),
+                DetailStat(Icons.Filled.Star, "2008", "Released"),
+                DetailStat(Icons.Filled.Star, "2h 32m", "Runtime"),
+            ),
+            backdropUrl = null,
+            posterUrl = null,
+            synopsisInitiallyOverflowing = true,
+        )
+    }
+}

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,7 +47,7 @@ fun TvChoiceRow(
     initialFocusedKey: String? = null,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.selectableGroup(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
@@ -91,7 +94,10 @@ private fun TvChoice(
                 .tvFocusFill(isFocused = focused, shape = BingeShapes.Pill)
                 .tvClickable(onFocusChanged = { focused = it }, onClick = onSelect)
                 .padding(horizontal = dimensionResource(TvR.dimen.tv_choice_padding_horizontal))
-                .semantics { this.selected = selected },
+                .semantics {
+                    role = Role.RadioButton
+                    this.selected = selected
+                },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {

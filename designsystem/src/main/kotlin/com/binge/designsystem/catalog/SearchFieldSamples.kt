@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -42,6 +43,21 @@ fun SearchFieldWithQuerySample() {
             onQueryChange = { query = it },
             onClear = { query = "" },
             placeholder = SEARCH_PLACEHOLDER,
+        )
+    }
+}
+
+/** Transparent container: the pill drops its fill, for a field sitting on a surface that already supplies one. */
+@Composable
+fun SearchFieldTransparentContainerSample() {
+    var query by remember { mutableStateOf("") }
+    ScreenshotTheme {
+        BingeSearchField(
+            query = query,
+            onQueryChange = { query = it },
+            onClear = { query = "" },
+            placeholder = SEARCH_PLACEHOLDER,
+            containerColor = Color.Transparent,
         )
     }
 }

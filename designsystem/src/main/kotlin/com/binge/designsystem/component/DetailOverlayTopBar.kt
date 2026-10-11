@@ -164,6 +164,13 @@ fun BoxScope.DetailOverlayTopBar(
     }
 }
 
+/**
+ * The height [DetailOverlayTopBar] takes below the status bar: its back button and the padding around it. A hero
+ * under the bar keeps its copy below this, so a large font scale grows the hero rather than running under the bar.
+ */
+@Composable
+internal fun detailOverlayBarHeight(): Dp = dimensionResource(R.dimen.top_bar_icon_size) + dimensionResource(R.dimen.padding_s) * 2
+
 /** Scrim progress past which the bar reads as the theme's background, and the icons follow it. */
 private const val STATUS_BAR_HANDOFF_PROGRESS = 0.5f
 

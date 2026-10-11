@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
@@ -44,6 +45,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -68,7 +70,8 @@ private const val STEP_SLIDE_MILLIS = 280
  * A tall space stacks the [aside] (an illustration), the [heading] and the [content] in one scroll. A space that is
  * wider than it is tall, or expanded, puts the aside, heading and footer on one side and scrolls the content on the
  * other. The choice reads the space the flow is given, not the window, so a flow in a narrow pane stacks.
- * While the keyboard is showing the choice is held, so a host that pads the flow for it does not flip the layout.
+ * While the keyboard is showing, or its inset is still animating away, the choice is held, so a host that pads the
+ * flow for it does not flip the layout.
  *
  * Back shows from the second step, and BACK, predictive back included, steps back too. A flow opened from inside the
  * app passes [onExit], which gives the first step a Back that leaves, and a [title] for its bar, so the flow has one
@@ -109,10 +112,10 @@ fun StepFlowScreen(
         val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
         BoxWithConstraints(modifier = Modifier.fillMaxWidth().weight(1f)) {
             // A keyboard shrinks the space a host pads for it; the layout must not flip under a focused field.
-            val imeVisible = WindowInsets.isImeVisible
+            val keyboardUp = keyboardUp()
             val memory = remember { SplitMemory() }
-            val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), imeVisible, memory.last)
-            if (!imeVisible || memory.last == null) memory.last = split
+            val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), keyboardUp, memory.last)
+            if (!keyboardUp || memory.last == null) memory.last = split
             if (loading) {
                 LoadingMessageScreen()
             } else {
@@ -136,6 +139,13 @@ internal fun splitsStep(
 internal class SplitMemory {
     var last: Boolean? = null
 }
+
+/**
+ * Whether the keyboard is up, for a split held while it is: visible, or its inset still animating away. On hide the
+ * keyboard stops reporting itself visible while its inset is still shrinking a host's padded space.
+ */
+@Composable
+internal fun keyboardUp(): Boolean = WindowInsets.isImeVisible || WindowInsets.ime.getBottom(LocalDensity.current) > 0
 
 /** The [measured] decision, or the [held] one while the keyboard is showing and there is one to hold. */
 internal fun heldWhileIme(

@@ -234,6 +234,9 @@ fun TvSeeAllTileSample() {
 private const val GRID_ITEM_COUNT = 30
 private const val GRID_FOCUSED_INDEX = 8
 
+/** A row and a half of the six-column grid, so a frame shows a loaded row, a part-loaded row and the edge between. */
+private const val GRID_LOADED_COUNT = 9
+
 private val SampleGridTitles =
     List(GRID_ITEM_COUNT) { index ->
         SampleTitle(
@@ -245,12 +248,16 @@ private val SampleGridTitles =
     }
 
 @Composable
-private fun SampleGrid(titles: List<SampleTitle> = SampleGridTitles, initialFocusedIndex: Int? = null) {
+private fun SampleGrid(
+    titles: List<SampleTitle> = SampleGridTitles,
+    initialFocusedIndex: Int? = null,
+    loadedCount: Int = titles.size,
+) {
     RailHosted {
         TvImmersiveGrid(
             heading = "All titles (${titles.size})",
             count = titles.size,
-            itemAt = { titles.getOrNull(it) },
+            itemAt = { index -> titles.getOrNull(index)?.takeIf { index < loadedCount } },
             itemKey = { titles[it].id },
             artwork = { title -> SampleArtwork(title) },
             copy = { title -> SampleCopy(title) },
@@ -265,6 +272,12 @@ private fun SampleGrid(titles: List<SampleTitle> = SampleGridTitles, initialFocu
 @Composable
 fun TvImmersiveGridSample() {
     SampleGrid()
+}
+
+/** Only the first page loaded: the cells past it are not loaded yet and draw nothing, while the heading counts them all. */
+@Composable
+fun TvImmersiveGridUnloadedSample() {
+    SampleGrid(loadedCount = GRID_LOADED_COUNT)
 }
 
 /** Focus on the second row: the row is anchored under the heading and the first is clipped away. */

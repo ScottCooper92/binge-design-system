@@ -43,6 +43,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun cardRowNoHeading() = Frame { TvCardRowNoHeadingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun messagePlate() = Frame { TvMessagePlateSample() }
 
     @PreviewTest

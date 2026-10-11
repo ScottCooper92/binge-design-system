@@ -53,7 +53,7 @@ private fun Typography.withFontFamily(family: FontFamily): Typography =
 
 private val outfitBase = Typography().withFontFamily(BingeFontFamily)
 
-val BingeTypography = outfitBase.copy(
+internal val BingeTypography = outfitBase.copy(
     displayLarge = outfitBase.displayLarge.copy(
         fontWeight = FontWeight.Bold,
         letterSpacing = (-1.2).sp,

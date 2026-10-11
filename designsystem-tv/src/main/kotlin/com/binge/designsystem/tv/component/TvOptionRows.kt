@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
@@ -62,7 +64,7 @@ fun <T> TvOptionGroup(
 ) {
     if (choices.isEmpty()) return
     Column(
-        modifier = modifier.width(dimensionResource(TvR.dimen.tv_text_field_width)),
+        modifier = modifier.width(dimensionResource(TvR.dimen.tv_text_field_width)).selectableGroup(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
     ) {
         Text(
@@ -124,7 +126,15 @@ fun TvOptionRow(
                 restingContent = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             ),
         scale = ListItemScale.None,
-        modifier = modifier.fillMaxWidth().onFocusChanged { focused = it.isFocused },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .onFocusChanged { focused = it.isFocused }
+                // One of a set, so it announces as a radio button, as the checkbox row announces as a checkbox.
+                .semantics {
+                    role = Role.RadioButton
+                    this.selected = selected
+                },
     )
 }
 

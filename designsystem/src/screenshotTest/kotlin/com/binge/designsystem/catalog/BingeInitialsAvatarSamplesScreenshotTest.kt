@@ -19,4 +19,11 @@ class BingeInitialsAvatarSamplesScreenshotTest {
     fun AvatarImage() {
         BingeInitialsAvatarImageSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun AvatarSizes() {
+        BingeInitialsAvatarSizesSample()
+    }
 }

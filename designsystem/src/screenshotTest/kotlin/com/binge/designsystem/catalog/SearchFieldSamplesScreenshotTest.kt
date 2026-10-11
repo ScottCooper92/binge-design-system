@@ -22,4 +22,11 @@ class SearchFieldSamplesScreenshotTest {
     fun WithQuery() {
         SearchFieldWithQuerySample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TransparentContainer() {
+        SearchFieldTransparentContainerSample()
+    }
 }

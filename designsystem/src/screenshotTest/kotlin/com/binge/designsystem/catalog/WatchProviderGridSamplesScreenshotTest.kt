@@ -18,4 +18,11 @@ class WatchProviderGridSamplesScreenshotTest {
     fun Skeleton() {
         WatchProviderGridSkeletonSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun PartialRow() {
+        WatchProviderGridPartialRowSample()
+    }
 }

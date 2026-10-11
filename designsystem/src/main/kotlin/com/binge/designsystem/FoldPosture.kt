@@ -20,7 +20,7 @@ import androidx.window.layout.WindowInfoTracker
  * into an upright top half and a flat bottom half. The crease is a region to *stay out of*, because a control drawn across it is bent over
  * the hinge and half of it faces away from the user.
  */
-data class HorizontalHinge(
+internal data class HorizontalHinge(
     val top: Dp,
     val height: Dp,
 ) {
@@ -34,7 +34,7 @@ data class HorizontalHinge(
  * already had.
  */
 @Composable
-fun rememberHorizontalHinge(): HorizontalHinge? =
+internal fun rememberHorizontalHinge(): HorizontalHinge? =
     rememberSeparatingFold(FoldingFeature.Orientation.HORIZONTAL) { bounds ->
         HorizontalHinge(top = bounds.top.toDp(), height = bounds.height().toDp())
     }
@@ -78,7 +78,7 @@ private fun <T> rememberSeparatingFold(orientation: FoldingFeature.Orientation, 
  * against its own window and would measure the wrong thing.
  */
 @Composable
-fun rememberFoldSafeBottomHeight(): Dp? {
+internal fun rememberFoldSafeBottomHeight(): Dp? {
     val windowHeight = with(LocalDensity.current) {
         LocalWindowInfo.current.containerSize.height
             .toDp()
@@ -99,7 +99,7 @@ fun rememberFoldSafeBottomHeight(): Dp? {
  * A crease close to the bottom edge is refused rather than honoured: squeezing a sheet into [minHeight]
  * of screen is a worse answer than letting it cross a fold it was never going to clear.
  */
-fun foldSafeBottomHeight(
+internal fun foldSafeBottomHeight(
     windowHeight: Dp,
     hinge: HorizontalHinge?,
     minHeight: Dp,

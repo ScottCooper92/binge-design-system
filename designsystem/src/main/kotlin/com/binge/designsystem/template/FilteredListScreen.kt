@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.binge.designsystem.component.BingeFilterChipPager
 import com.binge.designsystem.component.FilterChipItem
 
@@ -25,7 +29,13 @@ import com.binge.designsystem.component.FilterChipItem
  * [rememberPagedPhase] and [PagedPhaseContent] rather than writing the paging `when` again. The filters either
  * side of the selected one stay composed ([beyondViewportPageCount]), so their rows are loading before the
  * swipe reaches them.
+ *
+ * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state. By
+ * default the header is an opaque ground. Pass a transparent [headerBackground] and a [scrimFraction] ramped
+ * with the bar's collapse for [BingeScreenScaffold]'s look: one scrim over bar and header together, with the
+ * rows visible behind it.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilteredListScreen(
     title: String,
@@ -35,6 +45,9 @@ fun FilteredListScreen(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     bar: ScreenBar = ScreenBar.Small,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    headerBackground: Color = MaterialTheme.colorScheme.background,
+    scrimFraction: Float = 0f,
     ready: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     search: (@Composable () -> Unit)? = null,
@@ -49,6 +62,7 @@ fun FilteredListScreen(
         modifier = modifier,
         onBack = onBack,
         bar = bar,
+        scrollBehavior = scrollBehavior,
         snackbarHostState = snackbarHostState,
         barScrim = !ready,
         actions = actions,
@@ -67,6 +81,8 @@ fun FilteredListScreen(
                     Spacer(Modifier.height(padding.calculateTopPadding()))
                     search?.invoke()
                 },
+                headerBackground = headerBackground,
+                scrimFraction = scrimFraction,
                 beyondViewportPageCount = beyondViewportPageCount,
             ) { pagePadding, index ->
                 page(index, PaddingValues(top = pagePadding.calculateTopPadding(), bottom = padding.calculateBottomPadding()))

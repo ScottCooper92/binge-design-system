@@ -22,6 +22,34 @@ class BingeSnackbarHostSamplesScreenshotTest {
         BingeSnackbarDismissSample()
     }
 
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MessageOnly() {
+        BingeSnackbarMessageOnlySample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TwoLineMessage() {
+        BingeSnackbarTwoLineSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TwoLineWithAction() {
+        BingeSnackbarTwoLineWithActionSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TwoLineWithDismiss() {
+        BingeSnackbarTwoLineWithDismissSample()
+    }
+
     /** A full nav shell, not [ComponentPreviews]'s wrap-content canvas — the offset needs the bar beneath it. */
     @PreviewTest
     @Preview(name = "float-phone-light", widthDp = 412, heightDp = 740, uiMode = UI_MODE_NIGHT_NO)

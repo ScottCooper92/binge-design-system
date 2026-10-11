@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +33,7 @@ import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
 import com.binge.designsystem.tv.focus.tvFocusTarget
@@ -44,7 +49,8 @@ import com.binge.designsystem.tv.R as TvR
  *
  * Accept is the primary and takes the page's entry focus. Decline sits beside it, one press away. [hosting]
  * says whether the page claims that focus on arrival (see [TvPageHosting]). [acceptInitiallyFocused] draws
- * accept focused, for a frame.
+ * accept focused, for a frame. [acceptModifier] and [declineModifier] go on the answers, for a test tag a device lane
+ * finds them by, as `ScreenAction.modifier` does on the phone.
  */
 @Composable
 fun TvDecisionPage(
@@ -57,6 +63,8 @@ fun TvDecisionPage(
     modifier: Modifier = Modifier,
     hosting: TvPageHosting = currentTvPageHosting(),
     acceptInitiallyFocused: Boolean = false,
+    acceptModifier: Modifier = Modifier,
+    declineModifier: Modifier = Modifier,
 ) {
     val accept = remember { FocusRequester() }
     TvTwoPanePage(
@@ -71,13 +79,38 @@ fun TvDecisionPage(
                 onClick = onAccept,
                 style = TvButtonStyle.Primary,
                 initiallyFocused = acceptInitiallyFocused,
-                modifier = Modifier.focusRequester(accept),
+                modifier = Modifier.focusRequester(accept).then(acceptModifier),
             )
-            TvButton(label = declineLabel, onClick = onDecline)
+            TvButton(label = declineLabel, onClick = onDecline, modifier = declineModifier)
         },
         copy = { DecisionCopyColumn(copy) },
         action = { DecisionPointsCard(points) },
     )
+}
+
+/**
+ * [TvDecisionPage]'s content without the page around it (#638): the [copy] beside the read-out card of the [points],
+ * for a decision that is one step of a [TvStepFlow]. The flow supplies the chrome, the hosting and the footer that
+ * carries the answers. The points scroll on their own side, and each takes focus, so ↑ from the footer walks a card
+ * taller than the space into view.
+ */
+@Composable
+fun TvDecisionBody(
+    copy: DecisionCopy,
+    points: List<DecisionPoint>,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_two_pane_board_gap)),
+    ) {
+        Box(modifier = Modifier.weight(1f)) { DecisionCopyColumn(copy) }
+        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+            TvStableFocusScroll {
+                Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) { DecisionPointsCard(points) }
+            }
+        }
+    }
 }
 
 @Composable

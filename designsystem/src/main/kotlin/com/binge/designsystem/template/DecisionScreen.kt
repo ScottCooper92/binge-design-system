@@ -6,11 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
@@ -61,7 +59,7 @@ fun DecisionScreen(
     // The space it is given, not the window: in a pane of a wide window it is often taller than wide.
     BoxWithConstraints(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // A keyboard shrinks the space a host pads for it; the layout must not flip while it shows.
-        val imeVisible = WindowInsets.isImeVisible
+        val imeVisible = keyboardUp()
         val memory = remember { SplitMemory() }
         val wide = heldWhileIme(maxWidth > maxHeight, imeVisible, memory.last)
         if (!imeVisible || memory.last == null) memory.last = wide
@@ -153,8 +151,14 @@ private fun DecisionLandscape(
     }
 }
 
+/**
+ * A decision's kicker, title, subtitle and note, as [DecisionScreen] and [DecisionBody] head theirs. Public for a
+ * decision that is one step of a [StepFlowScreen]: it goes in the flow's heading slot, [DecisionHero] in its aside and
+ * [com.binge.designsystem.component.DecisionPointsCard] in its content, so a split step puts the hero and heading on
+ * the start side and the points on the end (#638).
+ */
 @Composable
-private fun DecisionHeading(copy: DecisionCopy, modifier: Modifier = Modifier) {
+fun DecisionHeading(copy: DecisionCopy, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth().padding(top = dimensionResource(R.dimen.padding_m))) {
         copy.kicker?.let {
             Text(

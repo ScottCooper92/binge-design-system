@@ -10,6 +10,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 
 private const val HERO_ONE_CELL_WIDTH_DP = 412
+private const val HERO_WIDE_WIDTH_DP = 840
 
 class HeroCarouselSamplesScreenshotTest {
     @PreviewTest
@@ -42,5 +43,21 @@ class HeroCarouselSamplesScreenshotTest {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             HeroCarouselSample()
         }
+    }
+
+    /** The full copy column: trending pill, title, tagline and meta row over the scrim, on the first slide. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Ready() {
+        HeroCarouselTaglineSample()
+    }
+
+    /** Expanded width: across a wide window the copy and dot rail hold their layout instead of stretching. */
+    @PreviewTest
+    @Preview(name = "wide-light", widthDp = HERO_WIDE_WIDTH_DP, showBackground = true)
+    @Composable
+    fun Wide() {
+        HeroCarouselTaglineSample()
     }
 }

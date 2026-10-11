@@ -48,6 +48,7 @@
     <!-- Detail components (DetailHero, CastSection, InfoRow) -->
     <dimen name="detail_title_logo_sample_width">220dp</dimen>
     <dimen name="detail_title_logo_sample_height">64dp</dimen>
+    <dimen name="detail_hero_sample_pane_width">360dp</dimen>
     <dimen name="detail_hero_height">480dp</dimen>
     <!-- DetailOverlayTopBar: scroll band over which the bar crossfades transparent → opaque as the hero clears. -->
     <dimen name="detail_overlay_bar_fade_band">112dp</dimen>
@@ -365,6 +366,8 @@
     <dimen name="letter_rail_width">32dp</dimen>
     <dimen name="letter_rail_letter">20dp</dimen>
     <dimen name="letter_rail_sample_height">520dp</dimen>
+    <!-- TextEntrySurface expanded sample: a phone-sized bounded height for the expanded mode to fill -->
+    <dimen name="text_entry_surface_sample_expanded_height">720dp</dimen>
     <!-- DecisionScreen: the hero plate and its badge, a point's icon plate, and the landscape points' drop -->
     <dimen name="decision_content_max_width">600dp</dimen>
     <dimen name="decision_hero_size">92dp</dimen>

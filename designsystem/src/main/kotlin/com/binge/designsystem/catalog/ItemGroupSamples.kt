@@ -13,13 +13,17 @@ import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.state.ToggleableState
 import com.binge.designsystem.R
@@ -477,6 +482,57 @@ fun ItemGroupExpandedSample() {
                     label = "Notifications",
                     expanded = notificationsOpen,
                     onClick = { notificationsOpen = !notificationsOpen },
+                ),
+            ),
+        )
+    }
+}
+
+/** [ItemGroup]'s `belowRows` slot: content under the rows sits on the same surface as them, not on a card of its own. */
+@Composable
+fun ItemGroupBelowRowsSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = null,
+            rows = listOf(ListItem(icon = Icons.Filled.Star, label = "Parent", detail = "Expanded")),
+            belowRows = {
+                HorizontalDivider()
+                Text(text = "Expanded content", modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)))
+            },
+        )
+    }
+}
+
+/** An untitled group with a non-clickable row (`clickable = false`): no chevron, and the row reads as information. */
+@Composable
+fun ItemGroupUntitledNonClickableSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = null,
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.Notifications,
+                    label = "Notifications",
+                    detail = "Push alerts enabled",
+                    clickable = false,
+                ),
+            ),
+        )
+    }
+}
+
+/** [ListItem.iconPainter] wins over [ListItem.icon]: the row draws the star, never the bell it names as fallback. */
+@Composable
+fun ItemGroupPainterIconSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = null,
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.Notifications,
+                    iconPainter = { rememberVectorPainter(Icons.Filled.Star) },
+                    label = "Seerr",
+                    detail = "A glyph resolved by the caller",
                 ),
             ),
         )

@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilterChipPager
@@ -36,6 +37,28 @@ fun BingeFilterChipRowSample() {
                 FilterChipItem(label = "Movies", count = 88),
                 FilterChipItem(label = "TV", count = 54),
                 FilterChipItem(label = "Watchlist"),
+            ),
+            selectedIndex = selected,
+            onSelect = { selected = it },
+        )
+    }
+}
+
+/**
+ * A selection past the first chip, over a request-status set whose last chip carries no count — the
+ * filled chip sitting between outlined ones, each with its count sub-pill.
+ */
+@Composable
+fun BingeFilterChipRowMidSelectionSample() {
+    var selected by remember { mutableIntStateOf(1) }
+    ScreenshotTheme {
+        BingeFilterChipRow(
+            items = listOf(
+                FilterChipItem("All", 142),
+                FilterChipItem("Pending", 3),
+                FilterChipItem("Processing", 5),
+                FilterChipItem("Available", 28),
+                FilterChipItem("Failed"),
             ),
             selectedIndex = selected,
             onSelect = { selected = it },
@@ -68,6 +91,42 @@ fun BingeFilterChipPagerSample() {
                 ),
                 selectedIndex = selected,
                 onSelectedIndexChange = { selected = it },
+                modifier = Modifier.fillMaxSize(),
+            ) { _, _ ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * [BingeFilterChipPager]'s scrim fully in, spanning the chip row over paged content running under a
+ * transparent header. Bounded to [R.dimen.catalog_filter_chip_pager_height] like
+ * [BingeFilterChipPagerSample].
+ */
+@Composable
+fun BingeFilterChipPagerScrimmedSample() {
+    var selected by remember { mutableIntStateOf(0) }
+    ScreenshotTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.catalog_filter_chip_pager_height)),
+        ) {
+            BingeFilterChipPager(
+                items = listOf(
+                    FilterChipItem("All", 142),
+                    FilterChipItem("Pending", 3),
+                    FilterChipItem("Processing", 5),
+                ),
+                selectedIndex = selected,
+                onSelectedIndexChange = { selected = it },
+                headerBackground = Color.Transparent,
+                scrimFraction = 1f,
                 modifier = Modifier.fillMaxSize(),
             ) { _, _ ->
                 Box(

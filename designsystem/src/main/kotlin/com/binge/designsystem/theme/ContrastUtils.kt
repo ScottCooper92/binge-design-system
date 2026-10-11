@@ -12,4 +12,4 @@ internal const val WCAG_CONTRAST_NORMAL = 4.5
  * (black vs white). Order-independent. Alpha is ignored — both colours are treated as opaque,
  * matching [ColorUtils.calculateContrast]'s requirement that the background be opaque.
  */
-fun Color.contrastRatio(against: Color): Double = ColorUtils.calculateContrast(toArgb(), against.toArgb())
+internal fun Color.contrastRatio(against: Color): Double = ColorUtils.calculateContrast(toArgb(), against.toArgb())

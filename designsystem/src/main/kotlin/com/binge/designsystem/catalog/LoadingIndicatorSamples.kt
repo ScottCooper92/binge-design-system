@@ -2,6 +2,7 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +25,19 @@ fun LoadingIndicatorSample() {
             contentAlignment = Alignment.Center,
         ) {
             BingeLoadingIndicator()
+        }
+    }
+}
+
+/** A caller-supplied colour, for a spinner drawn against a background the primary colour does not suit. */
+@Composable
+fun LoadingIndicatorCustomColorSample() {
+    ScreenshotTheme {
+        Box(
+            modifier = Modifier.size(dimensionResource(R.dimen.state_icon_container_size)),
+            contentAlignment = Alignment.Center,
+        ) {
+            BingeLoadingIndicator(color = MaterialTheme.colorScheme.tertiary)
         }
     }
 }

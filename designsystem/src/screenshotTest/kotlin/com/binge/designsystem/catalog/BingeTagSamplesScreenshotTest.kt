@@ -22,4 +22,11 @@ class BingeTagSamplesScreenshotTest {
     fun Tinted() {
         BingeTagTintedSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Tags() {
+        BingeTagKindsSample()
+    }
 }
