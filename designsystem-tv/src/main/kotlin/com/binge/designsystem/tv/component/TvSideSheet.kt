@@ -33,6 +33,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DISABLED_ALPHA
@@ -147,7 +148,7 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * reached. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false renders a read-out
  * that stays out of the focus order. [initiallyFocused] draws the focused state, for a frame.
  *
- * [supportingText] is a second line under the label. [leading] replaces [icon] with a visual of the caller's, such
+ * [supportingText] is a second line under the label, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
  * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
  * An [icon] sits on its tinted plate, in the error colour for a [destructive] row and dimmed for a disabled one.
  * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
@@ -219,7 +220,13 @@ fun TvSideSheetRow(
             Text(text = label, style = MaterialTheme.typography.titleMedium, color = content)
             when {
                 supportingText != null ->
-                    Text(text = supportingText, style = MaterialTheme.typography.bodyMedium, color = supporting)
+                    Text(
+                        text = supportingText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = supporting,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 // An empty line at the supporting style is that line's height, and nothing for a screen reader to read.
                 reserveSupportingLine ->
                     Text(text = "", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.clearAndSetSemantics {})

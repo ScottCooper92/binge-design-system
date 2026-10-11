@@ -36,7 +36,8 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The deliberate opposite of [TvTabRow], where focus is the commit. Use this where a switch is costly, such as one
  * that re-runs a query or drops what the user picked under the old value. Pressing the option already chosen is a
- * no-op, guarded here so no caller has to remember to. [initialFocusedKey] seeds one option as focused for a frame;
+ * no-op, guarded here so no caller has to remember to. The pills sit side by side, so they carry no second line;
+ * [TvOptionRow] is the stacked form that does. [initialFocusedKey] seeds one option as focused for a frame;
  * production passes null.
  */
 @Composable
