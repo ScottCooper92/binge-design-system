@@ -92,7 +92,8 @@ fun <T> TvOptionGroup(
  * Focus is the fill and selection is the tick, and the two are independent: the current value keeps its tick while
  * focus passes over it. The chosen option's label and tick take the accent at rest, and invert with the fill. The
  * row never scales on focus. [trailing] sits before the tick, for a short value the option carries. [initiallyFocused]
- * paints the row focused for a frame, which fires no focus events; production passes false.
+ * paints the row focused for a frame, which fires no focus events; production passes false. [supportingText] is one line
+ * under the label, ellipsized: what choosing the option does.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -104,6 +105,7 @@ fun TvOptionRow(
     initiallyFocused: Boolean = false,
     trailing: (@Composable () -> Unit)? = null,
     icon: ImageVector? = null,
+    supportingText: String? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     ListItem(
@@ -114,6 +116,7 @@ fun TvOptionRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
+        supportingContent = supportingText?.let { { SupportingLine(it) } },
         leadingContent = icon?.let { { TvRowIcon(icon = it, isFocused = focused) } },
         trailingContent =
             if (selected || trailing != null) {
@@ -146,7 +149,7 @@ fun TvOptionRow(
  * OK flips it through [onCheckedChange].
  *
  * Not [enabled], it is dimmed and OK does nothing, but it keeps focus so the remote does not lose its place. An [icon]
- * follows the box on its tinted plate.
+ * follows the box on its tinted plate, and [supportingText] adds one ellipsized line saying what the setting does.
  * [initiallyFocused] paints the row focused for a frame; production passes false.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -159,6 +162,7 @@ fun TvCheckboxRow(
     enabled: Boolean = true,
     initiallyFocused: Boolean = false,
     icon: ImageVector? = null,
+    supportingText: String? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     ListItem(
@@ -168,6 +172,7 @@ fun TvCheckboxRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
+        supportingContent = supportingText?.let { { SupportingLine(it) } },
         leadingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -224,6 +229,12 @@ fun tvRowListItemColors(
         focusedSelectedContainerColor = focusedContainer,
         focusedSelectedContentColor = focusedContent,
     )
+}
+
+/** A row's second line: one line, ellipsized, saying what the option does. */
+@Composable
+private fun SupportingLine(text: String) {
+    Text(text = text, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
 }
 
 /** The tick reads `ListItem`'s content colour rather than re-deriving it, so it inverts with the focus fill. */
