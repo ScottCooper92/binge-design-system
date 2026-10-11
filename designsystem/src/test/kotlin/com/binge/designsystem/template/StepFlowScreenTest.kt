@@ -20,6 +20,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.LocalIsSinglePaneNav
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.theme.LocalReduceMotion
 import org.junit.Assert.assertEquals
@@ -212,5 +213,33 @@ class StepFlowScreenTest {
         }
 
         composeTestRule.onNodeWithText("Tile 0").assertExists()
+    }
+
+    private fun setFlowBesideHub() {
+        composeTestRule.setContent {
+            TestTheme {
+                CompositionLocalProvider(LocalIsSinglePaneNav provides false) {
+                    StepFlowScreen(
+                        stepCount = STEPS,
+                        currentStep = step,
+                        onBack = { backs++ },
+                        title = "Edit connection",
+                        onExit = {},
+                    ) { Text("Step $it") }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun besideAListPaneTheFirstStepsBackIsHiddenButAStepBackStays() {
+        setFlowBesideHub()
+
+        composeTestRule.onNodeWithContentDescription("Back").assertDoesNotExist()
+
+        step = 1
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription("Back").assertExists()
     }
 }

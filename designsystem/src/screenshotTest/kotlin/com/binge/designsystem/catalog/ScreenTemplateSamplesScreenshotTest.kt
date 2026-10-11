@@ -125,6 +125,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun decisionInStepFlowSplit() = DecisionInStepFlowSplitSample()
 
+    /** A long step with the bar collapsed: the bar scrims in over the step and the read-out stays under it. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowScrolled() = StepFlowScreenScrolledSample()
+
     /** A wide window's end pane is taller than wide, so the decision in it keeps its portrait layout. */
     @PreviewTest
     @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)

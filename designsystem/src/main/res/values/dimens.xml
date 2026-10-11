@@ -354,8 +354,6 @@
     <dimen name="message_screen_icon_size">44dp</dimen>
     <dimen name="message_screen_icon_gap">20dp</dimen>
     <dimen name="message_screen_action_gap">22dp</dimen>
-    <dimen name="step_chrome_height">48dp</dimen>
-    <dimen name="step_chrome_padding_h">20dp</dimen>
     <dimen name="step_dot_size">7dp</dimen>
     <dimen name="step_dot_active_width">26dp</dimen>
     <dimen name="step_dot_spacing">7dp</dimen>

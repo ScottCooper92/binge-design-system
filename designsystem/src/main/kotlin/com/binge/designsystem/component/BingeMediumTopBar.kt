@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -133,7 +135,7 @@ fun BingeMediumTopBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = titleColor,
-                    modifier = Modifier.padding(start = titleStartInset),
+                    modifier = Modifier.padding(start = titleStartInset).semantics { heading() },
                 )
             },
             modifier = modifier.clearNavRail(),
