@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.ToggleOff
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
+import com.binge.designsystem.LocalIsSinglePaneNav
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DecisionHero
@@ -43,15 +45,20 @@ fun StepFlowScreenTitledSample() {
     }
 }
 
-/** The same flow in the end pane of a wide window. The pane is taller than wide, so the step stacks. */
+/**
+ * The same flow in the end pane of a wide window, with the list pane beside it, on its second step. The pane is taller
+ * than wide, so the step stacks. Back steps to the first step even with the list beside; there, Back would leave.
+ */
 @Composable
 fun StepFlowScreenInPaneSample() {
-    var step by remember { mutableIntStateOf(0) }
+    var step by remember { mutableIntStateOf(1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
-            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                ConnectionFlow(step = step, onStep = { step = it }, onExit = LocalDemoBack.current)
+        CompositionLocalProvider(LocalIsSinglePaneNav provides false) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    ConnectionFlow(step = step, onStep = { step = it }, onExit = LocalDemoBack.current)
+                }
             }
         }
     }

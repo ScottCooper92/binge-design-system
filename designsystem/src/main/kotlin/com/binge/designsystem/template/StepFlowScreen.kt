@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -47,6 +48,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.LocalPaneDepth
 import com.binge.designsystem.R
 import com.binge.designsystem.centredReadingColumn
 import com.binge.designsystem.theme.BingeShapes
@@ -101,30 +103,35 @@ fun StepFlowScreen(
     // the bar does not change kind as Back comes and goes. The read-out sits under it as the scaffold's header, and a
     // step scrolls under both. The scaffold does not consume the keyboard, so a step with a text field owns its own
     // imePadding and a footer rides above the keyboard, as before.
-    BingeScreenScaffold(
-        title = title.orEmpty(),
-        modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-        onBack = back,
-        bar = if (title != null) ScreenBar.Collapsing else ScreenBar.Small,
-        scrollBehavior = scrollBehavior,
-        header = if (stepCount > 1) ({ StepReadOut(stepCount, currentStep) }) else null,
-    ) { padding ->
-        ScreenBody(padding) { inner ->
-            val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
-            // The bottom clears the navigation bar here, and is consumed so a footer's imePadding adds only the excess.
-            val bottom = PaddingValues(bottom = inner.calculateBottomPadding())
-            BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(bottom).consumeWindowInsets(bottom)) {
-                // A keyboard shrinks the space a host pads for it; the layout must not flip under a focused field.
-                val keyboardUp = keyboardUp()
-                val memory = remember { SplitMemory() }
-                val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), keyboardUp, memory.last)
-                if (!keyboardUp || memory.last == null) memory.last = split
-                if (loading) {
-                    Box(Modifier.padding(top = inner.calculateTopPadding())) { LoadingMessageScreen() }
-                } else {
-                    StepTransition(currentStep) { step ->
-                        val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
-                        if (split) SplitStep(slots, inner.calculateTopPadding()) else StackedStep(slots, inner.calculateTopPadding())
+    // Past the first step Back goes to the previous step, not out of the screen, so the list pane beside the flow has no
+    // Back to offer in its place: the scaffold's pane rule is told the flow is nested. Step 0's exit keeps the rule.
+    val paneDepth = LocalPaneDepth.current
+    CompositionLocalProvider(LocalPaneDepth provides if (currentStep > 0) maxOf(paneDepth, 2) else paneDepth) {
+        BingeScreenScaffold(
+            title = title.orEmpty(),
+            modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+            onBack = back,
+            bar = if (title != null) ScreenBar.Collapsing else ScreenBar.Small,
+            scrollBehavior = scrollBehavior,
+            header = if (stepCount > 1) ({ StepReadOut(stepCount, currentStep) }) else null,
+        ) { padding ->
+            ScreenBody(padding) { inner ->
+                val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
+                // The bottom clears the navigation bar here, and is consumed so a footer's imePadding adds only the excess.
+                val bottom = PaddingValues(bottom = inner.calculateBottomPadding())
+                BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(bottom).consumeWindowInsets(bottom)) {
+                    // A keyboard shrinks the space a host pads for it; the layout must not flip under a focused field.
+                    val keyboardUp = keyboardUp()
+                    val memory = remember { SplitMemory() }
+                    val split = heldWhileIme(splitsStep(maxWidth, maxHeight, expandedWidth), keyboardUp, memory.last)
+                    if (!keyboardUp || memory.last == null) memory.last = split
+                    if (loading) {
+                        Box(Modifier.padding(top = inner.calculateTopPadding())) { LoadingMessageScreen() }
+                    } else {
+                        StepTransition(currentStep) { step ->
+                            val slots = StepSlots(step, heading, aside, footer, content, scrolls = contentScrolls(step))
+                            if (split) SplitStep(slots, inner.calculateTopPadding()) else StackedStep(slots, inner.calculateTopPadding())
+                        }
                     }
                 }
             }
