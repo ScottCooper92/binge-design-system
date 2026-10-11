@@ -572,7 +572,7 @@ internal fun <T> MultiChoiceList(
     // filter as the sheet opens, with no keyboard on screen.
     val dock = LocalBingeSheetDock.current
     val needsRoom = filterPlaceholder != null && imeVisible && dock?.canExpand == true
-    LaunchedEffect(needsRoom) { if (needsRoom) dock?.expand() }
+    LaunchedEffect(needsRoom) { if (needsRoom) dock.expand() }
     Column(modifier) {
         if (filterPlaceholder != null && choices is BingeChoiceList.Ready) {
             BingeSearchField(

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertCountEquals
@@ -14,9 +15,14 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.requestFocus
 import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,6 +67,33 @@ class BingeNumberSliderTest {
 
         composeTestRule.onNodeWithText("10 a week").assertExists()
         assertEquals("10 a week", sliderState())
+    }
+
+    @Test
+    fun `a drag across the track moves the value, and the caller gets it`() {
+        setSlider(10)
+
+        composeTestRule.onNodeWithContentDescription("Movie requests").performTouchInput {
+            down(center)
+            moveTo(centerRight)
+            up()
+        }
+        composeTestRule.waitForIdle()
+
+        assertTrue("a swipe towards the end must raise the value", (value ?: Int.MAX_VALUE) > 50)
+    }
+
+    @Test
+    fun `the right arrow steps one stop and the left arrow steps back`() {
+        setSlider(10)
+        val slider = composeTestRule.onNodeWithContentDescription("Movie requests")
+
+        slider.requestFocus()
+        slider.performKeyInput { pressKey(Key.DirectionRight) }
+        assertEquals(11, value)
+        slider.performKeyInput { pressKey(Key.DirectionLeft) }
+        slider.performKeyInput { pressKey(Key.DirectionLeft) }
+        assertEquals(9, value)
     }
 
     @Test
