@@ -33,7 +33,7 @@ class TvSideSheetTest {
         var dismissed = 0
         composeTestRule.setContent {
             BingeTvTheme {
-                TvSideSheet(onDismiss = { dismissed++ }) { entry ->
+                TvSideSheet(onDismissRequest = { dismissed++ }) { entry ->
                     TvSideSheetRow(label = "Approve", onClick = {}, modifier = Modifier.focusRequester(entry))
                     TvSideSheetRow(label = "Decline", onClick = {})
                     TvSideSheetStepFocus(entry)
@@ -52,7 +52,7 @@ class TvSideSheetTest {
         composeTestRule.setContent {
             BingeTvTheme {
                 var confirming by remember { mutableStateOf(true) }
-                TvSideSheet(onDismiss = {}) { entry ->
+                TvSideSheet(onDismissRequest = {}) { entry ->
                     if (confirming) {
                         TvSideSheetConfirm(
                             title = "Delete this request?",

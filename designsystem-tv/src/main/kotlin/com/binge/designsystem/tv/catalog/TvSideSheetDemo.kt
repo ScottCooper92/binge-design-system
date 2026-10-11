@@ -43,7 +43,7 @@ fun TvSideSheetDemo() {
         TvButton(label = "Open sheet", onClick = { open = true }, modifier = Modifier.focusRequester(opener))
     }
     if (open) {
-        TvSideSheet(onDismiss = closer::close) { entryFocus ->
+        TvSideSheet(onDismissRequest = closer::close) { entryFocus ->
             if (confirming) {
                 TvSideSheetConfirm(
                     title = "Delete this request?",
