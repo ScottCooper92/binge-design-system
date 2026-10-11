@@ -68,6 +68,7 @@ private fun SampleBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel:
                             body = "The quality a new request asks for.",
                             note = "You can still pick another for each request.",
                             icon = Icons.Filled.HighQuality,
+                            detail = quality,
                             options =
                                 listOf(QUALITY_HD to Icons.Filled.Hd, QUALITY_UHD to Icons.Filled.HighQuality).map { (option, glyph) ->
                                     TvPaneOption(
@@ -83,6 +84,7 @@ private fun SampleBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel:
                             label = "Subtitles",
                             body = "Whether new titles start with subtitles on.",
                             icon = Icons.Filled.Subtitles,
+                            detail = if (subtitles) "On" else "Off",
                             options =
                                 listOf(
                                     TvPaneOption(label = "On", selected = subtitles, onSelect = { subtitles = true }),

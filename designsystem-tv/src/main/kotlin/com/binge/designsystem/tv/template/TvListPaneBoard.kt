@@ -59,6 +59,9 @@ data class TvPaneOption(
  * The pane leads with [hero] when there is one (a code to scan, say), otherwise with [icon] on its plate, otherwise
  * with neither. [announceNote] makes the note a polite live region, for a note that reports an outcome rather than
  * a static hint, which would otherwise be read again every time focus reached the row.
+ *
+ * [detail] is the row's current value on its line in the list, for a row whose value is a choice (the chosen option,
+ * On or Off), so the list can be read without moving into each pane. Null leaves the row one line.
  */
 @Immutable
 data class TvPaneRow(
@@ -70,6 +73,7 @@ data class TvPaneRow(
     val icon: ImageVector? = null,
     val hero: (@Composable () -> Unit)? = null,
     val announceNote: Boolean = false,
+    val detail: String? = null,
 )
 
 /** A titled block of a [TvListPaneBoard]'s rows. The title is a read-out and never takes focus. */
@@ -173,6 +177,7 @@ private fun TvPaneList(
                     val described = row.key == describedKey
                     TvPaneListRow(
                         label = row.label,
+                        detail = row.detail,
                         emphasis = tvRowEmphasis(isDescribedRow = described, columnHasFocus = columnHasFocus),
                         onFocused = { onFocusRow(row.key) },
                         modifier =
@@ -203,13 +208,14 @@ private fun TvPaneGroupTitle(title: String) {
 }
 
 /**
- * A one-line tv-material `ListItem`: just the row's name, since the pane carries its value. No leading icon, because
+ * A tv-material `ListItem`: the row's name, and its current [detail] under it when it has one. No leading icon, because
  * every row in the column is the same kind of thing. Focus is colour, never scale.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun TvPaneListRow(
     label: String,
+    detail: String?,
     emphasis: TvRowEmphasis,
     onFocused: () -> Unit,
     modifier: Modifier = Modifier,
@@ -221,6 +227,10 @@ private fun TvPaneListRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
+        supportingContent =
+            detail?.let {
+                { Text(text = it, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            },
         shape = ListItemDefaults.shape(shape = BingeShapes.TvListItem),
         colors =
             tvRowListItemColors(
