@@ -17,9 +17,23 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
  * anyway is harmless — the nested theme resolves to the same colours — so the manual calls still in the
  * tree render identically and can be removed as they are touched.
  *
+ * Every cell pins [SOURCE_LOCALE], so a frame renders the source strings wherever it is recorded.
+ *
  * Keep preview `name`s compact/space-free (e.g. `phone-land`): the plugin bakes the name into each
  * reference filename, and long paths blow past Windows' 260-char MAX_PATH in worktree temp dirs.
  */
+
+/**
+ * The locale every cell pins unless it is a locale cell. Without it a single-module app, whose debug variant carries the
+ * AAPT2 pseudolocales, resolves a bare `en` to `values-en-XA` and records every string accented and bracketed. A region
+ * keeps the lookup on the source strings; for a library module it changes nothing but the baseline's file name.
+ */
+const val SOURCE_LOCALE = "en-rGB"
+
+private const val PHONE_PORTRAIT = "spec:width=411dp,height=891dp,orientation=portrait"
+private const val PHONE_LANDSCAPE = "spec:width=411dp,height=891dp,orientation=landscape"
+private const val FOLDABLE_PORTRAIT = "spec:width=840dp,height=1180dp,orientation=portrait"
+private const val TABLET_LANDSCAPE = "spec:width=800dp,height=1280dp,orientation=landscape"
 
 /** Standard phone — the de-facto Pixel-class width the wrap-content previews render at. */
 const val STANDARD_PHONE_WIDTH_DP = 412
@@ -30,8 +44,8 @@ const val STANDARD_PHONE_WIDTH_DP = 412
  * vs 480 isn't a distinct layout branch.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "light", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_NO)
-@Preview(name = "dark", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "light", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
+@Preview(name = "dark", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class ComponentPreviews
 
 /**
@@ -40,10 +54,10 @@ annotation class ComponentPreviews
  * wrap/overflow regressions.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "font10-light", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.0f, uiMode = UI_MODE_NIGHT_NO)
-@Preview(name = "font15-light", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.5f, uiMode = UI_MODE_NIGHT_NO)
-@Preview(name = "font10-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.0f, uiMode = UI_MODE_NIGHT_YES)
-@Preview(name = "font15-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.5f, uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "font10-light", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.0f, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
+@Preview(name = "font15-light", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.5f, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
+@Preview(name = "font10-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.0f, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "font15-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.5f, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class FontScalePreviews
 
 /**
@@ -51,7 +65,7 @@ annotation class FontScalePreviews
  * a container around its text, where the largest scale is what clips.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class LargestFontPreview
 
 /**
@@ -95,11 +109,11 @@ annotation class LocalePreviews
  * A hardcoded `darkTheme = …` inside the content still pins every cell to one theme.
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "phone", device = "spec:width=411dp,height=891dp,orientation=portrait", uiMode = UI_MODE_NIGHT_YES)
-@Preview(name = "phone-light", device = "spec:width=411dp,height=891dp,orientation=portrait", uiMode = UI_MODE_NIGHT_NO)
-@Preview(name = "phone-land", device = "spec:width=411dp,height=891dp,orientation=landscape", uiMode = UI_MODE_NIGHT_YES)
-@Preview(name = "foldable", device = "spec:width=840dp,height=1180dp,orientation=portrait", uiMode = UI_MODE_NIGHT_YES)
-@Preview(name = "tablet", device = "spec:width=800dp,height=1280dp,orientation=landscape", uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "phone", device = PHONE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "phone-light", device = PHONE_PORTRAIT, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
+@Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "foldable", device = FOLDABLE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "tablet", device = TABLET_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class ScreenPreviews
 
 /**
@@ -118,5 +132,5 @@ annotation class ScreenPreviews
  * type in a grid, content sized to overflow the window) stays on [ScreenPreviews].
  */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "phone", device = "spec:width=411dp,height=891dp,orientation=portrait", uiMode = UI_MODE_NIGHT_YES)
+@Preview(name = "phone", device = PHONE_PORTRAIT, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class ScreenStatePreview
