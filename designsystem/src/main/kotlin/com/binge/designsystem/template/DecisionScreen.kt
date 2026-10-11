@@ -49,6 +49,8 @@ private const val LANDSCAPE_CONTENT_WEIGHT = 3f
  * scroll together and the answers stay pinned below. A space wider than tall drops the hero, puts the copy and
  * answers on the start side, and gives the points their own scroll on the end side. The space is the one the screen
  * is given, so a pane of a wide window that is taller than wide stays in the portrait layout.
+ *
+ * [noteContent] replaces `copy.note` in both layouts, as [DecisionHeading] says.
  */
 @Composable
 fun DecisionScreen(
@@ -59,6 +61,7 @@ fun DecisionScreen(
     modifier: Modifier = Modifier,
     hero: ImageVector? = null,
     heroBadge: ImageVector? = null,
+    noteContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     // The space it is given, not the window: in a pane of a wide window it is often taller than wide.
     BoxWithConstraints(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -69,9 +72,9 @@ fun DecisionScreen(
         if (!imeVisible || memory.last == null) memory.last = wide
         Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
             if (wide) {
-                DecisionLandscape(copy, points, accept, decline)
+                DecisionLandscape(copy, points, accept, decline, noteContent)
             } else {
-                DecisionPortrait(copy, points, accept, decline, hero, heroBadge)
+                DecisionPortrait(copy, points, accept, decline, hero, heroBadge, noteContent)
             }
         }
     }
@@ -113,6 +116,7 @@ private fun DecisionPortrait(
     decline: ScreenAction,
     hero: ImageVector?,
     heroBadge: ImageVector?,
+    noteContent: (@Composable ColumnScope.() -> Unit)?,
 ) {
     Column(
         modifier =
@@ -121,7 +125,7 @@ private fun DecisionPortrait(
                 .padding(horizontal = dimensionResource(R.dimen.padding_l)),
     ) {
         Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            DecisionBody(copy = copy, points = points, hero = hero, heroBadge = heroBadge)
+            DecisionBody(copy = copy, points = points, hero = hero, heroBadge = heroBadge, noteContent = noteContent)
         }
         DecisionFooter(accept, decline)
     }
@@ -133,6 +137,7 @@ private fun DecisionLandscape(
     points: List<DecisionPoint>,
     accept: ScreenAction,
     decline: ScreenAction,
+    noteContent: (@Composable ColumnScope.() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.fillMaxSize().padding(horizontal = dimensionResource(R.dimen.padding_l)),
@@ -140,7 +145,7 @@ private fun DecisionLandscape(
     ) {
         Column(modifier = Modifier.weight(LANDSCAPE_HEADER_WEIGHT).fillMaxHeight()) {
             Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-                DecisionHeading(copy, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_l)))
+                DecisionHeading(copy, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_l)), noteContent = noteContent)
             }
             DecisionFooter(accept, decline)
         }
