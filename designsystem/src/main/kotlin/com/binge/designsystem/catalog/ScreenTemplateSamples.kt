@@ -559,8 +559,8 @@ fun FormScreenFooterSample() {
             title = "New network",
             onBack = LocalDemoBack.current,
             placement = FormActionPlacement.Footer,
-            primaryAction = FormAction("Create", onClick = {}),
-            secondaryAction = FormAction("Cancel", onClick = {}),
+            primaryAction = FormAction("Create", onClick = LocalDemoBack.current),
+            secondaryAction = FormAction("Cancel", onClick = LocalDemoBack.current),
         ) {
             SampleForm()
         }
@@ -628,15 +628,18 @@ fun StepFlowScreenSample() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StepFlowScreenScrolledSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         StepFlowScreen(
             stepCount = SAMPLE_STEPS,
-            currentStep = 1,
-            onBack = {},
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
             title = "Edit connection",
             scrollBehavior = collapsedTopBarScrollBehavior(),
             heading = { StepHeading(kicker = "Privacy", title = "Share usage data?", subtitle = "Counts of which screens are opened.") },
-            footer = { BingeFilledButton(label = "Share", onClick = {}, modifier = Modifier.fillMaxWidth()) },
+            footer = { BingeFilledButton(label = "Share", onClick = advance, modifier = Modifier.fillMaxWidth()) },
         ) {
             repeat(SAMPLE_SCROLLED_ROWS) { index ->
                 Box(
@@ -773,14 +776,17 @@ fun DecisionScreenSample() {
 /** The decision as one page of a step flow: the flow's bar and step read-out above it, its own footer pinned below. */
 @Composable
 fun DecisionBodyInStepFlowSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         StepFlowScreen(
             stepCount = SAMPLE_STEPS,
-            currentStep = 1,
-            onBack = {},
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
             footer = {
-                BingeFilledButton(label = "Share usage data", onClick = {}, modifier = Modifier.fillMaxWidth())
-                BingeTextButton(label = "Not now", onClick = {}, modifier = Modifier.fillMaxWidth())
+                BingeFilledButton(label = "Share usage data", onClick = advance, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Not now", onClick = advance, modifier = Modifier.fillMaxWidth())
             },
         ) {
             DecisionBody(
@@ -799,14 +805,17 @@ fun DecisionBodyInStepFlowSample() {
 /** The step-flow body with a note in two paragraphs through the note slot: the second reads quieter, in the variant colour. */
 @Composable
 fun DecisionBodyNoteContentSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         StepFlowScreen(
             stepCount = SAMPLE_STEPS,
-            currentStep = 1,
-            onBack = {},
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
             footer = {
-                BingeFilledButton(label = "Share usage data", onClick = {}, modifier = Modifier.fillMaxWidth())
-                BingeTextButton(label = "Not now", onClick = {}, modifier = Modifier.fillMaxWidth())
+                BingeFilledButton(label = "Share usage data", onClick = advance, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Not now", onClick = advance, modifier = Modifier.fillMaxWidth())
             },
         ) {
             DecisionBody(
