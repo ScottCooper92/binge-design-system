@@ -3,7 +3,6 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -188,20 +187,10 @@ private fun ListItemView(
         if (row.leadingContent != null) {
             row.leadingContent.invoke()
         } else {
-            Box(
-                modifier = Modifier
-                    .size(dimensionResource(R.dimen.item_group_icon_size))
-                    .clip(BingeShapes.MoreCard)
-                    .background(row.iconTint?.tonalContainer() ?: MaterialTheme.colorScheme.surfaceContainerHigh),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = row.iconPainter?.invoke() ?: rememberVectorPainter(row.icon),
-                    contentDescription = null,
-                    tint = row.iconTint ?: MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(dimensionResource(R.dimen.item_group_icon_glyph)),
-                )
-            }
+            BingeIconPlate(
+                painter = row.iconPainter?.invoke() ?: rememberVectorPainter(row.icon),
+                tint = row.iconTint,
+            )
         }
         Spacer(Modifier.width(dimensionResource(R.dimen.account_card_spacing)))
         Column(modifier = Modifier.weight(1f)) {

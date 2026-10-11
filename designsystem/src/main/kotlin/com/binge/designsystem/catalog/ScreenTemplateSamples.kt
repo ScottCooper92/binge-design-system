@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.ErrorKind
@@ -52,6 +53,7 @@ import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.component.BingeOutlinedButton
+import com.binge.designsystem.component.BingeSnackbar
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.FilterChipItem
@@ -67,6 +69,7 @@ import com.binge.designsystem.template.ErrorScreen
 import com.binge.designsystem.template.FilteredListScreen
 import com.binge.designsystem.template.FormAction
 import com.binge.designsystem.template.FormActionPlacement
+import com.binge.designsystem.template.FormSaveStatus
 import com.binge.designsystem.template.FormScreen
 import com.binge.designsystem.template.FormSection
 import com.binge.designsystem.template.HeroDetailLazyScreen
@@ -478,29 +481,74 @@ fun HeroDetailScreenFooterSample() {
     }
 }
 
-/** A short editor that saves from the bar. */
+/** A short editor that saves each change as it is made: "Saved" in the bar, and no Save button. */
 @Composable
 fun FormScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FormScreen(
             title = "General",
             onBack = LocalDemoBack.current,
-            primaryAction = FormAction("Save", onClick = {}),
+            saveStatus = FormSaveStatus.Saved,
         ) {
             SampleForm()
         }
     }
 }
 
-/** A long editor with Cancel and Save pinned below it. */
+/** [FormScreenSample] while a change is on its way: "Saving…" in the bar. */
+@Composable
+fun FormScreenSavingSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "General",
+            onBack = LocalDemoBack.current,
+            saveStatus = FormSaveStatus.Saving,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/**
+ * [FormScreenSample] after a write failed: the change stays on screen, and a snackbar offers Retry until a save
+ * succeeds. The pill is drawn directly, because a snackbar host is empty at frame 0 (see [BingeSnackbarSample]);
+ * [FormScreenSaveAsMadeDemo] shows the real one.
+ */
+@Composable
+fun FormScreenSaveFailedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize()) {
+            FormScreen(
+                title = "General",
+                onBack = LocalDemoBack.current,
+                saveStatus = FormSaveStatus.Failed(onRetry = {}),
+            ) {
+                SampleForm()
+            }
+            BingeSnackbar(
+                message = stringResource(R.string.form_save_failed),
+                actionLabel = stringResource(R.string.form_save_retry),
+                onActionClick = {},
+                showDismissAction = false,
+                onDismissRequest = {},
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = dimensionResource(R.dimen.padding_m), vertical = dimensionResource(R.dimen.padding_s)),
+            )
+        }
+    }
+}
+
+/** A long create form with Cancel and Create pinned below it: a create flow commits, so it keeps its button. */
 @Composable
 fun FormScreenFooterSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FormScreen(
-            title = "Network",
+            title = "New network",
             onBack = LocalDemoBack.current,
             placement = FormActionPlacement.Footer,
-            primaryAction = FormAction("Save", onClick = {}),
+            primaryAction = FormAction("Create", onClick = {}),
             secondaryAction = FormAction("Cancel", onClick = {}),
         ) {
             SampleForm()
@@ -508,7 +556,7 @@ fun FormScreenFooterSample() {
     }
 }
 
-/** A form under a large collapsing bar, its fields held to a reading column on a wide window. */
+/** An editor under a large collapsing bar that saves as it goes, its fields held to a reading column on a wide window. */
 @Composable
 fun FormScreenCappedSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
@@ -517,7 +565,7 @@ fun FormScreenCappedSample() {
             onBack = LocalDemoBack.current,
             bar = ScreenBar.Large,
             capWidth = true,
-            primaryAction = FormAction("Save", onClick = {}),
+            saveStatus = FormSaveStatus.Saved,
         ) {
             SampleForm()
         }

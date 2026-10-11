@@ -130,5 +130,9 @@
     <string name="error_kind_generic_title">Something went wrong</string>
     <string name="error_kind_generic_message">An unexpected error occurred.</string>
     <string name="error_kind_retry">Try again</string>
+    <string name="form_save_saving">Saving…</string>
+    <string name="form_save_saved">Saved</string>
+    <string name="form_save_failed">Couldn\'t save your change</string>
+    <string name="form_save_retry">Retry</string>
     <string name="empty_screen_title">Nothing here yet</string>
 </resources>
