@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.clearNavRail
 import com.binge.designsystem.hasPaneBeside
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.paneSideInsets
@@ -141,8 +142,10 @@ internal fun TwoRowTopBar(
     val glassBackgroundAlpha = 1f - foregroundScrimFraction
     val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
     val edgeInset = dimensionResource(R.dimen.medium_top_bar_edge_inset)
+    // Beside a pane the title offsets itself past the rail; alone, the bar's own insets do (topBarSideInsets).
     val contentStart =
-        resolvedContentPadding().calculateStartPadding(LocalLayoutDirection.current) + navOverlayStart()
+        resolvedContentPadding().calculateStartPadding(LocalLayoutDirection.current) +
+            if (hasPaneBeside()) navOverlayStart() else dimensionResource(R.dimen.zero)
     val onContentInset = contentStart - dimensionResource(R.dimen.pane_top_bar_title_inset)
     val contentEnd = resolvedContentPadding().calculateEndPadding(LocalLayoutDirection.current)
     val besideBackButton = dimensionResource(R.dimen.padding_s)
@@ -209,7 +212,7 @@ internal fun TwoRowTopBar(
                     )
                 }
             },
-            modifier = modifier,
+            modifier = modifier.clearNavRail(),
             navigationIcon = {
                 if (onBack != null) {
                     Box(modifier = Modifier.padding(start = edgeInset)) {

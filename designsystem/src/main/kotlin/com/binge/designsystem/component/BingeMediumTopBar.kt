@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.clearNavRail
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeTheme
@@ -129,7 +130,7 @@ fun BingeMediumTopBar(
                     modifier = Modifier.padding(start = titleStartInset),
                 )
             },
-            modifier = modifier,
+            modifier = modifier.clearNavRail(),
             navigationIcon = {
                 if (onBack != null) {
                     Box(modifier = Modifier.padding(start = edgeInset)) {
