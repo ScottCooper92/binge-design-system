@@ -17,6 +17,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetRowReservedLine() = Frame { TvSideSheetRowReservedLineSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun confirmDialog() = Frame { TvConfirmDialogSample() }
 
     @Composable

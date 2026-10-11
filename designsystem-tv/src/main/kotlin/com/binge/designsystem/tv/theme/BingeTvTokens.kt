@@ -25,6 +25,13 @@ import androidx.compose.material3.ColorScheme as M3ColorScheme
 val BingeTvColorScheme: ColorScheme = DarkColorScheme.toTvColorScheme()
 
 /**
+ * How opaque the page colour is over what an overlay covers: the side sheet's scrim, and the value an app's own TV overlay
+ * uses so its scrim reads as the same layer. Dark enough that the page behind recedes, light enough that it is still
+ * there to come back to.
+ */
+const val TV_OVERLAY_SCRIM_ALPHA = 0.72f
+
+/**
  * The projection [BingeTvColorScheme] is built with, public so an app with its own brand can build
  * its TV scheme the same way rather than re-deciding which slots move.
  */
