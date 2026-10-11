@@ -86,7 +86,7 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
  * pass under the rail, and what must stay clear of it pads by [LocalTvContentInset] (the collapsed width)
  * instead of the pane being structurally inset. The rail paints a scrim, not an opaque fill — but only over
  * real artwork: it fades between a solid panel and glass in step with the backdrop's own crossfade
- * ([TvRailArtworkPresence]), because a rail left translucent over a screen's hero↔backdrop transition reads as
+ * (the rail's artwork counter), because a rail left translucent over a screen's hero↔backdrop transition reads as
  * the rail itself flickering. The hold band is anchored in dp (`tv_nav_rail_scrim_falloff`), not a fraction of
  * width, so it reaches the label band expanded exactly as it reaches the icon collapsed — expanded and collapsed
  * read as the same glass, just wider. Fixed-width in both states rather than content-sized, since the items fill
@@ -97,7 +97,7 @@ private const val RAIL_SCRIM_HOLD_ALPHA = 0.65f
  * without a real focus event (focus-as-parameter — see `docs/tv-foundation.md`).
  *
  * [artworkBehind] pins the glass/solid fill the same way, and for the same reason. Production leaves it `null`
- * and the rail follows [TvRailArtworkPresence], which a backdrop reports into from a `DisposableEffect` — and
+ * and the rail follows its artwork counter, which a backdrop reports into from a `DisposableEffect` — and
  * effects do not run when a `@Preview` is rendered, so the glass state would be uncapturable and the whole
  * scrim ramp would go unscreenshotted while every baseline still passed.
  *
