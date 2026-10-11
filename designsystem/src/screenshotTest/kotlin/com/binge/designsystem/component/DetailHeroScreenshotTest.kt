@@ -20,7 +20,7 @@ import com.binge.designsystem.theme.BingeTheme
 
 /**
  * Detail header — tagline and genre eyebrow wrap differently across widths.
- * [DetailHero] fixes its own height (R.dimen.detail_hero_height), so we pass no
+ * [DetailHero] sets its own height, at least R.dimen.detail_hero_height, so we pass no
  * height modifier; it renders top-anchored with theme background filling below.
  */
 class DetailHeroScreenshotTest {

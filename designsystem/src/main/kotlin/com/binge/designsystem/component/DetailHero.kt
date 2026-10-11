@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
@@ -112,12 +113,15 @@ fun DetailHero(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(dimensionResource(R.dimen.detail_hero_height)),
+            .heightIn(min = dimensionResource(R.dimen.detail_hero_height)),
     ) {
+        // The band is a floor, not a fixed height, so the backdrop takes the Box's measured size rather than
+        // filling constraints that are now unbounded below.
         HeroBackdrop(
             backdropUrl = backdropUrl,
             contentDescription = title,
             richBackdrop = richBackdrop,
+            modifier = Modifier.matchParentSize(),
         )
 
         if (showChrome) {
@@ -152,7 +156,19 @@ fun DetailHero(
             eyebrowText = eyebrowText,
             metaContent = metaContent,
             titleContent = titleContent,
-            modifier = Modifier.align(Alignment.BottomStart),
+            // With the chrome drawn, the copy keeps clear of the back button: a title and tagline too tall for
+            // the band at a large font scale grow the band instead of running up under the button.
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .then(
+                    if (showChrome) {
+                        Modifier
+                            .statusBarsPadding()
+                            .padding(top = dimensionResource(R.dimen.top_bar_icon_size) + dimensionResource(R.dimen.padding_m) * 2)
+                    } else {
+                        Modifier
+                    },
+                ),
         )
     }
 }
