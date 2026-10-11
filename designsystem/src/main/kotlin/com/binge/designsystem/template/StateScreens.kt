@@ -15,7 +15,8 @@ import com.binge.designsystem.R
  *
  * [title] and [message] override the kind's copy, for a failure the caller can say more precisely, such as
  * a message the server sent. The whole message is announced, not just the headline, because it replaced what
- * the user was reading.
+ * the user was reading. [secondary] is a second way out beside Try again, such as Settings for a failure the
+ * user fixes there, as the TV's error plate offers its extra actions.
  */
 @Composable
 fun ErrorScreen(
@@ -24,12 +25,14 @@ fun ErrorScreen(
     modifier: Modifier = Modifier,
     title: String? = null,
     message: String? = null,
+    secondary: ScreenAction? = null,
 ) {
     MessageScreen(
         body = message ?: stringResource(kind.messageRes),
         headline = title ?: stringResource(kind.titleRes),
         icon = kind.icon,
         primary = onRetry?.let { ScreenAction(stringResource(R.string.error_kind_retry), it, Icons.Filled.Refresh) },
+        secondary = secondary,
         announce = true,
         modifier = modifier,
     )

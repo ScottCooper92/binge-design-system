@@ -19,34 +19,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.uppercaseLocalised
+import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /**
  * A multi-step flow on TV: a step read-out at the top, the step's [content], and a footer band of
  * [footerActions] with an optional [footerHint]. For onboarding before the shell and for setup or sign-in.
  *
- * [currentStep] is zero-based; [progressLabel] is the consumer's own "Step 2 of 3". BACK steps back through
+ * [currentStep] is zero-based. [progressLabel] defaults to the phone flow's own "Step 2 of 3", and a consumer
+ * passes its own to say more. BACK steps back through
  * [onBack] when it is non-null and falls through when it is null, and there is no on-screen Back: the remote's
- * key is the one every TV user knows. Focus lands on [entry] each time the step changes. [loading] replaces
- * the content with a plate carrying that label, so a step never shows an empty frame while it fills.
+ * key is the one every TV user knows. Focus lands on [entry] each time the step changes. A non-null
+ * [loadingLabel] replaces the content with a plate carrying it, so a step never shows an empty frame while it
+ * fills: the phone's `loading` with the words a ten-foot screen needs in place of a bare spinner.
  * [chromeOverContent] lets a full-bleed step draw under the read-out and supply its own footer.
+ *
+ * The footer is a row of [footerActions] at the end of the band, where the phone stacks its footer full width
+ * under the step: a remote moves across a row, a thumb reaches down a column.
  */
 @Composable
 fun TvStepFlow(
     stepCount: Int,
     currentStep: Int,
-    progressLabel: String,
+    progressLabel: String = stringResource(DesR.string.cd_step_progress, currentStep + 1, stepCount),
     modifier: Modifier = Modifier,
     hosting: TvPageHosting = TvPageHosting.PreShell,
     entry: FocusRequester? = null,
     arrivalEnabled: Boolean = true,
     onBack: (() -> Unit)? = null,
-    loading: String? = null,
+    loadingLabel: String? = null,
     footerHint: String? = null,
     footerActions: (@Composable RowScope.() -> Unit)? = null,
     chromeOverContent: Boolean = false,
@@ -59,7 +66,7 @@ fun TvStepFlow(
             modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .then(tvPageArrival(hosting, entry, arrivalEnabled && loading == null, key = currentStep)),
+                .then(tvPageArrival(hosting, entry, arrivalEnabled && loadingLabel == null, key = currentStep)),
     ) {
         Column(modifier = Modifier.fillMaxSize().then(if (chromeOverContent) Modifier else Modifier.padding(padding))) {
             if (!chromeOverContent) TvStepProgress(stepCount, currentStep, progressLabel)
@@ -76,8 +83,8 @@ fun TvStepFlow(
                             },
                         ),
             ) {
-                if (loading != null) {
-                    TvMessagePlate(body = loading, alignment = Alignment.Center)
+                if (loadingLabel != null) {
+                    TvMessagePlate(body = loadingLabel, alignment = Alignment.Center)
                 } else {
                     content()
                 }

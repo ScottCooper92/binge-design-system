@@ -19,9 +19,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.catalog.CatalogGroup
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.template.TvMessagePage
-import com.binge.designsystem.tv.template.TvPageAction
 import com.binge.designsystem.tv.template.TvPageHosting
 import com.binge.designsystem.tv.template.TvStepFlow
 import com.binge.designsystem.tv.template.TvStepHeading
@@ -87,7 +87,7 @@ fun TvMessagePageDemo() {
         icon = if (loading) null else Icons.Filled.CloudOff,
         hosting = TvPageHosting.Overlay,
         loading = loading,
-        primary = TvPageAction("Retry") { loading = true },
+        primary = ScreenAction("Retry", { loading = true }),
     )
 }
 
