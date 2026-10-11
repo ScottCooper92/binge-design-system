@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- A tab's count before it is known: format-only, so there is nothing to translate. -->
-    <string name="tv_tab_count_unknown" translatable="false">—</string>
-</resources>

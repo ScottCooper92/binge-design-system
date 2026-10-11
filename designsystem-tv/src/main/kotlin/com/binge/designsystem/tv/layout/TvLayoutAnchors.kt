@@ -41,13 +41,6 @@ object TvLayoutAnchors {
 
     /** An immersive hub's row at [index] among the rows it lays out, which the hub's skeleton reserves. */
     fun hubRow(index: Int): String = "${PREFIX}hub-row-$index"
-
-    /**
-     * A list-and-pane board's first row, which the board's skeleton reserves. Everything the skeleton must match
-     * sits above it — the title band, the column's focus-ring bleed and the first group header — so a shortfall in
-     * any of them moves this row.
-     */
-    const val LIST_PANE_FIRST_ROW: String = "${PREFIX}list-pane-first-row"
 }
 
 /**
