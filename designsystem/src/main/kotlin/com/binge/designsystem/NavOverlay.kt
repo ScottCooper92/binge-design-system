@@ -3,8 +3,10 @@ package com.binge.designsystem
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
@@ -68,3 +70,12 @@ fun navOverlayStart(): Dp = LocalNavOverlayInsets.current.calculateStartPadding(
  */
 @Composable
 fun navOverlayEnd(): Dp = LocalNavOverlayInsets.current.calculateEndPadding(LocalLayoutDirection.current)
+
+/**
+ * Pads a top bar's start past the rail that overlays it, when no pane is beside the bar. Plain padding, not window
+ * insets: the rail consumes the start safe area before its content, and its published overlay already holds that area,
+ * so passing the overlay through `windowInsetsPadding` would take the consumed part off it a second time and leave the
+ * bar short of the rail by a cutout's width. Zero where no rail is mounted. Beside a pane the bar offsets its own title.
+ */
+@Composable
+internal fun Modifier.clearNavRail(): Modifier = if (hasPaneBeside()) this else padding(start = navOverlayStart())
