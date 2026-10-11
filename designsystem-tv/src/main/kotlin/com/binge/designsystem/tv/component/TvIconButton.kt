@@ -23,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
@@ -42,11 +44,16 @@ import com.binge.designsystem.tv.R as TvR
  * expand-on-focus idiom [com.binge.designsystem.tv.nav.BingeTvNavRail] uses to reveal its destinations'
  * labels, so a user who has already learnt the rail has learnt this too.
  *
- * [label] never renders as its own [Text] node while resting, so it is required rather than optional: it
- * is the control's accessible name the whole time, and the copy the reveal shows once focused.
+ * [label] never renders as its own [Text] node while resting, so it is required rather than optional, where the
+ * phone's icon button takes a nullable description: a TV icon button must be named. It is the control's accessible
+ * name the whole time, and the copy the reveal shows once focused.
  *
  * Coloured by [tvButtonColors] like [TvButton], so an icon button focuses with the accent (red for
  * [TvButtonStyle.Destructive]) exactly like every other control.
+ *
+ * [loading] swaps the icon for a spinner of the same size and swallows OK, as the phone's icon button does. It is
+ * independent of [enabled]: the button keeps its colours and focus, so the remote does not lose its place, and the
+ * focused reveal still shows [label] beside the spinner.
  *
  * [initiallyFocused] seeds the focus flag so a screenshot can show the revealed frame (a baseline runs no
  * coroutines, so no real focus event lands); production leaves it false.
@@ -59,6 +66,7 @@ fun TvIconButton(
     modifier: Modifier = Modifier,
     style: TvButtonStyle = TvButtonStyle.Secondary,
     enabled: Boolean = true,
+    loading: Boolean = false,
     initiallyFocused: Boolean = false,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
@@ -68,8 +76,14 @@ fun TvIconButton(
         style = style,
         enabled = enabled,
         isFocused = focused,
+        loading = loading,
         modifier = modifier
-            .tvClickable(enabled = enabled, role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick),
+            .tvClickable(
+                enabled = enabled,
+                role = Role.Button,
+                onFocusChanged = { focused = it },
+                onClick = { if (!loading) onClick() },
+            ),
     )
 }
 
@@ -85,7 +99,8 @@ fun TvIconButton(
  *
  * [label] is applied once, to the surface itself via [clearAndSetSemantics], rather than conditionally —
  * a screen reader gets a stable accessible name in both states, and the [Text] added on focus does not
- * double-announce it.
+ * double-announce it. While [loading] the same node also says it is busy, which the spinner's own semantics cannot
+ * once they are cleared.
  */
 @Composable
 internal fun TvIconButtonSurface(
@@ -95,6 +110,7 @@ internal fun TvIconButtonSurface(
     enabled: Boolean,
     isFocused: Boolean,
     modifier: Modifier = Modifier,
+    loading: Boolean = false,
 ) {
     val palette = tvButtonColors(style = style, enabled = enabled, isFocused = isFocused)
     val diameter = dimensionResource(TvR.dimen.tv_icon_button_diameter)
@@ -108,19 +124,26 @@ internal fun TvIconButtonSurface(
             .background(palette.container)
             .border(dimensionResource(TvR.dimen.tv_button_border_width), palette.border, BingeShapes.Pill)
             .padding(horizontal = dimensionResource(TvR.dimen.tv_icon_button_padding_horizontal))
-            .clearAndSetSemantics { contentDescription = label },
+            .clearAndSetSemantics {
+                contentDescription = label
+                if (loading) progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
+            },
         contentAlignment = Alignment.Center,
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_button_icon_gap)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = palette.content,
-                modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
-            )
+            if (loading) {
+                TvButtonSpinner(color = palette.content)
+            } else {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = palette.content,
+                    modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
+                )
+            }
             if (isFocused) {
                 Text(
                     text = label,

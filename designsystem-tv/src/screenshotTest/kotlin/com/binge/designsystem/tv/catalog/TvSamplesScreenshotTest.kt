@@ -18,12 +18,22 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun buttonLoading() = Frame { TvButtonLoadingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun buttonOnPanel() = Frame { TvButtonOnPanelSample() }
 
     @PreviewTest
     @TvPreviews
     @Composable
     fun iconButton() = Frame { TvIconButtonSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun iconButtonLoading() = Frame { TvIconButtonLoadingSample() }
 
     @PreviewTest
     @TvPreviews

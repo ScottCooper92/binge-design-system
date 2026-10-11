@@ -6,6 +6,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertTextContains
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
@@ -33,7 +34,7 @@ class TvMessagePageAnnounceTest {
                     body = BODY,
                     headline = HEADLINE,
                     hosting = TvPageHosting.Overlay,
-                    primary = TvPageAction("Try again") {},
+                    primary = ScreenAction("Try again", {}),
                     announce = true,
                 )
             }
