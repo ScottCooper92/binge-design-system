@@ -399,7 +399,7 @@ fun <T> BingeChoiceSheetContent(
     caption: String? = null,
 ) {
     Column(modifier) {
-        RestingSheetTop(dragHandle) { BingeSheetHeader(title, subtitle, caption) }
+        RestingSheetTop(dragHandle) { BingeSheetHeader(title, subtitle = subtitle, caption = caption) }
         SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
     }
 }
@@ -435,7 +435,7 @@ fun <T> BingeMultiChoiceSheetContent(
 ) {
     Column(modifier) {
         RestingSheetTop(dragHandle) {
-            BingeSheetHeader(title, subtitle, caption) {
+            BingeSheetHeader(title, subtitle = subtitle, caption = caption) {
                 actions()
                 BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
                 doneLabel?.let { BingeTextButton(label = it, onClick = onDone) }
@@ -470,7 +470,7 @@ internal fun ChoiceSheetTop(
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     BingeSheetDockingHeader(
-        header = { BingeSheetHeader(title, subtitle, caption, actions) },
+        header = { BingeSheetHeader(title, subtitle = subtitle, caption = caption, actions = actions) },
         dockedTopBar = { onClose -> BingeSheetTopBar(title = title, onClose = onClose, actions = actions) },
     )
 }
@@ -487,13 +487,14 @@ internal fun ChoiceSheetTop(
 @Composable
 fun BingeSheetHeader(
     title: String,
+    modifier: Modifier = Modifier,
     subtitle: String? = null,
     caption: String? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Column(
         modifier =
-            Modifier.fillMaxWidth().padding(
+            modifier.fillMaxWidth().padding(
                 horizontal = dimensionResource(R.dimen.padding_m),
                 vertical = dimensionResource(R.dimen.padding_s),
             ),
