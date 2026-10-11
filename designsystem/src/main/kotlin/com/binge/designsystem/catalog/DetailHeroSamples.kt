@@ -24,7 +24,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
  * Public sample for [DetailHero]. See the convention KDoc on
  * [MediaCardRatedSample].
  *
- * The hero fixes its own height (`R.dimen.detail_hero_height`), so the sample passes no height
+ * The hero sets its own height, at least `R.dimen.detail_hero_height`, so the sample passes no height
  * modifier; it renders top-anchored with the theme background filling below. A null backdrop URL
  * keeps the render deterministic without a network image.
  */
@@ -94,6 +94,25 @@ fun DetailHeroTitleFallbackSample() {
             genres = listOf("Action", "Crime", "Drama"),
             onBack = {},
             titleContent = { Text(text = "The Dark Knight", maxLines = 2, autoSize = DetailHeroDefaults.titleAutoSize()) },
+        )
+    }
+}
+
+/**
+ * Every line of copy at its longest: a title that takes both of its lines, the genre eyebrow, a two-line tagline
+ * and the meta line. At a large font scale on a landscape phone this is taller than the band, which grows to hold it
+ * rather than running the title up under the back button.
+ */
+@Composable
+fun DetailHeroFullCopySample() {
+    ScreenshotTheme {
+        DetailHero(
+            title = "The Lord of the Rings: The Return of the King, Extended Edition",
+            backdropUrl = null,
+            tagline = "There can be no triumph without loss. No victory without suffering. No freedom without sacrifice.",
+            metaText = "8.9 · 2003 · 4h 23m",
+            genres = listOf("Adventure", "Fantasy", "Action"),
+            onBack = {},
         )
     }
 }
