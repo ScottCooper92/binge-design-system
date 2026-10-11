@@ -18,6 +18,7 @@ import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvChoiceRow
 import com.binge.designsystem.tv.component.TvChoiceUi
 import com.binge.designsystem.tv.component.TvOptionGroup
+import com.binge.designsystem.tv.component.TvRatingStepper
 import com.binge.designsystem.tv.component.TvTabCount
 import com.binge.designsystem.tv.component.TvTabRow
 import com.binge.designsystem.tv.component.TvTabUi
@@ -124,3 +125,43 @@ private val LibraryTabs =
     )
 
 private val RatedTabs = LibraryTabs + TvTabUi(key = KEY_EPISODES, label = "Episodes")
+
+/** The rating stepper at a whole-star value, resting: filled stars in the accent, the rest empty. */
+@Composable
+fun TvRatingStepperSample() {
+    SampleRatingStepper(initial = RATING_WHOLE, initiallyFocused = false)
+}
+
+/** An odd value draws a half star: seven reads as three and a half stars beside the number. */
+@Composable
+fun TvRatingStepperHalfStarSample() {
+    SampleRatingStepper(initial = RATING_HALF, initiallyFocused = false)
+}
+
+/** Nothing set yet: all five stars empty. */
+@Composable
+fun TvRatingStepperUnratedSample() {
+    SampleRatingStepper(initial = 0, initiallyFocused = false)
+}
+
+/** Focus on the stepper: the ring shows, and ← → would step the value. */
+@Composable
+fun TvRatingStepperFocusedSample() {
+    SampleRatingStepper(initial = RATING_HALF, initiallyFocused = true)
+}
+
+@Composable
+private fun SampleRatingStepper(initial: Int, initiallyFocused: Boolean) {
+    var value by remember { mutableStateOf(initial) }
+    TvRatingStepper(
+        value = value,
+        onValueChange = { value = it },
+        valueLabel = "$value / $RATING_MAX",
+        initiallyFocused = initiallyFocused,
+        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
+    )
+}
+
+private const val RATING_WHOLE = 8
+private const val RATING_HALF = 7
+private const val RATING_MAX = 10
