@@ -148,7 +148,8 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * that stays out of the focus order. [initiallyFocused] draws the focused state, for a frame.
  *
  * [supportingText] is a second line under the label. [leading] replaces [icon] with a visual of the caller's, such
- * as a poster thumbnail for a sheet about one title; an [icon] sits on its tinted plate, in the error colour for a [destructive] row; size it with `tv_side_sheet_thumbnail_width` and `_height`.
+ * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
+ * An [icon] sits on its tinted plate, in the error colour for a [destructive] row and dimmed for a disabled one.
  * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
  * stays as tall as neighbours that have something, such as a count.
  */
@@ -205,7 +206,12 @@ fun TvSideSheetRow(
             icon != null ->
                 TvRowIcon(
                     icon = icon,
-                    tint = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                    tint =
+                        when {
+                            !enabled -> resting
+                            destructive -> MaterialTheme.colorScheme.error
+                            else -> MaterialTheme.colorScheme.primary
+                        },
                     isFocused = focused,
                 )
         }

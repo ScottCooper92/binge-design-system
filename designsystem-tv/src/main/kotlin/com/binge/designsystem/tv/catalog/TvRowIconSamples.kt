@@ -89,12 +89,13 @@ fun TvRowIconRowsSample() {
     }
 }
 
-/** The side sheet's rows with an icon: tinted at rest, in the error colour when destructive, and on the focus fill. */
+/** The side sheet's rows with an icon: tinted at rest, in the error colour when destructive, dimmed when disabled, and on the focus fill. */
 @Composable
 fun TvRowIconSideSheetSample() {
     TvSideSheetPanel {
         TvSideSheetRow(label = "Approve", onClick = {}, icon = Icons.Filled.Check, initiallyFocused = true)
         TvSideSheetRow(label = "Subtitles", onClick = {}, icon = Icons.Filled.Subtitles)
         TvSideSheetRow(label = "Delete request", onClick = {}, icon = Icons.Filled.Delete, destructive = true)
+        TvSideSheetRow(label = "Already approved", onClick = {}, icon = Icons.Filled.Check, enabled = false)
     }
 }
