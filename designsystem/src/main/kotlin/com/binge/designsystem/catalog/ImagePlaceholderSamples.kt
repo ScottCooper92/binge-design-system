@@ -9,7 +9,7 @@ import com.binge.designsystem.component.ImagePlaceholder
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public sample for [ImagePlaceholder] (group `"Media"`). See the convention KDoc on
+ * Public sample for [ImagePlaceholder]. See the convention KDoc on
  * [MediaCardRatedSample].
  *
  * The placeholder fills whatever bounds it is given, so the sample pins a poster-class square via

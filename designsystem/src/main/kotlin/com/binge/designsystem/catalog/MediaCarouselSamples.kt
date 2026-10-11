@@ -12,7 +12,7 @@ import com.binge.designsystem.component.MediaCarousel
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public sample for [MediaCarousel] (group `"Media"`) — a titled, horizontally-scrolling row of
+ * Public sample for [MediaCarousel] — a titled, horizontally-scrolling row of
  * poster cards with a trailing "see all" tile. See the convention on [MediaCardRatedSample].
  */
 @Composable

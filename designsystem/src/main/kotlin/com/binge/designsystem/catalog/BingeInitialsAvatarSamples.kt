@@ -10,7 +10,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.preview.WithPreviewAvatarImage
 
 /**
- * Public sample for [BingeInitialsAvatar] (group `"Avatars"`). See the convention KDoc on
+ * Public sample for [BingeInitialsAvatar]. See the convention KDoc on
  * [MediaCardRatedSample].
  *
  * Each name hashes to a deterministic pastel tone, so the sample shows a row of distinct names to

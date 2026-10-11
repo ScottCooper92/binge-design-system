@@ -70,9 +70,13 @@ private fun DecisionPointRow(point: DecisionPoint) {
     }
 }
 
-/** The decorative plate that heads a decision: [icon] in a hero-shaped plate, with [badge] on its corner. */
+/**
+ * The decorative plate that heads a decision: [icon] in a hero-shaped plate, with [badge] on its corner. Public so a
+ * decision that is one step of a `StepFlowScreen` can put it in the flow's aside, where a split step keeps it beside
+ * the heading rather than in the content's scroll (#638).
+ */
 @Composable
-internal fun DecisionHero(
+fun DecisionHero(
     icon: ImageVector,
     badge: ImageVector?,
     modifier: Modifier = Modifier,

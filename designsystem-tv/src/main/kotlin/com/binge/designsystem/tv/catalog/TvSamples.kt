@@ -82,7 +82,7 @@ import com.binge.designsystem.tv.R as TvR
 /** Enough bands that the rail's ramp is legible against them, and an odd count so neither colour ends both edges. */
 private const val SAMPLE_ARTWORK_BANDS = 9
 
-/** The button across its roles and both focus states, through the stateless surface. */
+/** The button across its roles, both focus states and disabled, through the stateless surface. */
 @Composable
 fun TvButtonSample() {
     Column(
@@ -104,6 +104,7 @@ fun TvButtonSample() {
             TvButtonSurface("Sign out", TvButtonStyle.Destructive, enabled = true, isFocused = false)
             TvButtonSurface("Sign out", TvButtonStyle.Destructive, enabled = true, isFocused = true)
             TvButtonSurface("Continue", TvButtonStyle.Primary, enabled = false, isFocused = false)
+            TvButtonSurface("Sign out", TvButtonStyle.Destructive, enabled = false, isFocused = false)
         }
     }
 }
@@ -163,6 +164,13 @@ fun TvIconButtonSample() {
             TvIconButtonSurface(Icons.Filled.Delete, "Remove", TvButtonStyle.Destructive, enabled = true, isFocused = true)
             TvIconButtonSurface(Icons.Filled.Bookmark, "Watchlist", TvButtonStyle.Secondary, enabled = false, isFocused = false)
         }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TvIconButtonSurface(Icons.Filled.PlayArrow, "Play", TvButtonStyle.Primary, enabled = true, isFocused = true)
+            TvIconButtonSurface(Icons.Filled.PlayArrow, "Play", TvButtonStyle.Primary, enabled = false, isFocused = false)
+        }
     }
 }
 
@@ -183,6 +191,21 @@ fun TvCardRowSample() {
             key = { it },
             cellWidth = cellWidth,
             trailing = { _, _, cellModifier -> SamplePlate(label = "More", modifier = cellModifier.width(cellWidth)) },
+        ) { index, _, _, cellModifier ->
+            SamplePlate(label = "Season $index", modifier = cellModifier)
+        }
+    }
+}
+
+/** [TvCardRowSample] with no heading: the plates sit at the top, with no title band reserved above them. */
+@Composable
+fun TvCardRowNoHeadingSample() {
+    val cellWidth = dimensionResource(DesR.dimen.card_width)
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        TvCardRow(
+            items = (1..4).toList(),
+            key = { it },
+            cellWidth = cellWidth,
         ) { index, _, _, cellModifier ->
             SamplePlate(label = "Season $index", modifier = cellModifier)
         }

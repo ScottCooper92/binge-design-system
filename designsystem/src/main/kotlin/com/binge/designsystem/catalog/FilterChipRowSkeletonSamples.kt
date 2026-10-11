@@ -7,7 +7,7 @@ import com.binge.designsystem.component.FilterChipRowSkeleton
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Public sample for [FilterChipRowSkeleton] (group `"Skeletons"`) — see the convention on
+ * Public sample for [FilterChipRowSkeleton] — see the convention on
  * [MediaCardRatedSample].
  */
 @Composable

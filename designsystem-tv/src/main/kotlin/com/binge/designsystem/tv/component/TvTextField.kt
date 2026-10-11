@@ -193,6 +193,7 @@ private fun TvFieldFrame(
     val focusManager = LocalFocusManager.current
     val input = remember { FocusRequester() }
     val frame = remember { FocusRequester() }
+    val press = remember { SelectPress() }
     // Owned here, not left to the String overload, so the caret can start at the end: re-opening a field that holds
     // text must append, not insert at the start.
     var edit by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
@@ -222,7 +223,7 @@ private fun TvFieldFrame(
                 .then(arrival?.let { Modifier.tvArrivalTarget(it) } ?: Modifier)
                 .focusRequester(frame)
                 .onFocusChanged { focused = it.isFocused }
-                .editOnSelect(enabled = enabled && !editing) { editing = true }
+                .editOnSelect(enabled = enabled && !editing, press) { editing = true }
                 .focusable(enabled = enabled)
                 .semantics { contentDescription = name },
     ) {
@@ -301,12 +302,36 @@ private fun FieldText(
     }
 }
 
-/** Select (the remote's OK, or Enter) on the frame starts editing; the press is the frame's, so it types nothing. */
-private fun Modifier.editOnSelect(enabled: Boolean, onEdit: () -> Unit): Modifier =
+/** Whether the frame saw a select go down while it was not editing, so the select's key-up is the frame's to act on. */
+private class SelectPress {
+    var down = false
+}
+
+/**
+ * Select (the remote's OK, or Enter) on the frame starts editing; the press is the frame's, so it types nothing.
+ *
+ * Only a whole press starts it: the key-up must follow a key-down the frame saw while not editing. A hardware Enter
+ * that submits does so on its key-down, inside the input, and focus is back on the frame before its key-up arrives;
+ * that key-up belongs to the submit, and acting on it would raise the keyboard straight after it (#598).
+ */
+private fun Modifier.editOnSelect(
+    enabled: Boolean,
+    press: SelectPress,
+    onEdit: () -> Unit,
+): Modifier =
     onPreviewKeyEvent { event ->
-        val select = enabled && event.isSelect()
-        if (select && event.type == KeyEventType.KeyUp) onEdit()
-        select
+        if (!enabled || !event.isSelect()) {
+            if (!enabled) press.down = false
+            return@onPreviewKeyEvent false
+        }
+        when (event.type) {
+            KeyEventType.KeyDown -> press.down = true
+            KeyEventType.KeyUp -> if (press.down) {
+                press.down = false
+                onEdit()
+            }
+        }
+        true
     }
 
 private fun KeyEvent.isSelect(): Boolean = key == Key.DirectionCenter || key == Key.Enter || key == Key.NumPadEnter

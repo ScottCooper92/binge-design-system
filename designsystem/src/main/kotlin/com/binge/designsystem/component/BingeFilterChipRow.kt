@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.max
 import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.OverlaidHeaderContent
+import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
@@ -112,7 +113,7 @@ internal fun filterChipRowPadding(consumed: WindowInsets): PaddingValues {
     return PaddingValues(
         start = edges.calculateStartPadding(layoutDirection) + max(navOverlayStart(), sides.calculateStartPadding(layoutDirection)),
         top = vertical,
-        end = edges.calculateEndPadding(layoutDirection) + sides.calculateEndPadding(layoutDirection),
+        end = edges.calculateEndPadding(layoutDirection) + max(navOverlayEnd(), sides.calculateEndPadding(layoutDirection)),
         bottom = vertical,
     )
 }

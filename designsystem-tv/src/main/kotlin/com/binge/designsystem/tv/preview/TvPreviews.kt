@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
+import com.binge.designsystem.preview.SOURCE_LOCALE
 import com.binge.designsystem.tv.theme.BingeTvTheme
 
 /*
@@ -43,6 +44,7 @@ const val TV_PREVIEW_HEIGHT_DP = 540
 @Preview(
     name = "tv",
     device = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PREVIEW_HEIGHT_DP}dp,orientation=landscape",
+    locale = SOURCE_LOCALE,
     uiMode = UI_MODE_NIGHT_YES,
 )
 annotation class TvPreviews
@@ -77,6 +79,7 @@ annotation class TvRtlPreviews
 @Preview(
     name = "tv",
     device = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PREVIEW_HEIGHT_DP}dp,orientation=landscape",
+    locale = SOURCE_LOCALE,
     uiMode = UI_MODE_NIGHT_YES,
 )
 annotation class TvPreviewsOnBlack
