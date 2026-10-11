@@ -14,7 +14,9 @@ import com.binge.designsystem.R
  * A large collapsing bar for a screen whose heading carries more than its title: a [subtitle] line under it
  * (a summary of what the screen shows) and a [titleTrailing] control at the end of the title row. Both show
  * only while the bar is expanded; a control that should take over once it collapses goes in [actions], faded
- * on the [scrollBehavior]'s collapsed fraction. Otherwise it is [BingePaneTopBar]'s two-row form.
+ * on the [scrollBehavior]'s collapsed fraction. Otherwise it is [BingePaneTopBar]'s two-row form, with its
+ * defaults: a [Color.Transparent] bar whose scrim fades in on that same fraction. Pass
+ * `containerColor = Color.Unspecified` for an opaque bar on the app background.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,8 +26,8 @@ fun BingeLargeTopBar(
     subtitle: String? = null,
     onBack: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    containerColor: Color = Color.Unspecified,
-    scrimFraction: Float = 0f,
+    containerColor: Color = Color.Transparent,
+    scrimFraction: Float = scrollBehavior?.state?.collapsedFraction ?: 0f,
     foregroundScrimFraction: Float = scrimFraction,
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,

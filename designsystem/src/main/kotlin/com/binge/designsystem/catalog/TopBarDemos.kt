@@ -134,7 +134,7 @@ private fun SearchAction(glassBackgroundAlpha: Float) {
     )
 }
 
-/** [BingeTopBar] pinned and opaque, the plain screen bar, with its scrim following what scrolls under it. */
+/** [BingeTopBar] pinned at its defaults, the plain screen bar: transparent, with its scrim following what scrolls under it. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingeTopBarDemo() {
@@ -146,7 +146,7 @@ fun BingeTopBarDemo() {
 
 /**
  * [BingeTopBar] with the enter-always behaviour: the bar leaves on a scroll down and returns on a scroll up.
- * Its scrim follows `overlappedFraction`, as [BingeTopBar]'s KDoc says. On this behaviour
+ * Its default scrim follows `overlappedFraction`, as [BingeTopBar]'s KDoc says. On this behaviour
  * `collapsedFraction` measures how far the bar has slid off screen, which would clear the scrim exactly
  * when the bar comes back over content.
  */
@@ -154,15 +154,8 @@ fun BingeTopBarDemo() {
 @Composable
 fun BingeTopBarEnterAlwaysDemo() {
     val behavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    ScrollingBarDemoHost(behavior, "overlappedFraction", { it.overlappedFraction }) { fraction ->
-        BingeTopBar(
-            title = DEMO_TITLE,
-            onBack = LocalDemoBack.current,
-            scrollBehavior = behavior,
-            containerColor = Color.Transparent,
-            scrimFraction = fraction,
-            actions = { SearchAction(it) },
-        )
+    ScrollingBarDemoHost(behavior, "overlappedFraction", { it.overlappedFraction }) {
+        BingeTopBar(title = DEMO_TITLE, onBack = LocalDemoBack.current, scrollBehavior = behavior, actions = { SearchAction(it) })
     }
 }
 
@@ -239,19 +232,13 @@ fun BingeMediumTopBarGlassDemo() {
     }
 }
 
-/** [BingePaneTopBar] with the behaviour it is documented to pair with, [rememberPaneTopBarScrollBehavior]. */
+/** [BingePaneTopBar] with the behaviour it is documented to pair with, [rememberPaneTopBarScrollBehavior], at its defaults. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingePaneTopBarDemo() {
     val behavior = rememberPaneTopBarScrollBehavior()
-    ScrollingBarDemoHost(behavior) { fraction ->
-        BingePaneTopBar(
-            title = DEMO_TITLE,
-            onBack = LocalDemoBack.current,
-            scrollBehavior = behavior,
-            containerColor = Color.Transparent,
-            scrimFraction = fraction,
-        )
+    ScrollingBarDemoHost(behavior) {
+        BingePaneTopBar(title = DEMO_TITLE, onBack = LocalDemoBack.current, scrollBehavior = behavior)
     }
 }
 
@@ -264,15 +251,8 @@ fun BingePaneTopBarDemo() {
 fun BingePaneTopBarDetailPaneDemo() {
     val behavior = rememberPaneTopBarScrollBehavior()
     CompositionLocalProvider(LocalPaneInnerEdge provides PaneEdge.Start) {
-        ScrollingBarDemoHost(behavior) { fraction ->
-            BingePaneTopBar(
-                title = DEMO_TITLE,
-                onBack = LocalDemoBack.current,
-                scrollBehavior = behavior,
-                containerColor = Color.Transparent,
-                scrimFraction = fraction,
-                actions = { SearchAction(it) },
-            )
+        ScrollingBarDemoHost(behavior) {
+            BingePaneTopBar(title = DEMO_TITLE, onBack = LocalDemoBack.current, scrollBehavior = behavior, actions = { SearchAction(it) })
         }
     }
 }

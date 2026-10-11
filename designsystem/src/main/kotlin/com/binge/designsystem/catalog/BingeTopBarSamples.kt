@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +24,7 @@ import com.binge.designsystem.component.TransparentBingeTopBarSample
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
 
-/** Standard top bar — a back button, title, and a trailing plain search action. */
+/** Standard top bar, opaque on the app background (the explicit `Color.Unspecified`): a back button, title, and a trailing plain search action. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingeTopBarSample() {
@@ -31,6 +32,7 @@ fun BingeTopBarSample() {
         BingeTopBar(
             title = "Popular Movies",
             onBack = {},
+            containerColor = Color.Unspecified,
             actions = {
                 ExpressiveIconButton(
                     onClick = {},
@@ -41,6 +43,35 @@ fun BingeTopBarSample() {
                 )
             },
         )
+    }
+}
+
+/**
+ * The bar with nothing but a title and a behaviour: transparent over the content, at rest, so no scrim yet. This is
+ * the gallery chrome by default; see [BingeTopBarDefaultsOverlappedSample] for content scrolled under it.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarDefaultsSample() {
+    ScreenshotTheme {
+        TopBarOverContent {
+            BingeTopBar(title = "Popular Movies", onBack = {}, scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()) {
+                TopBarShareAction(it)
+            }
+        }
+    }
+}
+
+/** [BingeTopBarDefaultsSample] with content scrolled under it: the scrim has faded in with the bar's overlap. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarDefaultsOverlappedSample() {
+    ScreenshotTheme {
+        TopBarOverContent {
+            BingeTopBar(title = "Popular Movies", onBack = {}, scrollBehavior = overlappedTopBarScrollBehavior()) {
+                TopBarShareAction(it)
+            }
+        }
     }
 }
 

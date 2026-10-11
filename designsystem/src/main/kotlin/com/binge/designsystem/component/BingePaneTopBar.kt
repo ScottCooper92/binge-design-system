@@ -58,7 +58,9 @@ fun rememberPaneTopBarScrollBehavior(): TopAppBarScrollBehavior = TopAppBarDefau
  * collapses to the small title as that pane scrolls. Pair it with [rememberPaneTopBarScrollBehavior].
  *
  * The parameters are [BingeMediumTopBar]'s, and mean the same in both forms, so a screen swaps the call
- * and nothing else.
+ * and nothing else. So are the defaults: the gallery chrome, a [Color.Transparent] bar the content scrolls under
+ * with its scrim fading in on the [scrollBehavior]'s `collapsedFraction`. Pass `containerColor = Color.Unspecified`
+ * for an opaque bar on the app background.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,8 +69,8 @@ fun BingePaneTopBar(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    containerColor: Color = Color.Unspecified,
-    scrimFraction: Float = 0f,
+    containerColor: Color = Color.Transparent,
+    scrimFraction: Float = scrollBehavior?.state?.collapsedFraction ?: 0f,
     foregroundScrimFraction: Float = scrimFraction,
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
