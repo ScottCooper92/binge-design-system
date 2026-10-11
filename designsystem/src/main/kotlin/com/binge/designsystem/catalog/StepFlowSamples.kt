@@ -70,11 +70,14 @@ fun StepFlowScreenInPaneSample() {
  */
 @Composable
 fun DecisionInStepFlowSplitSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(DECISION_STEPS - 1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         StepFlowScreen(
             stepCount = DECISION_STEPS,
-            currentStep = 1,
-            onBack = {},
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
             aside = { DecisionHero(icon = Icons.Filled.BarChart, badge = Icons.Filled.Lock) },
             heading = {
                 DecisionHeading(
@@ -86,8 +89,8 @@ fun DecisionInStepFlowSplitSample() {
                 )
             },
             footer = {
-                BingeFilledButton(label = "Share usage data", onClick = {}, modifier = Modifier.fillMaxWidth())
-                BingeTextButton(label = "Not now", onClick = {}, modifier = Modifier.fillMaxWidth())
+                BingeFilledButton(label = "Share usage data", onClick = advance, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Not now", onClick = advance, modifier = Modifier.fillMaxWidth())
             },
         ) {
             DecisionPointsCard(
