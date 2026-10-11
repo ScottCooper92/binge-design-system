@@ -67,12 +67,12 @@ internal val SampleRegions =
 
 internal val SampleLanguages =
     listOf(
-        BingeChoice("de", "German", "Deutsch", icon = Icons.Filled.Translate),
+        BingeChoice("de", "German", icon = Icons.Filled.Translate),
         BingeChoice("en", "English", icon = Icons.Filled.Translate),
-        BingeChoice("es", "Spanish", "Español", icon = Icons.Filled.Translate),
-        BingeChoice("fr", "French", "Français", icon = Icons.Filled.Translate),
-        BingeChoice("ja", "Japanese", "日本語", icon = Icons.Filled.Translate),
-        BingeChoice("pt", "Portuguese", "Português", icon = Icons.Filled.Translate),
+        BingeChoice("es", "Spanish", icon = Icons.Filled.Translate),
+        BingeChoice("fr", "French", icon = Icons.Filled.Translate),
+        BingeChoice("ja", "Japanese", icon = Icons.Filled.Translate),
+        BingeChoice("pt", "Portuguese", icon = Icons.Filled.Translate),
     )
 
 /** A region's flag from its two-letter code, for the samples' marks. */
@@ -482,7 +482,12 @@ fun BingeChoiceSheetLongLabelSample() {
                     BingeChoiceList.Ready(
                         listOf(
                             BingeChoice("GB", "United Kingdom of Great Britain and Northern Ireland", mark = "GB"),
-                            BingeChoice("SH", "Saint Helena, Ascension and Tristan da Cunha", mark = "SH"),
+                            BingeChoice(
+                                "SH",
+                                "Saint Helena, Ascension and Tristan da Cunha",
+                                subtitle = "Sets the region used for release dates, certificates and where to watch",
+                                mark = "SH",
+                            ),
                             BingeChoice("JP", "Japan", mark = "JP"),
                         ),
                     ),

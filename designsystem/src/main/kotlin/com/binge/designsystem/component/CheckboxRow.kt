@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 
 /**
@@ -28,7 +29,7 @@ import com.binge.designsystem.R
  * long, scannable list (a season picker, a candidate list) rather than a one-off toggle. Reach for this instead of
  * hand-rolling a checkbox [Row] per screen.
  *
- * An [icon] leads the label on the same tinted plate a settings row uses, tinted [iconTint] or `primary`. A
+ * The [subtitle] is one line, ellipsized: say what ticking the row does, in a few words. An [icon] leads the label on the same tinted plate a settings row uses, tinted [iconTint] or `primary`. A
  * [leadingContent] replaces it when the row needs something else, such as an avatar.
  *
  * The row merges its descendants' semantics, so a decorative [leadingContent] such as an avatar should clear its own
@@ -88,6 +89,8 @@ fun CheckboxRow(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

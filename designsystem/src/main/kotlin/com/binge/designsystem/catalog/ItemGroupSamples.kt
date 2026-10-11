@@ -445,13 +445,14 @@ fun ItemGroupLongLabelSample() {
                 ListItem(
                     icon = Icons.Filled.Tune,
                     label = "Allow partial series requests for every user",
+                    detail = "Lets a request ask for some seasons of a series and leave the rest for anyone on the server to request later",
                     toggled = partial,
                     onClick = { partial = !partial },
                 ),
                 ListItem(
                     icon = Icons.Filled.HighQuality,
                     label = "Default quality profile for new requests",
-                    detail = "Applied when a request names no profile of its own",
+                    detail = "HD-1080p",
                 ),
             ),
         )
@@ -494,7 +495,7 @@ fun ItemGroupBelowRowsSample() {
     ScreenshotTheme {
         ItemGroup(
             title = null,
-            rows = listOf(ListItem(icon = Icons.Filled.Star, label = "Parent", detail = "Expanded")),
+            rows = listOf(ListItem(icon = Icons.Filled.Star, label = "Show options", detail = "Reveals the extra options below")),
             belowRows = {
                 HorizontalDivider()
                 Text(text = "Expanded content", modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)))
@@ -513,7 +514,7 @@ fun ItemGroupUntitledNonClickableSample() {
                 ListItem(
                     icon = Icons.Filled.Notifications,
                     label = "Notifications",
-                    detail = "Push alerts enabled",
+                    detail = "Alerts you when a request is approved",
                     clickable = false,
                 ),
             ),

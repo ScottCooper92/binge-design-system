@@ -91,6 +91,7 @@ fun CheckboxRowLongLabelSample() {
     ScreenshotTheme {
         CheckboxRow(
             label = "Season 12: the one with the longest title in the list",
+            subtitle = "Includes every episode, special and extra released so far, not only the main run",
             checked = checked,
             onToggle = { checked = it },
             icon = Icons.Filled.Tv,
