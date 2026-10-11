@@ -8,6 +8,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -27,7 +28,7 @@ class FormScreenSaveStatusTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private var status by mutableStateOf<FormSaveStatus>(FormSaveStatus.Idle)
+    private var status by mutableStateOf<SaveStatus>(SaveStatus.Idle)
 
     private fun setForm() {
         rule.setContent {
@@ -49,17 +50,17 @@ class FormScreenSaveStatusTest {
     fun `saving and saved show in the bar`() {
         setForm()
 
-        status = FormSaveStatus.Saving
+        status = SaveStatus.Saving
         rule.onNodeWithText(SAVING).assertIsDisplayed()
 
-        status = FormSaveStatus.Saved
+        status = SaveStatus.Saved
         rule.onNodeWithText(SAVED).assertIsDisplayed()
     }
 
     @Test
     fun `a failed save shows a snackbar whose Retry calls back`() {
         var retries = 0
-        status = FormSaveStatus.Failed(onRetry = { retries++ })
+        status = SaveStatus.Failed(onRetry = { retries++ })
         setForm()
 
         rule.onNodeWithText(FAILED).assertIsDisplayed()
@@ -70,7 +71,7 @@ class FormScreenSaveStatusTest {
 
     @Test
     fun `the failure snackbar stays until a save succeeds`() {
-        status = FormSaveStatus.Failed(onRetry = {})
+        status = SaveStatus.Failed(onRetry = {})
         setForm()
         rule.onNodeWithText(FAILED).assertIsDisplayed()
 
@@ -78,7 +79,7 @@ class FormScreenSaveStatusTest {
         rule.mainClock.advanceTimeBy(60_000)
         rule.onNodeWithText(FAILED).assertIsDisplayed()
 
-        status = FormSaveStatus.Saved
+        status = SaveStatus.Saved
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(1_000)
         rule.onNodeWithText(FAILED).assertDoesNotExist()

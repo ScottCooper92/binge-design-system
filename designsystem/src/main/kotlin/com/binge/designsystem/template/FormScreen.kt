@@ -42,6 +42,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeOutlinedButton
@@ -78,7 +79,7 @@ enum class FormActionPlacement {
  *
  * An edit screen saves each change as it is made and has no commit: pass its [saveStatus] and leave
  * [primaryAction] out. "Saving…" and "Saved" show in the bar, and a failed write keeps the change and shows a
- * snackbar with Retry until the next write succeeds (see [FormSaveStatus]). [primaryAction] is for the cases that
+ * snackbar with Retry until the next write succeeds (see [SaveStatus]). [primaryAction] is for the cases that
  * do commit: a create flow, a connection the server must test, a submit, or a destructive step.
  *
  * [bar] and [scrollBehavior] are [BingeScreenScaffold]'s, and the bar is its default: a transparent collapsing bar the
@@ -100,7 +101,7 @@ fun FormScreen(
     bar: ScreenBar = ScreenBar.Collapsing,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     capWidth: Boolean = false,
-    saveStatus: FormSaveStatus? = null,
+    saveStatus: SaveStatus? = null,
     extraActions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     notReady: (@Composable (padding: PaddingValues) -> Unit)? = null,

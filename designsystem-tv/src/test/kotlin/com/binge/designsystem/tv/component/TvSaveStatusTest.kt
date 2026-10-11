@@ -49,7 +49,7 @@ class TvSaveStatusTest {
     fun `idle draws nothing and takes no space`() {
         composeTestRule.setContent {
             BingeTvTheme {
-                Box(modifier = Modifier.testTag(LINE)) { TvSaveStatus(status = SaveStatus.Idle, onRetry = {}) }
+                Box(modifier = Modifier.testTag(LINE)) { TvSaveStatus(status = SaveStatus.Idle) }
             }
         }
 
@@ -62,7 +62,7 @@ class TvSaveStatusTest {
     @Test
     fun `saving and saved show no Retry`() {
         var status by mutableStateOf<SaveStatus>(SaveStatus.Saving)
-        composeTestRule.setContent { BingeTvTheme { TvSaveStatus(status = status, onRetry = {}) } }
+        composeTestRule.setContent { BingeTvTheme { TvSaveStatus(status = status) } }
 
         composeTestRule.onNodeWithText("Saving…").assertExists()
         composeTestRule.onNodeWithText(RETRY).assertDoesNotExist()
@@ -77,7 +77,7 @@ class TvSaveStatusTest {
     @Test
     fun `OK on Retry after a failure calls back`() {
         var retries = 0
-        composeTestRule.setContent { BingeTvTheme { TvSaveStatus(status = SaveStatus.Failed, onRetry = { retries++ }) } }
+        composeTestRule.setContent { BingeTvTheme { TvSaveStatus(status = SaveStatus.Failed(onRetry = { retries++ })) } }
         retry().requestFocus()
         composeTestRule.waitForIdle()
         retry().assertIsFocused()
@@ -95,14 +95,14 @@ class TvSaveStatusTest {
             BingeTvTheme {
                 Column {
                     TvButton(label = FIELD, onClick = {})
-                    TvSaveStatus(status = status, onRetry = {})
+                    TvSaveStatus(status = status)
                 }
             }
         }
         field().requestFocus()
         composeTestRule.waitForIdle()
 
-        status = SaveStatus.Failed
+        status = SaveStatus.Failed(onRetry = {})
         composeTestRule.waitForIdle()
 
         retry().assertExists()
@@ -116,13 +116,14 @@ class TvSaveStatusTest {
     fun `Retry moving to Saved does not send focus to the first item`() = retryLeavesTheLine(SaveStatus.Saved)
 
     private fun retryLeavesTheLine(next: SaveStatus) {
-        var status by mutableStateOf<SaveStatus>(SaveStatus.Failed)
+        var status by mutableStateOf<SaveStatus>(SaveStatus.Idle)
+        status = SaveStatus.Failed(onRetry = { status = next })
         composeTestRule.setContent {
             BingeTvTheme {
                 Column {
                     TvButton(label = "First", onClick = {})
                     TvButton(label = FIELD, onClick = {})
-                    TvSaveStatus(status = status, onRetry = { status = next })
+                    TvSaveStatus(status = status)
                 }
             }
         }

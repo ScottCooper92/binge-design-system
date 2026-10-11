@@ -209,7 +209,7 @@ fun TvTwoPanePageSaveAsMadeSample() {
         hosting = TvPageHosting.Overlay,
         copy = {
             TvTwoPaneCopy(headline = "Notification settings", body = "Each change saves as you make it.")
-            TvSaveStatus(status = SaveStatus.Saved, onRetry = {})
+            TvSaveStatus(status = SaveStatus.Saved)
         },
         action = {
             SampleNotifications.forEachIndexed { index, label ->

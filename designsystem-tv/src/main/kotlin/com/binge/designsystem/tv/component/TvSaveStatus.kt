@@ -32,18 +32,15 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [SaveStatus.Idle] draws nothing and takes no space, so place the line where its arrival moves nothing that
  * matters, such as under a top-aligned copy column. The other three states share one height, the button's, so
- * the line does not jump between them. A failure keeps the change on screen and puts Retry, calling [onRetry],
- * in the line itself. This is the TV form of the phone's permanent Retry snackbar, since the TV module has no
+ * the line does not jump between them. A failure keeps the change on screen and puts Retry, calling the failure's
+ * `onRetry`, in the line itself. This is the TV form of the phone's permanent Retry snackbar, since the TV module has no
  * snackbar. Retry is reachable on the D-pad but does not take focus, so a failure never pulls the user out of
- * the field they are on. Pressing Retry moves focus up and away from it before calling [onRetry], so the button
- * leaving the line when the status moves on does not send focus to the top of the page. The line is a polite live region, so each change of state is announced.
+ * the field they are on. Pressing Retry steps focus back towards the content before retrying, so the button
+ * leaving the line as the status moves on does not send focus to the top of the page. The line is a polite live
+ * region, so each change of state is announced.
  */
 @Composable
-fun TvSaveStatus(
-    status: SaveStatus,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun TvSaveStatus(status: SaveStatus, modifier: Modifier = Modifier) {
     if (status == SaveStatus.Idle) return
     Row(
         modifier = modifier
@@ -59,7 +56,7 @@ fun TvSaveStatus(
                 StatusGlyph(Icons.Filled.Check, MaterialTheme.colorScheme.onSurfaceVariant)
                 StatusText(stringResource(DesR.string.save_status_saved))
             }
-            SaveStatus.Failed -> {
+            is SaveStatus.Failed -> {
                 StatusGlyph(Icons.Filled.ErrorOutline, MaterialTheme.colorScheme.error)
                 StatusText(stringResource(DesR.string.save_status_failed), MaterialTheme.colorScheme.error)
                 val focusManager = LocalFocusManager.current
@@ -69,7 +66,7 @@ fun TvSaveStatus(
                         // Retry leaves the line once the status moves on, and a focused node that leaves sends
                         // focus to the page's first item. Step off it first, back towards the content.
                         if (!focusManager.moveFocus(FocusDirection.Up)) focusManager.moveFocus(FocusDirection.Previous)
-                        onRetry()
+                        status.onRetry()
                     },
                 )
             }

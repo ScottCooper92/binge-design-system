@@ -8,7 +8,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -18,39 +17,19 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
+import com.binge.designsystem.SaveStatus
 
-/**
- * Where a save-as-made form stands: an edit screen applies each change as it is made, with no Save button, and
- * reports the last write through this. Pass it as [FormScreen]'s `saveStatus`.
- *
- * [Saving] and [Saved] are a short status in the bar. [Failed] keeps the change on screen, unsent, and shows a
- * snackbar with Retry that stays until the next write succeeds, so a failure is never missed. Nothing here undoes
- * the change: the form holds it, and Retry sends it again.
- */
-@Immutable
-sealed interface FormSaveStatus {
-    /** Nothing written yet, or the status has been cleared. No status is drawn. */
-    data object Idle : FormSaveStatus
-
-    /** A change is on its way to the server. */
-    data object Saving : FormSaveStatus
-
-    /** The last change was written. It stays until the next one starts. */
-    data object Saved : FormSaveStatus
-
-    /** The last change was not written. It stays on screen; [onRetry] sends it again. */
-    data class Failed(
-        val onRetry: () -> Unit,
-    ) : FormSaveStatus
-}
+/** [FormScreen]'s save status under its first name. Both platforms now read the one [SaveStatus]. */
+@Deprecated("FormScreen takes the shared SaveStatus.", ReplaceWith("SaveStatus", "com.binge.designsystem.SaveStatus"))
+typealias FormSaveStatus = SaveStatus
 
 /** The inline "Saving…" or "Saved", in the bar's trailing slot. A failure has no inline text: its snackbar says so. */
 @Composable
-internal fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
+internal fun RowScope.FormSaveStatusText(status: SaveStatus) {
     val label =
         when (status) {
-            FormSaveStatus.Saving -> stringResource(R.string.form_save_saving)
-            FormSaveStatus.Saved -> stringResource(R.string.form_save_saved)
+            SaveStatus.Saving -> stringResource(R.string.save_status_saving)
+            SaveStatus.Saved -> stringResource(R.string.save_status_saved)
             else -> null
         }
     if (label != null) {
@@ -65,15 +44,15 @@ internal fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
 }
 
 /**
- * Keeps the failure snackbar up for as long as [status] is [FormSaveStatus.Failed]. It is shown indefinitely, with
+ * Keeps the failure snackbar up for as long as [status] is [SaveStatus.Failed]. It is shown indefinitely, with
  * Retry, and is dismissed when the status moves on: Retry sends the change again, so the next status is Saving.
  */
 @Composable
-internal fun FormSaveFailureSnackbar(status: FormSaveStatus, snackbarHostState: SnackbarHostState) {
-    val failed = status as? FormSaveStatus.Failed
+internal fun FormSaveFailureSnackbar(status: SaveStatus, snackbarHostState: SnackbarHostState) {
+    val failed = status as? SaveStatus.Failed
     val onRetry = rememberUpdatedState(failed?.onRetry)
-    val message = stringResource(R.string.form_save_failed)
-    val retry = stringResource(R.string.form_save_retry)
+    val message = stringResource(R.string.save_status_failed)
+    val retry = stringResource(R.string.save_status_retry)
     LaunchedEffect(failed != null) {
         if (failed != null) {
             // Cancelled when the status leaves Failed, which takes the snackbar down with it.

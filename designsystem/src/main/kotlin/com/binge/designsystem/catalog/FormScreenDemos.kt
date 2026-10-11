@@ -16,8 +16,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.preview.ScreenshotTheme
-import com.binge.designsystem.template.FormSaveStatus
 import com.binge.designsystem.template.FormScreen
 import com.binge.designsystem.template.FormSection
 import kotlinx.coroutines.delay
@@ -33,21 +33,21 @@ private const val SAVE_MILLIS = 800L
 @Composable
 fun FormScreenSaveAsMadeDemo() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        var status by remember { mutableStateOf<FormSaveStatus>(FormSaveStatus.Idle) }
+        var status by remember { mutableStateOf<SaveStatus>(SaveStatus.Idle) }
         var notify by remember { mutableStateOf(true) }
         var sync by remember { mutableStateOf(false) }
         var failNext by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
 
         fun save() {
-            status = FormSaveStatus.Saving
+            status = SaveStatus.Saving
             scope.launch {
                 delay(SAVE_MILLIS)
                 if (failNext) {
                     failNext = false
-                    status = FormSaveStatus.Failed(onRetry = ::save)
+                    status = SaveStatus.Failed(onRetry = ::save)
                 } else {
-                    status = FormSaveStatus.Saved
+                    status = SaveStatus.Saved
                 }
             }
         }

@@ -118,10 +118,6 @@
     <string name="error_kind_generic_title">Algo ha salido mal</string>
     <string name="error_kind_generic_message">Se ha producido un error inesperado.</string>
     <string name="error_kind_retry">Reintentar</string>
-    <string name="form_save_saving">Guardando…</string>
-    <string name="form_save_saved">Guardado</string>
-    <string name="form_save_failed">No se pudo guardar el cambio</string>
-    <string name="form_save_retry">Reintentar</string>
     <string name="empty_screen_title">Todavía no hay nada</string>
     <string name="save_status_saving">Guardando…</string>
     <string name="save_status_saved">Guardado</string>

@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeFilterChip
@@ -67,7 +68,6 @@ import com.binge.designsystem.template.ErrorScreen
 import com.binge.designsystem.template.FilteredListScreen
 import com.binge.designsystem.template.FormAction
 import com.binge.designsystem.template.FormActionPlacement
-import com.binge.designsystem.template.FormSaveStatus
 import com.binge.designsystem.template.FormScreen
 import com.binge.designsystem.template.FormSection
 import com.binge.designsystem.template.HeroDetailLazyScreen
@@ -482,7 +482,7 @@ fun FormScreenSample() {
         FormScreen(
             title = "General",
             onBack = LocalDemoBack.current,
-            saveStatus = FormSaveStatus.Saved,
+            saveStatus = SaveStatus.Saved,
         ) {
             SampleForm()
         }
@@ -498,7 +498,7 @@ fun FormScreenScrolledSample() {
             title = "General",
             onBack = LocalDemoBack.current,
             scrollBehavior = collapsedTopBarScrollBehavior(),
-            saveStatus = FormSaveStatus.Saved,
+            saveStatus = SaveStatus.Saved,
         ) {
             SampleForm()
         }
@@ -512,7 +512,7 @@ fun FormScreenSavingSample() {
         FormScreen(
             title = "General",
             onBack = LocalDemoBack.current,
-            saveStatus = FormSaveStatus.Saving,
+            saveStatus = SaveStatus.Saving,
         ) {
             SampleForm()
         }
@@ -531,13 +531,13 @@ fun FormScreenSaveFailedSample() {
             FormScreen(
                 title = "General",
                 onBack = LocalDemoBack.current,
-                saveStatus = FormSaveStatus.Failed(onRetry = {}),
+                saveStatus = SaveStatus.Failed(onRetry = {}),
             ) {
                 SampleForm()
             }
             BingeSnackbar(
-                message = stringResource(R.string.form_save_failed),
-                actionLabel = stringResource(R.string.form_save_retry),
+                message = stringResource(R.string.save_status_failed),
+                actionLabel = stringResource(R.string.save_status_retry),
                 onActionClick = {},
                 showDismissAction = false,
                 onDismissRequest = {},
@@ -575,7 +575,7 @@ fun FormScreenCappedSample() {
             onBack = LocalDemoBack.current,
             bar = ScreenBar.Large,
             capWidth = true,
-            saveStatus = FormSaveStatus.Saved,
+            saveStatus = SaveStatus.Saved,
         ) {
             SampleForm()
         }

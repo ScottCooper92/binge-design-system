@@ -133,7 +133,7 @@ fun TvTwoPanePageSaveAsMadeDemo() {
         if (saves == 0) return@LaunchedEffect
         status = SaveStatus.Saving
         delay(DEMO_SAVE_MILLIS)
-        status = if (failing) SaveStatus.Failed else SaveStatus.Saved
+        status = if (failing) SaveStatus.Failed(onRetry = { saves++ }) else SaveStatus.Saved
     }
     TvTwoPanePage(
         split = TvTwoPaneSplit.Balanced,
@@ -144,7 +144,7 @@ fun TvTwoPanePageSaveAsMadeDemo() {
                 headline = "Notification settings",
                 body = "Each change saves as you make it. Untick Make saves fail, then Retry, to save a failed change.",
             )
-            TvSaveStatus(status = status, onRetry = { saves++ })
+            TvSaveStatus(status = status)
         },
         action = {
             TvCheckboxRow(label = "Make saves fail", checked = failing, onCheckedChange = { failing = it })

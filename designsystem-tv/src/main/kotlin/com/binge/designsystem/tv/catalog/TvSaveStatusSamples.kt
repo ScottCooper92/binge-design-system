@@ -20,13 +20,13 @@ import com.binge.designsystem.R as DesR
 /** The save status line in each state it draws: saving, saved, and a failure with Retry. Idle draws nothing. */
 @Composable
 fun TvSaveStatusStatesSample() {
-    var failed by remember { mutableStateOf<SaveStatus>(SaveStatus.Failed) }
+    var retried by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
-        TvSaveStatus(status = SaveStatus.Saving, onRetry = {})
-        TvSaveStatus(status = SaveStatus.Saved, onRetry = {})
-        TvSaveStatus(status = failed, onRetry = { failed = SaveStatus.Saved })
+        TvSaveStatus(status = SaveStatus.Saving)
+        TvSaveStatus(status = SaveStatus.Saved)
+        TvSaveStatus(status = if (retried) SaveStatus.Saved else SaveStatus.Failed(onRetry = { retried = true }))
     }
 }
