@@ -96,6 +96,6 @@ fun TvRowIconSideSheetSample() {
         TvSideSheetRow(label = "Approve", onClick = {}, icon = Icons.Filled.Check, initiallyFocused = true)
         TvSideSheetRow(label = "Subtitles", onClick = {}, icon = Icons.Filled.Subtitles)
         TvSideSheetRow(label = "Delete request", onClick = {}, icon = Icons.Filled.Delete, destructive = true)
-        TvSideSheetRow(label = "Not available", onClick = {}, icon = Icons.Filled.Subtitles, enabled = false)
+        TvSideSheetRow(label = "Already approved", onClick = {}, icon = Icons.Filled.Check, enabled = false)
     }
 }

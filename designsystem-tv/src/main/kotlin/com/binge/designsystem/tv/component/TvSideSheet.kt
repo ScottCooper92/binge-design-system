@@ -149,8 +149,7 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  *
  * [supportingText] is a second line under the label. [leading] replaces [icon] with a visual of the caller's, such
  * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
- * An [icon] sits on its tinted plate, in the error colour for a [destructive] row and dimmed with the label when
- * not [enabled].
+ * An [icon] sits on its tinted plate, in the error colour for a [destructive] row and dimmed for a disabled one.
  * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
  * stays as tall as neighbours that have something, such as a count.
  */
