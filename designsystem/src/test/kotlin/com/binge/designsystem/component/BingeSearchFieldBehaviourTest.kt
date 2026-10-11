@@ -4,12 +4,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.test.performTouchInput
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -21,6 +26,9 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 private const val PLACEHOLDER = "Search films"
+
+/** Inside the pill's start padding, clear of the icon and the text field. */
+private const val PILL_EDGE_PX = 4f
 
 /** The search field's behaviour a frame cannot show (#394): the clear button, the keyboard's submit, a caller's focus. */
 @RunWith(RobolectricTestRunner::class)
@@ -75,6 +83,21 @@ class BingeSearchFieldBehaviourTest {
         }
 
         rule.runOnIdle { requester.requestFocus() }
+
+        rule.onNode(hasSetTextAction()).assertIsFocused()
+    }
+
+    @Test
+    fun `a tap on the pill outside the text focuses the field`() {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeSearchField(query = "", onQueryChange = {}, onClear = {}, placeholder = PLACEHOLDER)
+            }
+        }
+        rule.onNode(hasSetTextAction()).assertIsNotFocused()
+
+        rule.onRoot().performTouchInput { click(Offset(PILL_EDGE_PX, height / 2f)) }
+        rule.waitForIdle()
 
         rule.onNode(hasSetTextAction()).assertIsFocused()
     }
