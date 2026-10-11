@@ -84,7 +84,7 @@ private fun SampleFilterBoard(initialListHasFocus: Boolean, initialFocusedOption
 
     fun toggle(current: Set<String>, value: String) = if (value in current) current - value else current + value
 
-    fun summary(selected: Set<String>, any: String) = if (selected.isEmpty()) any else "${selected.size} selected"
+    fun detail(selected: Set<String>, any: String) = if (selected.isEmpty()) any else "${selected.size} selected"
     val genreOptions = listOf(GENRE_DRAMA, GENRE_COMEDY, GENRE_SCIENCE_FICTION, GENRE_THRILLER)
     val languageOptions = listOf(LANGUAGE_ENGLISH, LANGUAGE_SPANISH, LANGUAGE_FRENCH)
     TvListPaneBoard(
@@ -98,7 +98,7 @@ private fun SampleFilterBoard(initialListHasFocus: Boolean, initialFocusedOption
                             TvPaneRow(
                                 key = KEY_GENRE,
                                 label = "Genre",
-                                summary = summary(genres, "Any"),
+                                detail = detail(genres, "Any"),
                                 multiSelect = true,
                                 options = genreOptions.map {
                                     TvPaneOption(it, selected = it in genres, onSelect = {
@@ -115,7 +115,7 @@ private fun SampleFilterBoard(initialListHasFocus: Boolean, initialFocusedOption
                             TvPaneRow(
                                 key = KEY_LANGUAGE,
                                 label = "Language",
-                                summary = summary(languages, "Any"),
+                                detail = detail(languages, "Any"),
                                 multiSelect = true,
                                 options = languageOptions.map {
                                     TvPaneOption(it, selected = it in languages, onSelect = {
@@ -161,6 +161,7 @@ private fun SampleBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel:
                             body = "The quality a new request asks for.",
                             note = "You can still pick another for each request.",
                             icon = Icons.Filled.HighQuality,
+                            detail = quality,
                             options =
                                 listOf(QUALITY_HD, QUALITY_UHD).map { option ->
                                     TvPaneOption(label = option, selected = quality == option, onSelect = { quality = option })
@@ -171,6 +172,7 @@ private fun SampleBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel:
                             label = "Subtitles",
                             body = "Whether new titles start with subtitles on.",
                             icon = Icons.Filled.Subtitles,
+                            detail = if (subtitles) "On" else "Off",
                             options =
                                 listOf(
                                     TvPaneOption(label = "On", selected = subtitles, onSelect = { subtitles = true }),

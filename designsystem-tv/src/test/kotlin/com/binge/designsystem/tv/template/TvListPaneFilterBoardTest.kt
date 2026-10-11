@@ -40,7 +40,7 @@ private const val CLEAR_ALL = "Clear all"
 private const val GENRE_BODY = "Pick the genres."
 
 /**
- * [TvListPaneBoard] used as a filter panel: checkbox values, a summary on the list row, a clear button in the pane
+ * [TvListPaneBoard] used as a filter panel: checkbox values, a detail line on the list row, a clear button in the pane
  * and one under the list, all under a real D-pad.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -71,7 +71,7 @@ class TvListPaneFilterBoardTest {
                                             key = KEY_GENRE,
                                             label = ROW_GENRE,
                                             body = if (showBody) GENRE_BODY else "",
-                                            summary = "${genres.size} selected",
+                                            detail = "${genres.size} selected",
                                             multiSelect = true,
                                             options =
                                                 listOf(DRAMA, COMEDY).map { genre ->
@@ -136,7 +136,7 @@ class TvListPaneFilterBoardTest {
     }
 
     @Test
-    fun `the list row carries its summary, and it follows a toggle`() {
+    fun `the list row carries its detail line, and it follows a toggle`() {
         show()
         rule.onNode(hasText("1 selected")).assertExists()
 

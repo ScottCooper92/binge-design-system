@@ -4,6 +4,8 @@ import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -16,7 +18,7 @@ private const val PANEL_TEXT = "Filters"
 
 /**
  * Back dismisses the side sheet, through the dialog's own back dispatcher (#394). The scrim tap is pinned in
- * ClickableSemanticsTest.
+ * ClickableSemanticsTest, and a tap on the panel is checked here not to reach it.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w840dp-h900dp")
@@ -37,6 +39,16 @@ class BingeModalSideSheetDismissTest {
         rule.waitForIdle()
 
         assertEquals(1, dismissals)
+    }
+
+    @Test
+    fun `a tap on the panel does not fall through to the scrim`() {
+        show()
+
+        rule.onNodeWithText(PANEL_TEXT).performClick()
+        rule.waitForIdle()
+
+        assertEquals(0, dismissals)
     }
 
     private fun show() {

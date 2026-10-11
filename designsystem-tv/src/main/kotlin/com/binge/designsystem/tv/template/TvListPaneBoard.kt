@@ -61,11 +61,13 @@ data class TvPaneOption(
  * with neither. [announceNote] makes the note a polite live region, for a note that reports an outcome rather than
  * a static hint, which would otherwise be read again every time focus reached the row.
  *
- * A row can serve as a filter. [summary] is a short value shown at the end of the row in the list, such as "3 selected"
- * or "Any", so what is applied reads without entering the pane. [multiSelect] makes the options checkboxes, announced
- * with their toggled state, and [TvPaneOption.onSelect] then toggles; the default keeps them mutually exclusive, as
- * radio rows. [clear] puts a button under the options. An empty [body] draws no description, so the options sit
- * directly under the name.
+ * [detail] is the row's current value on its line in the list, for a row whose value is a choice (the chosen option,
+ * On or Off), so the list can be read without moving into each pane. Null leaves the row one line.
+ *
+ * A row can serve as a filter. [multiSelect] makes the options checkboxes, announced with their toggled state, and
+ * [TvPaneOption.onSelect] then toggles; the default keeps them mutually exclusive, as radio rows. [clear] puts a button
+ * under the options. An empty [body] draws no description, so the options sit directly under the name. A filter shows
+ * what it has applied through [detail], such as "3 selected" or "Any".
  */
 @Immutable
 data class TvPaneRow(
@@ -77,7 +79,7 @@ data class TvPaneRow(
     val icon: ImageVector? = null,
     val hero: (@Composable () -> Unit)? = null,
     val announceNote: Boolean = false,
-    val summary: String? = null,
+    val detail: String? = null,
     val multiSelect: Boolean = false,
     val clear: TvPaneAction? = null,
 )
@@ -195,7 +197,7 @@ private fun TvPaneList(
                     val described = row.key == describedKey
                     TvPaneListRow(
                         label = row.label,
-                        summary = row.summary,
+                        detail = row.detail,
                         emphasis = tvRowEmphasis(isDescribedRow = described, columnHasFocus = columnHasFocus),
                         onFocused = { onFocusRow(row.key) },
                         modifier =
@@ -232,15 +234,14 @@ private fun TvPaneGroupTitle(title: String) {
 }
 
 /**
- * A one-line tv-material `ListItem`: the row's name, with its [summary] at the end when it has one; the pane carries
- * the full value. No leading icon, because
+ * A tv-material `ListItem`: the row's name, and its current [detail] under it when it has one. No leading icon, because
  * every row in the column is the same kind of thing. Focus is colour, never scale.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun TvPaneListRow(
     label: String,
-    summary: String?,
+    detail: String?,
     emphasis: TvRowEmphasis,
     onFocused: () -> Unit,
     modifier: Modifier = Modifier,
@@ -252,8 +253,8 @@ private fun TvPaneListRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
-        trailingContent =
-            summary?.let {
+        supportingContent =
+            detail?.let {
                 { Text(text = it, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             },
         shape = ListItemDefaults.shape(shape = BingeShapes.TvListItem),

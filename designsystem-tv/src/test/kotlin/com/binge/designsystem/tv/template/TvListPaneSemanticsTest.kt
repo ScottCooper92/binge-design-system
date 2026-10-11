@@ -17,6 +17,7 @@ private const val KEY_QUALITY = "quality"
 private const val ROW_QUALITY = "Default quality"
 private const val OPTION_HD = "HD"
 private const val OPTION_UHD = "4K"
+private const val DETAIL_HD = "HD detail"
 
 /**
  * A [TvListPaneBoard] pane's options are one selectable group (#678), as [com.binge.designsystem.tv.component.TvOptionGroup]'s
@@ -46,7 +47,21 @@ class TvListPaneSemanticsTest {
         composeTestRule.onNode(hasText(ROW_QUALITY) and inSelectableGroup).assertDoesNotExist()
     }
 
-    private fun setBoard() {
+    @Test
+    fun `a row with a detail shows it under the name in the list`() {
+        setBoard(detail = DETAIL_HD)
+
+        composeTestRule.onNode(hasText(DETAIL_HD)).assertExists()
+    }
+
+    @Test
+    fun `a row with no detail shows no extra line`() {
+        setBoard()
+
+        composeTestRule.onNode(hasText(DETAIL_HD)).assertDoesNotExist()
+    }
+
+    private fun setBoard(detail: String? = null) {
         composeTestRule.setContent {
             BingeTvTheme {
                 TvListPaneBoard(
@@ -61,6 +76,7 @@ class TvListPaneSemanticsTest {
                                             key = KEY_QUALITY,
                                             label = ROW_QUALITY,
                                             body = "The quality a new request asks for.",
+                                            detail = detail,
                                             options =
                                                 listOf(
                                                     TvPaneOption(label = OPTION_HD, selected = true, onSelect = {}),

@@ -99,7 +99,8 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
 /**
  * The sheet's visible panel, with no scrim and no focus request of its own, so a frame can render it. A step
  * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus], so it pulls focus to
- * Cancel wherever it composes.
+ * Cancel wherever it composes. The panel is flush to the screen's end, top and bottom edges, so its content keeps
+ * the overscan margin from them.
  */
 @Composable
 fun TvSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
@@ -110,7 +111,12 @@ fun TvSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnS
                 .width(dimensionResource(TvR.dimen.tv_side_sheet_width))
                 .background(MaterialTheme.colorScheme.surface)
                 .tvExitFocusGroup()
-                .padding(dimensionResource(DesR.dimen.padding_l)),
+                .padding(
+                    start = dimensionResource(DesR.dimen.padding_l),
+                    top = dimensionResource(TvR.dimen.tv_overscan_vertical),
+                    end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
+                    bottom = dimensionResource(TvR.dimen.tv_overscan_vertical),
+                ),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
         content = content,
     )
