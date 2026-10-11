@@ -1,3 +1,5 @@
+@file:OnePerScreen(fullScreen = true)
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement
