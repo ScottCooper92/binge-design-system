@@ -211,7 +211,7 @@ class TvListPaneFilterBoardTest {
     }
 
     @Test
-    fun `an empty body draws no description, a given one does`() {
+    fun `an empty body draws no description`() {
         show()
         rule.onNode(hasText(GENRE_BODY)).assertDoesNotExist()
     }
