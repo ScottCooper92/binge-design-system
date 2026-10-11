@@ -131,4 +131,8 @@
     <string name="error_kind_generic_message">An unexpected error occurred.</string>
     <string name="error_kind_retry">Try again</string>
     <string name="empty_screen_title">Nothing here yet</string>
+    <string name="save_status_saving">Saving…</string>
+    <string name="save_status_saved">Saved</string>
+    <string name="save_status_failed">Couldn\'t save your change</string>
+    <string name="save_status_retry">Retry</string>
 </resources>
