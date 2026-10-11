@@ -27,6 +27,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -168,7 +170,10 @@ private fun TvTab(
                     onFocusChanged = { gained -> if (gained && !selected) onSelect() },
                     onClick = { if (!selected) onSelect() },
                 ).padding(horizontal = dimensionResource(TvR.dimen.tv_choice_padding_horizontal))
-                .semantics { this.selected = selected },
+                .semantics {
+                    role = Role.Tab
+                    this.selected = selected
+                },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
