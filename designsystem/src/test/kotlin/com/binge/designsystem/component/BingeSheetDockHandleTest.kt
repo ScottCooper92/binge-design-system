@@ -9,9 +9,9 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.TestTheme
@@ -125,7 +125,7 @@ class BingeSheetDockHandleTest {
         showDockingSheet(skipPartiallyExpanded = false, gesturesEnabled = false)
         rule.onAllNodes(hasDismiss or hasExpand or hasCollapse).assertCountEquals(0)
 
-        rule.onNode(hasText("Header")).performClick()
+        rule.onNode(hasClickAction() and isNotEnabled()).performSemanticsAction(SemanticsActions.OnClick)
         rule.waitForIdle()
 
         assertEquals(0, dismissed)
