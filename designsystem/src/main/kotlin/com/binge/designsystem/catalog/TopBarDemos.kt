@@ -47,6 +47,8 @@ import com.binge.designsystem.component.IconButtonTone
 import com.binge.designsystem.component.LocalTopBarActionTint
 import com.binge.designsystem.component.LocalTopBarActionTone
 import com.binge.designsystem.component.StatusBarScrim
+import com.binge.designsystem.component.measuredHeroHeight
+import com.binge.designsystem.component.rememberMeasuredHeroHeight
 import com.binge.designsystem.component.rememberPaneTopBarScrollBehavior
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
@@ -289,8 +291,10 @@ fun DetailOverlayTopBarDemo() {
     val scroll = rememberScrollState()
     ScreenshotTheme {
         Box(Modifier.fillMaxSize()) {
+            val measured = rememberMeasuredHeroHeight()
             Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
                 DetailHero(
+                    modifier = Modifier.measuredHeroHeight(measured),
                     title = DEMO_DETAIL_TITLE,
                     backdropUrl = null,
                     tagline = "Why So Serious?",
@@ -301,7 +305,12 @@ fun DetailOverlayTopBarDemo() {
                 )
                 repeat(DEMO_ROW_COUNT) { DemoRow(it) }
             }
-            DetailOverlayTopBar(title = DEMO_DETAIL_TITLE, scrollState = scroll, onBack = LocalDemoBack.current) { glassBackgroundAlpha ->
+            DetailOverlayTopBar(
+                title = DEMO_DETAIL_TITLE,
+                scrollState = scroll,
+                onBack = LocalDemoBack.current,
+                heroHeight = measured.height(dimensionResource(R.dimen.detail_hero_height)),
+            ) { glassBackgroundAlpha ->
                 ShareAction(glassBackgroundAlpha)
             }
             FractionLabel("scrolled", scroll.heroFraction(), Modifier.align(Alignment.BottomCenter))

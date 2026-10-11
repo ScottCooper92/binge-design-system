@@ -17,6 +17,8 @@ import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.DetailOverlayTopBar
 import com.binge.designsystem.component.ExpressiveIconButton
 import com.binge.designsystem.component.IconButtonTone
+import com.binge.designsystem.component.measuredHeroHeight
+import com.binge.designsystem.component.rememberMeasuredHeroHeight
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
 
@@ -46,8 +48,10 @@ fun DetailOverlayTopBarScrolledSample() {
 @Composable
 private fun DetailOverlayTopBarSample(scrollPx: Int) {
     ScreenshotTheme {
+        val measured = rememberMeasuredHeroHeight()
         Box(Modifier.fillMaxWidth()) {
             DetailHero(
+                modifier = Modifier.measuredHeroHeight(measured),
                 title = SAMPLE_TITLE,
                 backdropUrl = null,
                 tagline = "Why So Serious?",
@@ -60,6 +64,7 @@ private fun DetailOverlayTopBarSample(scrollPx: Int) {
                 title = SAMPLE_TITLE,
                 scrollState = rememberScrollState(initial = scrollPx),
                 onBack = {},
+                heroHeight = measured.height(dimensionResource(R.dimen.detail_hero_height)),
             ) { glassBackgroundAlpha ->
                 ExpressiveIconButton(
                     onClick = {},

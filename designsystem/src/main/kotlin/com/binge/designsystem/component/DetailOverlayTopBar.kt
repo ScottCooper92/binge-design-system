@@ -68,6 +68,10 @@ import com.binge.designsystem.theme.BingeTheme
  * A null [onBack] drops the back button, for a detail in a pane beside the list that already offers the way back.
  *
  * The title is invisible while the hero is untouched, so a screen reader skips it until the fade begins.
+ *
+ * The fade starts [heroHeight] down the page, so it must be the hero's laid-out height, not its floor: a hero that
+ * grows at a large font scale fades the bar early on the default. Measure it with [rememberMeasuredHeroHeight] and
+ * [measuredHeroHeight], as the hero detail templates do.
  */
 @Composable
 fun BoxScope.DetailOverlayTopBar(
