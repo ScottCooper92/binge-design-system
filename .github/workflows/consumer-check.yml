@@ -1,8 +1,9 @@
 name: Consumer check (binge-seerr)
 
-# Informational. Builds binge-seerr, a public consumer of this repository, against this PR's
-# head commit, because a green build here says nothing about a consumer: a changed public
-# signature is only noticed by the bump PR that arrives after it merged.
+# Informational. Compiles binge-seerr, a public consumer of this repository, against this PR's head
+# commit, because a green build here says nothing about a consumer: a changed public signature is
+# otherwise noticed only by the bump PR that arrives after it merged. The job itself is binge-ci's
+# consumer-check workflow; this file owns the triggers and says what to compile.
 #
 # Deliberately NOT named `CI`. bot-review, author-ci-fix and author-conflicts match that name,
 # and this check can go red for a reason that has nothing to do with the diff being reviewed,
@@ -18,14 +19,11 @@ name: Consumer check (binge-seerr)
 # Binge is the other consumer and is private, so it needs a token and is not covered here.
 #
 # It compiles the consumer's main and unit-test sources and nothing else: that is what catches a
-# changed public signature. The consumer's lint, unit tests and screenshot baselines say little
-# about this change, and made the job take over twenty minutes. A design change that moves
-# pixels moves the consumer's baselines by intent, so that part is reported by the consumer's
-# own bump PR. It also runs on pushes to main, which is what writes the Gradle cache:
-# setup-gradle only saves on the default branch, so a job that ran on pull requests alone would
-# start cold every time. It runs only when something the consumer compiles can have changed, and the
-# catalog modules count: Gradle configures every project of an included build, so a change to
-# `catalog-app` or `catalog-registry` can break the consumer's configuration phase (#407).
+# changed public signature. It also runs on pushes to main, which is what writes the Gradle cache:
+# setup-gradle only saves on the default branch. It runs only when something the consumer compiles
+# can have changed, and the catalog modules count: Gradle configures every project of an included
+# build, so a change to `catalog-app` or `catalog-registry` can break the consumer's configuration
+# phase (#407).
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -52,64 +50,12 @@ on:
       - 'gradle.properties'
       - '.github/workflows/consumer-check.yml'
 
-concurrency:
-  group: consumer-check-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
 
 jobs:
   seerr:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      # binge-seerr includes `binge-companions` and `design-system` as submodule composite
-      # builds (its settings.gradle.kts), so both must exist before Gradle evaluates settings.
-      - name: Check out binge-seerr
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ScottCooper92/binge-seerr
-          ref: main
-          submodules: true
-
-      # Swap the consumer's pinned design-system for this PR's candidate commit. The
-      # directory name is what its `includeBuild("design-system")` resolves.
-      - name: Replace design-system with this PR
-        run: rm -rf design-system
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          path: design-system
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
-
-      - name: Compile binge-seerr against this change
-        run: ./gradlew :app:compileDebugKotlin :app:compileDebugUnitTestKotlin --continue
-
-      - name: Report
-        if: ${{ always() }}
-        env:
-          OUTCOME: ${{ job.status }}
-          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          {
-            echo "## binge-seerr against this change (${SHA})"
-            echo
-            echo "Informational only. This is not a required check."
-            echo
-            echo "Compiled the consumer's main and unit-test sources. Lint, unit tests and screenshot baselines are not run here."
-            echo
-            if [ "${OUTCOME}" = "success" ]; then
-              echo "binge-seerr still compiles against this change."
-            else
-              echo "The consumer no longer compiles against this change. Its bump PR will need code changes. Expected for an intentional signature change; say so in the PR body."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@118a2849cba1529577e8df010210b9f0166bc2df # v1
+    with:
+      consumer: ScottCooper92/binge-seerr
+      tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
