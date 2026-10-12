@@ -2,6 +2,8 @@ package com.binge.designsystem.tv.component
 
 import android.app.Application
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
@@ -95,6 +97,33 @@ class TvOptionRowsTest {
         composeTestRule.onNodeWithText(TITLE).assertDoesNotExist()
         composeTestRule.onAllNodes(isFocusable()).assertCountEquals(0)
         composeTestRule.onNodeWithTag(GROUP).assertWidthIsEqualTo(0.dp).assertHeightIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun `the group asks for an icon for every choice and still commits on OK`() {
+        val asked = mutableSetOf<String>()
+        composeTestRule.setContent {
+            BingeTvTheme {
+                TvOptionGroup(
+                    title = TITLE,
+                    choices = listOf(FIRST to FIRST, SECOND to SECOND),
+                    selected = FIRST,
+                    onSelect = { committed += it },
+                    choiceIcon = { key ->
+                        asked += key
+                        Icons.Filled.Folder
+                    },
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        assertEquals(setOf(FIRST, SECOND), asked)
+
+        option(SECOND).requestFocus()
+        composeTestRule.waitForIdle()
+        press(Key.DirectionCenter)
+
+        assertEquals(listOf(SECOND), committed)
     }
 
     @Test
