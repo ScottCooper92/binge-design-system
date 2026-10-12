@@ -22,7 +22,7 @@ fun WatchProviderGridSample() {
         WatchProviderGrid(
             providers = catalogSampleWatchProviders(),
             selectedWatchProviderIds = selected,
-            onToggle = { id -> selected = if (id in selected) selected - id else selected + id },
+            onCheckedChange = { id, checked -> selected = if (checked) selected + id else selected - id },
         )
     }
 }
@@ -49,7 +49,7 @@ fun WatchProviderGridPartialRowSample() {
             providers = catalogPartialRowWatchProviders(),
             columns = PARTIAL_ROW_COLUMNS,
             selectedWatchProviderIds = selected,
-            onToggle = { id -> selected = if (id in selected) selected - id else selected + id },
+            onCheckedChange = { id, checked -> selected = if (checked) selected + id else selected - id },
         )
     }
 }

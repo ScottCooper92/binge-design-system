@@ -95,7 +95,7 @@ class SupportingMaxLinesTest {
                             ),
                         ),
                     chosen = emptySet(),
-                    onToggle = { _, _ -> },
+                    onCheckedChange = { _, _ -> },
                     clearLabel = "Clear",
                     onClear = {},
                 )
