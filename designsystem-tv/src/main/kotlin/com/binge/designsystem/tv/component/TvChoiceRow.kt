@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusContentColor
@@ -48,20 +50,24 @@ fun TvChoiceRow(
     modifier: Modifier = Modifier,
     initialFocusedKey: String? = null,
 ) {
-    Row(
-        modifier = modifier.selectableGroup(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
-    ) {
-        choices.forEach { choice ->
-            val isSelected = choice.key == selectedKey
-            TvChoice(
-                label = choice.label,
-                selected = isSelected,
-                initiallyFocused = choice.key == initialFocusedKey,
-                onSelect = { if (!isSelected) onSelect(choice.key) },
-                icon = choice.icon,
-            )
+    // Wraps onto a further line when the pills outgrow the row, as at a large font size. A plain row would squeeze the
+    // last pill to nothing. The box keeps what a row did for a parent that hands down a minimum size: the pills start
+    // at the start edge and sit in the middle of the height.
+    Box(modifier = modifier.selectableGroup(), contentAlignment = Alignment.CenterStart) {
+        WrappingRow(
+            horizontalSpacing = dimensionResource(DesR.dimen.padding_s),
+            verticalSpacing = dimensionResource(DesR.dimen.padding_s),
+        ) {
+            choices.forEach { choice ->
+                val isSelected = choice.key == selectedKey
+                TvChoice(
+                    label = choice.label,
+                    selected = isSelected,
+                    initiallyFocused = choice.key == initialFocusedKey,
+                    onSelect = { if (!isSelected) onSelect(choice.key) },
+                    icon = choice.icon,
+                )
+            }
         }
     }
 }

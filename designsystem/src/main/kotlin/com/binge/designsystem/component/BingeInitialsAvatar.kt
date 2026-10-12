@@ -14,10 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.TextUnit
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.AVATAR_INITIALS_PADDING_FRACTION
 import com.binge.designsystem.R
@@ -76,11 +77,20 @@ private fun InitialsAvatar(name: String, size: Dp) {
         Text(
             text = name.toInitials(locale = LocalConfiguration.current.locales[0]),
             modifier = Modifier.padding(size * AVATAR_INITIALS_PADDING_FRACTION),
-            style = MaterialTheme.typography.labelSmall,
+            // The line height is dropped because a fixed one scales with the system font and outgrows the circle.
+            style = MaterialTheme.typography.labelSmall.copy(lineHeight = TextUnit.Unspecified),
             color = ink,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 40.sp),
+            // The bounds are in dp, not sp: the circle is a fixed size, so its initials must not grow with the
+            // system font. At 2.0 an 8sp minimum is 16dp, which is bigger than a small avatar's interior.
+            autoSize =
+                with(LocalDensity.current) {
+                    TextAutoSize.StepBased(
+                        minFontSize = dimensionResource(R.dimen.avatar_initials_min_size).toSp(),
+                        maxFontSize = dimensionResource(R.dimen.avatar_initials_max_size).toSp(),
+                    )
+                },
         )
     }
 }
