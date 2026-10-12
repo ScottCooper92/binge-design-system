@@ -37,7 +37,7 @@ import com.binge.designsystem.theme.BingeShapes
 
 /**
  * The shared full-width list **Row** (see the Card / Tile / Row taxonomy in CLAUDE.md): a tonal
- * surface holding an optional [leading] visual, a content column, and an optional [trailing]
+ * surface holding an optional [leading] visual, a content column, and an optional [trailingContent]
  * element, stacked in a `LazyColumn`.
  *
  * `ListRow` owns the row chrome — rounded [containerColor] surface (`surfaceContainer` by default),
@@ -50,7 +50,7 @@ import com.binge.designsystem.theme.BingeShapes
  * between the two: on a short title the spacer pushes the bottom line down to the poster's height, and
  * on a title long enough to already exceed it the spacer simply has nothing left to give, so the two
  * groups sit stacked with no overlap and no clipping either way. Supply [leading] via [ListRowPoster]
- * (or an avatar) and [trailing] for an action or status element — [verticalAlignment] centers it
+ * (or an avatar) and [trailingContent] for an action or status element — [verticalAlignment] centers it
  * against the row's full matched height rather than pinning it to the top beside a two-line title.
  * An optional [footer] spans the full inner width below the main line (e.g. a progress bar that also
  * runs under the poster).

@@ -55,7 +55,11 @@ fun TvBoard(
     }
 }
 
-/** [TvBoard] under its old name for the heading slot, `trailing`; it is `trailingContent` now. Kotlin cannot hold two overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes none resolves to the new function, and a call that passes `trailing` by name lands here. */
+/**
+ * [TvBoard] under its old name for the heading slot, `trailing`; it is `trailingContent` now. Kotlin cannot hold two
+ * overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes none
+ * resolves to the new function, and a call that passes `trailing` by name lands here.
+ */
 @Deprecated(
     message = "Renamed: trailing is trailingContent.",
     replaceWith = ReplaceWith("TvBoard(title, modifier, hosting, entry, arrivalEnabled, trailingContent = trailing, content = content)"),

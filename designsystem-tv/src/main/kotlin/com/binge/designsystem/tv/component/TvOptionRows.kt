@@ -147,7 +147,11 @@ fun TvOptionRow(
     )
 }
 
-/** [TvOptionRow] under its old name for the value slot, `trailing`; it is `trailingContent` now. Kotlin cannot hold two overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes none resolves to the new function, and a call that passes `trailing` by name lands here. */
+/**
+ * [TvOptionRow] under its old name for the value slot, `trailing`; it is `trailingContent` now. Kotlin cannot hold
+ * two overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes
+ * none resolves to the new function, and a call that passes `trailing` by name lands here.
+ */
 @Deprecated(
     message = "Renamed: trailing is trailingContent.",
     replaceWith = ReplaceWith(

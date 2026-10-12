@@ -91,7 +91,7 @@ fun <T> TvCardRow(
     if (items.isEmpty()) return
     // Which cell draws the ring — one hoisted key, nulled on blur, so a row that has lost focus keeps none lit.
     var focusedKey by remember { mutableStateOf(initiallyFocusedKey) }
-    // The trailingContent tile, when present, occupies the entry's last slot so it is remembered like any other cell.
+    // The trailing tile, when present, occupies the entry's last slot so it is remembered like any other cell.
     val trailingIndex = items.size
     // The cell entry returns to — the shared remembered-cell contract (survives blur and the LazyColumn
     // scroll-out disposal). Seed the row state to it so it is laid out before entry arrives.
