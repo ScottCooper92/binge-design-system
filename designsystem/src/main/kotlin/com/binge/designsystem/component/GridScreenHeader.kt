@@ -19,10 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
+/**
+ * A grid screen's header: a back button above a large [title]. A null [onBack] drops the back button, for a grid in a pane
+ * beside the list that already offers the way back, as on the top bars.
+ */
 @Composable
 fun GridScreenHeader(
     title: String,
-    onBack: () -> Unit,
+    onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -30,17 +34,19 @@ fun GridScreenHeader(
             .fillMaxWidth()
             .statusBarsPadding(),
     ) {
-        ExpressiveIconButton(
-            onClick = onBack,
-            icon = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = stringResource(R.string.cd_navigate_back),
-            modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_s),
-                end = dimensionResource(R.dimen.padding_s),
-                top = dimensionResource(R.dimen.padding_s),
-                bottom = dimensionResource(R.dimen.padding_xs),
-            ),
-        )
+        if (onBack != null) {
+            ExpressiveIconButton(
+                onClick = onBack,
+                icon = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.cd_navigate_back),
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.padding_s),
+                    end = dimensionResource(R.dimen.padding_s),
+                    top = dimensionResource(R.dimen.padding_s),
+                    bottom = dimensionResource(R.dimen.padding_xs),
+                ),
+            )
+        }
         Text(
             text = title,
             style = MaterialTheme.typography.displaySmall,
