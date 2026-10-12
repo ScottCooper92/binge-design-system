@@ -78,6 +78,16 @@ annotation class ComponentPreviews
 annotation class FontScalePreviews
 
 /**
+ * The two font sizes a row is checked at when every optional line is filled and the text is long: 1.3, a common
+ * setting, and 2.0, the largest. Dark, at the standard phone width. For the worst-case fixtures; see
+ * `WorstCaseSamples.kt`.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "font13-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.3f, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+annotation class WorstCaseFontPreviews
+
+/**
  * The largest system font size, 2.0, dark, at the standard phone width: one cell for a component that sizes
  * a container around its text, where the largest scale is what clips.
  */

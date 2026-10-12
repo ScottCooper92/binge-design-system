@@ -26,22 +26,29 @@ import androidx.compose.ui.unit.IntSize
  * inside the width, so the text fits its box and passes here.
  *
  * Skipped, so that what is not on screen never fails:
- * - text inside a scroll container, where a clipped item is simply scrolled out of view;
- * - text with no bounds, or whose bounds lie wholly outside the root.
+ * - text inside a scroll container that is not wholly in view: a clipped item there is simply scrolled out, and only
+ *   its edge is cut by the container. A text that is wholly inside the container's viewport is still checked, because
+ *   anything cutting it is then something other than scrolling;
+ * - text whose own position lies outside the root.
  *
  * The unmerged semantics tree is searched, so a merged parent does not hide the text inside it.
+ *
+ * Returns how many text nodes it checked, so a test can tell a pass from a pass that skipped everything because the
+ * content was in a scroll container or off screen.
  */
-fun ComposeTestRule.assertNoTextClipped(root: SemanticsNodeInteraction = onRoot(useUnmergedTree = true), tolerancePx: Int = 1) {
+fun ComposeTestRule.assertNoTextClipped(root: SemanticsNodeInteraction = onRoot(useUnmergedTree = true), tolerancePx: Int = 1): Int {
     val rootNode = root.fetchSemanticsNode()
     val viewport = rootNode.boundsInRoot
     val clipped = mutableListOf<ClippedText>()
-    collectClipped(rootNode, viewport, tolerancePx, clipped)
+    val checked = intArrayOf(0)
+    collectClipped(rootNode, viewport, null, tolerancePx, clipped, checked)
     if (clipped.isNotEmpty()) {
         throw AssertionError(
             "Text is clipped by a parent (own size vs. visible size, in px):\n" +
                 clipped.joinToString("\n") { it.describe() },
         )
     }
+    return checked[0]
 }
 
 private data class ClippedText(
@@ -61,20 +68,22 @@ private data class ClippedText(
 private fun collectClipped(
     node: SemanticsNode,
     viewport: Rect,
+    scrollViewport: Rect?,
     tolerancePx: Int,
     out: MutableList<ClippedText>,
+    checked: IntArray,
 ) {
     val config = node.config
-    if (config.contains(SemanticsProperties.VerticalScrollAxisRange) ||
-        config.contains(SemanticsProperties.HorizontalScrollAxisRange)
-    ) {
-        return
-    }
+    val scrolls =
+        config.contains(SemanticsProperties.VerticalScrollAxisRange) ||
+            config.contains(SemanticsProperties.HorizontalScrollAxisRange)
+    val inScroll = if (scrolls) node.boundsInRoot else scrollViewport
     val text = config.getOrNull(SemanticsProperties.Text)?.joinToString(" ") { it.text }
     if (text != null) {
         val bounds = node.boundsInRoot
         val needed = node.neededTextSize()
-        if (needed != null && node.isInside(viewport)) {
+        if (needed != null && node.isInside(viewport) && node.isFullyInside(inScroll, tolerancePx)) {
+            checked[0]++
             val visibleWidth = bounds.width.toInt()
             val visibleHeight = bounds.height.toInt()
             // Width is the node's own box against what the parents let through. The text's own line width is not used,
@@ -95,7 +104,7 @@ private fun collectClipped(
             }
         }
     }
-    node.children.forEach { collectClipped(it, viewport, tolerancePx, out) }
+    node.children.forEach { collectClipped(it, viewport, inScroll, tolerancePx, out, checked) }
 }
 
 /**
@@ -105,6 +114,16 @@ private fun collectClipped(
 private fun SemanticsNode.isInside(viewport: Rect): Boolean {
     val at = positionInRoot
     return at.x < viewport.right && at.y < viewport.bottom && at.x + size.width >= viewport.left && at.y + size.height >= viewport.top
+}
+
+/** Whether the node's own, unclipped box lies wholly inside [container], or there is no container. */
+private fun SemanticsNode.isFullyInside(container: Rect?, tolerancePx: Int): Boolean {
+    if (container == null) return true
+    val at = positionInRoot
+    return at.x >= container.left - tolerancePx &&
+        at.y >= container.top - tolerancePx &&
+        at.x + size.width <= container.right + tolerancePx &&
+        at.y + size.height <= container.bottom + tolerancePx
 }
 
 /** The size the node's text needs: the height of the lines the layout drew, and the width of its widest line. */

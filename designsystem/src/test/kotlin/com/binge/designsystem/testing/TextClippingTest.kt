@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
@@ -29,6 +32,7 @@ import com.binge.designsystem.component.MediaTypeTag
 import com.binge.designsystem.component.MediaTypeTagType
 import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -141,6 +145,31 @@ class TextClippingTest {
         Text("2022")
     }
 
+    @Test
+    fun `text cut off while wholly in view inside a scroll container fails`() {
+        show {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Box(Modifier.height(SHORT_BOX).clipToBounds()) { Text("Cut off by its own parent") }
+            }
+        }
+
+        val failure = runCatching { rule.assertNoTextClipped() }.exceptionOrNull()
+        assertTrue("expected the clipped text to be reported", failure is AssertionError)
+        assertTrue(failure?.message.orEmpty().contains("Cut off by its own parent"))
+    }
+
+    @Test
+    fun `text scrolled partly out of a scroll container is skipped`() {
+        show {
+            Column(Modifier.height(SHORT_BOX).verticalScroll(rememberScrollState())) {
+                Spacer(Modifier.height(SHORT_BOX))
+                Text("Scrolled out of view")
+            }
+        }
+
+        assertEquals(0, rule.assertNoTextClipped())
+    }
+
     /** A chip as a fixed box, because Robolectric lays text out at about a pixel a character and nothing would wrap. */
     @Composable
     private fun Chip() {
@@ -176,6 +205,7 @@ class TextClippingTest {
     }
 
     private companion object {
+        val SHORT_BOX = 10.dp
         const val STACK_LINES = 3
         val ROW_WIDTHS = listOf(190, 210, 230, 250, 270, 290, 310, 330)
         val CHIP_WIDTH = 60.dp
