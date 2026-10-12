@@ -16,7 +16,7 @@ private const val HIGHLIGHT_ALPHA = 0.35f
  * tv-material scheme, so an app's brand passed to `BingeTvTheme` reaches it.
  */
 @Composable
-fun TvSkeletonBlock(modifier: Modifier = Modifier, shape: Shape = BingeShapes.ElementSmall) {
+internal fun TvSkeletonBlock(modifier: Modifier = Modifier, shape: Shape = BingeShapes.ElementSmall) {
     val scheme = MaterialTheme.colorScheme
     Box(
         modifier = modifier.skeleton(

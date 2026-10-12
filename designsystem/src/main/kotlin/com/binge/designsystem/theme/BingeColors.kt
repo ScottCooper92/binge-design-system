@@ -109,7 +109,7 @@ private val AvatarInk = Color(0xFF1A1A1A)
 private val LightFavourite = Color(0xFFD32F2F)
 private val DarkFavourite = Color(0xFFFF6B6B)
 
-val LightBingeColors = BingeColors(
+internal val LightBingeColors = BingeColors(
     ratingStar = Amber500,
     onRatingStar = AmberInk,
     successContainer = Color(0xFFB9E5BD),
