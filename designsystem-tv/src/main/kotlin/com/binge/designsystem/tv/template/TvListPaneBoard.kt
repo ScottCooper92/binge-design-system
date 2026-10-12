@@ -104,10 +104,10 @@ data class TvPaneRow(
     val detail: String? = null,
     val multiSelect: Boolean = false,
     val clear: TvPaneAction? = null,
-    val pinnedOptions: List<TvPaneOption> = emptyList(),
     val badgeCount: Int? = null,
     val badgeAlert: Boolean = false,
     val loading: Boolean = false,
+    val pinnedOptions: List<TvPaneOption> = emptyList(),
 )
 
 /** A button the board draws for an action that is not an option: what it says, what it does, and whether it is live. */
