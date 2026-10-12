@@ -19,14 +19,13 @@ private const val ROW_QUALITY = "Default quality"
 private const val OPTION_HD = "HD"
 private const val OPTION_UHD = "4K"
 private const val DETAIL_HD = "HD detail"
+private const val GROUP_NOTE = "Changed from your phone."
 
 /**
  * A [TvListPaneBoard] pane's options are one selectable group (#678), as [com.binge.designsystem.tv.component.TvOptionGroup]'s
  * and [com.binge.designsystem.tv.component.TvChoiceRow]'s are, so a screen reader announces them as a set. The list's
  * rows are not: moving along them describes a row, it chooses nothing.
  */
-private const val GROUP_NOTE = "Changed from your phone."
-
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvListPaneSemanticsTest {
