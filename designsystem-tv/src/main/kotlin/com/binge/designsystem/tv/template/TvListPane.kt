@@ -79,22 +79,17 @@ internal fun TvListPane(
                         } else {
                             Modifier
                                 .focusProperties { left = backToListFocus }
-                                .then(
-                                    if (routesToFirstValue) {
-                                        Modifier
-                                            .focusRestorer(
-                                                firstValueFocus,
-                                            ).focusGroup()
-                                    } else {
-                                        Modifier.tvFocusGroup()
-                                    },
-                                ).then(if (row.multiSelect) Modifier else Modifier.selectableGroup())
+                                .then(if (routesToFirstValue) Modifier.focusGroup() else Modifier.tvFocusGroup())
+                                .then(if (row.multiSelect) Modifier else Modifier.selectableGroup())
                         },
                     ),
         ) {
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize(),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .then(if (hasOptions && routesToFirstValue) Modifier.focusRestorer(firstValueFocus) else Modifier),
                 contentPadding = PaddingValues(vertical = dimensionResource(TvR.dimen.tv_focus_ring_bleed)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
