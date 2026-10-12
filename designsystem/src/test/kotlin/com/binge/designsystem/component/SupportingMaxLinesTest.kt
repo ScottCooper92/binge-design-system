@@ -82,6 +82,30 @@ class SupportingMaxLinesTest {
     }
 
     @Test
+    fun `an unmarked multi-select choice's supporting line takes more lines when raised`() {
+        rule.setContent {
+            Column(Modifier.width(300.dp)) {
+                BingeMultiChoiceSheetContent(
+                    title = "Pick",
+                    choices =
+                        BingeChoiceList.Ready(
+                            listOf(
+                                BingeChoice("a", "A", supportingText = ONE_LINE + FILLER),
+                                BingeChoice("b", "B", supportingText = THREE_LINES + FILLER, supportingMaxLines = 3),
+                            ),
+                        ),
+                    chosen = emptySet(),
+                    onToggle = { _, _ -> },
+                    clearLabel = "Clear",
+                    onClear = {},
+                )
+            }
+        }
+
+        assertRaisedLineIsTaller()
+    }
+
+    @Test
     fun `a list item's detail takes more lines when raised`() {
         rule.setContent {
             Column(Modifier.width(300.dp)) {

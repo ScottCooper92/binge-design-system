@@ -660,6 +660,7 @@ internal fun <T> MultiChoiceList(
                     CheckboxRow(
                         label = choice.label,
                         supportingText = choice.supportingText,
+                        supportingMaxLines = choice.supportingMaxLines,
                         trailingContent = choice.trailingText?.let { text -> { ChoiceTrailingText(text) } },
                         checked = choice.value in chosen,
                         onCheckedChange = { on -> onToggle(choice.value, on) },
