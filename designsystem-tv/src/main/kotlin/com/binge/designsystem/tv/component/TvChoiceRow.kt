@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.tvArrivalTarget
@@ -61,7 +63,10 @@ fun TvChoiceRow(
 ) {
     val selectedEntry = remember { FocusRequester() }
     val aimed = entryFocusRequester != null || arrival != null
-    Row(
+    // Wraps onto a further line when the pills outgrow the row, as at a large font size. A plain row would squeeze the
+    // last pill to nothing. The box keeps what a row did for a parent that hands down a minimum size: the pills start
+    // at the start edge and sit in the middle of the height.
+    Box(
         modifier =
             modifier
                 .selectableGroup()
@@ -69,19 +74,23 @@ fun TvChoiceRow(
                 .then(entryFocusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
                 .then(arrival?.let { Modifier.tvArrivalTarget(it) } ?: Modifier)
                 .then(if (aimed) Modifier.tvSelectionFocusGroup(selectedEntry) else Modifier),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+        contentAlignment = Alignment.CenterStart,
     ) {
-        choices.forEach { choice ->
-            val isSelected = choice.key == selectedKey
-            TvChoice(
-                label = choice.label,
-                selected = isSelected,
-                initiallyFocused = choice.key == initialFocusedKey,
-                onSelect = { if (!isSelected) onSelect(choice.key) },
-                icon = choice.icon,
-                modifier = Modifier.tvSelectionTarget(isSelected, selectedEntry),
-            )
+        WrappingRow(
+            horizontalSpacing = dimensionResource(DesR.dimen.padding_s),
+            verticalSpacing = dimensionResource(DesR.dimen.padding_s),
+        ) {
+            choices.forEach { choice ->
+                val isSelected = choice.key == selectedKey
+                TvChoice(
+                    label = choice.label,
+                    selected = isSelected,
+                    initiallyFocused = choice.key == initialFocusedKey,
+                    onSelect = { if (!isSelected) onSelect(choice.key) },
+                    icon = choice.icon,
+                    modifier = Modifier.tvSelectionTarget(isSelected, selectedEntry),
+                )
+            }
         }
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -130,6 +131,10 @@ fun TvButtonSurface(
                 style = MaterialTheme.typography.titleMedium,
                 color = palette.content,
                 textAlign = TextAlign.Center,
+                // The pill is a fixed height, so a label too long for it ends in an ellipsis and does not wrap
+                // onto a second line the pill would clip.
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
         if (loading) {

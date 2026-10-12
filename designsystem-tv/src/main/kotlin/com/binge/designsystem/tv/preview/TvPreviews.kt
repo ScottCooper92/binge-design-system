@@ -58,6 +58,15 @@ const val TV_PREVIEW_SPEC = "spec:width=${TV_PREVIEW_WIDTH_DP}dp,height=${TV_PRE
 annotation class TvPreviews
 
 /**
+ * [TvPreviews] at the two font sizes a row is checked at when every optional line is filled and the text is long: 1.3
+ * and 2.0. For the worst-case fixtures; see `TvWorstCaseSamples.kt`.
+ */
+@PreviewWrapper(TvScreenshotThemeWrapper::class)
+@Preview(name = "tv-font13", device = TV_PREVIEW_SPEC, locale = SOURCE_LOCALE, uiMode = UI_MODE_NIGHT_YES, fontScale = 1.3f)
+@Preview(name = "tv-font20", device = TV_PREVIEW_SPEC, locale = SOURCE_LOCALE, uiMode = UI_MODE_NIGHT_YES, fontScale = 2.0f)
+annotation class TvWorstCaseFontPreviews
+
+/**
  * [TvPreviews] under a right-to-left locale (`ar`), for a frame that checks a layout mirrors: a rail on the right edge,
  * arrows and chevrons flipped. A real locale rather than a pseudolocale, because the screenshot renderer does not apply
  * the latter. A single cell, as [TvPreviews] is; put it on a component or a screen whose start edge matters.

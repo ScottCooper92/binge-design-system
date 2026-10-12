@@ -273,6 +273,9 @@
     <dimen name="rating_card_edit_button">40dp</dimen>
     <dimen name="rating_card_footer_padding">14dp</dimen>
     <dimen name="rating_card_footer_icon">28dp</dimen>
+    <!-- The smallest and largest an avatar's initials get. Dp, not sp, so they follow the circle and not the system font. -->
+    <dimen name="avatar_initials_min_size">8dp</dimen>
+    <dimen name="avatar_initials_max_size">40dp</dimen>
     <dimen name="avatar_size_sm">24dp</dimen>
     <!-- BingeInitialsAvatar sample sizes for the catalog screenshot test -->
     <dimen name="avatar_size_md">44dp</dimen>
