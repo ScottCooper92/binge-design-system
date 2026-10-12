@@ -4,10 +4,13 @@ import android.app.Application
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,20 +36,37 @@ class TvListPaneSemanticsTest {
     val composeTestRule = createComposeRule()
 
     private val inSelectableGroup = hasAnyAncestor(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
+    private val inGroupDirectly = hasParent(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
 
     @Test
     fun `the pane's options sit in one selectable group`() {
         setBoard()
 
-        composeTestRule.onNode(hasText(OPTION_HD) and inSelectableGroup).assertExists()
-        composeTestRule.onNode(hasText(OPTION_UHD) and inSelectableGroup).assertExists()
+        composeTestRule.onNode(hasText(OPTION_HD) and isFocusable() and inGroupDirectly).assertExists()
+        composeTestRule.onNode(hasText(OPTION_UHD) and isFocusable() and inGroupDirectly).assertExists()
+    }
+
+    @Test
+    fun `the group counts the options alone and each option knows its place`() {
+        setBoard()
+
+        val group = composeTestRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
+        val info = group.fetchSemanticsNode().config[SemanticsProperties.CollectionInfo]
+        assertEquals(2, info.rowCount)
+        assertEquals(1, info.columnCount)
+        val hd = composeTestRule.onNode(hasText(OPTION_HD) and isFocusable()).fetchSemanticsNode()
+        val uhd = composeTestRule.onNode(hasText(OPTION_UHD) and isFocusable()).fetchSemanticsNode()
+        assertEquals(0, hd.config[SemanticsProperties.CollectionItemInfo].rowIndex)
+        assertEquals(1, uhd.config[SemanticsProperties.CollectionItemInfo].rowIndex)
     }
 
     @Test
     fun `the list's rows are not a selectable group`() {
         setBoard()
 
-        composeTestRule.onNode(hasText(ROW_QUALITY) and inSelectableGroup).assertDoesNotExist()
+        // The pane's heading carries the row's name too and is a child of the options' lazy column, so only the
+        // focusable list row is checked.
+        composeTestRule.onNode(hasText(ROW_QUALITY) and isFocusable() and inSelectableGroup).assertDoesNotExist()
     }
 
     @Test
@@ -78,7 +98,22 @@ class TvListPaneSemanticsTest {
         composeTestRule.onNode(hasText(GROUP_NOTE)).assertDoesNotExist()
     }
 
-    private fun setBoard(detail: String? = null, groupNote: String? = null) {
+    @Test
+    fun `a long option list composes only the options in view`() {
+        val labels = (1..300).map { "Option $it" }
+        setBoard(options = labels)
+
+        val composed = labels.count { label -> composeTestRule.onAllNodes(hasText(label)).fetchSemanticsNodes().isNotEmpty() }
+        assertTrue("composed $composed of 300 options", composed in 1..40)
+        composeTestRule.onNode(hasText("Option 1") and isFocusable()).assertExists()
+        composeTestRule.onNode(hasText("Option 300")).assertDoesNotExist()
+    }
+
+    private fun setBoard(
+        detail: String? = null,
+        groupNote: String? = null,
+        options: List<String>? = null,
+    ) {
         composeTestRule.setContent {
             BingeTvTheme {
                 TvListPaneBoard(
@@ -96,10 +131,11 @@ class TvListPaneSemanticsTest {
                                             body = "The quality a new request asks for.",
                                             detail = detail,
                                             options =
-                                                listOf(
-                                                    TvPaneOption(label = OPTION_HD, selected = true, onSelect = {}),
-                                                    TvPaneOption(label = OPTION_UHD, onSelect = {}),
-                                                ),
+                                                options?.map { TvPaneOption(label = it, onSelect = {}) }
+                                                    ?: listOf(
+                                                        TvPaneOption(label = OPTION_HD, selected = true, onSelect = {}),
+                                                        TvPaneOption(label = OPTION_UHD, onSelect = {}),
+                                                    ),
                                         ),
                                     ),
                             ),
