@@ -31,8 +31,8 @@ fun IncludeExcludeChipStatesSample() {
                 IncludeExcludeChip(
                     label = label,
                     state = states[index],
-                    onTap = { states[index] = states[index].toggled(IncludeExcludeState.Include) },
-                    onLongPress = { states[index] = states[index].toggled(IncludeExcludeState.Exclude) },
+                    onClick = { states[index] = states[index].toggled(IncludeExcludeState.Include) },
+                    onLongClick = { states[index] = states[index].toggled(IncludeExcludeState.Exclude) },
                 )
             }
         }

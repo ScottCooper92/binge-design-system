@@ -163,7 +163,7 @@ class TvCardRowFocusMemoryTest {
             cellWidth = CELL_WIDTH_DP.dp,
             entryFocusRequester = entryRequester,
             overrideIndex = overrideIndex,
-            trailing = { _, onFocusChanged, cellModifier ->
+            trailingContent = { _, onFocusChanged, cellModifier ->
                 Box(
                     Modifier
                         .testTag(TRAILING)

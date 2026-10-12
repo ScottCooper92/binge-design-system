@@ -205,7 +205,7 @@ fun BingeMultiChoiceSheetSample() {
                 chosen = chosen,
                 leading = chosen,
                 filterPlaceholder = FILTER,
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
                 initialQuery = "an",
             )
         }
@@ -225,7 +225,7 @@ fun BingeMultiChoiceSheetAppliedSample() {
                 title = LANGUAGES_TITLE,
                 choices = BingeChoiceList.Ready(SampleLanguages),
                 chosen = chosen,
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
                 clearLabel = CLEAR,
                 onClear = {},
             )
@@ -387,7 +387,7 @@ fun BingeMultiChoiceSheetSectionedSample() {
                 title = LANGUAGES_TITLE,
                 choices = BingeChoiceList.Ready(SampleSpokenLanguages),
                 chosen = setOf("ja", "ko"),
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
                 clearLabel = CLEAR,
                 onClear = {},
                 doneLabel = DONE,
@@ -412,7 +412,7 @@ fun BingeMultiChoiceSheetMarkedSample() {
                         listOf(BingeChoice("original", "Original language", icon = Icons.Filled.Language)) + SampleSpokenLanguages.take(5),
                     ),
                 chosen = setOf("en", "original"),
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
                 clearLabel = CLEAR,
                 onClear = {},
                 doneLabel = DONE,
@@ -442,7 +442,7 @@ fun BingeMultiChoiceSheetPeopleSample() {
                 chosen = setOf(2),
                 leading = setOf(2),
                 filterPlaceholder = null,
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
             )
         }
     }
@@ -492,6 +492,33 @@ fun BingeChoiceSheetLongLabelSample() {
                         ),
                     ),
                 selected = "SH",
+                onSelect = {},
+            )
+        }
+    }
+}
+
+/** A choice whose supporting line has to be read in full: [BingeChoice.supportingMaxLines] lets it take three lines. */
+@Composable
+fun BingeChoiceSheetSupportingLinesSample() {
+    ScreenshotTheme {
+        SheetSurface {
+            BingeChoiceSheetContent(
+                title = "Notifications",
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(
+                            BingeChoice("on", "Notify me", supportingText = "Sends an email when a request is approved"),
+                            BingeChoice(
+                                "blocked",
+                                "Blocked by the system",
+                                supportingText = "Allow notifications for this app in the system settings, or none of the alerts " +
+                                    "you turn on here will reach you, whatever the server sends. Open the settings to change it.",
+                                supportingMaxLines = 3,
+                            ),
+                        ),
+                    ),
+                selected = "on",
                 onSelect = {},
             )
         }
@@ -553,7 +580,7 @@ fun BingeMultiChoiceSheetCountsSample() {
                         ),
                     ),
                 chosen = setOf("backdrops"),
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
                 clearLabel = CLEAR,
                 onClear = {},
                 doneLabel = DONE,

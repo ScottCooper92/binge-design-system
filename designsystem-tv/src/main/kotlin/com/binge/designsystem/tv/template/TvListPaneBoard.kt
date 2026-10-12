@@ -228,6 +228,7 @@ private fun TvPaneList(
                     val described = row.key == describedKey
                     TvPaneListRow(
                         row = row,
+                        isFirst = row.key == firstRowKey,
                         emphasis = tvRowEmphasis(isDescribedRow = described, columnHasFocus = columnHasFocus),
                         onFocused = { onFocusRow(row.key) },
                         modifier =
@@ -279,6 +280,7 @@ private fun TvPaneGroupTitle(title: String, note: String?) {
 @Composable
 private fun TvPaneListRow(
     row: TvPaneRow,
+    isFirst: Boolean,
     emphasis: TvRowEmphasis,
     onFocused: () -> Unit,
     modifier: Modifier = Modifier,
@@ -289,7 +291,13 @@ private fun TvPaneListRow(
         selected = false,
         onClick = onFocused,
         headlineContent = {
-            Text(text = row.label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                text = row.label,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.tvListPaneFirstRowLabelAnchor(isFirst),
+            )
         },
         supportingContent =
             row.detail?.let {
@@ -301,7 +309,7 @@ private fun TvPaneListRow(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)),
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)).tvListPaneFirstRowIconAnchor(isFirst),
                     )
                 }
             },
@@ -356,3 +364,11 @@ private fun TvPaneListAction(action: TvPaneAction, modifier: Modifier = Modifier
  */
 internal fun Modifier.tvListPaneFirstRowAnchor(isFirst: Boolean): Modifier =
     if (isFirst) tvLayoutAnchor(TvLayoutAnchors.LIST_PANE_FIRST_ROW) else this
+
+/** Marks a board's first row's icon, which its skeleton's icon block is measured against. */
+internal fun Modifier.tvListPaneFirstRowIconAnchor(isFirst: Boolean): Modifier =
+    if (isFirst) tvLayoutAnchor(TvLayoutAnchors.LIST_PANE_FIRST_ROW_ICON) else this
+
+/** Marks a board's first row's label, which its skeleton's label bar is measured against. */
+internal fun Modifier.tvListPaneFirstRowLabelAnchor(isFirst: Boolean): Modifier =
+    if (isFirst) tvLayoutAnchor(TvLayoutAnchors.LIST_PANE_FIRST_ROW_LABEL) else this

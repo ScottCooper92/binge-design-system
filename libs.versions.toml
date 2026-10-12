@@ -12,7 +12,7 @@
 # rejects it. Binge's catalog has the same pair for the same reason, and these two must agree.
 [versions]
 agp = "9.4.1"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 composeBom = "2026.08.00"
 # tv-material ships its own MaterialTheme tree; the version agrees with Binge's.
 tvMaterial = "1.1.0"
@@ -49,7 +49,6 @@ compose-material3-adaptive-navigation3 = { module = "androidx.compose.material3.
 compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 tv-material = { module = "androidx.tv:tv-material", version.ref = "tvMaterial" }

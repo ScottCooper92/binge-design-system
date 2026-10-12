@@ -31,7 +31,7 @@ fun ListRowPosterSample() {
         ListRow(
             onClick = {},
             leading = { ListRowPoster(imageUrl = null, contentDescription = null) },
-            trailing = {
+            trailingContent = {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
@@ -132,7 +132,7 @@ fun ListRowHeaderSample() {
             Column(modifier = contentModifier) {
                 ListRowHeader(
                     title = "A long episode title that wraps onto a second line so the badge stays put",
-                    trailing = {
+                    trailingContent = {
                         Text(
                             text = "Open",
                             style = MaterialTheme.typography.labelMedium,

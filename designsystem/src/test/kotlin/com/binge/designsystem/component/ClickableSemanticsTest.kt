@@ -45,7 +45,7 @@ class ClickableSemanticsTest {
         show {
             Column {
                 TrendingSearchChip(label = "Dune", onClick = {})
-                DiscoverQuickClearChip(label = "Drama", tone = QuickClearTone.Include, onClear = {})
+                DiscoverQuickClearChip(label = "Drama", tone = QuickClearTone.Include, onClick = {})
             }
         }
 
@@ -59,9 +59,9 @@ class ClickableSemanticsTest {
             IncludeExcludeChip(
                 label = "Horror",
                 state = IncludeExcludeState.Neutral,
-                onTap = {},
-                onLongPress = {},
-                onLongPressLabel = "Exclude",
+                onClick = {},
+                onLongClick = {},
+                onLongClickLabel = "Exclude",
             )
         }
 

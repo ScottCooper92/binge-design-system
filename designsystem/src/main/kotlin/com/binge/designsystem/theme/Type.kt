@@ -2,20 +2,24 @@ package com.binge.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.Font
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import com.binge.designsystem.R
 
-private val fontProvider = GoogleFont.Provider(
-    providerAuthority = "com.google.android.gms.fonts",
-    providerPackage = "com.google.android.gms",
-    certificates = R.array.com_google_android_gms_fonts_certs,
-)
-
-private val outfitFont = GoogleFont("Outfit")
+/**
+ * One weight of Outfit, from the variable font bundled in `res/font` (its licence is `assets/fonts/Outfit-OFL.txt`).
+ * Bundled rather than downloaded so a device without Play services, or before the download lands, draws Outfit and
+ * not the system fallback (#3530).
+ */
+private fun outfit(weight: FontWeight) =
+    Font(
+        resId = R.font.outfit,
+        weight = weight,
+        variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
+    )
 
 /**
  * Binge's typeface. Public because the TV design system builds its own 10-foot type scale from
@@ -23,13 +27,13 @@ private val outfitFont = GoogleFont("Outfit")
  * separate `Typography` types, so only the font can be shared, not the scale.
  */
 val BingeFontFamily = FontFamily(
-    Font(googleFont = outfitFont, fontProvider = fontProvider, weight = FontWeight.Normal),
-    Font(googleFont = outfitFont, fontProvider = fontProvider, weight = FontWeight.Medium),
-    Font(googleFont = outfitFont, fontProvider = fontProvider, weight = FontWeight.SemiBold),
-    Font(googleFont = outfitFont, fontProvider = fontProvider, weight = FontWeight.Bold),
+    outfit(FontWeight.Normal),
+    outfit(FontWeight.Medium),
+    outfit(FontWeight.SemiBold),
+    outfit(FontWeight.Bold),
     // ExtraBold backs the big-number emphasis (rating scores, distribution headline); without it
     // those `fontWeight = ExtraBold` styles fall back to Bold rather than the intended weight.
-    Font(googleFont = outfitFont, fontProvider = fontProvider, weight = FontWeight.ExtraBold),
+    outfit(FontWeight.ExtraBold),
 )
 
 private fun Typography.withFontFamily(family: FontFamily): Typography =

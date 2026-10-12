@@ -306,7 +306,7 @@ fun ItemGroupBusySample() {
                     label = "Open on server",
                     destination = ListItemDestination.External,
                 ),
-                ListItem(icon = Icons.Filled.Flag, label = "Report an issue", disabled = true),
+                ListItem(icon = Icons.Filled.Flag, label = "Report an issue", enabled = false),
                 ListItem(
                     icon = Icons.Filled.Block,
                     iconTint = BingeSentiment.Negative.accent(),
@@ -396,7 +396,7 @@ fun ItemGroupSwitchSample() {
                     onClick = { trustProxy = !trustProxy },
                 ),
                 ListItem(icon = Icons.Filled.Policy, label = "Force IPv4", toggled = forceIpv4, onClick = { forceIpv4 = !forceIpv4 }),
-                ListItem(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, disabled = true),
+                ListItem(icon = Icons.Filled.Block, label = "CSRF protection", toggled = true, enabled = false),
                 ListItem(icon = Icons.Filled.Settings, label = "Set by the server", toggled = true, clickable = false),
             ),
         )
@@ -454,6 +454,27 @@ fun ItemGroupLongLabelSample() {
                     label = "Default quality profile for new requests",
                     detail = "HD-1080p",
                 ),
+            ),
+        )
+    }
+}
+
+/** A row whose detail has to be read in full: [ListItem.supportingMaxLines] lets it take three lines, ellipsized after that. */
+@Composable
+fun ItemGroupSupportingLinesSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Notifications",
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.Tune,
+                    label = "Notifications are blocked",
+                    detail = "Allow them in the system settings to be told about requests, approvals and failures. Until you do, " +
+                        "none of the alerts you turn on here will reach this device, whatever the server sends.",
+                    detailColor = MaterialTheme.colorScheme.error,
+                    supportingMaxLines = 3,
+                ),
+                ListItem(icon = Icons.Filled.HighQuality, label = "Default quality profile", detail = "HD-1080p"),
             ),
         )
     }

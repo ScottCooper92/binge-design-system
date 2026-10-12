@@ -21,3 +21,11 @@ fun GridScreenHeaderLongTitleSample() {
         GridScreenHeader(title = "Science Fiction & Fantasy Adventures", onBack = {})
     }
 }
+
+/** No back button, for a grid in a pane beside the list that already offers the way back. */
+@Composable
+fun GridScreenHeaderNoBackSample() {
+    ScreenshotTheme {
+        GridScreenHeader(title = "Action")
+    }
+}

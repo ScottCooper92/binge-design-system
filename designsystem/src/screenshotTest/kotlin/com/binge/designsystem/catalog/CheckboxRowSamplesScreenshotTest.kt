@@ -30,6 +30,13 @@ class CheckboxRowSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun supportingLines() {
+        CheckboxRowSupportingLinesSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun people() {
         CheckboxRowPeopleSample()
     }

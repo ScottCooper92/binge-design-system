@@ -77,7 +77,7 @@ import com.binge.designsystem.theme.BingeTheme
 fun BoxScope.DetailOverlayTopBar(
     title: String,
     scrollState: ScrollState,
-    onBack: (() -> Unit)?,
+    onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     heroHeight: Dp = dimensionResource(R.dimen.detail_hero_height),
     horizontalInset: Dp = dimensionResource(R.dimen.padding_m),
@@ -105,7 +105,7 @@ fun BoxScope.DetailOverlayTopBar(
 fun BoxScope.DetailOverlayTopBar(
     title: String,
     scrollOffsetPx: () -> Float,
-    onBack: (() -> Unit)?,
+    onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     heroHeight: Dp = dimensionResource(R.dimen.detail_hero_height),
     horizontalInset: Dp = dimensionResource(R.dimen.padding_m),

@@ -37,7 +37,7 @@ import com.binge.designsystem.theme.BingeShapes
 
 /**
  * The shared full-width list **Row** (see the Card / Tile / Row taxonomy in CLAUDE.md): a tonal
- * surface holding an optional [leading] visual, a content column, and an optional [trailing]
+ * surface holding an optional [leading] visual, a content column, and an optional [trailingContent]
  * element, stacked in a `LazyColumn`.
  *
  * `ListRow` owns the row chrome — rounded [containerColor] surface (`surfaceContainer` by default),
@@ -50,7 +50,7 @@ import com.binge.designsystem.theme.BingeShapes
  * between the two: on a short title the spacer pushes the bottom line down to the poster's height, and
  * on a title long enough to already exceed it the spacer simply has nothing left to give, so the two
  * groups sit stacked with no overlap and no clipping either way. Supply [leading] via [ListRowPoster]
- * (or an avatar) and [trailing] for an action or status element — [verticalAlignment] centers it
+ * (or an avatar) and [trailingContent] for an action or status element — [verticalAlignment] centers it
  * against the row's full matched height rather than pinning it to the top beside a two-line title.
  * An optional [footer] spans the full inner width below the main line (e.g. a progress bar that also
  * runs under the poster).
@@ -66,7 +66,7 @@ fun ListRow(
     // reason a gradient call-to-action row (DiscoverEntryRow) would otherwise re-roll this chrome.
     containerBrush: Brush? = null,
     leading: (@Composable () -> Unit)? = null,
-    trailing: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
     trailingGap: Dp = dimensionResource(R.dimen.list_row_gap),
     footer: (@Composable () -> Unit)? = null,
     content: @Composable RowScope.(Modifier) -> Unit,
@@ -95,9 +95,9 @@ fun ListRow(
                 Spacer(Modifier.width(dimensionResource(R.dimen.list_row_gap)))
             }
             content(Modifier.weight(1f).fillMaxHeight())
-            if (trailing != null) {
+            if (trailingContent != null) {
                 Spacer(Modifier.width(trailingGap))
-                trailing()
+                trailingContent()
             }
         }
         if (footer != null) {
@@ -108,8 +108,8 @@ fun ListRow(
 }
 
 /**
- * A list row's header line: the [title] (the row's primary text) with an optional [trailing] element
- * beside it — a status badge or action. Top-aligned so the trailing stays put when the title wraps to
+ * A list row's header line: the [title] (the row's primary text) with an optional [trailingContent] element
+ * beside it — a status badge or action. Top-aligned so the trailing content stays put when the title wraps to
  * a second line, and the title takes the remaining width. This is the single home for a row title's
  * style, so every adopting row reads the same; drop it at the top of a [ListRow] content column.
  */
@@ -117,7 +117,7 @@ fun ListRow(
 fun ListRowHeader(
     title: String,
     modifier: Modifier = Modifier,
-    trailing: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.Top) {
         Text(
@@ -128,12 +128,66 @@ fun ListRowHeader(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
-        if (trailing != null) {
+        if (trailingContent != null) {
             Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
-            trailing()
+            trailingContent()
         }
     }
 }
+
+/**
+ * [ListRow] under its old name for the trailing slot, `trailing`; it is [trailingContent] now, the name Material 3's
+ * `ListItem` uses. Kotlin cannot hold two overloads that differ only in parameter names, so this one has no default
+ * for `trailing`: a call that passes none resolves to [ListRow], and a call that passes `trailing` by name lands here.
+ */
+@Deprecated(
+    message = "Renamed: trailing is trailingContent.",
+    replaceWith = ReplaceWith(
+        "ListRow(modifier = modifier, onClick = onClick, enabled = enabled, verticalAlignment = verticalAlignment, " +
+            "containerColor = containerColor, containerBrush = containerBrush, leading = leading, " +
+            "trailingContent = trailing, trailingGap = trailingGap, footer = footer, content = content)",
+    ),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun ListRow(
+    trailing: (@Composable () -> Unit)?,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
+    containerBrush: Brush? = null,
+    leading: (@Composable () -> Unit)? = null,
+    trailingGap: Dp = dimensionResource(R.dimen.list_row_gap),
+    footer: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.(Modifier) -> Unit,
+) = ListRow(
+    modifier = modifier,
+    onClick = onClick,
+    enabled = enabled,
+    verticalAlignment = verticalAlignment,
+    containerColor = containerColor,
+    containerBrush = containerBrush,
+    leading = leading,
+    trailingContent = trailing,
+    trailingGap = trailingGap,
+    footer = footer,
+    content = content,
+)
+
+/** [ListRowHeader] under its old name for the trailing slot, `trailing`; see the deprecated [ListRow]. */
+@Deprecated(
+    message = "Renamed: trailing is trailingContent.",
+    replaceWith = ReplaceWith("ListRowHeader(title, modifier, trailingContent = trailing)"),
+)
+@Suppress("ModifierParameter")
+@Composable
+fun ListRowHeader(
+    title: String,
+    trailing: (@Composable () -> Unit)?,
+    modifier: Modifier = Modifier,
+) = ListRowHeader(title = title, modifier = modifier, trailingContent = trailing)
 
 /**
  * The standard [ListRow] leading poster: a fixed-width image clipped to the row's poster corner,

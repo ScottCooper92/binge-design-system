@@ -132,6 +132,12 @@ fun TvListPaneBoardSkeletonGroupNoteSample() {
     TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay, groupNote = true)
 }
 
+/** The skeleton for a board whose rows lead with an icon: each placeholder reserves the icon's slot, so the labels do not move. */
+@Composable
+fun TvListPaneBoardSkeletonRowIconSample() {
+    TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay, rowIcon = true)
+}
+
 /**
  * A filter panel on the same board: filters in the list, each showing what it has applied under its name, and the values of
  * the described filter beside it as checkboxes with no description above them. A clear button sits under the

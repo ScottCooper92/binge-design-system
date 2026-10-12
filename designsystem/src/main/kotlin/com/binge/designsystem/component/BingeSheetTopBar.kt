@@ -23,6 +23,9 @@ import com.binge.designsystem.R
  * leading, a title with an optional [subtitle], and [actions]. It sits on the sheet's own container colour and takes
  * no window insets, because the sheet has already padded its content below the status bar. Not [BingeTopBar]: that
  * bar leads with back and has no subtitle.
+ *
+ * It takes [onClose], not `onBack`, on purpose: the control at its start is an X that dismisses the sheet, not a way back
+ * through a stack, so the screen bars' optional `onBack` does not apply and the callback is required.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -65,6 +65,18 @@ enum class ScreenBar {
     None,
 }
 
+/** How a [BingeScreenScaffold]'s bar draws itself and its controls. */
+enum class ScreenBarChrome {
+    /** A transparent bar the body scrolls under, whose Back and actions sit on scrim-backed circles. The default. */
+    Glass,
+
+    /**
+     * An opaque bar in the app's background, with a plain Back and actions. For a screen with no imagery under its
+     * bar, such as a first-run flow, where a circle would frame the arrow against nothing.
+     */
+    Plain,
+}
+
 /**
  * The frame a phone, foldable or tablet screen with a top bar shares: a transparent bar over a body that
  * scrolls under it, a snackbar host, and an optional pinned [bottomBar].
@@ -80,6 +92,8 @@ enum class ScreenBar {
  *
  * [bottomBar] reaches the true edge of the window and clears the navigation bar and a side cutout itself, by
  * [com.binge.designsystem.bottomBarInsets], as `FormFooter` does.
+ *
+ * [barChrome] picks the transparent bar with circled controls, or the opaque one with plain controls.
  *
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
  * floating navigation bar. Split it with [screenOuterPadding] and [screenInnerPadding], or use [ScreenBody].
@@ -99,8 +113,10 @@ fun BingeScreenScaffold(
     header: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
+    barChrome: ScreenBarChrome = ScreenBarChrome.Glass,
     content: @Composable (padding: PaddingValues) -> Unit,
 ) {
+    val barColor = if (barChrome == ScreenBarChrome.Plain) Color.Unspecified else Color.Transparent
     val ownBehavior = rememberScreenBarScrollBehavior(bar)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
     val scrim = screenBarScrim(bar, behavior)
@@ -120,7 +136,7 @@ fun BingeScreenScaffold(
                         title = title,
                         onBack = back,
                         scrollBehavior = behavior,
-                        containerColor = Color.Transparent,
+                        containerColor = barColor,
                         scrimFraction = barScrimFraction,
                         foregroundScrimFraction = scrim,
                         actions = actions,
@@ -130,7 +146,7 @@ fun BingeScreenScaffold(
                         title = title,
                         onBack = back,
                         scrollBehavior = behavior,
-                        containerColor = Color.Transparent,
+                        containerColor = barColor,
                         scrimFraction = barScrimFraction,
                         foregroundScrimFraction = scrim,
                         actions = actions,
@@ -141,7 +157,7 @@ fun BingeScreenScaffold(
                         subtitle = subtitle,
                         onBack = back,
                         scrollBehavior = behavior,
-                        containerColor = Color.Transparent,
+                        containerColor = barColor,
                         scrimFraction = barScrimFraction,
                         foregroundScrimFraction = scrim,
                         titleTrailing = titleTrailing,

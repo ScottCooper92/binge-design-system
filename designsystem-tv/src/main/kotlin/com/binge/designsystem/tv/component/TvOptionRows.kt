@@ -96,7 +96,7 @@ fun <T> TvOptionGroup(
  *
  * Focus is the fill and selection is the tick, and the two are independent: the current value keeps its tick while
  * focus passes over it. The chosen option's label and tick take the accent at rest, and invert with the fill. The
- * row never scales on focus. [trailing] sits before the tick, for a short value the option carries. [initiallyFocused]
+ * row never scales on focus. [trailingContent] sits before the tick, for a short value the option carries. [initiallyFocused]
  * paints the row focused for a frame, which fires no focus events; production passes false. [supportingText] is one line
  * under the label, ellipsized: what choosing the option does.
  */
@@ -108,7 +108,7 @@ fun TvOptionRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     initiallyFocused: Boolean = false,
-    trailing: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
     icon: ImageVector? = null,
     supportingText: String? = null,
 ) {
@@ -124,8 +124,8 @@ fun TvOptionRow(
         supportingContent = supportingText?.let { { SupportingLine(it) } },
         leadingContent = icon?.let { { TvRowIcon(icon = it, isFocused = focused) } },
         trailingContent =
-            if (selected || trailing != null) {
-                { OptionTrailing(selected = selected, trailing = trailing) }
+            if (selected || trailingContent != null) {
+                { OptionTrailing(selected = selected, trailing = trailingContent) }
             } else {
                 null
             },
@@ -148,6 +148,40 @@ fun TvOptionRow(
                 },
     )
 }
+
+/**
+ * [TvOptionRow] under its old name for the value slot, `trailing`; it is `trailingContent` now. Kotlin cannot hold
+ * two overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes
+ * none resolves to the new function, and a call that passes `trailing` by name lands here.
+ */
+@Deprecated(
+    message = "Renamed: trailing is trailingContent.",
+    replaceWith = ReplaceWith(
+        "TvOptionRow(label, selected, onClick, modifier, initiallyFocused, trailingContent = trailing, icon = icon, " +
+            "supportingText = supportingText)",
+    ),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun TvOptionRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    trailing: (@Composable () -> Unit)?,
+    modifier: Modifier = Modifier,
+    initiallyFocused: Boolean = false,
+    icon: ImageVector? = null,
+    supportingText: String? = null,
+) = TvOptionRow(
+    label = label,
+    selected = selected,
+    onClick = onClick,
+    modifier = modifier,
+    initiallyFocused = initiallyFocused,
+    trailingContent = trailing,
+    icon = icon,
+    supportingText = supportingText,
+)
 
 /**
  * One yes-or-no setting as a row the remote can reach: a box that takes a tick when [checked], then its [label].

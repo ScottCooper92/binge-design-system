@@ -31,7 +31,7 @@ import com.binge.designsystem.R
  * long, scannable list (a season picker, a candidate list) rather than a one-off toggle. Reach for this instead of
  * hand-rolling a checkbox [Row] per screen.
  *
- * The [supportingText] is one line, ellipsized: say what ticking the row does, in a few words. An [icon] leads the label on the same tinted plate a settings row uses, tinted [iconTint] or `primary`. A
+ * The [supportingText] is [supportingMaxLines] lines, one by default, ellipsized: say what ticking the row does, in a few words. Raise [supportingMaxLines] for a row whose line has to be read in full. An [icon] leads the label on the same tinted plate a settings row uses, tinted [iconTint] or `primary`. A
  * [leadingContent] replaces it when the row needs something else, such as an avatar.
  *
  * The row merges its descendants' semantics, so a decorative [leadingContent] such as an avatar should clear its own
@@ -57,6 +57,7 @@ fun CheckboxRow(
     showDivider: Boolean = false,
     icon: ImageVector? = null,
     iconTint: Color? = null,
+    supportingMaxLines: Int = 1,
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
@@ -95,7 +96,7 @@ fun CheckboxRow(
                         text = supportingText,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
+                        maxLines = supportingMaxLines,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
