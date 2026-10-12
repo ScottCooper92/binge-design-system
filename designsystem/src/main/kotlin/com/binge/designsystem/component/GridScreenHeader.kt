@@ -47,13 +47,15 @@ fun GridScreenHeader(
                 ),
             )
         }
+        // The back button's own inset clears the status bar; without it the title needs one.
+        val titleTopInset = if (onBack == null) Modifier.padding(top = dimensionResource(R.dimen.padding_s)) else Modifier
         Text(
             text = title,
             style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
+            modifier = titleTopInset
                 .padding(
                     start = dimensionResource(R.dimen.grid_header_title_padding_h),
                     end = dimensionResource(R.dimen.grid_header_title_padding_h),
