@@ -122,7 +122,6 @@ class TvListPaneTriStateBoardTest {
     @Test
     fun `OK cycles an option through ticked and excluded and back, keeping focus`() {
         show()
-        press(Key.DirectionDown)
         node(FIRST).assertIsFocused()
 
         press(Key.DirectionCenter)
@@ -136,14 +135,15 @@ class TvListPaneTriStateBoardTest {
     }
 
     @Test
-    fun `the pinned option takes focus first, and down and up move between it and the options`() {
+    fun `entry lands on the first value, and up and down move between it and the pinned option`() {
         show()
 
+        node(FIRST).assertIsFocused()
+        press(Key.DirectionUp)
         node(PINNED).assertIsFocused()
         press(Key.DirectionDown)
         node(FIRST).assertIsFocused()
         press(Key.DirectionUp)
-        node(PINNED).assertIsFocused()
 
         press(Key.DirectionCenter)
         assertEquals(1, pinnedPressed)

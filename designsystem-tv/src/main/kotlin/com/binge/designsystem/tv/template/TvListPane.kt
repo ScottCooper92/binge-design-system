@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -30,6 +31,7 @@ import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
+import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.focus.tvFocusGroup
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -112,19 +114,25 @@ private fun PaneOptions(
     backToListFocus: FocusRequester,
     initialFocusedOptionLabel: String?,
 ) {
+    // Pinned options are controls, so → into the pane lands on the first value, one ↑ from them.
+    val routesToFirstValue = pinnedOptions.isNotEmpty() && options.isNotEmpty()
+    val firstValueFocus = remember { FocusRequester() }
     Column(
         modifier =
             Modifier
                 .width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
                 .padding(top = dimensionResource(DesR.dimen.padding_s))
                 .focusProperties { left = backToListFocus }
-                .tvFocusGroup()
+                .then(if (routesToFirstValue) Modifier.tvEntryFocusGroup(firstValueFocus) else Modifier.tvFocusGroup())
                 .then(if (multiSelect) Modifier else Modifier.selectableGroup()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
     ) {
         pinnedOptions.forEach { option -> PaneOption(option, multiSelect, initialFocusedOptionLabel) }
         if (pinnedOptions.isNotEmpty() && options.isNotEmpty()) PinnedDivider()
-        options.forEach { option -> PaneOption(option, multiSelect, initialFocusedOptionLabel) }
+        options.forEachIndexed { index, option ->
+            val entry = if (routesToFirstValue && index == 0) Modifier.focusRequester(firstValueFocus) else Modifier
+            PaneOption(option, multiSelect, initialFocusedOptionLabel, entry)
+        }
         clear?.let { action ->
             TvButton(
                 label = action.label,
@@ -157,8 +165,9 @@ private fun PaneOption(
     option: TvPaneOption,
     multiSelect: Boolean,
     initialFocusedOptionLabel: String?,
+    entryModifier: Modifier = Modifier,
 ) {
-    val optionModifier = option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier
+    val optionModifier = (option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier).then(entryModifier)
     if (multiSelect) {
         TvCheckboxRow(
             label = option.label,
