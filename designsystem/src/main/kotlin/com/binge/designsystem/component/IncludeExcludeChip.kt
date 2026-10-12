@@ -36,10 +36,10 @@ import com.binge.designsystem.theme.BingeShapes
 fun IncludeExcludeChip(
     label: String,
     state: IncludeExcludeState,
-    onTap: () -> Unit,
-    onLongPress: () -> Unit,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onLongPressLabel: String? = null,
+    onLongClickLabel: String? = null,
 ) {
     val shape = BingeShapes.Chip
     val errorTint = MaterialTheme.colorScheme.error.copy(alpha = 0.14f)
@@ -80,7 +80,7 @@ fun IncludeExcludeChip(
             .clip(shape)
             .background(chipColors.background)
             .border(BorderStroke(dimensionResource(R.dimen.hairline_thickness), chipColors.border), shape)
-            .combinedClickable(role = Role.Button, onLongClickLabel = onLongPressLabel, onClick = onTap, onLongClick = onLongPress)
+            .combinedClickable(role = Role.Button, onLongClickLabel = onLongClickLabel, onClick = onClick, onLongClick = onLongClick)
             .semantics { stateDescription = stateLabel }
             .padding(
                 horizontal = dimensionResource(R.dimen.discover_filter_chip_padding_h),
@@ -114,6 +114,38 @@ fun IncludeExcludeChip(
     }
 }
 
+/**
+ * [IncludeExcludeChip] under its old names, `onTap`, `onLongPress` and `onLongPressLabel`; they are `onClick`,
+ * `onLongClick` and `onLongClickLabel` now, the names Compose's own `combinedClickable` and Material 3's chips use.
+ * Kotlin cannot hold two overloads that differ only in parameter names, so this one takes `onLongPressLabel` ahead of
+ * `modifier`. Call it by name, as the old signature was.
+ */
+@Deprecated(
+    message = "Renamed: onTap is onClick, onLongPress is onLongClick and onLongPressLabel is onLongClickLabel.",
+    replaceWith = ReplaceWith(
+        "IncludeExcludeChip(label, state, onClick = onTap, onLongClick = onLongPress, modifier = modifier, " +
+            "onLongClickLabel = onLongPressLabel)",
+    ),
+)
+@Suppress("ModifierParameter")
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun IncludeExcludeChip(
+    label: String,
+    state: IncludeExcludeState,
+    onTap: () -> Unit,
+    onLongPress: () -> Unit,
+    onLongPressLabel: String? = null,
+    modifier: Modifier = Modifier,
+) = IncludeExcludeChip(
+    label = label,
+    state = state,
+    onClick = onTap,
+    onLongClick = onLongPress,
+    modifier = modifier,
+    onLongClickLabel = onLongPressLabel,
+)
+
 private data class ChipColors(
     val background: Color,
     val border: Color,
@@ -125,7 +157,7 @@ private data class ChipColors(
 @Composable
 private fun PreviewIncludeExcludeChipNeutral() {
     BingeExpressiveTheme {
-        IncludeExcludeChip(label = "Action", state = IncludeExcludeState.Neutral, onTap = {}, onLongPress = {})
+        IncludeExcludeChip(label = "Action", state = IncludeExcludeState.Neutral, onClick = {}, onLongClick = {})
     }
 }
 
@@ -133,7 +165,7 @@ private fun PreviewIncludeExcludeChipNeutral() {
 @Composable
 private fun PreviewIncludeExcludeChipInclude() {
     BingeExpressiveTheme {
-        IncludeExcludeChip(label = "Action", state = IncludeExcludeState.Include, onTap = {}, onLongPress = {})
+        IncludeExcludeChip(label = "Action", state = IncludeExcludeState.Include, onClick = {}, onLongClick = {})
     }
 }
 
@@ -141,6 +173,6 @@ private fun PreviewIncludeExcludeChipInclude() {
 @Composable
 private fun PreviewIncludeExcludeChipExclude() {
     BingeExpressiveTheme {
-        IncludeExcludeChip(label = "Horror", state = IncludeExcludeState.Exclude, onTap = {}, onLongPress = {})
+        IncludeExcludeChip(label = "Horror", state = IncludeExcludeState.Exclude, onClick = {}, onLongClick = {})
     }
 }
