@@ -24,7 +24,7 @@ private val skeletons: List<Pair<String, @Composable (String?) -> Unit>> =
     listOf(
         "ListRowSkeleton" to { description -> ListRowSkeleton(description = description) },
         "ListRowSkeletonColumn" to { description -> ListRowSkeletonColumn(PaddingValues(), count = 2, description = description) },
-        "CarouselSkeleton" to { description -> CarouselSkeleton(numCards = 2, description = description) },
+        "CarouselSkeleton" to { description -> CarouselSkeleton(count = 2, description = description) },
         "EpisodeListRowSkeleton" to { description -> EpisodeListRowSkeleton(description = description) },
         "FilterChipRowSkeleton" to { description -> FilterChipRowSkeleton(description = description) },
         "MediaCardSkeleton" to { description -> MediaCardSkeleton(description = description) },
