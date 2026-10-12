@@ -2,18 +2,18 @@ package com.binge.designsystem.tv.template
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +42,9 @@ import com.binge.designsystem.tv.R as TvR
  * closing note. The only place a value changes; the list only names rows. Nothing to describe leaves it empty.
  *
  * It scrolls, because a column that cannot scroll starves its last children into slivers that are still
- * focusable. ← from any option goes to [backToListFocus], the described row.
+ * focusable, and it is lazy, because a filter's options can run to hundreds (every provider of a region, say) and an
+ * eager column composes them all and loads every logo the moment the pane swaps in. Only the options in view, and
+ * a screenful either side, are composed. ← from any option goes to [backToListFocus], the described row.
  */
 @Composable
 internal fun TvListPane(
@@ -55,107 +57,126 @@ internal fun TvListPane(
         Box(modifier = modifier.fillMaxSize())
         return
     }
+    val hasOptions = row.options.isNotEmpty() || row.pinnedOptions.isNotEmpty()
+    // Pinned options are controls, so a first → into the pane lands on the first value, one ↑ from them. Re-entry still
+    // resumes on the option last focused: the restorer falls back to the first value only when nothing was saved.
+    val routesToFirstValue = row.pinnedOptions.isNotEmpty() && row.options.isNotEmpty()
+    val firstValueFocus = remember { FocusRequester() }
+    // Keyed on the row, so a described row opens at its top rather than where the last one was scrolled to.
+    val listState = key(row.key) { rememberLazyListState() }
+    val sectionGap = dimensionResource(DesR.dimen.padding_m)
+    val optionsLead = sectionGap + dimensionResource(DesR.dimen.padding_s)
+    val optionGap = dimensionResource(TvR.dimen.tv_option_row_gap)
+    val optionWidth = Modifier.width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
     TvStableFocusScroll {
-        Column(
+        Box(
             modifier =
                 modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(vertical = dimensionResource(TvR.dimen.tv_focus_ring_bleed)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                    .then(
+                        if (!hasOptions) {
+                            Modifier
+                        } else {
+                            Modifier
+                                .focusProperties { left = backToListFocus }
+                                .then(
+                                    if (routesToFirstValue) {
+                                        Modifier
+                                            .focusRestorer(
+                                                firstValueFocus,
+                                            ).focusGroup()
+                                    } else {
+                                        Modifier.tvFocusGroup()
+                                    },
+                                ).then(if (row.multiSelect) Modifier else Modifier.selectableGroup())
+                        },
+                    ),
         ) {
-            val hero = row.hero
-            val icon = row.icon
-            when {
-                hero != null -> hero()
-                icon != null -> TvIllustration(icon = icon)
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(vertical = dimensionResource(TvR.dimen.tv_focus_ring_bleed)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // The spacing between siblings is each item's own top inset, not an arrangement's, because the options sit
+                // closer together than the sections around them do and a lazy column has the one spacing.
+                val hero = row.hero
+                val icon = row.icon
+                val hasHeader = hero != null || icon != null
+                if (hasHeader) {
+                    item(key = "header") {
+                        when {
+                            hero != null -> hero()
+                            icon != null -> TvIllustration(icon = icon)
+                        }
+                    }
+                }
+                item(key = "label") {
+                    Text(
+                        text = row.label,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                        modifier = if (hasHeader) Modifier.padding(top = sectionGap) else Modifier,
+                    )
+                }
+                if (row.body.isNotEmpty()) {
+                    item(key = "body") {
+                        Text(
+                            text = row.body,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(top = sectionGap),
+                        )
+                    }
+                }
+                if (hasOptions) {
+                    itemsIndexed(row.pinnedOptions, key = { index, _ -> "pinned-$index" }) { index, option ->
+                        val inset = if (index == 0) optionsLead else optionGap
+                        PaneOption(option, row.multiSelect, initialFocusedOptionLabel, optionWidth.padding(top = inset))
+                    }
+                    if (routesToFirstValue) {
+                        item(key = "divider") { PinnedDivider(Modifier.padding(top = optionGap)) }
+                    }
+                    itemsIndexed(row.options, key = { index, _ -> "option-$index" }) { index, option ->
+                        val inset = if (index == 0 && row.pinnedOptions.isEmpty()) optionsLead else optionGap
+                        val entry = if (routesToFirstValue && index == 0) Modifier.focusRequester(firstValueFocus) else Modifier
+                        PaneOption(option, row.multiSelect, initialFocusedOptionLabel, optionWidth.padding(top = inset).then(entry))
+                    }
+                    row.clear?.let { action ->
+                        item(key = "clear") {
+                            TvButton(
+                                label = action.label,
+                                onClick = action.onClick,
+                                enabled = action.enabled,
+                                modifier = optionWidth.padding(top = optionGap),
+                            )
+                        }
+                    }
+                }
+                row.note?.let { note ->
+                    item(key = "note") { PaneNote(note = note, announce = row.announceNote, modifier = Modifier.padding(top = sectionGap)) }
+                }
             }
-            Text(
-                text = row.label,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-            )
-            if (row.body.isNotEmpty()) {
-                Text(
-                    text = row.body,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
-            }
-            if (row.options.isNotEmpty() || row.pinnedOptions.isNotEmpty()) {
-                PaneOptions(
-                    pinnedOptions = row.pinnedOptions,
-                    options = row.options,
-                    multiSelect = row.multiSelect,
-                    clear = row.clear,
-                    backToListFocus = backToListFocus,
-                    initialFocusedOptionLabel = initialFocusedOptionLabel,
-                )
-            }
-            row.note?.let { note -> PaneNote(note = note, announce = row.announceNote) }
-        }
-    }
-}
-
-/**
- * The options, at one fixed width and centred: a pane-wide row would split each label from its tick, and one width
- * for the set makes the options scan as a set. → back into the pane resumes on the option last focused. The column
- * is a selectable group, as [com.binge.designsystem.tv.component.TvOptionGroup]'s is, so a screen reader announces
- * the options as one set and their position in it (#678).
- */
-@Composable
-private fun PaneOptions(
-    pinnedOptions: List<TvPaneOption>,
-    options: List<TvPaneOption>,
-    multiSelect: Boolean,
-    clear: TvPaneAction?,
-    backToListFocus: FocusRequester,
-    initialFocusedOptionLabel: String?,
-) {
-    // Pinned options are controls, so a first → into the pane lands on the first value, one ↑ from them. Re-entry still
-    // resumes on the option last focused: the restorer falls back to the first value only when nothing was saved.
-    val routesToFirstValue = pinnedOptions.isNotEmpty() && options.isNotEmpty()
-    val firstValueFocus = remember { FocusRequester() }
-    Column(
-        modifier =
-            Modifier
-                .width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
-                .padding(top = dimensionResource(DesR.dimen.padding_s))
-                .focusProperties { left = backToListFocus }
-                .then(if (routesToFirstValue) Modifier.focusRestorer(firstValueFocus).focusGroup() else Modifier.tvFocusGroup())
-                .then(if (multiSelect) Modifier else Modifier.selectableGroup()),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
-    ) {
-        pinnedOptions.forEach { option -> PaneOption(option, multiSelect, initialFocusedOptionLabel) }
-        if (pinnedOptions.isNotEmpty() && options.isNotEmpty()) PinnedDivider()
-        options.forEachIndexed { index, option ->
-            val entry = if (routesToFirstValue && index == 0) Modifier.focusRequester(firstValueFocus) else Modifier
-            PaneOption(option, multiSelect, initialFocusedOptionLabel, entry)
-        }
-        clear?.let { action ->
-            TvButton(
-                label = action.label,
-                onClick = action.onClick,
-                enabled = action.enabled,
-                modifier = Modifier.fillMaxWidth(),
-            )
         }
     }
 }
 
 /** The pane's closing note, read politely when [announce] says it reports an outcome. */
 @Composable
-private fun PaneNote(note: String, announce: Boolean) {
+private fun PaneNote(
+    note: String,
+    announce: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Text(
         text = note,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
         modifier =
-            Modifier
+            modifier
                 .padding(top = dimensionResource(DesR.dimen.padding_xs))
                 .then(if (announce) Modifier.semantics { liveRegion = LiveRegionMode.Polite } else Modifier),
     )
@@ -195,11 +216,11 @@ private fun PaneOption(
 
 /** The line between the pinned options and the options, so a control is not mistaken for one of the values. */
 @Composable
-private fun PinnedDivider() {
+private fun PinnedDivider(modifier: Modifier = Modifier) {
     Box(
         modifier =
-            Modifier
-                .fillMaxWidth()
+            modifier
+                .width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
                 .padding(vertical = dimensionResource(DesR.dimen.padding_s))
                 .height(dimensionResource(DesR.dimen.hairline_thickness))
                 .background(MaterialTheme.colorScheme.border),
