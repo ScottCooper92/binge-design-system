@@ -12,6 +12,8 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.tv.focus.TvArrivalFocusEffect
+import com.binge.designsystem.tv.focus.rememberTvArrivalFocus
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -72,6 +74,27 @@ class TvChoiceRowTraversalTest {
         press(Key.DirectionCenter)
 
         assertEquals("Re-pressing the chosen option must commit nothing, but committed $committed", emptyList<String>(), committed)
+    }
+
+    /** A page that aims focus at the row lands on the chosen option, not the first, as a tab row does. */
+    @Test
+    fun `arrival lands on the chosen option`() {
+        composeTestRule.setContent {
+            BingeTvTheme {
+                val arrival = rememberTvArrivalFocus()
+                TvArrivalFocusEffect(arrival)
+                TvChoiceRow(
+                    choices = listOf(TvChoiceUi(MOVIES, MOVIES_LABEL), TvChoiceUi(TV, TV_LABEL)),
+                    selectedKey = TV,
+                    onSelect = { committed += it },
+                    arrival = arrival,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        option(TV_LABEL).assertIsFocused()
+        assertEquals("Landing on the chosen option must commit nothing, but committed $committed", emptyList<String>(), committed)
     }
 
     private fun setChoiceRow() {
