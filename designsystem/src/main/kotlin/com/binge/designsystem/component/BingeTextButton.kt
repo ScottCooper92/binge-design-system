@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -26,7 +27,7 @@ import com.binge.designsystem.theme.BingeShapes
 /**
  * Borderless counterpart of [BingeOutlinedButton], sharing its loading contract.
  *
- * [destructive] names what a caller otherwise says by passing an error [contentColor]: this control
+ * [destructive] names what a caller otherwise says by passing error [colors]: this control
  * commits or opens something irreversible. Naming it keeps the colour in one place, and keeps the
  * next destructive button from quietly defaulting to `primary` — which is how a repository ends up
  * with an error-toned confirmation behind a neutral trigger.
@@ -50,7 +51,9 @@ fun BingeTextButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     destructive: Boolean = false,
-    contentColor: Color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(
+        contentColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+    ),
 ) {
     require(showLabel || leadingIcon != null) {
         "BingeTextButton needs a leadingIcon to carry the accessible name when showLabel is false"
@@ -62,12 +65,12 @@ fun BingeTextButton(
         modifier = modifier.defaultMinSize(minHeight = dimensionResource(R.dimen.button_filled_height)),
         shape = BingeShapes.Medium,
         enabled = enabled,
-        colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
+        colors = colors,
     ) {
         if (loading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                color = contentColor,
+                color = colors.contentColor,
                 strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
             )
         } else {
@@ -98,6 +101,41 @@ fun BingeTextButton(
     }
 }
 
+/** [BingeTextButton] under its old colour override, `contentColor`; see the deprecated [BingeOutlinedButton]. */
+@Deprecated(
+    message = "Renamed: contentColor is colors, a ButtonColors.",
+    replaceWith = ReplaceWith(
+        "BingeTextButton(label, onClick, modifier, leadingIcon, trailingIcon, showLabel, enabled, loading, destructive, " +
+            "colors = ButtonDefaults.textButtonColors(contentColor = contentColor))",
+        "androidx.compose.material3.ButtonDefaults",
+    ),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun BingeTextButton(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    leadingIcon: ImageVector? = null,
+    trailingIcon: ImageVector? = null,
+    showLabel: Boolean = true,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    destructive: Boolean = false,
+    contentColor: Color,
+) = BingeTextButton(
+    label = label,
+    onClick = onClick,
+    modifier = modifier,
+    leadingIcon = leadingIcon,
+    trailingIcon = trailingIcon,
+    showLabel = showLabel,
+    enabled = enabled,
+    loading = loading,
+    destructive = destructive,
+    colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
+)
+
 @Preview(showBackground = true)
 @Composable
 private fun PreviewBingeTextButton() {
@@ -114,7 +152,7 @@ private fun PreviewBingeTextButtonWithIcon() {
             label = "Block this title",
             onClick = {},
             leadingIcon = Icons.Filled.Block,
-            contentColor = MaterialTheme.colorScheme.error,
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
         )
     }
 }
@@ -140,7 +178,7 @@ private fun PreviewBingeTextButtonIconOnly() {
             onClick = {},
             leadingIcon = Icons.Filled.Block,
             showLabel = false,
-            contentColor = MaterialTheme.colorScheme.error,
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
         )
     }
 }
@@ -152,7 +190,7 @@ private fun PreviewBingeTextButtonError() {
         BingeTextButton(
             label = "Cancel request",
             onClick = {},
-            contentColor = MaterialTheme.colorScheme.error,
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
         )
     }
 }
