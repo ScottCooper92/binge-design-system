@@ -30,10 +30,10 @@ fun DiscoverQuickClearChipSample() {
     ScreenshotTheme {
         Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
             if (showAction) {
-                DiscoverQuickClearChip(label = "Action", tone = QuickClearTone.Include, onClear = { showAction = false })
+                DiscoverQuickClearChip(label = "Action", tone = QuickClearTone.Include, onClick = { showAction = false })
             }
             if (showHorror) {
-                DiscoverQuickClearChip(label = "Horror", tone = QuickClearTone.Exclude, onClear = { showHorror = false })
+                DiscoverQuickClearChip(label = "Horror", tone = QuickClearTone.Exclude, onClick = { showHorror = false })
             }
             if (!showAction && !showHorror) {
                 TextButton(onClick = {

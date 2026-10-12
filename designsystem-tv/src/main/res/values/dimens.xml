@@ -135,6 +135,16 @@
     <!-- A group header's labelMedium line, which the skeleton's header plate stands in for -->
     <dimen name="tv_list_pane_group_header_height">16dp</dimen>
     <dimen name="tv_list_pane_option_width">280dp</dimen>
+    <!-- A list row's leading icon, plain in the row's content colour: no plate, so it costs the label as little width as it can -->
+    <dimen name="tv_list_pane_row_icon">24dp</dimen>
+    <!-- The slot ListItem gives leading content, in which the icon sits centred, then the gap after the slot; and a row
+         with an icon's height. The label starts 56dp in: 16dp padding, the 32dp slot and the 8dp gap. -->
+    <dimen name="tv_list_pane_row_icon_slot">32dp</dimen>
+    <dimen name="tv_list_pane_row_icon_gap">8dp</dimen>
+    <dimen name="tv_list_item_icon_height">56dp</dimen>
+    <!-- A list row's trailing spinner while its value loads, and the arc's stroke at that size -->
+    <dimen name="tv_list_pane_row_spinner">20dp</dimen>
+    <dimen name="tv_list_pane_row_spinner_stroke">2.5dp</dimen>
     <dimen name="tv_list_pane_skeleton_line_height">28dp</dimen>
     <!-- A row's supporting line, which the skeleton's second bar stands in for -->
     <dimen name="tv_list_pane_skeleton_detail_height">16dp</dimen>

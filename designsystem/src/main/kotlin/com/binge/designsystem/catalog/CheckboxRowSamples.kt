@@ -102,6 +102,23 @@ fun CheckboxRowLongLabelSample() {
     }
 }
 
+/** A row whose second line has to be read in full: [supportingMaxLines] lets it take three lines, ellipsized after that. */
+@Composable
+fun CheckboxRowSupportingLinesSample() {
+    var checked by remember { mutableStateOf(false) }
+    ScreenshotTheme {
+        CheckboxRow(
+            label = "Email a generated password",
+            supportingText = "Needs the application URL and email notifications set up on the server, or the new user cannot " +
+                "sign in with the password that is sent. Set both under General and Notifications first.",
+            supportingMaxLines = 3,
+            checked = checked,
+            onCheckedChange = { checked = it },
+            icon = Icons.Filled.Tv,
+        )
+    }
+}
+
 /** A checklist of people: each row carries the person's avatar between the checkbox and the name. */
 @Composable
 fun CheckboxRowPeopleSample() {

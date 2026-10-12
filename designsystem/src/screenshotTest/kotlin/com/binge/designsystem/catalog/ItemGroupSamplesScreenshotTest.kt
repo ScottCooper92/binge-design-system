@@ -48,7 +48,7 @@ class ItemGroupSamplesScreenshotTest {
         ItemGroupActionSample()
     }
 
-    /** [ListItem.loading] on the acting row and [ListItem.disabled] on the one it blocks. */
+    /** [ListItem.loading] on the acting row and [ListItem.enabled] on the one it blocks. */
     @PreviewTest
     @ComponentPreviews
     @Composable
@@ -116,6 +116,13 @@ class ItemGroupSamplesScreenshotTest {
     @Composable
     fun longLabels() {
         ItemGroupLongLabelSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun supportingLines() {
+        ItemGroupSupportingLinesSample()
     }
 
     /** [ListItem.expanded] rows: one open, one closed. */

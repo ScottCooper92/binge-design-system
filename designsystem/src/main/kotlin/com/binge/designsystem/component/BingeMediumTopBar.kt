@@ -88,6 +88,8 @@ import com.binge.designsystem.theme.BingeTheme
  * [edgeInset] gives back and [actions] the same breathing room from both edges that
  * [DetailOverlayTopBar]'s own `horizontalInset` gives its row, rather than M3's tighter built-in
  * edge padding.
+ *
+ * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

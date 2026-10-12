@@ -66,7 +66,7 @@ fun DiscoverEntryRow(
             ),
         ),
         leading = { DiscoverEntryGlyph() },
-        trailing = {
+        trailingContent = {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,

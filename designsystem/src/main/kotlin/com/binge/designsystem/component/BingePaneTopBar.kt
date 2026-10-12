@@ -61,6 +61,8 @@ fun rememberPaneTopBarScrollBehavior(): TopAppBarScrollBehavior = TopAppBarDefau
  * and nothing else. So are the defaults: the gallery chrome, a [Color.Transparent] bar the content scrolls under
  * with its scrim fading in on the [scrollBehavior]'s `collapsedFraction`. Pass `containerColor = Color.Unspecified`
  * for an opaque bar on the app background.
+ *
+ * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

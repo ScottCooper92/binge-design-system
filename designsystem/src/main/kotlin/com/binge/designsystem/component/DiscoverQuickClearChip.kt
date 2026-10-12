@@ -32,7 +32,7 @@ import com.binge.designsystem.theme.BingeShapes
 fun DiscoverQuickClearChip(
     label: String,
     tone: QuickClearTone,
-    onClear: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shape = BingeShapes.Pill
@@ -62,7 +62,7 @@ fun DiscoverQuickClearChip(
             .clip(shape)
             .background(backgroundColor)
             .border(BorderStroke(dimensionResource(R.dimen.hairline_thickness), borderColor), shape)
-            .clickable(role = Role.Button, onClick = onClear)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(
                 start = dimensionResource(R.dimen.discover_quickclear_chip_padding_start),
                 end = dimensionResource(R.dimen.discover_quickclear_chip_padding_end),
@@ -94,11 +94,29 @@ fun DiscoverQuickClearChip(
     }
 }
 
+/**
+ * [DiscoverQuickClearChip] under its old name for the tap, `onClear`; it is `onClick` now, as on every other chip.
+ * Kotlin cannot hold two overloads that differ only in parameter names, so this one takes `onClear` ahead of `tone`.
+ * Call it by name, as the old signature was.
+ */
+@Deprecated(
+    message = "Renamed: onClear is onClick.",
+    replaceWith = ReplaceWith("DiscoverQuickClearChip(label, tone, onClick = onClear, modifier = modifier)"),
+)
+@Suppress("ModifierParameter")
+@Composable
+fun DiscoverQuickClearChip(
+    label: String,
+    onClear: () -> Unit,
+    tone: QuickClearTone,
+    modifier: Modifier = Modifier,
+) = DiscoverQuickClearChip(label = label, tone = tone, onClick = onClear, modifier = modifier)
+
 @Preview(showBackground = true)
 @Composable
 private fun PreviewDiscoverQuickClearChipInclude() {
     BingeExpressiveTheme {
-        DiscoverQuickClearChip(label = "Action", tone = QuickClearTone.Include, onClear = {})
+        DiscoverQuickClearChip(label = "Action", tone = QuickClearTone.Include, onClick = {})
     }
 }
 
@@ -106,6 +124,6 @@ private fun PreviewDiscoverQuickClearChipInclude() {
 @Composable
 private fun PreviewDiscoverQuickClearChipExclude() {
     BingeExpressiveTheme {
-        DiscoverQuickClearChip(label = "Horror", tone = QuickClearTone.Exclude, onClear = {})
+        DiscoverQuickClearChip(label = "Horror", tone = QuickClearTone.Exclude, onClick = {})
     }
 }

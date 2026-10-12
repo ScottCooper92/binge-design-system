@@ -130,7 +130,7 @@ private fun ListItemView(
     verticalPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val interactive = row.clickable && !row.loading && !row.disabled
+    val interactive = row.clickable && !row.loading && row.enabled
     val external = interactive && row.switchState == null && row.trailingContent == null && row.destination == ListItemDestination.External
     val externalDescription = stringResource(R.string.cd_list_item_external)
     val loadingDescription = stringResource(R.string.cd_list_item_loading)
@@ -139,7 +139,7 @@ private fun ListItemView(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .alpha(if (row.disabled) DISABLED_ALPHA else 1f)
+            .alpha(if (row.enabled) 1f else DISABLED_ALPHA)
             .semantics {
                 selected = row.selected
                 if (row.loading) stateDescription = loadingDescription
@@ -198,7 +198,7 @@ private fun ListItemView(
             Text(
                 text = row.label,
                 style = MaterialTheme.typography.titleMedium,
-                color = if (row.destination == ListItemDestination.Action && !row.disabled) {
+                color = if (row.destination == ListItemDestination.Action && row.enabled) {
                     row.iconTint ?: MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onSurface
@@ -210,7 +210,7 @@ private fun ListItemView(
                     text = row.detail,
                     style = MaterialTheme.typography.bodySmall,
                     color = row.detailColor ?: MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = row.supportingMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

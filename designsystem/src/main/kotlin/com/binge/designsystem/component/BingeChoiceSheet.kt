@@ -63,7 +63,7 @@ import com.binge.designsystem.R
 import kotlinx.coroutines.launch
 
 /**
- * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [supportingText], one line of what the choice does. A
+ * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [supportingText], a line of what the choice does, held to [supportingMaxLines] lines (one by default). A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
  * language code. The mark sits on a plate tinted [iconTint], `primary` when it is null. A choice that is a person
  * carries [avatarName] instead, drawn as their avatar from [avatarUrl], with their initials while it loads or when
@@ -81,6 +81,8 @@ data class BingeChoice<out T>(
     val avatarUrl: String? = null,
     val trailingText: String? = null,
     val iconTint: Color? = null,
+    /** How many lines [supportingText] may take before it ends in an ellipsis; raise it for a line that has to be read in full. */
+    val supportingMaxLines: Int = 1,
 ) {
     /**
      * [BingeChoice] built with its old `subtitle` name. Required, and last, because Kotlin cannot hold a second
@@ -291,7 +293,7 @@ fun <T> BingeMultiChoiceSheet(
             chosen = draft,
             leading = openedWith,
             filterPlaceholder = filterPlaceholder,
-            onToggle = { value, on -> pick(if (on) draft + value else draft - value) },
+            onCheckedChange = { value, on -> pick(if (on) draft + value else draft - value) },
             underNavigationBar = partWay,
             suggested = suggested,
             pinned = pinned,
@@ -341,8 +343,7 @@ fun <T> bingeChoiceItem(
         icon = icon,
         label = title,
         detail = detail,
-        clickable = enabled,
-        disabled = !enabled,
+        enabled = enabled,
         onClick = { open = true },
     )
 }
@@ -400,8 +401,7 @@ fun <T> bingeMultiChoiceItem(
         icon = icon,
         label = title,
         detail = chosen.ifEmpty { emptyLabel },
-        clickable = enabled,
-        disabled = !enabled,
+        enabled = enabled,
         onClick = { open = true },
     )
 }
@@ -436,7 +436,7 @@ fun <T> BingeChoiceSheetContent(
 /**
  * A [BingeMultiChoiceSheet]'s body without its modal window, for a `@PreviewTest` frame or a sheet of the caller's own:
  * the title with [clearLabel] (and [doneLabel], when given) at the end, an optional filter, then the checkbox rows ticked
- * where in [chosen]. It holds no draft: each tick calls [onToggle], and Clear and Done call [onClear] and [onDone].
+ * where in [chosen]. It holds no draft: each tick calls [onCheckedChange], and Clear and Done call [onClear] and [onDone].
  * [leading] is the selection that comes first, as on the sheet; it defaults to [chosen], which suits a frame. A live
  * caller passes the selection the content opened with, so a row does not jump when ticked. Like
  * [BingeChoiceSheetContent], it draws no surface, its header does not dock, and `dragHandle = false` drops the handle
@@ -447,7 +447,7 @@ fun <T> BingeMultiChoiceSheetContent(
     title: String,
     choices: BingeChoiceList<T>,
     chosen: Set<T>,
-    onToggle: (value: T, ticked: Boolean) -> Unit,
+    onCheckedChange: (value: T, checked: Boolean) -> Unit,
     clearLabel: String,
     onClear: () -> Unit,
     modifier: Modifier = Modifier,
@@ -475,12 +475,67 @@ fun <T> BingeMultiChoiceSheetContent(
             chosen = chosen,
             leading = leading,
             filterPlaceholder = filterPlaceholder,
-            onToggle = onToggle,
+            onCheckedChange = onCheckedChange,
             suggested = suggested,
             pinned = pinned,
         )
     }
 }
+
+/**
+ * [BingeMultiChoiceSheetContent] under its old name for the tick callback, `onToggle`; it is `onCheckedChange` now, as on
+ * the checkbox rows. Kotlin cannot hold two overloads that differ only in parameter names, so this one takes
+ * `onToggle` after [onClear], where `onCheckedChange` sat before [clearLabel]. Call it by name, as the old signature
+ * was.
+ */
+@Deprecated(
+    message = "Renamed: onToggle is onCheckedChange.",
+    replaceWith = ReplaceWith(
+        "BingeMultiChoiceSheetContent(title, choices, chosen, onCheckedChange = onToggle, clearLabel = clearLabel, " +
+            "onClear = onClear, modifier = modifier, doneLabel = doneLabel, onDone = onDone, " +
+            "filterPlaceholder = filterPlaceholder, leading = leading, suggested = suggested, pinned = pinned, " +
+            "actions = actions, dragHandle = dragHandle, subtitle = subtitle, caption = caption)",
+    ),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun <T> BingeMultiChoiceSheetContent(
+    title: String,
+    choices: BingeChoiceList<T>,
+    chosen: Set<T>,
+    clearLabel: String,
+    onClear: () -> Unit,
+    onToggle: (value: T, ticked: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    doneLabel: String? = null,
+    onDone: () -> Unit = {},
+    filterPlaceholder: String? = null,
+    leading: Set<T> = chosen,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    actions: @Composable RowScope.() -> Unit = {},
+    dragHandle: Boolean = true,
+    subtitle: String? = null,
+    caption: String? = null,
+) = BingeMultiChoiceSheetContent(
+    title = title,
+    choices = choices,
+    chosen = chosen,
+    onCheckedChange = onToggle,
+    clearLabel = clearLabel,
+    onClear = onClear,
+    modifier = modifier,
+    doneLabel = doneLabel,
+    onDone = onDone,
+    filterPlaceholder = filterPlaceholder,
+    leading = leading,
+    suggested = suggested,
+    pinned = pinned,
+    actions = actions,
+    dragHandle = dragHandle,
+    subtitle = subtitle,
+    caption = caption,
+)
 
 /** A choice sheet's top as it rests, undocked: the drag handle over [header]. */
 @Composable
@@ -591,7 +646,7 @@ internal fun <T> MultiChoiceList(
     chosen: Set<T>,
     leading: Set<T>,
     filterPlaceholder: String?,
-    onToggle: (T, Boolean) -> Unit,
+    onCheckedChange: (T, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     initialQuery: String = "",
     imeVisible: Boolean = WindowInsets.isImeVisible,
@@ -639,7 +694,7 @@ internal fun <T> MultiChoiceList(
                     choice.value in chosen,
                     markSlot,
                     clearOfRail,
-                ) { on -> onToggle(choice.value, on) }
+                ) { on -> onCheckedChange(choice.value, on) }
             }
             return@Column
         }
@@ -653,14 +708,15 @@ internal fun <T> MultiChoiceList(
                         choice.value in chosen,
                         markSlot = true,
                         clearOfRail = false,
-                    ) { on -> onToggle(choice.value, on) }
+                    ) { on -> onCheckedChange(choice.value, on) }
                 } else {
                     CheckboxRow(
                         label = choice.label,
                         supportingText = choice.supportingText,
+                        supportingMaxLines = choice.supportingMaxLines,
                         trailingContent = choice.trailingText?.let { text -> { ChoiceTrailingText(text) } },
                         checked = choice.value in chosen,
-                        onCheckedChange = { on -> onToggle(choice.value, on) },
+                        onCheckedChange = { on -> onCheckedChange(choice.value, on) },
                         showDivider = index < shown.lastIndex,
                     )
                 }
@@ -765,7 +821,7 @@ private fun <T> RadioChoiceRow(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = choice.supportingMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -937,7 +993,7 @@ private fun <T> CheckChoiceRow(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = choice.supportingMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="tv_pane_row_badge_count">
+        <item quantity="one">%1$d novedad</item>
+        <item quantity="many">%1$d de novedades</item>
+        <item quantity="other">%1$d novedades</item>
+    </plurals>
+    <string name="tv_pane_row_badge_alert">Requiere atención</string>
+</resources>

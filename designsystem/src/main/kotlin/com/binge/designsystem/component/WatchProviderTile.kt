@@ -43,7 +43,7 @@ private const val CHECK_POP_INITIAL_SCALE = 0.7f
  * Square watch-provider tile with logo, selection border, and a pop-in check badge.
  * One cell of a provider-picking screen's grid.
  *
- * [provider] supplies id/name/logo metadata. Toggle semantics use [Role.Checkbox].
+ * [provider] supplies id/name/logo metadata. Toggle semantics use [Role.Checkbox], and [onCheckedChange] is told the state the tap asks for.
  * Reduce-motion safe: the check badge fades rather than scales and the selection
  * lift snaps instead of springing under [LocalReduceMotion].
  */
@@ -51,7 +51,7 @@ private const val CHECK_POP_INITIAL_SCALE = 0.7f
 fun WatchProviderTile(
     provider: WatchProviderUi,
     selected: Boolean,
-    onToggle: () -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tileShape = BingeShapes.Large
@@ -73,7 +73,7 @@ fun WatchProviderTile(
             ).toggleable(
                 value = selected,
                 role = Role.Checkbox,
-                onValueChange = { onToggle() },
+                onValueChange = onCheckedChange,
             ),
     ) {
         SubcomposeAsyncImage(
@@ -113,6 +113,24 @@ fun WatchProviderTile(
         }
     }
 }
+
+/**
+ * [WatchProviderTile] under its old callback, `onToggle`, which took no argument; it is `onCheckedChange` now and is
+ * told the state the tap asks for, as on every other toggle. Kotlin cannot hold two overloads that differ only in the
+ * parameter's name, and a lambda with no parameter fits either type, so call this one with `onToggle` by name.
+ */
+@Deprecated(
+    message = "Renamed: onToggle is onCheckedChange, which receives the new state.",
+    replaceWith = ReplaceWith("WatchProviderTile(provider, selected, onCheckedChange = { onToggle() }, modifier = modifier)"),
+)
+@Suppress("ModifierParameter")
+@Composable
+fun WatchProviderTile(
+    provider: WatchProviderUi,
+    selected: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) = WatchProviderTile(provider = provider, selected = selected, onCheckedChange = { onToggle() }, modifier = modifier)
 
 /** Brand identity shown when the logo image is loading or fails to render. */
 @Composable

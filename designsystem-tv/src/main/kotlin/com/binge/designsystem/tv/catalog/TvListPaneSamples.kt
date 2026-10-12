@@ -3,13 +3,17 @@
 package com.binge.designsystem.tv.catalog
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Hd
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.filled.Theaters
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +47,10 @@ private const val LANGUAGE_SPANISH = "Spanish"
 private const val LANGUAGE_FRENCH = "French"
 private const val QUALITY_HD = "1080p"
 private const val QUALITY_UHD = "4K"
+private const val STATUS_LOADING_ROW = 1
+private const val STATUS_ALERT_ROW = 2
+private const val STATUS_COUNT_ROW = 3
+private const val STATUS_COUNT = 3
 
 /** Settings as a list-and-pane board, focus on the described row: the full fill in the list, its options beside it. */
 @Composable
@@ -57,6 +65,38 @@ fun TvListPaneBoardSample() {
 @Composable
 fun TvListPaneBoardPaneFocusedSample() {
     SampleBoard(initialListHasFocus = false, initialFocusedOptionLabel = QUALITY_UHD)
+}
+
+/**
+ * Rows with their state at the end of the line: one whose value is loading, one that needs attention and one with
+ * something waiting. Each leads with its icon, and each label gives way to the mark rather than wrapping.
+ */
+@Composable
+fun TvListPaneBoardRowStatusSample() {
+    StatusBoard(
+        title = "Settings",
+        groupTitle = "Preferences",
+        labels = listOf("Sound effects", "Share analytics data", "Send crash reports", "Companion apps"),
+    )
+}
+
+/**
+ * The same rows with the longest labels a settings board ships: two Spanish and two pseudo-accented, at about the
+ * length the en-XA pseudolocale gives them. They show where a label ellipsizes against its icon and its mark.
+ */
+@Composable
+fun TvListPaneBoardRowStatusLongLabelsSample() {
+    StatusBoard(
+        title = "Ajustes",
+        groupTitle = "Preferencias",
+        labels =
+            listOf(
+                "Política de privacidad",
+                "Compartir datos de análisis",
+                "[Šéñð çŕåšĥ ŕéþöŕţš one two]",
+                "[Çömþåñîöñ åþþš one two three]",
+            ),
+    )
 }
 
 /** The board while it loads: the title, a column of row placeholders and the pane, where the board puts them. */
@@ -77,6 +117,12 @@ fun TvListPaneBoardSkeletonGroupNoteSample() {
     TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay, groupNote = true)
 }
 
+/** The skeleton for a board whose rows lead with an icon: each placeholder reserves the icon's slot, so the labels do not move. */
+@Composable
+fun TvListPaneBoardSkeletonRowIconSample() {
+    TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay, rowIcon = true)
+}
+
 /**
  * A filter panel on the same board: filters in the list, each showing what it has applied under its name, and the values of
  * the described filter beside it as checkboxes with no description above them. A clear button sits under the
@@ -91,6 +137,36 @@ fun TvListPaneFilterBoardSample() {
 @Composable
 fun TvListPaneFilterBoardPaneFocusedSample() {
     SampleFilterBoard(initialListHasFocus = false, initialFocusedOptionLabel = GENRE_COMEDY)
+}
+
+@Composable
+private fun StatusBoard(
+    title: String,
+    groupTitle: String,
+    labels: List<String>,
+) {
+    var focusedKey by remember { mutableStateOf(labels.first()) }
+    val icons = listOf(Icons.Filled.VolumeUp, Icons.Filled.Analytics, Icons.Filled.BugReport, Icons.Filled.Apps)
+    val rows =
+        labels.zip(icons).mapIndexed { index, (label, rowIcon) ->
+            TvPaneRow(
+                key = label,
+                label = label,
+                body = "What this setting changes.",
+                icon = rowIcon,
+                loading = index == STATUS_LOADING_ROW,
+                badgeAlert = index == STATUS_ALERT_ROW,
+                badgeCount = if (index == STATUS_COUNT_ROW) STATUS_COUNT else null,
+            )
+        }
+    TvListPaneBoard(
+        title = title,
+        groups = listOf(TvPaneGroup(title = groupTitle, rows = rows)),
+        focusedKey = focusedKey,
+        onFocusRow = { focusedKey = it },
+        hosting = TvPageHosting.Overlay,
+        initialListHasFocus = true,
+    )
 }
 
 @Composable

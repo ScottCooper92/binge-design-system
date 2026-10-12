@@ -106,6 +106,13 @@ class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun SupportingLines() {
+        BingeChoiceSheetSupportingLinesSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun Counts() {
         BingeChoiceSheetCountsSample()
     }

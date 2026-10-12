@@ -48,6 +48,18 @@ object TvLayoutAnchors {
      * any of them moves this row.
      */
     const val LIST_PANE_FIRST_ROW: String = "${PREFIX}list-pane-first-row"
+
+    /**
+     * The icon on a list-and-pane board's first row, which the skeleton's icon block stands in for. Where it starts
+     * across the row is what the row's leading slot and padding decide, so a drift in either moves it.
+     */
+    const val LIST_PANE_FIRST_ROW_ICON: String = "${PREFIX}list-pane-first-row-icon"
+
+    /**
+     * The label on a list-and-pane board's first row, which the skeleton's label bar stands in for. Where it starts
+     * across the row is what the padding, the icon's slot and the gap after it decide.
+     */
+    const val LIST_PANE_FIRST_ROW_LABEL: String = "${PREFIX}list-pane-first-row-label"
 }
 
 /**
