@@ -14,6 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
@@ -24,9 +26,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.focus.TvArrivalFocus
+import com.binge.designsystem.tv.focus.tvArrivalTarget
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
+import com.binge.designsystem.tv.focus.tvSelectionFocusGroup
+import com.binge.designsystem.tv.focus.tvSelectionTarget
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -39,6 +45,9 @@ import com.binge.designsystem.tv.R as TvR
  * no-op, guarded here so no caller has to remember to. The pills sit side by side, so they carry no second line;
  * [TvOptionRow] is the stacked form that does. [initialFocusedKey] seeds one option as focused for a frame;
  * production passes null.
+ *
+ * [entryFocusRequester] and [arrival] let a page aim focus at the row, as [TvTabRow]'s do: the request lands on the
+ * chosen option, and so does focus entering the row from outside. Without either, entry is the ordinary search.
  */
 @Composable
 fun TvChoiceRow(
@@ -47,9 +56,19 @@ fun TvChoiceRow(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
     initialFocusedKey: String? = null,
+    entryFocusRequester: FocusRequester? = null,
+    arrival: TvArrivalFocus? = null,
 ) {
+    val selectedEntry = remember { FocusRequester() }
+    val aimed = entryFocusRequester != null || arrival != null
     Row(
-        modifier = modifier.selectableGroup(),
+        modifier =
+            modifier
+                .selectableGroup()
+                // Outside the group, so a request aimed at the row lands in it and is routed to the chosen option.
+                .then(entryFocusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+                .then(arrival?.let { Modifier.tvArrivalTarget(it) } ?: Modifier)
+                .then(if (aimed) Modifier.tvSelectionFocusGroup(selectedEntry) else Modifier),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
@@ -61,6 +80,7 @@ fun TvChoiceRow(
                 initiallyFocused = choice.key == initialFocusedKey,
                 onSelect = { if (!isSelected) onSelect(choice.key) },
                 icon = choice.icon,
+                modifier = Modifier.tvSelectionTarget(isSelected, selectedEntry),
             )
         }
     }
@@ -89,12 +109,13 @@ private fun TvChoice(
     initiallyFocused: Boolean,
     onSelect: () -> Unit,
     icon: ImageVector? = null,
+    modifier: Modifier = Modifier,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val contentColor = tvFocusContentColor(isFocused = focused, resting = MaterialTheme.colorScheme.onSurfaceVariant)
     Row(
         modifier =
-            Modifier
+            modifier
                 .height(dimensionResource(TvR.dimen.tv_button_height))
                 .clip(BingeShapes.Pill)
                 .tvFocusFill(isFocused = focused, shape = BingeShapes.Pill)
