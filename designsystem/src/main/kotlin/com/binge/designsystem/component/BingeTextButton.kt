@@ -100,7 +100,6 @@ fun BingeTextButton(
     }
 }
 
-/** [BingeTextButton] under its old colour override, `contentColor`; see the deprecated [BingeOutlinedButton]. */
 @Preview(showBackground = true)
 @Composable
 private fun PreviewBingeTextButton() {

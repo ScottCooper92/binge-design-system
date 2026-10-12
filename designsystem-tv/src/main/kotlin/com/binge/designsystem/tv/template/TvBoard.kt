@@ -82,5 +82,3 @@ fun TvScreenHeading(
         trailingContent?.invoke(this)
     }
 }
-
-/** [TvScreenHeading] under its old name for the end slot, `trailing`; see the deprecated [TvBoard]. */

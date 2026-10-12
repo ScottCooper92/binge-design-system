@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** The chips' taps are `onClick` and `onLongClick`; the old names still work by name, and a positional call is not ambiguous. */
+/** The chips' taps are `onClick` and `onLongClick`, and a positional call with four arguments resolves. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class ChipClickNamesTest {
