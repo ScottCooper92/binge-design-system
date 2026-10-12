@@ -3,10 +3,12 @@ package com.binge.designsystem.tv.template
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,6 +40,8 @@ private const val PANE_TITLE_WIDTH_FRACTION = 0.6f
  * current value under their name: a row with one is taller, so a one-line skeleton would move the rows when it resolves.
  * [groupNote] reserves a note line under the first group's title, for a board whose first group carries a
  * [TvPaneGroup.note]: the note pushes the first row down, so a skeleton without it would move the rows when it resolves.
+ * [rowIcon] reserves each row's leading icon, for a board whose rows carry a [TvPaneRow.icon]: the icon takes the row's
+ * start and a little height, so the label bars would otherwise sit left of where the labels land.
  */
 @Composable
 fun TvListPaneBoardSkeleton(
@@ -49,6 +53,7 @@ fun TvListPaneBoardSkeleton(
     description: String? = null,
     rowDetail: Boolean = false,
     groupNote: Boolean = false,
+    rowIcon: Boolean = false,
 ) {
     TvTwoPanePage(
         title = title,
@@ -57,7 +62,7 @@ fun TvListPaneBoardSkeleton(
         style = TvTwoPaneStyle.Board,
         hosting = hosting,
         actionScrolls = false,
-        copy = { ListSkeleton(rows = rows, rowDetail = rowDetail, groupNote = groupNote) },
+        copy = { ListSkeleton(rows = rows, rowDetail = rowDetail, groupNote = groupNote, rowIcon = rowIcon) },
         action = { PaneSkeleton(options = options) },
     )
 }
@@ -68,6 +73,7 @@ private fun ListSkeleton(
     rows: Int,
     rowDetail: Boolean,
     groupNote: Boolean,
+    rowIcon: Boolean,
 ) {
     Column(
         modifier =
@@ -81,27 +87,48 @@ private fun ListSkeleton(
         repeat(rows) { index ->
             // A label bar in the row's full footprint rather than a plate filling it: the board's rows are transparent
             // until focused, so a filled plate would read as a dense block.
-            Column(
+            val height =
+                when {
+                    rowDetail -> TvR.dimen.tv_list_item_two_line_height
+                    rowIcon -> TvR.dimen.tv_list_item_icon_height
+                    else -> TvR.dimen.tv_list_item_height
+                }
+            Row(
                 modifier =
                     Modifier
                         .tvListPaneFirstRowAnchor(index == 0)
                         .fillMaxWidth()
-                        .height(
-                            dimensionResource(if (rowDetail) TvR.dimen.tv_list_item_two_line_height else TvR.dimen.tv_list_item_height),
-                        ).padding(start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_gap), Alignment.CenterVertically),
+                        .height(dimensionResource(height))
+                        .padding(start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_icon_gap)),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                TvSkeletonBlock(
-                    Modifier
-                        .fillMaxWidth(ROW_LABEL_WIDTH_FRACTION)
-                        .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_line_height)),
-                )
-                if (rowDetail) {
+                // The icon's leading slot, with the block centred in it where the board draws the icon, so the label bar
+                // starts where the label will.
+                if (rowIcon) {
+                    Box(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon_slot)), contentAlignment = Alignment.Center) {
+                        TvSkeletonBlock(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)), shape = BingeShapes.TvListItem)
+                    }
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(
+                        dimensionResource(TvR.dimen.tv_list_pane_row_gap),
+                        Alignment.CenterVertically,
+                    ),
+                ) {
                     TvSkeletonBlock(
                         Modifier
-                            .fillMaxWidth(ROW_DETAIL_WIDTH_FRACTION)
-                            .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_detail_height)),
+                            .fillMaxWidth(ROW_LABEL_WIDTH_FRACTION)
+                            .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_line_height)),
                     )
+                    if (rowDetail) {
+                        TvSkeletonBlock(
+                            Modifier
+                                .fillMaxWidth(ROW_DETAIL_WIDTH_FRACTION)
+                                .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_detail_height)),
+                        )
+                    }
                 }
             }
         }
