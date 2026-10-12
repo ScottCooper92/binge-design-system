@@ -45,18 +45,37 @@ class TvListPaneBoardSkeletonGeometryTest {
         ) { resolved ->
             BingeTvTheme { if (resolved) Board(detail = "High") else TvListPaneBoardSkeleton(title = TITLE, rowDetail = true) }
         }
+
+    @Test
+    fun `a skeleton for a first group with a note reserves the line the note takes`() =
+        composeTestRule.assertSkeletonReservesGeometry(
+            listOf(TvLayoutAnchors.LIST_PANE_FIRST_ROW),
+            checkStartEdge = true,
+            checkSize = true,
+        ) { resolved ->
+            BingeTvTheme {
+                if (resolved) {
+                    Board(
+                        note = "Applies to every request.",
+                    )
+                } else {
+                    TvListPaneBoardSkeleton(title = TITLE, groupNote = true)
+                }
+            }
+        }
 }
 
 private const val TITLE = "Settings"
 
 @Composable
-private fun Board(detail: String? = null) {
+private fun Board(detail: String? = null, note: String? = null) {
     TvListPaneBoard(
         title = TITLE,
         groups =
             listOf(
                 TvPaneGroup(
                     title = "Playback",
+                    note = note,
                     rows =
                         listOf(
                             TvPaneRow(

@@ -24,6 +24,7 @@ import com.binge.designsystem.tv.R as TvR
 private const val GROUP_TITLE_WIDTH_FRACTION = 0.35f
 private const val ROW_LABEL_WIDTH_FRACTION = 0.7f
 private const val ROW_DETAIL_WIDTH_FRACTION = 0.4f
+private const val GROUP_NOTE_WIDTH_FRACTION = 0.6f
 private const val PANE_TITLE_WIDTH_FRACTION = 0.6f
 
 /**
@@ -35,6 +36,8 @@ private const val PANE_TITLE_WIDTH_FRACTION = 0.6f
  * first of [rows] sits where the board's first row will and carries the same layout anchor. [hosting] is the board's.
  * [description] names the state for a screen reader. [rowDetail] makes each row two lines, for a board whose rows show a
  * current value under their name: a row with one is taller, so a one-line skeleton would move the rows when it resolves.
+ * [groupNote] reserves a note line under the first group's title, for a board whose first group carries a
+ * [TvPaneGroup.note]: the note pushes the first row down, so a skeleton without it would move the rows when it resolves.
  */
 @Composable
 fun TvListPaneBoardSkeleton(
@@ -45,6 +48,7 @@ fun TvListPaneBoardSkeleton(
     options: Int = 2,
     description: String? = null,
     rowDetail: Boolean = false,
+    groupNote: Boolean = false,
 ) {
     TvTwoPanePage(
         title = title,
@@ -53,14 +57,18 @@ fun TvListPaneBoardSkeleton(
         style = TvTwoPaneStyle.Board,
         hosting = hosting,
         actionScrolls = false,
-        copy = { ListSkeleton(rows = rows, rowDetail = rowDetail) },
+        copy = { ListSkeleton(rows = rows, rowDetail = rowDetail, groupNote = groupNote) },
         action = { PaneSkeleton(options = options) },
     )
 }
 
 /** The column, with the board's vertical padding and row gap, so each placeholder sits on its row. */
 @Composable
-private fun ListSkeleton(rows: Int, rowDetail: Boolean) {
+private fun ListSkeleton(
+    rows: Int,
+    rowDetail: Boolean,
+    groupNote: Boolean,
+) {
     Column(
         modifier =
             Modifier
@@ -68,7 +76,8 @@ private fun ListSkeleton(rows: Int, rowDetail: Boolean) {
                 .padding(vertical = dimensionResource(TvR.dimen.tv_focus_ring_bleed)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_gap)),
     ) {
-        GroupTitleSkeleton()
+        GroupTitleSkeleton(hasNote = groupNote)
+        if (groupNote) GroupNoteSkeleton()
         repeat(rows) { index ->
             // A label bar in the row's full footprint rather than a plate filling it: the board's rows are transparent
             // until focused, so a filled plate would read as a dense block.
@@ -104,12 +113,13 @@ private fun ListSkeleton(rows: Int, rowDetail: Boolean) {
  * title will take, so the rows under it do not move when the board arrives.
  */
 @Composable
-private fun GroupTitleSkeleton() {
+private fun GroupTitleSkeleton(hasNote: Boolean) {
     Box(
         modifier =
             Modifier.padding(
                 top = dimensionResource(TvR.dimen.tv_list_pane_group_gap),
-                bottom = dimensionResource(TvR.dimen.tv_list_pane_header_bottom_gap),
+                // With a note, the note carries the gap below, as the board's does.
+                bottom = if (hasNote) dimensionResource(DesR.dimen.zero) else dimensionResource(TvR.dimen.tv_list_pane_header_bottom_gap),
             ),
         contentAlignment = Alignment.CenterStart,
     ) {
@@ -119,6 +129,23 @@ private fun GroupTitleSkeleton() {
                 .padding(start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal))
                 .fillMaxWidth(GROUP_TITLE_WIDTH_FRACTION)
                 .height(dimensionResource(TvR.dimen.tv_list_pane_group_header_height)),
+        )
+    }
+}
+
+/** A group note's stand-in: the empty line of the note's style holds its height, and the bar sits on it. */
+@Composable
+private fun GroupNoteSkeleton() {
+    Box(
+        modifier = Modifier.padding(bottom = dimensionResource(TvR.dimen.tv_list_pane_header_bottom_gap)),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Text(text = "", style = MaterialTheme.typography.bodySmall)
+        TvSkeletonBlock(
+            Modifier
+                .padding(start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal))
+                .fillMaxWidth(GROUP_NOTE_WIDTH_FRACTION)
+                .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_note_height)),
         )
     }
 }
