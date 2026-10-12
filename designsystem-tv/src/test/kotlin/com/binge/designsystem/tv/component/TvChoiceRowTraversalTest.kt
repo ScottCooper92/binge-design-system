@@ -1,6 +1,8 @@
 package com.binge.designsystem.tv.component
 
 import android.app.Application
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsFocused
@@ -11,11 +13,13 @@ import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.TvArrivalFocusEffect
 import com.binge.designsystem.tv.focus.rememberTvArrivalFocus
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,6 +99,29 @@ class TvChoiceRowTraversalTest {
 
         option(TV_LABEL).assertIsFocused()
         assertEquals("Landing on the chosen option must commit nothing, but committed $committed", emptyList<String>(), committed)
+    }
+
+    /** A row narrower than its pills wraps rather than clipping, so the last option is still on screen and reachable. */
+    @Test
+    fun `a narrow row wraps so no option sits past the edge`() {
+        composeTestRule.setContent {
+            BingeTvTheme {
+                TvChoiceRow(
+                    choices = listOf(TvChoiceUi("a", "Local account"), TvChoiceUi("b", "Home media server"), TvChoiceUi("c", "API key")),
+                    selectedKey = "a",
+                    onSelect = {},
+                    modifier = Modifier.width(120.dp),
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        val first = option("Local account").fetchSemanticsNode().boundsInRoot
+        val last = option("API key").fetchSemanticsNode().boundsInRoot
+        assertTrue("the last option should wrap below the first, but sits at ${last.top} against ${first.top}", last.top > first.top)
+        option("API key").requestFocus()
+        composeTestRule.waitForIdle()
+        option("API key").assertIsFocused()
     }
 
     private fun setChoiceRow() {

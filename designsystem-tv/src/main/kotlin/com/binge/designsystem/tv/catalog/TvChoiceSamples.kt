@@ -137,6 +137,25 @@ fun TvChoiceRowSample() {
     )
 }
 
+/** Pills that do not fit the width they are given wrap to a second line, so every option stays on screen. */
+@Composable
+fun TvChoiceRowWrapsSample() {
+    var selected by remember { mutableStateOf(KEY_MOVIES) }
+    Box(Modifier.wrapContentSize(Alignment.TopStart).padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvChoiceRow(
+            choices =
+                listOf(
+                    TvChoiceUi(KEY_MOVIES, "Movies", Icons.Filled.Movie),
+                    TvChoiceUi(KEY_TV, "TV shows", Icons.Filled.Tv),
+                    TvChoiceUi("server", "Home server", Icons.Filled.Dns),
+                ),
+            selectedKey = selected,
+            onSelect = { selected = it },
+            modifier = Modifier.width(dimensionResource(TvR.dimen.tv_side_sheet_width)),
+        )
+    }
+}
+
 /** A tab row with focus gone down to what it shows: the selected tab in the dim accent, the others at rest. */
 @Composable
 fun TvTabRowSample() {

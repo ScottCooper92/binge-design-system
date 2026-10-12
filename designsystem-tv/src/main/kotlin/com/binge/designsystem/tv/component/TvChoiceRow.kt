@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,7 +44,8 @@ import com.binge.designsystem.tv.R as TvR
  * The deliberate opposite of [TvTabRow], where focus is the commit. Use this where a switch is costly, such as one
  * that re-runs a query or drops what the user picked under the old value. Pressing the option already chosen is a
  * no-op, guarded here so no caller has to remember to. The pills sit side by side, so they carry no second line;
- * [TvOptionRow] is the stacked form that does. [initialFocusedKey] seeds one option as focused for a frame;
+ * [TvOptionRow] is the stacked form that does. The row wraps when its pills do not fit the width it is given, as the
+ * narrow column of a form is, so every option stays on screen and none sits past an edge. [initialFocusedKey] seeds one option as focused for a frame;
  * production passes null.
  *
  * [entryFocusRequester] and [arrival] let a page aim focus at the row, as [TvTabRow]'s do: the request lands on the
@@ -61,7 +63,7 @@ fun TvChoiceRow(
 ) {
     val selectedEntry = remember { FocusRequester() }
     val aimed = entryFocusRequester != null || arrival != null
-    Row(
+    FlowRow(
         modifier =
             modifier
                 .selectableGroup()
@@ -69,8 +71,9 @@ fun TvChoiceRow(
                 .then(entryFocusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
                 .then(arrival?.let { Modifier.tvArrivalTarget(it) } ?: Modifier)
                 .then(if (aimed) Modifier.tvSelectionFocusGroup(selectedEntry) else Modifier),
-        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.CenterVertically),
+        itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         choices.forEach { choice ->
             val isSelected = choice.key == selectedKey
