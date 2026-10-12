@@ -127,7 +127,15 @@ internal val ListItem.switchState: ToggleableState?
  */
 @Deprecated(
     message = "Renamed and turned round: disabled = true is enabled = false.",
-    replaceWith = ReplaceWith("ListItem(icon = icon, label = label, enabled = !disabled)"),
+    replaceWith = ReplaceWith(
+        "ListItem(icon = icon, iconPainter = iconPainter, iconTint = iconTint, label = label, detail = detail, " +
+            "detailColor = detailColor, badgeCount = badgeCount, badgeTint = badgeTint, badgeAlert = badgeAlert, " +
+            "selected = selected, clickable = clickable, destination = destination, " +
+            "trailingContent = trailingContent, onClick = onClick, onLongClick = onLongClick, " +
+            "leadingContent = leadingContent, loading = loading, connector = connector, " +
+            "onLongClickLabel = onLongClickLabel, toggled = toggled, expanded = expanded, toggleState = toggleState, " +
+            "supportingMaxLines = supportingMaxLines, enabled = !disabled)",
+    ),
 )
 @Suppress("LongParameterList")
 fun ListItem(
