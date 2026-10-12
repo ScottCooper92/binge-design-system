@@ -57,6 +57,8 @@ fun GridScreenHeader(
                 .padding(
                     start = dimensionResource(R.dimen.grid_header_title_padding_h),
                     end = dimensionResource(R.dimen.grid_header_title_padding_h),
+                    // The back button's own inset clears the status bar; without one the title needs its own.
+                    top = if (onBack == null) dimensionResource(R.dimen.padding_m) else dimensionResource(R.dimen.zero),
                     bottom = dimensionResource(R.dimen.grid_header_title_padding_bottom),
                 ).semantics { heading() },
         )
