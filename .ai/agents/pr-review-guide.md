@@ -74,10 +74,16 @@ labelled, not a TODO and not a line in the PR description.
 
 ## The author's checklist
 
-Each PR body carries the checklist from `.github/pull_request_template.md`. Read it against the run:
+Each PR body carries the checklist from `.github/pull_request_template.md`. You only run on a green
+head, so the current run cannot show a failed check. Read the ticks against the PR's CI history
+instead, the runs on its earlier heads and the first above all (`gh run list --workflow CI --branch
+<head>`). A tick is judged against the head the author opened the PR on. A later author-bot fix does
+not excuse a check that failed on that first run.
 
-- A box ticked for a check that then failed CI is a finding: the author said it ran and it didn't pass. Name the check.
-- A box left unticked without a reason is a nit, unless CI failed on exactly that check.
-- A PR with no checklist at all, other than a Renovate dependency update, gets a nit asking for it.
-- "Screenshots viewed" ticked on a PR that re-records a lot of frames: check the body says how they were checked, all by eye or by script plus a sample.
-
+- A box ticked for a check that failed CI on an earlier head is a finding: the author said it ran and
+  it didn't pass. Name the check and the run.
+- A box left unticked without a reason is a nit, unless an earlier run failed on exactly that check.
+- A PR with no checklist at all, other than a Renovate dependency update, gets a nit asking for it. A
+  docs-only PR may collapse the list to the boxes that apply.
+- "Screenshots viewed" ticked on a PR that re-records a lot of frames: check the body says how they
+  were checked, all by eye or by script plus a sample.
