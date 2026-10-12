@@ -166,6 +166,7 @@ fun TvListPaneBoard(
         split = TvTwoPaneSplit.ListDetail,
         style = TvTwoPaneStyle.Board,
         hosting = hosting,
+        entry = if (hosting == TvPageHosting.Overlay) describedRowFocus else null,
         actionScrolls = false,
         copy = {
             TvPaneList(

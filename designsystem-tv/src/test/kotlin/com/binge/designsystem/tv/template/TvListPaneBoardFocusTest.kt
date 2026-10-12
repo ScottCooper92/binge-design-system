@@ -1,11 +1,13 @@
 package com.binge.designsystem.tv.template
 
 import android.app.Application
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isFocusable
@@ -13,6 +15,7 @@ import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
+import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
@@ -92,34 +95,55 @@ class TvListPaneBoardFocusTest {
         assertEquals(1, commits)
     }
 
-    private fun setBoard(describedKey: String) {
+    @Test
+    fun `an overlay board claims focus on the described row`() {
+        setBoard(describedKey = KEY_DISCONNECT, hosting = TvPageHosting.Overlay)
+
+        row(ROW_DISCONNECT).assertIsFocused()
+    }
+
+    @Test
+    fun `an overlay board claims focus on the described row under RTL`() {
+        setBoard(describedKey = KEY_DISCONNECT, hosting = TvPageHosting.Overlay, layoutDirection = LayoutDirection.Rtl)
+
+        row(ROW_DISCONNECT).assertIsFocused()
+    }
+
+    private fun setBoard(
+        describedKey: String,
+        hosting: TvPageHosting = TvPageHosting.RailDestination,
+        layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+    ) {
         composeTestRule.setContent {
             var focusedKey by remember { mutableStateOf<String?>(describedKey) }
-            BingeTvTheme {
-                TvListPaneBoard(
-                    title = "Settings",
-                    groups =
-                        listOf(
-                            TvPaneGroup(
-                                title = "Connection",
-                                rows =
-                                    listOf(
-                                        TvPaneRow(key = KEY_SERVER, label = ROW_SERVER, body = "http://media.example.com"),
-                                        TvPaneRow(
-                                            key = KEY_DISCONNECT,
-                                            label = ROW_DISCONNECT,
-                                            body = "Removes the saved sign-in.",
-                                            options = listOf(TvPaneOption(label = OPTION_DISCONNECT, onSelect = { commits++ })),
+            CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+                BingeTvTheme {
+                    TvListPaneBoard(
+                        title = "Settings",
+                        groups =
+                            listOf(
+                                TvPaneGroup(
+                                    title = "Connection",
+                                    rows =
+                                        listOf(
+                                            TvPaneRow(key = KEY_SERVER, label = ROW_SERVER, body = "http://media.example.com"),
+                                            TvPaneRow(
+                                                key = KEY_DISCONNECT,
+                                                label = ROW_DISCONNECT,
+                                                body = "Removes the saved sign-in.",
+                                                options = listOf(TvPaneOption(label = OPTION_DISCONNECT, onSelect = { commits++ })),
+                                            ),
                                         ),
-                                    ),
+                                ),
                             ),
-                        ),
-                    focusedKey = focusedKey,
-                    onFocusRow = {
-                        described += it
-                        focusedKey = it
-                    },
-                )
+                        focusedKey = focusedKey,
+                        onFocusRow = {
+                            described += it
+                            focusedKey = it
+                        },
+                        hosting = hosting,
+                    )
+                }
             }
         }
         composeTestRule.waitForIdle()
