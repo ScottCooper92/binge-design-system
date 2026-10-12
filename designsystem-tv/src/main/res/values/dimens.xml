@@ -138,6 +138,8 @@
     <dimen name="tv_list_pane_skeleton_line_height">28dp</dimen>
     <!-- A row's supporting line, which the skeleton's second bar stands in for -->
     <dimen name="tv_list_pane_skeleton_detail_height">16dp</dimen>
+    <!-- A group note's bar: no taller than a line of the note's own style, so the line sets the height. -->
+    <dimen name="tv_list_pane_skeleton_note_height">12dp</dimen>
     <dimen name="tv_option_row_gap">7dp</dimen>
     <!-- A row's leading icon plate: the tinted box behind the glyph, which is tv_button_icon -->
     <dimen name="tv_row_icon_plate">40dp</dimen>
