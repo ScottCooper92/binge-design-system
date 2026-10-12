@@ -18,4 +18,11 @@ class GridScreenHeaderSamplesScreenshotTest {
     fun LongTitle() {
         GridScreenHeaderLongTitleSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun NoBack() {
+        GridScreenHeaderNoBackSample()
+    }
 }

@@ -93,6 +93,8 @@ import com.binge.designsystem.theme.BingeTheme
  * [edgeInset] is the same symmetric leading/trailing inset [BingeMediumTopBar] carries, matching
  * [DetailOverlayTopBar]'s own `horizontalInset` so a transparent bar's controls float the same
  * distance from the edge everywhere.
+ *
+ * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

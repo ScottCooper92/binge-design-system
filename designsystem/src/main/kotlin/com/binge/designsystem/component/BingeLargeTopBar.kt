@@ -17,6 +17,8 @@ import com.binge.designsystem.R
  * on the [scrollBehavior]'s collapsed fraction. Otherwise it is [BingePaneTopBar]'s two-row form, with its
  * defaults: a [Color.Transparent] bar whose scrim fades in on that same fraction. Pass
  * `containerColor = Color.Unspecified` for an opaque bar on the app background.
+ *
+ * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
