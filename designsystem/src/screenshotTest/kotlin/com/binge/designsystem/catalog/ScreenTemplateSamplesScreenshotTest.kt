@@ -235,6 +235,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun stepFlow() = StepFlowScreenSample()
 
+    /** The plain bar: no circle behind Back, and an opaque bar where the glass one is transparent. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowPlainChrome() = StepFlowScreenPlainChromeSample()
+
     @PreviewTest
     @ScreenStatePreview
     @Composable

@@ -47,7 +47,10 @@ data class ListItem(
     /** Tint for the icon plate's wash and glyph; `primary` when null. */
     val iconTint: Color? = null,
     val label: String,
-    /** The second line, held to one line with an ellipsis: what the row does, or a picker's current value. */
+    /**
+     * The second line, held to [supportingMaxLines] lines with an ellipsis, one by default: what the row does, or a
+     * picker's current value.
+     */
     val detail: String? = null,
     /** Tint for [detail]; defaults to the muted caption colour. Use the error colour for problems. */
     val detailColor: Color? = null,
@@ -105,6 +108,11 @@ data class ListItem(
      * off. Read in place of [toggled] when set; the row is otherwise the same switch row.
      */
     val toggleState: ToggleableState? = null,
+    /**
+     * How many lines [detail] may take before it ends in an ellipsis. One is right for a value or a few words; raise it
+     * for the rare row whose second line has to be read in full, such as a warning's explanation.
+     */
+    val supportingMaxLines: Int = 1,
 )
 
 /** The row's switch state, from [ListItem.toggleState] or else [ListItem.toggled]; null for a row with no switch. */

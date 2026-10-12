@@ -118,6 +118,13 @@ class ItemGroupSamplesScreenshotTest {
         ItemGroupLongLabelSample()
     }
 
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun supportingLines() {
+        ItemGroupSupportingLinesSample()
+    }
+
     /** [ListItem.expanded] rows: one open, one closed. */
     @PreviewTest
     @ComponentPreviews
