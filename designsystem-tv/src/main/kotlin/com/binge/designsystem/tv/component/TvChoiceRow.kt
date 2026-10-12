@@ -90,6 +90,7 @@ fun TvChoiceRow(
                     icon = choice.icon,
                     modifier = Modifier.tvSelectionTarget(isSelected, selectedEntry),
                 )
+            }
         }
     }
 }
