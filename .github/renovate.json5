@@ -48,5 +48,14 @@
         "**Needs matching bumps in `Binge` and `binge-seerr`.** The root `libs.versions.toml` is not a local decision: Compose, AGP, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
       ],
     },
+    {
+      // material3 is pinned ahead of the BOM on an alpha, because the expressive theme reads APIs the BOM's stable line
+      // lacks. Its beta line is not taken until a Compose 1.13 BOM ships; alphas and the stable release still are.
+      matchPackageNames: [
+        "androidx.compose.material3:material3",
+        "androidx.compose.material3:material3-adaptive-navigation-suite",
+      ],
+      allowedVersions: "!/-beta/",
+    },
   ],
 }
