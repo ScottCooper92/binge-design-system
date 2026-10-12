@@ -73,8 +73,7 @@ enum class FormActionPlacement {
  * keyboard rather than covered by it, with its commit in the bar or pinned under the form.
  *
  * Until [notReady] is null the screen shows it instead (the record loading, or its load failing). [scrolling]
- * is off for a body that scrolls itself; it then folds the padding it is handed into its own list. Tag fields
- * with [formField] and a failed submit can bring the first problem into view through [FormFields].
+ * is off for a body that scrolls itself; it then folds the padding it is handed into its own list.
  *
  * An edit screen saves each change as it is made and has no commit: pass its [saveStatus] and leave
  * [primaryAction] out. "Saving…" and "Saved" show in the bar, and a failed write keeps the change and shows a
@@ -209,7 +208,7 @@ fun FormSection(
  * primary, both full-width halves, or the primary alone across the bar.
  */
 @Composable
-fun FormFooter(
+internal fun FormFooter(
     primary: FormAction,
     modifier: Modifier = Modifier,
     secondary: FormAction? = null,
@@ -255,7 +254,7 @@ fun FormFooter(
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Stable
-class FormFields {
+internal class FormFields {
     private val fields = mutableStateMapOf<String, FormFieldHandle>()
 
     /** Brings field [id] into view, or [fallback] (its section's header, say) when [id] is not on screen. */
@@ -283,12 +282,12 @@ internal class FormFieldHandle(
 
 /** The [FormFields] for one form, stable across recomposition. */
 @Composable
-fun rememberFormFields(): FormFields = remember { FormFields() }
+internal fun rememberFormFields(): FormFields = remember { FormFields() }
 
 /** Tags this field as [id] in [fields]. [takesFocus] is for a text field; a picker row is only scrolled to. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Modifier.formField(
+internal fun Modifier.formField(
     fields: FormFields,
     id: String,
     takesFocus: Boolean = true,
