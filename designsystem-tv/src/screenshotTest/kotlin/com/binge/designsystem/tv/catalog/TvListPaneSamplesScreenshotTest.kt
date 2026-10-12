@@ -49,6 +49,16 @@ class TvListPaneSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun filterBoardTriState() = Frame { TvListPaneFilterBoardTriStateSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun filterBoardPinned() = Frame { TvListPaneFilterBoardPinnedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun boardSkeleton() = Frame { TvListPaneBoardSkeletonSample() }
 
     @PreviewTest

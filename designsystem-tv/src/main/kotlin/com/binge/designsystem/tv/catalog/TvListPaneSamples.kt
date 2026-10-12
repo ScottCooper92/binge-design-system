@@ -2,6 +2,9 @@
 
 package com.binge.designsystem.tv.catalog
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Apps
@@ -19,7 +22,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.catalog.CatalogGroup
+import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.template.TvListPaneBoard
 import com.binge.designsystem.tv.template.TvListPaneBoardSkeleton
 import com.binge.designsystem.tv.template.TvPageHosting
@@ -27,6 +34,7 @@ import com.binge.designsystem.tv.template.TvPaneAction
 import com.binge.designsystem.tv.template.TvPaneGroup
 import com.binge.designsystem.tv.template.TvPaneOption
 import com.binge.designsystem.tv.template.TvPaneRow
+import com.binge.designsystem.tv.R as TvR
 
 /*
  * The list-and-pane board at the size it ships: a whole panel. Focus is seeded through the board's initial-focus
@@ -38,6 +46,13 @@ private const val KEY_SUBTITLES = "subtitles"
 private const val KEY_SERVER = "server"
 private const val KEY_GENRE = "genre"
 private const val KEY_LANGUAGE = "language"
+private const val KEY_SERVICE = "service"
+private const val SERVICE_STREAMLY = "Streamly"
+private const val SERVICE_FLIXORA = "Flixora"
+private const val SERVICE_CINEBOX = "Cinebox"
+private const val SERVICE_COLOUR_A = 0xFFE50914
+private const val SERVICE_COLOUR_B = 0xFF1CE783
+private const val SERVICE_COLOUR_C = 0xFF5B8DEF
 private const val GENRE_DRAMA = "Drama"
 private const val GENRE_COMEDY = "Comedy"
 private const val GENRE_SCIENCE_FICTION = "Science fiction"
@@ -237,6 +252,120 @@ private fun SampleFilterBoard(initialListHasFocus: Boolean, initialFocusedOption
             genres = emptySet()
             languages = emptySet()
         }),
+    )
+}
+
+/**
+ * A filter whose values can be ruled out as well as chosen: OK cycles a genre from off to ticked to excluded and back,
+ * and the box carries the excluded mark where the tick would be. Focus rests on a value, so the fill and the three
+ * states sit side by side.
+ */
+@Composable
+fun TvListPaneFilterBoardTriStateSample() {
+    SampleTriStateBoard(describedKey = KEY_GENRE, initialFocusedOptionLabel = GENRE_COMEDY)
+}
+
+/**
+ * A filter led by a pinned option, a shortcut that sits above the values behind a divider, over values that lead
+ * with a mark of their own, such as a service's logo.
+ */
+@Composable
+fun TvListPaneFilterBoardPinnedSample() {
+    SampleTriStateBoard(describedKey = KEY_SERVICE, initialFocusedOptionLabel = null)
+}
+
+@Composable
+private fun SampleTriStateBoard(describedKey: String, initialFocusedOptionLabel: String?) {
+    var focusedKey by remember { mutableStateOf(describedKey) }
+    var genreStates by remember {
+        mutableStateOf(mapOf(GENRE_DRAMA to FilterState.Included, GENRE_THRILLER to FilterState.Excluded))
+    }
+    var services by remember { mutableStateOf(setOf(SERVICE_STREAMLY)) }
+
+    fun cycle(state: FilterState?) =
+        when (state) {
+            null -> FilterState.Included
+            FilterState.Included -> FilterState.Excluded
+            FilterState.Excluded -> null
+        }
+    val serviceMarks =
+        listOf(
+            SERVICE_STREAMLY to Color(SERVICE_COLOUR_A),
+            SERVICE_FLIXORA to Color(SERVICE_COLOUR_B),
+            SERVICE_CINEBOX to Color(SERVICE_COLOUR_C),
+        )
+    TvListPaneBoard(
+        title = "Filters",
+        groups =
+            listOf(
+                TvPaneGroup(
+                    title = "Refine",
+                    rows =
+                        listOf(
+                            TvPaneRow(
+                                key = KEY_GENRE,
+                                label = "Genre",
+                                detail = if (genreStates.isEmpty()) "Any" else "${genreStates.size} set",
+                                multiSelect = true,
+                                options =
+                                    listOf(GENRE_DRAMA, GENRE_COMEDY, GENRE_SCIENCE_FICTION, GENRE_THRILLER).map { genre ->
+                                        TvPaneOption(
+                                            label = genre,
+                                            selected = genreStates[genre] == FilterState.Included,
+                                            excluded = genreStates[genre] == FilterState.Excluded,
+                                            onSelect = {
+                                                val next = cycle(genreStates[genre])
+                                                genreStates = if (next == null) genreStates - genre else genreStates + (genre to next)
+                                            },
+                                        )
+                                    },
+                                clear = TvPaneAction("Clear genre", { genreStates = emptyMap() }, enabled = genreStates.isNotEmpty()),
+                            ),
+                            TvPaneRow(
+                                key = KEY_SERVICE,
+                                label = "Streaming service",
+                                detail = if (services.isEmpty()) "Any" else "${services.size} selected",
+                                multiSelect = true,
+                                pinnedOptions =
+                                    listOf(
+                                        TvPaneOption(
+                                            label = "My services",
+                                            selected = services == setOf(SERVICE_STREAMLY),
+                                            onSelect = { services = setOf(SERVICE_STREAMLY) },
+                                            icon = Icons.Filled.Apps,
+                                        ),
+                                    ),
+                                options =
+                                    serviceMarks.map { (service, colour) ->
+                                        TvPaneOption(
+                                            label = service,
+                                            selected = service in services,
+                                            onSelect = { services = if (service in services) services - service else services + service },
+                                            leading = { SampleServiceMark(colour) },
+                                        )
+                                    },
+                            ),
+                        ),
+                ),
+            ),
+        focusedKey = focusedKey,
+        onFocusRow = { focusedKey = it },
+        hosting = TvPageHosting.Overlay,
+        initialListHasFocus = false,
+        initialFocusedOptionLabel = initialFocusedOptionLabel,
+    )
+}
+
+private enum class FilterState { Included, Excluded }
+
+/** A stand-in for a service's logo: a rounded square in the service's colour, at the row icon's size. */
+@Composable
+private fun SampleServiceMark(colour: Color) {
+    Box(
+        modifier =
+            Modifier
+                .size(dimensionResource(TvR.dimen.tv_list_pane_row_icon))
+                .background(colour, BingeShapes.ElementExtraSmall),
     )
 }
 

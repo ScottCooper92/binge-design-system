@@ -52,6 +52,10 @@ import com.binge.designsystem.tv.R as TvR
  * One option in a row's pane: a label, a tick when [selected], and the call that commits it. [focusRequester] is
  * set when an overlay this option opens needs to hand focus back to it on close. [icon] leads the option when one
  * fits the choice itself (a glyph per option, not one for the whole row).
+ *
+ * In a multi-select row an option can be [excluded] as well as [selected]: ruled out rather than chosen, with the
+ * excluded mark in its box. The caller decides what OK cycles through. [leading] is a mark of the caller's own, such as
+ * a logo, in place of [icon]; both apply to multi-select options only.
  */
 @Immutable
 data class TvPaneOption(
@@ -60,6 +64,8 @@ data class TvPaneOption(
     val onSelect: () -> Unit = {},
     val focusRequester: FocusRequester? = null,
     val icon: ImageVector? = null,
+    val excluded: Boolean = false,
+    val leading: (@Composable () -> Unit)? = null,
 )
 
 /**
@@ -79,7 +85,8 @@ data class TvPaneOption(
  * A row can serve as a filter. [multiSelect] makes the options checkboxes, announced with their toggled state, and
  * [TvPaneOption.onSelect] then toggles; the default keeps them mutually exclusive, as radio rows. [clear] puts a button
  * under the options. An empty [body] draws no description, so the options sit directly under the name. A filter shows
- * what it has applied through [detail], such as "3 selected" or "Any".
+ * what it has applied through [detail], such as "3 selected" or "Any". [pinnedOptions] sit above the options behind a
+ * divider: controls that act on the values, or shortcuts, kept apart so they are not taken for one of them.
  *
  * The row's end can carry a status: [loading] while its value is on its way, else [badgeAlert] when it needs the user,
  * else [badgeCount] when something is waiting. Each takes width from the label, which ellipsizes rather than wraps.
@@ -97,6 +104,7 @@ data class TvPaneRow(
     val detail: String? = null,
     val multiSelect: Boolean = false,
     val clear: TvPaneAction? = null,
+    val pinnedOptions: List<TvPaneOption> = emptyList(),
     val badgeCount: Int? = null,
     val badgeAlert: Boolean = false,
     val loading: Boolean = false,

@@ -27,6 +27,7 @@
     <string name="cd_remove_filter">Remove filter</string>
     <string name="cd_list_item_external">Opens in browser</string>
     <string name="cd_list_item_loading">In progress</string>
+    <string name="cd_option_excluded">Excluded</string>
     <string name="cd_group_expanded">Expanded</string>
     <string name="cd_group_collapsed">Collapsed</string>
     <string name="text_entry_cancel">Cancel</string>
