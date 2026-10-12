@@ -105,7 +105,6 @@ dependencies {
     // The paged-list phase takes load states, so the paging types are part of its signature.
     api(libs.paging.common)
     implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.ui.text.google.fonts)
     implementation(libs.androidx.core.ktx)
     // The step-flow template installs the system Back handler for the step it shows.
     implementation(libs.androidx.activity.compose)
