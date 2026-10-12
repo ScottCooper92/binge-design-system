@@ -117,8 +117,9 @@ fun IncludeExcludeChip(
 /**
  * [IncludeExcludeChip] under its old names, `onTap`, `onLongPress` and `onLongPressLabel`; they are `onClick`,
  * `onLongClick` and `onLongClickLabel` now, the names Compose's own `combinedClickable` and Material 3's chips use.
- * Kotlin cannot hold two overloads that differ only in parameter names, so this one takes `onLongPressLabel` ahead of
- * `modifier`. Call it by name, as the old signature was.
+ * Kotlin cannot hold two overloads that differ only in parameter names, nor tell them apart for a call that passes four
+ * arguments by position, so this one takes `onLongPressLabel` and `modifier` ahead of the two callbacks. Call it by
+ * name, as the old signature was; a positional call resolves to the new function.
  */
 @Deprecated(
     message = "Renamed: onTap is onClick, onLongPress is onLongClick and onLongPressLabel is onLongClickLabel.",
@@ -133,10 +134,10 @@ fun IncludeExcludeChip(
 fun IncludeExcludeChip(
     label: String,
     state: IncludeExcludeState,
-    onTap: () -> Unit,
-    onLongPress: () -> Unit,
     onLongPressLabel: String? = null,
     modifier: Modifier = Modifier,
+    onTap: () -> Unit,
+    onLongPress: () -> Unit,
 ) = IncludeExcludeChip(
     label = label,
     state = state,
