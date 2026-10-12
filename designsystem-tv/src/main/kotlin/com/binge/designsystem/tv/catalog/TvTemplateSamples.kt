@@ -322,7 +322,7 @@ fun TvBoardSample() {
         TvBoard(
             title = "Requests",
             hosting = TvPageHosting.RailDestination,
-            trailing = { TvButtonSurface("Sort", TvButtonStyle.Secondary, enabled = true, isFocused = false) },
+            trailingContent = { TvButtonSurface("Sort", TvButtonStyle.Secondary, enabled = true, isFocused = false) },
         ) {
             Text(text = "Pending", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
             repeat(SAMPLE_ROWS) { index ->

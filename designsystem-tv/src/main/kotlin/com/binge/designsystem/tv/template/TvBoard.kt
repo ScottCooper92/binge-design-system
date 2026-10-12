@@ -28,7 +28,7 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The frame every board, list and form page sits in, so none of them hand-roll the padding and background.
  * [entry] is where focus lands when it enters the page; whether the page also claims it is [hosting]'s call
- * (see [TvPageHosting]), and [arrivalEnabled] holds the claim back until the target exists. [trailing] sits in
+ * (see [TvPageHosting]), and [arrivalEnabled] holds the claim back until the target exists. [trailingContent] sits in
  * the heading band, so it is not shown when [title] is null.
  */
 @Composable
@@ -38,7 +38,7 @@ fun TvBoard(
     hosting: TvPageHosting = currentTvPageHosting(),
     entry: FocusRequester? = null,
     arrivalEnabled: Boolean = true,
-    trailing: (@Composable RowScope.() -> Unit)? = null,
+    trailingContent: (@Composable RowScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -50,20 +50,45 @@ fun TvBoard(
                 .padding(tvPagePadding(hosting)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
     ) {
-        if (title != null) TvScreenHeading(title = title, trailing = trailing)
+        if (title != null) TvScreenHeading(title = title, trailingContent = trailingContent)
         content()
     }
 }
 
+/** [TvBoard] under its old name for the heading slot, `trailing`; it is `trailingContent` now. Kotlin cannot hold two overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes none resolves to the new function, and a call that passes `trailing` by name lands here. */
+@Deprecated(
+    message = "Renamed: trailing is trailingContent.",
+    replaceWith = ReplaceWith("TvBoard(title, modifier, hosting, entry, arrivalEnabled, trailingContent = trailing, content = content)"),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun TvBoard(
+    title: String?,
+    trailing: (@Composable RowScope.() -> Unit)?,
+    modifier: Modifier = Modifier,
+    hosting: TvPageHosting = currentTvPageHosting(),
+    entry: FocusRequester? = null,
+    arrivalEnabled: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit,
+) = TvBoard(
+    title = title,
+    modifier = modifier,
+    hosting = hosting,
+    entry = entry,
+    arrivalEnabled = arrivalEnabled,
+    trailingContent = trailing,
+    content = content,
+)
+
 /**
- * A page's title, in a band as tall as the rail's header line so the two share a centre line. [trailing] sits
+ * A page's title, in a band as tall as the rail's header line so the two share a centre line. [trailingContent] sits
  * at the band's end, unweighted, so an action there is never squeezed out by a long title.
  */
 @Composable
 fun TvScreenHeading(
     title: String,
     modifier: Modifier = Modifier,
-    trailing: (@Composable RowScope.() -> Unit)? = null,
+    trailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().height(dimensionResource(TvR.dimen.tv_screen_heading_height)),
@@ -79,6 +104,19 @@ fun TvScreenHeading(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        trailing?.invoke(this)
+        trailingContent?.invoke(this)
     }
 }
+
+/** [TvScreenHeading] under its old name for the end slot, `trailing`; see the deprecated [TvBoard]. */
+@Deprecated(
+    message = "Renamed: trailing is trailingContent.",
+    replaceWith = ReplaceWith("TvScreenHeading(title, modifier, trailingContent = trailing)"),
+)
+@Suppress("ModifierParameter")
+@Composable
+fun TvScreenHeading(
+    title: String,
+    trailing: (@Composable RowScope.() -> Unit)?,
+    modifier: Modifier = Modifier,
+) = TvScreenHeading(title = title, modifier = modifier, trailingContent = trailing)

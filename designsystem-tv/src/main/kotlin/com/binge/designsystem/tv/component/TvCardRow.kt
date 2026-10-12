@@ -40,8 +40,8 @@ internal const val TRAILING_KEY = "tv-card-row-trailing"
  * `tvFocusGroup`, the helper reached for by name, is a restorer that silently does not do it (see its KDoc), so
  * hand-rolled rows kept getting it wrong. This wrapper owns all three plus per-cell focus tracking.
  *
- * Entering the row for the **first** time lands on its first cell — never [trailing], the optional see-all
- * tile. Returning lands on the cell **last focused**, and that includes [trailing] itself: it occupies the
+ * Entering the row for the **first** time lands on its first cell — never [trailingContent], the optional see-all
+ * tile. Returning lands on the cell **last focused**, and that includes [trailingContent] itself: it occupies the
  * entry's last slot (index `items.size`) exactly like any other cell, so a drill-down opened from it and
  * then backed out of resolves entry back onto the tile rather than redirecting to the last card. Both come
  * from the shared [rememberTvRowEntry] contract — see [TvRowEntry] for how the memory survives the
@@ -51,7 +51,7 @@ internal const val TRAILING_KEY = "tv-card-row-trailing"
  * thumbnails and stills as readily as cards.
  *
  * The [cell] slot receives the item, whether it is focused, an `onFocusChanged`, and a `cellModifier` (fixed
- * width plus, for the first cell, the entry requester) to apply to its **focusable** element. [trailing] is an
+ * width plus, for the first cell, the entry requester) to apply to its **focusable** element. [trailingContent] is an
  * optional see-all tile, keyed apart so it tracks focus like any other cell, and takes the same shape of
  * `cellModifier` (the entry requester when the tile is the remembered cell) to apply to its own focusable
  * element. [heading] is optional — a row under its own section chrome passes none.
@@ -85,17 +85,17 @@ fun <T> TvCardRow(
     // viewer to the image it was left on, which may not be the cell that was last focused before the push).
     // Null in production elsewhere: everything else trusts the row's own memory.
     overrideIndex: Int? = null,
-    trailing: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit)? = null,
+    trailingContent: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit)? = null,
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit,
 ) {
     if (items.isEmpty()) return
     // Which cell draws the ring — one hoisted key, nulled on blur, so a row that has lost focus keeps none lit.
     var focusedKey by remember { mutableStateOf(initiallyFocusedKey) }
-    // The trailing tile, when present, occupies the entry's last slot so it is remembered like any other cell.
+    // The trailingContent tile, when present, occupies the entry's last slot so it is remembered like any other cell.
     val trailingIndex = items.size
     // The cell entry returns to — the shared remembered-cell contract (survives blur and the LazyColumn
     // scroll-out disposal). Seed the row state to it so it is laid out before entry arrives.
-    val entry = rememberTvRowEntry(if (trailing != null) trailingIndex + 1 else trailingIndex, overrideIndex = overrideIndex)
+    val entry = rememberTvRowEntry(if (trailingContent != null) trailingIndex + 1 else trailingIndex, overrideIndex = overrideIndex)
     val rowState = rememberLazyListState(initialFirstVisibleItemIndex = entry.entryIndex)
     // Start is the in-pane content gutter (inset + gutter under the overlay rail), end the panel's overscan.
     // The row is full panel width, so cells scrolled off the front pass *under* the rail rather than clipping
@@ -141,7 +141,7 @@ fun <T> TvCardRow(
                             .then(entry.entryModifier(index)),
                     )
                 }
-                trailing?.let { drawTrailing ->
+                trailingContent?.let { drawTrailing ->
                     item(key = TRAILING_KEY) {
                         drawTrailing(
                             focusedKey == TRAILING_KEY,
@@ -160,6 +160,46 @@ fun <T> TvCardRow(
         }
     }
 }
+
+/**
+ * [TvCardRow] under its old name for the end tile, `trailing`; it is `trailingContent` now. Kotlin cannot hold two
+ * overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes none
+ * resolves to the new function, and a call that passes `trailing` by name lands here.
+ */
+@Deprecated(
+    message = "Renamed: trailing is trailingContent.",
+    replaceWith = ReplaceWith(
+        "TvCardRow(items, key, cellWidth, modifier, heading, entryFocusRequester, onCellFocused, initiallyFocusedKey, " +
+            "overrideIndex, trailingContent = trailing, cell = cell)",
+    ),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun <T> TvCardRow(
+    items: List<T>,
+    key: (T) -> Any,
+    cellWidth: Dp,
+    trailing: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit)?,
+    modifier: Modifier = Modifier,
+    heading: String? = null,
+    entryFocusRequester: FocusRequester? = null,
+    onCellFocused: ((Any) -> Unit)? = null,
+    initiallyFocusedKey: Any? = null,
+    overrideIndex: Int? = null,
+    cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit,
+) = TvCardRow(
+    items = items,
+    key = key,
+    cellWidth = cellWidth,
+    modifier = modifier,
+    heading = heading,
+    entryFocusRequester = entryFocusRequester,
+    onCellFocused = onCellFocused,
+    initiallyFocusedKey = initiallyFocusedKey,
+    overrideIndex = overrideIndex,
+    trailingContent = trailing,
+    cell = cell,
+)
 
 /**
  * Latch a row's single focused key: claim it on gain, release it only if this cell still holds it. The "only
