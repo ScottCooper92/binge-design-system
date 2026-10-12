@@ -1,7 +1,10 @@
 package com.binge.designsystem.tv.template
 
 import android.app.Application
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
@@ -63,12 +66,26 @@ class TvListPaneBoardSkeletonGeometryTest {
                 }
             }
         }
+
+    @Test
+    fun `a skeleton for rows with an icon reserves their taller first row`() =
+        composeTestRule.assertSkeletonReservesGeometry(
+            listOf(TvLayoutAnchors.LIST_PANE_FIRST_ROW),
+            checkStartEdge = true,
+            checkSize = true,
+        ) { resolved ->
+            BingeTvTheme { if (resolved) Board(icon = Icons.Filled.Movie) else TvListPaneBoardSkeleton(title = TITLE, rowIcon = true) }
+        }
 }
 
 private const val TITLE = "Settings"
 
 @Composable
-private fun Board(detail: String? = null, note: String? = null) {
+private fun Board(
+    detail: String? = null,
+    note: String? = null,
+    icon: ImageVector? = null,
+) {
     TvListPaneBoard(
         title = TITLE,
         groups =
@@ -83,6 +100,7 @@ private fun Board(detail: String? = null, note: String? = null) {
                                 label = "Default quality",
                                 body = "The quality a new request asks for.",
                                 detail = detail,
+                                icon = icon,
                             ),
                             TvPaneRow(key = "subtitles", label = "Subtitles", body = "Whether titles start with subtitles on."),
                         ),
