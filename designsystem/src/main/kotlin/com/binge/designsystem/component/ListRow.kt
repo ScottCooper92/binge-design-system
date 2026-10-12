@@ -136,60 +136,6 @@ fun ListRowHeader(
 }
 
 /**
- * [ListRow] under its old name for the trailing slot, `trailing`; it is [trailingContent] now, the name Material 3's
- * `ListItem` uses. Kotlin cannot hold two overloads that differ only in parameter names, so this one has no default
- * for `trailing`: a call that passes none resolves to [ListRow], and a call that passes `trailing` by name lands here.
- */
-@Deprecated(
-    message = "Renamed: trailing is trailingContent.",
-    replaceWith = ReplaceWith(
-        "ListRow(modifier = modifier, onClick = onClick, enabled = enabled, verticalAlignment = verticalAlignment, " +
-            "containerColor = containerColor, containerBrush = containerBrush, leading = leading, " +
-            "trailingContent = trailing, trailingGap = trailingGap, footer = footer, content = content)",
-    ),
-)
-@Suppress("ModifierParameter", "LongParameterList")
-@Composable
-fun ListRow(
-    trailing: (@Composable () -> Unit)?,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-    enabled: Boolean = true,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    containerBrush: Brush? = null,
-    leading: (@Composable () -> Unit)? = null,
-    trailingGap: Dp = dimensionResource(R.dimen.list_row_gap),
-    footer: (@Composable () -> Unit)? = null,
-    content: @Composable RowScope.(Modifier) -> Unit,
-) = ListRow(
-    modifier = modifier,
-    onClick = onClick,
-    enabled = enabled,
-    verticalAlignment = verticalAlignment,
-    containerColor = containerColor,
-    containerBrush = containerBrush,
-    leading = leading,
-    trailingContent = trailing,
-    trailingGap = trailingGap,
-    footer = footer,
-    content = content,
-)
-
-/** [ListRowHeader] under its old name for the trailing slot, `trailing`; see the deprecated [ListRow]. */
-@Deprecated(
-    message = "Renamed: trailing is trailingContent.",
-    replaceWith = ReplaceWith("ListRowHeader(title, modifier, trailingContent = trailing)"),
-)
-@Suppress("ModifierParameter")
-@Composable
-fun ListRowHeader(
-    title: String,
-    trailing: (@Composable () -> Unit)?,
-    modifier: Modifier = Modifier,
-) = ListRowHeader(title = title, modifier = modifier, trailingContent = trailing)
-
-/**
  * The standard [ListRow] leading poster: a fixed-width image clipped to the row's poster corner,
  * over a tonal placeholder. [aspectRatio] defaults to [CARD_ASPECT_RATIO] (a portrait poster); pass
  * a wider ratio for backdrop-style stills. Pass [onClick] to make the poster tappable on its own

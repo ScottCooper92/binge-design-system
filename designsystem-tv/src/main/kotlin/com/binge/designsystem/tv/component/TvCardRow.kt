@@ -162,46 +162,6 @@ fun <T> TvCardRow(
 }
 
 /**
- * [TvCardRow] under its old name for the end tile, `trailing`; it is `trailingContent` now. Kotlin cannot hold two
- * overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes none
- * resolves to the new function, and a call that passes `trailing` by name lands here.
- */
-@Deprecated(
-    message = "Renamed: trailing is trailingContent.",
-    replaceWith = ReplaceWith(
-        "TvCardRow(items, key, cellWidth, modifier, heading, entryFocusRequester, onCellFocused, initiallyFocusedKey, " +
-            "overrideIndex, trailingContent = trailing, cell = cell)",
-    ),
-)
-@Suppress("ModifierParameter", "LongParameterList")
-@Composable
-fun <T> TvCardRow(
-    items: List<T>,
-    key: (T) -> Any,
-    cellWidth: Dp,
-    trailing: (@Composable (isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit)?,
-    modifier: Modifier = Modifier,
-    heading: String? = null,
-    entryFocusRequester: FocusRequester? = null,
-    onCellFocused: ((Any) -> Unit)? = null,
-    initiallyFocusedKey: Any? = null,
-    overrideIndex: Int? = null,
-    cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit,
-) = TvCardRow(
-    items = items,
-    key = key,
-    cellWidth = cellWidth,
-    modifier = modifier,
-    heading = heading,
-    entryFocusRequester = entryFocusRequester,
-    onCellFocused = onCellFocused,
-    initiallyFocusedKey = initiallyFocusedKey,
-    overrideIndex = overrideIndex,
-    trailingContent = trailing,
-    cell = cell,
-)
-
-/**
  * Latch a row's single focused key: claim it on gain, release it only if this cell still holds it. The "only
  * if" matters — focus reaches the new cell before the old one reports its loss, so an unconditional clear on
  * blur would wipe the key the incoming cell just set and leave the row with no ring.

@@ -19,13 +19,6 @@ import com.binge.designsystem.tv.focus.TvFocusSink
 import com.binge.designsystem.tv.nav.LocalTvRailEntry
 import com.binge.designsystem.tv.theme.TvButtonStyle
 
-/**
- * The phone's [ScreenAction] under the name the TV templates first gave it. Both platforms now take the one type,
- * so a page's actions port between form factors unchanged, icon and modifier included.
- */
-@Deprecated("The TV templates take the phone's ScreenAction.", ReplaceWith("ScreenAction", "com.binge.designsystem.template.ScreenAction"))
-typealias TvPageAction = ScreenAction
-
 /** An [action] as a TV button: its label, icon and modifier, with [modifier] added for the page's own focus wiring. */
 @Composable
 internal fun TvActionButton(

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -248,7 +249,7 @@ private fun PickerActions(
         BingeTextButton(
             label = stringResource(R.string.month_year_picker_cancel),
             onClick = onDismissRequest,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
         )
         BingeTextButton(label = stringResource(R.string.month_year_picker_confirm), onClick = onConfirm, enabled = canConfirm)
     }

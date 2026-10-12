@@ -29,17 +29,4 @@ class ChipClickNamesTest {
         rule.onNodeWithText("Action").performClick()
         assertEquals(1, clicks)
     }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun `the old names still reach the same chip`() {
-        var clicks = 0
-        rule.setContent {
-            BingeExpressiveTheme {
-                IncludeExcludeChip(label = "Action", state = IncludeExcludeState.Neutral, onTap = { clicks++ }, onLongPress = {})
-            }
-        }
-        rule.onNodeWithText("Action").performClick()
-        assertEquals(1, clicks)
-    }
 }

@@ -83,34 +83,7 @@ data class BingeChoice<out T>(
     val iconTint: Color? = null,
     /** How many lines [supportingText] may take before it ends in an ellipsis; raise it for a line that has to be read in full. */
     val supportingMaxLines: Int = 1,
-) {
-    /**
-     * [BingeChoice] built with its old `subtitle` name. Required, and last, because Kotlin cannot hold a second
-     * constructor that differs from the primary only in a parameter's name.
-     */
-    @Deprecated(
-        message = "Renamed: subtitle is supportingText.",
-        replaceWith = ReplaceWith(
-            "BingeChoice(value, label, supportingText = subtitle, icon = icon, mark = mark, avatarName = avatarName, " +
-                "avatarUrl = avatarUrl, trailingText = trailingText, iconTint = iconTint)",
-        ),
-    )
-    constructor(
-        value: T,
-        label: String,
-        icon: ImageVector? = null,
-        mark: String? = null,
-        avatarName: String? = null,
-        avatarUrl: String? = null,
-        trailingText: String? = null,
-        iconTint: Color? = null,
-        subtitle: String?,
-    ) : this(value, label, subtitle, icon, mark, avatarName, avatarUrl, trailingText, iconTint)
-
-    /** The old name of [supportingText]. */
-    @Deprecated("Renamed to supportingText.", ReplaceWith("supportingText"))
-    val subtitle: String? get() = supportingText
-}
+)
 
 /**
  * From this many choices a list is long: it is sectioned (the chosen, suggestions, then all), and its sheet opens
@@ -481,61 +454,6 @@ fun <T> BingeMultiChoiceSheetContent(
         )
     }
 }
-
-/**
- * [BingeMultiChoiceSheetContent] under its old name for the tick callback, `onToggle`; it is `onCheckedChange` now, as on
- * the checkbox rows. Kotlin cannot hold two overloads that differ only in parameter names, so this one takes
- * `onToggle` after [onClear], where `onCheckedChange` sat before [clearLabel]. Call it by name, as the old signature
- * was.
- */
-@Deprecated(
-    message = "Renamed: onToggle is onCheckedChange.",
-    replaceWith = ReplaceWith(
-        "BingeMultiChoiceSheetContent(title, choices, chosen, onCheckedChange = onToggle, clearLabel = clearLabel, " +
-            "onClear = onClear, modifier = modifier, doneLabel = doneLabel, onDone = onDone, " +
-            "filterPlaceholder = filterPlaceholder, leading = leading, suggested = suggested, pinned = pinned, " +
-            "actions = actions, dragHandle = dragHandle, subtitle = subtitle, caption = caption)",
-    ),
-)
-@Suppress("ModifierParameter", "LongParameterList")
-@Composable
-fun <T> BingeMultiChoiceSheetContent(
-    title: String,
-    choices: BingeChoiceList<T>,
-    chosen: Set<T>,
-    clearLabel: String,
-    onClear: () -> Unit,
-    onToggle: (value: T, ticked: Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    doneLabel: String? = null,
-    onDone: () -> Unit = {},
-    filterPlaceholder: String? = null,
-    leading: Set<T> = chosen,
-    suggested: List<T> = emptyList(),
-    pinned: List<T> = emptyList(),
-    actions: @Composable RowScope.() -> Unit = {},
-    dragHandle: Boolean = true,
-    subtitle: String? = null,
-    caption: String? = null,
-) = BingeMultiChoiceSheetContent(
-    title = title,
-    choices = choices,
-    chosen = chosen,
-    onCheckedChange = onToggle,
-    clearLabel = clearLabel,
-    onClear = onClear,
-    modifier = modifier,
-    doneLabel = doneLabel,
-    onDone = onDone,
-    filterPlaceholder = filterPlaceholder,
-    leading = leading,
-    suggested = suggested,
-    pinned = pinned,
-    actions = actions,
-    dragHandle = dragHandle,
-    subtitle = subtitle,
-    caption = caption,
-)
 
 /** A choice sheet's top as it rests, undocked: the drag handle over [header]. */
 @Composable
