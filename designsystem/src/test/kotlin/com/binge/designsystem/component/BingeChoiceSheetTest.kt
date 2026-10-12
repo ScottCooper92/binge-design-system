@@ -66,7 +66,7 @@ class BingeChoiceSheetTest {
                 chosen = chosen,
                 leading = setOf("c"),
                 filterPlaceholder = null,
-                onToggle = { value, on -> chosen = if (on) chosen + value else chosen - value },
+                onCheckedChange = { value, on -> chosen = if (on) chosen + value else chosen - value },
             )
         }
         rule.onNodeWithText("Bravo").performClick()
@@ -98,7 +98,7 @@ class BingeChoiceSheetTest {
                 chosen = chosen,
                 leading = setOf("ja"),
                 filterPlaceholder = null,
-                onToggle = { value, on -> chosen = if (on) chosen + value else chosen - value },
+                onCheckedChange = { value, on -> chosen = if (on) chosen + value else chosen - value },
                 pinned = listOf("any"),
             )
         }
@@ -134,7 +134,7 @@ class BingeChoiceSheetTest {
                 chosen = emptySet(),
                 leading = emptySet(),
                 filterPlaceholder = "Filter",
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
             )
         }
         rule.onNodeWithText("24").assertIsDisplayed()
@@ -150,7 +150,7 @@ class BingeChoiceSheetTest {
                 chosen = emptySet(),
                 leading = emptySet(),
                 filterPlaceholder = "Filter",
-                onToggle = { _, _ -> },
+                onCheckedChange = { _, _ -> },
             )
         }
 
@@ -176,7 +176,7 @@ class BingeChoiceSheetTest {
                     chosen = emptySet(),
                     leading = emptySet(),
                     filterPlaceholder = "Filter",
-                    onToggle = { _, _ -> },
+                    onCheckedChange = { _, _ -> },
                     imeVisible = keyboard,
                 )
             }
