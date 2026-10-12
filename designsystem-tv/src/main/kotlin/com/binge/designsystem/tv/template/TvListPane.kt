@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.template
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -31,7 +33,6 @@ import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
-import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.focus.tvFocusGroup
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -114,7 +115,8 @@ private fun PaneOptions(
     backToListFocus: FocusRequester,
     initialFocusedOptionLabel: String?,
 ) {
-    // Pinned options are controls, so → into the pane lands on the first value, one ↑ from them.
+    // Pinned options are controls, so a first → into the pane lands on the first value, one ↑ from them. Re-entry still
+    // resumes on the option last focused: the restorer falls back to the first value only when nothing was saved.
     val routesToFirstValue = pinnedOptions.isNotEmpty() && options.isNotEmpty()
     val firstValueFocus = remember { FocusRequester() }
     Column(
@@ -123,7 +125,7 @@ private fun PaneOptions(
                 .width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
                 .padding(top = dimensionResource(DesR.dimen.padding_s))
                 .focusProperties { left = backToListFocus }
-                .then(if (routesToFirstValue) Modifier.tvEntryFocusGroup(firstValueFocus) else Modifier.tvFocusGroup())
+                .then(if (routesToFirstValue) Modifier.focusRestorer(firstValueFocus).focusGroup() else Modifier.tvFocusGroup())
                 .then(if (multiSelect) Modifier else Modifier.selectableGroup()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
     ) {

@@ -150,6 +150,19 @@ class TvListPaneTriStateBoardTest {
     }
 
     @Test
+    fun `re-entering a pinned row resumes on the option last focused, not the first value`() {
+        show()
+        press(Key.DirectionDown)
+        node(SECOND).assertIsFocused()
+
+        press(Key.DirectionLeft)
+        node(ROW_LABEL).assertIsFocused()
+        press(Key.DirectionRight)
+
+        node(SECOND).assertIsFocused()
+    }
+
+    @Test
     fun `an option leads with the mark it was given`() {
         show()
 
