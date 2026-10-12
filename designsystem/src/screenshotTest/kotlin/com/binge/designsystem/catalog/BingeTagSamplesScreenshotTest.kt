@@ -29,4 +29,11 @@ class BingeTagSamplesScreenshotTest {
     fun Tags() {
         BingeTagKindsSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun WrappingRow() {
+        WrappingRowSample()
+    }
 }

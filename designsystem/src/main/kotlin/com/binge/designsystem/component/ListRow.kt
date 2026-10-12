@@ -52,7 +52,9 @@ import com.binge.designsystem.theme.BingeShapes
  * groups sit stacked with no overlap and no clipping either way. Supply [leading] via [ListRowPoster]
  * (or an avatar) and [trailingContent] for an action or status element — [verticalAlignment] centers it
  * against the row's full matched height rather than pinning it to the top beside a two-line title.
- * An optional [footer] spans the full inner width below the main line (e.g. a progress bar that also
+ * Because that main line is measured at [IntrinsicSize.Min], wrapping content in [content] or [trailingContent] must be
+ * a [WrappingRow], not a `FlowRow`: `FlowRow` reports fewer lines than it draws, so the card comes out too short and
+ * clips what sits below. An optional [footer] spans the full inner width below the main line (e.g. a progress bar that also
  * runs under the poster).
  */
 @Composable
