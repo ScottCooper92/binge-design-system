@@ -172,8 +172,7 @@ fun bingeNumberItem(
         icon = icon,
         label = title,
         detail = if (value == null && openEndLabel != null) openEndLabel else format((value ?: range.first).coerceIn(range)),
-        clickable = enabled,
-        disabled = !enabled,
+        enabled = enabled,
         onClick = { open = true },
     )
 }

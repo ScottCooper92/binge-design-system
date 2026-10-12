@@ -84,8 +84,8 @@ data class ListItem(
     val loading: Boolean = false,
     /** Joins the row to a parent row above it; the icon box then follows a connector-width inset. */
     val connector: ListItemConnector? = null,
-    /** Dimmed and inert, for a row that cannot be used because something else is in flight. */
-    val disabled: Boolean = false,
+    /** Dimmed and inert when false, for a row that cannot be used because something else is in flight. */
+    val enabled: Boolean = true,
     /** What a long-press does, announced by TalkBack ("double tap and hold to …"). Only read with [onLongClick]. */
     val onLongClickLabel: String? = null,
     /**
@@ -118,3 +118,80 @@ data class ListItem(
 /** The row's switch state, from [ListItem.toggleState] or else [ListItem.toggled]; null for a row with no switch. */
 internal val ListItem.switchState: ToggleableState?
     get() = toggleState ?: toggled?.let { ToggleableState(it) }
+
+/**
+ * A [ListItem] under its old flag, `disabled`; it is [ListItem.enabled] now, the Material 3 name, with the sense turned
+ * round. Kotlin cannot hold two constructors that differ only in a parameter's name, so this one takes `disabled` last
+ * and with no default: a call that passes `enabled`, or neither, builds the primary one, and a call that passes `disabled`
+ * lands here. Call it by name, as the old signature was.
+ */
+@Deprecated(
+    message = "Renamed and turned round: disabled = true is enabled = false.",
+    replaceWith = ReplaceWith(
+        "ListItem(icon = icon, iconPainter = iconPainter, iconTint = iconTint, label = label, detail = detail, " +
+            "detailColor = detailColor, badgeCount = badgeCount, badgeTint = badgeTint, badgeAlert = badgeAlert, " +
+            "selected = selected, clickable = clickable, destination = destination, " +
+            "trailingContent = trailingContent, onClick = onClick, onLongClick = onLongClick, " +
+            "leadingContent = leadingContent, loading = loading, connector = connector, " +
+            "onLongClickLabel = onLongClickLabel, toggled = toggled, expanded = expanded, toggleState = toggleState, " +
+            "supportingMaxLines = supportingMaxLines, enabled = !disabled)",
+    ),
+)
+@Suppress("LongParameterList")
+fun ListItem(
+    icon: ImageVector,
+    iconPainter: (@Composable () -> Painter)? = null,
+    iconTint: Color? = null,
+    label: String,
+    detail: String? = null,
+    detailColor: Color? = null,
+    badgeCount: Int? = null,
+    badgeTint: Color? = null,
+    badgeAlert: Boolean = false,
+    selected: Boolean = false,
+    clickable: Boolean = true,
+    destination: ListItemDestination = ListItemDestination.InApp,
+    trailingContent: (@Composable () -> Unit)? = null,
+    onClick: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
+    loading: Boolean = false,
+    connector: ListItemConnector? = null,
+    onLongClickLabel: String? = null,
+    toggled: Boolean? = null,
+    expanded: Boolean? = null,
+    toggleState: ToggleableState? = null,
+    supportingMaxLines: Int = 1,
+    disabled: Boolean,
+): ListItem =
+    ListItem(
+        icon = icon,
+        iconPainter = iconPainter,
+        iconTint = iconTint,
+        label = label,
+        detail = detail,
+        detailColor = detailColor,
+        badgeCount = badgeCount,
+        badgeTint = badgeTint,
+        badgeAlert = badgeAlert,
+        selected = selected,
+        clickable = clickable,
+        destination = destination,
+        trailingContent = trailingContent,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        leadingContent = leadingContent,
+        loading = loading,
+        connector = connector,
+        onLongClickLabel = onLongClickLabel,
+        toggled = toggled,
+        expanded = expanded,
+        toggleState = toggleState,
+        supportingMaxLines = supportingMaxLines,
+        enabled = !disabled,
+    )
+
+/** The old flag, [ListItem.enabled] turned round. */
+@Deprecated(message = "Renamed and turned round: use enabled.", replaceWith = ReplaceWith("!enabled"))
+val ListItem.disabled: Boolean
+    get() = !enabled
