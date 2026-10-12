@@ -114,24 +114,6 @@ fun WatchProviderTile(
     }
 }
 
-/**
- * [WatchProviderTile] under its old callback, `onToggle`, which took no argument; it is `onCheckedChange` now and is
- * told the state the tap asks for, as on every other toggle. Kotlin cannot hold two overloads that differ only in the
- * parameter's name, and a lambda with no parameter fits either type, so call this one with `onToggle` by name.
- */
-@Deprecated(
-    message = "Renamed: onToggle is onCheckedChange, which receives the new state.",
-    replaceWith = ReplaceWith("WatchProviderTile(provider, selected, onCheckedChange = { onToggle() }, modifier = modifier)"),
-)
-@Suppress("ModifierParameter")
-@Composable
-fun WatchProviderTile(
-    provider: WatchProviderUi,
-    selected: Boolean,
-    onToggle: () -> Unit,
-    modifier: Modifier = Modifier,
-) = WatchProviderTile(provider = provider, selected = selected, onCheckedChange = { onToggle() }, modifier = modifier)
-
 /** Brand identity shown when the logo image is loading or fails to render. */
 @Composable
 private fun WatchProviderNameFallback(name: String) {

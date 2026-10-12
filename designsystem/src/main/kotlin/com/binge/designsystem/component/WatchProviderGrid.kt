@@ -64,30 +64,6 @@ fun WatchProviderGrid(
     }
 }
 
-/** [WatchProviderGrid] under its old callback, `onToggle`, which was told only the provider's id; see [onCheckedChange]. */
-@Deprecated(
-    message = "Renamed: onToggle is onCheckedChange, which also receives the new state.",
-    replaceWith = ReplaceWith(
-        "WatchProviderGrid(providers, selectedWatchProviderIds, onCheckedChange = { id, _ -> onToggle(id) }, " +
-            "modifier = modifier, columns = columns)",
-    ),
-)
-@Suppress("ModifierParameter")
-@Composable
-fun WatchProviderGrid(
-    providers: List<WatchProviderUi>,
-    selectedWatchProviderIds: Set<Int>,
-    onToggle: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    columns: Int = DEFAULT_GRID_COLUMNS,
-) = WatchProviderGrid(
-    providers = providers,
-    selectedWatchProviderIds = selectedWatchProviderIds,
-    onCheckedChange = { id, _ -> onToggle(id) },
-    modifier = modifier,
-    columns = columns,
-)
-
 /**
  * One row of up to [columns] tiles, trailing slots padded with `Spacer(weight 1f)` so a short last row's
  * tiles stay the width of the full rows above.
@@ -130,32 +106,6 @@ fun WatchProviderGridRow(
         repeat(columns - providers.size) { Spacer(Modifier.weight(1f)) }
     }
 }
-
-/** [WatchProviderGridRow] under its old callback, `onToggle`, which was told only the provider's id. */
-@Deprecated(
-    message = "Renamed: onToggle is onCheckedChange, which also receives the new state.",
-    replaceWith = ReplaceWith(
-        "WatchProviderGridRow(providers, columns, selectedWatchProviderIds, onCheckedChange = { id, _ -> onToggle(id) }, " +
-            "modifier = modifier, isFirstRow = isFirstRow)",
-    ),
-)
-@Suppress("ModifierParameter")
-@Composable
-fun WatchProviderGridRow(
-    providers: List<WatchProviderUi>,
-    columns: Int,
-    selectedWatchProviderIds: Set<Int>,
-    onToggle: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    isFirstRow: Boolean = false,
-) = WatchProviderGridRow(
-    providers = providers,
-    columns = columns,
-    selectedWatchProviderIds = selectedWatchProviderIds,
-    onCheckedChange = { id, _ -> onToggle(id) },
-    modifier = modifier,
-    isFirstRow = isFirstRow,
-)
 
 /**
  * Placeholder grid rendered while provider logos are loading — preserves the

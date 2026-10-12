@@ -67,24 +67,6 @@ fun CarouselSkeleton(
 }
 
 /**
- * [CarouselSkeleton] under its old name for the card count, `numCards`; it is `count` now, as on the other skeletons.
- * Kotlin cannot hold two overloads that differ only in parameter names, so this one has no default for `numCards`: a
- * call that passes none resolves to the new function, and a call that passes `numCards` lands here. `numCards` and `description` swap places so the two overloads have different
- * signatures on the JVM; call it by name, as the old signature was.
- */
-@Deprecated(
-    message = "Renamed: numCards is count.",
-    replaceWith = ReplaceWith("CarouselSkeleton(modifier, count = numCards, description = description)"),
-)
-@Suppress("ModifierParameter")
-@Composable
-fun CarouselSkeleton(
-    modifier: Modifier = Modifier,
-    description: String? = null,
-    numCards: Int,
-) = CarouselSkeleton(modifier = modifier, count = numCards, description = description)
-
-/**
  * The skeleton's side padding, as the loaded MediaCarousel and SectionHeader take theirs: the content inset, plus an
  * overlay a shell or hub publishes on either side, so the first and last columns clear it as the loaded row's do.
  */

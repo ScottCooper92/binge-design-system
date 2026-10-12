@@ -16,7 +16,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -88,45 +87,6 @@ fun BingeOutlinedButton(
         }
     }
 }
-
-/**
- * [BingeOutlinedButton] under its old colour override, `contentColor`; it is `colors: ButtonColors` now, as on
- * [BingeFilledButton] and Material 3's buttons, so a caller can also set the container and the disabled colours. This
- * one builds `outlinedButtonColors(contentColor = contentColor)`, which is what the old parameter did. Kotlin cannot
- * hold two overloads that differ only in a parameter's name or default, so `contentColor` has no default here: a call
- * that passes none resolves to [BingeOutlinedButton], and a call that passes `contentColor` lands here. Call it by name.
- */
-@Deprecated(
-    message = "Renamed: contentColor is colors, a ButtonColors.",
-    replaceWith = ReplaceWith(
-        "BingeOutlinedButton(label, onClick, modifier, leadingIcon, showLabel, enabled, loading, destructive, " +
-            "colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor))",
-        "androidx.compose.material3.ButtonDefaults",
-    ),
-)
-@Suppress("ModifierParameter", "LongParameterList")
-@Composable
-fun BingeOutlinedButton(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    leadingIcon: ImageVector? = null,
-    showLabel: Boolean = true,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    destructive: Boolean = false,
-    contentColor: Color,
-) = BingeOutlinedButton(
-    label = label,
-    onClick = onClick,
-    modifier = modifier,
-    leadingIcon = leadingIcon,
-    showLabel = showLabel,
-    enabled = enabled,
-    loading = loading,
-    destructive = destructive,
-    colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
-)
 
 @Preview(showBackground = true)
 @Composable

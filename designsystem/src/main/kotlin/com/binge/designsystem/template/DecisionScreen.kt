@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -235,7 +236,7 @@ private fun DecisionFooter(accept: ScreenAction, decline: ScreenAction) {
             label = decline.label,
             onClick = decline.onClick,
             leadingIcon = decline.leadingIcon,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
             modifier = Modifier.fillMaxWidth().then(decline.modifier),
         )
         BingeFilledButton(

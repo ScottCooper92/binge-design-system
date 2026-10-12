@@ -49,31 +49,6 @@ class TvTemplateTwinShapesTest {
         assertEquals(listOf("accept", "decline"), pressed)
     }
 
-    @Suppress("DEPRECATION")
-    @Test
-    fun `the loose-label decision forwards to the shared shape`() {
-        val pressed = mutableListOf<String>()
-        rule.setContent {
-            BingeTvTheme {
-                TvDecisionPage(
-                    copy = Copy,
-                    points = emptyList(),
-                    acceptLabel = "Accept",
-                    declineLabel = "Decline",
-                    onAccept = { pressed += "accept" },
-                    onDecline = { pressed += "decline" },
-                    hosting = TvPageHosting.PreShell,
-                    declineModifier = Modifier.testTag("decline"),
-                )
-            }
-        }
-        rule.waitForIdle()
-
-        rule.onNodeWithText("Accept").assertIsFocused().performClick()
-        rule.onNodeWithTag("decline").performClick()
-        assertEquals(listOf("accept", "decline"), pressed)
-    }
-
     @Test
     fun `a message page's action keeps the modifier it was given`() {
         var retries = 0

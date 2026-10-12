@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -100,41 +99,6 @@ fun BingeTextButton(
         }
     }
 }
-
-/** [BingeTextButton] under its old colour override, `contentColor`; see the deprecated [BingeOutlinedButton]. */
-@Deprecated(
-    message = "Renamed: contentColor is colors, a ButtonColors.",
-    replaceWith = ReplaceWith(
-        "BingeTextButton(label, onClick, modifier, leadingIcon, trailingIcon, showLabel, enabled, loading, destructive, " +
-            "colors = ButtonDefaults.textButtonColors(contentColor = contentColor))",
-        "androidx.compose.material3.ButtonDefaults",
-    ),
-)
-@Suppress("ModifierParameter", "LongParameterList")
-@Composable
-fun BingeTextButton(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    leadingIcon: ImageVector? = null,
-    trailingIcon: ImageVector? = null,
-    showLabel: Boolean = true,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    destructive: Boolean = false,
-    contentColor: Color,
-) = BingeTextButton(
-    label = label,
-    onClick = onClick,
-    modifier = modifier,
-    leadingIcon = leadingIcon,
-    trailingIcon = trailingIcon,
-    showLabel = showLabel,
-    enabled = enabled,
-    loading = loading,
-    destructive = destructive,
-    colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
-)
 
 @Preview(showBackground = true)
 @Composable

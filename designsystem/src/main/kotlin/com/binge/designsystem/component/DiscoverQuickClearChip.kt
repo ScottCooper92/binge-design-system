@@ -94,24 +94,6 @@ fun DiscoverQuickClearChip(
     }
 }
 
-/**
- * [DiscoverQuickClearChip] under its old name for the tap, `onClear`; it is `onClick` now, as on every other chip.
- * Kotlin cannot hold two overloads that differ only in parameter names, so this one takes `onClear` ahead of `tone`.
- * Call it by name, as the old signature was.
- */
-@Deprecated(
-    message = "Renamed: onClear is onClick.",
-    replaceWith = ReplaceWith("DiscoverQuickClearChip(label, tone, onClick = onClear, modifier = modifier)"),
-)
-@Suppress("ModifierParameter")
-@Composable
-fun DiscoverQuickClearChip(
-    label: String,
-    onClear: () -> Unit,
-    tone: QuickClearTone,
-    modifier: Modifier = Modifier,
-) = DiscoverQuickClearChip(label = label, tone = tone, onClick = onClear, modifier = modifier)
-
 @Preview(showBackground = true)
 @Composable
 private fun PreviewDiscoverQuickClearChipInclude() {

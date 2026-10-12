@@ -89,42 +89,6 @@ fun TvDecisionPage(
     )
 }
 
-/** [TvDecisionPage] with its answers as loose labels and callbacks, from before both platforms shared `ScreenAction`. */
-@Deprecated(
-    "Pass the answers as ScreenAction, as the phone's DecisionScreen takes them.",
-    ReplaceWith(
-        "TvDecisionPage(copy, points, ScreenAction(acceptLabel, onAccept, modifier = acceptModifier), " +
-            "ScreenAction(declineLabel, onDecline, modifier = declineModifier), modifier, hosting, acceptInitiallyFocused, noteContent)",
-        "com.binge.designsystem.template.ScreenAction",
-    ),
-)
-@Composable
-fun TvDecisionPage(
-    copy: DecisionCopy,
-    points: List<DecisionPoint>,
-    acceptLabel: String,
-    declineLabel: String,
-    onAccept: () -> Unit,
-    onDecline: () -> Unit,
-    modifier: Modifier = Modifier,
-    hosting: TvPageHosting = currentTvPageHosting(),
-    acceptInitiallyFocused: Boolean = false,
-    acceptModifier: Modifier = Modifier,
-    declineModifier: Modifier = Modifier,
-    noteContent: (@Composable ColumnScope.() -> Unit)? = null,
-) {
-    TvDecisionPage(
-        copy = copy,
-        points = points,
-        accept = ScreenAction(acceptLabel, onAccept, modifier = acceptModifier),
-        decline = ScreenAction(declineLabel, onDecline, modifier = declineModifier),
-        modifier = modifier,
-        hosting = hosting,
-        acceptInitiallyFocused = acceptInitiallyFocused,
-        noteContent = noteContent,
-    )
-}
-
 /**
  * [TvDecisionPage]'s content without the page around it (#638): the [copy] beside the read-out card of the [points],
  * for a decision that is one step of a [TvStepFlow]. The flow supplies the chrome, the hosting and the footer that

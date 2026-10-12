@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** The chips' taps are `onClick` and `onLongClick`; the old names still work by name, and a positional call is not ambiguous. */
+/** The chips' taps are `onClick` and `onLongClick`, and a positional call is not ambiguous. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class ChipClickNamesTest {
@@ -24,19 +24,6 @@ class ChipClickNamesTest {
         rule.setContent {
             BingeExpressiveTheme {
                 IncludeExcludeChip("Action", IncludeExcludeState.Neutral, { clicks++ }, {})
-            }
-        }
-        rule.onNodeWithText("Action").performClick()
-        assertEquals(1, clicks)
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    fun `the old names still reach the same chip`() {
-        var clicks = 0
-        rule.setContent {
-            BingeExpressiveTheme {
-                IncludeExcludeChip(label = "Action", state = IncludeExcludeState.Neutral, onTap = { clicks++ }, onLongPress = {})
             }
         }
         rule.onNodeWithText("Action").performClick()

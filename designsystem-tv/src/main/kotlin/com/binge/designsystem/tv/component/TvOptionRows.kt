@@ -150,40 +150,6 @@ fun TvOptionRow(
 }
 
 /**
- * [TvOptionRow] under its old name for the value slot, `trailing`; it is `trailingContent` now. Kotlin cannot hold
- * two overloads that differ only in parameter names, so this one has no default for `trailing`: a call that passes
- * none resolves to the new function, and a call that passes `trailing` by name lands here.
- */
-@Deprecated(
-    message = "Renamed: trailing is trailingContent.",
-    replaceWith = ReplaceWith(
-        "TvOptionRow(label, selected, onClick, modifier, initiallyFocused, trailingContent = trailing, icon = icon, " +
-            "supportingText = supportingText)",
-    ),
-)
-@Suppress("ModifierParameter", "LongParameterList")
-@Composable
-fun TvOptionRow(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    trailing: (@Composable () -> Unit)?,
-    modifier: Modifier = Modifier,
-    initiallyFocused: Boolean = false,
-    icon: ImageVector? = null,
-    supportingText: String? = null,
-) = TvOptionRow(
-    label = label,
-    selected = selected,
-    onClick = onClick,
-    modifier = modifier,
-    initiallyFocused = initiallyFocused,
-    trailingContent = trailing,
-    icon = icon,
-    supportingText = supportingText,
-)
-
-/**
  * One yes-or-no setting as a row the remote can reach: a box that takes a tick when [checked], then its [label].
  * OK flips it through [onCheckedChange].
  *
