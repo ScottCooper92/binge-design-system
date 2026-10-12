@@ -97,16 +97,31 @@ fun bingeExpandableItem(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     collapsedDetail: String? = null,
-    disabled: Boolean = false,
+    enabled: Boolean = true,
 ): ListItem =
     ListItem(
         icon = icon,
         label = title,
         detail = collapsedDetail.takeUnless { expanded },
         expanded = expanded,
-        disabled = disabled,
+        enabled = enabled,
         onClick = { onExpandedChange(!expanded) },
     )
+
+/** [bingeExpandableItem] under its old flag, `disabled`; it is `enabled` now, turned round. `disabled` and `collapsedDetail` swap places so the two have different JVM
+ * signatures; call it by name. */
+@Deprecated(
+    message = "Renamed and turned round: disabled = true is enabled = false.",
+    replaceWith = ReplaceWith("bingeExpandableItem(icon, title, expanded, onExpandedChange, collapsedDetail, enabled = !disabled)"),
+)
+fun bingeExpandableItem(
+    icon: ImageVector,
+    title: String,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    disabled: Boolean,
+    collapsedDetail: String? = null,
+): ListItem = bingeExpandableItem(icon, title, expanded, onExpandedChange, collapsedDetail, enabled = !disabled)
 
 @Composable
 private fun GroupContentBody(content: BingeGroupContent) {

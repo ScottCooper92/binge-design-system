@@ -343,8 +343,7 @@ fun <T> bingeChoiceItem(
         icon = icon,
         label = title,
         detail = detail,
-        clickable = enabled,
-        disabled = !enabled,
+        enabled = enabled,
         onClick = { open = true },
     )
 }
@@ -402,8 +401,7 @@ fun <T> bingeMultiChoiceItem(
         icon = icon,
         label = title,
         detail = chosen.ifEmpty { emptyLabel },
-        clickable = enabled,
-        disabled = !enabled,
+        enabled = enabled,
         onClick = { open = true },
     )
 }

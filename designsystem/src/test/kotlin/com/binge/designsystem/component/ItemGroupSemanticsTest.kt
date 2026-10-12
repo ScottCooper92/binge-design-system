@@ -146,7 +146,7 @@ class ItemGroupSemanticsTest {
                 ItemGroup(
                     title = null,
                     rows = listOf(
-                        ListItem(icon = Icons.Filled.Bookmark, label = "Report", disabled = true, onClick = { clicked = true }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Report", enabled = false, onClick = { clicked = true }),
                     ),
                 )
             }
@@ -222,7 +222,7 @@ class ItemGroupSemanticsTest {
                 ItemGroup(
                     title = null,
                     rows = listOf(
-                        ListItem(icon = Icons.Filled.Bookmark, label = "CSRF", toggled = true, disabled = true, onClick = { taps++ }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "CSRF", toggled = true, enabled = false, onClick = { taps++ }),
                     ),
                 )
             }
