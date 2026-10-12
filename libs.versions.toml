@@ -12,7 +12,7 @@
 # rejects it. Binge's catalog has the same pair for the same reason, and these two must agree.
 [versions]
 agp = "9.4.1"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 composeBom = "2026.08.00"
 # tv-material ships its own MaterialTheme tree; the version agrees with Binge's.
 tvMaterial = "1.1.0"
@@ -20,7 +20,7 @@ tvMaterial = "1.1.0"
 qrcodegen = "1.8.0"
 # material3 is pinned ahead of the BOM, as Binge pins it: the expressive theme reads APIs the BOM's
 # stable line does not have yet.
-material3 = "1.5.0-alpha29"
+material3 = "1.5.0-beta01"
 # Pinned ahead of the BOM too, matching Binge's own adaptive-navigation3 pin.
 material3AdaptiveNavigation3 = "1.3.0"
 materialColorUtilities = "0.1.2"
