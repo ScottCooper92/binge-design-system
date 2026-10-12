@@ -46,4 +46,12 @@ class MediaCardSamplesScreenshotTest {
     fun LibraryAction() {
         MediaCardLibrarySample()
     }
+
+    @PreviewTest
+    @Preview(name = "status", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "status-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun Status() {
+        MediaCardStatusSample()
+    }
 }

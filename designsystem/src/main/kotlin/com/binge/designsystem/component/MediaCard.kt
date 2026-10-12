@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -58,6 +59,7 @@ fun MediaCard(
     topEndAction: MediaCardAction? = null,
     typeBadge: MediaTypeTagType? = null,
     userRating: Float? = null,
+    status: MediaCardStatus? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -114,6 +116,7 @@ fun MediaCard(
                     rating = rating,
                     userRating = userRating,
                     typeBadge = typeBadge,
+                    status = status,
                     topEndAction = topEndAction,
                 )
             }
@@ -180,6 +183,7 @@ private fun MediaCardOverlays(
     rating: Float?,
     userRating: Float?,
     typeBadge: MediaTypeTagType?,
+    status: MediaCardStatus?,
     topEndAction: MediaCardAction?,
 ) {
     val badgeInset = dimensionResource(R.dimen.card_badge_inset)
@@ -201,13 +205,16 @@ private fun MediaCardOverlays(
                     .padding(dimensionResource(R.dimen.card_rating_padding)),
             )
         }
-        if (typeBadge != null) {
-            MediaTypeTag(
-                type = typeBadge,
+        if (typeBadge != null || status != null) {
+            Column(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(badgeInset),
-            )
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+            ) {
+                if (typeBadge != null) MediaTypeTag(type = typeBadge)
+                if (status != null) MediaCardStatusChip(status)
+            }
         }
         if (topEndAction != null) {
             MediaCardActionButton(
@@ -218,6 +225,18 @@ private fun MediaCardOverlays(
             )
         }
     }
+}
+
+/** The chip's wash is translucent, so it sits on a solid surface rather than straight on the artwork. */
+@Composable
+private fun MediaCardStatusChip(status: MediaCardStatus) {
+    StatusChip(
+        label = status.label,
+        sentiment = status.sentiment,
+        modifier = Modifier
+            .clip(BingeShapes.Pill)
+            .background(MaterialTheme.colorScheme.surface),
+    )
 }
 
 @Composable
