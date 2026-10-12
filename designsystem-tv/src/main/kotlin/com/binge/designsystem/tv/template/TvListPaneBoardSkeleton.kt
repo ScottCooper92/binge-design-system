@@ -40,8 +40,8 @@ private const val PANE_TITLE_WIDTH_FRACTION = 0.6f
  * current value under their name: a row with one is taller, so a one-line skeleton would move the rows when it resolves.
  * [groupNote] reserves a note line under the first group's title, for a board whose first group carries a
  * [TvPaneGroup.note]: the note pushes the first row down, so a skeleton without it would move the rows when it resolves.
- * [rowIcon] reserves each row's leading icon, for a board whose rows carry a [TvPaneRow.icon]: the icon takes the row's
- * start and a little height, so the label bars would otherwise sit left of where the labels land.
+ * [rowIcon] reserves each row's leading icon, for a board whose rows carry a [TvPaneRow.icon]: the icon sits in a leading
+ * slot at the row's start and the row is a little taller, so the label bars would otherwise sit left of where the labels land.
  */
 @Composable
 fun TvListPaneBoardSkeleton(
@@ -103,9 +103,15 @@ private fun ListSkeleton(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_icon_gap)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // The icon's slot at the board's icon size, so the label bar starts where the label will.
+                // The row's leading slot, with the icon's block centred in it at the board's icon size, so the block sits
+                // where the icon lands and the label bar starts where the label will.
                 if (rowIcon) {
-                    TvSkeletonBlock(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)), shape = BingeShapes.TvListItem)
+                    Box(
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon_slot)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        TvSkeletonBlock(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)), shape = BingeShapes.TvListItem)
+                    }
                 }
                 Column(
                     modifier = Modifier.weight(1f),

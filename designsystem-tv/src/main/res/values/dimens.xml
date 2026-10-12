@@ -137,8 +137,10 @@
     <dimen name="tv_list_pane_option_width">280dp</dimen>
     <!-- A list row's leading icon, plain in the row's content colour: no plate, so it costs the label as little width as it can -->
     <dimen name="tv_list_pane_row_icon">24dp</dimen>
-    <!-- The gap after a list row's icon, and a row with an icon's height: what ListItem takes with leading content. -->
-    <dimen name="tv_list_pane_row_icon_gap">16dp</dimen>
+    <!-- A list row's leading slot, with the icon centred in it, and the gap after the slot, as ListItem lays them out. -->
+    <dimen name="tv_list_pane_row_icon_slot">32dp</dimen>
+    <dimen name="tv_list_pane_row_icon_gap">8dp</dimen>
+    <!-- A row with an icon is taller than one without. -->
     <dimen name="tv_list_item_icon_height">56dp</dimen>
     <!-- A list row's trailing spinner while its value loads, and the arc's stroke at that size -->
     <dimen name="tv_list_pane_row_spinner">20dp</dimen>
