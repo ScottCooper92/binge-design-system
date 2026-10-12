@@ -135,7 +135,11 @@ internal fun TvIconButtonSurface(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (loading) {
-                TvButtonSpinner(color = palette.content)
+                TvSpinner(
+                    color = palette.content,
+                    diameter = dimensionResource(TvR.dimen.tv_button_icon),
+                    stroke = dimensionResource(TvR.dimen.tv_button_spinner_stroke),
+                )
             } else {
                 Icon(
                     imageVector = icon,

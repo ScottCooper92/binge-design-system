@@ -2,4 +2,11 @@
 <resources>
     <!-- A tab's count before it is known: format-only, so there is nothing to translate. -->
     <string name="tv_tab_count_unknown" translatable="false">—</string>
+    <!-- A list row's count badge, read in place of the number it shows. A count of things waiting for the user. -->
+    <plurals name="tv_pane_row_badge_count">
+        <item quantity="one">%1$d new</item>
+        <item quantity="other">%1$d new</item>
+    </plurals>
+    <!-- A list row's uncounted attention badge, read in place of the "!" it shows -->
+    <string name="tv_pane_row_badge_alert">Needs attention</string>
 </resources>
