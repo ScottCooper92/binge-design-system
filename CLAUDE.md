@@ -111,6 +111,8 @@ still an issue; a serious problem inside the diff is a change to make now.
 
 ## Commits and pull requests
 
+**Open every PR from `.github/pull_request_template.md`** (`gh pr create --body-file` it, then fill it in, or paste its checklist into your body). Tick only the checks you ran locally on the final head, and say what you left to CI and why. The review bot compares the ticks with CI, so a ticked check that fails CI is a finding.
+
 - Conventional-commit subjects (`feat:`, `fix:`, `docs:`, `chore:`), imperative mood.
 - One reviewable idea per PR.
 - A PR that changes a public signature says what it means for the consumers.
