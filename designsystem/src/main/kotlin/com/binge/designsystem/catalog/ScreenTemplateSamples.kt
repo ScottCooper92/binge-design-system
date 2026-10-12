@@ -83,6 +83,7 @@ import com.binge.designsystem.template.LocalHeroReadingMargin
 import com.binge.designsystem.template.MessageScreen
 import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.template.ScreenBar
+import com.binge.designsystem.template.ScreenBarChrome
 import com.binge.designsystem.template.ScreenBody
 import com.binge.designsystem.template.StepFlowScreen
 import com.binge.designsystem.template.StepHeading
@@ -626,6 +627,17 @@ fun FormScreenCappedSample() {
 /** The middle step of a flow: portrait stacks the art, heading and choices; a wide window splits them. */
 @Composable
 fun StepFlowScreenSample() {
+    SampleStepFlow(ScreenBarChrome.Glass)
+}
+
+/** The same step on the plain bar, a first-run flow's: an opaque bar and a Back with no circle behind it. */
+@Composable
+fun StepFlowScreenPlainChromeSample() {
+    SampleStepFlow(ScreenBarChrome.Plain)
+}
+
+@Composable
+private fun SampleStepFlow(barChrome: ScreenBarChrome) {
     var step by remember { mutableIntStateOf(1) }
     val leave = LocalDemoBack.current
     val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
@@ -634,6 +646,7 @@ fun StepFlowScreenSample() {
             stepCount = SAMPLE_STEPS,
             currentStep = step,
             onBack = { if (step > 0) step-- else leave() },
+            barChrome = barChrome,
             aside = {
                 Box(
                     modifier =
