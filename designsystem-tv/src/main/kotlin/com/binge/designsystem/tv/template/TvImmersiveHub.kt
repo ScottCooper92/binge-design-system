@@ -254,7 +254,7 @@ fun <T : Any> TvImmersiveHub(
                                 seeAllRowKey = row.key
                             }
                         },
-                        trailing =
+                        trailingContent =
                             row.onSeeAll?.takeIf { seeAllLabel != null }?.let { onSeeAll ->
                                 { isFocused, onFocusChanged, cellModifier ->
                                     TvSeeAllTile(

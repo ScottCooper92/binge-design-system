@@ -190,7 +190,7 @@ fun TvCardRowSample() {
             items = (1..4).toList(),
             key = { it },
             cellWidth = cellWidth,
-            trailing = { _, _, cellModifier -> SamplePlate(label = "More", modifier = cellModifier.width(cellWidth)) },
+            trailingContent = { _, _, cellModifier -> SamplePlate(label = "More", modifier = cellModifier.width(cellWidth)) },
         ) { index, _, _, cellModifier ->
             SamplePlate(label = "Season $index", modifier = cellModifier)
         }
@@ -223,7 +223,7 @@ fun TvCardRowFocusedSample() {
             key = { it },
             cellWidth = cellWidth,
             initiallyFocusedKey = 2,
-            trailing = { isFocused, _, cellModifier ->
+            trailingContent = { isFocused, _, cellModifier ->
                 SamplePlate(label = "More", modifier = cellModifier.width(cellWidth), isFocused = isFocused)
             },
         ) { index, isFocused, _, cellModifier ->
