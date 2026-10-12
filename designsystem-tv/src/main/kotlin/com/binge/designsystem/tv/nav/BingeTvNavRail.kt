@@ -155,8 +155,10 @@ fun BingeTvNavRail(
     // toward the rail still opens it while the sink holds focus.
     val railEntry = railFocusRequester ?: remember { FocusRequester() }
     val contentFocus = contentFocusRequester ?: remember { FocusRequester() }
+    val destinationEntry = remember { FocusRequester() }
     var railHasFocus by remember { mutableStateOf(false) }
     var contentHasFocus by remember { mutableStateOf(false) }
+    var destinationHasFocus by remember { mutableStateOf(false) }
     // Set by `onPreviewKeyEvent` below on every key, true only for the one that moves toward the rail — so
     // [userMovedToRail] is true exactly while the rail holds focus *because of* that press. A later key
     // overwrites it directly, but focus can also leave the rail with no key at all (the handoffs below move
@@ -259,15 +261,21 @@ fun BingeTvNavRail(
                 LocalTvRailArtwork provides artwork,
                 LocalTvRailEntry provides railEntry,
             ) {
-                content()
+                // Its own group, so focus can be offered to the destination alone while the sink below holds it.
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .onFocusChanged { destinationHasFocus = it.hasFocus }
+                        .focusRequester(destinationEntry)
+                        .focusGroup(),
+                ) { content() }
             }
-            // A sibling of the destination's own content, never inside it: the group's entry requester
-            // (`contentFocus`) then always has something to land on from frame one, rather than racing
-            // whatever the destination composes first. Gone the instant the pane reports focus —
-            // including the sink's own: re-composing it forces Compose's own recovery search rather than
-            // leaving a stale grant unable to yield to whatever the destination grows next (see the class
-            // KDoc's fault-injection note on [TvFocusSink] usage).
-            if (!contentHasFocus) TvFocusSink(startEntry = railEntry)
+            ContentFocusSink(
+                sinkHoldsFocus = contentHasFocus && !destinationHasFocus,
+                visible = !destinationHasFocus,
+                destinationEntry = destinationEntry,
+                railEntry = railEntry,
+            )
         }
         Column(
             modifier = Modifier
@@ -430,3 +438,25 @@ private fun railGlassFraction(artworkPresent: Boolean): State<Float> =
         animationSpec = if (LocalReduceMotion.current) snap() else tween(TV_IMMERSIVE_CROSSFADE_MILLIS),
         label = "tvNavRailGlass",
     )
+
+/**
+ * The content pane's [TvFocusSink], [visible] while nothing in the destination has focus.
+ *
+ * A sibling of the destination, never inside it, so the pane's entry has something to land on from frame one while a
+ * skeleton has nothing focusable. The sink stays mounted while it holds focus, and [handOffFromSink] offers focus to
+ * the destination's own group until something there takes it. Removing a focused sink instead would leave focus with
+ * nowhere in the pane to go, so Compose's recovery would hand it to the rail and back every other frame: the rail
+ * flicking between its focused and resting look for as long as a cold first screen loads.
+ */
+@Composable
+private fun ContentFocusSink(
+    sinkHoldsFocus: Boolean,
+    visible: Boolean,
+    destinationEntry: FocusRequester,
+    railEntry: FocusRequester,
+) {
+    if (visible) TvFocusSink(startEntry = railEntry)
+    LaunchedEffect(sinkHoldsFocus) {
+        if (sinkHoldsFocus) handOffFromSink(destinationEntry)
+    }
+}

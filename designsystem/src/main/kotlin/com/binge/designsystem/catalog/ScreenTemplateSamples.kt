@@ -32,15 +32,20 @@ import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -83,6 +88,8 @@ import com.binge.designsystem.template.StepFlowScreen
 import com.binge.designsystem.template.StepHeading
 import com.binge.designsystem.template.screenListPadding
 import com.binge.designsystem.theme.BingeShapes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /*
  * The screen templates, each at the size it ships: a whole window. Every sample fills its slots with plain
@@ -132,6 +139,7 @@ fun BingeScreenScaffoldNoBarSample() {
 /** The large bar: a subtitle summarising what the screen shows, and a control at the end of the title row. */
 @Composable
 fun BingeScreenScaffoldLargeBarSample() {
+    var filtered by remember { mutableStateOf(true) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         BingeScreenScaffold(
             title = "Discover",
@@ -140,8 +148,8 @@ fun BingeScreenScaffoldLargeBarSample() {
             titleTrailing = {
                 BingeFilterChip(
                     label = "Filters",
-                    selected = true,
-                    onClick = {},
+                    selected = filtered,
+                    onClick = { filtered = !filtered },
                     count = 2,
                 )
             },
@@ -154,18 +162,21 @@ fun BingeScreenScaffoldLargeBarSample() {
 /** A pinned bottom bar: the list's last row comes to rest above it rather than under it. */
 @Composable
 fun BingeScreenScaffoldBottomBarSample() {
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         BingeScreenScaffold(
             title = "Sliders",
             onBack = LocalDemoBack.current,
             bar = ScreenBar.Small,
+            snackbarHostState = snackbar,
             bottomBar = {
                 Box(
                     modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerHigh),
                 ) {
                     BingeFilledButton(
                         label = "Add slider",
-                        onClick = {},
+                        onClick = { scope.launch { snackbar.showSnackbar("Slider added") } },
                         modifier = Modifier
                             .windowInsetsPadding(bottomBarInsets())
                             .fillMaxWidth()
@@ -182,18 +193,21 @@ fun BingeScreenScaffoldBottomBarSample() {
 /** A failure that replaced the screen's content: the reason and two ways out. */
 @Composable
 fun MessageScreenSample() {
+    val leave = LocalDemoBack.current
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        BingeScreenScaffold(title = "Requests", onBack = LocalDemoBack.current) { padding ->
+        BingeScreenScaffold(title = "Requests", onBack = leave) { padding ->
             ScreenBody(padding) { inner ->
-                MessageScreen(
-                    headline = "Can't reach the server",
-                    body = "Check your connection, then try again.",
-                    icon = Icons.Filled.CloudOff,
-                    primary = ScreenAction("Try again", onClick = {}, leadingIcon = Icons.Filled.Refresh),
-                    secondary = ScreenAction("Settings", onClick = {}),
-                    announce = true,
-                    modifier = Modifier.padding(inner),
-                )
+                RetryDemo(Modifier.padding(inner)) { retry ->
+                    MessageScreen(
+                        headline = "Can't reach the server",
+                        body = "Check your connection, then try again.",
+                        icon = Icons.Filled.CloudOff,
+                        primary = ScreenAction("Try again", onClick = retry, leadingIcon = Icons.Filled.Refresh),
+                        secondary = ScreenAction("Settings", onClick = leave),
+                        announce = true,
+                        modifier = Modifier.padding(inner),
+                    )
+                }
             }
         }
     }
@@ -202,26 +216,34 @@ fun MessageScreenSample() {
 /** A message with three ways out, one of them destructive: the stacked actions slot, full width. */
 @Composable
 fun MessageScreenStackedActionsSample() {
+    val leave = LocalDemoBack.current
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        BingeScreenScaffold(title = "Requests", onBack = LocalDemoBack.current) { padding ->
+        BingeScreenScaffold(title = "Requests", onBack = leave) { padding ->
             ScreenBody(padding) { inner ->
-                MessageScreen(
-                    headline = "Can't reach the server",
-                    body = "Check your connection, then try again.",
-                    icon = Icons.Filled.CloudOff,
-                    announce = true,
-                    modifier = Modifier.padding(inner),
-                    actions = {
-                        BingeFilledButton(
-                            label = "Try again",
-                            onClick = {},
-                            leadingIcon = Icons.Filled.Refresh,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        BingeOutlinedButton(label = "Edit connection", onClick = {}, modifier = Modifier.fillMaxWidth())
-                        BingeOutlinedButton(label = "Disconnect", onClick = {}, destructive = true, modifier = Modifier.fillMaxWidth())
-                    },
-                )
+                RetryDemo(Modifier.padding(inner)) { retry ->
+                    MessageScreen(
+                        headline = "Can't reach the server",
+                        body = "Check your connection, then try again.",
+                        icon = Icons.Filled.CloudOff,
+                        announce = true,
+                        modifier = Modifier.padding(inner),
+                        actions = {
+                            BingeFilledButton(
+                                label = "Try again",
+                                onClick = retry,
+                                leadingIcon = Icons.Filled.Refresh,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            BingeOutlinedButton(label = "Edit connection", onClick = leave, modifier = Modifier.fillMaxWidth())
+                            BingeOutlinedButton(
+                                label = "Disconnect",
+                                onClick = leave,
+                                destructive = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        },
+                    )
+                }
             }
         }
     }
@@ -247,6 +269,7 @@ fun LoadingMessageScreenSample() {
 @Composable
 fun FilteredListScreenSample() {
     var selected by remember { mutableIntStateOf(0) }
+    var descending by remember { mutableStateOf(false) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FilteredListScreen(
             title = "Requests",
@@ -254,9 +277,9 @@ fun FilteredListScreenSample() {
             filters = listOf(FilterChipItem("All", 42), FilterChipItem("Pending", 3), FilterChipItem("Approved", 39)),
             selectedFilter = selected,
             onFilterChange = { selected = it },
-            actions = { BingeTextButton(label = "Sort", onClick = {}) },
+            actions = { BingeTextButton(label = "Sort", onClick = { descending = !descending }) },
         ) { _, contentPadding ->
-            SampleRows(contentPadding)
+            SampleRows(contentPadding, descending)
         }
     }
 }
@@ -422,13 +445,15 @@ fun HeroDetailLazyScreenSample() {
 fun HeroDetailStateScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         HeroDetailStateScreen(onBack = LocalDemoBack.current) {
-            MessageScreen(
-                headline = "Can't load this title",
-                body = "Check your connection, then try again.",
-                icon = Icons.Filled.CloudOff,
-                primary = ScreenAction("Try again", onClick = {}, leadingIcon = Icons.Filled.Refresh),
-                announce = true,
-            )
+            RetryDemo { retry ->
+                MessageScreen(
+                    headline = "Can't load this title",
+                    body = "Check your connection, then try again.",
+                    icon = Icons.Filled.CloudOff,
+                    primary = ScreenAction("Try again", onClick = retry, leadingIcon = Icons.Filled.Refresh),
+                    announce = true,
+                )
+            }
         }
     }
 }
@@ -444,15 +469,18 @@ fun HeroDetailStateScreenLoadingSample() {
 /** The same page with its one action pinned below the scroll. */
 @Composable
 fun HeroDetailScreenFooterSample() {
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         HeroDetailScreen(
             title = "A title",
             onBack = LocalDemoBack.current,
+            snackbarHostState = snackbar,
             footer = {
                 Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerHigh)) {
                     BingeFilledButton(
                         label = "Approve",
-                        onClick = {},
+                        onClick = { scope.launch { snackbar.showSnackbar("Request approved") } },
                         modifier = Modifier
                             .windowInsetsPadding(bottomBarInsets())
                             .fillMaxWidth()
@@ -522,31 +550,43 @@ fun FormScreenSavingSample() {
 
 /**
  * [FormScreenSample] after a write failed: the change stays on screen, and a snackbar offers Retry until a save
- * succeeds. The pill is drawn directly, because a snackbar host is empty at frame 0 (see [BingeSnackbarSample]);
- * [FormScreenSaveAsMadeDemo] shows the real one.
+ * succeeds. A snackbar host is empty at frame 0 (see [BingeSnackbarSample]), so the frame draws the pill directly, under
+ * `LocalInspectionMode`; the live catalog app shows the template's own, once, as [FormScreenSaveAsMadeDemo] does.
  */
 @Composable
 fun FormScreenSaveFailedSample() {
+    var status by remember { mutableStateOf<FormSaveStatus>(FormSaveStatus.Idle) }
+    // Retry saves again: Saving, then Saved, so the failure and its pill give way once a save succeeds.
+    val retry: () -> Unit = { status = FormSaveStatus.Saving }
+    LaunchedEffect(status) {
+        if (status == FormSaveStatus.Saving) {
+            delay(RETRY_DEMO_MILLIS)
+            status = FormSaveStatus.Saved
+        }
+    }
+    val shown = if (status == FormSaveStatus.Idle) FormSaveStatus.Failed(onRetry = retry) else status
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         Box(Modifier.fillMaxSize()) {
             FormScreen(
                 title = "General",
                 onBack = LocalDemoBack.current,
-                saveStatus = FormSaveStatus.Failed(onRetry = {}),
+                saveStatus = shown,
             ) {
                 SampleForm()
             }
-            BingeSnackbar(
-                message = stringResource(R.string.form_save_failed),
-                actionLabel = stringResource(R.string.form_save_retry),
-                onActionClick = {},
-                showDismissAction = false,
-                onDismissRequest = {},
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(horizontal = dimensionResource(R.dimen.padding_m), vertical = dimensionResource(R.dimen.padding_s)),
-            )
+            if (shown is FormSaveStatus.Failed && LocalInspectionMode.current) {
+                BingeSnackbar(
+                    message = stringResource(R.string.form_save_failed),
+                    actionLabel = stringResource(R.string.form_save_retry),
+                    onActionClick = retry,
+                    showDismissAction = false,
+                    onDismissRequest = {},
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = dimensionResource(R.dimen.padding_m), vertical = dimensionResource(R.dimen.padding_s)),
+                )
+            }
         }
     }
 }
@@ -703,8 +743,28 @@ fun StepFlowScreenLazyStepSample() {
     }
 }
 
+private const val RETRY_DEMO_MILLIS = 800L
+
+/**
+ * A failed screen's Try again, for a sample: the failure gives way to the loading screen for a moment and comes back,
+ * so the button visibly acts and the frame, which shows the failure, does not change.
+ */
 @Composable
-internal fun SampleRows(padding: PaddingValues) {
+private fun RetryDemo(modifier: Modifier = Modifier, failure: @Composable (retry: () -> Unit) -> Unit) {
+    var retrying by remember { mutableStateOf(false) }
+    if (retrying) {
+        LoadingMessageScreen(modifier)
+        LaunchedEffect(Unit) {
+            delay(RETRY_DEMO_MILLIS)
+            retrying = false
+        }
+    } else {
+        failure { retrying = true }
+    }
+}
+
+@Composable
+internal fun SampleRows(padding: PaddingValues, descending: Boolean = false) {
     // Through ScreenBody, as a screen's own list goes: the side insets stay outside the scroll, so the rows clear a
     // side cutout or navigation bar.
     ScreenBody(padding) { inner ->
@@ -714,8 +774,9 @@ internal fun SampleRows(padding: PaddingValues) {
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
             items(SAMPLE_ROWS) { index ->
+                val row = if (descending) SAMPLE_ROWS - index else index + 1
                 ListRow { textModifier ->
-                    Text(text = "Row ${index + 1}", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
+                    Text(text = "Row $row", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
                 }
             }
         }
@@ -756,6 +817,7 @@ private fun SampleForm() {
 /** A question asked once before the app goes on: the hero, the copy, three points, and accept under decline. */
 @Composable
 fun DecisionScreenSample() {
+    val leave = LocalDemoBack.current
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         DecisionScreen(
             copy =
@@ -765,8 +827,8 @@ fun DecisionScreenSample() {
                     subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
                 ),
             points = SampleDecisionPoints,
-            accept = ScreenAction("Share usage data", onClick = {}),
-            decline = ScreenAction("Not now", onClick = {}),
+            accept = ScreenAction("Share usage data", onClick = leave),
+            decline = ScreenAction("Not now", onClick = leave),
             hero = Icons.Filled.BarChart,
             heroBadge = Icons.Filled.Lock,
         )
@@ -841,6 +903,7 @@ fun DecisionBodyNoteContentSample() {
 /** The same question in the end pane of a wide window: the pane is taller than wide, so it keeps the portrait layout. */
 @Composable
 fun DecisionScreenInPaneSample() {
+    val leave = LocalDemoBack.current
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
@@ -853,8 +916,8 @@ fun DecisionScreenInPaneSample() {
                             subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
                         ),
                     points = SampleDecisionPoints,
-                    accept = ScreenAction("Share usage data", onClick = {}),
-                    decline = ScreenAction("Not now", onClick = {}),
+                    accept = ScreenAction("Share usage data", onClick = leave),
+                    decline = ScreenAction("Not now", onClick = leave),
                     hero = Icons.Filled.BarChart,
                     heroBadge = Icons.Filled.Lock,
                 )
@@ -867,7 +930,7 @@ fun DecisionScreenInPaneSample() {
 @Composable
 fun ErrorScreenSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        ErrorScreen(kind = ErrorKind.Network, onRetry = {})
+        RetryDemo { retry -> ErrorScreen(kind = ErrorKind.Network, onRetry = retry) }
     }
 }
 
@@ -882,19 +945,23 @@ fun ErrorScreenConfigurationSample() {
 /** A refused sign-in with two ways out: Try again, and the settings page where the user fixes it. */
 @Composable
 fun ErrorScreenSecondarySample() {
+    val leave = LocalDemoBack.current
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-        ErrorScreen(kind = ErrorKind.Auth, onRetry = {}, secondary = ScreenAction("Open settings", {}))
+        RetryDemo { retry ->
+            ErrorScreen(kind = ErrorKind.Auth, onRetry = retry, secondary = ScreenAction("Open settings", leave))
+        }
     }
 }
 
 /** An empty list with something to do about it: the default headline, and one action. */
 @Composable
 fun EmptyScreenActionSample() {
+    val leave = LocalDemoBack.current
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         EmptyScreen(
             message = "Requests you make show up here.",
             icon = Icons.Filled.Inbox,
-            action = ScreenAction("Find something", onClick = {}),
+            action = ScreenAction("Find something", onClick = leave),
         )
     }
 }

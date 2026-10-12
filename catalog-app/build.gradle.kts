@@ -103,7 +103,7 @@ abstract class GenerateCatalogRegistry
         }
     }
 
-val generator by configurations.creating {
+val generator = configurations.create("generator") {
     isCanBeConsumed = false
     isCanBeResolved = true
 }

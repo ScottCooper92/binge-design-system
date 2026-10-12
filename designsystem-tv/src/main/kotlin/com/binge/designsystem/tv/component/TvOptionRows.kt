@@ -51,7 +51,8 @@ import com.binge.designsystem.tv.R as TvR
  * remember to. With no [choices] it draws nothing, title included.
  *
  * [initialFocusedLabel] seeds one row as focused for a frame; production passes null. [arrival] makes the first row
- * the one the page lands on.
+ * the one the page lands on. [choiceIcon] gives a choice the icon its row leads with, on its tinted plate: the
+ * choice's own where each has one, otherwise the setting's. Null draws no icon.
  */
 @Composable
 fun <T> TvOptionGroup(
@@ -62,6 +63,7 @@ fun <T> TvOptionGroup(
     modifier: Modifier = Modifier,
     initialFocusedLabel: String? = null,
     arrival: TvArrivalFocus? = null,
+    choiceIcon: (T) -> ImageVector? = { null },
 ) {
     if (choices.isEmpty()) return
     Column(
@@ -80,6 +82,7 @@ fun <T> TvOptionGroup(
                 selected = isSelected,
                 onClick = { if (!isSelected) onSelect(key) },
                 initiallyFocused = label == initialFocusedLabel,
+                icon = choiceIcon(key),
                 modifier = if (index == 0 && arrival != null) Modifier.tvArrivalTarget(arrival) else Modifier,
             )
         }

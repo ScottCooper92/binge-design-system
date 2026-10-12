@@ -32,8 +32,8 @@ private const val TARGET = "target"
 /** How long [TvLateTarget] withholds the real target for, in the first case below. */
 private const val TARGET_DELAY_FRAMES = 30
 
-/** A window checked across, not a single frame: see the class KDoc's note on why the grant is not continuous. */
-private const val EARLY_WINDOW_FRAMES = 6
+/** Frames the sink is given to win the pane before it must hold it continuously. */
+private const val EARLY_WINDOW_FRAMES = 2
 
 /** Frames to settle after the delayed target composes. */
 private const val SETTLE_FRAMES = 10
@@ -43,15 +43,10 @@ private const val SETTLE_FRAMES = 10
  * rather than in isolation — [BingeTvNavRailAdverseScheduleFocusTest] already proves the retry loop converges
  * with the sink present; this file asserts on the sink itself along that same path, plus its absence case.
  *
- * **Not a continuous, single-frame hold.** The group has no `onEnter`, so a repeated entry request re-resolves
- * the *default* candidate each time rather than holding the prior grant — measured directly (see git history on
- * this file): the sink wins the pane, is disposed the moment it is itself the thing focused (its own presence
- * gate reads the pane's own `hasFocus`), and is re-composed and re-won the next frame, with Compose's own
- * disposal-triggered recovery search landing the *in-between* frame wherever it geometrically would without the
- * sink at all. So the window below asserts the sink wins the pane repeatedly through the wait — real content is
- * never left target-less for a sustained stretch — rather than a specific frame's parity or an uninterrupted
- * hold. Whether that in-between frame should also be closed off (a shell-root interceptor, not a second sink)
- * is a separate open question, outside what this file asserts.
+ * **A continuous hold.** The sink wins the pane within the first frames and keeps it, frame after frame, until the
+ * destination grows a target. The rail no longer disposes a sink that holds focus, so nothing hands Compose's
+ * recovery search a frame to send focus to the rail: it once landed every other frame there, which on a device read
+ * as the rail flicking while a cold first screen loaded. The sink then hands focus to the target and goes.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -60,7 +55,7 @@ class BingeTvNavRailFocusSinkTest {
     val composeTestRule = createKeyboardComposeRule()
 
     @Test
-    fun `the sink wins the pane repeatedly while content has nothing, then yields once the target composes`() {
+    fun `the sink holds the pane every frame while content has nothing, then yields once the target composes`() {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
             BingeTvTheme {
@@ -71,13 +66,14 @@ class BingeTvNavRailFocusSinkTest {
                 }
             }
         }
-        var sinkWonAFrame = false
-        repeat(EARLY_WINDOW_FRAMES) {
-            composeTestRule.mainClock.advanceTimeByFrame()
+        repeat(EARLY_WINDOW_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        repeat(TARGET_DELAY_FRAMES - EARLY_WINDOW_FRAMES * 2) { frame ->
             val sinkNodes = composeTestRule.onAllNodesWithTag(TV_FOCUS_SINK_TAG).fetchSemanticsNodes()
-            if (sinkNodes.any { it.config.getOrElse(SemanticsProperties.Focused) { false } }) sinkWonAFrame = true
+            check(sinkNodes.any { it.config.getOrElse(SemanticsProperties.Focused) { false } }) {
+                "the sink did not hold the pane ${frame + EARLY_WINDOW_FRAMES} frames in"
+            }
+            composeTestRule.mainClock.advanceTimeByFrame()
         }
-        check(sinkWonAFrame) { "the sink never won the pane in the first $EARLY_WINDOW_FRAMES frames" }
 
         repeat(TARGET_DELAY_FRAMES + SETTLE_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
         composeTestRule.waitForIdle()

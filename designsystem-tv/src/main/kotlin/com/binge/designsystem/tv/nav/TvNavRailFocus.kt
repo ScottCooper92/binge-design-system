@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.nav
 
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.focus.FocusRequester
+import kotlinx.coroutines.delay
 
 /*
  * These are retry *counts*, not durations. `withFrameNanos` resumes on the next frame the app produces, and a
@@ -72,4 +73,30 @@ internal suspend fun awaitContentFocusLost(contentHasFocus: () -> Boolean): Bool
         withFrameNanos { }
     }
     return false
+}
+
+/**
+ * How often the sink re-offers focus to a destination once the frame-paced offers run out. Polled on a timer rather
+ * than per frame, so a destination that never grows anything focusable does not keep the app drawing frames.
+ */
+internal const val SINK_HANDOFF_POLL_MILLIS = 100L
+
+/**
+ * While the content pane's sink holds focus, offer it to the destination's own group until something there takes it.
+ *
+ * A request into a group with nothing focusable fails silently, so each failed offer leaves focus on the sink. Nothing
+ * else ever moves, which is the point: focus never passes through the rail on its way to content. Frame-paced at
+ * first, so content that arrives with its first frame is reached at once, then on [SINK_HANDOFF_POLL_MILLIS]. The
+ * caller cancels this the moment the sink stops holding focus, whether to the destination or to a user who pressed
+ * toward the rail.
+ */
+internal suspend fun handOffFromSink(destinationEntry: FocusRequester) {
+    repeat(FOCUS_HANDOFF_FRAMES) {
+        runCatching { destinationEntry.requestFocus() }
+        withFrameNanos { }
+    }
+    while (true) {
+        runCatching { destinationEntry.requestFocus() }
+        delay(SINK_HANDOFF_POLL_MILLIS)
+    }
 }

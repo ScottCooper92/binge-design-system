@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Tv
@@ -59,6 +60,7 @@ fun TvOptionGroupSample() {
         selected = selected,
         onSelect = { selected = it },
         initialFocusedLabel = "/data/movies-4k",
+        choiceIcon = { Icons.Filled.Folder },
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
     )
 }

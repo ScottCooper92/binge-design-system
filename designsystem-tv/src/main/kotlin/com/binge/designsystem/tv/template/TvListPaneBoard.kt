@@ -110,11 +110,16 @@ data class TvPaneAction(
     val enabled: Boolean = true,
 )
 
-/** A titled block of a [TvListPaneBoard]'s rows. The title is a read-out and never takes focus. */
+/**
+ * A titled block of a [TvListPaneBoard]'s rows. The title is a read-out and never takes focus. [note] sits under it,
+ * also a read-out, for a line that holds for the whole group, such as where its values are changed. It shows beside
+ * the rows whichever one is described, so it is not repeated on each.
+ */
 @Immutable
 data class TvPaneGroup(
     val title: String,
     val rows: List<TvPaneRow>,
+    val note: String? = null,
 )
 
 /**
@@ -210,7 +215,7 @@ private fun TvPaneList(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_gap)),
         ) {
             groups.forEach { group ->
-                TvPaneGroupTitle(group.title)
+                TvPaneGroupTitle(group.title, group.note)
                 group.rows.forEach { row ->
                     val described = row.key == describedKey
                     TvPaneListRow(
@@ -234,20 +239,28 @@ private fun TvPaneList(
     }
 }
 
-/** A group's title, inset to line up with the row labels under it and held clear of the first row's fill. */
+/** A group's title and its note, inset to line up with the row labels under them and held clear of the first row's fill. */
 @Composable
-private fun TvPaneGroupTitle(title: String) {
+private fun TvPaneGroupTitle(title: String, note: String?) {
+    val start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal)
+    val gap = dimensionResource(TvR.dimen.tv_list_pane_header_bottom_gap)
     Text(
         text = title.uppercaseLocalised(),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier =
-            Modifier.padding(
-                start = dimensionResource(TvR.dimen.tv_list_pane_row_padding_horizontal),
-                top = dimensionResource(TvR.dimen.tv_list_pane_group_gap),
-                bottom = dimensionResource(TvR.dimen.tv_list_pane_header_bottom_gap),
-            ),
+            Modifier
+                .padding(start = start, top = dimensionResource(TvR.dimen.tv_list_pane_group_gap))
+                .then(if (note == null) Modifier.padding(bottom = gap) else Modifier),
     )
+    note?.let {
+        Text(
+            text = it,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = start, bottom = gap),
+        )
+    }
 }
 
 /**

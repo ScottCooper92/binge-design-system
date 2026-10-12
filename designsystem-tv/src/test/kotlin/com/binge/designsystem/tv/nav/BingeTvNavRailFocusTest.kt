@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -133,17 +134,13 @@ class BingeTvNavRailFocusTest {
     }
 
     /**
-     * With content never becoming focusable and nothing else claiming focus either, focus is still on the rail
-     * or [TvFocusSink] well past the startup offer's 120-frame budget — there is no dead end where neither holds
-     * it. The offer has no `railEntry.requestFocus()` fallback of its own: [TvFocusSink] claims
-     * the content group's entry before that fallback could ever run, and the two then alternate every frame
-     * indefinitely (a sink holding focus disposes itself the next frame, and Compose's own disposal-triggered
-     * recovery search — not this rail's code — lands the frame in between). Landing on the rail specifically at
-     * this one sampled frame is a coincidence of that oscillation's parity, not a deliberate fallback; see
-     * [BingeTvNavRailStartupFallbackRemovalTest] for the invariant checked across every frame instead of one.
+     * With content never becoming focusable and nothing else claiming focus either, the content pane's [TvFocusSink]
+     * still holds focus well past the startup offer's 120-frame budget, and the rail never does. The sink stays
+     * mounted while it holds focus, so there is no disposal for Compose's recovery to answer by sending focus to the
+     * rail; see [BingeTvNavRailStartupFallbackRemovalTest] for the invariant checked across every frame.
      */
     @Test
-    fun `focus is on the rail or the sink once the startup offer's budget has run out`() {
+    fun `the sink holds focus once the startup offer's budget has run out, and the rail does not`() {
         fixture()
 
         repeat(FOCUS_HANDOFF_FRAMES + PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
@@ -155,7 +152,8 @@ class BingeTvNavRailFocusTest {
         val sinkFocused = composeTestRule.onAllNodesWithTag(TV_FOCUS_SINK_TAG).fetchSemanticsNodes().any {
             it.config.getOrElse(SemanticsProperties.Focused) { false }
         }
-        assertTrue("neither the rail nor the sink held focus", railFocused || sinkFocused)
+        assertTrue("the sink did not hold focus", sinkFocused)
+        assertFalse("the rail held focus", railFocused)
     }
 
     /**

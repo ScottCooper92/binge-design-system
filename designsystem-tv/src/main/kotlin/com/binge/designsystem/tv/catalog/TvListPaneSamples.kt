@@ -111,6 +111,12 @@ fun TvListPaneBoardSkeletonRowDetailSample() {
     TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay, rowDetail = true)
 }
 
+/** The skeleton for a board whose first group carries a note: a line is reserved under the title, so the rows do not move. */
+@Composable
+fun TvListPaneBoardSkeletonGroupNoteSample() {
+    TvListPaneBoardSkeleton(title = "Settings", hosting = TvPageHosting.Overlay, groupNote = true)
+}
+
 /**
  * A filter panel on the same board: filters in the list, each showing what it has applied under its name, and the values of
  * the described filter beside it as checkboxes with no description above them. A clear button sits under the
@@ -278,6 +284,7 @@ private fun SampleBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel:
             ),
             TvPaneGroup(
                 title = "Connection",
+                note = "Changed from your phone.",
                 rows =
                     listOf(
                         TvPaneRow(
