@@ -59,6 +59,11 @@ class TvListPaneSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun filterBoardPinnedAction() = Frame { TvListPaneFilterBoardPinnedActionSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun boardSkeleton() = Frame { TvListPaneBoardSkeletonSample() }
 
     @PreviewTest

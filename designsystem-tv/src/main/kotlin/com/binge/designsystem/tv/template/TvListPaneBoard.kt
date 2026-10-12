@@ -56,6 +56,9 @@ import com.binge.designsystem.tv.R as TvR
  * In a multi-select row an option can be [excluded] as well as [selected]: ruled out rather than chosen, with the
  * excluded mark in its box. The caller decides what OK cycles through. [leading] is a mark of the caller's own, such as
  * a logo, in place of [icon]; both apply to multi-select options only.
+ *
+ * An [action] does something rather than being chosen, such as a pinned shortcut that opens a screen: it renders and
+ * announces as a button, with no tick or box, and [selected] and [excluded] do not apply.
  */
 @Immutable
 data class TvPaneOption(
@@ -66,6 +69,7 @@ data class TvPaneOption(
     val icon: ImageVector? = null,
     val excluded: Boolean = false,
     val leading: (@Composable () -> Unit)? = null,
+    val action: Boolean = false,
 )
 
 /**

@@ -280,8 +280,21 @@ fun TvListPaneFilterBoardPinnedSample() {
     SampleTriStateBoard(describedKey = KEY_SERVICE, initialFocusedOptionLabel = null)
 }
 
+/**
+ * The same filter before any services are saved: the pinned shortcut opens a screen rather than choosing anything, so it
+ * is an action, a plain row with no box that announces as a button.
+ */
 @Composable
-private fun SampleTriStateBoard(describedKey: String, initialFocusedOptionLabel: String?) {
+fun TvListPaneFilterBoardPinnedActionSample() {
+    SampleTriStateBoard(describedKey = KEY_SERVICE, initialFocusedOptionLabel = null, servicesSaved = false)
+}
+
+@Composable
+private fun SampleTriStateBoard(
+    describedKey: String,
+    initialFocusedOptionLabel: String?,
+    servicesSaved: Boolean = true,
+) {
     var focusedKey by remember { mutableStateOf(describedKey) }
     var genreStates by remember {
         mutableStateOf(mapOf(GENRE_DRAMA to FilterState.Included, GENRE_THRILLER to FilterState.Excluded))
@@ -334,12 +347,16 @@ private fun SampleTriStateBoard(describedKey: String, initialFocusedOptionLabel:
                                 multiSelect = true,
                                 pinnedOptions =
                                     listOf(
-                                        TvPaneOption(
-                                            label = "My services",
-                                            selected = services == setOf(SERVICE_STREAMLY),
-                                            onSelect = { services = setOf(SERVICE_STREAMLY) },
-                                            icon = Icons.Filled.Apps,
-                                        ),
+                                        if (servicesSaved) {
+                                            TvPaneOption(
+                                                label = "My services",
+                                                selected = services == setOf(SERVICE_STREAMLY),
+                                                onSelect = { services = setOf(SERVICE_STREAMLY) },
+                                                icon = Icons.Filled.Apps,
+                                            )
+                                        } else {
+                                            TvPaneOption(label = "Set up my services", icon = Icons.Filled.Apps, action = true)
+                                        },
                                     ),
                                 options =
                                     serviceMarks.map { (service, colour) ->
