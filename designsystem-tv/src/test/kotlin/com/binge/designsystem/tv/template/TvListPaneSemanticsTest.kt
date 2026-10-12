@@ -5,6 +5,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
@@ -24,6 +25,8 @@ private const val DETAIL_HD = "HD detail"
  * and [com.binge.designsystem.tv.component.TvChoiceRow]'s are, so a screen reader announces them as a set. The list's
  * rows are not: moving along them describes a row, it chooses nothing.
  */
+private const val GROUP_NOTE = "Changed from your phone."
+
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvListPaneSemanticsTest {
@@ -61,7 +64,22 @@ class TvListPaneSemanticsTest {
         composeTestRule.onNode(hasText(DETAIL_HD)).assertDoesNotExist()
     }
 
-    private fun setBoard(detail: String? = null) {
+    @Test
+    fun `a group note reads under its title and never takes focus`() {
+        setBoard(groupNote = GROUP_NOTE)
+
+        composeTestRule.onNode(hasText(GROUP_NOTE)).assertExists()
+        composeTestRule.onNode(hasText(GROUP_NOTE) and isFocusable()).assertDoesNotExist()
+    }
+
+    @Test
+    fun `a group with no note shows none`() {
+        setBoard()
+
+        composeTestRule.onNode(hasText(GROUP_NOTE)).assertDoesNotExist()
+    }
+
+    private fun setBoard(detail: String? = null, groupNote: String? = null) {
         composeTestRule.setContent {
             BingeTvTheme {
                 TvListPaneBoard(
@@ -70,6 +88,7 @@ class TvListPaneSemanticsTest {
                         listOf(
                             TvPaneGroup(
                                 title = "Playback",
+                                note = groupNote,
                                 rows =
                                     listOf(
                                         TvPaneRow(
