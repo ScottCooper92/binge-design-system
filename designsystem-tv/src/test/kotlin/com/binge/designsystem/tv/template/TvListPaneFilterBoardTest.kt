@@ -177,6 +177,20 @@ class TvListPaneFilterBoardTest {
     }
 
     @Test
+    fun `re-entering a pane with no pinned options resumes on the option last focused`() {
+        show()
+        press(Key.DirectionRight)
+        press(Key.DirectionDown)
+        node(COMEDY).assertIsFocused()
+
+        press(Key.DirectionLeft)
+        node(ROW_GENRE).assertIsFocused()
+        press(Key.DirectionRight)
+
+        node(COMEDY).assertIsFocused()
+    }
+
+    @Test
     fun `left from the clear button returns to the row its pane describes`() {
         show()
         focus(CLEAR_GENRE)

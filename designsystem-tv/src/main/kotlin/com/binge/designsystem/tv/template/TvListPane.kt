@@ -37,7 +37,6 @@ import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
-import com.binge.designsystem.tv.focus.tvFocusGroup
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -79,6 +78,13 @@ internal fun TvListPane(
             .selectableGroup()
             .semantics { collectionInfo = CollectionInfo(rowCount = optionCount, columnCount = 1) }
     val optionWidth = Modifier.width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
+    // On the lazy column, the focus group the options are inside, so it saves an option rather than the column.
+    val restorer =
+        when {
+            routesToFirstValue -> Modifier.focusRestorer(firstValueFocus)
+            hasOptions -> Modifier.focusRestorer()
+            else -> Modifier
+        }
     TvStableFocusScroll {
         Box(
             modifier =
@@ -90,7 +96,7 @@ internal fun TvListPane(
                         } else {
                             Modifier
                                 .focusProperties { left = backToListFocus }
-                                .then(if (routesToFirstValue) Modifier.focusGroup() else Modifier.tvFocusGroup())
+                                .focusGroup()
                         },
                     ),
         ) {
@@ -99,7 +105,7 @@ internal fun TvListPane(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .then(if (routesToFirstValue) Modifier.focusRestorer(firstValueFocus) else Modifier)
+                        .then(restorer)
                         .then(if (!hasOptions || row.multiSelect) Modifier else optionsGroup),
                 contentPadding = PaddingValues(vertical = dimensionResource(TvR.dimen.tv_focus_ring_bleed)),
                 horizontalAlignment = Alignment.CenterHorizontally,
