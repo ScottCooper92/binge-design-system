@@ -26,7 +26,11 @@ class WrappingRowTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private fun heightOf(count: Int, childWidth: Int): Int {
+    private fun heightOf(
+        count: Int,
+        childWidth: Int,
+        firstHeight: Int = 10,
+    ): Int {
         var size = IntSize.Zero
         rule.setContent {
             Row(Modifier.width(100.dp).height(IntrinsicSize.Min).onSizeChanged { size = it }) {
@@ -35,7 +39,7 @@ class WrappingRowTest {
                     horizontalSpacing = 4.dp,
                     verticalSpacing = 4.dp,
                 ) {
-                    repeat(count) { Box(Modifier.size(width = childWidth.dp, height = 10.dp)) }
+                    repeat(count) { index -> Box(Modifier.size(width = childWidth.dp, height = (if (index == 0) firstHeight else 10).dp)) }
                 }
             }
         }
@@ -52,5 +56,11 @@ class WrappingRowTest {
     @Test
     fun `children that fit share a line`() {
         assertEquals(with(rule.density) { 10.dp.roundToPx() }, heightOf(count = 2, childWidth = 30))
+    }
+
+    @Test
+    fun `a zero-height child still takes its place on a line`() {
+        // 60dp then 60dp in 100dp wrap, so the lines are 0dp and 10dp with one 4dp gap, as `measure` lays them out.
+        assertEquals(with(rule.density) { 14.dp.roundToPx() }, heightOf(count = 2, childWidth = 60, firstHeight = 0))
     }
 }

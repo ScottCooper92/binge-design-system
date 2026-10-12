@@ -101,20 +101,24 @@ private class WrappingRowPolicy(
         var total = 0
         var lineHeight = 0
         var used = 0
+        var onLine = 0
         var lines = 0
         for (measurable in measurables) {
             val childWidth = measurable.maxIntrinsicWidth(Constraints.Infinity).coerceAtMost(width)
-            val needed = if (used == 0 && lineHeight == 0) childWidth else used + hGap + childWidth
-            if (lineHeight > 0 && needed > width) {
+            // Line emptiness is a count, as in `measure`, not an inference from the height or width so far: a child of
+            // zero height or width still takes a place on its line and charges a gap.
+            if (onLine > 0 && used + hGap + childWidth > width) {
                 total += lineHeight
                 lines++
                 lineHeight = 0
                 used = 0
+                onLine = 0
             }
-            used = if (lineHeight == 0) childWidth else used + hGap + childWidth
+            used = if (onLine == 0) childWidth else used + hGap + childWidth
+            onLine++
             lineHeight = maxOf(lineHeight, measurable.minIntrinsicHeight(childWidth))
         }
-        if (lineHeight > 0) {
+        if (onLine > 0) {
             total += lineHeight
             lines++
         }
