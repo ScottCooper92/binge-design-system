@@ -103,9 +103,12 @@ private fun ListSkeleton(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_icon_gap)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // The icon's slot at the board's icon size, so the label bar starts where the label will.
+                // The icon's leading slot, with the block centred in it where the board draws the icon, so the label bar
+                // starts where the label will.
                 if (rowIcon) {
-                    TvSkeletonBlock(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)), shape = BingeShapes.TvListItem)
+                    Box(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon_slot)), contentAlignment = Alignment.Center) {
+                        TvSkeletonBlock(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)), shape = BingeShapes.TvListItem)
+                    }
                 }
                 Column(
                     modifier = Modifier.weight(1f),
