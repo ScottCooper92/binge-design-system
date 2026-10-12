@@ -36,6 +36,7 @@ import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
+import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -72,7 +73,9 @@ internal fun TvListPane(
     val optionGap = dimensionResource(TvR.dimen.tv_option_row_gap)
     // The options' direct semantics parent is the lazy column, so the group and its counts sit there. The counts are the
     // options only, not the label and body around them, and the lazy layout's own collection info yields to this one.
-    val optionCount = row.pinnedOptions.size + row.options.size
+    // An action is not one of the choices, so it is neither counted nor given a place.
+    val pinnedChoices = row.pinnedOptions.count { !it.action }
+    val optionCount = pinnedChoices + row.options.count { !it.action }
     val optionsGroup =
         Modifier
             .selectableGroup()
@@ -146,7 +149,8 @@ internal fun TvListPane(
                 if (hasOptions) {
                     itemsIndexed(row.pinnedOptions, key = { index, _ -> "pinned-$index" }) { index, option ->
                         val inset = if (index == 0) optionsLead else optionGap
-                        PaneOption(option, row.multiSelect, initialFocusedOptionLabel, optionWidth.padding(top = inset), index)
+                        val position = row.pinnedOptions.take(index).count { !it.action }
+                        PaneOption(option, row.multiSelect, initialFocusedOptionLabel, optionWidth.padding(top = inset), position)
                     }
                     if (routesToFirstValue) {
                         item(key = "divider") { PinnedDivider(Modifier.padding(top = optionGap)) }
@@ -159,7 +163,7 @@ internal fun TvListPane(
                             row.multiSelect,
                             initialFocusedOptionLabel,
                             optionWidth.padding(top = inset).then(entry),
-                            row.pinnedOptions.size + index,
+                            pinnedChoices + row.options.take(index).count { !it.action },
                         )
                     }
                     row.clear?.let { action ->
@@ -200,7 +204,10 @@ private fun PaneNote(
     )
 }
 
-/** One option as the row's kind of choice: a checkbox in a multi-select row, a radio-style row otherwise. */
+/**
+ * One option as the row's kind of choice: a checkbox in a multi-select row, a radio-style row otherwise, and a plain
+ * row that announces as a button for a [TvPaneOption.action], which is not one of the choices.
+ */
 @Composable
 private fun PaneOption(
     option: TvPaneOption,
@@ -213,7 +220,7 @@ private fun PaneOption(
         (option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
             .then(entryModifier)
             .then(
-                if (multiSelect) {
+                if (multiSelect || option.action) {
                     Modifier
                 } else {
                     Modifier.semantics {
@@ -221,7 +228,16 @@ private fun PaneOption(
                     }
                 },
             )
-    if (multiSelect) {
+    if (option.action) {
+        // The side sheet's row: a plain row with the option's look that announces as a button, with no selection state.
+        TvSideSheetRow(
+            label = option.label,
+            onClick = option.onSelect,
+            icon = option.icon,
+            initiallyFocused = option.label == initialFocusedOptionLabel,
+            modifier = optionModifier,
+        )
+    } else if (multiSelect) {
         TvCheckboxRow(
             label = option.label,
             checked = option.selected,

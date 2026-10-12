@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.template
 
 import android.app.Application
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasAnyAncestor
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -23,6 +25,7 @@ private const val OPTION_HD = "HD"
 private const val OPTION_UHD = "4K"
 private const val DETAIL_HD = "HD detail"
 private const val GROUP_NOTE = "Changed from your phone."
+private const val ACTION_SET_UP = "Set up"
 
 /**
  * A [TvListPaneBoard] pane's options are one selectable group (#678), as [com.binge.designsystem.tv.component.TvOptionGroup]'s
@@ -58,6 +61,22 @@ class TvListPaneSemanticsTest {
         val uhd = composeTestRule.onNode(hasText(OPTION_UHD) and isFocusable()).fetchSemanticsNode()
         assertEquals(0, hd.config[SemanticsProperties.CollectionItemInfo].rowIndex)
         assertEquals(1, uhd.config[SemanticsProperties.CollectionItemInfo].rowIndex)
+    }
+
+    /** A shortcut that opens a screen is not one of the choices (#793): a button, and outside the group's count. */
+    @Test
+    fun `an action option announces as a button, with no state, and is not counted as a choice`() {
+        setBoard(pinned = listOf(TvPaneOption(label = ACTION_SET_UP, action = true)))
+
+        val action = composeTestRule.onNode(hasText(ACTION_SET_UP) and isFocusable()).fetchSemanticsNode().config
+        assertEquals(Role.Button, action[SemanticsProperties.Role])
+        assertFalse(SemanticsProperties.Selected in action)
+        assertFalse(SemanticsProperties.ToggleableState in action)
+        assertFalse(SemanticsProperties.CollectionItemInfo in action)
+        val group = composeTestRule.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
+        assertEquals(2, group.fetchSemanticsNode().config[SemanticsProperties.CollectionInfo].rowCount)
+        val hd = composeTestRule.onNode(hasText(OPTION_HD) and isFocusable()).fetchSemanticsNode()
+        assertEquals(0, hd.config[SemanticsProperties.CollectionItemInfo].rowIndex)
     }
 
     @Test
@@ -113,6 +132,7 @@ class TvListPaneSemanticsTest {
         detail: String? = null,
         groupNote: String? = null,
         options: List<String>? = null,
+        pinned: List<TvPaneOption> = emptyList(),
     ) {
         composeTestRule.setContent {
             BingeTvTheme {
@@ -130,6 +150,7 @@ class TvListPaneSemanticsTest {
                                             label = ROW_QUALITY,
                                             body = "The quality a new request asks for.",
                                             detail = detail,
+                                            pinnedOptions = pinned,
                                             options =
                                                 options?.map { TvPaneOption(label = it, onSelect = {}) }
                                                     ?: listOf(
