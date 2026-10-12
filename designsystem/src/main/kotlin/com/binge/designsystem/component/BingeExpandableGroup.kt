@@ -108,8 +108,6 @@ fun bingeExpandableItem(
         onClick = { onExpandedChange(!expanded) },
     )
 
-/** [bingeExpandableItem] under its old flag, `disabled`; it is `enabled` now, turned round. `disabled` and `collapsedDetail` swap places so the two have different JVM
- * signatures; call it by name. */
 @Composable
 private fun GroupContentBody(content: BingeGroupContent) {
     when (content) {
