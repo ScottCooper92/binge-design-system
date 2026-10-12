@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -549,8 +550,8 @@ fun FormScreenSavingSample() {
 
 /**
  * [FormScreenSample] after a write failed: the change stays on screen, and a snackbar offers Retry until a save
- * succeeds. The pill is drawn directly, because a snackbar host is empty at frame 0 (see [BingeSnackbarSample]);
- * [FormScreenSaveAsMadeDemo] shows the real one.
+ * succeeds. A snackbar host is empty at frame 0 (see [BingeSnackbarSample]), so the frame draws the pill directly, under
+ * `LocalInspectionMode`; the live catalog app shows the template's own, once, as [FormScreenSaveAsMadeDemo] does.
  */
 @Composable
 fun FormScreenSaveFailedSample() {
@@ -573,7 +574,7 @@ fun FormScreenSaveFailedSample() {
             ) {
                 SampleForm()
             }
-            if (shown is FormSaveStatus.Failed) {
+            if (shown is FormSaveStatus.Failed && LocalInspectionMode.current) {
                 BingeSnackbar(
                     message = stringResource(R.string.form_save_failed),
                     actionLabel = stringResource(R.string.form_save_retry),
