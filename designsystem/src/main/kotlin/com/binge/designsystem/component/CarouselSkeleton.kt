@@ -24,7 +24,7 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 private const val SKELETON_CARD_COUNT = 6
 
 /**
- * Loading placeholder for a [MediaCarousel] under its [SectionHeader]: the heading plate, then [numCards] card
+ * Loading placeholder for a [MediaCarousel] under its [SectionHeader]: the heading plate, then [count] card
  * plates on the loaded row's insets.
  *
  * [description] names the loading state for a screen reader; without one it stays silent.
@@ -32,7 +32,7 @@ private const val SKELETON_CARD_COUNT = 6
 @Composable
 fun CarouselSkeleton(
     modifier: Modifier = Modifier,
-    numCards: Int = SKELETON_CARD_COUNT,
+    count: Int = SKELETON_CARD_COUNT,
     description: String? = null,
 ) {
     val sides = carouselSkeletonSidePadding()
@@ -57,7 +57,7 @@ fun CarouselSkeleton(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
             userScrollEnabled = false,
         ) {
-            items(numCards) {
+            items(count) {
                 // MediaCardSkeleton, not a bare poster plate: the row resolves to MediaCards, whose two-line
                 // title sits 46dp below the poster and moved every rail after this one when unreserved.
                 MediaCardSkeleton(Modifier.width(dimensionResource(R.dimen.card_width)))
@@ -65,6 +65,24 @@ fun CarouselSkeleton(
         }
     }
 }
+
+/**
+ * [CarouselSkeleton] under its old name for the card count, `numCards`; it is `count` now, as on the other skeletons.
+ * Kotlin cannot hold two overloads that differ only in parameter names, so this one has no default for `numCards`: a
+ * call that passes none resolves to the new function, and a call that passes `numCards` lands here. `numCards` and `description` swap places so the two overloads have different
+ * signatures on the JVM; call it by name, as the old signature was.
+ */
+@Deprecated(
+    message = "Renamed: numCards is count.",
+    replaceWith = ReplaceWith("CarouselSkeleton(modifier, count = numCards, description = description)"),
+)
+@Suppress("ModifierParameter")
+@Composable
+fun CarouselSkeleton(
+    modifier: Modifier = Modifier,
+    description: String? = null,
+    numCards: Int,
+) = CarouselSkeleton(modifier = modifier, count = numCards, description = description)
 
 /**
  * The skeleton's side padding, as the loaded MediaCarousel and SectionHeader take theirs: the content inset, plus an
