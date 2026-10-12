@@ -21,10 +21,12 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
@@ -188,6 +190,10 @@ fun TvOptionRow(
  * Not [enabled], it is dimmed and OK does nothing, but it keeps focus so the remote does not lose its place. An [icon]
  * follows the box on its tinted plate, and [supportingText] adds one ellipsized line saying what the setting does.
  * [initiallyFocused] paints the row focused for a frame; production passes false.
+ *
+ * [excluded] makes it a third state, ruled out rather than chosen: the box carries the excluded mark in place of the
+ * tick, and the row announces as indeterminate and excluded. [leading] replaces [icon] with a mark of the caller's own,
+ * such as a logo, in the same place.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -200,8 +206,11 @@ fun TvCheckboxRow(
     initiallyFocused: Boolean = false,
     icon: ImageVector? = null,
     supportingText: String? = null,
+    excluded: Boolean = false,
+    leading: (@Composable () -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
+    val excludedDescription = stringResource(DesR.string.cd_option_excluded)
     ListItem(
         selected = false,
         onClick = { onCheckedChange(!checked) },
@@ -215,8 +224,8 @@ fun TvCheckboxRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
             ) {
-                CheckboxMark(checked = checked)
-                icon?.let { TvRowIcon(icon = it, isFocused = focused) }
+                CheckboxMark(checked = checked, excluded = excluded)
+                if (leading != null) leading() else icon?.let { TvRowIcon(icon = it, isFocused = focused) }
             }
         },
         shape = ListItemDefaults.shape(shape = BingeShapes.TvListItem),
@@ -234,7 +243,8 @@ fun TvCheckboxRow(
                 .onFocusChanged { focused = it.isFocused }
                 .semantics {
                     role = Role.Checkbox
-                    toggleableState = ToggleableState(checked)
+                    toggleableState = if (excluded) ToggleableState.Indeterminate else ToggleableState(checked)
+                    if (excluded) stateDescription = excludedDescription
                 },
     )
 }
@@ -286,9 +296,9 @@ private fun OptionTrailing(selected: Boolean, trailing: (@Composable () -> Unit)
     }
 }
 
-/** An outline and a tick in the row's own content colour, so both read on the focus fill and off it. */
+/** An outline and a tick, or the excluded mark, in the row's own content colour, so both read on the focus fill and off it. */
 @Composable
-private fun CheckboxMark(checked: Boolean) {
+private fun CheckboxMark(checked: Boolean, excluded: Boolean) {
     val color = LocalContentColor.current
     Box(
         modifier =
@@ -297,6 +307,10 @@ private fun CheckboxMark(checked: Boolean) {
                 .border(dimensionResource(TvR.dimen.tv_checkbox_border), color, BingeShapes.ElementExtraSmall),
         contentAlignment = Alignment.Center,
     ) {
-        if (checked) TvSelectedTick(tint = color)
+        if (excluded) {
+            TvExcludedMark(tint = color)
+        } else if (checked) {
+            TvSelectedTick(tint = color)
+        }
     }
 }

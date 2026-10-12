@@ -1,10 +1,12 @@
 package com.binge.designsystem.tv.template
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -80,8 +82,9 @@ internal fun TvListPane(
                     textAlign = TextAlign.Center,
                 )
             }
-            if (row.options.isNotEmpty()) {
+            if (row.options.isNotEmpty() || row.pinnedOptions.isNotEmpty()) {
                 PaneOptions(
+                    pinnedOptions = row.pinnedOptions,
                     options = row.options,
                     multiSelect = row.multiSelect,
                     clear = row.clear,
@@ -102,6 +105,7 @@ internal fun TvListPane(
  */
 @Composable
 private fun PaneOptions(
+    pinnedOptions: List<TvPaneOption>,
     options: List<TvPaneOption>,
     multiSelect: Boolean,
     clear: TvPaneAction?,
@@ -118,28 +122,9 @@ private fun PaneOptions(
                 .then(if (multiSelect) Modifier else Modifier.selectableGroup()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
     ) {
-        options.forEach { option ->
-            val optionModifier = option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier
-            if (multiSelect) {
-                TvCheckboxRow(
-                    label = option.label,
-                    checked = option.selected,
-                    onCheckedChange = { option.onSelect() },
-                    initiallyFocused = option.label == initialFocusedOptionLabel,
-                    icon = option.icon,
-                    modifier = optionModifier,
-                )
-            } else {
-                TvOptionRow(
-                    label = option.label,
-                    selected = option.selected,
-                    onClick = option.onSelect,
-                    initiallyFocused = option.label == initialFocusedOptionLabel,
-                    icon = option.icon,
-                    modifier = optionModifier,
-                )
-            }
-        }
+        pinnedOptions.forEach { option -> PaneOption(option, multiSelect, initialFocusedOptionLabel) }
+        if (pinnedOptions.isNotEmpty() && options.isNotEmpty()) PinnedDivider()
+        options.forEach { option -> PaneOption(option, multiSelect, initialFocusedOptionLabel) }
         clear?.let { action ->
             TvButton(
                 label = action.label,
@@ -163,5 +148,49 @@ private fun PaneNote(note: String, announce: Boolean) {
             Modifier
                 .padding(top = dimensionResource(DesR.dimen.padding_xs))
                 .then(if (announce) Modifier.semantics { liveRegion = LiveRegionMode.Polite } else Modifier),
+    )
+}
+
+/** One option as the row's kind of choice: a checkbox in a multi-select row, a radio-style row otherwise. */
+@Composable
+private fun PaneOption(
+    option: TvPaneOption,
+    multiSelect: Boolean,
+    initialFocusedOptionLabel: String?,
+) {
+    val optionModifier = option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier
+    if (multiSelect) {
+        TvCheckboxRow(
+            label = option.label,
+            checked = option.selected,
+            onCheckedChange = { option.onSelect() },
+            initiallyFocused = option.label == initialFocusedOptionLabel,
+            icon = option.icon,
+            excluded = option.excluded,
+            leading = option.leading,
+            modifier = optionModifier,
+        )
+    } else {
+        TvOptionRow(
+            label = option.label,
+            selected = option.selected,
+            onClick = option.onSelect,
+            initiallyFocused = option.label == initialFocusedOptionLabel,
+            icon = option.icon,
+            modifier = optionModifier,
+        )
+    }
+}
+
+/** The line between the pinned options and the options, so a control is not mistaken for one of the values. */
+@Composable
+private fun PinnedDivider() {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(DesR.dimen.padding_s))
+                .height(dimensionResource(DesR.dimen.hairline_thickness))
+                .background(MaterialTheme.colorScheme.border),
     )
 }
