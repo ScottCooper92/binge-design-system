@@ -28,6 +28,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
+import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.template.ScreenAction
@@ -38,6 +39,7 @@ import com.binge.designsystem.tv.component.TvSaveStatus
 import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.template.TvBoard
 import com.binge.designsystem.tv.template.TvDecisionPage
+import com.binge.designsystem.tv.template.TvErrorPage
 import com.binge.designsystem.tv.template.TvMessagePage
 import com.binge.designsystem.tv.template.TvPageHosting
 import com.binge.designsystem.tv.template.TvScreenHeading
@@ -365,6 +367,24 @@ fun TvMessagePageNoActionSample() {
         body = "Check the server is running, then come back.",
         icon = Icons.Filled.CloudOff,
         hosting = TvPageHosting.Overlay,
+    )
+}
+
+/** A failure as a whole page: the kind's glyph and copy, and Try again, announced as one. */
+@Composable
+fun TvErrorPageSample() {
+    TvErrorPage(kind = ErrorKind.Server, onRetry = {}, hosting = TvPageHosting.Overlay)
+}
+
+/** A failure the caller cannot retry, in the caller's own words: no button, so the page holds focus itself. */
+@Composable
+fun TvErrorPageNoRetrySample() {
+    TvErrorPage(
+        kind = ErrorKind.Configuration,
+        onRetry = null,
+        hosting = TvPageHosting.Overlay,
+        title = "No API key",
+        message = "Add a key in the server's settings, then open this page again.",
     )
 }
 
