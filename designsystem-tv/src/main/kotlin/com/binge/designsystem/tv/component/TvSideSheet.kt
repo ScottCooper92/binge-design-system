@@ -152,7 +152,8 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
  * An [icon] sits on its tinted plate, in the error colour for a [destructive] row and dimmed for a disabled one.
  * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
- * stays as tall as neighbours that have something, such as a count.
+ * stays as tall as neighbours that have something, such as a count. The label then centres in that height, level with the
+ * icon plate, instead of sitting at the top of it.
  */
 @Composable
 fun TvSideSheetRow(
@@ -216,16 +217,33 @@ fun TvSideSheetRow(
                     isFocused = focused,
                 )
         }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.titleMedium,
-                color = content,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            when {
-                supportingText != null ->
+        if (supportingText == null && reserveSupportingLine) {
+            // The reserved line is ghost text that only sets the height, so the label centres in the row against the icon plate
+            // rather than sitting at the top of the two lines.
+            Box(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.clearAndSetSemantics {}) {
+                    Text(text = "", style = MaterialTheme.typography.titleMedium, maxLines = 1)
+                    Text(text = "", style = MaterialTheme.typography.bodyMedium)
+                }
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = content,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.align(Alignment.CenterStart),
+                )
+            }
+        } else {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = content,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (supportingText != null) {
                     Text(
                         text = supportingText,
                         style = MaterialTheme.typography.bodyMedium,
@@ -233,9 +251,7 @@ fun TvSideSheetRow(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                // An empty line at the supporting style is that line's height, and nothing for a screen reader to read.
-                reserveSupportingLine ->
-                    Text(text = "", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.clearAndSetSemantics {})
+                }
             }
         }
         if (selected) TvSelectedTick(tint = content)
