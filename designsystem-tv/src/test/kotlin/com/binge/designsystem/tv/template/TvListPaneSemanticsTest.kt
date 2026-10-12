@@ -5,6 +5,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
@@ -18,6 +19,7 @@ private const val ROW_QUALITY = "Default quality"
 private const val OPTION_HD = "HD"
 private const val OPTION_UHD = "4K"
 private const val DETAIL_HD = "HD detail"
+private const val GROUP_NOTE = "Changed from your phone."
 
 /**
  * A [TvListPaneBoard] pane's options are one selectable group (#678), as [com.binge.designsystem.tv.component.TvOptionGroup]'s
@@ -61,7 +63,22 @@ class TvListPaneSemanticsTest {
         composeTestRule.onNode(hasText(DETAIL_HD)).assertDoesNotExist()
     }
 
-    private fun setBoard(detail: String? = null) {
+    @Test
+    fun `a group note reads under its title and never takes focus`() {
+        setBoard(groupNote = GROUP_NOTE)
+
+        composeTestRule.onNode(hasText(GROUP_NOTE)).assertExists()
+        composeTestRule.onNode(hasText(GROUP_NOTE) and isFocusable()).assertDoesNotExist()
+    }
+
+    @Test
+    fun `a group with no note shows none`() {
+        setBoard()
+
+        composeTestRule.onNode(hasText(GROUP_NOTE)).assertDoesNotExist()
+    }
+
+    private fun setBoard(detail: String? = null, groupNote: String? = null) {
         composeTestRule.setContent {
             BingeTvTheme {
                 TvListPaneBoard(
@@ -70,6 +87,7 @@ class TvListPaneSemanticsTest {
                         listOf(
                             TvPaneGroup(
                                 title = "Playback",
+                                note = groupNote,
                                 rows =
                                     listOf(
                                         TvPaneRow(

@@ -208,6 +208,7 @@ private fun SampleBoard(initialListHasFocus: Boolean, initialFocusedOptionLabel:
             ),
             TvPaneGroup(
                 title = "Connection",
+                note = "Changed from your phone.",
                 rows =
                     listOf(
                         TvPaneRow(
