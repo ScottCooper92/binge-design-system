@@ -74,10 +74,11 @@ class TextClippingTest {
     }
 
     /**
-     * The fault `FlowRow` showed under `ListRow`: a wrapping row whose intrinsic height reports fewer lines than it then
-     * draws. `ListRow` sizes its card from that report, so the card is too short and the line below is clipped. The
-     * stand-in states the fault directly, because `FlowRow` shows it only with real font metrics and Robolectric lays
-     * text out at about a pixel a character.
+     * Simulates the undercount `FlowRow` showed under `ListRow` in a consumer: a wrapping row whose intrinsic height
+     * reports fewer lines than it then draws. `ListRow` sizes its card from that report, so the card is too short and
+     * the line below is squeezed or clipped. The stand-in is a layout that states the fault directly. `FlowRow` itself
+     * did not reproduce it here, with the design system's own tags at widths from 190dp to 330dp and font scale 1.3,
+     * so a test of `FlowRow` would pass without proving the assertion catches anything.
      */
     @Test
     fun `a row that reports fewer lines than it draws, under a ListRow, fails and names the clipped text`() {
