@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -26,7 +27,7 @@ import com.binge.designsystem.theme.BingeShapes
 /**
  * Outlined counterpart of [BingeFilledButton], sharing its loading contract.
  *
- * [destructive] names what a caller otherwise says by passing an error [contentColor]: this control
+ * [destructive] names what a caller otherwise says by passing error [colors]: this control
  * commits or opens something irreversible. Naming it keeps the colour in one place, and keeps the
  * next destructive button from quietly defaulting to `primary` — which is how a repository ends up
  * with an error-toned confirmation behind a neutral trigger.
@@ -45,7 +46,9 @@ fun BingeOutlinedButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     destructive: Boolean = false,
-    contentColor: Color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(
+        contentColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+    ),
 ) {
     require(showLabel || leadingIcon != null) {
         "BingeOutlinedButton needs a leadingIcon to carry the accessible name when showLabel is false"
@@ -57,13 +60,13 @@ fun BingeOutlinedButton(
         modifier = modifier.defaultMinSize(minHeight = dimensionResource(R.dimen.button_filled_height)),
         shape = BingeShapes.Medium,
         enabled = enabled,
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
-        border = BorderStroke(dimensionResource(R.dimen.hairline_thickness), contentColor),
+        colors = colors,
+        border = BorderStroke(dimensionResource(R.dimen.hairline_thickness), colors.contentColor),
     ) {
         if (loading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                color = contentColor,
+                color = colors.contentColor,
                 strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
             )
         } else {
@@ -85,6 +88,45 @@ fun BingeOutlinedButton(
         }
     }
 }
+
+/**
+ * [BingeOutlinedButton] under its old colour override, `contentColor`; it is `colors: ButtonColors` now, as on
+ * [BingeFilledButton] and Material 3's buttons, so a caller can also set the container and the disabled colours. This
+ * one builds `outlinedButtonColors(contentColor = contentColor)`, which is what the old parameter did. Kotlin cannot
+ * hold two overloads that differ only in a parameter's name or default, so `contentColor` has no default here: a call
+ * that passes none resolves to [BingeOutlinedButton], and a call that passes `contentColor` lands here. Call it by name.
+ */
+@Deprecated(
+    message = "Renamed: contentColor is colors, a ButtonColors.",
+    replaceWith = ReplaceWith(
+        "BingeOutlinedButton(label, onClick, modifier, leadingIcon, showLabel, enabled, loading, destructive, " +
+            "colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor))",
+        "androidx.compose.material3.ButtonDefaults",
+    ),
+)
+@Suppress("ModifierParameter", "LongParameterList")
+@Composable
+fun BingeOutlinedButton(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    leadingIcon: ImageVector? = null,
+    showLabel: Boolean = true,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    destructive: Boolean = false,
+    contentColor: Color,
+) = BingeOutlinedButton(
+    label = label,
+    onClick = onClick,
+    modifier = modifier,
+    leadingIcon = leadingIcon,
+    showLabel = showLabel,
+    enabled = enabled,
+    loading = loading,
+    destructive = destructive,
+    colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
+)
 
 @Preview(showBackground = true)
 @Composable
