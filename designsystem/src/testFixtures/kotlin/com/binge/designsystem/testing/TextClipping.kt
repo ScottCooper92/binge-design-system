@@ -17,7 +17,9 @@ import androidx.compose.ui.unit.IntSize
  * It is how a test catches a row that is too short for its content, such as a card sized from an intrinsic height
  * that undercounts a wrapped line: the line below is squeezed to nothing or clipped away. For each node under [root]
  * with text, the size its text needs (the lines the layout drew, as `TextLayoutResult` reports them) is compared
- * with the node's visible bounds, which are the node's own size after every ancestor's clip. The height is the larger
+ * with the node's visible bounds: its own box clipped to the bounds of every ancestor, whether or not that ancestor has a
+ * clip modifier. So text that overflows a parent which does not clip, and is still drawn, is reported too. That errs on
+ * the strict side, which suits a check for a layout that is too small for its content. The height is the larger
  * of the two, so a text squeezed to nothing by a parent that ran out of room is caught as well as one clipped away. A
  * shortfall of more than [tolerancePx] in width or height fails the test, naming the text and the shortfall.
  *

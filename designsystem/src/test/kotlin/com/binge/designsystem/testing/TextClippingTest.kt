@@ -101,7 +101,7 @@ class TextClippingTest {
         assertTrue(failure?.message.orEmpty().contains("FROM Scott"))
     }
 
-    /** The same row at ten widths, because the undercount shows only where the tags wrap onto a further line. */
+    /** The same row at eight widths, because the undercount shows only where the tags wrap onto a further line. */
     private fun showAtManyWidths(statusLine: @Composable () -> Unit) {
         rule.setContent {
             val density = LocalDensity.current
@@ -171,7 +171,7 @@ class TextClippingTest {
         assertEquals(0, rule.assertNoTextClipped())
     }
 
-    /** A chip as a fixed box, because Robolectric lays text out at about a pixel a character and nothing would wrap. */
+    /** A chip as a fixed box, so the stack's height is known and does not depend on font metrics. */
     @Composable
     private fun Chip() {
         Box(Modifier.size(width = CHIP_WIDTH, height = CHIP_HEIGHT))
@@ -215,7 +215,6 @@ class TextClippingTest {
         val LEADING_WIDTH = 50.dp
         val LEADING_HEIGHT = 70.dp
         val TRAILING_SIZE = 24.dp
-        const val LONG_STATUS = "A status line far longer than the narrow column, so it wraps inside its own box and the line is two high"
         val ROW_WIDTH = 260.dp
         const val FONT_SCALE = 1.3f
     }
