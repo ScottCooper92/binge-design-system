@@ -498,6 +498,33 @@ fun BingeChoiceSheetLongLabelSample() {
     }
 }
 
+/** A choice whose supporting line has to be read in full: [BingeChoice.supportingMaxLines] lets it take three lines. */
+@Composable
+fun BingeChoiceSheetSupportingLinesSample() {
+    ScreenshotTheme {
+        SheetSurface {
+            BingeChoiceSheetContent(
+                title = "Notifications",
+                choices =
+                    BingeChoiceList.Ready(
+                        listOf(
+                            BingeChoice("on", "Notify me", supportingText = "Sends an email when a request is approved"),
+                            BingeChoice(
+                                "blocked",
+                                "Blocked by the system",
+                                supportingText = "Allow notifications for this app in the system settings, or none of the alerts " +
+                                    "you turn on here will reach you, whatever the server sends. Open the settings to change it.",
+                                supportingMaxLines = 3,
+                            ),
+                        ),
+                    ),
+                selected = "on",
+                onSelect = {},
+            )
+        }
+    }
+}
+
 /** Choices that carry a count beside the label, as a filter sheet offers: a long label still leaves the count its room. */
 @Composable
 fun BingeChoiceSheetCountsSample() {

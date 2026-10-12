@@ -210,7 +210,7 @@ private fun ListItemView(
                     text = row.detail,
                     style = MaterialTheme.typography.bodySmall,
                     color = row.detailColor ?: MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = row.supportingMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
