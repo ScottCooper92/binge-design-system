@@ -459,6 +459,27 @@ fun ItemGroupLongLabelSample() {
     }
 }
 
+/** A row whose detail has to be read in full: [ListItem.supportingMaxLines] lets it take three lines, ellipsized after that. */
+@Composable
+fun ItemGroupSupportingLinesSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Notifications",
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.Tune,
+                    label = "Notifications are blocked",
+                    detail = "Allow them in the system settings to be told about requests, approvals and failures. Until you do, " +
+                        "none of the alerts you turn on here will reach this device, whatever the server sends.",
+                    detailColor = MaterialTheme.colorScheme.error,
+                    supportingMaxLines = 3,
+                ),
+                ListItem(icon = Icons.Filled.HighQuality, label = "Default quality profile", detail = "HD-1080p"),
+            ),
+        )
+    }
+}
+
 /**
  * A row that opens something below it ([ListItem.expanded]): it draws an expand or collapse chevron in
  * place of the destination one and tells a screen reader which state it is in. The first row starts open

@@ -63,7 +63,7 @@ import com.binge.designsystem.R
 import kotlinx.coroutines.launch
 
 /**
- * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [supportingText], one line of what the choice does. A
+ * One entry a choice sheet offers: the [value] a pick hands back, the [label] it shows, and an optional [supportingText], a line of what the choice does, held to [supportingMaxLines] lines (one by default). A
  * choice can carry a mark in a settings row's icon box: an [icon], or a short [mark] of text such as a flag or a
  * language code. The mark sits on a plate tinted [iconTint], `primary` when it is null. A choice that is a person
  * carries [avatarName] instead, drawn as their avatar from [avatarUrl], with their initials while it loads or when
@@ -81,6 +81,8 @@ data class BingeChoice<out T>(
     val avatarUrl: String? = null,
     val trailingText: String? = null,
     val iconTint: Color? = null,
+    /** How many lines [supportingText] may take before it ends in an ellipsis; raise it for a line that has to be read in full. */
+    val supportingMaxLines: Int = 1,
 ) {
     /**
      * [BingeChoice] built with its old `subtitle` name. Required, and last, because Kotlin cannot hold a second
@@ -765,7 +767,7 @@ private fun <T> RadioChoiceRow(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = choice.supportingMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -937,7 +939,7 @@ private fun <T> CheckChoiceRow(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = choice.supportingMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
