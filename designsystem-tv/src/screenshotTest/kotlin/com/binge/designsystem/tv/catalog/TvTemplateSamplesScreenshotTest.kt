@@ -105,6 +105,16 @@ class TvTemplateSamplesScreenshotTest {
     @Composable
     fun messagePageLoading() = Frame { TvMessagePageLoadingSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun errorPage() = Frame { TvErrorPageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun errorPageNoRetry() = Frame { TvErrorPageNoRetrySample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
