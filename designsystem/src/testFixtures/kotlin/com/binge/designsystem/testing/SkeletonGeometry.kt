@@ -56,6 +56,11 @@ import kotlin.math.abs
  * An anchor holding text needs `@GraphicsMode(NATIVE)` on the test: Robolectric's legacy mode measures text at
  * one pixel per character and never wraps it, so the band's height is fiction.
  *
+ * @param checkTop the down-the-page comparison, on by default. Turn it off for an anchor whose two nodes are
+ * different heights by nature, such as a skeleton's label bar against the text that replaces it: both are centred in
+ * their row, so their tops differ by half the difference in height while the start edge, which is what the check is
+ * for, agrees.
+ *
  * The harness lives here, in the phone design system, rather than beside either surface's anchors: it names
  * no Material type at all — only `testTag` and bounds — so the tv-material separation the two component
  * layers keep does not reach it, and both surfaces assert the invariant with one implementation. TV callers
@@ -69,6 +74,7 @@ fun ComposeContentTestRule.assertSkeletonReservesGeometry(
     tolerance: Dp = DEFAULT_TOLERANCE,
     checkStartEdge: Boolean = false,
     checkSize: Boolean = false,
+    checkTop: Boolean = true,
     content: @Composable (resolved: Boolean) -> Unit,
 ) {
     require(anchors.isNotEmpty()) { "Name at least one anchor, or the assertion passes vacuously." }
@@ -83,7 +89,7 @@ fun ComposeContentTestRule.assertSkeletonReservesGeometry(
     val settled = anchors.associateWith { boxOf(it) }
 
     val failures = anchors.mapNotNull { anchor ->
-        describeDrift(anchor, loading[anchor], settled[anchor], tolerance, checkStartEdge, checkSize)
+        describeDrift(anchor, loading[anchor], settled[anchor], tolerance, checkStartEdge, checkSize, checkTop)
     }
     check(failures.isEmpty()) {
         "The skeleton does not reserve what the content fills:\n" + failures.joinToString("\n") { "  - $it" }
@@ -118,6 +124,7 @@ private fun describeDrift(
     tolerance: Dp,
     checkStartEdge: Boolean,
     checkSize: Boolean,
+    checkTop: Boolean,
 ): String? =
     when {
         loading == null && resolved == null ->
@@ -131,7 +138,7 @@ private fun describeDrift(
                 "describing a page that no longer exists."
 
         else -> listOfNotNull(
-            describeAxis(anchor, "down the page", loading.top, resolved.top, tolerance),
+            describeAxis(anchor, "down the page", loading.top, resolved.top, tolerance).takeIf { checkTop },
             describeAxis(anchor, "across the page", loading.start, resolved.start, tolerance)
                 .takeIf { checkStartEdge },
             describeResize(anchor, "wider", "narrower", loading.width, resolved.width, tolerance)

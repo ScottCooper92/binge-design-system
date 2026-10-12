@@ -107,7 +107,10 @@ private fun ListSkeleton(
                 // starts where the label will.
                 if (rowIcon) {
                     Box(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon_slot)), contentAlignment = Alignment.Center) {
-                        TvSkeletonBlock(Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)), shape = BingeShapes.TvListItem)
+                        TvSkeletonBlock(
+                            Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)).tvListPaneFirstRowIconAnchor(index == 0),
+                            shape = BingeShapes.TvListItem,
+                        )
                     }
                 }
                 Column(
@@ -119,6 +122,7 @@ private fun ListSkeleton(
                 ) {
                     TvSkeletonBlock(
                         Modifier
+                            .tvListPaneFirstRowLabelAnchor(index == 0)
                             .fillMaxWidth(ROW_LABEL_WIDTH_FRACTION)
                             .height(dimensionResource(TvR.dimen.tv_list_pane_skeleton_line_height)),
                     )

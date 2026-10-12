@@ -76,6 +76,37 @@ class TvListPaneBoardSkeletonGeometryTest {
         ) { resolved ->
             BingeTvTheme { if (resolved) Board(icon = Icons.Filled.Movie) else TvListPaneBoardSkeleton(title = TITLE, rowIcon = true) }
         }
+
+    @Test
+    fun `the skeleton's label bar starts where the board's label does`() =
+        composeTestRule.assertSkeletonReservesGeometry(
+            listOf(TvLayoutAnchors.LIST_PANE_FIRST_ROW_LABEL),
+            checkStartEdge = true,
+            checkTop = false,
+        ) { resolved ->
+            BingeTvTheme { if (resolved) Board() else TvListPaneBoardSkeleton(title = TITLE) }
+        }
+
+    @Test
+    fun `with an icon, the skeleton's icon block starts where the board's icon does`() =
+        composeTestRule.assertSkeletonReservesGeometry(
+            listOf(TvLayoutAnchors.LIST_PANE_FIRST_ROW_ICON),
+            checkStartEdge = true,
+            checkSize = true,
+        ) { resolved ->
+            BingeTvTheme { if (resolved) Board(icon = Icons.Filled.Movie) else TvListPaneBoardSkeleton(title = TITLE, rowIcon = true) }
+        }
+
+    // The label is a bar against text, so it is held to its start edge and not to its height or its top.
+    @Test
+    fun `with an icon, the skeleton's label bar starts where the board's label does`() =
+        composeTestRule.assertSkeletonReservesGeometry(
+            listOf(TvLayoutAnchors.LIST_PANE_FIRST_ROW_LABEL),
+            checkStartEdge = true,
+            checkTop = false,
+        ) { resolved ->
+            BingeTvTheme { if (resolved) Board(icon = Icons.Filled.Movie) else TvListPaneBoardSkeleton(title = TITLE, rowIcon = true) }
+        }
 }
 
 private const val TITLE = "Settings"
