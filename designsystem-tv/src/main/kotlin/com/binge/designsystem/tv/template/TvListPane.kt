@@ -22,7 +22,11 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.CollectionItemInfo
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.collectionItemInfo
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -67,6 +71,13 @@ internal fun TvListPane(
     val sectionGap = dimensionResource(DesR.dimen.padding_m)
     val optionsLead = sectionGap + dimensionResource(DesR.dimen.padding_s)
     val optionGap = dimensionResource(TvR.dimen.tv_option_row_gap)
+    // The options' direct semantics parent is the lazy column, so the group and its counts sit there. The counts are the
+    // options only, not the label and body around them, and the lazy layout's own collection info yields to this one.
+    val optionCount = row.pinnedOptions.size + row.options.size
+    val optionsGroup =
+        Modifier
+            .selectableGroup()
+            .semantics { collectionInfo = CollectionInfo(rowCount = optionCount, columnCount = 1) }
     val optionWidth = Modifier.width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
     TvStableFocusScroll {
         Box(
@@ -80,7 +91,6 @@ internal fun TvListPane(
                             Modifier
                                 .focusProperties { left = backToListFocus }
                                 .then(if (routesToFirstValue) Modifier.focusGroup() else Modifier.tvFocusGroup())
-                                .then(if (row.multiSelect) Modifier else Modifier.selectableGroup())
                         },
                     ),
         ) {
@@ -89,7 +99,8 @@ internal fun TvListPane(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .then(if (hasOptions && routesToFirstValue) Modifier.focusRestorer(firstValueFocus) else Modifier),
+                        .then(if (routesToFirstValue) Modifier.focusRestorer(firstValueFocus) else Modifier)
+                        .then(if (!hasOptions || row.multiSelect) Modifier else optionsGroup),
                 contentPadding = PaddingValues(vertical = dimensionResource(TvR.dimen.tv_focus_ring_bleed)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -129,7 +140,7 @@ internal fun TvListPane(
                 if (hasOptions) {
                     itemsIndexed(row.pinnedOptions, key = { index, _ -> "pinned-$index" }) { index, option ->
                         val inset = if (index == 0) optionsLead else optionGap
-                        PaneOption(option, row.multiSelect, initialFocusedOptionLabel, optionWidth.padding(top = inset))
+                        PaneOption(option, row.multiSelect, initialFocusedOptionLabel, optionWidth.padding(top = inset), index)
                     }
                     if (routesToFirstValue) {
                         item(key = "divider") { PinnedDivider(Modifier.padding(top = optionGap)) }
@@ -137,7 +148,13 @@ internal fun TvListPane(
                     itemsIndexed(row.options, key = { index, _ -> "option-$index" }) { index, option ->
                         val inset = if (index == 0 && row.pinnedOptions.isEmpty()) optionsLead else optionGap
                         val entry = if (routesToFirstValue && index == 0) Modifier.focusRequester(firstValueFocus) else Modifier
-                        PaneOption(option, row.multiSelect, initialFocusedOptionLabel, optionWidth.padding(top = inset).then(entry))
+                        PaneOption(
+                            option,
+                            row.multiSelect,
+                            initialFocusedOptionLabel,
+                            optionWidth.padding(top = inset).then(entry),
+                            row.pinnedOptions.size + index,
+                        )
                     }
                     row.clear?.let { action ->
                         item(key = "clear") {
@@ -183,9 +200,21 @@ private fun PaneOption(
     option: TvPaneOption,
     multiSelect: Boolean,
     initialFocusedOptionLabel: String?,
-    entryModifier: Modifier = Modifier,
+    entryModifier: Modifier,
+    position: Int,
 ) {
-    val optionModifier = (option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier).then(entryModifier)
+    val optionModifier =
+        (option.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+            .then(entryModifier)
+            .then(
+                if (multiSelect) {
+                    Modifier
+                } else {
+                    Modifier.semantics {
+                        collectionItemInfo = CollectionItemInfo(rowIndex = position, rowSpan = 1, columnIndex = 0, columnSpan = 1)
+                    }
+                },
+            )
     if (multiSelect) {
         TvCheckboxRow(
             label = option.label,
