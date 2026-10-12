@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
@@ -18,10 +20,11 @@ import com.binge.designsystem.theme.tonalContainer
 
 /**
  * The tinted plate a row leads with: [content] drawn over a wash of [tint], which is `primary` unless the row
- * names its own. Settings rows and choice rows share it, so an icon reads the same wherever it leads.
+ * names its own. Settings rows and choice rows share it, so an icon reads the same wherever it leads. [content] is
+ * handed the accent, for a glyph that should match the wash; anything else, such as a flag emoji, can ignore it.
  */
 @Composable
-internal fun BingeIconPlate(
+fun BingeIconPlate(
     modifier: Modifier = Modifier,
     tint: Color? = null,
     content: @Composable (Color) -> Unit,
@@ -40,7 +43,7 @@ internal fun BingeIconPlate(
 
 /** [BingeIconPlate] around a single glyph. */
 @Composable
-internal fun BingeIconPlate(
+fun BingeIconPlate(
     painter: Painter,
     modifier: Modifier = Modifier,
     tint: Color? = null,
@@ -53,4 +56,14 @@ internal fun BingeIconPlate(
             modifier = Modifier.size(dimensionResource(R.dimen.item_group_icon_glyph)),
         )
     }
+}
+
+/** [BingeIconPlate] around a single vector glyph. */
+@Composable
+fun BingeIconPlate(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    tint: Color? = null,
+) {
+    BingeIconPlate(painter = rememberVectorPainter(icon), modifier = modifier, tint = tint)
 }
