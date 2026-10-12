@@ -10,8 +10,10 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.MediaCard
 import com.binge.designsystem.component.MediaCardAction
 import com.binge.designsystem.component.MediaCardSkeleton
+import com.binge.designsystem.component.MediaCardStatus
 import com.binge.designsystem.component.MediaTypeTagType
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeSentiment
 
 /**
  * Shared public-sample convention — the worked example.
@@ -90,6 +92,25 @@ fun MediaCardUnratedSample() {
             title = "A Very Long Movie Title That Should Wrap Or Truncate",
             rating = null,
             onClick = {},
+            modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+        )
+    }
+}
+
+/**
+ * A poster carrying a status chip top-start, the way a grid marks where a request for the title stands.
+ * The type badge sits above it on a surface that mixes kinds, so the sample shows both.
+ */
+@Composable
+fun MediaCardStatusSample() {
+    ScreenshotTheme {
+        MediaCard(
+            posterUrl = null,
+            title = "Arrival",
+            rating = 7.9f,
+            onClick = {},
+            typeBadge = MediaTypeTagType.Movie,
+            status = MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive),
             modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
         )
     }
