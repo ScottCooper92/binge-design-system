@@ -30,6 +30,11 @@ class TvWorstCaseSamplesScreenshotTest {
     @PreviewTest
     @TvWorstCaseFontPreviews
     @Composable
+    fun detailActionRow() = Frame { TvDetailActionRowWorstCaseSample() }
+
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
     fun listPaneBoard() = Frame { TvListPaneBoardWorstCaseSample() }
 
     @Composable

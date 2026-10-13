@@ -58,6 +58,10 @@ class TvWorstCaseFixturesTest {
 
     @Test fun `a choice row at 2_0`() = check(FONT_20) { TvChoiceRowWorstCaseSample() }
 
+    @Test fun `a detail action row at 1_3`() = check(FONT_13) { TvDetailActionRowWorstCaseSample() }
+
+    @Test fun `a detail action row at 2_0`() = check(FONT_20) { TvDetailActionRowWorstCaseSample() }
+
     @Test fun `a list pane board at 1_3`() = check(FONT_13) { TvListPaneBoardWorstCaseSample() }
 
     @Test fun `a list pane board at 2_0`() = check(FONT_20) { TvListPaneBoardWorstCaseSample() }

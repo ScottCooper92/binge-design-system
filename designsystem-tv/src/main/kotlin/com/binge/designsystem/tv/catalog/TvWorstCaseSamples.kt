@@ -7,11 +7,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -19,6 +28,8 @@ import com.binge.designsystem.catalog.ScreenshotOnly
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvChoiceRow
 import com.binge.designsystem.tv.component.TvChoiceUi
+import com.binge.designsystem.tv.component.TvDetailAction
+import com.binge.designsystem.tv.component.TvDetailActionRow
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.template.TvListPaneBoard
 import com.binge.designsystem.tv.template.TvPaneAction
@@ -89,6 +100,26 @@ fun TvChoiceRowWorstCaseSample() {
         selectedKey = "a",
         onSelect = {},
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
+    )
+}
+
+/** The most a detail page can offer: a primary and six labelled actions, more than a line holds at a large font. */
+@Composable
+fun TvDetailActionRowWorstCaseSample() {
+    TvDetailActionRow(
+        actions =
+            listOf(
+                TvDetailAction("Approve", Icons.Filled.Check, onClick = {}, isPrimary = true),
+                TvDetailAction("Decline", Icons.Filled.Close, onClick = {}, showLabel = true),
+                TvDetailAction("Remove", Icons.Filled.Delete, onClick = {}, showLabel = true),
+                TvDetailAction("Block", Icons.Filled.Block, onClick = {}, showLabel = true),
+                TvDetailAction("Mark as", Icons.Filled.Done, onClick = {}, showLabel = true),
+                TvDetailAction("Report an issue", Icons.Filled.ReportProblem, onClick = {}, showLabel = true),
+                TvDetailAction("Open in Binge", Icons.AutoMirrored.Filled.OpenInNew, onClick = {}, showLabel = true),
+            ),
+        entryFocus = remember { FocusRequester() },
+        // The page's own side margins, which is the width a detail page gives its row.
+        modifier = Modifier.padding(horizontal = dimensionResource(TvR.dimen.tv_overscan_horizontal)),
     )
 }
 
