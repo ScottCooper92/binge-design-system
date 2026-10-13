@@ -62,6 +62,23 @@ fun TvSideSheetRowReservedLineSample() {
     }
 }
 
+/**
+ * A page opened from a [com.binge.designsystem.tv.component.TvSideSheetStack]'s list: its own title and its own rows
+ * on the same panel, the first focused. The stack's live behaviour, a page opening over another and focus returning to the
+ * row that opened it, is [TvSideSheetStackDemo]'s.
+ */
+@Composable
+fun TvSideSheetStackPageSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Notifications")
+            TvSideSheetRow(label = "New requests", supportingText = "On", onClick = {}, initiallyFocused = true)
+            TvSideSheetRow(label = "Approved requests", supportingText = "On", onClick = {})
+            TvSideSheetRow(label = "Issues", supportingText = "Off", onClick = {})
+        }
+    }
+}
+
 /** A row whose label is longer than the sheet is wide: it stops on one line with an ellipsis, beside its tick. */
 @Composable
 fun TvSideSheetRowLongLabelSample() {
