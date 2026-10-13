@@ -17,6 +17,7 @@ import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvSideSheet
 import com.binge.designsystem.tv.component.TvSideSheetConfirm
 import com.binge.designsystem.tv.component.TvSideSheetRow
+import com.binge.designsystem.tv.component.TvSideSheetStack
 import com.binge.designsystem.tv.component.TvSideSheetStepFocus
 import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.focus.rememberTvOverlayCloser
@@ -70,6 +71,45 @@ fun TvSideSheetDemo() {
                     destructive = true,
                 )
                 TvSideSheetStepFocus(entryFocus)
+            }
+        }
+    }
+}
+
+/**
+ * The real stacked sheet: Settings opens a list whose rows each open their own page. BACK, or the key pointing away from
+ * the panel, goes back one page with focus on the row that opened the one just left, and from the list closes the sheet and returns
+ * focus to the button.
+ */
+@Composable
+fun TvSideSheetStackDemo() {
+    var open by remember { mutableStateOf(false) }
+    val opener = remember { FocusRequester() }
+    val closer = rememberTvOverlayCloser(restoreTo = opener) { open = false }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvButton(label = "Open settings", onClick = { open = true }, modifier = Modifier.focusRequester(opener))
+    }
+    if (open) {
+        TvSideSheetStack(root = "settings", onDismissRequest = closer::close) { nav ->
+            when (nav.page) {
+                "settings" -> {
+                    TvSideSheetTitle("Settings")
+                    TvSideSheetRow(
+                        "Notifications",
+                        onClick = { nav.push("notifications", openedBy = "notifications") },
+                        modifier = nav.row("notifications"),
+                    )
+                    TvSideSheetRow("Quality", onClick = { nav.push("quality", openedBy = "quality") }, modifier = nav.row("quality"))
+                }
+                "notifications" -> {
+                    TvSideSheetTitle("Notifications")
+                    TvSideSheetRow("New requests", onClick = {}, supportingText = "On", modifier = nav.row("new"))
+                    TvSideSheetRow("Issues", onClick = {}, supportingText = "Off", modifier = nav.row("issues"))
+                }
+                else -> {
+                    TvSideSheetTitle("Quality")
+                    DemoQualities.forEach { label -> TvSideSheetRow(label, onClick = {}, modifier = nav.row(label)) }
+                }
             }
         }
     }

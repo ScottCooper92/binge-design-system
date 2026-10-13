@@ -22,6 +22,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetStackPage() = Frame { TvSideSheetStackPageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun sideSheetRowLongLabel() = Frame { TvSideSheetRowLongLabelSample() }
 
     @PreviewTest
