@@ -62,6 +62,7 @@ internal class RowRequesters {
 @Stable
 class TvSideSheetNav internal constructor(
     val page: String,
+    /** How many pages are open, the root being one: for a caller that words its first page differently from the rest. */
     val depth: Int,
     private val onPush: (page: String, openedBy: String) -> Unit,
     private val onBack: () -> Unit,
@@ -79,7 +80,10 @@ class TvSideSheetNav internal constructor(
      */
     fun row(key: String): Modifier = Modifier.focusRequester(requesters.requesterFor(key))
 
-    /** Where focus lands when this page opens, in place of its first row: the Cancel of a confirm, say. */
+    /**
+     * Where focus lands when this page opens, in place of its first row: the Cancel of a confirm, say, which
+     * [TvSideSheetConfirm] takes as `cancelModifier = nav.row("cancel")` with a null `entryFocus`.
+     */
     fun arriveAt(key: String) {
         requesters.arrival = key
     }
@@ -92,8 +96,8 @@ class TvSideSheetNav internal constructor(
  * [onDismissRequest], where the caller returns focus to what opened the sheet, with `rememberTvOverlayCloser`.
  *
  * Focus follows the pages. A page that opens puts focus on its first row, and going back puts it on the row that opened the
- * page just left, so the user is where they were. Pages are keyed by name, so the stack survives a rotation; what a
- * page shows is the caller's to read from its own state. [content] draws the page named by [TvSideSheetNav.page],
+ * page just left, so the user is where they were. Pages are keyed by name, so the stack survives a rotation, and no page
+ * opens another of the same name; what a page shows is the caller's to read from its own state. [content] draws the page named by [TvSideSheetNav.page],
  * and gives every row [TvSideSheetNav.row].
  */
 @Composable

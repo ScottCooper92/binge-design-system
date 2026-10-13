@@ -262,6 +262,9 @@ fun TvSideSheetRow(
  * A sheet's second step, for an action that deletes or blocks: what is about to happen, then the confirm and
  * Cancel rows. Focus lands on Cancel, so a stray OK does nothing. [cancelInitiallyFocused] draws that, for a frame.
  * The confirm row rests in the error colour; pass `destructive = false` for a step that asks first but destroys nothing.
+ *
+ * On a [TvSideSheetStack] page there is no [entryFocus]: pass null, give Cancel `nav.row("cancel")` as [cancelModifier] and
+ * call `nav.arriveAt("cancel")`, and the stack lands focus there.
  */
 @Composable
 fun ColumnScope.TvSideSheetConfirm(
@@ -270,9 +273,10 @@ fun ColumnScope.TvSideSheetConfirm(
     confirmLabel: String,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
-    entryFocus: FocusRequester,
+    entryFocus: FocusRequester?,
     cancelInitiallyFocused: Boolean = false,
     destructive: Boolean = true,
+    cancelModifier: Modifier = Modifier,
 ) {
     TvSideSheetTitle(title)
     TvSideSheetBody(message)
@@ -281,7 +285,7 @@ fun ColumnScope.TvSideSheetConfirm(
         label = stringResource(DesR.string.action_cancel),
         onClick = onCancel,
         initiallyFocused = cancelInitiallyFocused,
-        modifier = Modifier.focusRequester(entryFocus),
+        modifier = (if (entryFocus != null) Modifier.focusRequester(entryFocus) else Modifier).then(cancelModifier),
     )
-    TvSideSheetStepFocus(entryFocus)
+    if (entryFocus != null) TvSideSheetStepFocus(entryFocus)
 }
