@@ -31,7 +31,8 @@ data class ScanResult(
  * Source scanning rather than reflection or KSP, by decision on the catalog epic: the samples are
  * top-level, annotated on the line above or the same line and carry a KDoc, which a line scan reads exactly, and a
  * reflection pass over Compose-rewritten signatures would not. A public function ending in `Sample` or
- * `Demo` that is not a no-argument composable is reported with its file and line, not skipped.
+ * `Demo` that is not a no-argument composable is reported with its file and line, not skipped. So is one
+ * with an annotation that runs over several lines, which the line scan cannot read.
  *
  * Four file annotations from the catalog package are read the same way, as lines: `@file:OnePerScreen`
  * (and its `fullScreen = true`), `@file:CatalogGroup("…")`, `@file:SelfDescribing` and `@file:ScreenshotOnly`, whose file lists nothing.
@@ -68,7 +69,11 @@ object SampleScanner {
             val above = annotationsAbove(lines, index)
             val annotations = (above + match.groupValues[1]).flatMap { line -> annotationToken.findAll(line).map { it.value } }
             val parameters = parametersFrom(lines, index)
+            val multiLine = multiLineAnnotationAbove(lines, index)
             when {
+                multiLine != null ->
+                    problems += "$where: $function has ${multiLine.first} over several lines, from line ${multiLine.second + 1}; " +
+                        "keep each annotation on one line so the catalog can read it"
                 annotations.none { it.startsWith(COMPOSABLE) } ->
                     problems += "$where: public $function is not @Composable; a catalog ${kind.noun} must be"
                 parameters.isNotBlank() ->
@@ -118,6 +123,28 @@ object SampleScanner {
         }
         return found.toList()
     }
+
+    /**
+     * The annotation above [declarationIndex] whose arguments run onto later lines, with its row, or null.
+     * Walking up, a `)` not yet matched means the lines in between are inside an argument list.
+     */
+    private fun multiLineAnnotationAbove(lines: List<String>, declarationIndex: Int): Pair<String, Int>? {
+        var unmatched = 0
+        for (i in declarationIndex - 1 downTo 0) {
+            val line = lines[i].trim()
+            if (line.isEmpty() || line.startsWith("*") || line.startsWith("/") || line.endsWith("*/")) return null
+            val net = line.count { it == ')' } - line.count { it == '(' }
+            when {
+                line.startsWith("@") && net < 0 && unmatched > 0 -> return (annotationName.find(line)?.value ?: line) to i
+                line.startsWith("@") -> unmatched += net
+                unmatched + net > 0 -> unmatched += net
+                else -> return null
+            }
+        }
+        return null
+    }
+
+    private val annotationName = Regex("""@\w+""")
 
     private fun parametersFrom(lines: List<String>, declarationIndex: Int): String {
         val text = lines.drop(declarationIndex).joinToString("\n")

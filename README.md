@@ -109,6 +109,10 @@ for Android TV.
 - The first sentence of its KDoc is its description, and the app's search reads it.
 - A public `…Sample` or `…Demo` that takes parameters, or is not composable, fails the build with its
   file and line. A private or internal one is ignored.
+- Keep each of a sample's annotations on one line. One whose arguments run over several lines fails
+  the build, naming the annotation and its line.
+- Samples and demos sit directly in `catalog/`. One in a sub-package fails the build with "samples
+  must sit directly in catalog/". A helper file with no samples may sit in one.
 
 **One card per component.** Samples and demos are variants of a component, and the grid shows the
 component once. A component is its samples file, without the `Samples` suffix. A demo joins the
