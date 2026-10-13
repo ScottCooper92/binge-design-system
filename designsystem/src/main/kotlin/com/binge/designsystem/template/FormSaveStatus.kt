@@ -66,7 +66,11 @@ internal fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
 
 /**
  * Keeps the failure snackbar up for as long as [status] is [FormSaveStatus.Failed]. It is shown indefinitely, with
- * Retry, and is dismissed when the status moves on: Retry sends the change again, so the next status is Saving.
+ * Retry, and goes when the status moves on: Retry sends the change again, so the next status is Saving.
+ *
+ * It is shown again whenever it goes without being answered, since another message on the host dismisses the one
+ * showing, and after a Retry that fails at once, which leaves the status Failed and this effect unrestarted. Retry
+ * calls the latest `onRetry`, not the one the effect started with.
  */
 @Composable
 internal fun FormSaveFailureSnackbar(status: FormSaveStatus, snackbarHostState: SnackbarHostState) {
@@ -75,8 +79,9 @@ internal fun FormSaveFailureSnackbar(status: FormSaveStatus, snackbarHostState: 
     val message = stringResource(R.string.form_save_failed)
     val retry = stringResource(R.string.form_save_retry)
     LaunchedEffect(failed != null) {
-        if (failed != null) {
-            // Cancelled when the status leaves Failed, which takes the snackbar down with it.
+        if (failed == null) return@LaunchedEffect
+        // Cancelled when the status leaves Failed, which takes the snackbar down with it.
+        while (true) {
             val result = snackbarHostState.showSnackbar(message = message, actionLabel = retry, duration = SnackbarDuration.Indefinite)
             if (result == SnackbarResult.ActionPerformed) onRetry.value?.invoke()
         }
