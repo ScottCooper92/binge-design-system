@@ -30,6 +30,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvEndDirectionKey
 import com.binge.designsystem.tv.focus.tvFocusIndicator
@@ -43,7 +44,7 @@ import com.binge.designsystem.tv.R as TvR
  * chevrons that dim at either end. The number reads as [valueLabel], which the screen words ("5 requests",
  * "Unlimited") and which is announced as the control's state. Like [TvRatingStepper], a press past either end is
  * consumed and does nothing, direction follows the layout, OK commits nothing, and the control only reports
- * [onValueChange]. [initiallyFocused] seeds the lit state for a frame; production passes false.
+ * [onValueChange]. [step] must be positive. [initiallyFocused] seeds the lit state for a frame; production passes false.
  */
 @Composable
 fun TvNumberStepper(
@@ -55,6 +56,7 @@ fun TvNumberStepper(
     step: Int = 1,
     initiallyFocused: Boolean = false,
 ) {
+    require(step > 0) { "step must be positive, was $step" }
     var focused by remember { mutableStateOf(initiallyFocused) }
     val lowerKey = tvStartDirectionKey()
     val raiseKey = tvEndDirectionKey()
@@ -119,9 +121,12 @@ private fun Chevron(icon: ImageVector, enabled: Boolean) {
     Icon(
         imageVector = icon,
         contentDescription = null,
-        tint = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = DIMMED_ALPHA),
+        tint =
+            if (enabled) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = DISABLED_ALPHA)
+            },
         modifier = Modifier.size(dimensionResource(TvR.dimen.tv_number_stepper_chevron_size)),
     )
 }
-
-private const val DIMMED_ALPHA = 0.38f
