@@ -107,6 +107,26 @@ class TvImmersiveGridStateTest {
     }
 
     @Test
+    fun `fewer cells under the same query do not read past the end`() {
+        setGrid()
+        focusRemembered()
+
+        val shrunk = 2
+        content =
+            TvImmersiveGridContent.Items(
+                count = shrunk,
+                key = { it },
+                at = { index ->
+                    check(index in 0 until shrunk) { "read $index past the end" }
+                    index
+                },
+            )
+        composeTestRule.settle(SETTLE_MILLIS)
+
+        composeTestRule.onNodeWithTag("cell-0").assertExists()
+    }
+
+    @Test
     fun `an end press leaves from the end edge only`() {
         setGrid()
         enterFromRail()

@@ -62,7 +62,8 @@ private const val DEFAULT_COLUMNS = 6
  * @param trailingAction pinned to the heading row's end, never squeezed out by [band].
  * @param onNavigateToEnd an end-direction press from the grid's end edge, or from any non-cell state.
  * @param entryFocusRequester a requester on the grid's body, for a caller restoring focus to it; entry still routes
- * to the remembered cell.
+ * to the remembered cell. It reaches the cells only: in the message state, attach the same requester inside [message]
+ * or focus falls to the rail.
  * @param queryKey the content's identity: a new one resets the focus memory and the scroll to the top.
  * @param drawBackdrop false when a host draws the backdrop itself; [onBackdropItemChanged] tells it which item.
  * @param messageEndInset keeps a centred message clear of a pane drawn over this one's end.
@@ -102,7 +103,7 @@ fun <T : Any> TvImmersiveGrid(
     // A visit is the screen, not the query, so this is deliberately not keyed on queryKey.
     val depth = rememberTvVisitDepth(onVisitEnded)
     var memory by rememberSaveable(queryKey, stateSaver = TvGridMemorySaver) {
-        mutableStateOf(initialFocusedIndex?.let { TvGridMemory(it, items?.key?.invoke(it)) })
+        mutableStateOf(initialFocusedIndex?.let { TvGridMemory(it, items?.takeIf { s -> it < s.count }?.key?.invoke(it)) })
     }
     var ringIndex by remember(queryKey) { mutableStateOf(initialFocusedIndex) }
     val remembered = memory.resolveIn(content)
@@ -122,7 +123,7 @@ fun <T : Any> TvImmersiveGrid(
     val bursting = rememberBursting(anchor)
     // At rest, before focus has entered, the backdrop shows the first cell, where entry lands.
     val settled = rememberSettledFocus(remembered, reduceMotion)
-    val backdropItem = items?.takeIf { it.count > 0 }?.let { it.at(settled ?: 0) ?: it.at(0) }
+    val backdropItem = items?.takeIf { it.count > 0 }?.let { it.at(settled?.takeIf { s -> s < it.count } ?: 0) ?: it.at(0) }
     ReportBackdropItem(backdropItem, onBackdropItemChanged)
 
     val entry = remember { FocusRequester() }
