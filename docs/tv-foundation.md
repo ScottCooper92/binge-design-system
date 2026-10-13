@@ -69,9 +69,9 @@ the white with the theme's `primary`.
 
 Three rules follow, and they are the whole model.
 
-1. **The fill is the focus channel; the hue stays the role.** A focused destructive control fills
+1. **The fill is the focus channel; the hue stays the role.** A focused destructive outline control fills
    with the error colour, not the accent, so it stays dangerous exactly when the user is about to
-   press it. Everything else fills with the accent. `TvButtonStyle.Destructive` and `DestructiveOutline` are this rule.
+   press it. Everything else fills with the accent. `TvButtonStyle.DestructiveOutline` is this rule.
    Destructive actions go last in an action row. A reversible one (block) takes `DestructiveOutline`; an
    irreversible one (remove, delete) takes `Destructive`.
 2. **No control carries the accent at rest, and emphasis is shape rather than colour.** A primary

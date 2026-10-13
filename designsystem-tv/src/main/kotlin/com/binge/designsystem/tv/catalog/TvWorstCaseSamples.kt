@@ -114,9 +114,9 @@ fun TvDetailActionRowWorstCaseSample() {
                 TvDetailAction("Decline", Icons.Filled.Close, onClick = {}, showLabel = true),
                 TvDetailAction("Mark as", Icons.Filled.Done, onClick = {}, showLabel = true),
                 TvDetailAction("Report an issue", Icons.Filled.ReportProblem, onClick = {}, showLabel = true),
+                TvDetailAction("Open in Binge", Icons.AutoMirrored.Filled.OpenInNew, onClick = {}, showLabel = true),
                 TvDetailAction("Block", Icons.Filled.Block, onClick = {}, showLabel = true, style = TvButtonStyle.DestructiveOutline),
                 TvDetailAction("Remove", Icons.Filled.Delete, onClick = {}, showLabel = true, style = TvButtonStyle.Destructive),
-                TvDetailAction("Open in Binge", Icons.AutoMirrored.Filled.OpenInNew, onClick = {}, showLabel = true),
             ),
         entryFocus = remember { FocusRequester() },
         // The page's own side margins, which is the width a detail page gives its row.

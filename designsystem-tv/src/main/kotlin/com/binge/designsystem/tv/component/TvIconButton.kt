@@ -48,8 +48,9 @@ import com.binge.designsystem.tv.R as TvR
  * phone's icon button takes a nullable description: a TV icon button must be named. It is the control's accessible
  * name the whole time, and the copy the reveal shows once focused.
  *
- * Coloured by [tvButtonColors] like [TvButton], so an icon button focuses with the accent (red for
- * [TvButtonStyle.Destructive]) exactly like every other control.
+ * Coloured by [tvButtonColors] like [TvButton], so an icon button focuses with the accent exactly like every
+ * other control. [TvButtonStyle.DestructiveOutline] fills red on focus, and [TvButtonStyle.Destructive] adds a light
+ * border to its solid red.
  *
  * [loading] swaps the icon for a spinner of the same size and swallows OK, as the phone's icon button does. It is
  * independent of [enabled]: the button keeps its colours and focus, so the remote does not lose its place, and the
