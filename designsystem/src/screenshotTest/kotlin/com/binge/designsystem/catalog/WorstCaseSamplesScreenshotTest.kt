@@ -26,6 +26,13 @@ class WorstCaseSamplesScreenshotTest {
     @PreviewTest
     @WorstCaseFontPreviews
     @Composable
+    fun ItemGroupWideTrailing() {
+        ItemGroupWideTrailingWorstCaseSample()
+    }
+
+    @PreviewTest
+    @WorstCaseFontPreviews
+    @Composable
     fun CheckboxRow() {
         CheckboxRowWorstCaseSample()
     }

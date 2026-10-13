@@ -3,6 +3,7 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -48,6 +56,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.DISABLED_ALPHA
@@ -194,27 +203,6 @@ private fun ListItemView(
             )
         }
         Spacer(Modifier.width(dimensionResource(R.dimen.account_card_spacing)))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = row.label,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (row.destination == ListItemDestination.Action && row.enabled) {
-                    row.iconTint ?: MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                },
-            )
-            if (!row.detail.isNullOrBlank()) {
-                Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
-                Text(
-                    text = row.detail,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = row.detailColor ?: MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = row.supportingMaxLines,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
         val chevron = interactive && row.destination != ListItemDestination.Action
         val trails =
             row.badgeAlert ||
@@ -225,46 +213,168 @@ private fun ListItemView(
                 row.expanded != null ||
                 external ||
                 chevron
-        if (trails) Spacer(Modifier.width(dimensionResource(R.dimen.row_trailing_control_gap)))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (row.badgeAlert) {
-                Badge { Text(stringResource(R.string.badge_alert)) }
-                Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
-            } else if (row.badgeCount != null && row.badgeCount > 0) {
-                CountBadge(count = row.badgeCount, tint = row.badgeTint)
-                Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
-            }
-            val switchState = row.switchState
-            when {
-                row.loading -> BingeLoadingIndicator(
-                    modifier = Modifier.size(dimensionResource(R.dimen.item_group_loading_size)),
-                )
-                row.trailingContent != null -> row.trailingContent.invoke()
-                // The row is the control, so its switch looks enabled only when tapping the row would toggle it.
-                switchState != null -> RowSwitch(state = switchState, enabled = interactive)
-                row.expanded != null -> {
-                    Icon(
-                        imageVector = if (row.expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        LabelAndTrailing(
+            gap = dimensionResource(R.dimen.row_trailing_control_gap),
+            modifier = Modifier.weight(1f),
+            label = {
+                Column {
+                    Text(
+                        text = row.label,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (row.destination == ListItemDestination.Action && row.enabled) {
+                            row.iconTint ?: MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
                     )
+                    if (!row.detail.isNullOrBlank()) {
+                        Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
+                        Text(
+                            text = row.detail,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = row.detailColor ?: MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = row.supportingMaxLines,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
-                external -> {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+            },
+            trailing = if (!trails) {
+                null
+            } else {
+                {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (row.badgeAlert) {
+                            Badge { Text(stringResource(R.string.badge_alert)) }
+                            Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
+                        } else if (row.badgeCount != null && row.badgeCount > 0) {
+                            CountBadge(count = row.badgeCount, tint = row.badgeTint)
+                            Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
+                        }
+                        val switchState = row.switchState
+                        when {
+                            row.loading -> BingeLoadingIndicator(
+                                modifier = Modifier.size(dimensionResource(R.dimen.item_group_loading_size)),
+                            )
+                            row.trailingContent != null -> row.trailingContent.invoke()
+                            // The row is the control, so its switch looks enabled only when tapping the row would toggle it.
+                            switchState != null -> RowSwitch(state = switchState, enabled = interactive)
+                            row.expanded != null -> {
+                                Icon(
+                                    imageVector = if (row.expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            external -> {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            chevron -> {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
                 }
-                chevron -> {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            },
+        )
+    }
+}
+
+/**
+ * A row's label with its trailing content at the end, where the label is guaranteed a floor.
+ *
+ * A plain row measures the trailing content first and gives the label what is left, so at a large font a wide
+ * trailing slot left the label no width and its text wrapped a character a line. Here the trailing content is capped
+ * so the label keeps its natural width when that is small, and otherwise at least its longest word and a third of the
+ * room. A trailing slot that fits beside that floor is laid out as it always was; one that does not is given less
+ * width, and must cope with it, by ellipsizing or wrapping its own content.
+ */
+@Composable
+private fun LabelAndTrailing(
+    gap: Dp,
+    label: @Composable () -> Unit,
+    trailing: (@Composable () -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    Layout(
+        content = {
+            // In this order: the policy reads the first child as the label and the second, when there is one, as the trailing.
+            Box { label() }
+            if (trailing != null) Box { trailing() }
+        },
+        modifier = modifier,
+        measurePolicy = LabelAndTrailingPolicy(gap),
+    )
+}
+
+/** The share of the row a label is held to at least, when its natural width is more than that. */
+private const val LABEL_FLOOR_FRACTION = 0.34f
+
+private class LabelAndTrailingPolicy(
+    private val gap: Dp,
+) : MeasurePolicy {
+    override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
+        val label = measurables.first()
+        val trailing = measurables.getOrNull(1)
+        val width = if (constraints.hasBoundedWidth) constraints.maxWidth else null
+        val gapPx = if (trailing != null) gap.roundToPx() else 0
+        val loose = constraints.copy(minWidth = 0, minHeight = 0)
+        val trailingPlaceable =
+            trailing?.measure(
+                if (width == null) loose else loose.copy(maxWidth = trailingBudget(label, width - gapPx)),
+            )
+        val labelMax = if (width == null) Constraints.Infinity else (width - gapPx - (trailingPlaceable?.width ?: 0)).coerceAtLeast(0)
+        val labelPlaceable = label.measure(loose.copy(minWidth = if (width == null) 0 else labelMax, maxWidth = labelMax))
+        val rowWidth = width ?: (labelPlaceable.width + gapPx + (trailingPlaceable?.width ?: 0))
+        val height = maxOf(labelPlaceable.height, trailingPlaceable?.height ?: 0).coerceIn(constraints.minHeight, constraints.maxHeight)
+        return layout(rowWidth, height) {
+            // The alignment's own rounding, as a row's children get, so a label sits where it did.
+            labelPlaceable.placeRelative(0, Alignment.CenterVertically.align(labelPlaceable.height, height))
+            trailingPlaceable?.placeRelative(
+                rowWidth - trailingPlaceable.width,
+                Alignment.CenterVertically.align(trailingPlaceable.height, height),
+            )
         }
+    }
+
+    /** What the trailing content may take: the room left once the label has its floor. */
+    private fun trailingBudget(label: IntrinsicMeasurable, available: Int): Int {
+        val natural = label.maxIntrinsicWidth(0)
+        val longestWord = label.minIntrinsicWidth(0)
+        val floor = minOf(natural, maxOf(longestWord, (available * LABEL_FLOOR_FRACTION).toInt())).coerceAtMost(available)
+        return (available - floor).coerceAtLeast(0)
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(measurables: List<IntrinsicMeasurable>, height: Int): Int =
+        measurables.sumOf { it.minIntrinsicWidth(height) } + gapIfTrailing(measurables)
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(measurables: List<IntrinsicMeasurable>, height: Int): Int =
+        measurables.sumOf { it.maxIntrinsicWidth(height) } + gapIfTrailing(measurables)
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(measurables: List<IntrinsicMeasurable>, width: Int): Int =
+        heightAt(measurables, width)
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(measurables: List<IntrinsicMeasurable>, width: Int): Int =
+        heightAt(measurables, width)
+
+    private fun IntrinsicMeasureScope.gapIfTrailing(measurables: List<IntrinsicMeasurable>): Int =
+        if (measurables.size > 1) gap.roundToPx() else 0
+
+    private fun IntrinsicMeasureScope.heightAt(measurables: List<IntrinsicMeasurable>, width: Int): Int {
+        val label = measurables.first()
+        val trailing = measurables.getOrNull(1)
+        val gapPx = gapIfTrailing(measurables)
+        val trailingWidth = trailing?.let { minOf(it.maxIntrinsicWidth(0), trailingBudget(label, width - gapPx)) } ?: 0
+        val labelWidth = (width - gapPx - trailingWidth).coerceAtLeast(0)
+        return maxOf(label.minIntrinsicHeight(labelWidth), trailing?.minIntrinsicHeight(trailingWidth) ?: 0)
     }
 }
 
