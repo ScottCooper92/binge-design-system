@@ -21,24 +21,40 @@ import com.binge.designsystem.theme.LocalReduceMotion
 private const val SHIMMER_PERIOD_MS = 1200
 private const val SHIMMER_TRAVEL = 2f
 private const val SHIMMER_FROZEN_PROGRESS = 0.5f
-private const val SHIMMER_HIGHLIGHT_ALPHA = 0.35f
+
+/** How opaque the sweep's highlight is over its surface colour; [skeleton] and a TV caller of [shimmerSkeleton] share it. */
+const val SKELETON_HIGHLIGHT_ALPHA = 0.35f
 
 /**
  * Paints the receiver's own bounds as a shimmering loading placeholder when [visible], masking wrapped
  * children; a no-op passthrough otherwise. A Loading state renders its *real* content with
  * `Modifier.skeleton(isLoading)`, so the skeleton is the layout and can't drift from it.
  *
- * A `surfaceVariant` base with a lighter highlight sweeping across; the sweep freezes at a fixed offset
- * under [LocalReduceMotion] so screenshot baselines stay deterministic. [shape] clips the placeholder,
- * defaulting to the media-card radius (the common poster/card case). [base] and [highlight] default to the
- * Material 3 scheme; a host outside Material 3 passes its own.
+ * The phone wrapper over [shimmerSkeleton]: a Material 3 `surfaceVariant` base with a lighter `surface`
+ * highlight. [shape] clips the placeholder, defaulting to the media-card radius. TV code calls
+ * [shimmerSkeleton] with its own scheme instead, because it has no Material 3 theme to read.
  */
 @Composable
-fun Modifier.skeleton(
+fun Modifier.skeleton(visible: Boolean, shape: Shape = BingeShapes.MediaCard): Modifier =
+    shimmerSkeleton(
+        visible = visible,
+        base = MaterialTheme.colorScheme.surfaceVariant,
+        highlight = MaterialTheme.colorScheme.surface.copy(alpha = SKELETON_HIGHLIGHT_ALPHA),
+        shape = shape,
+    )
+
+/**
+ * [skeleton] without a theme: a [base] fill with a [highlight] sweeping across it, clipped to [shape], when [visible].
+ * The colours are required, so a caller outside Material 3, such as the TV module, cannot fall back to its baseline
+ * scheme by leaving them out. The sweep freezes at a fixed offset under [LocalReduceMotion], so screenshot
+ * baselines stay deterministic.
+ */
+@Composable
+fun Modifier.shimmerSkeleton(
     visible: Boolean,
+    base: Color,
+    highlight: Color,
     shape: Shape = BingeShapes.MediaCard,
-    base: Color = MaterialTheme.colorScheme.surfaceVariant,
-    highlight: Color = MaterialTheme.colorScheme.surface.copy(alpha = SHIMMER_HIGHLIGHT_ALPHA),
 ): Modifier {
     if (!visible) return this
 
