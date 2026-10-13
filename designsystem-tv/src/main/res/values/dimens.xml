@@ -168,6 +168,8 @@
     <dimen name="tv_rating_stepper_star_gap">4dp</dimen>
     <!-- The room a side sheet leaves a stepper: its width less the start padding and the end overscan margin -->
     <dimen name="tv_rating_stepper_sheet_room">308dp</dimen>
+    <!-- TvNumberStepper: the chevron either side of the number, dimmed at that end of the range. -->
+    <dimen name="tv_number_stepper_chevron_size">32dp</dimen>
     <!-- The save status line: its glyph, at the button icon's size so the line matches the Retry beside it -->
     <dimen name="tv_save_status_icon">22dp</dimen>
     <dimen name="tv_save_status_narrow_sample_width">280dp</dimen>

@@ -79,6 +79,21 @@ class TvChoiceSamplesScreenshotTest {
     @Composable
     fun ratingStepperInSheet() = Frame { TvRatingStepperInSheetSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun numberStepper() = Frame { TvNumberStepperSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun numberStepperAtStart() = Frame { TvNumberStepperAtStartSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun numberStepperFocused() = Frame { TvNumberStepperFocusedSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
