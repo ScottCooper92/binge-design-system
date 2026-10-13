@@ -63,7 +63,7 @@ enum class FormActionPlacement {
 
     /**
      * A bar pinned under the form, with the secondary action beside the primary: the action the screen exists for,
-     * such as connect, send, request, create or report.
+     * such as connect, send, request, create or report. The default.
      */
     Footer,
 }
@@ -93,7 +93,7 @@ fun FormScreen(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     primaryAction: FormAction? = null,
-    placement: FormActionPlacement = FormActionPlacement.TopBar,
+    placement: FormActionPlacement = FormActionPlacement.Footer,
     secondaryAction: FormAction? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrolling: Boolean = true,

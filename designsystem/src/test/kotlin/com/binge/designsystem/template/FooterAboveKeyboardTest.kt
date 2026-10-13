@@ -60,6 +60,22 @@ class FooterAboveKeyboardTest {
     }
 
     @Test
+    fun `a form's primary action is pinned in the footer unless it asks for the top bar`() {
+        rule.setContent {
+            TestTheme {
+                WithKeyboard(Keyboard) {
+                    FormScreen(title = "Edit", primaryAction = FormAction(SAVE, onClick = {})) {
+                        Box(Modifier.fillMaxWidth().height(48.dp))
+                    }
+                }
+            }
+        }
+
+        assertAboveKeyboard(SAVE)
+        assertPinnedNearKeyboard(SAVE)
+    }
+
+    @Test
     fun `a step's footer sits above the keyboard`() {
         rule.setContent {
             TestTheme {
@@ -80,7 +96,12 @@ class FooterAboveKeyboardTest {
             TestTheme {
                 CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(bottom = Overlay)) {
                     WithKeyboard(Keyboard) {
-                        FormScreen(title = "Edit", primaryAction = FormAction(SAVE, onClick = {}), scrolling = false) { padding ->
+                        FormScreen(
+                            title = "Edit",
+                            primaryAction = FormAction(SAVE, onClick = {}),
+                            placement = FormActionPlacement.TopBar,
+                            scrolling = false,
+                        ) { padding ->
                             Spacer(Modifier.weight(1f))
                             Text(LAST_FIELD, Modifier.fillMaxWidth().padding(padding).height(48.dp))
                         }
@@ -94,6 +115,16 @@ class FooterAboveKeyboardTest {
         assertTrue(
             "the last field ends at $body, under the overlay from ${Window - Overlay}",
             body.value <= (Window - Overlay).value + TOLERANCE,
+        )
+    }
+
+    /** A top-bar button also sits above the keyboard, so this is what tells the footer from the top bar. */
+    private fun assertPinnedNearKeyboard(text: String) {
+        val bottom = rule.onNodeWithText(text).getBoundsInRoot().bottom
+        val keyboardTop = Window - Keyboard
+        assertTrue(
+            "$text ends at $bottom, in the top half of the space above the keyboard (top ${keyboardTop / 2}), so it is not in the footer",
+            bottom.value > (keyboardTop / 2).value,
         )
     }
 
