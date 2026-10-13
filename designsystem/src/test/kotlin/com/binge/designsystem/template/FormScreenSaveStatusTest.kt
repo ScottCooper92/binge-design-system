@@ -1,5 +1,6 @@
 package com.binge.designsystem.template
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -82,5 +83,56 @@ class FormScreenSaveStatusTest {
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(1_000)
         rule.onNodeWithText(FAILED).assertDoesNotExist()
+    }
+
+    @Test
+    fun `a retry that fails at once shows the snackbar again`() {
+        var retries = 0
+        status = FormSaveStatus.Failed(onRetry = { retries++ })
+        setForm()
+
+        // The retry fails at once, so the status never leaves Failed and the effect is not restarted.
+        rule.onNodeWithText(RETRY).performClick()
+        rule.waitForIdle()
+
+        assertEquals(1, retries)
+        rule.onNodeWithText(FAILED).assertIsDisplayed()
+    }
+
+    @Test
+    fun `a message on the host does not take the failure away for good`() {
+        val host = SnackbarHostState()
+        status = FormSaveStatus.Failed(onRetry = {})
+        rule.setContent {
+            TestTheme {
+                FormScreen(title = "General", saveStatus = status, snackbarHostState = host) { Text("Fields") }
+            }
+        }
+        rule.onNodeWithText(FAILED).assertIsDisplayed()
+
+        // Showing a message dismisses the one showing; the failure comes back when it has gone.
+        rule.runOnIdle { host.currentSnackbarData?.dismiss() }
+        rule.waitForIdle()
+
+        rule.onNodeWithText(FAILED).assertIsDisplayed()
+    }
+
+    @Test
+    fun `retry calls the latest callback`() {
+        val sent = mutableListOf<String>()
+        var latest by mutableStateOf("X")
+        rule.setContent {
+            TestTheme {
+                val current = latest
+                FormScreen(title = "General", saveStatus = FormSaveStatus.Failed(onRetry = { sent += current })) { Text("Fields") }
+            }
+        }
+
+        // A second failed save changes what Retry must send while the status stays Failed.
+        latest = "Y"
+        rule.waitForIdle()
+        rule.onNodeWithText(RETRY).performClick()
+
+        assertEquals(listOf("Y"), sent)
     }
 }
