@@ -272,8 +272,9 @@ private fun snackbarNavigationInset(): Dp {
 
 /**
  * The one insets policy. The sides clear this pane's system bars and cutout, less what an ancestor [consumed], or a
- * navigation rail drawn over it, whichever reaches further: the rail's inset already holds the cutout, so the two are not summed. The bottom clears a pinned bottom bar when there is one, or else the floating navigation bar or the
- * gesture bar, whichever is taller: inside the shell the floating bar's inset already covers the gesture bar.
+ * navigation rail drawn over it, whichever reaches further: the rail's inset already holds the cutout, so the two are not summed. The bottom clears
+ * whichever is tallest of a pinned bottom bar, the floating navigation bar and the gesture bar. The pinned bar already
+ * clears the gesture bar itself, and inside the shell the floating bar's inset already covers it, so none is summed.
  */
 @Composable
 private fun screenPadding(
@@ -290,6 +291,6 @@ private fun screenPadding(
         start = max(sides.calculateStartPadding(direction), overlay.calculateStartPadding(direction)),
         top = if (hasBar) scaffoldPadding.calculateTopPadding() else WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
         end = max(sides.calculateEndPadding(direction), overlay.calculateEndPadding(direction)),
-        bottom = if (bottomBar > dimensionResource(R.dimen.zero)) bottomBar else navigation,
+        bottom = max(bottomBar, navigation),
     )
 }
