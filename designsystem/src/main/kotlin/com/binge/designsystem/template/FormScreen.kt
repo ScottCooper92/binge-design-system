@@ -61,10 +61,13 @@ data class FormAction(
 
 /** Where a [FormScreen]'s [FormAction]s sit. */
 enum class FormActionPlacement {
-    /** The primary action as a text button in the top bar: a short create or submit form. */
+    /** The primary action as a text verb in the top bar: a multi-field edit whose fields must apply together. */
     TopBar,
 
-    /** A bar pinned under the form, with the secondary action beside the primary: a long form, or a submit. */
+    /**
+     * A bar pinned under the form, with the secondary action beside the primary: the action the screen exists for,
+     * such as connect, send, request, create or report.
+     */
     Footer,
 }
 
@@ -78,7 +81,8 @@ enum class FormActionPlacement {
  * An edit screen saves each change as it is made and has no commit: pass its [saveStatus] and leave
  * [primaryAction] out. "Saving…" and "Saved" show in the bar, and a failed write keeps the change and shows a
  * snackbar with Retry until the next write succeeds (see [FormSaveStatus]). [primaryAction] is for the cases that
- * do commit: a create flow, a connection the server must test, a submit, or a destructive step.
+ * do commit: a create flow, a connection the server must test, or a submit. A destructive action is not a commit: it
+ * sits in an overflow menu or behind a confirm.
  *
  * [bar] and [scrollBehavior] are [BingeScreenScaffold]'s, and the bar is its default: a transparent collapsing bar the
  * fields scroll under, its scrim fading in as it collapses. Pass [ScreenBar.Small] for a single-line bar that slides
