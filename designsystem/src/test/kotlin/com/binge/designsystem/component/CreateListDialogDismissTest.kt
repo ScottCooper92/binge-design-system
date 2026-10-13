@@ -11,9 +11,8 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowDialog
 
 /**
- * The caller keeps the dialog open for the whole create→add round trip. A back press that dismissed
- * it mid-submit would close it with the request still running, so every caller would have to guard
- * [CreateListDialog]'s `onDismissRequest` itself (#227).
+ * Back closes the dialog whether or not a create is in flight. Mid-submit it stops the wait for the create→add round
+ * trip, not the request, which the caller leaves running so a create that lands still lands.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
@@ -46,7 +45,7 @@ class CreateListDialogDismissTest {
     }
 
     @Test
-    fun `back does not dismiss the dialog mid-submit`() {
-        assertEquals(0, backPressDismisses(isSubmitting = true))
+    fun `back dismisses the dialog mid-submit`() {
+        assertEquals(1, backPressDismisses(isSubmitting = true))
     }
 }
