@@ -7,7 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
-/** Screenshot coverage for the immersive hub — at rest with and without a hero, with a row anchored — its see-all tile, and the paged grid it opens. */
+/** Screenshot coverage for the immersive hub — at rest with and without a hero, with a row anchored — its see-all tile, and the paged grid it opens, loading, with a message and with heading controls. */
 class TvImmersiveSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
@@ -58,6 +58,21 @@ class TvImmersiveSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun gridUnloaded() = Frame { TvImmersiveGridUnloadedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun gridLoading() = Frame { TvImmersiveGridLoadingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun gridMessage() = Frame { TvImmersiveGridMessageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun gridHeadingControls() = Frame { TvImmersiveGridHeadingControlsSample() }
 
     @PreviewTest
     @TvPreviews
