@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
@@ -118,5 +120,79 @@ class BingeLetterRailTest {
         rule.waitForIdle()
 
         assertEachOnce(listOf('A', 'B', 'C', 'D'), drags = 2)
+    }
+
+    private val alphabet = ('A'..'Z').toList() + '#'
+
+    private fun showShortRail() =
+        rule.setContent {
+            Box(Modifier.height(300.dp)) {
+                BingeLetterRail(letters = alphabet, onLetter = { picked += it })
+            }
+        }
+
+    @Test
+    fun `a rail too short for every letter draws alternate ones`() {
+        showShortRail()
+
+        // 27 letters need 540dp; at 300dp every third fits with a dot between each.
+        listOf('A', 'D', 'G', 'J', 'M', 'P', 'S', 'V', 'Y').forEach { rule.onNodeWithText(it.toString()).assertExists() }
+        listOf('B', 'C', 'E', 'Z', '#').forEach { rule.onNodeWithText(it.toString()).assertDoesNotExist() }
+    }
+
+    @Test
+    fun `a tap on a letter that is drawn picks that letter`() {
+        showShortRail()
+
+        listOf('A', 'D', 'G', 'J', 'M', 'P', 'S', 'V', 'Y').forEach { letter ->
+            picked.clear()
+            rule.onNodeWithText(letter.toString()).performClick()
+            rule.waitForIdle()
+
+            assertEquals("a tap on $letter", listOf(letter), picked)
+        }
+    }
+
+    @Test
+    fun `a tap on a dot picks a letter beside it, never one that is not drawn`() {
+        showShortRail()
+
+        val a = rule.onNodeWithText("A").fetchSemanticsNode().boundsInRoot
+        val d = rule.onNodeWithText("D").fetchSemanticsNode().boundsInRoot
+        val between = (a.bottom + d.top) / 2f
+        rule.onRoot().performTouchInput { click(Offset(a.center.x, between)) }
+        rule.waitForIdle()
+
+        assertEquals(1, picked.size)
+        assertEquals(true, picked.single() == 'A' || picked.single() == 'D')
+    }
+
+    @Test
+    fun `a rail with room for every letter draws them all and keeps no dots`() {
+        val letters = ('A'..'P').toList()
+        rule.setContent { Box(Modifier.height(400.dp)) { BingeLetterRail(letters = letters, onLetter = {}) } }
+
+        letters.forEach { rule.onNodeWithText(it.toString()).assertExists() }
+    }
+
+    @Test
+    fun `the plan keeps every letter that fits and thins the rest by a stride`() {
+        val all = letterRailPlan(alphabet, heightPx = 540, letterPx = 20, dotPx = 10)
+        assertEquals(alphabet, all.shown)
+        assertEquals(false, all.dotted)
+
+        val second = letterRailPlan(alphabet, heightPx = 420, letterPx = 20, dotPx = 10)
+        assertEquals(alphabet.filterIndexed { i, _ -> i % 2 == 0 }, second.shown)
+        assertEquals(true, second.dotted)
+
+        val third = letterRailPlan(alphabet, heightPx = 300, letterPx = 20, dotPx = 10)
+        assertEquals(alphabet.filterIndexed { i, _ -> i % 3 == 0 }, third.shown)
+    }
+
+    @Test
+    fun `the plan never draws fewer than one letter`() {
+        val plan = letterRailPlan(alphabet, heightPx = 5, letterPx = 20, dotPx = 10)
+
+        assertEquals(listOf('A'), plan.shown)
     }
 }

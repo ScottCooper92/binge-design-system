@@ -368,7 +368,11 @@
     <!-- BingeLetterRail: the rail's width beside a long list, and one letter's lit square -->
     <dimen name="letter_rail_width">32dp</dimen>
     <dimen name="letter_rail_letter">20dp</dimen>
-    <dimen name="letter_rail_sample_height">520dp</dimen>
+    <dimen name="letter_rail_sample_height">540dp</dimen>
+    <!-- A short rail drops letters for dots: the height of a dot's row, and the dot drawn in it. -->
+    <dimen name="letter_rail_dot">10dp</dimen>
+    <dimen name="letter_rail_dot_mark">3dp</dimen>
+    <dimen name="letter_rail_short_sample_height">300dp</dimen>
     <!-- TextEntrySurface expanded sample: a phone-sized bounded height for the expanded mode to fill -->
     <dimen name="text_entry_surface_sample_expanded_height">720dp</dimen>
     <!-- DecisionScreen: the hero plate and its badge, a point's icon plate, and the landscape points' drop -->

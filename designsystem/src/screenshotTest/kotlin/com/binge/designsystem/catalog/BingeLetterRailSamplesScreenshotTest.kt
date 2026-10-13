@@ -11,4 +11,12 @@ class BingeLetterRailSamplesScreenshotTest {
     fun Rail() {
         BingeLetterRailSample()
     }
+
+    /** A rail too short for every letter: alternate letters with a dot between. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ShortRail() {
+        BingeLetterRailShortSample()
+    }
 }

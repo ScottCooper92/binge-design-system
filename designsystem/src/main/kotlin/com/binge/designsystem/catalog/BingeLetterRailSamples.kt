@@ -27,3 +27,17 @@ fun BingeLetterRailSample() {
         )
     }
 }
+
+/** The rail in a short sheet: too short for every letter, so it shows every second one with a dot for each left out. */
+@Composable
+fun BingeLetterRailShortSample() {
+    ScreenshotTheme {
+        var current by remember { mutableStateOf<Char?>('M') }
+        BingeLetterRail(
+            letters = ('A'..'Z').toList() + '#',
+            onLetter = { current = it },
+            current = current,
+            modifier = Modifier.height(dimensionResource(R.dimen.letter_rail_short_sample_height)),
+        )
+    }
+}
