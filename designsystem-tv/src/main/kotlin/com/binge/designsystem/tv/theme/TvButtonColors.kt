@@ -9,18 +9,13 @@ import com.binge.designsystem.DISABLED_ALPHA
 /**
  * The role a TV control surface plays, which fixes its resting colours via [tvButtonColors].
  *
- * [Destructive] marks an irreversible action (sign out): a red-tinted container and red border at rest, and —
- * because the accent model makes the *fill* the focus channel while the hue stays the role — a solid **red** fill when
- * focused, where every other style fills with the accent. A dangerous action is at its most dangerous the instant before
- * OK, which is precisely when it is focused.
+ * Two roles are red, for two kinds of danger. [Destructive] is an irreversible action (remove, delete, sign out): a
+ * solid `error` fill at rest, and a light border added when focused, since the fill is already the colour focus would
+ * bring. [DestructiveOutline] is a reversible one (block): an `error` outline and label at rest, filling solid `error`
+ * when focused as every other style fills with the accent. Both stay red under focus, because a dangerous action is at
+ * its most dangerous the instant before OK.
  */
-enum class TvButtonStyle { Primary, Secondary, Destructive }
-
-/**
- * A Destructive container at rest is its error colour at low alpha — a warning wash. Focused, it goes
- * to the solid error fill.
- */
-private const val DESTRUCTIVE_CONTAINER_ALPHA = 0.16f
+enum class TvButtonStyle { Primary, Secondary, Destructive, DestructiveOutline }
 
 /** Container / content / border for a TV control in one state — focus included, see [tvButtonColors]. */
 @Immutable
@@ -43,8 +38,9 @@ data class TvButtonColors(
  * and the accent appears only under the user's focus.
  *
  * Two exceptions, both deliberate:
- * - [TvButtonStyle.Destructive] keeps a red wash and red label **at rest**, because danger is a property
- *   of the action rather than of where the remote happens to be, and fills solid `error` when focused.
+ * - The two red styles keep their hue **at rest**, because danger is a property of the action rather than of where
+ *   the remote happens to be. [TvButtonStyle.Destructive] rests as a solid `error` fill and shows focus with a light
+ *   `onError` border; [TvButtonStyle.DestructiveOutline] rests as an `error` outline and fills solid `error` when focused.
  * - A **disabled** control never takes the focus fill. It stays focusable so ↓ isn't a dead end, but a
  *   filled disabled button would promise a press that does nothing.
  *
@@ -74,33 +70,37 @@ fun tvButtonColors(
 ): TvButtonColors {
     val colors = MaterialTheme.colorScheme
     val focusFilled = isFocused && enabled
-    val destructive = style == TvButtonStyle.Destructive
+    val solidRed = enabled && style == TvButtonStyle.Destructive
+    val outlineRed = enabled && style == TvButtonStyle.DestructiveOutline
+    val red = solidRed || outlineRed
     val filledAtRest = enabled && !isFocused && style == TvButtonStyle.Primary
-    val destructiveAtRest = enabled && !isFocused && destructive
     return TvButtonColors(
         container = when {
-            focusFilled -> if (destructive) colors.error else colors.primary
+            solidRed -> colors.error
+            focusFilled -> if (red) colors.error else colors.primary
             // Transparent, not `surface` — a disabled control is drawn as an outline so its shape cannot be
             // erased by a panel that happens to use the same token. See the KDoc for what that cost.
             !enabled -> Color.Transparent
-            destructiveAtRest -> colors.error.copy(alpha = DESTRUCTIVE_CONTAINER_ALPHA)
             // The neutral fill that marks the primary. Nothing else rests filled in neutral, so "filled" never
             // reads as "ready" on a control that isn't.
             filledAtRest -> colors.surfaceVariant
             else -> Color.Transparent
         },
         content = when {
-            focusFilled -> if (destructive) colors.onError else colors.onPrimary
+            red && (focusFilled || solidRed) -> colors.onError
+            focusFilled -> colors.onPrimary
             !enabled -> colors.onSurfaceVariant
-            destructiveAtRest -> colors.error
+            outlineRed -> colors.error
             else -> colors.onSurface
         },
         border = when {
+            // The solid style's fill is the same at rest and focused, so the border is what says it has focus.
+            solidRed -> if (isFocused) colors.onError else Color.Transparent
             focusFilled || filledAtRest -> Color.Transparent
             // The disabled control's only visible edge, so it is dimmed rather than removed: the line that keeps it a
             // button on any panel. Applied to `border`, which is opaque, so the result is not a function of the backdrop.
             !enabled -> colors.border.copy(alpha = DISABLED_ALPHA)
-            destructiveAtRest -> colors.error
+            outlineRed -> colors.error
             else -> colors.border
         },
     )

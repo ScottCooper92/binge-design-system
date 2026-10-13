@@ -106,6 +106,14 @@ fun TvButtonSample() {
             TvButtonSurface("Continue", TvButtonStyle.Primary, enabled = false, isFocused = false)
             TvButtonSurface("Sign out", TvButtonStyle.Destructive, enabled = false, isFocused = false)
         }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TvButtonSurface("Block", TvButtonStyle.DestructiveOutline, enabled = true, isFocused = false)
+            TvButtonSurface("Block", TvButtonStyle.DestructiveOutline, enabled = true, isFocused = true)
+            TvButtonSurface("Block", TvButtonStyle.DestructiveOutline, enabled = false, isFocused = false)
+        }
     }
 }
 
