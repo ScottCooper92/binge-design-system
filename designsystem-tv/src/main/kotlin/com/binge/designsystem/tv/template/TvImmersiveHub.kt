@@ -1,22 +1,15 @@
 package com.binge.designsystem.tv.template
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -31,30 +24,20 @@ import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
-import androidx.tv.material3.MaterialTheme
-import com.binge.designsystem.startHorizontalGradient
 import com.binge.designsystem.theme.LocalReduceMotion
-import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
 import com.binge.designsystem.tv.component.TRAILING_KEY
 import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
-import com.binge.designsystem.tv.nav.LocalTvPaneShift
-import com.binge.designsystem.tv.nav.ReportTvRailArtwork
-import com.binge.designsystem.tv.nav.tvContentGutterStart
-import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -67,18 +50,15 @@ data class TvHubRow<T>(
     val items: List<T>,
     /** The row's end tile, opening the whole set behind it; null means the row has none. Shown only when the hub is given a `seeAllLabel`. */
     val onSeeAll: (() -> Unit)? = null,
+    /**
+     * Whether the row's items are still on their way. An empty loading row holds its slot with the hub's
+     * `pendingRow` until they arrive, so the row does not push in under the user; it takes no focus meanwhile.
+     */
+    val isLoading: Boolean = false,
 )
 
-private const val COPY_WIDTH_FRACTION = 0.75f
-private const val SCRIM_START_ALPHA = 0.86f
-private const val SCRIM_START_HOLD_FRACTION = 0.75f
-private const val SCRIM_START_HOLD_ALPHA = 0.72f
-private const val SCRIM_START_MID_FRACTION = 0.87f
-private const val SCRIM_START_MID_ALPHA = 0.4f
-private const val SCRIM_START_TAIL_FRACTION = 0.95f
-private const val SCRIM_START_TAIL_ALPHA = 0.12f
-private const val SCRIM_BOTTOM_START_FRACTION = 0.38f
-private const val SCRIM_BOTTOM_ALPHA = 0.96f
+/** Enough placeholder cards to run a pending row off the edge, as a loaded row does. */
+private const val PENDING_ROW_CARDS = 8
 
 /** Row key -> the item id focus returns to in that row, saveable so Back from a drill-down retraces the path. */
 private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
@@ -96,7 +76,8 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
  * type a `Bundle` holds, as a lazy list's key is: a `String`, an `Int`, a `Long`), [cell] draws one focusable
  * card, [artwork] paints the backdrop and [copy] fills the text band above the rows. An optional [hero] sits
  * above the rows at rest and gives way to the backdrop once a card takes focus; without one the first row's
- * first item is the resting backdrop.
+ * first item is the resting backdrop. An empty row is skipped, unless it is [TvHubRow.isLoading]: then [pendingRow]
+ * holds its place, unfocusable, until its items arrive.
  *
  * A page template, like [TvBoard]: [hosting] decides who places first focus on it — in a rail destination the
  * shell offers focus and the hub only routes it to the hero or first row, as an overlay it claims focus itself
@@ -106,6 +87,10 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
  * The scroll, anchor and clip behaviour here is the one every hub shares, so a surface using it moves the same
  * way Binge's hubs do. Beyond the arrival [hosting] asks for, nothing here calls `requestFocus`: state changes
  * follow focus arriving.
+ *
+ * The visit hooks report what focus did, for impressions: [onHeroVisible] and [onRowVisible] as focus arrives in
+ * the hero or a row, [onItemTapped] with a click's row and position, and [onVisitEnded] once as the hub leaves, with
+ * the deepest place focus reached. That place counts the hero as 0 and each row by its position in [rows] after it.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -127,11 +112,19 @@ fun <T : Any> TvImmersiveHub(
     seeAllLabel: String? = null,
     // Where a caller aims focus on the tile of a row (to restore it after the set it opened closes).
     seeAllModifier: (rowKey: String) -> Modifier = { Modifier },
+    copyLayout: TvImmersiveCopyLayout = TvImmersiveCopyLayout.Wide,
+    pendingRow: @Composable (Modifier) -> Unit = { rowModifier -> PosterRowSkeleton(PENDING_ROW_CARDS, cardWidth, rowModifier) },
+    onHeroVisible: () -> Unit = {},
+    onRowVisible: (rowKey: String) -> Unit = {},
+    onItemTapped: (rowKey: String, index: Int) -> Unit = { _, _ -> },
+    onVisitEnded: (deepestIndex: Int?) -> Unit = {},
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, onClick: () -> Unit, cellModifier: Modifier) -> Unit,
 ) {
     val hasHero = hero != null
     // The rows the list lays out; every index below is a slot in this list, so an empty row cannot shift them.
-    val visibleRows = rows.filter { it.items.isNotEmpty() }
+    val visibleRows = rows.filter { it.items.isNotEmpty() || it.isLoading }
+    val depth = rememberTvVisitDepth(onVisitEnded)
+    val heroDepth = if (hasHero) 1 else 0
     var focusedRowKey by rememberSaveable { mutableStateOf(initialFocused?.first) }
     var heroHasFocus by remember { mutableStateOf(false) }
     var bodyHasFocus by remember { mutableStateOf(false) }
@@ -153,7 +146,7 @@ fun <T : Any> TvImmersiveHub(
     val settledRowKey = rememberSettledFocus(focusedRowKey, reduceMotion)
     // The hero is the resting state; without one the backdrop is never "resting", it just shows the first item.
     val showHero = hasHero && (heroHasFocus || settledItem == null || (!bodyHasFocus && entryRowKey == null))
-    val restingItem = if (hasHero) null else visibleRows.firstOrNull()?.items?.first()
+    val restingItem = if (hasHero) null else visibleRows.firstOrNull { it.items.isNotEmpty() }?.items?.first()
     val backdropItem = if (showHero) null else (settledItem ?: restingItem)
     val bursting = rememberBursting(focusedRowKey)
 
@@ -194,10 +187,10 @@ fun <T : Any> TvImmersiveHub(
             }
         }
     // Without a hero, entry from outside (the rail) lands on the first row.
-    val effectiveEntryKey = entryRowKey ?: if (hasHero) null else visibleRows.firstOrNull()?.key
+    val effectiveEntryKey = entryRowKey ?: if (hasHero) null else visibleRows.firstOrNull { it.items.isNotEmpty() }?.key
 
     Box(modifier = modifier.fillMaxSize().onFocusChanged(reportBodyFocus)) {
-        TvImmersiveBackdrop(item = backdropItem, artwork = artwork, copy = copy)
+        TvImmersiveBackdrop(item = backdropItem, artwork = artwork, copy = copy, layout = copyLayout)
         TvStableFocusScroll {
             LazyColumn(
                 state = listState,
@@ -221,7 +214,11 @@ fun <T : Any> TvImmersiveHub(
                                     .focusGroup()
                                     .onFocusChanged {
                                         heroHasFocus = it.hasFocus
-                                        if (it.hasFocus) entryRowKey = null
+                                        if (it.hasFocus) {
+                                            entryRowKey = null
+                                            onHeroVisible()
+                                            depth.reach(0)
+                                        }
                                     },
                         ) { hero() }
                     } else {
@@ -229,12 +226,17 @@ fun <T : Any> TvImmersiveHub(
                     }
                 }
                 itemsIndexed(items = visibleRows, key = { _, row -> row.key }) { index, row ->
+                    // So the skeleton's promise to lay its rows out here is assertable; see TvLayoutAnchors.
+                    val rowAnchor = Modifier.tvLayoutAnchor(TvLayoutAnchors.hubRow(index))
+                    if (row.items.isEmpty()) {
+                        pendingRow(rowAnchor)
+                        return@itemsIndexed
+                    }
                     TvCardRow(
                         items = row.items,
                         key = itemId,
                         cellWidth = cardWidth,
-                        // So the skeleton's promise to lay its rows out here is assertable; see TvLayoutAnchors.
-                        modifier = Modifier.tvLayoutAnchor(TvLayoutAnchors.hubRow(index)),
+                        modifier = rowAnchor,
                         heading = row.title,
                         entryFocusRequester = hubEntry.takeIf { row.key == effectiveEntryKey },
                         initiallyFocusedKey = initialFocused?.takeIf { it.first == row.key }?.second,
@@ -247,6 +249,8 @@ fun <T : Any> TvImmersiveHub(
                         onCellFocused = { key ->
                             focusedRowKey = row.key
                             entryRowKey = row.key
+                            onRowVisible(row.key)
+                            depth.reach(rows.indexOfFirst { it.key == row.key } + heroDepth)
                             if (key != TRAILING_KEY) {
                                 rowMemory[row.key] = key
                                 if (seeAllRowKey == row.key) seeAllRowKey = null
@@ -267,102 +271,14 @@ fun <T : Any> TvImmersiveHub(
                                 }
                             },
                     ) { item, isFocused, onFocusChanged, cellModifier ->
-                        cell(item, isFocused, onFocusChanged, { onItemClick(item) }, cellModifier)
+                        val onClick = {
+                            onItemTapped(row.key, row.items.indexOfFirst { itemId(it) == itemId(item) })
+                            onItemClick(item)
+                        }
+                        cell(item, isFocused, onFocusChanged, onClick, cellModifier)
                     }
                 }
             }
         }
     }
-}
-
-/**
- * The backdrop layer: [artwork] full-bleed under a scrim, with [copy] in the band above the rows.
- *
- * [copyTopInset] reserves space at the top of the copy's band for a caller drawing over it, such as the grid's
- * heading. The copy is bottom-anchored, so without it a tall block would overflow up into the heading. [copyStart] is
- * where the copy starts: the content gutter by default, or a page's own start edge ([tvPagePadding]) for one that pads its
- * heading and cards by that.
- */
-@Composable
-fun <T : Any> TvImmersiveBackdrop(
-    item: T?,
-    artwork: @Composable (T) -> Unit,
-    copy: @Composable ColumnScope.(T) -> Unit,
-    modifier: Modifier = Modifier,
-    copyTopInset: Dp = Dp.Hairline,
-    copyStart: Dp = tvContentGutterStart(),
-) {
-    Crossfade(
-        targetState = item,
-        modifier = modifier.fillMaxSize(),
-        animationSpec = if (LocalReduceMotion.current) snap() else tween(TV_IMMERSIVE_CROSSFADE_MILLIS),
-        label = "tv-immersive-backdrop",
-    ) { focused ->
-        if (focused != null) {
-            val paneShift = LocalTvPaneShift.current
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Cancel the pane's expansion shift so the artwork holds still while rows and copy slide over it.
-                Box(modifier = Modifier.fillMaxSize().graphicsLayer { translationX = -paneShift.value.toPx() }) {
-                    artwork(focused)
-                    TvImmersiveScrim()
-                }
-                ReportTvRailArtwork()
-                TvImmersiveCopyBand(copyTopInset, copyStart) { copy(focused) }
-            }
-        }
-    }
-}
-
-/** The text band above the rows, bottom-anchored so the copy does not shift as a title wraps. */
-@Composable
-private fun BoxScope.TvImmersiveCopyBand(
-    copyTopInset: Dp,
-    start: Dp,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Column(
-        modifier =
-            Modifier
-                .align(Alignment.TopStart)
-                .height(dimensionResource(TvR.dimen.tv_immersive_content_top))
-                .fillMaxWidth(COPY_WIDTH_FRACTION)
-                .padding(
-                    start = start,
-                    end = dimensionResource(DesR.dimen.padding_m),
-                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset,
-                    bottom = dimensionResource(DesR.dimen.padding_l),
-                ).tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
-        content = content,
-    )
-}
-
-/** Two gradients: the horizontal one beds the copy, the vertical one beds the rows below. */
-@Composable
-private fun TvImmersiveScrim() {
-    val background = MaterialTheme.colorScheme.background
-    Box(
-        modifier =
-            Modifier.fillMaxSize().background(
-                startHorizontalGradient(
-                    0f to background.copy(alpha = SCRIM_START_ALPHA),
-                    SCRIM_START_HOLD_FRACTION to background.copy(alpha = SCRIM_START_HOLD_ALPHA),
-                    SCRIM_START_MID_FRACTION to background.copy(alpha = SCRIM_START_MID_ALPHA),
-                    SCRIM_START_TAIL_FRACTION to background.copy(alpha = SCRIM_START_TAIL_ALPHA),
-                    1f to background.copy(alpha = 0f),
-                ),
-            ),
-    )
-    Box(
-        modifier =
-            Modifier.fillMaxSize().background(
-                Brush.verticalGradient(
-                    colorStops =
-                        arrayOf(
-                            SCRIM_BOTTOM_START_FRACTION to background.copy(alpha = 0f),
-                            1f to background.copy(alpha = SCRIM_BOTTOM_ALPHA),
-                        ),
-                ),
-            ),
-    )
 }
