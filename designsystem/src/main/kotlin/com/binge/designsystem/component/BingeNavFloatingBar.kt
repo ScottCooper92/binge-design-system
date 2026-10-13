@@ -115,7 +115,9 @@ enum class BingeNavFloatingStyle {
  * see [NavFloatingItem] for what that costs.
  *
  * Unlike the docked bar this **overlays** [content] rather than reserving height for it, so the strip
- * it occupies is published through [LocalNavOverlayInsets] for scrollables to pad themselves by.
+ * it occupies is published through [LocalNavOverlayInsets] for scrollables to pad themselves by. Only
+ * scrollables read it: a screen's pinned bottom bar and its snackbar are not lifted, so a pinned bottom
+ * bar under the pill is unsupported (#825).
  *
  * That inset is computed rather than measured. A measured one arrives a frame late, and a scrollable
  * that has already settled at its maximum scroll never re-clamps, leaving the last row stranded under

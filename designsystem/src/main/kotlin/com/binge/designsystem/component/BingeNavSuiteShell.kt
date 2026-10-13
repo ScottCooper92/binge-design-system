@@ -87,6 +87,9 @@ enum class BingeNavPresentation {
     /**
      * Everything that isn't a landscape tablet — phones, portrait tablets and unfolded foldables: the
      * floating pill, bottom-centred over content.
+     *
+     * The pill overlays the screen's bottom edge, so a screen under it cannot pin a bottom bar: the bar and its
+     * snackbar would sit under the pill. Commit from the top bar instead.
      */
     FloatingBar,
 }

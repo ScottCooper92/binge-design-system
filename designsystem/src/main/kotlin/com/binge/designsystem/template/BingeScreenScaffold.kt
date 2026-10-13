@@ -93,6 +93,11 @@ enum class ScreenBarChrome {
  * [bottomBar] reaches the true edge of the window and clears the navigation bar and a side cutout itself, by
  * [com.binge.designsystem.bottomBarInsets], as `FormFooter` does.
  *
+ * A [bottomBar] under the floating navigation pill
+ * ([com.binge.designsystem.component.BingeNavPresentation.FloatingBar]) is not supported. The body's padding
+ * still clears the pill, but the bar and the snackbar are not lifted above it, so the pill covers them. A
+ * screen shown as a tab root under the pill commits from the top bar instead.
+ *
  * [barChrome] picks the transparent bar with circled controls, or the opaque one with plain controls.
  *
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
