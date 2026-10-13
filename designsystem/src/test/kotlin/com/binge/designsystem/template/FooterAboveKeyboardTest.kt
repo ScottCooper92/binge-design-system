@@ -72,6 +72,7 @@ class FooterAboveKeyboardTest {
         }
 
         assertAboveKeyboard(SAVE)
+        assertPinnedNearKeyboard(SAVE)
     }
 
     @Test
@@ -114,6 +115,16 @@ class FooterAboveKeyboardTest {
         assertTrue(
             "the last field ends at $body, under the overlay from ${Window - Overlay}",
             body.value <= (Window - Overlay).value + TOLERANCE,
+        )
+    }
+
+    /** A top-bar button also sits above the keyboard, so this is what tells the footer from the top bar. */
+    private fun assertPinnedNearKeyboard(text: String) {
+        val bottom = rule.onNodeWithText(text).getBoundsInRoot().bottom
+        val keyboardTop = Window - Keyboard
+        assertTrue(
+            "$text ends at $bottom, in the top half of the space above the keyboard (top ${keyboardTop / 2}), so it is not in the footer",
+            bottom.value > (keyboardTop / 2).value,
         )
     }
 
