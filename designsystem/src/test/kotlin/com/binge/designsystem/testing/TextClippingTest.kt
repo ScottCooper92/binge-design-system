@@ -160,6 +160,13 @@ class TextClippingTest {
     }
 
     @Test
+    fun `an empty text has nothing to clip and is skipped`() {
+        show { Box(Modifier.width(0.dp).clipToBounds()) { Text("") } }
+
+        assertEquals(0, rule.assertNoTextClipped())
+    }
+
+    @Test
     fun `text scrolled partly out of a scroll container is skipped`() {
         show {
             Column(Modifier.height(SHORT_BOX).verticalScroll(rememberScrollState())) {

@@ -31,7 +31,9 @@ import androidx.compose.ui.unit.IntSize
  * - text inside a scroll container that is not wholly in view: a clipped item there is simply scrolled out, and only
  *   its edge is cut by the container. A text that is wholly inside the container's viewport is still checked, because
  *   anything cutting it is then something other than scrolling;
- * - text whose own position lies outside the root.
+ * - text whose own position lies outside the root;
+ * - empty text, which has no glyph for a parent to cut. A bar that is given no title draws one, and it is no bigger than
+ *   the nothing it holds.
  *
  * The unmerged semantics tree is searched, so a merged parent does not hide the text inside it.
  *
@@ -81,7 +83,7 @@ private fun collectClipped(
             config.contains(SemanticsProperties.HorizontalScrollAxisRange)
     val inScroll = if (scrolls) node.boundsInRoot else scrollViewport
     val text = config.getOrNull(SemanticsProperties.Text)?.joinToString(" ") { it.text }
-    if (text != null) {
+    if (!text.isNullOrEmpty()) {
         val bounds = node.boundsInRoot
         val needed = node.neededTextSize()
         if (needed != null && node.isInside(viewport) && node.isFullyInside(inScroll, tolerancePx)) {
