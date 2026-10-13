@@ -97,8 +97,8 @@ class TvSideSheetNav internal constructor(
  *
  * Focus follows the pages. A page that opens puts focus on its first row, and going back puts it on the row that opened the
  * page just left, so the user is where they were. Pages are keyed by name, so the stack survives a rotation, and no page
- * opens another of the same name; what a page shows is the caller's to read from its own state. [content] draws the page named by [TvSideSheetNav.page],
- * and gives every row [TvSideSheetNav.row].
+ * opens another of the same name; what a page shows is the caller's to read from its own
+ * state. [content] draws the page named by [TvSideSheetNav.page], and gives every row [TvSideSheetNav.row].
  */
 @Composable
 fun TvSideSheetStack(

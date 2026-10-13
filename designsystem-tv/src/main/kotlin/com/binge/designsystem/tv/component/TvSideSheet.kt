@@ -97,8 +97,8 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
 
 /**
  * The sheet's visible panel, with no scrim and no focus request of its own, so a frame can render it. A step
- * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus], so it pulls focus to
- * Cancel wherever it composes. The panel is flush to the screen's end, top and bottom edges, so its content keeps
+ * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus] when given an `entryFocus`,
+ * so it pulls focus to Cancel wherever it composes; on a stack page the stack does that. The panel is flush to the screen's end, top and bottom edges, so its content keeps
  * the overscan margin from them.
  */
 @Composable
@@ -265,6 +265,9 @@ fun TvSideSheetRow(
  *
  * On a [TvSideSheetStack] page there is no [entryFocus]: pass null, give Cancel `nav.row("cancel")` as [cancelModifier] and
  * call `nav.arriveAt("cancel")`, and the stack lands focus there.
+ *
+ * @param entryFocus the request [TvSideSheet] hands its content. Null only on a [TvSideSheetStack] page: anywhere else
+ * a null leaves the step taking no focus.
  */
 @Composable
 fun ColumnScope.TvSideSheetConfirm(
