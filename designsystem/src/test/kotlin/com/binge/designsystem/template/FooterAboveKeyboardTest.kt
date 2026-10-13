@@ -60,6 +60,21 @@ class FooterAboveKeyboardTest {
     }
 
     @Test
+    fun `a form's primary action is pinned in the footer unless it asks for the top bar`() {
+        rule.setContent {
+            TestTheme {
+                WithKeyboard(Keyboard) {
+                    FormScreen(title = "Edit", primaryAction = FormAction(SAVE, onClick = {})) {
+                        Box(Modifier.fillMaxWidth().height(48.dp))
+                    }
+                }
+            }
+        }
+
+        assertAboveKeyboard(SAVE)
+    }
+
+    @Test
     fun `a step's footer sits above the keyboard`() {
         rule.setContent {
             TestTheme {
@@ -80,7 +95,12 @@ class FooterAboveKeyboardTest {
             TestTheme {
                 CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(bottom = Overlay)) {
                     WithKeyboard(Keyboard) {
-                        FormScreen(title = "Edit", primaryAction = FormAction(SAVE, onClick = {}), scrolling = false) { padding ->
+                        FormScreen(
+                            title = "Edit",
+                            primaryAction = FormAction(SAVE, onClick = {}),
+                            placement = FormActionPlacement.TopBar,
+                            scrolling = false,
+                        ) { padding ->
                             Spacer(Modifier.weight(1f))
                             Text(LAST_FIELD, Modifier.fillMaxWidth().padding(padding).height(48.dp))
                         }

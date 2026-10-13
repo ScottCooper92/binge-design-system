@@ -61,10 +61,16 @@ data class FormAction(
 
 /** Where a [FormScreen]'s [FormAction]s sit. */
 enum class FormActionPlacement {
-    /** The primary action as a text button in the top bar: a short create or submit form. */
+    /**
+     * The primary action as a text button in the top bar, disabled until something changes: only for a multi-field
+     * edit that has to apply together. A send, report, create, request or connect action belongs in [Footer].
+     */
     TopBar,
 
-    /** A bar pinned under the form, with the secondary action beside the primary: a long form, or a submit. */
+    /**
+     * A bar pinned under the form, with the secondary action beside the primary: a send, report, create, request or
+     * connect action, where the button is the reason the screen exists. The default.
+     */
     Footer,
 }
 
@@ -92,7 +98,7 @@ fun FormScreen(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     primaryAction: FormAction? = null,
-    placement: FormActionPlacement = FormActionPlacement.TopBar,
+    placement: FormActionPlacement = FormActionPlacement.Footer,
     secondaryAction: FormAction? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrolling: Boolean = true,
