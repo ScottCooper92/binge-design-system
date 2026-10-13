@@ -29,6 +29,7 @@ import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvChoiceRow
 import com.binge.designsystem.tv.component.TvChoiceUi
+import com.binge.designsystem.tv.component.TvNumberStepper
 import com.binge.designsystem.tv.component.TvOptionGroup
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.component.TvRatingStepper
@@ -255,6 +256,40 @@ private fun SampleRatingStepper(
         modifier = if (padded) modifier.padding(dimensionResource(DesR.dimen.padding_l)) else modifier,
     )
 }
+
+/** A number in the middle of its range: both chevrons lit, since a press either way would step it. */
+@Composable
+fun TvNumberStepperSample() {
+    SampleNumberStepper(initial = NUMBER_MIDDLE, initiallyFocused = false)
+}
+
+/** At the bottom of the range, where the screen words zero as "Unlimited": the chevron toward it is dimmed. */
+@Composable
+fun TvNumberStepperAtStartSample() {
+    SampleNumberStepper(initial = 0, initiallyFocused = false)
+}
+
+/** Focus on the stepper: the ring shows, and ← → would step the number. */
+@Composable
+fun TvNumberStepperFocusedSample() {
+    SampleNumberStepper(initial = NUMBER_MIDDLE, initiallyFocused = true)
+}
+
+@Composable
+private fun SampleNumberStepper(initial: Int, initiallyFocused: Boolean) {
+    var value by remember { mutableStateOf(initial) }
+    TvNumberStepper(
+        value = value,
+        onValueChange = { value = it },
+        range = 0..NUMBER_MAX,
+        valueLabel = if (value == 0) "Unlimited" else "$value requests",
+        initiallyFocused = initiallyFocused,
+        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
+    )
+}
+
+private const val NUMBER_MIDDLE = 5
+private const val NUMBER_MAX = 100
 
 private const val RATING_WHOLE = 8
 private const val RATING_HALF = 7
