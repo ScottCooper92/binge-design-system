@@ -267,3 +267,35 @@ internal fun PosterRowSkeleton(
         }
     }
 }
+
+private const val GRID_SKELETON_ROWS = 2
+
+/**
+ * [TvImmersiveGrid]'s loading cells: two rows of poster blocks in the padding the cells will take, so the first
+ * resolved cell lands where the first block was. Two rows, because the grid cannot know how many results are coming.
+ */
+@Composable
+internal fun TvImmersiveGridSkeleton(
+    columns: Int,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth().padding(contentPadding),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
+    ) {
+        repeat(GRID_SKELETON_ROWS) { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap))) {
+                repeat(columns) { column ->
+                    TvSkeletonBlock(
+                        Modifier
+                            .weight(1f)
+                            .aspectRatio(POSTER_RATIO)
+                            .then(if (row == 0 && column == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier),
+                        shape = BingeShapes.MediaCard,
+                    )
+                }
+            }
+        }
+    }
+}
