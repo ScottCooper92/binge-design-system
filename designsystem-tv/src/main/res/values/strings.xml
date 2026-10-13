@@ -9,4 +9,6 @@
     </plurals>
     <!-- A list row's uncounted attention badge, read in place of the "!" it shows -->
     <string name="tv_pane_row_badge_alert">Needs attention</string>
+    <!-- What a screen reader says for a secret field that holds something, in place of the value or its length. -->
+    <string name="tv_text_field_hidden">Hidden</string>
 </resources>

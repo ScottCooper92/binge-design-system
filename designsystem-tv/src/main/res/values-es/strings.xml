@@ -6,4 +6,5 @@
         <item quantity="other">%1$d novedades</item>
     </plurals>
     <string name="tv_pane_row_badge_alert">Requiere atención</string>
+    <string name="tv_text_field_hidden">Oculto</string>
 </resources>

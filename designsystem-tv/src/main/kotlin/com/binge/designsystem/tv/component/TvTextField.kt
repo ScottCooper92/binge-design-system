@@ -45,10 +45,12 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -169,7 +171,8 @@ fun TvSearchField(
 /**
  * The frame both fields share. The frame is what the remote lands on; the input inside takes focus only once select
  * is pressed, because a TV raises the keyboard whenever a text input is focused, and walking a form would throw it up
- * at every field. [name] labels the frame and the input alike: while editing, a screen reader is on the input.
+ * at every field. [name] labels the frame and the input alike: while editing, a screen reader is on the input. While the
+ * remote rests on the frame, a screen reader reads the name and then the value, as its state; a secret reads as hidden.
  */
 @Composable
 private fun TvFieldFrame(
@@ -194,6 +197,7 @@ private fun TvFieldFrame(
     val input = remember { FocusRequester() }
     val frame = remember { FocusRequester() }
     val press = remember { SelectPress() }
+    val hidden = stringResource(TvR.string.tv_text_field_hidden)
     // Owned here, not left to the String overload, so the caret can start at the end: re-opening a field that holds
     // text must append, not insert at the start.
     var edit by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
@@ -225,7 +229,12 @@ private fun TvFieldFrame(
                 .onFocusChanged { focused = it.isFocused }
                 .editOnSelect(enabled = enabled && !editing, press) { editing = true }
                 .focusable(enabled = enabled)
-                .semantics { contentDescription = name },
+                .semantics {
+                    contentDescription = name
+                    // The value the frame rests on, which the drawn text does not carry for a reader: "Display name, Living
+                    // room". A secret says that it is hidden, never what it holds or how long it is.
+                    if (value.isNotEmpty()) stateDescription = if (secret) hidden else value
+                },
     ) {
         BasicTextField(
             value = edit.copy(text = value),
