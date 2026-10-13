@@ -162,8 +162,11 @@ val LocalBingeColors = staticCompositionLocalOf<BingeColors> {
     error("BingeColors not provided — wrap content with BingeExpressiveTheme.")
 }
 
-/** The `darkTheme` [BingeExpressiveTheme] was given, or null outside one. Read it through [BingeTheme.isDark]. */
-internal val LocalBingeDarkTheme = staticCompositionLocalOf<Boolean?> { null }
+/**
+ * Whether the theme in effect is dark: the `darkTheme` [BingeExpressiveTheme] was given, `true` under the dark-only
+ * `BingeTvTheme`, or null outside both. Read it through [BingeTheme.isDark]. Public so the TV theme can provide it.
+ */
+val LocalBingeDarkTheme = staticCompositionLocalOf<Boolean?> { null }
 
 /** Below this, a surface reads as dark: the fallback [BingeTheme.isDark] takes outside [BingeExpressiveTheme]. */
 private const val DARK_SURFACE_LUMINANCE = 0.5f
