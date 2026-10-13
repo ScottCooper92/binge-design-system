@@ -6,6 +6,7 @@ import androidx.tv.material3.ColorScheme
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.DarkBingeColors
 import com.binge.designsystem.theme.LocalBingeColors
+import com.binge.designsystem.theme.LocalBingeDarkTheme
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.theme.systemReduceMotion
 
@@ -20,8 +21,9 @@ import com.binge.designsystem.theme.systemReduceMotion
  * Dark-only, deliberately: a 10-foot UI is viewed in a dim room at distance, where the light
  * surface ramp is glaring. There is no `darkTheme` parameter to pass by mistake.
  *
- * [LocalBingeColors] and [LocalReduceMotion] are re-provided here because they are plain token
- * CompositionLocals rather than Material 3 types — they carry across the seam unchanged.
+ * [LocalBingeColors], [LocalBingeDarkTheme] and [LocalReduceMotion] are re-provided here because they are plain token
+ * CompositionLocals rather than Material 3 types — they carry across the seam unchanged. The dark flag is what keeps
+ * `BingeTheme.isDark` from falling back to Material 3's theme, which this tree does not have.
  *
  * [colorScheme] defaults to Binge's. An app with its own brand passes
  * `itsDarkScheme.toTvColorScheme()`, so its TV surface takes the same accent its phone screens do —
@@ -40,6 +42,7 @@ fun BingeTvTheme(
 ) {
     CompositionLocalProvider(
         LocalBingeColors provides DarkBingeColors,
+        LocalBingeDarkTheme provides true,
         LocalReduceMotion provides reduceMotion,
     ) {
         MaterialTheme(
