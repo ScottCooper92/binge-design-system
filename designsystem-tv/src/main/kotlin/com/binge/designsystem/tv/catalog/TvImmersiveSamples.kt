@@ -5,6 +5,7 @@ package com.binge.designsystem.tv.catalog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -25,6 +27,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
@@ -34,7 +38,9 @@ import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.template.TvHubRow
 import com.binge.designsystem.tv.template.TvImmersiveCopyLayout
 import com.binge.designsystem.tv.template.TvImmersiveGrid
+import com.binge.designsystem.tv.template.TvImmersiveGridContent
 import com.binge.designsystem.tv.template.TvImmersiveHub
+import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -317,6 +323,70 @@ fun TvImmersiveGridUnloadedSample() {
 @Composable
 fun TvImmersiveGridFocusedSample() {
     SampleGrid(initialFocusedIndex = GRID_FOCUSED_INDEX)
+}
+
+/** A grid of [content], rail-hosted, with the sample cells and the given heading controls and message. */
+@Composable
+private fun SampleStateGrid(
+    content: TvImmersiveGridContent<SampleTitle>,
+    band: (@Composable () -> Unit)? = null,
+    trailingAction: (@Composable () -> Unit)? = null,
+    message: @Composable BoxScope.() -> Unit = {},
+) {
+    RailHosted {
+        TvImmersiveGrid(
+            heading = "All titles",
+            content = content,
+            onItemClick = {},
+            artwork = { title -> SampleArtwork(title) },
+            copy = { title -> SampleCopy(title) },
+            band = band,
+            trailingAction = trailingAction,
+            message = message,
+        ) { title, isFocused, onFocusChanged, onClick, cellModifier ->
+            SampleCard(title, isFocused, onFocusChanged, onClick = onClick, modifier = cellModifier)
+        }
+    }
+}
+
+/** The first page still loading: two rows of poster blocks where the cells will land, and no backdrop yet. */
+@Composable
+fun TvImmersiveGridLoadingSample() {
+    SampleStateGrid(content = TvImmersiveGridContent.Loading)
+}
+
+/** Nothing to show as cells: the caller's message is centred in the pane, with the one action that resolves it. */
+@Composable
+fun TvImmersiveGridMessageSample() {
+    SampleStateGrid(
+        content = TvImmersiveGridContent.Message(),
+        message = {
+            TvMessagePlate(
+                body = "Nothing matches these filters.",
+                alignment = Alignment.Center,
+                actions = { TvButton(label = "Clear filters", onClick = {}, style = TvButtonStyle.Primary) },
+            )
+        },
+    )
+}
+
+/** Controls sharing the heading's row: a band of filters after the heading, and an action pinned to the end. */
+@Composable
+fun TvImmersiveGridHeadingControlsSample() {
+    SampleStateGrid(
+        content = TvImmersiveGridContent.Items(
+            count = SampleGridTitles.size,
+            key = { SampleGridTitles[it].id },
+            at = SampleGridTitles::getOrNull,
+        ),
+        band = {
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s))) {
+                TvButton(label = "Drama", onClick = {})
+                TvButton(label = "2025", onClick = {})
+            }
+        },
+        trailingAction = { TvButton(label = "Filters", onClick = {}) },
+    )
 }
 
 private const val GRID_DEMO_ITEM_COUNT = 90
