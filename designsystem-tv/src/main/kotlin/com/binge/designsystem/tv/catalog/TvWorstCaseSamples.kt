@@ -36,6 +36,7 @@ import com.binge.designsystem.tv.template.TvPaneAction
 import com.binge.designsystem.tv.template.TvPaneGroup
 import com.binge.designsystem.tv.template.TvPaneOption
 import com.binge.designsystem.tv.template.TvPaneRow
+import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -111,11 +112,11 @@ fun TvDetailActionRowWorstCaseSample() {
             listOf(
                 TvDetailAction("Approve", Icons.Filled.Check, onClick = {}, isPrimary = true),
                 TvDetailAction("Decline", Icons.Filled.Close, onClick = {}, showLabel = true),
-                TvDetailAction("Remove", Icons.Filled.Delete, onClick = {}, showLabel = true),
-                TvDetailAction("Block", Icons.Filled.Block, onClick = {}, showLabel = true),
                 TvDetailAction("Mark as", Icons.Filled.Done, onClick = {}, showLabel = true),
                 TvDetailAction("Report an issue", Icons.Filled.ReportProblem, onClick = {}, showLabel = true),
                 TvDetailAction("Open in Binge", Icons.AutoMirrored.Filled.OpenInNew, onClick = {}, showLabel = true),
+                TvDetailAction("Block", Icons.Filled.Block, onClick = {}, showLabel = true, style = TvButtonStyle.DestructiveOutline),
+                TvDetailAction("Remove", Icons.Filled.Delete, onClick = {}, showLabel = true, style = TvButtonStyle.Destructive),
             ),
         entryFocus = remember { FocusRequester() },
         // The page's own side margins, which is the width a detail page gives its row.

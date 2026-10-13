@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -35,6 +36,7 @@ import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
 import com.binge.designsystem.tv.template.TvDetailPage
+import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -66,8 +68,9 @@ private fun sampleActions(): List<TvDetailAction> =
     listOf(
         TvDetailAction("Approve", Icons.Filled.Check, onClick = {}, isPrimary = true, initiallyFocused = true),
         TvDetailAction("Decline", Icons.Filled.Close, onClick = {}, showLabel = true),
-        TvDetailAction("Block", Icons.Filled.Block, onClick = {}, showLabel = true),
         TvDetailAction("Open", Icons.AutoMirrored.Filled.OpenInNew, onClick = {}),
+        TvDetailAction("Block", Icons.Filled.Block, onClick = {}, showLabel = true, style = TvButtonStyle.DestructiveOutline),
+        TvDetailAction("Remove", Icons.Filled.Delete, onClick = {}, showLabel = true, style = TvButtonStyle.Destructive),
     )
 
 @Composable

@@ -58,6 +58,7 @@ fun TvDetailActionRow(
                     TvButton(
                         label = action.label,
                         onClick = action.onClick,
+                        style = action.style,
                         leadingIcon = action.icon,
                         initiallyFocused = action.initiallyFocused,
                         modifier = target,
@@ -67,6 +68,7 @@ fun TvDetailActionRow(
                         icon = action.icon,
                         label = action.label,
                         onClick = action.onClick,
+                        style = action.style,
                         initiallyFocused = action.initiallyFocused,
                         modifier = target,
                     )
@@ -91,4 +93,10 @@ data class TvDetailAction(
     val focusRequester: FocusRequester? = null,
     /** A secondary action as a labelled button rather than an icon: for an action a bare glyph would not name clearly enough. */
     val showLabel: Boolean = false,
+    /**
+     * The role of a secondary action; the primary is always [TvButtonStyle.Primary]. Destructive actions go last in
+     * the row: a reversible one (block) takes [TvButtonStyle.DestructiveOutline], an irreversible one (remove,
+     * delete) takes [TvButtonStyle.Destructive].
+     */
+    val style: TvButtonStyle = TvButtonStyle.Secondary,
 )
