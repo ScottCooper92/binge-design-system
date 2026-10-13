@@ -237,7 +237,7 @@ private const val LAST_LINE_FRACTION = 0.6f
 private const val DETAIL_CARDS = 6
 
 @Composable
-private fun PosterRowSkeleton(
+internal fun PosterRowSkeleton(
     cards: Int,
     cardWidth: Dp,
     modifier: Modifier = Modifier,

@@ -32,6 +32,16 @@ class TvImmersiveSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun hubPendingRow() = Frame { TvImmersiveHubPendingRowSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun hubNarrowCopy() = Frame { TvImmersiveHubNarrowCopySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun grid() = Frame { TvImmersiveGridSample() }
 
     @PreviewTest

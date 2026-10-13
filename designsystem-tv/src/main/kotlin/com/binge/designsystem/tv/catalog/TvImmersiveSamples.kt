@@ -32,6 +32,7 @@ import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.template.TvHubRow
+import com.binge.designsystem.tv.template.TvImmersiveCopyLayout
 import com.binge.designsystem.tv.template.TvImmersiveGrid
 import com.binge.designsystem.tv.template.TvImmersiveHub
 import com.binge.designsystem.R as DesR
@@ -98,6 +99,7 @@ private fun SampleHub(
     hero: (@Composable () -> Unit)? = null,
     initialFocused: Pair<String, Int>? = null,
     rows: List<TvHubRow<SampleTitle>> = SampleRows,
+    copyLayout: TvImmersiveCopyLayout = TvImmersiveCopyLayout.Wide,
 ) {
     RailHosted {
         TvImmersiveHub(
@@ -110,6 +112,7 @@ private fun SampleHub(
             hero = hero,
             initialFocused = initialFocused,
             seeAllLabel = "See all",
+            copyLayout = copyLayout,
         ) { title, isFocused, onFocusChanged, onClick, cellModifier ->
             SampleCard(title = title, isFocused = isFocused, onFocusChanged = onFocusChanged, onClick = onClick, modifier = cellModifier)
         }
@@ -197,6 +200,22 @@ private fun SampleHero() {
 @Composable
 fun TvImmersiveHubFocusedSample() {
     SampleHub(initialFocused = "approved" to 202)
+}
+
+private val PendingSampleRow = TvHubRow<SampleTitle>(key = "pending", title = "Pending", items = emptyList(), isLoading = true)
+
+/** The first row is still loading: a skeleton holds its slot, so it fills in place rather than pushing the rows below down. */
+@Composable
+fun TvImmersiveHubPendingRowSample() {
+    SampleHub(
+        rows = listOf(PendingSampleRow) + SampleRows.drop(1),
+    )
+}
+
+/** The narrow copy layout: the copy and the scrim that beds it stop just past half the screen, so more artwork shows. */
+@Composable
+fun TvImmersiveHubNarrowCopySample() {
+    SampleHub(initialFocused = "approved" to 202, copyLayout = TvImmersiveCopyLayout.Narrow)
 }
 
 /** An empty first row is skipped: focus on the row after it still anchors that row, not the one below. */
