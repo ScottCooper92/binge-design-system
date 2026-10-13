@@ -97,6 +97,9 @@
     <dimen name="tv_detail_page_section_gap">32dp</dimen>
     <dimen name="tv_detail_page_section_anchor_top">64dp</dimen>
     <dimen name="tv_detail_page_content_bottom">240dp</dimen>
+    <!-- TvDetailInfoFooter's Table layout: the label column's width and the gap between rows -->
+    <dimen name="tv_detail_info_label_width">170dp</dimen>
+    <dimen name="tv_detail_info_row_gap">10dp</dimen>
 
     <!-- Skeleton pages: the placeholders that stand for a hub's or a detail page's text, sized like the text they replace -->
     <dimen name="tv_skeleton_overline_width">96dp</dimen>

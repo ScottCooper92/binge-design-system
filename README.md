@@ -68,7 +68,7 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── nav/         the navigation rail shell
 ├── component/   the buttons, the card row, the section title, the message plate, the initials
 │                avatar, the QR code, the selected tick, the row emphasis, the option rows, the
-│                choice row, the tab row and the vertical divider
+│                choice row, the tab row, the vertical divider and a detail page's Details footer
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
 │                flow, the message page, the error page, the detail page, the decision page, the list-and-pane board,
