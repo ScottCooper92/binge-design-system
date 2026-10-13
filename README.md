@@ -64,7 +64,7 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
 │                flow, the message page, the error page, the detail page, the decision page, the list-and-pane board,
-│                the immersive hub and grid, and the skeleton pages
+│                the immersive hub and grid, the full-screen reader, and the skeleton pages
 ├── Dimens.kt    the non-dp constants the TV components share, such as the nav rail's collapsed row cap
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme

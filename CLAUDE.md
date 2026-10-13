@@ -28,7 +28,7 @@ same way in both apps. On the phone (`com.binge.designsystem.template`) they are
 message screen, the error and empty screens, the filtered list, the hero detail page, the form, the
 step flow, the decision screen and the paged phase. On the TV (`com.binge.designsystem.tv.template`)
 they are the page hosting, the board, the two-pane page, the step flow, the message page, the error page, the detail
-page, the decision page, the list-and-pane board, the immersive hub and grid, and the skeleton pages that stand in for them
+page, the decision page, the list-and-pane board, the immersive hub and grid, the full-screen reader, and the skeleton pages that stand in for them
 while they load. `TvImmersiveScroll.kt` there is the scroll the hub and
 grid share, not a template of its own. A template follows
 the one rule below like any component: it takes slots and callbacks, never a Binge type.
@@ -79,6 +79,12 @@ agree with the consumers'.
   `OnePerScreen`, `CatalogGroup`, `ScreenshotOnly` and `SelfDescribing`.
 - A `@Preview(name = …)` token is short, lowercase and space-free: it is baked into the baseline's
   filename, and a long one breaks out of Windows' path limit under a worktree.
+
+**Where a screen's commit goes.** A filled primary button pinned in the footer (`FormActionPlacement.Footer`) when the action is the
+reason the screen exists and finishes it: connect, send, request, create, report. Editing an existing setting saves as it is made,
+with no button. A top-bar text "Save" (`FormActionPlacement.TopBar`) is only for a multi-field edit that must apply together, and
+stays disabled until something changes. A single toggle or choice applies at once. One primary per screen; a top-bar action is a
+verb, never an icon alone; a destructive action sits in an overflow menu or behind a confirm.
 
 ## Gates
 
