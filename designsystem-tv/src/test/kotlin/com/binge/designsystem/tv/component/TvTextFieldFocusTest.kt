@@ -8,6 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.hasContentDescription
@@ -199,6 +202,48 @@ class TvTextFieldFocusTest {
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText(EXAMPLE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `the frame reads its name and then its value, as the remote rests on it`() {
+        composeTestRule.setContent { BingeTvTheme { TvTextField(value = "Living room", onValueChange = {}, label = NAME) } }
+        composeTestRule.waitForIdle()
+
+        frame(NAME).assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Living room"))
+    }
+
+    @Test
+    fun `an empty frame announces no value`() {
+        composeTestRule.setContent { BingeTvTheme { TvTextField(value = "", onValueChange = {}, label = NAME, placeholder = "Name") } }
+        composeTestRule.waitForIdle()
+
+        frame(NAME).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.StateDescription))
+    }
+
+    @Test
+    fun `a secret frame says it is hidden, never its value or its length`() {
+        composeTestRule.setContent { BingeTvTheme { TvTextField(value = "hunter2", onValueChange = {}, label = NAME, secret = true) } }
+        composeTestRule.waitForIdle()
+
+        frame(NAME).assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Hidden"))
+    }
+
+    @Test
+    fun `an empty secret frame announces no value`() {
+        composeTestRule.setContent { BingeTvTheme { TvTextField(value = "", onValueChange = {}, label = NAME, secret = true) } }
+        composeTestRule.waitForIdle()
+
+        frame(NAME).assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.StateDescription))
+    }
+
+    @Test
+    fun `a search field announces what it holds`() {
+        composeTestRule.setContent {
+            BingeTvTheme { TvSearchField(value = "dune", onValueChange = {}, label = SEARCH, placeholder = "Titles", onSearch = {}) }
+        }
+        composeTestRule.waitForIdle()
+
+        frame(SEARCH).assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "dune"))
     }
 
     private fun setFields() {
