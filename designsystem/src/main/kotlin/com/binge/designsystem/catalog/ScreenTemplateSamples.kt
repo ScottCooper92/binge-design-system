@@ -85,6 +85,7 @@ import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.template.ScreenBar
 import com.binge.designsystem.template.ScreenBarChrome
 import com.binge.designsystem.template.ScreenBody
+import com.binge.designsystem.template.ScreenFooter
 import com.binge.designsystem.template.StepFlowScreen
 import com.binge.designsystem.template.StepHeading
 import com.binge.designsystem.template.screenListPadding
@@ -182,6 +183,29 @@ fun BingeScreenScaffoldBottomBarSample() {
                             .windowInsetsPadding(bottomBarInsets())
                             .fillMaxWidth()
                             .padding(dimensionResource(R.dimen.padding_m)),
+                    )
+                }
+            },
+        ) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/** A pinned bar of plain text on [ScreenFooter]: the chrome a form's buttons sit on, for content that is not a button. */
+@Composable
+fun ScreenFooterSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(
+            title = "Sliders",
+            onBack = LocalDemoBack.current,
+            bar = ScreenBar.Small,
+            bottomBar = {
+                ScreenFooter {
+                    Text(
+                        text = "3 of 8 sliders in use",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             },

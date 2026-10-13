@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
@@ -24,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -42,7 +40,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
-import com.binge.designsystem.bottomBarInsets
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeTextButton
@@ -84,7 +81,8 @@ enum class FormActionPlacement {
  * An edit screen saves each change as it is made and has no commit: pass its [saveStatus] and leave
  * [primaryAction] out. "Saving…" and "Saved" show in the bar, and a failed write keeps the change and shows a
  * snackbar with Retry until the next write succeeds (see [FormSaveStatus]). [primaryAction] is for the cases that
- * do commit: a create flow, a connection the server must test, a submit, or a destructive step.
+ * do commit: a create flow, a connection the server must test, or a submit. A destructive action is not a commit: it
+ * sits in an overflow menu or behind a confirm.
  *
  * [bar] and [scrollBehavior] are [BingeScreenScaffold]'s, and the bar is its default: a transparent collapsing bar the
  * fields scroll under, its scrim fading in as it collapses. Pass [ScreenBar.Small] for a single-line bar that slides
@@ -210,8 +208,8 @@ fun FormSection(
 }
 
 /**
- * The bar pinned under a [FormScreen] in [FormActionPlacement.Footer]: the secondary action beside the
- * primary, both full-width halves, or the primary alone across the bar.
+ * The bar pinned under a [FormScreen] in [FormActionPlacement.Footer], on [ScreenFooter]: the secondary action
+ * beside the primary, both full-width halves, or the primary alone across the bar.
  */
 @Composable
 internal fun FormFooter(
@@ -219,21 +217,8 @@ internal fun FormFooter(
     modifier: Modifier = Modifier,
     secondary: FormAction? = null,
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = BingeShapes.HeroTop,
-        shadowElevation = dimensionResource(R.dimen.snackbar_elevation),
-    ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(bottomBarInsets())
-                    .padding(horizontal = resolvedContentInset())
-                    .padding(top = dimensionResource(R.dimen.padding_sm), bottom = dimensionResource(R.dimen.padding_m)),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
+    ScreenFooter(modifier = modifier) {
+        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
             secondary?.let {
                 BingeOutlinedButton(
                     label = it.label,

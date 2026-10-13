@@ -91,7 +91,7 @@ enum class ScreenBarChrome {
  * expanded; a caller whose action takes over once it collapses hoists [scrollBehavior] to fade it.
  *
  * [bottomBar] reaches the true edge of the window and clears the navigation bar and a side cutout itself, by
- * [com.binge.designsystem.bottomBarInsets], as `FormFooter` does.
+ * [com.binge.designsystem.bottomBarInsets]. [ScreenFooter] is that chrome ready made, for a bar of any content.
  *
  * A [bottomBar] under the floating navigation pill
  * ([com.binge.designsystem.component.BingeNavPresentation.FloatingBar]) is not supported. The body's padding

@@ -39,6 +39,9 @@ object TvLayoutAnchors {
     /** An immersive hub's copy band above its rows, which the hub's skeleton reserves. */
     const val HUB_COPY: String = "${PREFIX}hub-copy"
 
+    /** An immersive grid's first cell, which the grid's loading cells reserve. */
+    const val GRID_FIRST_CELL: String = "${PREFIX}grid-first-cell"
+
     /** An immersive hub's row at [index] among the rows it lays out, which the hub's skeleton reserves. */
     fun hubRow(index: Int): String = "${PREFIX}hub-row-$index"
 
