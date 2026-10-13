@@ -135,7 +135,7 @@ androidComponents {
     onVariants { variant ->
         val generate =
             tasks.register<GenerateCatalogRegistry>("generate${variant.name.replaceFirstChar { it.uppercase() }}CatalogRegistry") {
-                samples.from(fileTree(phoneCatalogSources) { include("*.kt") }, fileTree(tvCatalogSources) { include("*.kt") })
+                samples.from(fileTree(phoneCatalogSources) { include("**/*.kt") }, fileTree(tvCatalogSources) { include("**/*.kt") })
                 phoneSamplesDir.set(phoneCatalogSources)
                 tvSamplesDir.set(tvCatalogSources)
                 generator.from(configurations.named("generator"))
