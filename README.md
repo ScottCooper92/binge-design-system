@@ -26,6 +26,14 @@ the focus units, the rail shell, the button, the card row and the message plate 
 `checkTvMaterialSeparation` holds the line. Binge's TV media card, media row and immersive backdrop
 take its media-item model and stay there, as its error plate does.
 
+TV code may call a phone-module helper only if the helper reads no theme. The check reads imports,
+so it cannot see a helper that reads Material 3's `MaterialTheme` inside it. Under `BingeTvTheme`
+that read finds no Material 3 theme and paints Material 3's baseline light scheme. So a shared helper
+takes its colours as parameters, and the phone side keeps a thin wrapper that reads Material 3:
+`Modifier.shimmerSkeleton` takes its colours, `Modifier.skeleton` reads them from `MaterialTheme`,
+and `TvSkeletonBlock` passes the tv-material scheme. Give the two different names, so leaving the
+colours out cannot reach the wrapper.
+
 What stays in Binge is everything that names a TMDB type, an account, a navigation route, or
 Binge's error model, and everything that renders one of those. The line now runs through the
 media-item model (the hub and poster carousels take Binge's `MediaItemUi`, which carries a TMDB
