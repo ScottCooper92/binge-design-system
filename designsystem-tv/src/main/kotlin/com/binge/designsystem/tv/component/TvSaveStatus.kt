@@ -37,6 +37,7 @@ import com.binge.designsystem.tv.R as TvR
  * snackbar. Retry is reachable on the D-pad but does not take focus, so a failure never pulls the user out of
  * the field they are on. Pressing Retry moves focus up and away from it before calling [onRetry], so the button
  * leaving the line when the status moves on does not send focus to the top of the page. The line is a polite live region, so each change of state is announced.
+ * In a narrow panel the failure's words wrap before Retry gives up its width.
  */
 @Composable
 fun TvSaveStatus(
@@ -61,7 +62,12 @@ fun TvSaveStatus(
             }
             SaveStatus.Failed -> {
                 StatusGlyph(Icons.Filled.ErrorOutline, MaterialTheme.colorScheme.error)
-                StatusText(stringResource(DesR.string.save_status_failed), MaterialTheme.colorScheme.error)
+                // The words give way before Retry, so a narrow panel wraps them rather than squeezing the button to dots.
+                StatusText(
+                    stringResource(DesR.string.save_status_failed),
+                    MaterialTheme.colorScheme.error,
+                    Modifier.weight(1f, fill = false),
+                )
                 val focusManager = LocalFocusManager.current
                 TvButton(
                     label = stringResource(DesR.string.save_status_retry),
@@ -88,6 +94,10 @@ private fun StatusGlyph(icon: ImageVector, tint: Color) {
 }
 
 @Composable
-private fun StatusText(text: String, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
-    Text(text = text, style = MaterialTheme.typography.titleMedium, color = color)
+private fun StatusText(
+    text: String,
+    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    modifier: Modifier = Modifier,
+) {
+    Text(text = text, style = MaterialTheme.typography.titleMedium, color = color, modifier = modifier)
 }

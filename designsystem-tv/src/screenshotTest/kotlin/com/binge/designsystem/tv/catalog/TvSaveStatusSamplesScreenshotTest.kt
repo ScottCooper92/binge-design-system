@@ -16,4 +16,12 @@ class TvSaveStatusSamplesScreenshotTest {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
             TvSaveStatusStatesSample()
         }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun saveStatusNarrow() =
+        TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+            TvSaveStatusNarrowSample()
+        }
 }

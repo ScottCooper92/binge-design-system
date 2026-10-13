@@ -167,6 +167,7 @@
     <dimen name="tv_rating_stepper_sheet_room">308dp</dimen>
     <!-- The save status line: its glyph, at the button icon's size so the line matches the Retry beside it -->
     <dimen name="tv_save_status_icon">22dp</dimen>
+    <dimen name="tv_save_status_narrow_sample_width">280dp</dimen>
     <!-- The full-screen reader: the still on the left with the title and text beside it, inset from the start edge and
          capped to a readable measure. The poster sits beside the copy column, not above it, so its width only sets how
          much horizontal room the text gets: 140dp (210dp tall at 2:3) reads as a poster without crowding the measure. -->
