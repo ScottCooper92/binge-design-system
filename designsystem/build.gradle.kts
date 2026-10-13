@@ -104,6 +104,8 @@ dependencies {
     api(libs.compose.material3.adaptive.navigation3)
     // The paged-list phase takes load states, so the paging types are part of its signature.
     api(libs.paging.common)
+    // The save-as-made engine takes the scopes and dispatcher it writes on, so the types are part of its signature.
+    api(libs.kotlinx.coroutines.core)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     // The step-flow template installs the system Back handler for the step it shows.
