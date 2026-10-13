@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalog.BingeChoiceWorstCaseSample
 import com.binge.designsystem.catalog.CheckboxRowWorstCaseSample
+import com.binge.designsystem.catalog.ItemGroupWideTrailingWorstCaseSample
 import com.binge.designsystem.catalog.ItemGroupWorstCaseSample
 import com.binge.designsystem.catalog.ListRowWorstCaseSample
 import com.binge.designsystem.catalog.MediaCardWorstCaseSample
@@ -54,6 +55,10 @@ class WorstCaseFixturesTest {
     @Test fun `an item group at 1_3`() = check(FONT_13) { ItemGroupWorstCaseSample() }
 
     @Test fun `an item group at 2_0`() = check(FONT_20) { ItemGroupWorstCaseSample() }
+
+    @Test fun `an item group row with a wide trailing slot at 1_3`() = check(FONT_13) { ItemGroupWideTrailingWorstCaseSample() }
+
+    @Test fun `an item group row with a wide trailing slot at 2_0`() = check(FONT_20) { ItemGroupWideTrailingWorstCaseSample() }
 
     @Test fun `a checkbox row at 1_3`() = check(FONT_13) { CheckboxRowWorstCaseSample() }
 

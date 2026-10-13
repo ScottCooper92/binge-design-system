@@ -2,6 +2,7 @@
 
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
@@ -131,6 +133,43 @@ fun ItemGroupWorstCaseSample() {
                         detail = "Opens in your browser",
                         badgeAlert = true,
                         destination = ListItemDestination.External,
+                    ),
+                ),
+        )
+    }
+}
+
+/**
+ * An [ItemGroup] row whose trailing slot is wide: a long name beside a role tag, a long count and a chevron. The trailing
+ * slot used to be measured before the label, so at a large font the name got no width and wrapped a character a line.
+ */
+@Composable
+fun ItemGroupWideTrailingWorstCaseSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = null,
+            rows =
+                listOf(
+                    ListItem(
+                        icon = Icons.Filled.Person,
+                        label = "Alexandria Fitzgerald-Montgomery",
+                        detail = "alexandria.fitzgerald-montgomery · Plex",
+                        trailingContent = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                            ) {
+                                BingeTag(label = "Admin")
+                                Text(
+                                    text = "12,840 requests",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+                            }
+                        },
                     ),
                 ),
         )
