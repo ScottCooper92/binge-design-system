@@ -14,17 +14,24 @@ class UnregistrableSampleException(
 ) : IllegalStateException("Cannot register catalog samples:\n" + problems.joinToString("\n") { "  $it" })
 
 /**
- * Renders a registry file from a catalog's source files, given as `(file name, text)` pairs, with
- * the samples in [catalogPackage] listed in a top-level `val` named [registryName]. Entries are
- * gathered into components ([toComponents]); files are read in name order so the output is stable
- * whatever order they arrive in.
+ * Renders a registry file from a catalog's source files, given as `(path, text)` pairs with the path
+ * relative to `catalog/`, with the samples in [catalogPackage] listed in a top-level `val` named
+ * [registryName]. Entries are gathered into components ([toComponents]); files are read in path order
+ * so the output is stable whatever order they arrive in. A sample or demo in a sub-package of
+ * `catalog/` fails the build: its import would name the wrong package.
  */
 fun generateRegistry(
     files: List<Pair<String, String>>,
     catalogPackage: String = PHONE_CATALOG_PACKAGE,
     registryName: String = "CatalogRegistry",
 ): String {
-    val results = files.sortedBy { it.first }.map { (name, text) -> SampleScanner.scan(name, text) }
+    val results = files.sortedBy { it.first }.map { (path, text) ->
+        val result = SampleScanner.scan(path, text)
+        if ('/' !in path || (result.samples.isEmpty() && result.problems.isEmpty())) return@map result
+        val what = result.samples.joinToString { it.function }.ifEmpty { "a sample or demo" }
+        val misplaced = "$path: $what is in catalog/${path.substringBeforeLast('/')}/; samples must sit directly in catalog/"
+        ScanResult(emptyList(), result.problems + misplaced)
+    }
     val problems = results.flatMap { it.problems }
     if (problems.isNotEmpty()) throw UnregistrableSampleException(problems)
     val entries = toComponents(results.flatMap { it.samples })
@@ -55,6 +62,18 @@ fun generateRegistry(
     }
 }
 
+/**
+ * Every Kotlin file under [catalogDir], sub-packages included, as `(path relative to it, text)`. The walk is
+ * recursive so a sample in a sub-package fails the build rather than going unlisted.
+ */
+fun catalogSources(catalogDir: File): List<Pair<String, String>> =
+    catalogDir
+        .walkTopDown()
+        .filter { it.isFile && it.extension == "kt" }
+        .map { it.relativeTo(catalogDir).invariantSeparatorsPath to it.readText() }
+        .sortedBy { it.first }
+        .toList()
+
 private fun String.literal(): String = "\"" + replace("\\", "\\\\").replace("\"", "\\\"").replace("$", "\\$") + "\""
 
 /**
@@ -67,9 +86,8 @@ fun main(args: Array<String>) {
     val problems = mutableListOf<String>()
     args.drop(1).forEach { spec ->
         val (registryName, catalogPackage, sourceDir) = spec.split("=", limit = 3)
-        val sources = File(sourceDir).listFiles { file -> file.extension == "kt" }.orEmpty().sortedBy { it.name }
         try {
-            val registry = generateRegistry(sources.map { it.name to it.readText() }, catalogPackage, registryName)
+            val registry = generateRegistry(catalogSources(File(sourceDir)), catalogPackage, registryName)
             File(outputDir, "$registryName.kt").writeText(registry)
         } catch (e: UnregistrableSampleException) {
             problems += e.problems

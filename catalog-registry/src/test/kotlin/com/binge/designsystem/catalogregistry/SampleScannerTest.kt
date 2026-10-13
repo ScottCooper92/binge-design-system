@@ -277,4 +277,48 @@ class SampleScannerTest {
         assertTrue(result.problems.isEmpty(), result.problems.toString())
         assertEquals("Doc", result.samples.single().description)
     }
+
+    @Test
+    fun `names a multi-line annotation between the annotations and fun, not a missing @Composable`() {
+        val result = scan(
+            """
+            /** Doc. */
+            @Composable
+            @OptIn(
+                ExperimentalFoundationApi::class,
+            )
+            fun WideSample() {}
+            """,
+        )
+
+        assertTrue(result.samples.isEmpty())
+        val problem = result.problems.single()
+        assertTrue("ButtonSamples.kt:6: WideSample has @OptIn over several lines, from line 3" in problem, problem)
+        assertTrue("not @Composable" !in problem, problem)
+    }
+
+    @Test
+    fun `names a multi-line annotation above the @Composable line too`() {
+        val result = scan(
+            """
+            /** Doc. */
+            @OptIn(
+                ExperimentalFoundationApi::class,
+                ExperimentalMaterial3Api::class,
+            )
+            @Composable
+            fun WideSample() {}
+            """,
+        )
+
+        assertTrue("WideSample has @OptIn over several lines, from line 2" in result.problems.single(), result.problems.toString())
+    }
+
+    @Test
+    fun `a one-line annotation with arguments is still read`() {
+        val result = scan("/** Doc. */\n@OptIn(ExperimentalFoo::class)\n@Composable\nfun NarrowSample() {}")
+
+        assertTrue(result.problems.isEmpty(), result.problems.toString())
+        assertEquals("NarrowSample", result.samples.single().function)
+    }
 }

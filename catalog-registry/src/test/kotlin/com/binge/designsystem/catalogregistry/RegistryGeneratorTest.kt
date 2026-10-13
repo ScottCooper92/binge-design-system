@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.io.File
 
 class RegistryGeneratorTest {
     private val button = "ButtonSamples.kt" to "/** Buttons. */\n@Composable\nfun ButtonFamilySample() {}"
@@ -65,6 +67,39 @@ class RegistryGeneratorTest {
         assertTrue("import com.binge.designsystem.tv.catalog.TvButtonSample" in out)
         assertTrue("val TvCatalogRegistry: List<CatalogEntry> =" in out)
         assertTrue("com.binge.designsystem.catalog.ButtonFamilySample" !in out)
+    }
+
+    @Test
+    fun `fails a sample in a catalog sub-package, naming it and where it should sit`() {
+        val nested = "widgets/ChipSamples.kt" to "/** A chip. */\n@Composable\nfun ChipSample() {}"
+
+        val thrown = assertThrows(UnregistrableSampleException::class.java) { generateRegistry(listOf(button, nested)) }
+
+        assertEquals(
+            listOf("widgets/ChipSamples.kt: ChipSample is in catalog/widgets/; samples must sit directly in catalog/"),
+            thrown.problems,
+        )
+    }
+
+    @Test
+    fun `allows a helper file without samples in a catalog sub-package`() {
+        val helper = "support/Fixtures.kt" to "internal val chipLabels = listOf(\"One\", \"Two\")"
+
+        val out = generateRegistry(listOf(button, helper))
+
+        assertTrue("id = \"ButtonFamilySample\"" in out, out)
+    }
+
+    @Test
+    fun `reads catalog sources recursively, with paths relative to catalog`(
+        @TempDir catalog: File,
+    ) {
+        File(catalog, "ButtonSamples.kt").writeText(button.second)
+        File(catalog, "widgets").mkdirs()
+        File(catalog, "widgets/ChipSamples.kt").writeText("/** A chip. */\n@Composable\nfun ChipSample() {}")
+        File(catalog, "README.md").writeText("not Kotlin")
+
+        assertEquals(listOf("ButtonSamples.kt", "widgets/ChipSamples.kt"), catalogSources(catalog).map { it.first })
     }
 
     @Test
