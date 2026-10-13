@@ -67,7 +67,9 @@ fun SectionHeader(
             text = title,
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.semantics { heading() },
+            // Weighted, not fill: a long title at a large font wraps inside what the trailing action leaves, where an
+            // unweighted one took the whole row and squeezed "More" to a few pixels wide.
+            modifier = Modifier.weight(1f, fill = false).semantics { heading() },
         )
         when {
             trailingContent != null -> trailingContent()
