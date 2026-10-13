@@ -35,12 +35,16 @@ class TvSideSheetStackTest {
                             TvSideSheetRow("Beta", onClick = { nav.push("beta", openedBy = "beta") }, modifier = nav.row("beta"))
                             TvSideSheetRow("Gamma", onClick = { nav.push("gamma", openedBy = "gamma") }, modifier = nav.row("gamma"))
                         }
-                        "gamma" -> {
-                            TvSideSheetTitle("Gamma page")
-                            TvSideSheetRow("Keep", onClick = {}, modifier = nav.row("keep"))
-                            TvSideSheetRow("Cancel", onClick = nav::pop, modifier = nav.row("cancel"))
-                            nav.arriveAt("cancel")
-                        }
+                        "gamma" ->
+                            TvSideSheetConfirm(
+                                title = "Remove gamma?",
+                                message = "It goes for everyone.",
+                                confirmLabel = "Remove",
+                                onConfirm = {},
+                                onCancel = nav::pop,
+                                entryFocus = null,
+                                cancelModifier = nav.row("cancel"),
+                            ).also { nav.arriveAt("cancel") }
                         else -> {
                             TvSideSheetTitle("${nav.page} page")
                             TvSideSheetRow("First", onClick = {}, modifier = nav.row("first"))
@@ -82,7 +86,7 @@ class TvSideSheetStackTest {
     }
 
     @Test
-    fun `a page can name another row to arrive at, and its own pop returns to the row that opened it`() {
+    fun `a confirm page lands on its Cancel, and Cancel returns to the row that opened it`() {
         show()
         press(Key.DirectionDown)
         press(Key.DirectionDown) // Gamma

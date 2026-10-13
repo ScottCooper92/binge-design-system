@@ -97,8 +97,8 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
 
 /**
  * The sheet's visible panel, with no scrim and no focus request of its own, so a frame can render it. A step
- * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus], so it pulls focus to
- * Cancel wherever it composes. The panel is flush to the screen's end, top and bottom edges, so its content keeps
+ * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus] when given an `entryFocus`,
+ * so it pulls focus to Cancel wherever it composes; on a stack page the stack does that. The panel is flush to the screen's end, top and bottom edges, so its content keeps
  * the overscan margin from them.
  */
 @Composable
@@ -262,6 +262,12 @@ fun TvSideSheetRow(
  * A sheet's second step, for an action that deletes or blocks: what is about to happen, then the confirm and
  * Cancel rows. Focus lands on Cancel, so a stray OK does nothing. [cancelInitiallyFocused] draws that, for a frame.
  * The confirm row rests in the error colour; pass `destructive = false` for a step that asks first but destroys nothing.
+ *
+ * On a [TvSideSheetStack] page there is no [entryFocus]: pass null, give Cancel `nav.row("cancel")` as [cancelModifier] and
+ * call `nav.arriveAt("cancel")`, and the stack lands focus there.
+ *
+ * @param entryFocus the request [TvSideSheet] hands its content. Null only on a [TvSideSheetStack] page: anywhere else
+ * a null leaves the step taking no focus.
  */
 @Composable
 fun ColumnScope.TvSideSheetConfirm(
@@ -270,9 +276,10 @@ fun ColumnScope.TvSideSheetConfirm(
     confirmLabel: String,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
-    entryFocus: FocusRequester,
+    entryFocus: FocusRequester?,
     cancelInitiallyFocused: Boolean = false,
     destructive: Boolean = true,
+    cancelModifier: Modifier = Modifier,
 ) {
     TvSideSheetTitle(title)
     TvSideSheetBody(message)
@@ -281,7 +288,7 @@ fun ColumnScope.TvSideSheetConfirm(
         label = stringResource(DesR.string.action_cancel),
         onClick = onCancel,
         initiallyFocused = cancelInitiallyFocused,
-        modifier = Modifier.focusRequester(entryFocus),
+        modifier = (if (entryFocus != null) Modifier.focusRequester(entryFocus) else Modifier).then(cancelModifier),
     )
-    TvSideSheetStepFocus(entryFocus)
+    if (entryFocus != null) TvSideSheetStepFocus(entryFocus)
 }
