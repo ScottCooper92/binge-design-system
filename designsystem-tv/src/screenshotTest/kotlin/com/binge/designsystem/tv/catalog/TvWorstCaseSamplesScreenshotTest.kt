@@ -20,6 +20,11 @@ class TvWorstCaseSamplesScreenshotTest {
     @PreviewTest
     @TvWorstCaseFontPreviews
     @Composable
+    fun optionRowSaving() = Frame { TvOptionRowSavingWorstCaseSample() }
+
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
     fun checkboxRow() = Frame { TvCheckboxRowWorstCaseSample() }
 
     @PreviewTest

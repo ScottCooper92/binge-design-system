@@ -73,6 +73,34 @@ fun TvOptionRowWorstCaseSample() {
     }
 }
 
+/** Option rows saving, with a long label, a long supporting line and a trailing value: the spinner holds the tick's place. */
+@Composable
+fun TvOptionRowSavingWorstCaseSample() {
+    Column(
+        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)).width(dimensionResource(TvR.dimen.tv_text_field_width)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
+    ) {
+        TvOptionRow(
+            label = LONG_LABEL,
+            selected = false,
+            onClick = {},
+            icon = Icons.Filled.Folder,
+            supportingText = LONG_SUPPORT,
+            trailingContent = { Text("1,284", style = MaterialTheme.typography.labelMedium) },
+            initiallyFocused = true,
+            saving = true,
+        )
+        TvOptionRow(
+            label = LONG_LABEL,
+            selected = true,
+            onClick = {},
+            icon = Icons.Filled.Dns,
+            supportingText = LONG_SUPPORT,
+            trailingContent = { Text("1,284", style = MaterialTheme.typography.labelMedium) },
+        )
+    }
+}
+
 /** Checkbox rows with an icon, a long label, a long supporting line, and one ruled out. */
 @Composable
 fun TvCheckboxRowWorstCaseSample() {
