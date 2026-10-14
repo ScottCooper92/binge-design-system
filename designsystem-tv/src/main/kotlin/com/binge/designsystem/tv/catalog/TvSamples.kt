@@ -63,6 +63,7 @@ import com.binge.designsystem.tv.component.TvSelectedTickBadge
 import com.binge.designsystem.tv.component.TvSideSheetConfirm
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetRow
+import com.binge.designsystem.tv.component.TvSideSheetRows
 import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.component.TvVerticalDivider
 import com.binge.designsystem.tv.component.containerColor
@@ -551,10 +552,12 @@ fun TvSideSheetSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Dune: Part Two")
-            TvSideSheetRow(label = "Approve", onClick = {}, icon = Icons.Filled.Check, initiallyFocused = true)
-            TvSideSheetRow(label = "4K", onClick = {}, selected = true)
-            TvSideSheetRow(label = "Not available", onClick = {}, enabled = false)
-            TvSideSheetRow(label = "Delete request", onClick = {}, icon = Icons.Filled.Delete, destructive = true)
+            TvSideSheetRows {
+                TvSideSheetRow(label = "Approve", onClick = {}, icon = Icons.Filled.Check, initiallyFocused = true)
+                TvSideSheetRow(label = "4K", onClick = {}, selected = true)
+                TvSideSheetRow(label = "Not available", onClick = {}, enabled = false)
+                TvSideSheetRow(label = "Delete request", onClick = {}, icon = Icons.Filled.Delete, destructive = true)
+            }
         }
     }
 }

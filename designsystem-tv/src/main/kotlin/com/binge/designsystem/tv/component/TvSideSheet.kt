@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -102,7 +103,7 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
  * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus] when given an `entryFocus`,
  * so it pulls focus to Cancel wherever it composes; on a stack page the stack does that. The panel is flush to the screen's end, top and bottom edges, so its content keeps
  * the overscan margin from them. [toBottomEdge] drops the bottom margin, for content that scrolls: it runs to the screen's
- * edge and carries the bottom overscan inside its scroll, so its last row can still scroll clear of the edge.
+ * edge, and [TvSideSheetRows] carries the bottom overscan inside its scroll, so its last row can still scroll clear of the edge.
  */
 @Composable
 fun TvSideSheetPanel(
@@ -123,8 +124,9 @@ fun TvSideSheetPanel(
                     end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
                 ).then(if (toBottomEdge) Modifier else Modifier.padding(bottom = dimensionResource(TvR.dimen.tv_overscan_vertical))),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
-        content = content,
-    )
+    ) {
+        CompositionLocalProvider(LocalTvSideSheetToBottomEdge provides toBottomEdge) { content() }
+    }
 }
 
 /** The sheet's heading: what its rows act on. */
@@ -366,12 +368,14 @@ fun ColumnScope.TvSideSheetConfirm(
 ) {
     TvSideSheetTitle(title)
     TvSideSheetBody(message)
-    TvSideSheetRow(label = confirmLabel, onClick = onConfirm, destructive = destructive)
-    TvSideSheetRow(
-        label = stringResource(DesR.string.action_cancel),
-        onClick = onCancel,
-        initiallyFocused = cancelInitiallyFocused,
-        modifier = (if (entryFocus != null) Modifier.focusRequester(entryFocus) else Modifier).then(cancelModifier),
-    )
+    TvSideSheetRows {
+        TvSideSheetRow(label = confirmLabel, onClick = onConfirm, destructive = destructive)
+        TvSideSheetRow(
+            label = stringResource(DesR.string.action_cancel),
+            onClick = onCancel,
+            initiallyFocused = cancelInitiallyFocused,
+            modifier = (if (entryFocus != null) Modifier.focusRequester(entryFocus) else Modifier).then(cancelModifier),
+        )
+    }
     if (entryFocus != null) TvSideSheetStepFocus(entryFocus)
 }

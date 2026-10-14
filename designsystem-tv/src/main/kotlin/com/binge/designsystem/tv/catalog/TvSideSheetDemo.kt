@@ -17,6 +17,7 @@ import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvSideSheet
 import com.binge.designsystem.tv.component.TvSideSheetConfirm
 import com.binge.designsystem.tv.component.TvSideSheetRow
+import com.binge.designsystem.tv.component.TvSideSheetRows
 import com.binge.designsystem.tv.component.TvSideSheetStack
 import com.binge.designsystem.tv.component.TvSideSheetStepFocus
 import com.binge.designsystem.tv.component.TvSideSheetTitle
@@ -56,20 +57,22 @@ fun TvSideSheetDemo() {
                 )
             } else {
                 TvSideSheetTitle("Dune: Part Two")
-                DemoQualities.forEachIndexed { index, label ->
+                TvSideSheetRows {
+                    DemoQualities.forEachIndexed { index, label ->
+                        TvSideSheetRow(
+                            label = label,
+                            onClick = { quality = label },
+                            selected = quality == label,
+                            modifier = if (index == 0) Modifier.focusRequester(entryFocus) else Modifier,
+                        )
+                    }
                     TvSideSheetRow(
-                        label = label,
-                        onClick = { quality = label },
-                        selected = quality == label,
-                        modifier = if (index == 0) Modifier.focusRequester(entryFocus) else Modifier,
+                        label = "Delete request",
+                        onClick = { confirming = true },
+                        icon = Icons.Filled.Delete,
+                        destructive = true,
                     )
                 }
-                TvSideSheetRow(
-                    label = "Delete request",
-                    onClick = { confirming = true },
-                    icon = Icons.Filled.Delete,
-                    destructive = true,
-                )
                 TvSideSheetStepFocus(entryFocus)
             }
         }
@@ -94,21 +97,25 @@ fun TvSideSheetStackDemo() {
             when (nav.page) {
                 "settings" -> {
                     TvSideSheetTitle("Settings")
-                    TvSideSheetRow(
-                        "Notifications",
-                        onClick = { nav.push("notifications", openedBy = "notifications") },
-                        modifier = nav.row("notifications"),
-                    )
-                    TvSideSheetRow("Quality", onClick = { nav.push("quality", openedBy = "quality") }, modifier = nav.row("quality"))
+                    TvSideSheetRows {
+                        TvSideSheetRow(
+                            "Notifications",
+                            onClick = { nav.push("notifications", openedBy = "notifications") },
+                            modifier = nav.row("notifications"),
+                        )
+                        TvSideSheetRow("Quality", onClick = { nav.push("quality", openedBy = "quality") }, modifier = nav.row("quality"))
+                    }
                 }
                 "notifications" -> {
                     TvSideSheetTitle("Notifications")
-                    TvSideSheetRow("New requests", onClick = {}, supportingText = "On", modifier = nav.row("new"))
-                    TvSideSheetRow("Issues", onClick = {}, supportingText = "Off", modifier = nav.row("issues"))
+                    TvSideSheetRows {
+                        TvSideSheetRow("New requests", onClick = {}, supportingText = "On", modifier = nav.row("new"))
+                        TvSideSheetRow("Issues", onClick = {}, supportingText = "Off", modifier = nav.row("issues"))
+                    }
                 }
                 else -> {
                     TvSideSheetTitle("Quality")
-                    DemoQualities.forEach { label -> TvSideSheetRow(label, onClick = {}, modifier = nav.row(label)) }
+                    TvSideSheetRows { DemoQualities.forEach { label -> TvSideSheetRow(label, onClick = {}, modifier = nav.row(label)) } }
                 }
             }
         }
