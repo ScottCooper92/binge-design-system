@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -215,14 +217,19 @@ internal fun FormFooter(
     secondary: FormAction? = null,
 ) {
     ScreenFooter(modifier = modifier) {
-        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+        // Min intrinsic height, with both buttons filling it, so a label that wraps further than its neighbour's makes the
+        // pair as tall as the taller rather than leaving the other short with its label off-centre (#840).
+        Row(
+            modifier = Modifier.height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
             secondary?.let {
                 BingeOutlinedButton(
                     label = it.label,
                     onClick = it.onClick,
                     enabled = it.enabled,
                     loading = it.busy,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
             }
             BingeFilledButton(
@@ -230,7 +237,7 @@ internal fun FormFooter(
                 onClick = primary.onClick,
                 enabled = primary.enabled,
                 loading = primary.busy,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
     }
