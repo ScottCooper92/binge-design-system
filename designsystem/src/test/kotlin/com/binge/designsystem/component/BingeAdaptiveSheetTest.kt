@@ -292,9 +292,10 @@ class BingeAdaptiveSheetResizeTest {
         val leftPages = mutableListOf<String>()
         rule.setContent {
             val base = LocalContext.current
+            val baseConfiguration = LocalConfiguration.current
             val context =
-                remember(wide, base) {
-                    val config = Configuration(base.resources.configuration)
+                remember(wide, base, baseConfiguration) {
+                    val config = Configuration(baseConfiguration)
                     config.screenWidthDp = if (wide) WIDE_DP else NARROW_DP
                     base.createConfigurationContext(config)
                 }
