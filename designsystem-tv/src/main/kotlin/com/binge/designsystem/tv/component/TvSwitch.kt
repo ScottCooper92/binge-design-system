@@ -21,7 +21,8 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * A switch's state at the end of a row: a track with its thumb at the end it is set to, filled when [checked]. It is drawn,
  * not pressed: the row holds focus and toggles, and passes its own focus as [isFocused] so the switch reads on the row's
- * fill. The state is set on the switch's semantics, which the row's merged node announces.
+ * fill. The state is set on the switch's semantics, which the row's merged node announces; give the row `role = Role.Switch`
+ * so a screen reader calls it a switch rather than a button.
  */
 @Composable
 fun TvSwitch(

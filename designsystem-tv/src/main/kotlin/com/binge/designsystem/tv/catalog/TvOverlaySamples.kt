@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
@@ -304,13 +305,13 @@ private fun SwitchSheet(firstOn: Boolean) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("This app")
-            TvSideSheetRow(label = "Notify me", onClick = { notify = !notify }, initiallyFocused = true) { isFocused ->
+            TvSideSheetRow(label = "Notify me", onClick = { notify = !notify }, initiallyFocused = true, role = Role.Switch) { isFocused ->
                 TvSwitch(checked = notify, isFocused = isFocused)
             }
-            TvSideSheetRow(label = "Autoplay trailers", onClick = { autoplay = !autoplay }) { isFocused ->
+            TvSideSheetRow(label = "Autoplay trailers", onClick = { autoplay = !autoplay }, role = Role.Switch) { isFocused ->
                 TvSwitch(checked = autoplay, isFocused = isFocused)
             }
-            TvSideSheetRow(label = "Show subtitles", onClick = { subtitles = !subtitles }) { isFocused ->
+            TvSideSheetRow(label = "Show subtitles", onClick = { subtitles = !subtitles }, role = Role.Switch) { isFocused ->
                 TvSwitch(checked = subtitles, isFocused = isFocused)
             }
         }

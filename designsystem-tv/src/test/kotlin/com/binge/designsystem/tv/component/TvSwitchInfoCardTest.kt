@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.SemanticsMatcher
@@ -33,7 +34,7 @@ private const val CARD = "card"
 private const val BELOW = "below"
 
 /**
- * A row ending in a [TvSwitch] announces the switch's state, and OK on the row flips it. A [TvInfoCard] takes focus on the
+ * A row ending in a [TvSwitch] announces itself as a switch with the switch's state, and OK on the row flips it. A [TvInfoCard] takes focus on the
  * D-pad, has nothing to press, and reads its title and lines as one item.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -47,18 +48,34 @@ class TvSwitchInfoCardTest {
         var on by mutableStateOf(false)
         rule.setContent {
             BingeTvTheme {
-                TvSideSheetRow(label = "Notify me", onClick = { on = !on }, modifier = Modifier.testTag(ROW)) { isFocused ->
+                TvSideSheetRow(
+                    label = "Notify me",
+                    onClick = { on = !on },
+                    modifier = Modifier.testTag(ROW),
+                    role = Role.Switch,
+                ) { isFocused ->
                     TvSwitch(checked = on, isFocused = isFocused)
                 }
             }
         }
-        rule.onNodeWithTag(ROW).assert(toggleable(ToggleableState.Off))
+        rule.onNodeWithTag(ROW).assert(toggleable(ToggleableState.Off)).assert(role(Role.Switch))
 
         rule.onNodeWithTag(ROW).requestFocus()
         rule.onRoot().performKeyInput { pressKey(Key.Enter) }
         rule.waitForIdle()
 
         rule.onNodeWithTag(ROW).assert(toggleable(ToggleableState.On))
+    }
+
+    @Test
+    fun `a row is a button unless it says otherwise`() {
+        rule.setContent {
+            BingeTvTheme {
+                TvSideSheetRow(label = "Sign out", onClick = {}, modifier = Modifier.testTag(ROW))
+            }
+        }
+
+        rule.onNodeWithTag(ROW).assert(role(Role.Button))
     }
 
     @Test
@@ -82,6 +99,8 @@ class TvSwitchInfoCardTest {
             .assert(hasText("Media server") and hasText("Connected"))
             .assertHasNoClickAction()
     }
+
+    private fun role(role: Role) = SemanticsMatcher.expectValue(SemanticsProperties.Role, role)
 
     private fun toggleable(state: ToggleableState) = SemanticsMatcher.expectValue(SemanticsProperties.ToggleableState, state)
 }
