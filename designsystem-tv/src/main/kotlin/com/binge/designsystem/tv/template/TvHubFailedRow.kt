@@ -16,13 +16,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvSectionTitle
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
-
-private const val POSTER_RATIO = 2f / 3f
 
 /**
  * A hub row whose items could not be read: its title, then the [failure]'s message and retry where the cards would be.
@@ -48,7 +47,7 @@ internal fun TvHubFailedRow(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .heightIn(min = cardWidth / POSTER_RATIO)
+                    .heightIn(min = cardWidth / CARD_ASPECT_RATIO)
                     .padding(start = tvContentGutterStart(), end = dimensionResource(TvR.dimen.tv_overscan_horizontal)),
             contentAlignment = Alignment.CenterStart,
         ) {
