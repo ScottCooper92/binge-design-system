@@ -7,7 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
-/** Screenshot coverage for the side sheet's thumbnail rows and the confirm dialog's card. */
+/** Screenshot coverage for the side sheet's thumbnail rows, its read-outs and the confirm dialog's card. */
 class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
@@ -28,6 +28,11 @@ class TvOverlaySamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun sideSheetRowLongLabel() = Frame { TvSideSheetRowLongLabelSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun sideSheetReadout() = Frame { TvSideSheetReadoutSample() }
 
     @PreviewTest
     @TvPreviews
