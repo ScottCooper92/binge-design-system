@@ -1,14 +1,9 @@
 package com.binge.designsystem.tv.catalog
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
@@ -38,10 +33,10 @@ import com.binge.designsystem.tv.component.TvInfoCard
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetReadout
 import com.binge.designsystem.tv.component.TvSideSheetRow
+import com.binge.designsystem.tv.component.TvSideSheetRows
 import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.component.TvSwitch
 import com.binge.designsystem.tv.focus.tvFocusContentColor
-import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -54,28 +49,30 @@ fun TvSideSheetRowReservedLineSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Show requests")
-            TvSideSheetRow(
-                label = "Pending",
-                icon = Icons.Filled.Schedule,
-                supportingText = "12 requests",
-                onClick = { selected = "Pending" },
-                selected = selected == "Pending",
-                initiallyFocused = true,
-            )
-            TvSideSheetRow(
-                label = "Approved",
-                icon = Icons.Filled.CheckCircle,
-                supportingText = "48 requests",
-                onClick = { selected = "Approved" },
-                selected = selected == "Approved",
-            )
-            TvSideSheetRow(
-                label = "All",
-                icon = Icons.AutoMirrored.Filled.List,
-                onClick = { selected = "All" },
-                selected = selected == "All",
-                reserveSupportingLine = true,
-            )
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Pending",
+                    icon = Icons.Filled.Schedule,
+                    supportingText = "12 requests",
+                    onClick = { selected = "Pending" },
+                    selected = selected == "Pending",
+                    initiallyFocused = true,
+                )
+                TvSideSheetRow(
+                    label = "Approved",
+                    icon = Icons.Filled.CheckCircle,
+                    supportingText = "48 requests",
+                    onClick = { selected = "Approved" },
+                    selected = selected == "Approved",
+                )
+                TvSideSheetRow(
+                    label = "All",
+                    icon = Icons.AutoMirrored.Filled.List,
+                    onClick = { selected = "All" },
+                    selected = selected == "All",
+                    reserveSupportingLine = true,
+                )
+            }
         }
     }
 }
@@ -90,9 +87,11 @@ fun TvSideSheetStackPageSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Notifications")
-            TvSideSheetRow(label = "New requests", supportingText = "On", onClick = {}, initiallyFocused = true)
-            TvSideSheetRow(label = "Approved requests", supportingText = "On", onClick = {})
-            TvSideSheetRow(label = "Issues", supportingText = "Off", onClick = {})
+            TvSideSheetRows {
+                TvSideSheetRow(label = "New requests", supportingText = "On", onClick = {}, initiallyFocused = true)
+                TvSideSheetRow(label = "Approved requests", supportingText = "On", onClick = {})
+                TvSideSheetRow(label = "Issues", supportingText = "Off", onClick = {})
+            }
         }
     }
 }
@@ -106,15 +105,17 @@ fun TvSideSheetReadoutSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Server")
-            TvSideSheetReadout(label = "Address", supportingText = "http://media.local:5055", icon = Icons.Filled.Dns)
-            TvSideSheetReadout(label = "Version", supportingText = "2.7.3", icon = Icons.Filled.Info)
-            TvSideSheetRow(
-                label = "Scan the library",
-                supportingText = "Last run 2 hours ago",
-                icon = Icons.Filled.Refresh,
-                onClick = {},
-                initiallyFocused = true,
-            )
+            TvSideSheetRows {
+                TvSideSheetReadout(label = "Address", supportingText = "http://media.local:5055", icon = Icons.Filled.Dns)
+                TvSideSheetReadout(label = "Version", supportingText = "2.7.3", icon = Icons.Filled.Info)
+                TvSideSheetRow(
+                    label = "Scan the library",
+                    supportingText = "Last run 2 hours ago",
+                    icon = Icons.Filled.Refresh,
+                    onClick = {},
+                    initiallyFocused = true,
+                )
+            }
         }
     }
 }
@@ -128,17 +129,19 @@ fun TvSideSheetRowLongLabelSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Add to a list")
-            TvSideSheetRow(
-                label = longLabel,
-                onClick = { selected = longLabel },
-                selected = selected == longLabel,
-                initiallyFocused = true,
-            )
-            TvSideSheetRow(
-                label = shortLabel,
-                onClick = { selected = shortLabel },
-                selected = selected == shortLabel,
-            )
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = longLabel,
+                    onClick = { selected = longLabel },
+                    selected = selected == longLabel,
+                    initiallyFocused = true,
+                )
+                TvSideSheetRow(
+                    label = shortLabel,
+                    onClick = { selected = shortLabel },
+                    selected = selected == shortLabel,
+                )
+            }
         }
     }
 }
@@ -149,25 +152,27 @@ fun TvSideSheetRowThumbnailSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Add to a list")
-            TvSideSheetRow(
-                label = "Dune: Part Two",
-                supportingText = "2024 · Film",
-                onClick = {},
-                leading = { PosterThumbnail() },
-                initiallyFocused = true,
-            )
-            TvSideSheetRow(
-                label = "Severance",
-                supportingText = "2022 · Series",
-                onClick = {},
-                leading = { PosterThumbnail() },
-            )
-            TvSideSheetRow(
-                label = "Remove from this list",
-                supportingText = "It stays in your other lists, and keeps its place in each of them.",
-                onClick = {},
-                destructive = true,
-            )
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Dune: Part Two",
+                    supportingText = "2024 · Film",
+                    onClick = {},
+                    leading = { PosterThumbnail() },
+                    initiallyFocused = true,
+                )
+                TvSideSheetRow(
+                    label = "Severance",
+                    supportingText = "2022 · Series",
+                    onClick = {},
+                    leading = { PosterThumbnail() },
+                )
+                TvSideSheetRow(
+                    label = "Remove from this list",
+                    supportingText = "It stays in your other lists, and keeps its place in each of them.",
+                    onClick = {},
+                    destructive = true,
+                )
+            }
         }
     }
 }
@@ -232,45 +237,41 @@ fun TvSideSheetRowTrailingSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Account")
-            TvSideSheetRow(
-                label = "Notifications",
-                supportingText = "Email and push",
-                icon = Icons.Filled.Notifications,
-                onClick = {},
-            ) { isFocused ->
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = tvFocusContentColor(isFocused = isFocused, resting = MaterialTheme.colorScheme.onSurfaceVariant),
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Notifications",
+                    supportingText = "Email and push",
+                    icon = Icons.Filled.Notifications,
+                    onClick = {},
+                ) { isFocused ->
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = tvFocusContentColor(isFocused = isFocused, resting = MaterialTheme.colorScheme.onSurfaceVariant),
+                    )
+                }
+                TvSideSheetRow(
+                    label = "Sign out",
+                    icon = Icons.AutoMirrored.Filled.Logout,
+                    onClick = {},
+                    destructive = true,
+                    initiallyFocused = true,
                 )
             }
-            TvSideSheetRow(
-                label = "Sign out",
-                icon = Icons.AutoMirrored.Filled.Logout,
-                onClick = {},
-                destructive = true,
-                initiallyFocused = true,
-            )
         }
     }
 }
 
 /**
- * A sheet whose rows run to the screen's bottom edge: the panel keeps no bottom margin, and the scrolling rows carry the
- * bottom overscan inside their scroll, so the last one can still scroll clear of the edge.
+ * A sheet whose rows run to the screen's bottom edge: the panel keeps no bottom margin, and [TvSideSheetRows] carries the
+ * bottom overscan inside its scroll, so the last row can still scroll clear of the edge.
  */
 @Composable
 fun TvSideSheetToBottomEdgeSample() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel(toBottomEdge = true) {
             TvSideSheetTitle("Maintenance")
-            Column(
-                modifier =
-                    Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(bottom = dimensionResource(TvR.dimen.tv_overscan_vertical)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
-            ) {
+            TvSideSheetRows {
                 BottomEdgeJobs.forEachIndexed { index, job ->
                     TvSideSheetRow(label = job, supportingText = "Last run an hour ago", onClick = {}, initiallyFocused = index == 0)
                 }
@@ -305,14 +306,21 @@ private fun SwitchSheet(firstOn: Boolean) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("This app")
-            TvSideSheetRow(label = "Notify me", onClick = { notify = !notify }, initiallyFocused = true, role = Role.Switch) { isFocused ->
-                TvSwitch(checked = notify, isFocused = isFocused)
-            }
-            TvSideSheetRow(label = "Autoplay trailers", onClick = { autoplay = !autoplay }, role = Role.Switch) { isFocused ->
-                TvSwitch(checked = autoplay, isFocused = isFocused)
-            }
-            TvSideSheetRow(label = "Show subtitles", onClick = { subtitles = !subtitles }, role = Role.Switch) { isFocused ->
-                TvSwitch(checked = subtitles, isFocused = isFocused)
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Notify me",
+                    onClick = { notify = !notify },
+                    initiallyFocused = true,
+                    role = Role.Switch,
+                ) { isFocused ->
+                    TvSwitch(checked = notify, isFocused = isFocused)
+                }
+                TvSideSheetRow(label = "Autoplay trailers", onClick = { autoplay = !autoplay }, role = Role.Switch) { isFocused ->
+                    TvSwitch(checked = autoplay, isFocused = isFocused)
+                }
+                TvSideSheetRow(label = "Show subtitles", onClick = { subtitles = !subtitles }, role = Role.Switch) { isFocused ->
+                    TvSwitch(checked = subtitles, isFocused = isFocused)
+                }
             }
         }
     }
