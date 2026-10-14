@@ -81,7 +81,9 @@ agree with the consumers'.
   filename, and a long one breaks out of Windows' path limit under a worktree.
 
 **Where a screen's commit goes.** A filled primary button pinned in the footer (`FormActionPlacement.Footer`) when the action is the
-reason the screen exists and finishes it: connect, send, request, create, report. Editing an existing setting saves as it is made,
+reason the screen exists and finishes it: connect, send, request, create, report. The exception is a tab-root screen under the floating
+navigation pill (`BingeNavPresentation.FloatingBar`): the pill covers a pinned footer, so that commit goes in the top bar
+(`FormActionPlacement.TopBar`) as a text verb such as "Connect" or "Send". Editing an existing setting saves as it is made,
 with no button. A top-bar text "Save" (`FormActionPlacement.TopBar`) is only for a multi-field edit that must apply together, and
 stays disabled until something changes. A single toggle or choice applies at once. One primary per screen; a top-bar action is a
 verb, never an icon alone; a destructive action sits in an overflow menu or behind a confirm.
