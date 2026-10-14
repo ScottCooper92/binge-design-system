@@ -36,6 +36,7 @@ import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.template.TvHubRow
+import com.binge.designsystem.tv.template.TvHubRowFailure
 import com.binge.designsystem.tv.template.TvImmersiveCopyLayout
 import com.binge.designsystem.tv.template.TvImmersiveGrid
 import com.binge.designsystem.tv.template.TvImmersiveGridContent
@@ -215,6 +216,23 @@ private val PendingSampleRow = TvHubRow<SampleTitle>(key = "pending", title = "P
 fun TvImmersiveHubPendingRowSample() {
     SampleHub(
         rows = listOf(PendingSampleRow) + SampleRows.drop(1),
+    )
+}
+
+private val FailedSampleRow =
+    TvHubRow<SampleTitle>(
+        key = "failed",
+        title = "Your requests",
+        items = emptyList(),
+        failure = TvHubRowFailure(message = "These requests could not be loaded.", retryLabel = "Retry", onRetry = {}),
+    )
+
+/** The second row could not be read: it keeps its slot and says so, with its retry focused, in place of its cards. */
+@Composable
+fun TvImmersiveHubFailedRowSample() {
+    SampleHub(
+        initialFocused = FailedSampleRow.key to 0,
+        rows = SampleRows.take(1) + FailedSampleRow + SampleRows.drop(1),
     )
 }
 

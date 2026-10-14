@@ -55,6 +55,18 @@ data class TvHubRow<T>(
      * `pendingRow` until they arrive, so the row does not push in under the user; it takes no focus meanwhile.
      */
     val isLoading: Boolean = false,
+    /**
+     * Why the row's items could not be read. An empty row that failed shows this in place of its cards, with a retry that takes
+     * focus when the row is entered, rather than vanishing as an empty row does. Ignored while the row has items.
+     */
+    val failure: TvHubRowFailure? = null,
+)
+
+/** What a failed [TvHubRow] says, and the retry it offers. The caller owns the copy, as it does the row's title. */
+data class TvHubRowFailure(
+    val message: String,
+    val retryLabel: String,
+    val onRetry: () -> Unit,
 )
 
 /** Enough placeholder cards to run a pending row off the edge, as a loaded row does. */
@@ -77,7 +89,8 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
  * card, [artwork] paints the backdrop and [copy] fills the text band above the rows. An optional [hero] sits
  * above the rows at rest and gives way to the backdrop once a card takes focus; without one the first row's
  * first item is the resting backdrop. An empty row is skipped, unless it is [TvHubRow.isLoading]: then [pendingRow]
- * holds its place, unfocusable, until its items arrive.
+ * holds its place, unfocusable, until its items arrive. An empty row with a [TvHubRow.failure] keeps its slot too, and says
+ * why in place of its cards, with a retry that is the row's one focus stop.
  *
  * A page template, like [TvBoard]: [hosting] decides who places first focus on it — in a rail destination the
  * shell offers focus and the hub only routes it to the hero or first row, as an overlay it claims focus itself
@@ -122,7 +135,7 @@ fun <T : Any> TvImmersiveHub(
 ) {
     val hasHero = hero != null
     // The rows the list lays out; every index below is a slot in this list, so an empty row cannot shift them.
-    val visibleRows = rows.filter { it.items.isNotEmpty() || it.isLoading }
+    val visibleRows = rows.filter { it.items.isNotEmpty() || it.isLoading || it.failure != null }
     val depth = rememberTvVisitDepth(onVisitEnded)
     val heroDepth = if (hasHero) 1 else 0
     var focusedRowKey by rememberSaveable { mutableStateOf(initialFocused?.first) }
@@ -187,7 +200,8 @@ fun <T : Any> TvImmersiveHub(
             }
         }
     // Without a hero, entry from outside (the rail) lands on the first row.
-    val effectiveEntryKey = entryRowKey ?: if (hasHero) null else visibleRows.firstOrNull { it.items.isNotEmpty() }?.key
+    val effectiveEntryKey =
+        entryRowKey ?: if (hasHero) null else visibleRows.firstOrNull { it.items.isNotEmpty() || it.failure != null }?.key
 
     Box(modifier = modifier.fillMaxSize().onFocusChanged(reportBodyFocus)) {
         TvImmersiveBackdrop(item = backdropItem, artwork = artwork, copy = copy, layout = copyLayout)
@@ -228,6 +242,24 @@ fun <T : Any> TvImmersiveHub(
                 itemsIndexed(items = visibleRows, key = { _, row -> row.key }) { index, row ->
                     // So the skeleton's promise to lay its rows out here is assertable; see TvLayoutAnchors.
                     val rowAnchor = Modifier.tvLayoutAnchor(TvLayoutAnchors.hubRow(index))
+                    val failure = row.failure
+                    if (row.items.isEmpty() && failure != null) {
+                        TvHubFailedRow(
+                            title = row.title,
+                            failure = failure,
+                            cardWidth = cardWidth,
+                            modifier = rowAnchor,
+                            entryFocusRequester = hubEntry.takeIf { row.key == effectiveEntryKey },
+                            initiallyFocused = initialFocused?.first == row.key,
+                            onFocused = {
+                                focusedRowKey = row.key
+                                entryRowKey = row.key
+                                onRowVisible(row.key)
+                                depth.reach(rows.indexOfFirst { it.key == row.key } + heroDepth)
+                            },
+                        )
+                        return@itemsIndexed
+                    }
                     if (row.items.isEmpty()) {
                         pendingRow(rowAnchor)
                         return@itemsIndexed
