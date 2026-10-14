@@ -22,8 +22,9 @@ private const val FOCUSED_PLATE_ALPHA = 0.2f
  * A row's leading icon on its tinted plate, the TV twin of the settings-row icon box: the glyph in [tint], on a
  * low-alpha wash of the same colour. [tint] defaults to the accent.
  *
- * Focus is a parameter, as for the rows that host it. On the focus fill the plate becomes a wash of `onPrimary` and
- * the glyph takes `onPrimary`, so the icon inverts with the row instead of fighting its container.
+ * Focus is a parameter, as for the rows that host it. On the focus fill the plate becomes a wash of [focusedTint] and
+ * the glyph takes it, so the icon inverts with the row instead of fighting its container. It defaults to `onPrimary`, the
+ * ink on the accent fill; a row that fills with another colour, such as a destructive row's `error`, passes that fill's ink.
  */
 @Composable
 fun TvRowIcon(
@@ -31,8 +32,9 @@ fun TvRowIcon(
     modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.primary,
     isFocused: Boolean = false,
+    focusedTint: Color = MaterialTheme.colorScheme.onPrimary,
 ) {
-    val glyph = if (isFocused) MaterialTheme.colorScheme.onPrimary else tint
+    val glyph = if (isFocused) focusedTint else tint
     val plate = glyph.copy(alpha = if (isFocused) FOCUSED_PLATE_ALPHA else PLATE_ALPHA)
     Box(
         modifier =

@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DISABLED_ALPHA
@@ -122,8 +121,7 @@ fun TvSideSheetPanel(
                     start = dimensionResource(DesR.dimen.padding_l),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical),
                     end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                    bottom = if (toBottomEdge) 0.dp else dimensionResource(TvR.dimen.tv_overscan_vertical),
-                ),
+                ).then(if (toBottomEdge) Modifier else Modifier.padding(bottom = dimensionResource(TvR.dimen.tv_overscan_vertical))),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
         content = content,
     )
@@ -224,6 +222,7 @@ fun TvSideSheetRow(
                 destructive -> MaterialTheme.colorScheme.error
                 else -> MaterialTheme.colorScheme.primary
             },
+        focusedIconTint = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
         isFocused = focused,
         selected = selected,
         supportingText = supportingText,
@@ -277,6 +276,7 @@ private fun SideSheetRowLayout(
     leading: (@Composable () -> Unit)?,
     reserveSupportingLine: Boolean,
     trailing: (@Composable () -> Unit)? = null,
+    focusedIconTint: Color = MaterialTheme.colorScheme.onPrimary,
 ) {
     Row(
         modifier =
@@ -294,6 +294,7 @@ private fun SideSheetRowLayout(
                     icon = icon,
                     tint = iconTint,
                     isFocused = isFocused,
+                    focusedTint = focusedIconTint,
                 )
         }
         if (supportingText == null && reserveSupportingLine) {
