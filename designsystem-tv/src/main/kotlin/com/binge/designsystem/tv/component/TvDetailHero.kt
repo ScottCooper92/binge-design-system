@@ -96,7 +96,8 @@ fun TvDetailHero(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(dimensionResource(TvR.dimen.tv_detail_page_hero_height)),
+                // The band grows by a host's top bar, as its content top moves down by it, so the poster row keeps its height.
+                .height(dimensionResource(TvR.dimen.tv_detail_page_hero_height) + LocalTvTopInset.current),
     ) {
         TvHeroArtworkPanel(
             veilColor = MaterialTheme.colorScheme.background,

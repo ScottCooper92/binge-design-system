@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.ShadowMeshSpecification
@@ -15,6 +16,7 @@ import com.binge.designsystem.tv.component.TvDetailHero
 import com.binge.designsystem.tv.component.TvDetailHeroItem
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -29,6 +31,9 @@ private const val SECTION = "seasons"
 private val CardWidth = 140.dp
 private const val CARD_RATIO = 4f / 3f
 private val HeroAnchor = TvLayoutAnchors.entry(TvLayoutAnchors.HERO_KEY)
+
+/** A real top bar's height: the top overscan, an icon button, and the bar's bottom gap. */
+private val TopBar = 95.dp
 
 /**
  * [TvDetailPageSkeleton] reserves the hero band and puts the first row where [TvDetailPage] does (#369). The row is held
@@ -54,6 +59,17 @@ class TvDetailPageSkeletonGeometryTest {
     fun `the skeleton's hero band is the loaded band's size, in its place`() =
         composeTestRule.assertSkeletonReservesGeometry(listOf(HeroAnchor), checkStartEdge = true, checkSize = true) { resolved ->
             BingeTvTheme { if (resolved) Page() else TvDetailPageSkeleton(firstSectionKey = SECTION) }
+        }
+
+    /** Under a host's top bar the loaded hero grows by the bar, so the skeleton's band must grow with it. */
+    @Test
+    fun `under a top bar the skeleton's hero band is still the loaded band's size, in its place`() =
+        composeTestRule.assertSkeletonReservesGeometry(listOf(HeroAnchor), checkStartEdge = true, checkSize = true) { resolved ->
+            BingeTvTheme {
+                CompositionLocalProvider(LocalTvTopInset provides TopBar) {
+                    if (resolved) Page() else TvDetailPageSkeleton(firstSectionKey = SECTION)
+                }
+            }
         }
 
     @Test
