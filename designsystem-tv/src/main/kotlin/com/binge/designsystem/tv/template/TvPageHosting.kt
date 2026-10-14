@@ -14,6 +14,7 @@ import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
 import com.binge.designsystem.tv.focus.tvArrivalObserver
 import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.R as TvR
 
@@ -48,7 +49,7 @@ fun tvPagePadding(hosting: TvPageHosting): PaddingValues {
     val vertical = dimensionResource(TvR.dimen.tv_overscan_vertical)
     return PaddingValues(
         start = if (hosting == TvPageHosting.RailDestination) tvContentGutterStart() else horizontal,
-        top = vertical,
+        top = vertical + LocalTvTopInset.current,
         end = horizontal,
         bottom = vertical,
     )
@@ -70,6 +71,7 @@ internal fun tvPageArrival(
     return when (hosting) {
         TvPageHosting.RailDestination -> Modifier.tvEntryFocusGroup(entry)
         TvPageHosting.Overlay -> {
+            if (com.binge.designsystem.tv.nav.LocalTvTabHosted.current) return Modifier.tvEntryFocusGroup(entry)
             val arrival = remember(entry, key) { TvArrivalFocus(entry) }
             // The effect is keyed on `enabled` alone, so a new holder needs a fresh effect to be offered.
             key(arrival) { TvArrivalFocusEffect(arrival, enabled) }

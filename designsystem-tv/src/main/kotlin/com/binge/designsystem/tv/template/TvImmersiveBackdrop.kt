@@ -113,12 +113,12 @@ private fun BoxScope.TvImmersiveCopyBand(
         modifier =
             Modifier
                 .align(Alignment.TopStart)
-                .height(dimensionResource(TvR.dimen.tv_immersive_content_top))
+                .height(dimensionResource(TvR.dimen.tv_immersive_content_top) + com.binge.designsystem.tv.nav.LocalTvTopInset.current)
                 .fillMaxWidth(widthFraction)
                 .padding(
                     start = start,
                     end = dimensionResource(DesR.dimen.padding_m),
-                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset,
+                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset + com.binge.designsystem.tv.nav.LocalTvTopInset.current,
                     bottom = dimensionResource(DesR.dimen.padding_l),
                 ).tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),

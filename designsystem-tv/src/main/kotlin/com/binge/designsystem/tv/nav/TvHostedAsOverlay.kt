@@ -1,6 +1,8 @@
 package com.binge.designsystem.tv.nav
 
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.unit.Dp
 
 /**
  * Whether the current TV content is hosted as a **full-screen overlay above the shell** (a detail page, a
@@ -17,3 +19,12 @@ import androidx.compose.runtime.staticCompositionLocalOf
  * it and inherits this local.
  */
 val LocalTvHostedAsOverlay = staticCompositionLocalOf { false }
+
+/**
+ * PROTOTYPE: a page shown as a tab under a persistent bar. It is laid out as an overlay, full-screen with its own overscan, but
+ * arrives like a destination: it never claims focus, so selecting the tab leaves focus on the tab.
+ */
+val LocalTvTabHosted = staticCompositionLocalOf { false }
+
+/** PROTOTYPE: the height of a bar the host lays over the top of its pages, which a page adds to its top overscan. */
+val LocalTvTopInset = compositionLocalOf { Dp(0f) }

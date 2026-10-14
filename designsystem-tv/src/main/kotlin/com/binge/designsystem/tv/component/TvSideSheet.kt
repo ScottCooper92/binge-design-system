@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -63,6 +64,8 @@ import com.binge.designsystem.tv.R as TvR
 fun TvSideSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    /** PROTOTYPE: the content runs to the screen's bottom edge and carries its own bottom inset, inside its scroll. */
+    toBottomEdge: Boolean = false,
     content: @Composable ColumnScope.(entryFocus: FocusRequester) -> Unit,
 ) {
     val entryFocus = remember { FocusRequester() }
@@ -82,7 +85,7 @@ fun TvSideSheet(
                     }
                 },
     ) {
-        TvSideSheetPanel(modifier = Modifier.align(Alignment.CenterEnd)) { content(entryFocus) }
+        TvSideSheetPanel(modifier = Modifier.align(Alignment.CenterEnd), toBottomEdge = toBottomEdge) { content(entryFocus) }
     }
 }
 
@@ -103,7 +106,11 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
  * the overscan margin from them.
  */
 @Composable
-fun TvSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+fun TvSideSheetPanel(
+    modifier: Modifier = Modifier,
+    toBottomEdge: Boolean = false,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier =
             modifier
@@ -115,7 +122,7 @@ fun TvSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnS
                     start = dimensionResource(DesR.dimen.padding_l),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical),
                     end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                    bottom = dimensionResource(TvR.dimen.tv_overscan_vertical),
+                    bottom = if (toBottomEdge) Dp(0f) else dimensionResource(TvR.dimen.tv_overscan_vertical),
                 ),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
         content = content,
@@ -169,6 +176,8 @@ fun TvSideSheetRow(
     supportingText: String? = null,
     leading: (@Composable () -> Unit)? = null,
     reserveSupportingLine: Boolean = false,
+    /** PROTOTYPE: what ends the row, such as a switch; given whether the row is focused. */
+    trailing: (@Composable (focused: Boolean) -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val resting =
@@ -177,9 +186,10 @@ fun TvSideSheetRow(
             destructive -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurface
         }
-    val content = tvFocusContentColor(isFocused = focused, resting = resting)
+    // PROTOTYPE: a destructive row fills red on focus, as a destructive button does, not with the accent.
+    val content = if (focused && destructive) MaterialTheme.colorScheme.onError else tvFocusContentColor(isFocused = focused, resting = resting)
     val supporting =
-        tvFocusContentColor(
+        if (focused && destructive) MaterialTheme.colorScheme.onError else tvFocusContentColor(
             isFocused = focused,
             resting = if (enabled && !destructive) MaterialTheme.colorScheme.onSurfaceVariant else resting,
         )
@@ -197,7 +207,11 @@ fun TvSideSheetRow(
             modifier
                 .fillMaxWidth()
                 .clip(BingeShapes.TvListItem)
-                .tvFocusFill(isFocused = focused, shape = BingeShapes.TvListItem)
+                .tvFocusFill(
+                    isFocused = focused,
+                    shape = BingeShapes.TvListItem,
+                    fillColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                )
                 .then(clickable)
                 .then(if (selected) Modifier.semantics { this.selected = true } else Modifier),
         icon = icon,
@@ -212,6 +226,7 @@ fun TvSideSheetRow(
         supportingText = supportingText,
         leading = leading,
         reserveSupportingLine = reserveSupportingLine,
+        trailing = trailing?.let { { it(focused) } },
     )
 }
 
@@ -258,12 +273,13 @@ private fun SideSheetRowLayout(
     supportingText: String?,
     leading: (@Composable () -> Unit)?,
     reserveSupportingLine: Boolean,
+    trailing: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier =
             modifier.padding(
-                horizontal = dimensionResource(DesR.dimen.padding_l),
-                vertical = dimensionResource(DesR.dimen.padding_m),
+                horizontal = dimensionResource(DesR.dimen.padding_sm),
+                vertical = dimensionResource(DesR.dimen.padding_s),
             ),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
         verticalAlignment = Alignment.CenterVertically,
@@ -314,6 +330,7 @@ private fun SideSheetRowLayout(
                 }
             }
         }
+        trailing?.invoke()
         if (selected) TvSelectedTick(tint = content)
     }
 }

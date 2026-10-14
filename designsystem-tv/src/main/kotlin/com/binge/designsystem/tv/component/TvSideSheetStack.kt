@@ -105,6 +105,7 @@ fun TvSideSheetStack(
     root: String,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    toBottomEdge: Boolean = false,
     content: @Composable ColumnScope.(nav: TvSideSheetNav) -> Unit,
 ) {
     val entries = rememberSaveable(root, saver = StackSaver) { mutableStateListOf(StackEntry(root, null)) }
@@ -117,7 +118,7 @@ fun TvSideSheetStack(
             onDismissRequest()
         }
     }
-    TvSideSheet(onDismissRequest = back, modifier = modifier) {
+    TvSideSheet(onDismissRequest = back, modifier = modifier, toBottomEdge = toBottomEdge) {
         val top = entries.last()
         key(top.page) {
             val rows = remember { RowRequesters() }

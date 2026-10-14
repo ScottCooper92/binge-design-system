@@ -110,7 +110,7 @@ fun TvDetailHero(
                     .padding(
                         start = tvContentGutterStart(),
                         end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                        top = dimensionResource(TvR.dimen.tv_detail_page_hero_content_top),
+                        top = dimensionResource(TvR.dimen.tv_detail_page_hero_content_top) + com.binge.designsystem.tv.nav.LocalTvTopInset.current,
                     ),
         ) {
             Row(

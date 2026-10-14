@@ -175,7 +175,7 @@ fun <T : Any> TvImmersiveGrid(
                                 top =
                                     dimensionResource(
                                         TvR.dimen.tv_immersive_content_top,
-                                    ) - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
+                                    ) + com.binge.designsystem.tv.nav.LocalTvTopInset.current - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
                             )
                         },
                     ).immersiveTopClip(

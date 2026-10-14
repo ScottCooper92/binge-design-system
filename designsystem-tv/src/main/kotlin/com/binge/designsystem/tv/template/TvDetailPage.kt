@@ -76,7 +76,7 @@ fun TvDetailPage(
     val entries = TvDetailPageScope().apply(sections).entries
     if (entries.isEmpty()) return
     val anchorTopPx = with(LocalDensity.current) {
-        dimensionResource(TvR.dimen.tv_detail_page_section_anchor_top).roundToPx()
+        (dimensionResource(TvR.dimen.tv_detail_page_section_anchor_top) + com.binge.designsystem.tv.nav.LocalTvTopInset.current).roundToPx()
     }
     // Saveable so a drill-down push-and-pop (which disposes this composition) restores the browsed
     // section rather than presenting the page back at rest.
