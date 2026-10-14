@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
@@ -30,7 +31,6 @@ import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
-private const val POSTER_RATIO = 2f / 3f
 private const val LANDSCAPE_RATIO = 4f / 3f
 private const val SYNOPSIS_LINES = 3
 
@@ -150,7 +150,7 @@ private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_page_hero_gap)),
         ) {
             TvSkeletonBlock(
-                Modifier.width(dimensionResource(TvR.dimen.tv_detail_page_poster_width)).aspectRatio(POSTER_RATIO),
+                Modifier.width(dimensionResource(TvR.dimen.tv_detail_page_poster_width)).aspectRatio(CARD_ASPECT_RATIO),
                 shape = BingeShapes.MediaCard,
             )
             Column(
@@ -262,7 +262,7 @@ internal fun PosterRowSkeleton(
             userScrollEnabled = false,
         ) {
             items(count = cards) {
-                TvSkeletonBlock(Modifier.width(cardWidth).aspectRatio(POSTER_RATIO), shape = BingeShapes.MediaCard)
+                TvSkeletonBlock(Modifier.width(cardWidth).aspectRatio(CARD_ASPECT_RATIO), shape = BingeShapes.MediaCard)
             }
         }
     }
@@ -290,7 +290,7 @@ internal fun TvImmersiveGridSkeleton(
                     TvSkeletonBlock(
                         Modifier
                             .weight(1f)
-                            .aspectRatio(POSTER_RATIO)
+                            .aspectRatio(CARD_ASPECT_RATIO)
                             .then(if (row == 0 && column == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier),
                         shape = BingeShapes.MediaCard,
                     )

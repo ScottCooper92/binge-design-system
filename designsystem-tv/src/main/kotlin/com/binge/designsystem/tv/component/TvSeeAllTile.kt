@@ -20,13 +20,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
-
-private const val TILE_ASPECT_RATIO = 2f / 3f
 
 /**
  * The tile that closes a row: press it to open the whole set behind the row.
@@ -42,7 +41,7 @@ fun TvSeeAllTile(
     onFocusChanged: (Boolean) -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    aspectRatio: Float = TILE_ASPECT_RATIO,
+    aspectRatio: Float = CARD_ASPECT_RATIO,
 ) {
     Column(
         modifier =

@@ -40,6 +40,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.theme.BingeShapes
@@ -462,7 +463,7 @@ private fun SamplePlate(
     Box(
         modifier =
             modifier
-                .aspectRatio(2f / 3f)
+                .aspectRatio(CARD_ASPECT_RATIO)
                 .tvFocusIndicator(isFocused)
                 .clip(BingeShapes.MediaCard)
                 .background(MaterialTheme.colorScheme.surfaceVariant),

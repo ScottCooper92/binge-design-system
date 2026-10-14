@@ -25,6 +25,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvButton
@@ -163,15 +164,13 @@ private fun SampleCard(
     Box(
         modifier =
             modifier
-                .aspectRatio(POSTER_RATIO)
+                .aspectRatio(CARD_ASPECT_RATIO)
                 .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
                 .clip(BingeShapes.MediaCard)
                 .background(sampleTone(title.id))
                 .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick),
     )
 }
-
-private const val POSTER_RATIO = 2f / 3f
 
 /** A row of posters per filter over a backdrop that follows focus, with no hero: at rest it shows the first title. */
 @Composable
