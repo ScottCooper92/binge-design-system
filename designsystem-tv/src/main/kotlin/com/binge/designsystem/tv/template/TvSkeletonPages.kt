@@ -139,7 +139,7 @@ private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(dimensionResource(TvR.dimen.tv_detail_page_hero_height))
+                .height(dimensionResource(TvR.dimen.tv_detail_page_hero_height) + LocalTvTopInset.current)
                 .padding(
                     start = tvContentGutterStart(),
                     end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
