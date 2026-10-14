@@ -69,7 +69,8 @@ class BingeSheetNav internal constructor(
  * [content] draws the page named by [BingeSheetNav.page]; what a page shows is the caller's to read from its own state,
  * and no page opens another of the same name. [skipPartiallyExpanded], [gesturesEnabled], [dismissOnClickOutside],
  * [dockable] and [edgeToEdge] are [BingeBottomSheet]'s and apply to its form; the side sheet has no drag, so they do not
- * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it.
+ * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it, and [gesturesEnabled] false
+ * locks it like the bottom sheet: system Back and the Back bar do nothing, so a write in flight is not walked away from.
  *
  * The page stack is saved, so a rotation keeps the sheet on the page it was on. A caller whose pages are backed by its own
  * state (a view model that holds the draft a page edits) hears every page left by Back, by the Back bar or the system,
@@ -95,6 +96,7 @@ fun BingeAdaptiveSheet(
             root = root,
             onDismissRequest = onDismissRequest,
             onPageBack = onPageBack,
+            locked = !gesturesEnabled,
             scrimDismisses = dismissOnClickOutside,
             modifier = modifier,
             content = content,
@@ -121,13 +123,20 @@ private fun BingeTaskSideSheet(
     root: String,
     onDismissRequest: () -> Unit,
     onPageBack: (page: String) -> Unit,
+    locked: Boolean,
     scrimDismisses: Boolean,
     modifier: Modifier,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
     val back: () -> Unit = {
-        if (pages.size > 1) onPageBack(pages.removeAt(pages.lastIndex)) else onDismissRequest()
+        if (locked) {
+            Unit
+        } else if (pages.size > 1) {
+            onPageBack(pages.removeAt(pages.lastIndex))
+        } else {
+            onDismissRequest()
+        }
     }
     BingeSideSheetWindow(
         onDismissRequest = back,
@@ -137,6 +146,7 @@ private fun BingeTaskSideSheet(
                 pages = pages,
                 onPush = { page -> pages.add(page) },
                 onBack = back,
+                backEnabled = !locked,
                 modifier = modifier,
                 content = content,
             )
@@ -161,6 +171,7 @@ internal fun BingeTaskSheetPanel(
     onPush: (page: String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    backEnabled: Boolean = true,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     BingeSideSheetPanel(modifier = modifier, width = dimensionResource(R.dimen.task_sheet_width)) {
@@ -173,7 +184,7 @@ internal fun BingeTaskSheetPanel(
                     onPush = onPush,
                     onBack = onBack,
                 )
-            if (pages.size > 1) BingeSheetBackBar(onBack)
+            if (pages.size > 1) BingeSheetBackBar(onBack, enabled = backEnabled)
             key(nav.page) { content(nav) }
         }
     }
@@ -181,9 +192,9 @@ internal fun BingeTaskSheetPanel(
 
 /** The bar above a stacked page: Back at the start, as a sheet that is not the first page of its stack has no other way out but the scrim. */
 @Composable
-private fun BingeSheetBackBar(onBack: () -> Unit) {
+private fun BingeSheetBackBar(onBack: () -> Unit, enabled: Boolean) {
     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.padding_xs))) {
-        IconButton(onClick = onBack) {
+        IconButton(onClick = onBack, enabled = enabled) {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_navigate_back))
         }
     }

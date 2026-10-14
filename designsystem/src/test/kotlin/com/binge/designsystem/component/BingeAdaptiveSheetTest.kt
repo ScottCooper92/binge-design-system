@@ -49,10 +49,15 @@ class BingeAdaptiveSheetExpandedTest {
     private var back: OnBackPressedDispatcherOwner? = null
     private var stacks: Boolean? = null
 
-    private fun show(kind: BingeSheetKind = BingeSheetKind.Task) {
+    private fun show(kind: BingeSheetKind = BingeSheetKind.Task, gesturesEnabled: Boolean = true) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                BingeAdaptiveSheet(kind = kind, onDismissRequest = { dismissals++ }, onPageBack = { leftPages += it }) { nav -> Pages(nav) }
+                BingeAdaptiveSheet(
+                    kind = kind,
+                    onDismissRequest = { dismissals++ },
+                    onPageBack = { leftPages += it },
+                    gesturesEnabled = gesturesEnabled,
+                ) { nav -> Pages(nav) }
             }
         }
         rule.waitForIdle()
@@ -132,6 +137,21 @@ class BingeAdaptiveSheetExpandedTest {
         pressBack()
         assertEquals(listOf("detail"), leftPages)
         assertEquals(1, dismissals)
+    }
+
+    @Test
+    fun `a locked sheet ignores Back and its scrim, so a write in flight is not walked away from`() {
+        show(gesturesEnabled = false)
+        rule.onNodeWithText(OPEN).performClick()
+        rule.waitForIdle()
+
+        pressBack()
+        backBar().onFirst().performClick()
+        rule.waitForIdle()
+
+        rule.onNodeWithText(DETAIL_TEXT).assertExists()
+        assertEquals(emptyList<String>(), leftPages)
+        assertEquals(0, dismissals)
     }
 
     @Test
