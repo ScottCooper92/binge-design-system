@@ -8,13 +8,20 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
@@ -24,7 +31,9 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.testing.ANCHOR_COALESCE_WAIT_MILLIS
 import com.binge.designsystem.tv.testing.LeanbackRule
+import com.binge.designsystem.tv.testing.settle
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -34,6 +43,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 private const val RAIL = "rail"
+private const val HERO = "hero-target"
 private const val RETRY = "Retry"
 private const val MESSAGE = "These could not be loaded."
 private const val ITEMS_PER_ROW = 3
@@ -94,20 +104,61 @@ class TvImmersiveHubFailedRowTest {
         composeTestRule.onNodeWithText(MESSAGE).assertDoesNotExist()
     }
 
-    private fun setHub(rows: List<TvHubRow<Int>>) {
+    @Test
+    fun `in a hub with a hero, focus on a failed row keeps the list there and the hero away`() {
+        setHub(listOf(row("first", 0), row("second", 10), row("third", 20), failed("fourth")), hero = true)
+
+        move(FocusDirection.Right)
+        repeat(4) { move(FocusDirection.Down) }
+        composeTestRule.settle(ANCHOR_COALESCE_WAIT_MILLIS)
+
+        composeTestRule.onNodeWithText(RETRY).assertIsFocused()
+        composeTestRule.onNodeWithText(RETRY).assertIsDisplayed()
+        assertEquals(1, artworkCount())
+        composeTestRule.onNodeWithTag(HERO).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `when the retry brings items in, focus is not left on a dead node`() {
+        var rows by mutableStateOf(listOf(failed("first"), row("below", 20)))
+        setHub(rows = { rows })
+
+        move(FocusDirection.Right)
+        composeTestRule.onNodeWithText(RETRY).assertIsFocused()
+        composeTestRule.runOnIdle { rows = listOf(row("first", 0), row("below", 20)) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(RETRY).assertDoesNotExist()
+        move(FocusDirection.Down)
+        composeTestRule.onNode(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true)).assertExists()
+    }
+
+    private fun artworkCount() =
+        composeTestRule
+            .onAllNodes(
+                SemanticsMatcher("is backdrop artwork") { node ->
+                    SemanticsProperties.TestTag in node.config && node.config[SemanticsProperties.TestTag].startsWith("art-")
+                },
+            ).fetchSemanticsNodes()
+            .size
+
+    private fun setHub(rows: List<TvHubRow<Int>>, hero: Boolean = false) = setHub(rows = { rows }, hero = hero)
+
+    private fun setHub(rows: () -> List<TvHubRow<Int>>, hero: Boolean = false) {
         composeTestRule.setContent {
             BingeTvTheme {
                 focusManager = LocalFocusManager.current
                 Row {
                     Box(Modifier.size(48.dp).testTag(RAIL).focusable())
                     TvImmersiveHub(
-                        rows = rows,
+                        rows = rows(),
                         itemId = { it },
                         cardWidth = CARD_WIDTH,
                         onItemClick = {},
-                        artwork = {},
+                        artwork = { item -> Box(Modifier.testTag("art-$item")) },
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
+                        hero = if (hero) ({ Box(Modifier.size(width = 320.dp, height = 96.dp).testTag(HERO).focusable()) }) else null,
                         hosting = TvPageHosting.RailDestination,
                     ) { item, _, onFocusChanged, onClick, cellModifier ->
                         Card(item, onFocusChanged, onClick, cellModifier)

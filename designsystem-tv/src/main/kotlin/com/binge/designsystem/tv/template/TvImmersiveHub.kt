@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -157,10 +158,15 @@ fun <T : Any> TvImmersiveHub(
             ?.let { row -> row.items.firstOrNull { itemId(it) == rowMemory[row.key] } }
     val settledItem = rememberSettledFocus(focusedItem, reduceMotion)
     val settledRowKey = rememberSettledFocus(focusedRowKey, reduceMotion)
+    // A focused failed row has no item either, but focus is in the body there, not resting on the hero.
+    val onFailedRow = visibleRows.any { it.key == settledRowKey && it.items.isEmpty() && it.failure != null }
     // The hero is the resting state; without one the backdrop is never "resting", it just shows the first item.
-    val showHero = hasHero && (heroHasFocus || settledItem == null || (!bodyHasFocus && entryRowKey == null))
+    val showHero = hasHero && (heroHasFocus || (settledItem == null && !onFailedRow) || (!bodyHasFocus && entryRowKey == null))
     val restingItem = if (hasHero) null else visibleRows.firstOrNull { it.items.isNotEmpty() }?.items?.first()
-    val backdropItem = if (showHero) null else (settledItem ?: restingItem)
+    // On a failed row the backdrop stays on the last card focus held, rather than flipping to nothing.
+    var lastFocusedItem by remember { mutableStateOf<T?>(null) }
+    LaunchedEffect(focusedItem) { if (focusedItem != null) lastFocusedItem = focusedItem }
+    val backdropItem = if (showHero) null else (settledItem ?: if (onFailedRow) lastFocusedItem else null) ?: restingItem
     val bursting = rememberBursting(focusedRowKey)
 
     val contentTop = dimensionResource(TvR.dimen.tv_immersive_content_top)
