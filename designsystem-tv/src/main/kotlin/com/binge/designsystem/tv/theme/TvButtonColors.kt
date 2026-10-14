@@ -44,13 +44,14 @@ data class TvButtonColors(
  *
  * **Emphasis is shape, not colour.** Following the platform's button hierarchy, a
  * [TvButtonStyle.Primary] rests as a *filled* neutral (the higher-emphasis form) and everything else
- * rests as an *outline* — so a screen still reads as one prominent action among quieter ones, in greys,
+ * (bar the text styles below) rests as an *outline* — so a screen still reads as one prominent action among quieter ones, in greys,
  * and the accent appears only under the user's focus.
  *
- * Two exceptions, both deliberate:
- * - The two red styles keep their hue **at rest**, because danger is a property of the action rather than of where
+ * Three exceptions, all deliberate:
+ * - The red styles keep their hue **at rest**, because danger is a property of the action rather than of where
  *   the remote happens to be. [TvButtonStyle.Destructive] rests as a solid `error` fill and shows focus with a light
  *   `onError` border; [TvButtonStyle.DestructiveOutline] rests as an `error` outline and fills solid `error` when focused.
+ *   [TvButtonStyle.TextDestructive] rests as an `error` label alone.
  * - A text style ([TvButtonStyle.Text], [TvButtonStyle.TextDestructive]) has no edge at all, enabled or not: it sits on
  *   a dialog's panel, which is the shape. Disabled, it is its dimmed label alone.
  * - A **disabled** control never takes the focus fill. It stays focusable so ↓ isn't a dead end, but a

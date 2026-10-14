@@ -75,9 +75,10 @@ Three rules follow, and they are the whole model.
    Destructive actions go last in an action row. A reversible one (block) takes `DestructiveOutline`; an
    irreversible one (remove, delete) takes `Destructive`.
 2. **No control carries the accent at rest, and emphasis is shape rather than colour.** A primary
-   control rests as a filled neutral; everything else rests as an outline, except the two red styles. `Destructive`
+   control rests as a filled neutral; everything else rests as an outline, except the red styles and the text styles. `Destructive`
    rests as a solid error fill and shows focus with a light border, since its fill already is the colour focus would
-   bring; `DestructiveOutline` rests as a red outline. A screen still reads as
+   bring; `DestructiveOutline` rests as a red outline. `Text` and `TextDestructive` are for a dialog's answers,
+   where the panel is the shape: they rest as a bare label with no edge, and `TextDestructive` keeps its red label. A screen still reads as
    one prominent action among quieter ones, in greys, and the accent appears only under the user's
    focus. Giving an accent back to a resting state re-opens the collision the rule exists to
    prevent: while the accent means both "primary" and "focused", an unfocused primary button looks

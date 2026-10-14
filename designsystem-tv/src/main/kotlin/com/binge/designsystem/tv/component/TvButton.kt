@@ -36,6 +36,8 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * The shared 10-foot text button: a pill coloured by [tvButtonColors], focus filling it with the accent. The
+ * text styles ([TvButtonStyle.Text], [TvButtonStyle.TextDestructive]) are the exception: a dialog's answers, a bare
+ * label with no edge, since the panel is the shape. The
  * red styles keep their hue: [TvButtonStyle.DestructiveOutline] fills red on focus, and [TvButtonStyle.Destructive]
  * is already solid red, so focus adds only a light border.
  *
@@ -43,7 +45,7 @@ import com.binge.designsystem.tv.R as TvR
  * fill, its border and its focus fill together, and the roles share one colour model with [TvIconButton].
  *
  * A disabled button stays focusable but inert — a D-pad control that refuses focus reads as broken, not
- * "not ready". It is drawn as an outline, not filled: a `colors.surface` fill composites to nothing
+ * "not ready". Except for the text styles, it is drawn as an outline, not filled: a `colors.surface` fill composites to nothing
  * on a panel, whereas a transparent container with a dimmed border keeps its shape on any background.
  *
  * [loading] draws a spinner over the content and swallows OK, as the phone's buttons do, so an in-flight action cannot
