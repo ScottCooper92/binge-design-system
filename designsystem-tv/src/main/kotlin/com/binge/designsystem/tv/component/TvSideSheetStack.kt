@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
@@ -96,7 +97,9 @@ class TvSideSheetNav internal constructor(
  * [onDismissRequest], where the caller returns focus to what opened the sheet, with `rememberTvOverlayCloser`.
  *
  * Focus follows the pages. A page that opens puts focus on its first row, and going back puts it on the row that opened the
- * page just left, so the user is where they were. Pages are keyed by name, so the stack survives a rotation, and no page
+ * page just left, so the user is where they were. Each page keeps its own saved state while a page is open over it, so a
+ * list scrolled down comes back where it was, the default scroll of [TvSideSheetRows] included; a page gone back from forgets
+ * its own. Pages are keyed by name, so the stack survives a rotation, and no page
  * opens another of the same name; what a page shows is the caller's to read from its own
  * state. [content] draws the page named by [TvSideSheetNav.page], and gives every row [TvSideSheetNav.row].
  */
@@ -109,34 +112,39 @@ fun TvSideSheetStack(
     content: @Composable ColumnScope.(nav: TvSideSheetNav) -> Unit,
 ) {
     val entries = rememberSaveable(root, saver = StackSaver) { mutableStateListOf(StackEntry(root, null)) }
+    val pageStates = rememberSaveableStateHolder()
     var restoreTo by remember { mutableStateOf<String?>(null) }
     val back: () -> Unit = {
         if (entries.size > 1) {
-            restoreTo = entries.last().openedBy
-            entries.removeAt(entries.lastIndex)
+            val left = entries.removeAt(entries.lastIndex)
+            restoreTo = left.openedBy
+            pageStates.removeState(left.page)
         } else {
             onDismissRequest()
         }
     }
     TvSideSheet(onDismissRequest = back, modifier = modifier, toBottomEdge = toBottomEdge) {
+        val column = this
         val top = entries.last()
         key(top.page) {
-            val rows = remember { RowRequesters() }
-            val nav =
-                TvSideSheetNav(
-                    page = top.page,
-                    depth = entries.size,
-                    onPush = { page, openedBy ->
-                        restoreTo = null
-                        entries.add(StackEntry(page, openedBy))
-                    },
-                    onBack = back,
-                    requesters = rows,
-                )
-            content(nav)
-            // After the page's rows, which are what put their requesters in the map.
-            val target = rows.target(restoreTo)
-            if (target != null) LaunchedEffect(Unit) { restoreTvOverlayFocus(target) }
+            pageStates.SaveableStateProvider(top.page) {
+                val rows = remember { RowRequesters() }
+                val nav =
+                    TvSideSheetNav(
+                        page = top.page,
+                        depth = entries.size,
+                        onPush = { page, openedBy ->
+                            restoreTo = null
+                            entries.add(StackEntry(page, openedBy))
+                        },
+                        onBack = back,
+                        requesters = rows,
+                    )
+                column.content(nav)
+                // After the page's rows, which are what put their requesters in the map.
+                val target = rows.target(restoreTo)
+                if (target != null) LaunchedEffect(Unit) { restoreTvOverlayFocus(target) }
+            }
         }
     }
 }
