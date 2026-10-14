@@ -28,6 +28,7 @@ import com.binge.designsystem.tv.focus.tvArrivalObserver
 import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -76,7 +77,7 @@ fun TvDetailPage(
     val entries = TvDetailPageScope().apply(sections).entries
     if (entries.isEmpty()) return
     val anchorTopPx = with(LocalDensity.current) {
-        dimensionResource(TvR.dimen.tv_detail_page_section_anchor_top).roundToPx()
+        (dimensionResource(TvR.dimen.tv_detail_page_section_anchor_top) + LocalTvTopInset.current).roundToPx()
     }
     // Saveable so a drill-down push-and-pop (which disposes this composition) restores the browsed
     // section rather than presenting the page back at rest.
