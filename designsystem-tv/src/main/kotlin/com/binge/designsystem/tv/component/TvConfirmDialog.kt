@@ -105,14 +105,14 @@ fun TvConfirmDialogContent(
             TvButton(
                 label = dismissLabel,
                 onClick = onDismissRequest,
-                style = TvButtonStyle.Secondary,
+                style = TvButtonStyle.Text,
                 initiallyFocused = initiallyDismissFocused,
                 modifier = Modifier.focusRequester(dismissFocus),
             )
             TvButton(
                 label = confirmLabel,
                 onClick = onConfirm,
-                style = if (destructive) TvButtonStyle.Destructive else TvButtonStyle.Primary,
+                style = if (destructive) TvButtonStyle.TextDestructive else TvButtonStyle.Text,
             )
         }
     }
