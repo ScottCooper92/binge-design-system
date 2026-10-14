@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -145,8 +146,8 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
 
 /**
  * One row. Focus is the fill. A [destructive] row rests in the error colour, so it reads as one before it is
- * reached. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false renders a read-out
- * that stays out of the focus order. [initiallyFocused] draws the focused state, for a frame.
+ * reached. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false dims a control that cannot
+ * be used yet and keeps it out of the focus order; a fact the sheet shows is a [TvSideSheetReadout]. [initiallyFocused] draws the focused state, for a frame.
  *
  * The [label] holds to one line with an ellipsis, as every TV row's does. [supportingText] is a second line under it, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
  * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
@@ -188,18 +189,82 @@ fun TvSideSheetRow(
         } else {
             Modifier
         }
-    Row(
+    SideSheetRowLayout(
+        label = label,
+        content = content,
+        supporting = supporting,
         modifier =
             modifier
                 .fillMaxWidth()
                 .clip(BingeShapes.TvListItem)
                 .tvFocusFill(isFocused = focused, shape = BingeShapes.TvListItem)
                 .then(clickable)
-                .then(if (selected) Modifier.semantics { this.selected = true } else Modifier)
-                .padding(
-                    horizontal = dimensionResource(DesR.dimen.padding_l),
-                    vertical = dimensionResource(DesR.dimen.padding_m),
-                ),
+                .then(if (selected) Modifier.semantics { this.selected = true } else Modifier),
+        icon = icon,
+        iconTint =
+            when {
+                !enabled -> resting
+                destructive -> MaterialTheme.colorScheme.error
+                else -> MaterialTheme.colorScheme.primary
+            },
+        isFocused = focused,
+        selected = selected,
+        supportingText = supportingText,
+        leading = leading,
+        reserveSupportingLine = reserveSupportingLine,
+    )
+}
+
+/**
+ * A read-out in a side sheet: a fact the sheet shows, such as a server's address or version, rather than a control. It stays out
+ * of the focus order, as a disabled [TvSideSheetRow] does, but draws at full contrast, since the value is what the row is for.
+ * A screen reader reads the [label] and [supportingText] together, as one item.
+ */
+@Composable
+fun TvSideSheetReadout(
+    label: String,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    supportingText: String? = null,
+    leading: (@Composable () -> Unit)? = null,
+    reserveSupportingLine: Boolean = false,
+) {
+    SideSheetRowLayout(
+        label = label,
+        content = MaterialTheme.colorScheme.onSurface,
+        supporting = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
+        icon = icon,
+        iconTint = MaterialTheme.colorScheme.primary,
+        isFocused = false,
+        selected = false,
+        supportingText = supportingText,
+        leading = leading,
+        reserveSupportingLine = reserveSupportingLine,
+    )
+}
+
+/** The row both [TvSideSheetRow] and [TvSideSheetReadout] draw: what leads, the label and its second line, and the tick. */
+@Composable
+private fun SideSheetRowLayout(
+    label: String,
+    content: Color,
+    supporting: Color,
+    modifier: Modifier,
+    icon: ImageVector?,
+    iconTint: Color,
+    isFocused: Boolean,
+    selected: Boolean,
+    supportingText: String?,
+    leading: (@Composable () -> Unit)?,
+    reserveSupportingLine: Boolean,
+) {
+    Row(
+        modifier =
+            modifier.padding(
+                horizontal = dimensionResource(DesR.dimen.padding_l),
+                vertical = dimensionResource(DesR.dimen.padding_m),
+            ),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -208,13 +273,8 @@ fun TvSideSheetRow(
             icon != null ->
                 TvRowIcon(
                     icon = icon,
-                    tint =
-                        when {
-                            !enabled -> resting
-                            destructive -> MaterialTheme.colorScheme.error
-                            else -> MaterialTheme.colorScheme.primary
-                        },
-                    isFocused = focused,
+                    tint = iconTint,
+                    isFocused = isFocused,
                 )
         }
         if (supportingText == null && reserveSupportingLine) {

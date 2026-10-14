@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +25,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvSideSheetPanel
+import com.binge.designsystem.tv.component.TvSideSheetReadout
 import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.R as TvR
@@ -75,6 +79,28 @@ fun TvSideSheetStackPageSample() {
             TvSideSheetRow(label = "New requests", supportingText = "On", onClick = {}, initiallyFocused = true)
             TvSideSheetRow(label = "Approved requests", supportingText = "On", onClick = {})
             TvSideSheetRow(label = "Issues", supportingText = "Off", onClick = {})
+        }
+    }
+}
+
+/**
+ * A sheet that shows facts as well as offering controls: the read-outs stay out of the focus order at full contrast, and the
+ * one control below them is focused.
+ */
+@Composable
+fun TvSideSheetReadoutSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Server")
+            TvSideSheetReadout(label = "Address", supportingText = "http://media.local:5055", icon = Icons.Filled.Dns)
+            TvSideSheetReadout(label = "Version", supportingText = "2.7.3", icon = Icons.Filled.Info)
+            TvSideSheetRow(
+                label = "Scan the library",
+                supportingText = "Last run 2 hours ago",
+                icon = Icons.Filled.Refresh,
+                onClick = {},
+                initiallyFocused = true,
+            )
         }
     }
 }
