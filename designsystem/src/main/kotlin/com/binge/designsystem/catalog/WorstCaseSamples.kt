@@ -47,6 +47,8 @@ import com.binge.designsystem.component.MediaTypeTag
 import com.binge.designsystem.component.MediaTypeTagType
 import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.template.FormAction
+import com.binge.designsystem.template.FormFooter
 import com.binge.designsystem.theme.BingeSentiment
 
 /*
@@ -245,6 +247,17 @@ fun MediaCardWorstCaseSample() {
             topEndAction = MediaCardAction(icon = Icons.Filled.Close, contentDescription = "Remove", onClick = {}),
             status = MediaCardStatus(label = "Partly available", sentiment = BingeSentiment.Positive),
             modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+        )
+    }
+}
+
+/** A [FormFooter] whose secondary label wraps further than the primary's, so the two buttons are asked for different heights. */
+@Composable
+fun FormFooterWorstCaseSample() {
+    ScreenshotTheme {
+        FormFooter(
+            primary = FormAction(label = "Send", onClick = {}),
+            secondary = FormAction(label = "Report this on GitHub instead", onClick = {}),
         )
     }
 }

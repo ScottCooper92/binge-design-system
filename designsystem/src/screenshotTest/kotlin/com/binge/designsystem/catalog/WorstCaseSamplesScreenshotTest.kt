@@ -50,4 +50,11 @@ class WorstCaseSamplesScreenshotTest {
     fun MediaCard() {
         MediaCardWorstCaseSample()
     }
+
+    @PreviewTest
+    @WorstCaseFontPreviews
+    @Composable
+    fun FormFooter() {
+        FormFooterWorstCaseSample()
+    }
 }
