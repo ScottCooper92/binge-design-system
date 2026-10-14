@@ -112,6 +112,12 @@
     <dimen name="tv_skeleton_heading_height">28dp</dimen>
     <dimen name="tv_skeleton_action_height">48dp</dimen>
     <dimen name="tv_skeleton_card_width">140dp</dimen>
+    <!-- TvSwitch: the track, the outline it keeps unchecked, and the thumb inset within it -->
+    <dimen name="tv_switch_track_width">44dp</dimen>
+    <dimen name="tv_switch_track_height">24dp</dimen>
+    <dimen name="tv_switch_outline_width">2dp</dimen>
+    <dimen name="tv_switch_thumb_inset">4dp</dimen>
+    <dimen name="tv_switch_thumb">16dp</dimen>
     <!-- TvSideSheet: the end-edge panel's width -->
     <dimen name="tv_side_sheet_width">420dp</dimen>
     <!-- TvDecisionPage: the copy's gaps, a point row's padding, and its icon plate -->

@@ -30,7 +30,9 @@ import com.binge.designsystem.tv.component.TvChoiceRow
 import com.binge.designsystem.tv.component.TvChoiceUi
 import com.binge.designsystem.tv.component.TvDetailAction
 import com.binge.designsystem.tv.component.TvDetailActionRow
+import com.binge.designsystem.tv.component.TvInfoCard
 import com.binge.designsystem.tv.component.TvOptionRow
+import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.template.TvHubFailedRow
 import com.binge.designsystem.tv.template.TvHubRowFailure
 import com.binge.designsystem.tv.template.TvListPaneBoard
@@ -180,4 +182,22 @@ fun TvHubFailedRowWorstCaseSample() {
         initiallyFocused = true,
         onFocused = {},
     )
+}
+
+/** An info card with a title and lines long enough to wrap at a large font, in a sheet's width. */
+@Composable
+fun TvInfoCardWorstCaseSample() {
+    TvSideSheetPanel {
+        TvInfoCard(
+            title = "The media server everything you request is sent to · version 2.7.3, two updates behind",
+            lines =
+                listOf(
+                    "https://a-very-long-host-name.example.internal:5055/seerr",
+                    "Connected, though the last two scans finished with warnings",
+                    "Signed in as the household's shared administrator account",
+                ),
+            icon = Icons.Filled.Dns,
+            initiallyFocused = true,
+        )
+    }
 }
