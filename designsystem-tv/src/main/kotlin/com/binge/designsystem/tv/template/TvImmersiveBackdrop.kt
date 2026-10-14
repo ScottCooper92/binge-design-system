@@ -78,6 +78,19 @@ fun <T : Any> TvImmersiveBackdrop(
     copyTopInset: Dp = Dp.Hairline,
     copyStart: Dp = tvContentGutterStart(),
     layout: TvImmersiveCopyLayout = TvImmersiveCopyLayout.Wide,
+) = TvImmersiveBackdrop(item, artwork, copy, modifier, copyTopInset, copyStart, layout, tvImmersiveContentTop())
+
+/** The backdrop with the copy band's height given: the grid grows it by what its heading takes, so the copy keeps its room. */
+@Composable
+internal fun <T : Any> TvImmersiveBackdrop(
+    item: T?,
+    artwork: @Composable (T) -> Unit,
+    copy: @Composable ColumnScope.(T) -> Unit,
+    modifier: Modifier,
+    copyTopInset: Dp,
+    copyStart: Dp,
+    layout: TvImmersiveCopyLayout,
+    bandHeight: Dp,
 ) {
     Crossfade(
         targetState = item,
@@ -94,7 +107,7 @@ fun <T : Any> TvImmersiveBackdrop(
                     TvImmersiveScrim(layout)
                 }
                 ReportTvRailArtwork()
-                TvImmersiveCopyBand(copyTopInset, copyStart, layout.copyWidthFraction) { copy(focused) }
+                TvImmersiveCopyBand(copyTopInset, bandHeight, copyStart, layout.copyWidthFraction) { copy(focused) }
             }
         }
     }
@@ -104,6 +117,7 @@ fun <T : Any> TvImmersiveBackdrop(
 @Composable
 private fun BoxScope.TvImmersiveCopyBand(
     copyTopInset: Dp,
+    bandHeight: Dp,
     start: Dp,
     widthFraction: Float,
     content: @Composable ColumnScope.() -> Unit,
@@ -113,7 +127,7 @@ private fun BoxScope.TvImmersiveCopyBand(
         modifier =
             Modifier
                 .align(Alignment.TopStart)
-                .height(tvImmersiveContentTop())
+                .height(bandHeight)
                 .fillMaxWidth(widthFraction)
                 .padding(
                     start = start,

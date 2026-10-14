@@ -63,3 +63,11 @@ internal fun tvImmersiveCopyClearance(headingHeight: Dp): Dp {
     val overscan = dimensionResource(TvR.dimen.tv_overscan_vertical)
     return overscan + LocalTvTopInset.current + headingHeight - tvImmersiveCopySpacing(Dp.Hairline).top
 }
+
+/**
+ * Where the grid's rows start, and how tall its copy band is. Under a bar the heading takes [headingHeight] of the band, so
+ * the band grows by the copy's clearance and the copy keeps the room the hub's copy has; with none it is [tvImmersiveContentTop].
+ */
+@Composable
+internal fun tvImmersiveGridContentTop(headingHeight: Dp): Dp =
+    tvImmersiveContentTop() + if (underTopBar()) tvImmersiveCopyClearance(headingHeight) else Dp.Hairline

@@ -28,6 +28,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.template.ScreenAction
@@ -58,6 +59,10 @@ private val Bar = 95.dp
 private val ShortBar = 56.dp
 private const val SYNOPSIS = "synopsis"
 private const val META = "meta"
+private const val TITLE = "title"
+private const val STATUS = "status"
+private val TITLE_HEIGHT = 40.dp
+private val STATUS_HEIGHT = 20.dp
 private const val SYNOPSIS_LINES = 2
 private const val LONG_SYNOPSIS =
     "A synopsis long enough to need more than two lines at the band's width, so the copy has to fit its lines into " +
@@ -112,13 +117,25 @@ class TvTopInsetTest {
     }
 
     @Test
-    fun `under a top bar the grid's first cell stays in step with the hub's rows`() {
+    fun `under a top bar the grid's rows start below the band that holds its heading and its copy`() {
         show { Grid() }
 
         inset = Bar
         rule.waitForIdle()
 
-        assertAt(CONTENT_TOP + Bar - BAR_OVERLAP, top(TvLayoutAnchors.GRID_FIRST_CELL))
+        assertAt(CONTENT_TOP + Bar - BAR_OVERLAP + GRID_HEADING_CLEARANCE, top(TvLayoutAnchors.GRID_FIRST_CELL))
+    }
+
+    /** The copy a grid draws under a bar keeps its meta line, title and status line whole: the heading does not eat its room. */
+    @Test
+    fun `under a top bar the grid's copy shows its status line whole`() {
+        inset = Bar
+        show { Grid(copy = { BackdropCopy() }) }
+
+        val status = rule.onNodeWithTag(STATUS, useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val title = rule.onNodeWithTag(TITLE, useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("the status line is ${status.height} tall", status.height >= STATUS_HEIGHT)
+        assertTrue("the title is ${title.height} tall", title.height >= TITLE_HEIGHT)
     }
 
     @Test
@@ -145,7 +162,8 @@ class TvTopInsetTest {
         inset = ShortBar
         show { Grid() }
 
-        assertAt(CONTENT_TOP, top(TvLayoutAnchors.GRID_FIRST_CELL))
+        val first = top(TvLayoutAnchors.GRID_FIRST_CELL)
+        assertTrue("the first cell is at $first, above $CONTENT_TOP", first >= CONTENT_TOP - TOLERANCE.dp)
     }
 
     /** The copy a hub draws, a meta line, a title, a status line and a synopsis, clears the bar with two synopsis lines. */
@@ -245,12 +263,15 @@ private val BAND_BOTTOM_UNDER_BAR = 12.dp
 private val BAR_OVERLAP = 92.dp
 private val BAR_COPY_OVERLAP = 8.dp
 
+/** The grid's copy clearance under the 95dp bar: overscan 27 + bar 95 + heading 52, less the copy's own start at 87. */
+private val GRID_HEADING_CLEARANCE = 87.dp
+
 /** A hub's copy as the companion draws it: the synopsis takes the lines the band leaves it, up to two. */
 @Composable
 private fun ColumnScope.BackdropCopy() {
     Text("Movie · 2024 · PG-13", style = MaterialTheme.typography.titleMedium, maxLines = 1, modifier = Modifier.testTag(META))
-    Text("A title", style = MaterialTheme.typography.displaySmall, maxLines = 1)
-    Text("Pending · Scott · 2 days ago", style = MaterialTheme.typography.titleMedium, maxLines = 1)
+    Text("A title", style = MaterialTheme.typography.displaySmall, maxLines = 1, modifier = Modifier.testTag(TITLE))
+    Text("Pending · Scott · 2 days ago", style = MaterialTheme.typography.titleMedium, maxLines = 1, modifier = Modifier.testTag(STATUS))
     val style = MaterialTheme.typography.bodyMedium
     BoxWithConstraints(modifier = Modifier.weight(1f, fill = false)) {
         val lineHeight = with(LocalDensity.current) { style.lineHeight.toDp() }

@@ -132,14 +132,19 @@ fun <T : Any> TvImmersiveGrid(
     val padding = tvPagePadding(hosting)
     val direction = LocalLayoutDirection.current
 
+    val headingHeight = dimensionResource(TvR.dimen.tv_screen_heading_height)
+    val contentTop = tvImmersiveGridContentTop(headingHeight)
+
     Box(modifier = modifier.fillMaxSize()) {
         TvImmersiveBackdrop(
             item = backdropItem.takeIf { drawBackdrop },
             artwork = artwork,
             copy = copy,
-            copyTopInset = tvImmersiveCopyClearance(dimensionResource(TvR.dimen.tv_screen_heading_height)),
+            modifier = Modifier,
+            copyTopInset = tvImmersiveCopyClearance(headingHeight),
             copyStart = padding.calculateStartPadding(direction),
             layout = copyLayout,
+            bandHeight = contentTop,
         )
         TvGridHeading(
             heading = heading,
@@ -172,7 +177,7 @@ fun <T : Any> TvImmersiveGrid(
                         } else {
                             // The ring's bleed goes into the cells' own padding, so the first row's ring is inside the viewport.
                             Modifier.padding(
-                                top = tvImmersiveContentTop() - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
+                                top = contentTop - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
                             )
                         },
                     ).immersiveTopClip(
