@@ -28,11 +28,9 @@ import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.LocalTvPaneShift
-import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.ReportTvRailArtwork
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
-import com.binge.designsystem.tv.R as TvR
 
 private const val SCRIM_START_ALPHA = 0.86f
 private const val SCRIM_START_HOLD_ALPHA = 0.72f
@@ -80,6 +78,19 @@ fun <T : Any> TvImmersiveBackdrop(
     copyTopInset: Dp = Dp.Hairline,
     copyStart: Dp = tvContentGutterStart(),
     layout: TvImmersiveCopyLayout = TvImmersiveCopyLayout.Wide,
+) = TvImmersiveBackdrop(item, artwork, copy, modifier, copyTopInset, copyStart, layout, tvImmersiveContentTop())
+
+/** The backdrop with the copy band's height given: the grid grows it by what its heading takes, so the copy keeps its room. */
+@Composable
+internal fun <T : Any> TvImmersiveBackdrop(
+    item: T?,
+    artwork: @Composable (T) -> Unit,
+    copy: @Composable ColumnScope.(T) -> Unit,
+    modifier: Modifier,
+    copyTopInset: Dp,
+    copyStart: Dp,
+    layout: TvImmersiveCopyLayout,
+    bandHeight: Dp,
 ) {
     Crossfade(
         targetState = item,
@@ -96,7 +107,7 @@ fun <T : Any> TvImmersiveBackdrop(
                     TvImmersiveScrim(layout)
                 }
                 ReportTvRailArtwork()
-                TvImmersiveCopyBand(copyTopInset, copyStart, layout.copyWidthFraction) { copy(focused) }
+                TvImmersiveCopyBand(copyTopInset, bandHeight, copyStart, layout.copyWidthFraction) { copy(focused) }
             }
         }
     }
@@ -106,23 +117,25 @@ fun <T : Any> TvImmersiveBackdrop(
 @Composable
 private fun BoxScope.TvImmersiveCopyBand(
     copyTopInset: Dp,
+    bandHeight: Dp,
     start: Dp,
     widthFraction: Float,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val spacing = tvImmersiveCopySpacing(copyTopInset)
     Column(
         modifier =
             Modifier
                 .align(Alignment.TopStart)
-                .height(dimensionResource(TvR.dimen.tv_immersive_content_top) + LocalTvTopInset.current)
+                .height(bandHeight)
                 .fillMaxWidth(widthFraction)
                 .padding(
                     start = start,
                     end = dimensionResource(DesR.dimen.padding_m),
-                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset + LocalTvTopInset.current,
-                    bottom = dimensionResource(DesR.dimen.padding_l),
+                    top = spacing.top,
+                    bottom = spacing.bottom,
                 ).tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
+        verticalArrangement = Arrangement.spacedBy(spacing.lineGap, Alignment.Bottom),
         content = content,
     )
 }
