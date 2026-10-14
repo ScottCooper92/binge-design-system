@@ -53,7 +53,10 @@ class BingeSheetNav internal constructor(
     /** Opens [page] over this one, inside the sheet. Does nothing unless [stacksPages]. */
     fun push(page: String) = onPush(page)
 
-    /** Goes back one page, or closes the sheet from the first. A page left this way is reported to `onPageBack` too. */
+    /**
+     * Goes back one page, or closes the sheet from the first. A page left this way is reported to `onPageBack` too. It is
+     * the caller's own call, so a sheet locked by `gesturesEnabled` false still obeys it.
+     */
     fun pop() = onBack()
 }
 
@@ -72,10 +75,12 @@ class BingeSheetNav internal constructor(
  * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it, and [gesturesEnabled] false
  * locks it like the bottom sheet: system Back and the Back bar do nothing, so a write in flight is not walked away from.
  *
- * The page stack is saved, so a rotation keeps the sheet on the page it was on. A caller whose pages are backed by its own
- * state (a view model that holds the draft a page edits) hears every page left by Back, by the Back bar or the system,
- * through [onPageBack], and can drop that page's state there. It is not called for the sheet closing from the root, which
- * is [onDismissRequest], nor for a page the caller pops itself.
+ * The page stack is saved and shared by both forms, so a rotation or a fold keeps the sheet on the page it was on. If the
+ * window narrows with pages open, the bottom sheet shows the top one; it opens no more, a drag or system Back closes it
+ * outright, and [BingeSheetNav.pop] steps back through the rest. A caller whose pages are backed by its own state (a view
+ * model that holds the draft a page edits) hears every page left by Back, by the Back bar, by the system or by
+ * [BingeSheetNav.pop], through [onPageBack], and can drop that page's state there. It is not called for the sheet closing,
+ * which is [onDismissRequest]; the caller drops whatever pages remain then.
  */
 @Composable
 fun BingeAdaptiveSheet(
@@ -91,18 +96,31 @@ fun BingeAdaptiveSheet(
     edgeToEdge: Boolean = false,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
+    val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
+    val popPage: () -> Unit = {
+        if (pages.size > 1) onPageBack(pages.removeAt(pages.lastIndex)) else onDismissRequest()
+    }
     if (kind == BingeSheetKind.Task && isExpandedLayout()) {
         BingeTaskSideSheet(
-            root = root,
+            pages = pages,
             onDismissRequest = onDismissRequest,
-            onPageBack = onPageBack,
+            popPage = popPage,
             locked = !gesturesEnabled,
             scrimDismisses = dismissOnClickOutside,
             modifier = modifier,
             content = content,
         )
     } else {
-        val nav = BingeSheetNav(page = root, depth = 1, stacksPages = false, onPush = {}, onBack = onDismissRequest)
+        // A stack carried over from the side sheet (a fold, a rotation) keeps its top page here. The bottom sheet opens no
+        // more pages; a drag or system Back closes it outright, and only nav.pop() steps back through what is left.
+        val nav =
+            BingeSheetNav(
+                page = pages.last(),
+                depth = pages.size,
+                stacksPages = false,
+                onPush = {},
+                onBack = popPage,
+            )
         BingeBottomSheet(
             onDismissRequest = onDismissRequest,
             modifier = modifier,
@@ -120,32 +138,23 @@ const val ROOT_PAGE = "root"
 
 @Composable
 private fun BingeTaskSideSheet(
-    root: String,
+    pages: MutableList<String>,
     onDismissRequest: () -> Unit,
-    onPageBack: (page: String) -> Unit,
+    popPage: () -> Unit,
     locked: Boolean,
     scrimDismisses: Boolean,
     modifier: Modifier,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
-    val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
-    val back: () -> Unit = {
-        if (locked) {
-            Unit
-        } else if (pages.size > 1) {
-            onPageBack(pages.removeAt(pages.lastIndex))
-        } else {
-            onDismissRequest()
-        }
-    }
     BingeSideSheetWindow(
-        onDismissRequest = back,
+        // The lock stops the user's Back; a caller's own nav.pop() goes through popPage and is not held by it.
+        onDismissRequest = { if (!locked) popPage() },
         onScrimTap = { if (scrimDismisses) onDismissRequest() },
         panel = {
             BingeTaskSheetPanel(
                 pages = pages,
                 onPush = { page -> pages.add(page) },
-                onBack = back,
+                onBack = popPage,
                 backEnabled = !locked,
                 modifier = modifier,
                 content = content,

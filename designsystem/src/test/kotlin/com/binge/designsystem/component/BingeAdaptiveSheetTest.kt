@@ -1,13 +1,21 @@
 package com.binge.designsystem.component
 
+import android.content.res.Configuration
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasClickAction
@@ -48,6 +56,7 @@ class BingeAdaptiveSheetExpandedTest {
     private val leftPages = mutableListOf<String>()
     private var back: OnBackPressedDispatcherOwner? = null
     private var stacks: Boolean? = null
+    private var navHandle: BingeSheetNav? = null
 
     private fun show(kind: BingeSheetKind = BingeSheetKind.Task, gesturesEnabled: Boolean = true) {
         rule.setContent {
@@ -67,6 +76,7 @@ class BingeAdaptiveSheetExpandedTest {
     private fun ColumnScope.Pages(nav: BingeSheetNav) {
         back = LocalOnBackPressedDispatcherOwner.current
         stacks = nav.stacksPages
+        navHandle = nav
         if (nav.page == "detail") {
             Text(DETAIL_TEXT)
         } else {
@@ -147,11 +157,44 @@ class BingeAdaptiveSheetExpandedTest {
 
         pressBack()
         backBar().onFirst().performClick()
+        rule
+            .onNode(hasContentDescription(RuntimeEnvironment.getApplication().getString(R.string.cd_close_sheet)) and hasClickAction())
+            .performTouchInput { click(Offset(width * SCRIM_TOUCH_FRACTION, centerY)) }
         rule.waitForIdle()
 
         rule.onNodeWithText(DETAIL_TEXT).assertExists()
         assertEquals(emptyList<String>(), leftPages)
         assertEquals(0, dismissals)
+    }
+
+    @Test
+    fun `nav pop goes back a page and reports it, then closes from the root`() {
+        show()
+        rule.onNodeWithText(OPEN).performClick()
+        rule.waitForIdle()
+
+        rule.runOnIdle { checkNotNull(navHandle).pop() }
+        rule.waitForIdle()
+        assertEquals(listOf("detail"), leftPages)
+        rule.onNodeWithText(ROOT_TEXT).assertExists()
+        assertEquals(0, dismissals)
+
+        rule.runOnIdle { checkNotNull(navHandle).pop() }
+        assertEquals(1, dismissals)
+        assertEquals(listOf("detail"), leftPages)
+    }
+
+    @Test
+    fun `nav pop is not held by the lock, which stops only the user's Back`() {
+        show(gesturesEnabled = false)
+        rule.onNodeWithText(OPEN).performClick()
+        rule.waitForIdle()
+
+        rule.runOnIdle { checkNotNull(navHandle).pop() }
+        rule.waitForIdle()
+
+        assertEquals(listOf("detail"), leftPages)
+        rule.onNodeWithText(ROOT_TEXT).assertExists()
     }
 
     @Test
@@ -234,3 +277,58 @@ class BingeAdaptiveSheetCompactTest {
             ).assertCountEquals(0)
     }
 }
+
+/** A window that crosses the expanded width mid-session keeps the page the sheet was on. */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = android.app.Application::class, qualifiers = "w900dp-h900dp")
+class BingeAdaptiveSheetResizeTest {
+    @get:Rule
+    val rule = createComposeRule()
+
+    @Test
+    fun `a pushed page survives the window narrowing and widening`() {
+        var wide by mutableStateOf(true)
+        var stacks: Boolean? = null
+        val leftPages = mutableListOf<String>()
+        rule.setContent {
+            val base = LocalContext.current
+            val context =
+                remember(wide, base) {
+                    val config = Configuration(base.resources.configuration)
+                    config.screenWidthDp = if (wide) WIDE_DP else NARROW_DP
+                    base.createConfigurationContext(config)
+                }
+            CompositionLocalProvider(LocalContext provides context, LocalConfiguration provides context.resources.configuration) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}, onPageBack = { leftPages += it }) { nav ->
+                        stacks = nav.stacksPages
+                        if (nav.page == "detail") {
+                            Text(DETAIL_TEXT)
+                        } else {
+                            Text(ROOT_TEXT)
+                            Text(OPEN, modifier = Modifier.clickable { nav.push("detail") })
+                        }
+                    }
+                }
+            }
+        }
+        rule.onNodeWithText(OPEN).performClick()
+        rule.waitForIdle()
+
+        wide = false
+        rule.waitForIdle()
+
+        assertEquals(false, stacks)
+        rule.onNodeWithText(DETAIL_TEXT).assertExists()
+
+        wide = true
+        rule.waitForIdle()
+
+        assertEquals(true, stacks)
+        rule.onNodeWithText(DETAIL_TEXT).assertExists()
+        assertEquals(emptyList<String>(), leftPages)
+    }
+}
+
+private const val WIDE_DP = 900
+private const val NARROW_DP = 412
