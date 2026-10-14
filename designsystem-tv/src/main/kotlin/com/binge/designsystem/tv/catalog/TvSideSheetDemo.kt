@@ -102,8 +102,14 @@ fun TvSideSheetStackDemo() {
                             "Notifications",
                             onClick = { nav.push("notifications", openedBy = "notifications") },
                             modifier = nav.row("notifications"),
+                            opensPage = true,
                         )
-                        TvSideSheetRow("Quality", onClick = { nav.push("quality", openedBy = "quality") }, modifier = nav.row("quality"))
+                        TvSideSheetRow(
+                            "Quality",
+                            onClick = { nav.push("quality", openedBy = "quality") },
+                            modifier = nav.row("quality"),
+                            opensPage = true,
+                        )
                     }
                 }
                 "notifications" -> {
