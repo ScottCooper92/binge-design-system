@@ -53,7 +53,7 @@ class BingeSheetNav internal constructor(
     /** Opens [page] over this one, inside the sheet. Does nothing unless [stacksPages]. */
     fun push(page: String) = onPush(page)
 
-    /** Goes back one page, or closes the sheet from the first. */
+    /** Goes back one page, or closes the sheet from the first. A page left this way is reported to `onPageBack` too. */
     fun pop() = onBack()
 }
 
@@ -71,7 +71,10 @@ class BingeSheetNav internal constructor(
  * [dockable] and [edgeToEdge] are [BingeBottomSheet]'s and apply to its form; the side sheet has no drag, so they do not
  * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it.
  *
- * The page stack is saved, so a rotation keeps the sheet on the page it was on.
+ * The page stack is saved, so a rotation keeps the sheet on the page it was on. A caller whose pages are backed by its own
+ * state (a view model that holds the draft a page edits) hears every page left by Back, by the Back bar or the system,
+ * through [onPageBack], and can drop that page's state there. It is not called for the sheet closing from the root, which
+ * is [onDismissRequest], nor for a page the caller pops itself.
  */
 @Composable
 fun BingeAdaptiveSheet(
@@ -79,6 +82,7 @@ fun BingeAdaptiveSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     root: String = ROOT_PAGE,
+    onPageBack: (page: String) -> Unit = {},
     skipPartiallyExpanded: Boolean = true,
     gesturesEnabled: Boolean = true,
     dismissOnClickOutside: Boolean = gesturesEnabled,
@@ -90,6 +94,7 @@ fun BingeAdaptiveSheet(
         BingeTaskSideSheet(
             root = root,
             onDismissRequest = onDismissRequest,
+            onPageBack = onPageBack,
             scrimDismisses = dismissOnClickOutside,
             modifier = modifier,
             content = content,
@@ -115,13 +120,14 @@ const val ROOT_PAGE = "root"
 private fun BingeTaskSideSheet(
     root: String,
     onDismissRequest: () -> Unit,
+    onPageBack: (page: String) -> Unit,
     scrimDismisses: Boolean,
     modifier: Modifier,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
     val back: () -> Unit = {
-        if (pages.size > 1) pages.removeAt(pages.lastIndex) else onDismissRequest()
+        if (pages.size > 1) onPageBack(pages.removeAt(pages.lastIndex)) else onDismissRequest()
     }
     BingeSideSheetWindow(
         onDismissRequest = back,

@@ -45,13 +45,14 @@ class BingeAdaptiveSheetExpandedTest {
     val rule = createComposeRule()
 
     private var dismissals = 0
+    private val leftPages = mutableListOf<String>()
     private var back: OnBackPressedDispatcherOwner? = null
     private var stacks: Boolean? = null
 
     private fun show(kind: BingeSheetKind = BingeSheetKind.Task) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                BingeAdaptiveSheet(kind = kind, onDismissRequest = { dismissals++ }) { nav -> Pages(nav) }
+                BingeAdaptiveSheet(kind = kind, onDismissRequest = { dismissals++ }, onPageBack = { leftPages += it }) { nav -> Pages(nav) }
             }
         }
         rule.waitForIdle()
@@ -116,6 +117,20 @@ class BingeAdaptiveSheetExpandedTest {
 
         pressBack()
 
+        assertEquals(1, dismissals)
+    }
+
+    @Test
+    fun `a page left by Back is reported, and closing from the root is not a page`() {
+        show()
+        rule.onNodeWithText(OPEN).performClick()
+        rule.waitForIdle()
+
+        pressBack()
+        assertEquals(listOf("detail"), leftPages)
+
+        pressBack()
+        assertEquals(listOf("detail"), leftPages)
         assertEquals(1, dismissals)
     }
 
