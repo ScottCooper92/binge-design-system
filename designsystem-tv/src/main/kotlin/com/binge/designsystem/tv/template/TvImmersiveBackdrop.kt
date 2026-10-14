@@ -28,11 +28,9 @@ import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.LocalTvPaneShift
-import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.ReportTvRailArtwork
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
-import com.binge.designsystem.tv.R as TvR
 
 private const val SCRIM_START_ALPHA = 0.86f
 private const val SCRIM_START_HOLD_ALPHA = 0.72f
@@ -110,19 +108,20 @@ private fun BoxScope.TvImmersiveCopyBand(
     widthFraction: Float,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val spacing = tvImmersiveCopySpacing(copyTopInset)
     Column(
         modifier =
             Modifier
                 .align(Alignment.TopStart)
-                .height(dimensionResource(TvR.dimen.tv_immersive_content_top) + LocalTvTopInset.current)
+                .height(tvImmersiveContentTop())
                 .fillMaxWidth(widthFraction)
                 .padding(
                     start = start,
                     end = dimensionResource(DesR.dimen.padding_m),
-                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset + LocalTvTopInset.current,
-                    bottom = dimensionResource(DesR.dimen.padding_l),
+                    top = spacing.top,
+                    bottom = spacing.bottom,
                 ).tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
+        verticalArrangement = Arrangement.spacedBy(spacing.lineGap, Alignment.Bottom),
         content = content,
     )
 }

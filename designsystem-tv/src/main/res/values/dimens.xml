@@ -76,6 +76,11 @@
     <!-- Immersive hub: how much backdrop shows above the focused row, the gap between rows, and the bottom
          padding that lets the last row scroll up to the anchor. -->
     <dimen name="tv_immersive_content_top">240dp</dimen>
+    <!-- Under a host's top bar, how much of the bar's height the immersive content does not add to its top: the bar
+         already holds the top overscan and its own bottom gap, so adding all of it left the copy far below the bar. -->
+    <dimen name="tv_immersive_top_bar_overlap">92dp</dimen>
+    <!-- Under a top bar, how far the copy may start inside the bar's height, into the faded foot of its scrim. -->
+    <dimen name="tv_immersive_top_bar_copy_overlap">8dp</dimen>
     <dimen name="tv_immersive_rows_bottom">120dp</dimen>
     <dimen name="tv_immersive_row_gap">24dp</dimen>
     <dimen name="tv_immersive_grid_row_gap">16dp</dimen>

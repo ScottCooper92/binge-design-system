@@ -45,7 +45,6 @@ import com.binge.designsystem.tv.focus.tvEndDirectionKey
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.LocalTvContentInset
-import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -173,10 +172,7 @@ fun <T : Any> TvImmersiveGrid(
                         } else {
                             // The ring's bleed goes into the cells' own padding, so the first row's ring is inside the viewport.
                             Modifier.padding(
-                                top =
-                                    dimensionResource(
-                                        TvR.dimen.tv_immersive_content_top,
-                                    ) + LocalTvTopInset.current - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
+                                top = tvImmersiveContentTop() - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
                             )
                         },
                     ).immersiveTopClip(

@@ -56,21 +56,21 @@ fun TvImmersiveHubSkeleton(
     cardWidth: Dp = dimensionResource(TvR.dimen.tv_immersive_card_width),
     description: String? = null,
 ) {
+    // The hub's own copy band geometry, so the loaded page lands where the skeleton stood, with or without a top bar.
+    val spacing = tvImmersiveCopySpacing(copyTopInset = Dp.Hairline)
     Column(
         modifier =
             modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(top = dimensionResource(TvR.dimen.tv_overscan_vertical) + LocalTvTopInset.current)
                 .describedAs(description),
     ) {
         Column(
             modifier = Modifier
-                .height(
-                    dimensionResource(TvR.dimen.tv_immersive_content_top) - dimensionResource(TvR.dimen.tv_overscan_vertical),
-                ).padding(start = tvContentGutterStart(), bottom = dimensionResource(DesR.dimen.padding_l))
+                .height(tvImmersiveContentTop())
+                .padding(start = tvContentGutterStart(), top = spacing.top, bottom = spacing.bottom)
                 .tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),
+            verticalArrangement = Arrangement.spacedBy(spacing.lineGap, Alignment.Bottom),
         ) {
             TvSkeletonBlock(
                 Modifier
