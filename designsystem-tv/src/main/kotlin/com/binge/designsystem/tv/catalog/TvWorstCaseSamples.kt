@@ -31,6 +31,8 @@ import com.binge.designsystem.tv.component.TvChoiceUi
 import com.binge.designsystem.tv.component.TvDetailAction
 import com.binge.designsystem.tv.component.TvDetailActionRow
 import com.binge.designsystem.tv.component.TvOptionRow
+import com.binge.designsystem.tv.template.TvHubFailedRow
+import com.binge.designsystem.tv.template.TvHubRowFailure
 import com.binge.designsystem.tv.template.TvListPaneBoard
 import com.binge.designsystem.tv.template.TvPaneAction
 import com.binge.designsystem.tv.template.TvPaneGroup
@@ -159,5 +161,23 @@ fun TvListPaneBoardWorstCaseSample() {
             ),
         focusedKey = "quality",
         onFocusRow = {},
+    )
+}
+
+/** A hub row that could not be read, with a long title and a message long enough to wrap at a large font. */
+@Composable
+fun TvHubFailedRowWorstCaseSample() {
+    TvHubFailedRow(
+        title = "Everything you have asked for, newest first, across every server",
+        failure =
+            TvHubRowFailure(
+                message = "These requests could not be loaded, because the server did not answer before the connection timed out.",
+                retryLabel = "Try loading these requests again",
+                onRetry = {},
+            ),
+        cardWidth = dimensionResource(TvR.dimen.tv_immersive_card_width),
+        entryFocusRequester = null,
+        initiallyFocused = true,
+        onFocused = {},
     )
 }

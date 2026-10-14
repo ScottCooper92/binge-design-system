@@ -66,6 +66,8 @@ class TvWorstCaseFixturesTest {
 
     @Test fun `a list pane board at 2_0`() = check(FONT_20) { TvListPaneBoardWorstCaseSample() }
 
+    @Test fun `a failed hub row at 1_3`() = check(FONT_13) { TvHubFailedRowWorstCaseSample() }
+
     private companion object {
         const val MIN_CHECKED = 3
         const val FONT_13 = 1.3f
