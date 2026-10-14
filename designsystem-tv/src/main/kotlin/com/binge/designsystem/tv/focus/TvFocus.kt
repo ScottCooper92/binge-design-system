@@ -186,7 +186,14 @@ fun Modifier.tvClickable(
         .onFocusChanged { onFocusChanged(it.isFocused) }
         .then(
             if (enabled) {
-                Modifier.clickable(role = role, onClickLabel = onClickLabel, onClick = onClick)
+                // No indication: every TV component draws its own focus, and the default one is a square over the bounds (#839).
+                Modifier.clickable(
+                    interactionSource = null,
+                    indication = null,
+                    role = role,
+                    onClickLabel = onClickLabel,
+                    onClick = onClick,
+                )
             } else {
                 // Still focusable, so it must say it is unavailable: focusable() alone announces an enabled control.
                 Modifier.focusable().semantics {
