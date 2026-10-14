@@ -98,7 +98,9 @@ fun <T> TvOptionGroup(
  * focus passes over it. The chosen option's label and tick take the accent at rest, and invert with the fill. The
  * row never scales on focus. [trailingContent] sits before the tick, for a short value the option carries. [initiallyFocused]
  * paints the row focused for a frame, which fires no focus events; production passes false. [supportingText] is one line
- * under the label, ellipsized: what choosing the option does.
+ * under the label, ellipsized: what choosing the option does. While [saving], the tick's place holds a spinner instead, in
+ * the tick's box so nothing moves, and the row announces that it is in progress: for a choice that applies at once but takes
+ * a moment to land. The caller decides what a press does meanwhile.
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -111,8 +113,10 @@ fun TvOptionRow(
     trailingContent: (@Composable () -> Unit)? = null,
     icon: ImageVector? = null,
     supportingText: String? = null,
+    saving: Boolean = false,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
+    val savingDescription = stringResource(DesR.string.cd_list_item_loading)
     ListItem(
         // Passed through so the row announces its state. The colours below give selection no container of its
         // own: the container belongs to focus, and the tick is the selection.
@@ -124,8 +128,8 @@ fun TvOptionRow(
         supportingContent = supportingText?.let { { SupportingLine(it) } },
         leadingContent = icon?.let { { TvRowIcon(icon = it, isFocused = focused) } },
         trailingContent =
-            if (selected || trailingContent != null) {
-                { OptionTrailing(selected = selected, trailing = trailingContent) }
+            if (selected || saving || trailingContent != null) {
+                { OptionTrailing(selected = selected, saving = saving, trailing = trailingContent) }
             } else {
                 null
             },
@@ -145,6 +149,7 @@ fun TvOptionRow(
                 .semantics {
                     role = Role.RadioButton
                     this.selected = selected
+                    if (saving) stateDescription = savingDescription
                 },
     )
 }
@@ -252,13 +257,23 @@ private fun SupportingLine(text: String) {
 
 /** The tick reads `ListItem`'s content colour rather than re-deriving it, so it inverts with the focus fill. */
 @Composable
-private fun OptionTrailing(selected: Boolean, trailing: (@Composable () -> Unit)?) {
+private fun OptionTrailing(
+    selected: Boolean,
+    saving: Boolean,
+    trailing: (@Composable () -> Unit)?,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
         trailing?.invoke()
-        if (selected) TvSelectedTick(tint = LocalContentColor.current)
+        when {
+            saving ->
+                Box(modifier = Modifier.size(dimensionResource(TvR.dimen.tv_selected_tick_size)), contentAlignment = Alignment.Center) {
+                    TvRowStatus(badgeCount = null, badgeAlert = false, loading = true)
+                }
+            selected -> TvSelectedTick(tint = LocalContentColor.current)
+        }
     }
 }
 

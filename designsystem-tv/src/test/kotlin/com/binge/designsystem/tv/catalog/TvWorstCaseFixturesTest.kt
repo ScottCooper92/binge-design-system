@@ -50,6 +50,10 @@ class TvWorstCaseFixturesTest {
 
     @Test fun `an option row at 2_0`() = check(FONT_20) { TvOptionRowWorstCaseSample() }
 
+    @Test fun `a saving option row at 1_3`() = check(FONT_13) { TvOptionRowSavingWorstCaseSample() }
+
+    @Test fun `a saving option row at 2_0`() = check(FONT_20) { TvOptionRowSavingWorstCaseSample() }
+
     @Test fun `a checkbox row at 1_3`() = check(FONT_13) { TvCheckboxRowWorstCaseSample() }
 
     @Test fun `a checkbox row at 2_0`() = check(FONT_20) { TvCheckboxRowWorstCaseSample() }
