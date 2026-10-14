@@ -14,13 +14,14 @@ private fun underTopBar(): Boolean = LocalTvTopInset.current > Dp.Hairline
 
 /**
  * Where the immersive rows start, and how tall the copy band above them is: the hub, the band and the grid read this one
- * value so they stay in step. Under a top bar it moves down by the bar's height less [TvR.dimen.tv_immersive_top_bar_overlap];
- * with none it is [TvR.dimen.tv_immersive_content_top], as it always was.
+ * value so they stay in step. Under a top bar it moves down by the bar's height less [TvR.dimen.tv_immersive_top_bar_overlap],
+ * and never up, so a short bar leaves it where it sits with none; with none it is [TvR.dimen.tv_immersive_content_top].
  */
 @Composable
 internal fun tvImmersiveContentTop(): Dp {
     val base = dimensionResource(TvR.dimen.tv_immersive_content_top)
-    return if (underTopBar()) base + LocalTvTopInset.current - dimensionResource(TvR.dimen.tv_immersive_top_bar_overlap) else base
+    val overlap = dimensionResource(TvR.dimen.tv_immersive_top_bar_overlap)
+    return if (underTopBar()) base + max(Dp.Hairline, LocalTvTopInset.current - overlap) else base
 }
 
 /** The copy band's spacing: where its copy may start, the gap between its lines, and what it leaves above the rows. */

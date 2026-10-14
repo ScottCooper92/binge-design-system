@@ -53,6 +53,9 @@ private const val ACTION = "Refresh"
 
 /** A real top bar's height: the top overscan, an icon button, and the bar's bottom gap. */
 private val Bar = 95.dp
+
+/** A bar shorter than the overlap the immersive content does not add. */
+private val ShortBar = 56.dp
 private const val SYNOPSIS = "synopsis"
 private const val META = "meta"
 private const val SYNOPSIS_LINES = 2
@@ -116,6 +119,23 @@ class TvTopInsetTest {
         rule.waitForIdle()
 
         assertAt(CONTENT_TOP + Bar - BAR_OVERLAP, top(TvLayoutAnchors.GRID_FIRST_CELL))
+    }
+
+    /** A bar shorter than the overlap moves nothing up: the rows sit no higher than they do with no bar. */
+    @Test
+    fun `under a short top bar the hub's rows sit no higher than with no bar`() {
+        inset = ShortBar
+        show { Hub() }
+
+        assertAt(CONTENT_TOP + ROW_GAP, top(TvLayoutAnchors.hubRow(0)))
+    }
+
+    @Test
+    fun `under a short top bar the grid's first cell sits no higher than with no bar`() {
+        inset = ShortBar
+        show { Grid() }
+
+        assertAt(CONTENT_TOP, top(TvLayoutAnchors.GRID_FIRST_CELL))
     }
 
     /** The copy a hub draws, a meta line, a title, a status line and a synopsis, clears the bar with two synopsis lines. */
