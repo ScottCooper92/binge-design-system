@@ -42,6 +42,11 @@ class TvWorstCaseSamplesScreenshotTest {
     @Composable
     fun hubFailedRow() = Frame { TvHubFailedRowWorstCaseSample() }
 
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun infoCard() = Frame { TvInfoCardWorstCaseSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {

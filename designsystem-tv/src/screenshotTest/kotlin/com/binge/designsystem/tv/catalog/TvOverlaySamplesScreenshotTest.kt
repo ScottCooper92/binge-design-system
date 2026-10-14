@@ -47,6 +47,21 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun switchOn() = Frame { TvSwitchSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun switchOff() = Frame { TvSwitchOffSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun infoCard() = Frame { TvInfoCardSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun confirmDialog() = Frame { TvConfirmDialogSample() }
 
     @PreviewTest

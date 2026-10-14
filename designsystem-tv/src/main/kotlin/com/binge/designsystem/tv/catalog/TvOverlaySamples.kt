@@ -33,10 +33,12 @@ import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
+import com.binge.designsystem.tv.component.TvInfoCard
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetReadout
 import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.component.TvSideSheetTitle
+import com.binge.designsystem.tv.component.TvSwitch
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -278,3 +280,56 @@ fun TvSideSheetToBottomEdgeSample() {
 
 private val BottomEdgeJobs =
     listOf("Scan the library", "Refresh the cache", "Sync watchlists", "Check availability", "Clean up downloads", "Rebuild posters")
+
+/**
+ * A sheet's switches, as rows that toggle: the focused one is on and inverts against the row's fill, and the resting rows
+ * show on and off.
+ */
+@Composable
+fun TvSwitchSample() {
+    SwitchSheet(firstOn = true)
+}
+
+/** The same sheet with its focused switch off: an outline and a thumb at the start, on the row's fill. */
+@Composable
+fun TvSwitchOffSample() {
+    SwitchSheet(firstOn = false)
+}
+
+@Composable
+private fun SwitchSheet(firstOn: Boolean) {
+    var notify by remember { mutableStateOf(firstOn) }
+    var autoplay by remember { mutableStateOf(true) }
+    var subtitles by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("This app")
+            TvSideSheetRow(label = "Notify me", onClick = { notify = !notify }, initiallyFocused = true) { isFocused ->
+                TvSwitch(checked = notify, isFocused = isFocused)
+            }
+            TvSideSheetRow(label = "Autoplay trailers", onClick = { autoplay = !autoplay }) { isFocused ->
+                TvSwitch(checked = autoplay, isFocused = isFocused)
+            }
+            TvSideSheetRow(label = "Show subtitles", onClick = { subtitles = !subtitles }) { isFocused ->
+                TvSwitch(checked = subtitles, isFocused = isFocused)
+            }
+        }
+    }
+}
+
+/** Facts as tiles in a sheet: the focused one shows the ring a focused button does, with no fill; the one below rests. */
+@Composable
+fun TvInfoCardSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Settings")
+            TvInfoCard(
+                title = "Media server · 2.7.3",
+                lines = listOf("http://media.local:5055", "Connected", "Signed in as Ana"),
+                icon = Icons.Filled.Dns,
+                initiallyFocused = true,
+            )
+            TvInfoCard(title = "Services", lines = listOf("Main · Default", "Main · 4K"), icon = Icons.Filled.Info)
+        }
+    }
+}
