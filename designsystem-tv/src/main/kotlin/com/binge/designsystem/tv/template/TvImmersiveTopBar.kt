@@ -52,3 +52,14 @@ internal fun tvImmersiveCopySpacing(copyTopInset: Dp): TvImmersiveCopySpacing {
         )
     }
 }
+
+/**
+ * What a copy band must reserve at its top to start below a heading of [headingHeight] that a page pads by [tvPagePadding]:
+ * the heading's foot, less where the band's own spacing already starts the copy. The heading rides the whole top inset while
+ * the copy starts just inside the bar's foot, so under a bar this is more than [headingHeight]; with none it is exactly that.
+ */
+@Composable
+internal fun tvImmersiveCopyClearance(headingHeight: Dp): Dp {
+    val overscan = dimensionResource(TvR.dimen.tv_overscan_vertical)
+    return overscan + LocalTvTopInset.current + headingHeight - tvImmersiveCopySpacing(Dp.Hairline).top
+}

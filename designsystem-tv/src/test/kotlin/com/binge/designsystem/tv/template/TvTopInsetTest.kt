@@ -121,6 +121,16 @@ class TvTopInsetTest {
         assertAt(CONTENT_TOP + Bar - BAR_OVERLAP, top(TvLayoutAnchors.GRID_FIRST_CELL))
     }
 
+    @Test
+    fun `under a top bar the grid's copy starts at or below the grid's heading`() {
+        inset = Bar
+        show { Grid(copy = { BackdropCopy() }) }
+
+        val headingBottom = rule.onNodeWithText("Trending", useUnmergedTree = true).getUnclippedBoundsInRoot().bottom
+        val copyTop = rule.onNodeWithTag(META, useUnmergedTree = true).getUnclippedBoundsInRoot().top
+        assertTrue("the copy starts at $copyTop, over the heading's foot at $headingBottom", copyTop >= headingBottom - TOLERANCE.dp)
+    }
+
     /** A bar shorter than the overlap moves nothing up: the rows sit no higher than they do with no bar. */
     @Test
     fun `under a short top bar the hub's rows sit no higher than with no bar`() {
@@ -267,14 +277,14 @@ private fun Hub(copy: @Composable ColumnScope.(Int) -> Unit = {}) {
 }
 
 @Composable
-private fun Grid() {
+private fun Grid(copy: @Composable ColumnScope.(Int) -> Unit = {}) {
     TvImmersiveGrid(
         heading = "Trending",
         count = 8,
         itemAt = { it },
         itemKey = { it },
         artwork = {},
-        copy = {},
+        copy = copy,
         hosting = TvPageHosting.Overlay,
     ) { _, _, onFocusChanged, cellModifier ->
         Box(cellModifier.aspectRatio(2f / 3f).tvClickable(onFocusChanged = onFocusChanged, onClick = {}))

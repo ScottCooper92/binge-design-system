@@ -137,7 +137,7 @@ fun <T : Any> TvImmersiveGrid(
             item = backdropItem.takeIf { drawBackdrop },
             artwork = artwork,
             copy = copy,
-            copyTopInset = dimensionResource(TvR.dimen.tv_screen_heading_height),
+            copyTopInset = tvImmersiveCopyClearance(dimensionResource(TvR.dimen.tv_screen_heading_height)),
             copyStart = padding.calculateStartPadding(direction),
             layout = copyLayout,
         )
