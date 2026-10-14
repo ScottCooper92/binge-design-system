@@ -39,6 +39,7 @@ import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -169,7 +170,7 @@ fun <T : Any> TvImmersiveHub(
     val backdropItem = if (showHero) null else (settledItem ?: if (onFailedRow) lastFocusedItem else null) ?: restingItem
     val bursting = rememberBursting(focusedRowKey)
 
-    val contentTop = dimensionResource(TvR.dimen.tv_immersive_content_top)
+    val contentTop = dimensionResource(TvR.dimen.tv_immersive_content_top) + LocalTvTopInset.current
     val contentTopPx = with(LocalDensity.current) { contentTop.roundToPx() }
     // Seeded, not only driven: a static frame runs no coroutines, so a baseline relying on the anchor effect below
     // would capture an unscrolled list.

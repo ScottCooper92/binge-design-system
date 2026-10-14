@@ -28,6 +28,7 @@ import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.LocalTvPaneShift
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.ReportTvRailArtwork
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
@@ -113,12 +114,12 @@ private fun BoxScope.TvImmersiveCopyBand(
         modifier =
             Modifier
                 .align(Alignment.TopStart)
-                .height(dimensionResource(TvR.dimen.tv_immersive_content_top))
+                .height(dimensionResource(TvR.dimen.tv_immersive_content_top) + LocalTvTopInset.current)
                 .fillMaxWidth(widthFraction)
                 .padding(
                     start = start,
                     end = dimensionResource(DesR.dimen.padding_m),
-                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset,
+                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + copyTopInset + LocalTvTopInset.current,
                     bottom = dimensionResource(DesR.dimen.padding_l),
                 ).tvLayoutAnchor(TvLayoutAnchors.HUB_COPY),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s), Alignment.Bottom),

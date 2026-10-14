@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
 import com.binge.designsystem.testing.createKeyboardComposeRule
@@ -13,6 +14,7 @@ import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.nav.LocalTvContentInset
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -24,6 +26,7 @@ import org.robolectric.annotation.GraphicsMode
 private const val CARDS_PER_ROW = 8
 private val CardWidth = 120.dp
 private val RailWidth = 72.dp
+private val TopBar = 56.dp
 
 private val Rows =
     listOf(
@@ -56,12 +59,17 @@ class TvImmersiveHubSkeletonGeometryTest {
     @Test
     fun `the skeleton reserves the hub's copy band and rows before the shell`() = assertReserved(TvPageHosting.PreShell)
 
-    private fun assertReserved(hosting: TvPageHosting) =
+    /** Under a host's top bar the skeleton moves down with the hub, so the loaded page still lands where it stood. */
+    @Test
+    fun `the skeleton reserves the hub's copy band and rows under a top bar`() = assertReserved(TvPageHosting.Overlay, topInset = TopBar)
+
+    private fun assertReserved(hosting: TvPageHosting, topInset: Dp = 0.dp) =
         composeTestRule.assertSkeletonReservesGeometry(Anchors, checkStartEdge = true) { resolved ->
             BingeTvTheme {
                 CompositionLocalProvider(
                     LocalTvContentInset provides if (hosting == TvPageHosting.RailDestination) RailWidth else 0.dp,
                     LocalTvHostedAsOverlay provides (hosting == TvPageHosting.Overlay),
+                    LocalTvTopInset provides topInset,
                 ) {
                     if (resolved) Hub(hosting) else Skeleton(hosting)
                 }

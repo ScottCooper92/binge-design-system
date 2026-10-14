@@ -40,6 +40,7 @@ import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
 import com.binge.designsystem.tv.focus.tvEndDirectionKey
 import com.binge.designsystem.tv.focus.tvFocusTarget
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import kotlinx.coroutines.launch
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -137,7 +138,10 @@ fun TvOverviewScreen(
                 .verticalScroll(scrollState)
                 // Vertical overscan inset as content padding (inside the scroll), so the title clears the
                 // panel's top edge at rest yet a long synopsis still scrolls the full height to the edge.
-                .padding(vertical = dimensionResource(TvR.dimen.tv_overscan_vertical)),
+                .padding(
+                    top = dimensionResource(TvR.dimen.tv_overscan_vertical) + LocalTvTopInset.current,
+                    bottom = dimensionResource(TvR.dimen.tv_overscan_vertical),
+                ),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
         ) {
             TvOverviewArtwork(posterUrl = posterUrl, backdropUrl = backdropUrl)

@@ -27,6 +27,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -60,7 +61,7 @@ fun TvImmersiveHubSkeleton(
             modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(top = dimensionResource(TvR.dimen.tv_overscan_vertical))
+                .padding(top = dimensionResource(TvR.dimen.tv_overscan_vertical) + LocalTvTopInset.current)
                 .describedAs(description),
     ) {
         Column(
@@ -142,7 +143,7 @@ private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
                 .padding(
                     start = tvContentGutterStart(),
                     end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                    top = dimensionResource(TvR.dimen.tv_detail_page_hero_content_top),
+                    top = dimensionResource(TvR.dimen.tv_detail_page_hero_content_top) + LocalTvTopInset.current,
                 ),
     ) {
         Row(

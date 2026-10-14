@@ -45,6 +45,7 @@ import com.binge.designsystem.tv.focus.tvEndDirectionKey
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.LocalTvContentInset
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -175,7 +176,7 @@ fun <T : Any> TvImmersiveGrid(
                                 top =
                                     dimensionResource(
                                         TvR.dimen.tv_immersive_content_top,
-                                    ) - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
+                                    ) + LocalTvTopInset.current - dimensionResource(TvR.dimen.tv_focus_ring_bleed),
                             )
                         },
                     ).immersiveTopClip(
