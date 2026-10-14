@@ -44,9 +44,12 @@ sealed interface FormSaveStatus {
     ) : FormSaveStatus
 }
 
-/** The inline "Saving…" or "Saved", in the bar's trailing slot. A failure has no inline text: its snackbar says so. */
+/**
+ * The inline "Saving…" or "Saved", for a bar's trailing slot. A failure has no inline text: [FormSaveFailureSnackbar]
+ * says so. [FormScreen] draws this itself; a page built on another scaffold places it in the bar's actions.
+ */
 @Composable
-internal fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
+fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
     val label =
         when (status) {
             FormSaveStatus.Saving -> stringResource(R.string.form_save_saving)
@@ -73,7 +76,7 @@ internal fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
  * calls the latest `onRetry`, not the one the effect started with.
  */
 @Composable
-internal fun FormSaveFailureSnackbar(status: FormSaveStatus, snackbarHostState: SnackbarHostState) {
+fun FormSaveFailureSnackbar(status: FormSaveStatus, snackbarHostState: SnackbarHostState) {
     val failed = status as? FormSaveStatus.Failed
     val onRetry = rememberUpdatedState(failed?.onRetry)
     val message = stringResource(R.string.form_save_failed)
