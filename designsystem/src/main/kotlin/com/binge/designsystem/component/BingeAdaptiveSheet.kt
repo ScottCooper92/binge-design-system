@@ -162,11 +162,12 @@ private val PageStackSaver =
 
 /**
  * A task sheet's resting panel: the page at the top of [pages] under a Back bar once there is more than one, inside the
- * side sheet's chrome and clear of the system bars and the keyboard. Apart from the window around it, so a catalog frame can
- * render it (a modal window does not capture).
+ * side sheet's chrome and clear of the system bars and the keyboard. It is the panel without the modal window around it,
+ * which a screenshot does not capture, so a frame or a test can render a sheet's page as the side sheet draws it. A sheet in
+ * use is [BingeAdaptiveSheet], which owns the stack; this takes it as [pages] and reports [onPush] and [onBack].
  */
 @Composable
-internal fun BingeTaskSheetPanel(
+fun BingeTaskSheetPanel(
     pages: List<String>,
     onPush: (page: String) -> Unit,
     onBack: () -> Unit,
