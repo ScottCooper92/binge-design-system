@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.binge.designsystem.R
@@ -55,6 +56,23 @@ fun BingeModalSideSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
+) {
+    BingeSideSheetWindow(
+        onDismissRequest = onDismissRequest,
+        onScrimTap = onDismissRequest,
+        panel = { BingeSideSheetPanel(modifier = modifier, content = content) },
+    )
+}
+
+/**
+ * The window, scrim and slide behind a side sheet, with the [panel] it slides in. Back press goes to [onDismissRequest];
+ * a tap on the scrim goes to [onScrimTap], which a sheet of pages sends past its own Back to close the whole sheet.
+ */
+@Composable
+internal fun BingeSideSheetWindow(
+    onDismissRequest: () -> Unit,
+    onScrimTap: () -> Unit,
+    panel: @Composable () -> Unit,
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -84,7 +102,7 @@ fun BingeModalSideSheet(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
                                 role = Role.Button,
-                                onClick = onDismissRequest,
+                                onClick = onScrimTap,
                             ).semantics { contentDescription = closeLabel },
                 )
             }
@@ -95,7 +113,7 @@ fun BingeModalSideSheet(
                 enter = slideInHorizontally(tween(SIDE_SHEET_ANIMATION_MS)) { it },
                 exit = slideOutHorizontally(tween(SIDE_SHEET_ANIMATION_MS)) { it },
             ) {
-                BingeSideSheetPanel(modifier = modifier, content = content)
+                panel()
             }
         }
     }
@@ -113,12 +131,16 @@ internal fun rememberSideSheetShown(): MutableState<Boolean> = rememberSaveable 
  * window around it, so a catalog frame can render it (a modal window does not capture).
  */
 @Composable
-internal fun BingeSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+internal fun BingeSideSheetPanel(
+    modifier: Modifier = Modifier,
+    width: Dp = dimensionResource(R.dimen.side_sheet_width),
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier =
             modifier
                 .fillMaxHeight()
-                .width(dimensionResource(R.dimen.side_sheet_width))
+                .width(width)
                 .clip(BingeShapes.HeroStart)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 // Swallow taps on the panel so they don't fall through to the scrim, with no semantics node of its own.
