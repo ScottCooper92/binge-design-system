@@ -49,7 +49,7 @@ sealed interface FormSaveStatus {
  * says so. [FormScreen] draws this itself; a page built on another scaffold places it in the bar's actions.
  */
 @Composable
-fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
+fun RowScope.FormSaveStatusText(status: FormSaveStatus, modifier: Modifier = Modifier) {
     val label =
         when (status) {
             FormSaveStatus.Saving -> stringResource(R.string.form_save_saving)
@@ -62,7 +62,7 @@ fun RowScope.FormSaveStatusText(status: FormSaveStatus) {
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             // Polite, so a screen reader reads each change of status without cutting in on what it is reading.
-            modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_s)).semantics { liveRegion = LiveRegionMode.Polite },
+            modifier = modifier.padding(horizontal = dimensionResource(R.dimen.padding_s)).semantics { liveRegion = LiveRegionMode.Polite },
         )
     }
 }
