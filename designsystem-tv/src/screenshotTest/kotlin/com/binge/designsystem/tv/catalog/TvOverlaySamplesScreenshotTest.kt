@@ -42,6 +42,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetRowOpensPage() = Frame { TvSideSheetRowOpensPageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun sideSheetToBottomEdge() = Frame { TvSideSheetToBottomEdgeSample() }
 
     @PreviewTest

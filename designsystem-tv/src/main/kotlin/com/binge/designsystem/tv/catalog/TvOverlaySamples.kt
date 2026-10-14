@@ -5,11 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
@@ -24,8 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
-import androidx.tv.material3.Icon
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
@@ -229,8 +231,8 @@ fun TvConfirmDialogExtraContentSample() {
 }
 
 /**
- * A row that ends in something of its own, here a chevron, beside a destructive row that is focused: the destructive row
- * fills with the error colour, as a destructive button does, not with the accent.
+ * A row that opens a page, ending in its chevron, beside a destructive row that is focused: the destructive row fills with
+ * the error colour, as a destructive button does, not with the accent.
  */
 @Composable
 fun TvSideSheetRowTrailingSample() {
@@ -243,13 +245,8 @@ fun TvSideSheetRowTrailingSample() {
                     supportingText = "Email and push",
                     icon = Icons.Filled.Notifications,
                     onClick = {},
-                ) { isFocused ->
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        tint = tvFocusContentColor(isFocused = isFocused, resting = MaterialTheme.colorScheme.onSurfaceVariant),
-                    )
-                }
+                    opensPage = true,
+                )
                 TvSideSheetRow(
                     label = "Sign out",
                     icon = Icons.AutoMirrored.Filled.Logout,
@@ -260,6 +257,47 @@ fun TvSideSheetRowTrailingSample() {
             }
         }
     }
+}
+
+/**
+ * Rows that open pages: each ends in a chevron, and one that shows its current value puts the value before the chevron. The
+ * focused row's value and chevron take the fill's colour. OK on Quality steps its value here, where a real sheet opens a page.
+ */
+@Composable
+fun TvSideSheetRowOpensPageSample() {
+    var quality by remember { mutableStateOf(QUALITIES.first()) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Playback")
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Quality",
+                    icon = Icons.Filled.HighQuality,
+                    onClick = { quality = QUALITIES[(QUALITIES.indexOf(quality) + 1) % QUALITIES.size] },
+                    opensPage = true,
+                    initiallyFocused = true,
+                ) { isFocused -> SheetValue(quality, isFocused) }
+                TvSideSheetRow(label = "Subtitles", icon = Icons.Filled.ClosedCaption, onClick = {}, opensPage = true) { isFocused ->
+                    SheetValue("English", isFocused)
+                }
+                TvSideSheetRow(label = "Notifications", icon = Icons.Filled.Notifications, onClick = {}, opensPage = true)
+            }
+        }
+    }
+}
+
+private val QUALITIES = listOf("Auto", "4K", "1080p", "720p")
+
+/** A sheet row's trailing value: one line, ellipsized, in the supporting colour until the row is focused. */
+@Composable
+private fun SheetValue(text: String, isFocused: Boolean) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = tvFocusContentColor(isFocused = isFocused, resting = MaterialTheme.colorScheme.onSurfaceVariant),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
 
 /**

@@ -11,7 +11,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -36,6 +40,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DISABLED_ALPHA
@@ -153,8 +158,10 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
 
 /**
  * One row. Focus is the fill. A [destructive] row rests in the error colour, so it reads as one before it is
- * reached, and fills with it when focused, as a destructive button does. [trailing] ends the row, such as a switch, and is told
- * whether the row is focused so it can match the fill. [role] is what a screen reader calls the row: `Role.Switch` for a row
+ * reached, and fills with it when focused, as a destructive button does. [trailing] ends the row, such as a switch or a short
+ * value, and is told whether the row is focused so it can match the fill. It is held to `tv_side_sheet_trailing_max_width`, so
+ * at a large font a value cannot take the label's room: give a text value one line and an ellipsis. A row that [opensPage],
+ * one that pushes a page on a [TvSideSheetStack], ends in a chevron, after the trailing value and the tick. [role] is what a screen reader calls the row: `Role.Switch` for a row
  * ending in a [TvSwitch], whose on or off state the row then announces with it. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false dims a control that cannot
  * be used yet and keeps it out of the focus order; a fact the sheet shows is a [TvSideSheetReadout]. [initiallyFocused] draws the focused state, for a frame.
  *
@@ -179,6 +186,7 @@ fun TvSideSheetRow(
     leading: (@Composable () -> Unit)? = null,
     reserveSupportingLine: Boolean = false,
     role: Role = Role.Button,
+    opensPage: Boolean = false,
     trailing: (@Composable (isFocused: Boolean) -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
@@ -233,6 +241,7 @@ fun TvSideSheetRow(
         leading = leading,
         reserveSupportingLine = reserveSupportingLine,
         trailing = trailing?.let { slot -> { slot(focused) } },
+        chevronTint = if (opensPage) supporting else null,
     )
 }
 
@@ -265,7 +274,10 @@ fun TvSideSheetReadout(
     )
 }
 
-/** The row both [TvSideSheetRow] and [TvSideSheetReadout] draw: what leads, the label and its second line, and the tick. */
+/**
+ * The row both [TvSideSheetRow] and [TvSideSheetReadout] draw: what leads, the label and its second line, then the trailing
+ * slot, the tick and, given a [chevronTint], the chevron of a row that opens a page.
+ */
 @Composable
 private fun SideSheetRowLayout(
     label: String,
@@ -281,6 +293,7 @@ private fun SideSheetRowLayout(
     reserveSupportingLine: Boolean,
     trailing: (@Composable () -> Unit)? = null,
     focusedIconTint: Color = MaterialTheme.colorScheme.onPrimary,
+    chevronTint: Color? = null,
 ) {
     Row(
         modifier =
@@ -338,8 +351,21 @@ private fun SideSheetRowLayout(
                 }
             }
         }
-        trailing?.invoke()
+        if (trailing != null) {
+            Box(
+                modifier = Modifier.widthIn(max = dimensionResource(TvR.dimen.tv_side_sheet_trailing_max_width)),
+                contentAlignment = Alignment.CenterEnd,
+            ) { trailing() }
+        }
         if (selected) TvSelectedTick(tint = content)
+        if (chevronTint != null) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = chevronTint,
+                modifier = Modifier.size(dimensionResource(TvR.dimen.tv_side_sheet_chevron_size)),
+            )
+        }
     }
 }
 

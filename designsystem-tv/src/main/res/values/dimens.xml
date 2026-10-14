@@ -136,6 +136,10 @@
     <dimen name="tv_decision_point_text_gap">6dp</dimen>
     <dimen name="tv_side_sheet_thumbnail_width">40dp</dimen>
     <dimen name="tv_side_sheet_thumbnail_height">60dp</dimen>
+    <!-- A sheet row's trailing slot is held to this, so at a large font a value cannot take the label's room. -->
+    <dimen name="tv_side_sheet_trailing_max_width">120dp</dimen>
+    <!-- The chevron that ends a sheet row opening a page: the tick's size, so the two line up. -->
+    <dimen name="tv_side_sheet_chevron_size">24dp</dimen>
     <dimen name="tv_confirm_dialog_width">560dp</dimen>
     <!-- List rows in the tv-material ListItem form: a list-and-pane board's column, the options in its pane, and the
          rows' own marks. tv_list_item_height mirrors ListItem's one-line minimum height, which the library keeps

@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.ScreenshotOnly
@@ -33,6 +34,8 @@ import com.binge.designsystem.tv.component.TvDetailActionRow
 import com.binge.designsystem.tv.component.TvInfoCard
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.component.TvSideSheetPanel
+import com.binge.designsystem.tv.component.TvSideSheetRow
+import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.template.TvHubFailedRow
 import com.binge.designsystem.tv.template.TvHubRowFailure
 import com.binge.designsystem.tv.template.TvListPaneBoard
@@ -199,5 +202,32 @@ fun TvInfoCardWorstCaseSample() {
             icon = Icons.Filled.Dns,
             initiallyFocused = true,
         )
+    }
+}
+
+/**
+ * Sheet rows that open pages, with a long label, a long supporting line and a long value before the chevron: the value is held
+ * to its cap, so at a large font the label keeps its room and the chevron stays in the row.
+ */
+@Composable
+fun TvSideSheetRowOpensPageWorstCaseSample() {
+    TvSideSheetPanel {
+        TvSideSheetRow(
+            label = LONG_LABEL,
+            onClick = {},
+            icon = Icons.Filled.Dns,
+            supportingText = LONG_SUPPORT,
+            opensPage = true,
+            initiallyFocused = true,
+        ) { isFocused ->
+            Text(
+                text = "Every request since the server was set up",
+                style = MaterialTheme.typography.bodyMedium,
+                color = tvFocusContentColor(isFocused = isFocused, resting = MaterialTheme.colorScheme.onSurfaceVariant),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        TvSideSheetRow(label = LONG_LABEL, onClick = {}, icon = Icons.Filled.Folder, opensPage = true)
     }
 }
