@@ -57,12 +57,13 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [content] gets the entry requester. Each step it shows pins the requester to its first row and pulls it
  * there with [TvSideSheetStepFocus]. The caller owns the visibility flag, and returns focus to what opened
- * the sheet, with `rememberTvOverlayCloser`.
+ * the sheet, with `rememberTvOverlayCloser`. [toBottomEdge] is the panel's: see [TvSideSheetPanel].
  */
 @Composable
 fun TvSideSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    toBottomEdge: Boolean = false,
     content: @Composable ColumnScope.(entryFocus: FocusRequester) -> Unit,
 ) {
     val entryFocus = remember { FocusRequester() }
@@ -82,7 +83,7 @@ fun TvSideSheet(
                     }
                 },
     ) {
-        TvSideSheetPanel(modifier = Modifier.align(Alignment.CenterEnd)) { content(entryFocus) }
+        TvSideSheetPanel(modifier = Modifier.align(Alignment.CenterEnd), toBottomEdge = toBottomEdge) { content(entryFocus) }
     }
 }
 
@@ -100,10 +101,15 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
  * The sheet's visible panel, with no scrim and no focus request of its own, so a frame can render it. A step
  * placed inside brings its own request: [TvSideSheetConfirm] calls [TvSideSheetStepFocus] when given an `entryFocus`,
  * so it pulls focus to Cancel wherever it composes; on a stack page the stack does that. The panel is flush to the screen's end, top and bottom edges, so its content keeps
- * the overscan margin from them.
+ * the overscan margin from them. [toBottomEdge] drops the bottom margin, for content that scrolls: it runs to the screen's
+ * edge and carries the bottom overscan inside its scroll, so its last row can still scroll clear of the edge.
  */
 @Composable
-fun TvSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+fun TvSideSheetPanel(
+    modifier: Modifier = Modifier,
+    toBottomEdge: Boolean = false,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Column(
         modifier =
             modifier
@@ -115,8 +121,7 @@ fun TvSideSheetPanel(modifier: Modifier = Modifier, content: @Composable ColumnS
                     start = dimensionResource(DesR.dimen.padding_l),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical),
                     end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                    bottom = dimensionResource(TvR.dimen.tv_overscan_vertical),
-                ),
+                ).then(if (toBottomEdge) Modifier else Modifier.padding(bottom = dimensionResource(TvR.dimen.tv_overscan_vertical))),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
         content = content,
     )
@@ -146,7 +151,8 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
 
 /**
  * One row. Focus is the fill. A [destructive] row rests in the error colour, so it reads as one before it is
- * reached. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false dims a control that cannot
+ * reached, and fills with it when focused, as a destructive button does. [trailing] ends the row, such as a switch, and is told
+ * whether the row is focused so it can match the fill. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false dims a control that cannot
  * be used yet and keeps it out of the focus order; a fact the sheet shows is a [TvSideSheetReadout]. [initiallyFocused] draws the focused state, for a frame.
  *
  * The [label] holds to one line with an ellipsis, as every TV row's does. [supportingText] is a second line under it, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
@@ -169,6 +175,7 @@ fun TvSideSheetRow(
     supportingText: String? = null,
     leading: (@Composable () -> Unit)? = null,
     reserveSupportingLine: Boolean = false,
+    trailing: (@Composable (isFocused: Boolean) -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val resting =
@@ -177,12 +184,17 @@ fun TvSideSheetRow(
             destructive -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurface
         }
-    val content = tvFocusContentColor(isFocused = focused, resting = resting)
+    val focusedDestructive = focused && destructive
+    val content = if (focusedDestructive) MaterialTheme.colorScheme.onError else tvFocusContentColor(isFocused = focused, resting = resting)
     val supporting =
-        tvFocusContentColor(
-            isFocused = focused,
-            resting = if (enabled && !destructive) MaterialTheme.colorScheme.onSurfaceVariant else resting,
-        )
+        if (focusedDestructive) {
+            MaterialTheme.colorScheme.onError
+        } else {
+            tvFocusContentColor(
+                isFocused = focused,
+                resting = if (enabled && !destructive) MaterialTheme.colorScheme.onSurfaceVariant else resting,
+            )
+        }
     val clickable =
         if (enabled) {
             Modifier.tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick)
@@ -197,8 +209,11 @@ fun TvSideSheetRow(
             modifier
                 .fillMaxWidth()
                 .clip(BingeShapes.TvListItem)
-                .tvFocusFill(isFocused = focused, shape = BingeShapes.TvListItem)
-                .then(clickable)
+                .tvFocusFill(
+                    isFocused = focused,
+                    shape = BingeShapes.TvListItem,
+                    fillColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                ).then(clickable)
                 .then(if (selected) Modifier.semantics { this.selected = true } else Modifier),
         icon = icon,
         iconTint =
@@ -207,11 +222,13 @@ fun TvSideSheetRow(
                 destructive -> MaterialTheme.colorScheme.error
                 else -> MaterialTheme.colorScheme.primary
             },
+        focusedIconTint = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
         isFocused = focused,
         selected = selected,
         supportingText = supportingText,
         leading = leading,
         reserveSupportingLine = reserveSupportingLine,
+        trailing = trailing?.let { slot -> { slot(focused) } },
     )
 }
 
@@ -258,12 +275,14 @@ private fun SideSheetRowLayout(
     supportingText: String?,
     leading: (@Composable () -> Unit)?,
     reserveSupportingLine: Boolean,
+    trailing: (@Composable () -> Unit)? = null,
+    focusedIconTint: Color = MaterialTheme.colorScheme.onPrimary,
 ) {
     Row(
         modifier =
             modifier.padding(
-                horizontal = dimensionResource(DesR.dimen.padding_l),
-                vertical = dimensionResource(DesR.dimen.padding_m),
+                horizontal = dimensionResource(DesR.dimen.padding_sm),
+                vertical = dimensionResource(DesR.dimen.padding_s),
             ),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
         verticalAlignment = Alignment.CenterVertically,
@@ -275,6 +294,7 @@ private fun SideSheetRowLayout(
                     icon = icon,
                     tint = iconTint,
                     isFocused = isFocused,
+                    focusedTint = focusedIconTint,
                 )
         }
         if (supportingText == null && reserveSupportingLine) {
@@ -314,6 +334,7 @@ private fun SideSheetRowLayout(
                 }
             }
         }
+        trailing?.invoke()
         if (selected) TvSelectedTick(tint = content)
     }
 }

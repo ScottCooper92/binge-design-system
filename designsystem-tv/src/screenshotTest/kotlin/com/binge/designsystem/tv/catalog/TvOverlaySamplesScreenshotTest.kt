@@ -37,6 +37,16 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetRowTrailing() = Frame { TvSideSheetRowTrailingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun sideSheetToBottomEdge() = Frame { TvSideSheetToBottomEdgeSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun confirmDialog() = Frame { TvConfirmDialogSample() }
 
     @PreviewTest

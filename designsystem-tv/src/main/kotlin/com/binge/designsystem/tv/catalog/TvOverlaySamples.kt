@@ -1,14 +1,22 @@
 package com.binge.designsystem.tv.catalog
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.runtime.Composable
@@ -20,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCheckboxRow
@@ -28,6 +37,8 @@ import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetReadout
 import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.component.TvSideSheetTitle
+import com.binge.designsystem.tv.focus.tvFocusContentColor
+import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -208,3 +219,62 @@ fun TvConfirmDialogExtraContentSample() {
         )
     }
 }
+
+/**
+ * A row that ends in something of its own, here a chevron, beside a destructive row that is focused: the destructive row
+ * fills with the error colour, as a destructive button does, not with the accent.
+ */
+@Composable
+fun TvSideSheetRowTrailingSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Account")
+            TvSideSheetRow(
+                label = "Notifications",
+                supportingText = "Email and push",
+                icon = Icons.Filled.Notifications,
+                onClick = {},
+            ) { isFocused ->
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = tvFocusContentColor(isFocused = isFocused, resting = MaterialTheme.colorScheme.onSurfaceVariant),
+                )
+            }
+            TvSideSheetRow(
+                label = "Sign out",
+                icon = Icons.AutoMirrored.Filled.Logout,
+                onClick = {},
+                destructive = true,
+                initiallyFocused = true,
+            )
+        }
+    }
+}
+
+/**
+ * A sheet whose rows run to the screen's bottom edge: the panel keeps no bottom margin, and the scrolling rows carry the
+ * bottom overscan inside their scroll, so the last one can still scroll clear of the edge.
+ */
+@Composable
+fun TvSideSheetToBottomEdgeSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel(toBottomEdge = true) {
+            TvSideSheetTitle("Maintenance")
+            Column(
+                modifier =
+                    Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = dimensionResource(TvR.dimen.tv_overscan_vertical)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+            ) {
+                BottomEdgeJobs.forEachIndexed { index, job ->
+                    TvSideSheetRow(label = job, supportingText = "Last run an hour ago", onClick = {}, initiallyFocused = index == 0)
+                }
+            }
+        }
+    }
+}
+
+private val BottomEdgeJobs =
+    listOf("Scan the library", "Refresh the cache", "Sync watchlists", "Check availability", "Clean up downloads", "Rebuild posters")
