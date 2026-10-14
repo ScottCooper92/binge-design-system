@@ -29,7 +29,8 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * A centred confirm dialog for the 10-foot screen: a title, a message, and a dismiss and confirm pair. Focus arrives
- * on dismiss, so a stray OK does nothing. [destructive] draws the confirm button in the error colour.
+ * on dismiss, so a stray OK does nothing. Both answers are text buttons, and [destructive] draws the confirm one in the
+ * error colour.
  *
  * [extraContent] sits between the message and the buttons, as on the phone's confirm dialog: an option the confirm
  * applies, say. Focus still arrives on dismiss, whatever the slot holds.
@@ -105,14 +106,14 @@ fun TvConfirmDialogContent(
             TvButton(
                 label = dismissLabel,
                 onClick = onDismissRequest,
-                style = TvButtonStyle.Secondary,
+                style = TvButtonStyle.Text,
                 initiallyFocused = initiallyDismissFocused,
                 modifier = Modifier.focusRequester(dismissFocus),
             )
             TvButton(
                 label = confirmLabel,
                 onClick = onConfirm,
-                style = if (destructive) TvButtonStyle.Destructive else TvButtonStyle.Primary,
+                style = if (destructive) TvButtonStyle.TextDestructive else TvButtonStyle.Text,
             )
         }
     }

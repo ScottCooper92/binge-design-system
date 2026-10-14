@@ -115,6 +115,16 @@ fun TvButtonSample() {
             TvButtonSurface("Block", TvButtonStyle.DestructiveOutline, enabled = true, isFocused = true)
             TvButtonSurface("Block", TvButtonStyle.DestructiveOutline, enabled = false, isFocused = false)
         }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TvButtonSurface("Cancel", TvButtonStyle.Text, enabled = true, isFocused = false)
+            TvButtonSurface("Cancel", TvButtonStyle.Text, enabled = true, isFocused = true)
+            TvButtonSurface("Delete", TvButtonStyle.TextDestructive, enabled = true, isFocused = false)
+            TvButtonSurface("Delete", TvButtonStyle.TextDestructive, enabled = true, isFocused = true)
+            TvButtonSurface("Cancel", TvButtonStyle.Text, enabled = false, isFocused = false)
+        }
     }
 }
 

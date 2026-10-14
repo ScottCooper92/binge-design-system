@@ -40,7 +40,7 @@ import com.binge.designsystem.tv.R as TvR
  * is already solid red, so focus adds only a light border.
  *
  * Danger is a [style], not a `destructive` flag as on the phone's buttons: a TV control's role fixes its resting
- * fill, its border and its focus fill together, and the four roles share one colour model with [TvIconButton].
+ * fill, its border and its focus fill together, and the roles share one colour model with [TvIconButton].
  *
  * A disabled button stays focusable but inert — a D-pad control that refuses focus reads as broken, not
  * "not ready". It is drawn as an outline, not filled: a `colors.surface` fill composites to nothing

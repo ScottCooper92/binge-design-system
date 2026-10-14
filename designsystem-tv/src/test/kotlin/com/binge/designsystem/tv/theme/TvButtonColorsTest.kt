@@ -99,4 +99,59 @@ class TvButtonColorsTest {
             assertEquals(scheme.onSurfaceVariant, disabled.content)
         }
     }
+
+    @Test
+    fun `a text button is its label alone at rest`() {
+        lateinit var plain: TvButtonColors
+        lateinit var red: TvButtonColors
+        lateinit var scheme: ColorScheme
+        inTheme {
+            scheme = it
+            plain = tvButtonColors(TvButtonStyle.Text, enabled = true, isFocused = false)
+            red = tvButtonColors(TvButtonStyle.TextDestructive, enabled = true, isFocused = false)
+        }
+
+        listOf(plain, red).forEach { rest ->
+            assertEquals(Color.Transparent, rest.container)
+            assertEquals(Color.Transparent, rest.border)
+        }
+        assertEquals(scheme.onSurface, plain.content)
+        assertEquals(scheme.error, red.content)
+    }
+
+    @Test
+    fun `a focused text button fills with the accent, or with error when destructive`() {
+        lateinit var plain: TvButtonColors
+        lateinit var red: TvButtonColors
+        lateinit var scheme: ColorScheme
+        inTheme {
+            scheme = it
+            plain = tvButtonColors(TvButtonStyle.Text, enabled = true, isFocused = true)
+            red = tvButtonColors(TvButtonStyle.TextDestructive, enabled = true, isFocused = true)
+        }
+
+        assertEquals(scheme.primary, plain.container)
+        assertEquals(scheme.onPrimary, plain.content)
+        assertEquals(scheme.error, red.container)
+        assertEquals(scheme.onError, red.content)
+        listOf(plain, red).forEach { assertEquals(Color.Transparent, it.border) }
+    }
+
+    @Test
+    fun `a disabled text button is a dimmed label with no edge`() {
+        lateinit var plain: TvButtonColors
+        lateinit var red: TvButtonColors
+        lateinit var scheme: ColorScheme
+        inTheme {
+            scheme = it
+            plain = tvButtonColors(TvButtonStyle.Text, enabled = false, isFocused = true)
+            red = tvButtonColors(TvButtonStyle.TextDestructive, enabled = false, isFocused = true)
+        }
+
+        listOf(plain, red).forEach { disabled ->
+            assertEquals(Color.Transparent, disabled.container)
+            assertEquals(Color.Transparent, disabled.border)
+            assertEquals(scheme.onSurfaceVariant, disabled.content)
+        }
+    }
 }

@@ -14,8 +14,18 @@ import com.binge.designsystem.DISABLED_ALPHA
  * bring. [DestructiveOutline] is a reversible one (block): an `error` outline and label at rest, filling solid `error`
  * when focused as every other style fills with the accent. Both stay red under focus, because a dangerous action is at
  * its most dangerous the instant before OK.
+ *
+ * [Text] and [TextDestructive] are a dialog's answers: a label alone at rest, with no fill and no edge, filling with the
+ * accent, or with `error`, under focus. The dialog's own panel is the shape, so the answers need none of their own.
  */
-enum class TvButtonStyle { Primary, Secondary, Destructive, DestructiveOutline }
+enum class TvButtonStyle {
+    Primary,
+    Secondary,
+    Destructive,
+    DestructiveOutline,
+    Text,
+    TextDestructive,
+}
 
 /** Container / content / border for a TV control in one state — focus included, see [tvButtonColors]. */
 @Immutable
@@ -41,6 +51,8 @@ data class TvButtonColors(
  * - The two red styles keep their hue **at rest**, because danger is a property of the action rather than of where
  *   the remote happens to be. [TvButtonStyle.Destructive] rests as a solid `error` fill and shows focus with a light
  *   `onError` border; [TvButtonStyle.DestructiveOutline] rests as an `error` outline and fills solid `error` when focused.
+ * - A text style ([TvButtonStyle.Text], [TvButtonStyle.TextDestructive]) has no edge at all, enabled or not: it sits on
+ *   a dialog's panel, which is the shape. Disabled, it is its dimmed label alone.
  * - A **disabled** control never takes the focus fill. It stays focusable so ↓ isn't a dead end, but a
  *   filled disabled button would promise a press that does nothing.
  *
@@ -71,8 +83,9 @@ fun tvButtonColors(
     val colors = MaterialTheme.colorScheme
     val focusFilled = isFocused && enabled
     val solidRed = enabled && style == TvButtonStyle.Destructive
-    val outlineRed = enabled && style == TvButtonStyle.DestructiveOutline
+    val outlineRed = enabled && (style == TvButtonStyle.DestructiveOutline || style == TvButtonStyle.TextDestructive)
     val red = solidRed || outlineRed
+    val text = style == TvButtonStyle.Text || style == TvButtonStyle.TextDestructive
     val filledAtRest = enabled && !isFocused && style == TvButtonStyle.Primary
     return TvButtonColors(
         container = when {
@@ -96,7 +109,7 @@ fun tvButtonColors(
         border = when {
             // The solid style's fill is the same at rest and focused, so the border is what says it has focus.
             solidRed -> if (isFocused) colors.onError else Color.Transparent
-            focusFilled || filledAtRest -> Color.Transparent
+            focusFilled || filledAtRest || text -> Color.Transparent
             // The disabled control's only visible edge, so it is dimmed rather than removed: the line that keeps it a
             // button on any panel. Applied to `border`, which is opaque, so the result is not a function of the backdrop.
             !enabled -> colors.border.copy(alpha = DISABLED_ALPHA)
