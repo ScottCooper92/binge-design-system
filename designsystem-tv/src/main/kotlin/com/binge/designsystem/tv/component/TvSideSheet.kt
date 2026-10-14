@@ -152,7 +152,8 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
 /**
  * One row. Focus is the fill. A [destructive] row rests in the error colour, so it reads as one before it is
  * reached, and fills with it when focused, as a destructive button does. [trailing] ends the row, such as a switch, and is told
- * whether the row is focused so it can match the fill. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false dims a control that cannot
+ * whether the row is focused so it can match the fill. [role] is what a screen reader calls the row: `Role.Switch` for a row
+ * ending in a [TvSwitch], whose on or off state the row then announces with it. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false dims a control that cannot
  * be used yet and keeps it out of the focus order; a fact the sheet shows is a [TvSideSheetReadout]. [initiallyFocused] draws the focused state, for a frame.
  *
  * The [label] holds to one line with an ellipsis, as every TV row's does. [supportingText] is a second line under it, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
@@ -175,6 +176,7 @@ fun TvSideSheetRow(
     supportingText: String? = null,
     leading: (@Composable () -> Unit)? = null,
     reserveSupportingLine: Boolean = false,
+    role: Role = Role.Button,
     trailing: (@Composable (isFocused: Boolean) -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
@@ -197,7 +199,7 @@ fun TvSideSheetRow(
         }
     val clickable =
         if (enabled) {
-            Modifier.tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick)
+            Modifier.tvClickable(role = role, onFocusChanged = { focused = it }, onClick = onClick)
         } else {
             Modifier
         }
