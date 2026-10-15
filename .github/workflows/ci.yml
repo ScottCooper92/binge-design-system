@@ -96,7 +96,7 @@ jobs:
       # as it is to be a failing test, and author-ci-fix triages from what it can read.
       - name: Upload reports
         if: ${{ failure() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: build-reports
           path: |
@@ -113,7 +113,7 @@ jobs:
       # rather than fail the upload and hide the real error.
       - name: Upload screenshot diffs
         if: ${{ failure() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: screenshot-diffs
           path: '**/build/outputs/screenshotTest-results/**/diffs/**'
