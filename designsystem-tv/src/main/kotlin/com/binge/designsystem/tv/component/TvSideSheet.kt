@@ -39,6 +39,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
@@ -171,6 +172,10 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
  * stays as tall as neighbours that have something, such as a count. The label then centres in that height, level with the
  * icon plate, instead of sitting at the top of it.
+ *
+ * While [saving], a spinner holds the tick's place, in the tick's box, after the trailing value and before the chevron, and
+ * the row announces that it is in progress: for a press that applies at once but takes a moment to land. The caller decides
+ * what a press does meanwhile.
  */
 @Composable
 fun TvSideSheetRow(
@@ -187,9 +192,11 @@ fun TvSideSheetRow(
     reserveSupportingLine: Boolean = false,
     role: Role = Role.Button,
     opensPage: Boolean = false,
+    saving: Boolean = false,
     trailing: (@Composable (isFocused: Boolean) -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
+    val savingDescription = stringResource(DesR.string.cd_list_item_loading)
     val resting =
         when {
             !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ALPHA)
@@ -226,7 +233,8 @@ fun TvSideSheetRow(
                     shape = BingeShapes.TvListItem,
                     fillColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 ).then(clickable)
-                .then(if (selected) Modifier.semantics { this.selected = true } else Modifier),
+                .then(if (selected) Modifier.semantics { this.selected = true } else Modifier)
+                .then(if (saving) Modifier.semantics { stateDescription = savingDescription } else Modifier),
         icon = icon,
         iconTint =
             when {
@@ -242,6 +250,7 @@ fun TvSideSheetRow(
         reserveSupportingLine = reserveSupportingLine,
         trailing = trailing?.let { slot -> { slot(focused) } },
         chevronTint = if (opensPage) supporting else null,
+        saving = saving,
     )
 }
 
@@ -276,7 +285,7 @@ fun TvSideSheetReadout(
 
 /**
  * The row both [TvSideSheetRow] and [TvSideSheetReadout] draw: what leads, the label and its second line, then the trailing
- * slot, the tick and, given a [chevronTint], the chevron of a row that opens a page.
+ * slot, the tick or, while [saving], the spinner in its place, and, given a [chevronTint], the chevron of a row that opens a page.
  */
 @Composable
 private fun SideSheetRowLayout(
@@ -294,6 +303,7 @@ private fun SideSheetRowLayout(
     trailing: (@Composable () -> Unit)? = null,
     focusedIconTint: Color = MaterialTheme.colorScheme.onPrimary,
     chevronTint: Color? = null,
+    saving: Boolean = false,
 ) {
     Row(
         modifier =
@@ -357,7 +367,17 @@ private fun SideSheetRowLayout(
                 contentAlignment = Alignment.CenterEnd,
             ) { trailing() }
         }
-        if (selected) TvSelectedTick(tint = content)
+        when {
+            saving ->
+                Box(modifier = Modifier.size(dimensionResource(TvR.dimen.tv_selected_tick_size)), contentAlignment = Alignment.Center) {
+                    TvSpinner(
+                        color = content,
+                        diameter = dimensionResource(TvR.dimen.tv_list_pane_row_spinner),
+                        stroke = dimensionResource(TvR.dimen.tv_list_pane_row_spinner_stroke),
+                    )
+                }
+            selected -> TvSelectedTick(tint = content)
+        }
         if (chevronTint != null) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

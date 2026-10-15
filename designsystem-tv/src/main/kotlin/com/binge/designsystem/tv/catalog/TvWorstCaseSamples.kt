@@ -259,3 +259,31 @@ fun TvSideSheetRowOpensPageWorstCaseSample() {
         TvSideSheetRow(label = LONG_LABEL, onClick = {}, icon = Icons.Filled.Folder, opensPage = true)
     }
 }
+
+/**
+ * Sheet rows saving, with a long label, a long supporting line, a value and the chevron of a row that opens a page: the
+ * spinner holds the tick's place, between the value and the chevron.
+ */
+@Composable
+fun TvSideSheetRowSavingWorstCaseSample() {
+    TvSideSheetPanel {
+        TvSideSheetRow(
+            label = LONG_LABEL,
+            onClick = {},
+            icon = Icons.Filled.Dns,
+            supportingText = LONG_SUPPORT,
+            opensPage = true,
+            saving = true,
+            initiallyFocused = true,
+        ) { isFocused ->
+            Text(
+                text = "1,284",
+                style = MaterialTheme.typography.bodyMedium,
+                color = tvFocusContentColor(isFocused = isFocused, resting = MaterialTheme.colorScheme.onSurfaceVariant),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        TvSideSheetRow(label = LONG_LABEL, onClick = {}, icon = Icons.Filled.Folder, supportingText = LONG_SUPPORT, saving = true)
+    }
+}

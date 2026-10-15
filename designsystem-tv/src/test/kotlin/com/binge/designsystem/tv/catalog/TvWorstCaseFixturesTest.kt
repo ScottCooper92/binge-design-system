@@ -78,6 +78,10 @@ class TvWorstCaseFixturesTest {
 
     @Test fun `a sheet row that opens a page at 2_0`() = check(FONT_20) { TvSideSheetRowOpensPageWorstCaseSample() }
 
+    @Test fun `a saving sheet row at 1_3`() = check(FONT_13) { TvSideSheetRowSavingWorstCaseSample() }
+
+    @Test fun `a saving sheet row at 2_0`() = check(FONT_20) { TvSideSheetRowSavingWorstCaseSample() }
+
     private companion object {
         const val MIN_CHECKED = 3
         const val FONT_13 = 1.3f
