@@ -23,8 +23,9 @@ The television layer is a module of its own, `designsystem-tv`, because Material
 must not be mixed: they ship separate `MaterialTheme` trees, and the wrong import compiles cleanly
 and renders subtly wrong. It carries the TV foundation that names none of Binge's types — the theme,
 the focus units, the rail shell, the button, the card row and the message plate — and
-`checkTvMaterialSeparation` holds the line. Binge's TV media card, media row and immersive backdrop
-take its media-item model and stay there, as its error plate does.
+`checkTvMaterialSeparation` holds the line. Binge's TV media card and media row take its media-item
+model and stay there. The immersive backdrop and the error plate are here: the backdrop takes any item
+type, and the plate is built on `ErrorKind`.
 
 TV code may call a phone-module helper only if the helper reads no theme. The check reads imports,
 so it cannot see a helper that reads Material 3's `MaterialTheme` inside it. Under `BingeTvTheme`
@@ -37,9 +38,9 @@ colours out cannot reach the wrapper.
 What stays in Binge is everything that names a TMDB type, an account, a navigation route, or
 Binge's error model, and everything that renders one of those. The line now runs through the
 media-item model (the hub and poster carousels take Binge's `MediaItemUi`, which carries a TMDB
-media type), the error screens (typed against Binge's `UiError`), and the request-state UI, which
-is typed against the integration contract rather than against a design system and belongs with the
-SDK a companion already depends on.
+media type), and the request-state UI, which is typed against the integration contract rather
+than against a design system and belongs with the SDK a companion already depends on. The error
+screens are here, built on `ErrorKind`; an app maps its own errors onto those kinds.
 
 ## What is here
 
@@ -52,10 +53,12 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 │                          formatRuntime, the relative-or-absolute date formatter and month
 │                          names
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
-│                icons, brushes, collapsing-title state and the shared aspect ratios
+│                icons, brushes, collapsing-title state, the shared aspect ratios, the error
+│                kinds, the save status, a decision screen's copy and locale-aware text
 ├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders,
 │                and the …Demo()s the catalog app runs live
-├── modifier/    skeleton shimmer, selection lift
+├── modifier/    skeleton shimmer, selection lift, a content description
+├── save/        the save-as-made engine: a change writes itself a moment after the last one
 ├── layout/      layout anchors
 ├── template/    the whole-screen frames: the scaffold, the message screen, the error and empty
 │                screens, the filtered list, the hero detail page, the form, the step flow, the
@@ -87,9 +90,10 @@ docs/
 In each module every dp a component reads lives in `src/main/res/values/dimens.xml` (with the width and
 orientation qualifiers next to it), and the screenshot baselines are under
 `src/screenshotTestDebug/reference/`. Two things are exempt from the dimens rule: a literal in a private
-`@Preview`, and the corner radii in `BingeShapes`, which are theme tokens. In `designsystem`, every
-user-visible string is in `values/strings.xml` with its Spanish translation alongside; `designsystem-tv`
-has no strings, because its components take their copy as parameters. The baselines are the ones Binge
+`@Preview`, and the corner radii in `BingeShapes`, which are theme tokens. In each module, every
+user-visible string is in `values/strings.xml` with its Spanish translation alongside. Most TV
+components take their copy as parameters, so `designsystem-tv` holds only a few strings of its own,
+such as a badge's count and a hidden field's announcement. The baselines are the ones Binge
 recorded; each slice validated byte-identical against them before it landed.
 
 ## The catalog app

@@ -8,7 +8,7 @@ than one failure — fix them all, or say which you did not.
 
 | Symptom | What it means | Correct fix |
 | --- | --- | --- |
-| `ktlintMainSourceSetCheck` / `ktlintTestSourceSetCheck` failed | Formatting. Import order, indentation, wrapping, trailing commas. | `./gradlew :designsystem:ktlintFormat`, then read the diff before committing — it reformats, it does not think. **Never** a baseline or a `ktlint-disable` comment. |
+| `ktlintMainSourceSetCheck` / `ktlintTestSourceSetCheck` failed | Formatting. Import order, indentation, wrapping, trailing commas. | `./gradlew ktlintFormat`, which formats every module, then read the diff before committing — it reformats, it does not think. **Never** a baseline or a `ktlint-disable` comment. |
 | `validateDebugScreenshotTest` / `reports/screenshotTest/` | A `@PreviewTest` frame no longer matches its committed PNG, or a new frame has no PNG. The report carries expected, actual and diff. | If the change was intended, `./gradlew updateDebugScreenshotTest`, look at the PNGs, commit them with the code. If not, the render changed by accident: fix the code. Never delete a baseline to get green. |
 | `checkTvMaterialSeparation` | A `designsystem-tv` file imports `androidx.compose.material3`, or a phone file imports `androidx.tv`. The two must not mix. | Use the equivalent on the right side of the seam. The one sanctioned crossing is `BingeTvTokens.kt`, named in `designsystem-tv/build.gradle.kts`; never add to that list to get green. |
 | `lintDebug` / `lint-results-*.html` | Android lint. Most often an unused resource, a missing content description, or an API level above `minSdk` 26. | Fix the finding. A `@Suppress` needs a reason in the code, and `lint-baseline.xml` is never the answer. |
