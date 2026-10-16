@@ -20,8 +20,10 @@ run-name: >-
 # PUBLIC repository, and one that two other builds include directly. `./gradlew build`
 # here cannot see every consumer, so a change that compiles fine in this repository can
 # still break a consuming app at its next sync. auto_merge was off until the review had a
-# track record here. It is on now: CI's `seerr` job builds binge-seerr against the change, and
-# a consumer break that gets through surfaces at that consumer's own submodule bump.
+# track record here. It is on now. The `Consumer check (binge-seerr)` workflow, kept apart from
+# `CI`, compiles binge-seerr against a change that touches what it compiles, and a red or pending
+# run there holds auto-merge at UNSTABLE. A consumer break that gets through surfaces at that
+# consumer's own submodule bump.
 on:
   workflow_run:
     workflows: ["CI"]
