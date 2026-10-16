@@ -140,14 +140,14 @@ kept current, but a maintainer lands it.
 
 Add `hold` alongside `agent` only when:
 
-- the PR changes how the bots review or merge: `.ai/agents/` or `.github/workflows/`. A mistake there
-  can disable the checks that would have caught it.
+- the PR changes how the bots review or merge: `.ai/agents/`, `.github/workflows/`, or these label
+  rules themselves. A mistake there can disable the checks that would have caught it.
 - a maintainer has to check it on a device before it lands.
 - it isn't ready to merge: a stack to land by hand, or a PR waiting on a decision or on a consumer.
 
-`CLAUDE.md`, `.claude/skills/`, docs, large changes and public API changes take `agent` alone and merge
-once reviewed and green. (Narrowed 2026-10-16: held PRs were waiting on a maintainer who was not
-reviewing them.)
+Other `CLAUDE.md`, `.claude/skills/`, docs, large changes and public API changes take `agent` alone and
+merge once reviewed and green. The reviewer reads `main`'s `CLAUDE.md` and `.claude/`, not the PR's copy,
+so an edit to them is still judged by the rules it changes.
 
 The label still grants an agent code execution with this repository's secrets in scope. Never apply it
 to a PR from a fork; the workflows refuse fork PRs, and that guard is the load-bearing control. Don't
