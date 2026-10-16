@@ -632,6 +632,42 @@ fun FormScreenFooterSample() {
     }
 }
 
+/**
+ * A multi-field edit that must apply together, with Save in the top bar. The address has changed, so Save is on;
+ * saving takes the fields as the new saved values and turns it off until the next change.
+ */
+@Composable
+fun FormScreenTopBarSample() {
+    TopBarSaveForm(savedAddress = "media.example.com", address = "media.example.org")
+}
+
+/** [FormScreenTopBarSample] before anything has changed: Save stays off until a field differs from what is saved. */
+@Composable
+fun FormScreenTopBarUnchangedSample() {
+    TopBarSaveForm(savedAddress = "media.example.com", address = "media.example.com")
+}
+
+@Composable
+private fun TopBarSaveForm(savedAddress: String, address: String) {
+    var saved by remember { mutableStateOf(savedAddress to "5055") }
+    val addressField = rememberTextFieldState(address)
+    val portField = rememberTextFieldState(saved.second)
+    val current = addressField.text.toString() to portField.text.toString()
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "Server",
+            onBack = LocalDemoBack.current,
+            placement = FormActionPlacement.TopBar,
+            primaryAction = FormAction("Save", onClick = { saved = current }, enabled = current != saved),
+        ) {
+            FormSection(title = "Server") {
+                OutlinedTextField(state = addressField, label = { Text("Address") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(state = portField, label = { Text("Port") }, modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+}
+
 /** An editor under a large collapsing bar that saves as it goes, its fields held to a reading column on a wide window. */
 @Composable
 fun FormScreenCappedSample() {

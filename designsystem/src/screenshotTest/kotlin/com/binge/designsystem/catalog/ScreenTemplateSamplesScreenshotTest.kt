@@ -233,6 +233,16 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenPreviews
     @Composable
+    fun formTopBar() = FormScreenTopBarSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun formTopBarUnchanged() = FormScreenTopBarUnchangedSample()
+
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
     fun formCapped() = FormScreenCappedSample()
 
     @PreviewTest
