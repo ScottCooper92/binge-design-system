@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import com.binge.designsystem.modifier.skeleton
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -227,7 +228,16 @@ private fun ListItemView(
                             MaterialTheme.colorScheme.onSurface
                         },
                     )
-                    if (!row.detail.isNullOrBlank()) {
+                    if (row.detailLoading) {
+                        Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
+                        Text(
+                            text = NBSP,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier
+                                .fillMaxWidth(DETAIL_SKELETON_FRACTION)
+                                .skeleton(visible = true, shape = BingeShapes.ElementSmall),
+                        )
+                    } else if (!row.detail.isNullOrBlank()) {
                         Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
                         Text(
                             text = row.detail,
@@ -474,3 +484,8 @@ private fun listItemConnector(connector: ListItemConnector): Modifier {
         }
     }
 }
+
+/** A pending detail line's skeleton: about the width of a short summary. */
+private const val DETAIL_SKELETON_FRACTION = 0.55f
+
+private const val NBSP = "\u00A0"
