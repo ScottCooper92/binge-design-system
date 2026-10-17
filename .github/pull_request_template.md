@@ -9,5 +9,5 @@
 - [ ] The unit tests of every module this touches
 - [ ] `validateDebugScreenshotTest` for every class this touches; new or changed frames viewed
 - [ ] A new public component has a `…Sample()` in `catalog/` and a `@PreviewTest` frame that renders it
-- [ ] Consumer impact stated above: additive, a deprecated forward, or a break that Binge and binge-seerr must follow
+- [ ] Consumer impact stated above: additive, a deprecated forward, or a break that Binge, binge-seerr and binge-archive must follow
 - [ ] Left to CI, and why: <!-- e.g. the full validateDebugScreenshotTest runs out of memory locally -->

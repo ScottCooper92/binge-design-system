@@ -156,7 +156,7 @@ private fun ListItemView(
                 selected = row.selected
                 if (row.loading) stateDescription = loadingDescription
                 // Appended to the row's own merged node rather than a contentDescription on the trailing
-                // icon, so a screen reader announces one node ("Watchlist, Opens in browser, Button")
+                // icon, so a screen reader announces one node ("Help, Opens in browser, Button")
                 // instead of reading the icon as a second stop.
                 if (external) stateDescription = externalDescription
                 // Deliberately replaces "In progress" on a loading header: the group shows its own loading body.

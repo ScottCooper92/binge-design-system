@@ -45,7 +45,7 @@
       groupName: "compose + kotlin + android toolchain",
       automerge: false,
       prBodyNotes: [
-        "**Needs matching bumps in `Binge` and `binge-seerr`.** The root `libs.versions.toml` is not a local decision: Compose, AGP, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
+        "**Needs matching bumps in `Binge`, `binge-seerr` and `binge-archive`.** The root `libs.versions.toml` is not a local decision: Compose, AGP, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
       ],
     },
     {

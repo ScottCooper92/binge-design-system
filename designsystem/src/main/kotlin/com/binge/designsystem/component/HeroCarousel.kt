@@ -92,7 +92,7 @@ data class HeroItem(
  * cap it off the window height so the first content rail peeks; tall windows (portrait phone, tablet)
  * use the full [R.dimen.hero_height].
  *
- * [heroActions] is a caller-filled slot for per-item CTAs (e.g. Watch trailer / Watchlist); the
+ * [heroActions] is a caller-filled slot for per-item CTAs (e.g. Play / Add to list); the
  * backdrop itself stays tappable via [onItemClick].
  *
  * [onItemTapped] reports the slide that was open when the backdrop was tapped. It rides alongside

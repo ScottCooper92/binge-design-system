@@ -91,8 +91,8 @@ class TvSideSheetNav internal constructor(
 }
 
 /**
- * A [TvSideSheet] of pages that open one over another, like a settings list whose rows each open their own list, with
- * Jellyfin's TV preferences as the model. The root [root] page shows first. A row opens another with
+ * A [TvSideSheet] of pages that open one over another, like a settings list whose rows each open their own list. The
+ * root [root] page shows first. A row opens another with
  * [TvSideSheetNav.push]; Back, or the key pointing away from the panel, goes back one page, and from the root calls
  * [onDismissRequest], where the caller returns focus to what opened the sheet, with `rememberTvOverlayCloser`.
  *

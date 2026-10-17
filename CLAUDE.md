@@ -8,8 +8,8 @@ Conventions for this repository. The agent workflows in `.github/workflows/` rea
 The design system shared by Binge and the companion apps. Read `README.md` for why it exists and
 what belongs in it.
 
-Status is pre-alpha, and consumed by both Binge and binge-seerr. Three slices of the carve from
-Binge are here: the theme, the preview and screenshot scaffolding and every component that named
+Status is pre-alpha, and consumed by Binge, binge-seerr and binge-archive. Three slices of the
+carve from Binge are here: the theme, the preview and screenshot scaffolding and every component that named
 none of Binge's types; the display formatters (`DisplayFormatters.kt`) and the components they
 unlocked — the nav shell, the poster card and carousel, the hero, the chips, the skeletons; and the
 settings group with the relative-date formatter, for the companion's own settings screens. Binge
@@ -48,13 +48,14 @@ author with no knowledge of Binge could use it and have it mean something.
 
 ## Consumers, and what that costs
 
-Two builds include this one with `includeBuild`: Binge, and binge-seerr. There is no published
-artifact and no version negotiation, which buys a lot and costs one specific thing:
+Three builds include this one with `includeBuild`: Binge, binge-seerr and binge-archive. There is no
+published artifact and no version negotiation, which buys a lot and costs one specific thing:
 
-**A green build here does not mean a green build there.** CI compiles binge-seerr's main and unit-test
-sources against a PR's head (`consumer-check`, informational), and that is the only consumer evidence.
-Binge is private and is not compiled. A changed public signature is a change in two other codebases
-that will not notice until their next sync, so a PR that changes one says so in its body.
+**A green build here does not mean a green build there.** CI compiles the main and unit-test sources
+of binge-seerr and binge-archive against a PR's head (`consumer-check`, informational), and that is the
+only consumer evidence. Binge is private and is not compiled. A changed public signature is a change in
+three other codebases that will not notice until their next sync, so a PR that changes one says so in
+its body.
 
 Corollary: the root `libs.versions.toml` is not a local decision. Compose and AGP versions have to
 agree with the consumers'.
@@ -102,11 +103,13 @@ re-record with `./gradlew updateDebugScreenshotTest`, look at the regenerated PN
 in the same commit as the code. Committing that output is the only way to accept a change; there is
 no override flag.
 
-There is no coverage floor in this repository, and the one custom task is `checkTvMaterialSeparation`
-(wired into `check`). Do not look for any other, and do not report a finding as though one had caught it.
+There is no coverage floor in this repository, and the one custom check is `checkTvMaterialSeparation`
+(wired into `check`). The catalog app's `generate<Variant>CatalogRegistry` is a generator, not a check,
+but it fails the build on a malformed `…Sample` or `…Demo`. Do not look for any other, and do not report
+a finding as though one had caught it.
 
 **Never silence a gate instead of fixing it.** No ktlint baseline, no `ktlint-disable`, no
-`lint-baseline.xml`, no `abortOnError = false`. A baseline here is a finding suppressed in two
+`lint-baseline.xml`, no `abortOnError = false`. A baseline here is a finding suppressed in three
 codebases that never agreed to it.
 
 ## Follow-ups
