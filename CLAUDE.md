@@ -132,15 +132,22 @@ still an issue; a serious problem inside the diff is a change to make now.
 [binge-ci](https://github.com/ScottCooper92/binge-ci). They act only on PRs carrying the `agent`
 label.
 
-**Label every PR you open, and add `hold` when a human must do the merging.** Ordinary work gets
+**Label every PR you open, and add `hold` only when a human must do the merging.** Ordinary work gets
 `agent` by default, including from the agent that opened it. Review here is CI plus the reviewer bot,
 not a human reading the diff, so withholding the label buys no extra check. It only parks the PR. `agent`
 buys the review and, once it passes, the bot's merge. `hold` withholds the merge: the PR is reviewed and
 kept current, but a maintainer lands it.
 
-Add `hold` alongside `agent` for changes to what governs the agents: `.github/workflows/`, `CLAUDE.md`,
-`.ai/agents/` and `.claude/skills/`. A mistake there can disable the checks that would have caught it.
-Also add it for a change to a public API that a consumer would have to follow in the same sync.
+Add `hold` alongside `agent` only when:
+
+- the PR changes how the bots review or merge: `.ai/agents/`, `.github/workflows/`, or these label
+  rules themselves. A mistake there can disable the checks that would have caught it.
+- a maintainer has to check it on a device before it lands.
+- it isn't ready to merge: a stack to land by hand, or a PR waiting on a decision or on a consumer.
+
+Other `CLAUDE.md`, `.claude/skills/`, docs, large changes and public API changes take `agent` alone and
+merge once reviewed and green. The reviewer reads `main`'s `CLAUDE.md` and `.claude/`, not the PR's copy,
+so an edit to them is still judged by the rules it changes.
 
 The label still grants an agent code execution with this repository's secrets in scope. Never apply it
 to a PR from a fork; the workflows refuse fork PRs, and that guard is the load-bearing control. Don't
