@@ -15,12 +15,15 @@ import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,6 +44,7 @@ import com.binge.designsystem.component.ItemRows
 import com.binge.designsystem.component.ListItem
 import com.binge.designsystem.component.ListItemConnector
 import com.binge.designsystem.component.ListItemDestination
+import com.binge.designsystem.component.ListItemNote
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
 import com.binge.designsystem.theme.BingeShapes
@@ -330,6 +334,33 @@ fun ItemGroupDetailLoadingSample() {
             rows = listOf(
                 ListItem(icon = Icons.Filled.Inbox, label = "Requests", detail = "Requested · downloading 40%"),
                 ListItem(icon = Icons.Filled.Sync, label = "Sources", detailLoading = true),
+            ),
+        )
+    }
+}
+
+/**
+ * [ListItem.note]: a line of its own under the detail, so a long label cannot crowd it out. A plain note, and a
+ * [ListItemNote.warning] one in the error colour, each led by its icon.
+ */
+@Composable
+fun ItemGroupNoteSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Sources",
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.PlayCircle,
+                    label = "Night of the Living Dead (1968), restored from the original negative",
+                    detail = "Archive · H.264",
+                    note = ListItemNote("Public domain (US)", icon = Icons.Filled.Verified),
+                ),
+                ListItem(
+                    icon = Icons.Filled.PlayCircle,
+                    label = "Home recording",
+                    detail = "Archive",
+                    note = ListItemNote("No licence stated", icon = Icons.Filled.Warning, warning = true),
+                ),
             ),
         )
     }
