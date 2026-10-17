@@ -13,7 +13,7 @@
 [versions]
 agp = "9.4.1"
 kotlin = "2.4.21"
-composeBom = "2026.08.00"
+composeBom = "2026.09.00"
 # tv-material ships its own MaterialTheme tree; the version agrees with Binge's.
 tvMaterial = "1.1.0"
 # Only the TV QR code reads it: a symbol drawn from booleans stays crisp at panel size.
