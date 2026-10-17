@@ -61,6 +61,10 @@ internal fun TvListPane(
         Box(modifier = modifier.fillMaxSize())
         return
     }
+    row.paneContent?.let { content ->
+        Box(modifier = modifier.fillMaxSize()) { content() }
+        return
+    }
     val hasOptions = row.options.isNotEmpty() || row.pinnedOptions.isNotEmpty()
     // Pinned options are controls, so a first → into the pane lands on the first value, one ↑ from them. Re-entry still
     // resumes on the option last focused: the restorer falls back to the first value only when nothing was saved.

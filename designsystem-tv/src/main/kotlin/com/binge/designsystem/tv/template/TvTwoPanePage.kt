@@ -62,7 +62,7 @@ sealed interface TvTwoPaneSplit {
 
     companion object {
         val Balanced: TvTwoPaneSplit = Weighted(BALANCED_COPY_SHARE)
-        val ListDetail: TvTwoPaneSplit = Weighted(LIST_DETAIL_COPY_SHARE)
+        val ListDetail: Weighted = Weighted(LIST_DETAIL_COPY_SHARE)
         val ActionLed: TvTwoPaneSplit = Weighted(ACTION_LED_COPY_SHARE)
     }
 }

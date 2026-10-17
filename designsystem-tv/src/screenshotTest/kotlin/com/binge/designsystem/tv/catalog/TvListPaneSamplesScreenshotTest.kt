@@ -12,7 +12,8 @@ import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
 /**
  * Screenshot coverage for the list-and-pane board: focus in the list, focus in the pane, the same two as a filter
- * panel, rows carrying a status mark (with the longest labels, in Spanish), and the board's skeleton.
+ * panel, rows carrying a status mark (with the longest labels, in Spanish), rows that open something of their own
+ * (a caller's glyph, a pane of the caller's, a preview of the list a row opens), and the board's skeleton.
  * The pair worth diffing is the first two, where the described row moves from the full fill to the dim accent.
  */
 class TvListPaneSamplesScreenshotTest {
@@ -80,6 +81,21 @@ class TvListPaneSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun boardSkeletonRowIcon() = Frame { TvListPaneBoardSkeletonRowIconSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun rowPainter() = Frame { TvListPaneBoardRowPainterSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun paneContent() = Frame { TvListPaneBoardPaneContentSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun listPreview() = Frame { TvListPaneBoardListPreviewSample() }
 
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
