@@ -319,6 +319,23 @@ fun ItemGroupBusySample() {
 }
 
 /**
+ * [ListItem.detailLoading]: a row whose summary is still on its way holds a skeleton line where it will land, beside
+ * one that has arrived. Both rows stay tappable.
+ */
+@Composable
+fun ItemGroupDetailLoadingSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Companions",
+            rows = listOf(
+                ListItem(icon = Icons.Filled.Inbox, label = "Requests", detail = "Requested · downloading 40%"),
+                ListItem(icon = Icons.Filled.Sync, label = "Sources", detailLoading = true),
+            ),
+        )
+    }
+}
+
+/**
  * [ItemRows] with no surface of its own, drawn inside a card the caller supplies — the request
  * quota readout living on the account card, rather than [ItemGroup]'s own clipped surface.
  */

@@ -56,6 +56,14 @@ class ItemGroupSamplesScreenshotTest {
         ItemGroupBusySample()
     }
 
+    /** [ListItem.detailLoading]'s skeleton line beside a row whose detail has landed. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun detailLoading() {
+        ItemGroupDetailLoadingSample()
+    }
+
     /** The `rowVerticalPadding` override beside [titled]'s default rows (#133). */
     @PreviewTest
     @ComponentPreviews

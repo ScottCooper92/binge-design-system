@@ -113,6 +113,11 @@ data class ListItem(
      * for the rare row whose second line has to be read in full, such as a warning's explanation.
      */
     val supportingMaxLines: Int = 1,
+    /**
+     * The second line is still on its way: a skeleton line holds its place, so the row does not grow when [detail]
+     * lands. The row stays tappable; only its summary is pending.
+     */
+    val detailLoading: Boolean = false,
 )
 
 /** The row's switch state, from [ListItem.toggleState] or else [ListItem.toggled]; null for a row with no switch. */
