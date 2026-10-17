@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.BingeIcons
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeNavFloatingStyle
 import com.binge.designsystem.component.BingeNavFloatingTone
@@ -44,7 +45,6 @@ private const val SAMPLE_ROW_COUNT = 20
 /** Poster-grid stand-in: enough cells to fill any sample canvas, at the poster aspect the app uses. */
 private const val SAMPLE_ARTWORK_COLUMNS = 3
 private const val SAMPLE_ARTWORK_CELLS = 24
-private const val SAMPLE_POSTER_RATIO = 2f / 3f
 
 private enum class FloatingSampleTab {
     Movies,
@@ -159,7 +159,7 @@ internal fun SampleArtworkGrid() {
         items(SAMPLE_ARTWORK_CELLS) { index ->
             Box(
                 Modifier
-                    .aspectRatio(SAMPLE_POSTER_RATIO)
+                    .aspectRatio(CARD_ASPECT_RATIO)
                     .background(swatches[index % swatches.size]),
             )
         }
