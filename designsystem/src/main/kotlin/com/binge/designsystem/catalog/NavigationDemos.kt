@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.BingeIcons
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeNavFloatingStyle
 import com.binge.designsystem.component.BingeNavFloatingTone
@@ -43,7 +44,6 @@ import com.binge.designsystem.preview.ScreenshotTheme
 private const val DEMO_ROW_COUNT = 60
 private const val DEMO_ARTWORK_EVERY = 6
 private const val DEMO_ARTWORK_CELLS = 3
-private const val DEMO_POSTER_RATIO = 2f / 3f
 
 private enum class DemoTab { Movies, TvShows, Discover, Search, Account }
 
@@ -115,7 +115,7 @@ private fun DemoArtworkBand() {
     val scheme = MaterialTheme.colorScheme
     val swatches = listOf(scheme.primaryContainer, scheme.tertiaryContainer, scheme.errorContainer)
     Row(Modifier.fillMaxWidth()) {
-        repeat(DEMO_ARTWORK_CELLS) { Box(Modifier.weight(1f).aspectRatio(DEMO_POSTER_RATIO).background(swatches[it])) }
+        repeat(DEMO_ARTWORK_CELLS) { Box(Modifier.weight(1f).aspectRatio(CARD_ASPECT_RATIO).background(swatches[it])) }
     }
 }
 

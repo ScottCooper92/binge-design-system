@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.component.SeeAllTile
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -21,7 +22,7 @@ fun SeeAllTileSample() {
             onClick = {},
             modifier = Modifier
                 .width(dimensionResource(R.dimen.see_all_tile_width))
-                .aspectRatio(POSTER_ASPECT_RATIO),
+                .aspectRatio(CARD_ASPECT_RATIO),
         )
     }
 }
@@ -35,9 +36,7 @@ fun SeeAllTileLabelledSample() {
             onClick = {},
             modifier = Modifier
                 .width(dimensionResource(R.dimen.see_all_tile_width))
-                .aspectRatio(POSTER_ASPECT_RATIO),
+                .aspectRatio(CARD_ASPECT_RATIO),
         )
     }
 }
-
-private const val POSTER_ASPECT_RATIO = 2f / 3f
