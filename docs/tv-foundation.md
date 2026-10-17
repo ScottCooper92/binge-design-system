@@ -31,6 +31,10 @@ A screen that appears while the user is somewhere else must not take focus, beca
 `tv*FocusGroup` units here are for, and why a component in this module never fires a requester it
 was handed.
 
+A lazy row, column or grid is already its own focus group, so it takes `tvLazyFocusGroup` — the restorer alone,
+with an optional fallback for the first entry — rather than `tvFocusGroup`. `TvListPane` is the case: its first
+entry lands on the first value below the pinned controls, and re-entry resumes on the option last focused.
+
 A user-invoked overlay — a dialog, a filter panel, a setup step — is the opposite case, and
 **should** pull focus: the user's own press is what put it on screen, and focus arriving is
 precisely what they asked for. `TvOverlayArrivalFocusEffect` is that, packaged.

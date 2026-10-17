@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CollectionItemInfo
@@ -38,6 +37,7 @@ import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
+import com.binge.designsystem.tv.focus.tvLazyFocusGroup
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -82,12 +82,7 @@ internal fun TvListPane(
             .semantics { collectionInfo = CollectionInfo(rowCount = optionCount, columnCount = 1) }
     val optionWidth = Modifier.width(dimensionResource(TvR.dimen.tv_list_pane_option_width))
     // On the lazy column, the focus group the options are inside, so it saves an option rather than the column.
-    val restorer =
-        when {
-            routesToFirstValue -> Modifier.focusRestorer(firstValueFocus)
-            hasOptions -> Modifier.focusRestorer()
-            else -> Modifier
-        }
+    val restorer = if (hasOptions) Modifier.tvLazyFocusGroup(fallback = firstValueFocus.takeIf { routesToFirstValue }) else Modifier
     TvStableFocusScroll {
         Box(
             modifier =
