@@ -112,6 +112,8 @@ data class TvPaneRow(
     val badgeAlert: Boolean = false,
     val loading: Boolean = false,
     val pinnedOptions: List<TvPaneOption> = emptyList(),
+    /** What OK on the row does, for a row that opens something of its own; null keeps OK describing it, as today. */
+    val onClick: (() -> Unit)? = null,
 )
 
 /** A button the board draws for an action that is not an option: what it says, what it does, and whether it is live. */
@@ -294,7 +296,7 @@ private fun TvPaneListRow(
     ListItem(
         // The described row is marked by its emphasis, not by `selected`, which would give it a container of its own.
         selected = false,
-        onClick = onFocused,
+        onClick = row.onClick ?: onFocused,
         headlineContent = {
             Text(
                 text = row.label,
