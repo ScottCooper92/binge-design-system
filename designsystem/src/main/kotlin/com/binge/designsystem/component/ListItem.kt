@@ -118,7 +118,7 @@ data class ListItem(
      * lands. The row stays tappable; only its summary is pending.
      */
     val detailLoading: Boolean = false,
-    /** A line of its own under [detail], never truncated by the label or the detail. See [ListItemNote]. */
+    /** A line of its own under [detail], never cut short by the label or the detail, but capped at two lines. See [ListItemNote]. */
     val note: ListItemNote? = null,
 )
 

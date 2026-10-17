@@ -255,12 +255,13 @@ fun TvSideSheetRow(
         chevronTint = if (opensPage) supporting else null,
         saving = saving,
         note = note,
+        noteColor = if (note?.warning == true && enabled && !focused) MaterialTheme.colorScheme.error else supporting,
     )
 }
 
 /**
- * A fact a [TvSideSheetRow] has to show in full, on a line of its own under the second line: a licence, say, which the
- * one-line label must not cut off. It leads with an optional [icon], and rests in the error colour when it is a
+ * A fact a [TvSideSheetRow] shows on a line of its own under the second line: a licence, say, which the
+ * one-line label must not cut off. It takes one line and ellipsizes, so keep [text] short. It leads with an optional [icon], and rests in the error colour when it is a
  * [warning]; focused, it takes the fill's content colour like the rest of the row.
  */
 @Immutable
@@ -321,6 +322,7 @@ private fun SideSheetRowLayout(
     chevronTint: Color? = null,
     saving: Boolean = false,
     note: TvSideSheetNote? = null,
+    noteColor: Color = supporting,
 ) {
     Row(
         modifier =
@@ -376,7 +378,7 @@ private fun SideSheetRowLayout(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                note?.let { RowNote(it, if (it.warning && !isFocused) MaterialTheme.colorScheme.error else supporting) }
+                note?.let { RowNote(it, noteColor) }
             }
         }
         if (trailing != null) {
