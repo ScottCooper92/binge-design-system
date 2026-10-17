@@ -1,5 +1,6 @@
 package com.binge.designsystem.tv.template
 
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,9 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -41,7 +44,7 @@ import com.binge.designsystem.tv.component.hasTvRowStatus
 import com.binge.designsystem.tv.component.tvRowEmphasis
 import com.binge.designsystem.tv.component.tvRowListItemColors
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
-import com.binge.designsystem.tv.focus.tvEntryFocusGroup
+import com.binge.designsystem.tv.focus.tvEndFocusDirection
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.uppercaseLocalised
@@ -94,6 +97,11 @@ data class TvPaneOption(
  *
  * The row's end can carry a status: [loading] while its value is on its way, else [badgeAlert] when it needs the user,
  * else [badgeCount] when something is waiting. Each takes width from the label, which ellipsizes rather than wraps.
+ *
+ * A row can open something of its own. [onClick] is what OK on it does; null keeps OK on the row as a move onto it.
+ * [paneContent] replaces the whole pane description, such as a [TvListPaneListPreview] of the list OK opens, and a
+ * row with both steps in on → as well as OK, since its pane shows the next level rather than controls to move into.
+ * [iconPainter] leads the row in place of [icon], for a glyph the caller resolves itself, such as an app's own.
  */
 @Immutable
 data class TvPaneRow(
@@ -112,7 +120,14 @@ data class TvPaneRow(
     val badgeAlert: Boolean = false,
     val loading: Boolean = false,
     val pinnedOptions: List<TvPaneOption> = emptyList(),
+    val onClick: (() -> Unit)? = null,
+    val iconPainter: (@Composable () -> Painter)? = null,
+    val paneContent: (@Composable () -> Unit)? = null,
 )
+
+/** Whether → on the row runs its [TvPaneRow.onClick] rather than moving into a pane that has nothing to focus. */
+internal val TvPaneRow.stepsIn: Boolean
+    get() = onClick != null && paneContent != null
 
 /** A button the board draws for an action that is not an option: what it says, what it does, and whether it is live. */
 @Immutable
@@ -178,6 +193,7 @@ fun TvListPaneBoard(
                 describedKey = describedRow?.key,
                 onFocusRow = onFocusRow,
                 describedRowFocus = describedRowFocus,
+                onStepIn = describedRow?.takeIf { it.stepsIn }?.onClick,
                 initialColumnHasFocus = initialListHasFocus,
                 clearAll = clearAll,
             )
@@ -194,18 +210,21 @@ fun TvListPaneBoard(
 
 /**
  * The start column: group titles over their rows. It scrolls under focus, with its vertical padding inside the
- * scroll so a focus fill at either end is not shaved by the column's edge.
+ * scroll so a focus fill at either end is not shaved by the column's edge. [onStepIn] runs on → in place of the
+ * move into the pane, for a described row whose pane previews where it leads.
  */
 @Composable
-private fun TvPaneList(
+internal fun TvPaneList(
     groups: List<TvPaneGroup>,
     describedKey: String?,
     onFocusRow: (String) -> Unit,
     describedRowFocus: FocusRequester,
     modifier: Modifier = Modifier,
+    onStepIn: (() -> Unit)? = null,
     initialColumnHasFocus: Boolean = false,
     clearAll: TvPaneAction? = null,
 ) {
+    val endDirection = tvEndFocusDirection()
     var columnHasFocus by remember { mutableStateOf(initialColumnHasFocus) }
     val firstRowKey =
         groups
@@ -222,7 +241,15 @@ private fun TvPaneList(
                     .onFocusChanged { columnHasFocus = it.hasFocus }
                     // Routes focus as it enters rather than requesting it on mount, so it never takes focus from a
                     // rail that still holds it. It is also what sends ← from an option back to the described row.
-                    .tvEntryFocusGroup(describedRowFocus)
+                    .focusProperties {
+                        onEnter = { runCatching { describedRowFocus.requestFocus() } }
+                        onExit = {
+                            if (onStepIn != null && requestedFocusDirection == endDirection) {
+                                cancelFocusChange()
+                                onStepIn()
+                            }
+                        }
+                    }.focusGroup()
                     .verticalScroll(rememberScrollState())
                     .padding(vertical = dimensionResource(TvR.dimen.tv_focus_ring_bleed)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_list_pane_row_gap)),
@@ -294,7 +321,7 @@ private fun TvPaneListRow(
     ListItem(
         // The described row is marked by its emphasis, not by `selected`, which would give it a container of its own.
         selected = false,
-        onClick = onFocused,
+        onClick = row.onClick ?: onFocused,
         headlineContent = {
             Text(
                 text = row.label,
@@ -309,7 +336,15 @@ private fun TvPaneListRow(
                 { Text(text = it, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             },
         leadingContent =
-            row.icon?.let { icon ->
+            row.iconPainter?.let { painter ->
+                {
+                    Icon(
+                        painter = painter(),
+                        contentDescription = null,
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)).tvListPaneFirstRowIconAnchor(isFirst),
+                    )
+                }
+            } ?: row.icon?.let { icon ->
                 {
                     Icon(
                         imageVector = icon,

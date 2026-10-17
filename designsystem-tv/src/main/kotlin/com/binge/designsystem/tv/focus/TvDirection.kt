@@ -55,3 +55,9 @@ internal fun tvEndFocusDirection(layoutDirection: LayoutDirection): FocusDirecti
         LayoutDirection.Ltr -> FocusDirection.Right
         LayoutDirection.Rtl -> FocusDirection.Left
     }
+
+internal fun tvStartFocusDirection(layoutDirection: LayoutDirection): FocusDirection =
+    when (layoutDirection) {
+        LayoutDirection.Ltr -> FocusDirection.Left
+        LayoutDirection.Rtl -> FocusDirection.Right
+    }
