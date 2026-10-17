@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.PreviewSystemBarInsets
 
 /**
  * Screenshot coverage for the containers / chrome catalog samples. Each renders the shared
@@ -38,6 +39,14 @@ class BingeActionFooterSamplesScreenshotTest {
     @Composable
     fun FooterElevated() {
         BingeActionFooterElevatedSample()
+    }
+
+    /** [FooterElevated] under a navigation bar: `clearsNavigationBar` lifts the button clear of it. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun FooterElevatedUnderSystemBars() {
+        PreviewSystemBarInsets { BingeActionFooterElevatedSample() }
     }
 
     /** The `loading` variant: spinner in place of the label. */

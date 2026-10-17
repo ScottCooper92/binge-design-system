@@ -1015,6 +1015,22 @@ fun ErrorScreenConfigurationSample() {
     }
 }
 
+/** Something that is not there: the not-found kind's glyph and copy, with nothing to retry. */
+@Composable
+fun ErrorScreenNotFoundSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        ErrorScreen(kind = ErrorKind.NotFound, onRetry = null)
+    }
+}
+
+/** Too many requests: the rate-limited kind's glyph and copy, and Try again for when the wait is over. */
+@Composable
+fun ErrorScreenRateLimitedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        RetryDemo { retry -> ErrorScreen(kind = ErrorKind.RateLimited, onRetry = retry) }
+    }
+}
+
 /** A refused sign-in with two ways out: Try again, and the settings page where the user fixes it. */
 @Composable
 fun ErrorScreenSecondarySample() {

@@ -78,6 +78,8 @@ agree with the consumers'.
   frame shows, so the screenshot does not change. Where the copy is ours, it says what the sample
   shows, and the file is `@file:SelfDescribing`. The README lists the catalog's file annotations:
   `OnePerScreen`, `CatalogGroup`, `ScreenshotOnly` and `SelfDescribing`.
+- The preview renderer reports every system-bar inset as 0dp, so a component or screen that reserves an inset itself
+  gets one frame wrapped in `PreviewSystemBarInsets` that would change if the reservation went.
 - A `@Preview(name = …)` token is short, lowercase and space-free: it is baked into the baseline's
   filename, and a long one breaks out of Windows' path limit under a worktree.
 

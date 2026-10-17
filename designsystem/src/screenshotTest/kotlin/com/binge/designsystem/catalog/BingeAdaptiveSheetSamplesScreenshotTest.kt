@@ -5,6 +5,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.PreviewSystemBarInsets
 
 /** A phone, below the expanded width, and a tablet in landscape, above it. */
 private const val COMPACT_DEVICE = "spec:width=412dp,height=800dp"
@@ -19,6 +20,14 @@ class BingeAdaptiveSheetSamplesScreenshotTest {
     @Composable
     fun Task() {
         BingeAdaptiveTaskSheetSample()
+    }
+
+    /** The side sheet keeps its pages clear of the status and navigation bars, which a default frame renders as zero. */
+    @PreviewTest
+    @Preview(name = "expanded-dark", device = EXPANDED_DEVICE, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun TaskUnderSystemBars() {
+        PreviewSystemBarInsets { BingeAdaptiveTaskSheetSample() }
     }
 
     @PreviewTest
