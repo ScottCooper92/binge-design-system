@@ -377,6 +377,53 @@ fun TvSwitchOffSample() {
     SwitchSheet(firstOn = false)
 }
 
+/** A switch in a row that cannot be used yet: the row and its switch dim together, whether the switch is on or off. */
+@Composable
+fun TvSwitchDisabledSample() {
+    var signedIn by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("This app")
+            TvSideSheetRows {
+                TvSideSheetRow(label = "Notify me", onClick = { signedIn = !signedIn }, initiallyFocused = true, role = Role.Switch) { isFocused ->
+                    TvSwitch(checked = signedIn, isFocused = isFocused)
+                }
+                TvSideSheetRow(label = "Sync watchlists", onClick = {}, enabled = false, role = Role.Switch) { isFocused ->
+                    TvSwitch(checked = true, isFocused = isFocused, enabled = false)
+                }
+                TvSideSheetRow(label = "Share my activity", onClick = {}, enabled = false, role = Role.Switch) { isFocused ->
+                    TvSwitch(checked = false, isFocused = isFocused, enabled = false)
+                }
+            }
+        }
+    }
+}
+
+/** A switch in a destructive row, focused: the row fills with the error colour and the switch inverts against it. */
+@Composable
+fun TvSwitchDestructiveSample() {
+    var wipe by remember { mutableStateOf(true) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("This app")
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Clear data on sign out",
+                    onClick = { wipe = !wipe },
+                    destructive = true,
+                    initiallyFocused = true,
+                    role = Role.Switch,
+                ) { isFocused ->
+                    TvSwitch(checked = wipe, isFocused = isFocused, destructive = true)
+                }
+                TvSideSheetRow(label = "Reset on update", onClick = {}, destructive = true, role = Role.Switch) { isFocused ->
+                    TvSwitch(checked = false, isFocused = isFocused, destructive = true)
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun SwitchSheet(firstOn: Boolean) {
     var notify by remember { mutableStateOf(firstOn) }
