@@ -385,7 +385,12 @@ fun TvSwitchDisabledSample() {
         TvSideSheetPanel {
             TvSideSheetTitle("This app")
             TvSideSheetRows {
-                TvSideSheetRow(label = "Notify me", onClick = { signedIn = !signedIn }, initiallyFocused = true, role = Role.Switch) { isFocused ->
+                TvSideSheetRow(
+                    label = "Notify me",
+                    onClick = { signedIn = !signedIn },
+                    initiallyFocused = true,
+                    role = Role.Switch,
+                ) { isFocused ->
                     TvSwitch(checked = signedIn, isFocused = isFocused)
                 }
                 TvSideSheetRow(label = "Sync watchlists", onClick = {}, enabled = false, role = Role.Switch) { isFocused ->
