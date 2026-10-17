@@ -1,6 +1,9 @@
 package com.binge.designsystem.tv.template
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -198,6 +201,29 @@ fun TvListPaneBoard(
         },
     )
 }
+
+/**
+ * A board's list column on its own and inert, as it will look once focus steps into it: drawn beside the list that
+ * leads to it, so the next level is the real list rather than a summary of it. Focus cannot enter it.
+ */
+@Composable
+fun TvListPaneListPreview(
+    groups: List<TvPaneGroup>,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                // The list column's share of a board, out of the pane's share, so the rows are as wide as they will be.
+                .fillMaxWidth(LIST_COLUMN_SHARE / (1f - LIST_COLUMN_SHARE))
+                .focusProperties { onEnter = { cancelFocusChange() } }
+                .focusGroup(),
+    ) {
+        TvPaneList(groups = groups, describedKey = null, onFocusRow = {}, describedRowFocus = remember { FocusRequester() })
+    }
+}
+
+private const val LIST_COLUMN_SHARE = 0.3f
 
 /**
  * The start column: group titles over their rows. It scrolls under focus, with its vertical padding inside the
