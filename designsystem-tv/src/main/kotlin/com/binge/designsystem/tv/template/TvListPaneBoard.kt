@@ -19,6 +19,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -114,6 +115,10 @@ data class TvPaneRow(
     val pinnedOptions: List<TvPaneOption> = emptyList(),
     /** What OK on the row does, for a row that opens something of its own; null keeps OK describing it, as today. */
     val onClick: (() -> Unit)? = null,
+    /** Drawn in place of [icon] in the list, for a glyph the caller resolves itself (a companion's own, say). */
+    val iconPainter: (@Composable () -> Painter)? = null,
+    /** Drawn in place of the whole pane description, for a row whose pane previews a list of its own. */
+    val paneContent: (@Composable () -> Unit)? = null,
 )
 
 /** A button the board draws for an action that is not an option: what it says, what it does, and whether it is live. */
@@ -311,7 +316,15 @@ private fun TvPaneListRow(
                 { Text(text = it, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             },
         leadingContent =
-            row.icon?.let { icon ->
+            row.iconPainter?.let { painter ->
+                {
+                    Icon(
+                        painter = painter(),
+                        contentDescription = null,
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_list_pane_row_icon)).tvListPaneFirstRowIconAnchor(isFirst),
+                    )
+                }
+            } ?: row.icon?.let { icon ->
                 {
                     Icon(
                         imageVector = icon,
