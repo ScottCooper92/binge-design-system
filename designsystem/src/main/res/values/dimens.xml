@@ -314,6 +314,8 @@
     <dimen name="item_group_row_padding_h">16dp</dimen>
     <dimen name="item_group_row_padding_v">14dp</dimen>
     <dimen name="item_group_icon_size">38dp</dimen>
+    <!-- ListItemNote's leading glyph, sized to the bodySmall line it leads. -->
+    <dimen name="list_item_note_icon_size">14dp</dimen>
     <dimen name="item_group_icon_glyph">20dp</dimen>
     <dimen name="item_group_loading_size">24dp</dimen>
     <!-- ListItem.connector: the corner radius where the line turns into a child row. -->

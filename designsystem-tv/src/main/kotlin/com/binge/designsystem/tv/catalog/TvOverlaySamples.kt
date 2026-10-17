@@ -13,8 +13,11 @@ import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +35,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvInfoCard
+import com.binge.designsystem.tv.component.TvSideSheetNote
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetReadout
 import com.binge.designsystem.tv.component.TvSideSheetRow
@@ -142,6 +146,43 @@ fun TvSideSheetRowLongLabelSample() {
                     label = shortLabel,
                     onClick = { selected = shortLabel },
                     selected = selected == shortLabel,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * [TvSideSheetNote]: a line of its own under the second line, so the one-line label cannot cut it off. The focused row's
+ * note takes the fill's colour; the resting row's [TvSideSheetNote.warning] note rests in the error colour.
+ */
+@Composable
+fun TvSideSheetRowNoteSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Sources")
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Night of the Living Dead (1968), restored from the original negative",
+                    icon = Icons.Filled.PlayCircle,
+                    supportingText = "Archive · H.264",
+                    note = TvSideSheetNote("No licence stated", icon = Icons.Filled.Warning, warning = true),
+                    onClick = {},
+                    initiallyFocused = true,
+                )
+                TvSideSheetRow(
+                    label = "Home recording",
+                    icon = Icons.Filled.PlayCircle,
+                    supportingText = "Archive",
+                    note = TvSideSheetNote("All rights reserved", icon = Icons.Filled.Warning, warning = true),
+                    onClick = {},
+                )
+                TvSideSheetRow(
+                    label = "Plan 9 from Outer Space",
+                    icon = Icons.Filled.PlayCircle,
+                    supportingText = "Archive",
+                    note = TvSideSheetNote("Public domain (US)", icon = Icons.Filled.Verified),
+                    onClick = {},
                 )
             }
         }

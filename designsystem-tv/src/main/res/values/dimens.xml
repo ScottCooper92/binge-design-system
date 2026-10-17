@@ -195,4 +195,6 @@
     <dimen name="tv_overview_backdrop_width">300dp</dimen>
     <dimen name="tv_overview_poster_width">140dp</dimen>
     <dimen name="tv_overview_text_max_width">760dp</dimen>
+    <!-- TvSideSheetNote's leading glyph, sized to the bodyMedium line it leads. -->
+    <dimen name="tv_side_sheet_note_icon_size">18dp</dimen>
 </resources>

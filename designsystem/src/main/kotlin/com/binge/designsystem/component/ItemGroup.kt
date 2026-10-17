@@ -243,6 +243,7 @@ private fun ListItemView(
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
+                    row.note?.let { RowNote(it) }
                 }
             },
             trailing = if (!trails) {
@@ -502,3 +503,30 @@ private const val DETAIL_SKELETON_FRACTION = 0.55f
 
 /** A line's height with nothing to read: the skeleton covers it. */
 private const val NBSP = "\u00A0"
+
+/** [ListItem.note]: its icon and text on one line under the detail, in the error colour for a warning. */
+@Composable
+private fun RowNote(note: ListItemNote) {
+    val color = if (note.warning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+    Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        note.icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(dimensionResource(R.dimen.list_item_note_icon_size)),
+            )
+            Spacer(Modifier.width(dimensionResource(R.dimen.padding_xs)))
+        }
+        Text(
+            text = note.text,
+            style = MaterialTheme.typography.bodySmall,
+            color = color,
+            maxLines = NOTE_MAX_LINES,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+private const val NOTE_MAX_LINES = 2

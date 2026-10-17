@@ -64,6 +64,14 @@ class ItemGroupSamplesScreenshotTest {
         ItemGroupDetailLoadingSample()
     }
 
+    /** [ListItem.note]: a plain note and a warning, each on its own line under a long label. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun note() {
+        ItemGroupNoteSample()
+    }
+
     /** The `rowVerticalPadding` override beside [titled]'s default rows (#133). */
     @PreviewTest
     @ComponentPreviews

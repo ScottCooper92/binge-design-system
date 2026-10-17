@@ -32,6 +32,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetRowNote() = Frame { TvSideSheetRowNoteSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun sideSheetReadout() = Frame { TvSideSheetReadoutSample() }
 
     @PreviewTest

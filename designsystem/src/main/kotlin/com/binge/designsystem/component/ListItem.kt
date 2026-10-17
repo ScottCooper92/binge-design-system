@@ -118,6 +118,20 @@ data class ListItem(
      * lands. The row stays tappable; only its summary is pending.
      */
     val detailLoading: Boolean = false,
+    /** A line of its own under [detail], never truncated by the label or the detail. See [ListItemNote]. */
+    val note: ListItemNote? = null,
+)
+
+/**
+ * A fact a row has to show in full, on a line of its own under the detail: a licence, say, which a long label or
+ * detail must not crowd out. It leads with an optional [icon], takes up to two lines, and reads in the error colour
+ * when it is a [warning].
+ */
+@Immutable
+data class ListItemNote(
+    val text: String,
+    val icon: ImageVector? = null,
+    val warning: Boolean = false,
 )
 
 /** The row's switch state, from [ListItem.toggleState] or else [ListItem.toggled]; null for a row with no switch. */

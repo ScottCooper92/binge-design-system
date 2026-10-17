@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -193,6 +195,7 @@ fun TvSideSheetRow(
     role: Role = Role.Button,
     opensPage: Boolean = false,
     saving: Boolean = false,
+    note: TvSideSheetNote? = null,
     trailing: (@Composable (isFocused: Boolean) -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
@@ -251,8 +254,21 @@ fun TvSideSheetRow(
         trailing = trailing?.let { slot -> { slot(focused) } },
         chevronTint = if (opensPage) supporting else null,
         saving = saving,
+        note = note,
     )
 }
+
+/**
+ * A fact a [TvSideSheetRow] has to show in full, on a line of its own under the second line: a licence, say, which the
+ * one-line label must not cut off. It leads with an optional [icon], and rests in the error colour when it is a
+ * [warning]; focused, it takes the fill's content colour like the rest of the row.
+ */
+@Immutable
+data class TvSideSheetNote(
+    val text: String,
+    val icon: ImageVector? = null,
+    val warning: Boolean = false,
+)
 
 /**
  * A read-out in a side sheet: a fact the sheet shows, such as a server's address or version, rather than a control. It stays out
@@ -304,6 +320,7 @@ private fun SideSheetRowLayout(
     focusedIconTint: Color = MaterialTheme.colorScheme.onPrimary,
     chevronTint: Color? = null,
     saving: Boolean = false,
+    note: TvSideSheetNote? = null,
 ) {
     Row(
         modifier =
@@ -324,7 +341,7 @@ private fun SideSheetRowLayout(
                     focusedTint = focusedIconTint,
                 )
         }
-        if (supportingText == null && reserveSupportingLine) {
+        if (supportingText == null && note == null && reserveSupportingLine) {
             // The reserved line is ghost text that only sets the height, so the label centres in the row against the icon plate
             // rather than sitting at the top of the two lines.
             Box(modifier = Modifier.weight(1f)) {
@@ -359,6 +376,7 @@ private fun SideSheetRowLayout(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+                note?.let { RowNote(it, if (it.warning && !isFocused) MaterialTheme.colorScheme.error else supporting) }
             }
         }
         if (trailing != null) {
@@ -386,6 +404,28 @@ private fun SideSheetRowLayout(
                 modifier = Modifier.size(dimensionResource(TvR.dimen.tv_side_sheet_chevron_size)),
             )
         }
+    }
+}
+
+@Composable
+private fun RowNote(note: TvSideSheetNote, color: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        note.icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(dimensionResource(TvR.dimen.tv_side_sheet_note_icon_size)),
+            )
+            Spacer(Modifier.width(dimensionResource(DesR.dimen.padding_xs)))
+        }
+        Text(
+            text = note.text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = color,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
