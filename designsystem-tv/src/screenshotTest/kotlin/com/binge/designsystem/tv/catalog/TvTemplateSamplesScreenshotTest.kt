@@ -113,6 +113,11 @@ class TvTemplateSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun errorPageGeneric() = Frame { TvErrorPageGenericSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun errorPageNoRetry() = Frame { TvErrorPageNoRetrySample() }
 
     @Composable

@@ -106,6 +106,16 @@ class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
     @ScreenStatePreview
     @Composable
+    fun errorKindNotFound() = ErrorScreenNotFoundSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun errorKindRateLimited() = ErrorScreenRateLimitedSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
     fun emptyAction() = EmptyScreenActionSample()
 
     @PreviewTest
@@ -229,6 +239,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @ScreenPreviews
     @Composable
     fun formFooter() = FormScreenFooterSample()
+
+    /** The pinned footer clears the navigation bar itself, which a default frame renders as zero. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun formFooterUnderSystemBars() = PreviewSystemBarInsets { FormScreenFooterSample() }
 
     @PreviewTest
     @ScreenPreviews
