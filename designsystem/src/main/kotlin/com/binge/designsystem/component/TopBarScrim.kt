@@ -64,7 +64,7 @@ private const val TITLE_SCRIM_SWITCH_FRACTION = 0.75f
  * other claim on (a screen transparent-bars scroll over, never a [Box] sized to the bar alone).
  */
 @Composable
-fun BoxScope.TopBarScrim(
+internal fun BoxScope.TopBarScrim(
     fraction: Float,
     modifier: Modifier = Modifier,
     scrimColor: Color = BingeTheme.colors.scrim,
