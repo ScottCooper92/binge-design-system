@@ -1,9 +1,9 @@
-name: Consumer check (binge-seerr)
+name: Consumer check
 
-# Informational. Compiles binge-seerr, a public consumer of this repository, against this PR's head
-# commit, because a green build here says nothing about a consumer: a changed public signature is
-# otherwise noticed only by the bump PR that arrives after it merged. The job itself is binge-ci's
-# consumer-check workflow; this file owns the triggers and says what to compile.
+# Informational. Compiles binge-seerr and binge-archive, the public consumers of this repository,
+# against this PR's head commit, because a green build here says nothing about a consumer: a changed
+# public signature is otherwise noticed only by the bump PR that arrives after it merged. Each job is
+# binge-ci's consumer-check workflow; this file owns the triggers and says what to compile.
 #
 # Deliberately NOT named `CI`. bot-review, author-ci-fix and author-conflicts match that name,
 # and this check can go red for a reason that has nothing to do with the diff being reviewed,
@@ -14,11 +14,15 @@ name: Consumer check (binge-seerr)
 # Informational is not the same as no effect on merging. bot-review's auto-merge reads the PR's
 # merge state, and a failing or still-running check here holds it at UNSTABLE, so the bot holds
 # the merge of an approved PR and names this check. That includes an intentional signature
-# change. A maintainer then merges by hand, or re-runs CI once this job is green.
+# change. A maintainer then merges by hand, or re-runs CI once both jobs are green.
 #
-# Binge is the other consumer and is private, so it needs a token and is not covered here.
+# Binge is the third consumer and is private, so it needs a token and is not covered here.
 #
-# It compiles the consumer's main and unit-test sources and nothing else: that is what catches a
+# The two jobs run one after the other. binge-ci's workflow takes one concurrency group per
+# repository and ref, with cancel-in-progress, so two calls side by side would cancel each other.
+# The second runs whatever the first's result, so each consumer still gets its own verdict.
+#
+# Each job compiles its consumer's main and unit-test sources and nothing else: that is what catches a
 # changed public signature. It also runs on pushes to main, which is what writes the Gradle cache:
 # setup-gradle only saves on the default branch. It runs only when something the consumer compiles
 # can have changed, and the catalog modules count: Gradle configures every project of an included
@@ -58,4 +62,12 @@ jobs:
     uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0c5177c6b9f591bf2d4c87a2d0d48d2680b4c398 # v1
     with:
       consumer: ScottCooper92/binge-seerr
+      tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
+
+  archive:
+    needs: seerr
+    if: ${{ !cancelled() }}
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0c5177c6b9f591bf2d4c87a2d0d48d2680b4c398 # v1
+    with:
+      consumer: ScottCooper92/binge-archive
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'

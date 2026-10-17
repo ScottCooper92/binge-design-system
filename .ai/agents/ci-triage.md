@@ -11,7 +11,8 @@ than one failure — fix them all, or say which you did not.
 | `ktlintMainSourceSetCheck` / `ktlintTestSourceSetCheck` failed | Formatting. Import order, indentation, wrapping, trailing commas. | `./gradlew ktlintFormat`, which formats every module, then read the diff before committing — it reformats, it does not think. **Never** a baseline or a `ktlint-disable` comment. |
 | `validateDebugScreenshotTest` / `reports/screenshotTest/` | A `@PreviewTest` frame no longer matches its committed PNG, or a new frame has no PNG. The report carries expected, actual and diff. | If the change was intended, `./gradlew updateDebugScreenshotTest`, look at the PNGs, commit them with the code. If not, the render changed by accident: fix the code. Never delete a baseline to get green. |
 | `checkTvMaterialSeparation` | A `designsystem-tv` file imports `androidx.compose.material3`, or a phone file imports `androidx.tv`. The two must not mix. | Use the equivalent on the right side of the seam. The one sanctioned crossing is `BingeTvTokens.kt`, named in `designsystem-tv/build.gradle.kts`; never add to that list to get green. |
-| `lintDebug` / `lint-results-*.html` | Android lint. Most often an unused resource, a missing content description, or an API level above `minSdk` 26. | Fix the finding. A `@Suppress` needs a reason in the code, and `lint-baseline.xml` is never the answer. |
+| `lintDebug` / `lint-results-*.html` | Android lint. Only six checks are raised to error, all about translations: a string missing its Spanish translation or one with no English source, a plural quantity missing or unused, a format placeholder that does not match. Other findings are warnings and do not fail the build. | Fix the finding. A `@Suppress` needs a reason in the code, and `lint-baseline.xml` is never the answer. |
+| `generate<Variant>CatalogRegistry` | The catalog app's generator found a malformed sample: a public `…Sample` or `…Demo` that takes parameters or is not composable, an annotation that runs over several lines, or a sample in a sub-package of `catalog/`. The error names the file and line. | Fix the sample. Make it a public no-parameter composable, put each annotation on one line, and keep samples directly in `catalog/`. A helper that is not a sample can be private or internal. |
 | Kotlin compile error | Ordinary. | Fix it. If the fix changes a **public** signature, say so in the PR body — see below. |
 | Unit test failure | Ordinary. | Fix the code, not the assertion, unless the assertion is provably the thing that is wrong. |
 | `Unresolved reference` after adding a dependency | The catalog and the module's `build.gradle.kts` disagree, or the dependency is not in `libs.versions.toml`. | Add it to the catalog at the root, not as a hardcoded coordinate. |
@@ -21,9 +22,9 @@ than one failure — fix them all, or say which you did not.
 
 **A green build here does not mean a green build in the consumers.**
 
-`consumer-check` compiles binge-seerr informationally, and Binge is private and is not compiled. If a repair changes a public signature — a
-parameter, a return type, a component's name — it is a change in two other codebases that will not
-notice until their next sync.
+`consumer-check` compiles binge-seerr and binge-archive informationally, and Binge is private and is
+not compiled. If a repair changes a public signature — a parameter, a return type, a component's
+name — it is a change in three other codebases that will not notice until their next sync.
 
 That is not a reason to avoid the fix. It is a reason to say so, in the PR body, rather than letting
 green be read as safe.

@@ -49,9 +49,9 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── theme/       BingeColors, BingeShapes, the expressive theme, typography, contrast
 ├── component/   the shared M3 components: the nav shell, buttons, chips, top bars, sheets, cards,
 │                rows, tiles, the hero carousel, the skeletons
-├── DisplayFormatters.kt   formatRating, formatVoteCount, toInitials, badgeCountLabel,
-│                          formatRuntime, the relative-or-absolute date formatter and month
-│                          names
+├── DisplayFormatters.kt   every formatter a component applies to a plain value — a score, a
+│                          count, initials, a runtime, a date, a time left — so each app shows
+│                          it the same way
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state, the shared aspect ratios, the error
 │                kinds, the save status, a decision screen's copy and locale-aware text
@@ -69,9 +69,8 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── theme/       the tv-material theme, projected from the same tokens
 ├── focus/       the focus groups, the indicator, arrival and scroll units
 ├── nav/         the navigation rail shell
-├── component/   the buttons, the card row, the section title, the message plate, the initials
-│                avatar, the QR code, the selected tick, the row emphasis, the option rows, the
-│                choice row, the tab row, the vertical divider and a detail page's Details footer
+├── component/   the shared tv-material components, one file each: anything a TV screen places
+│                that names none of Binge's types, from a button to a side sheet or a stepper
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
 │                flow, the message page, the error page, the detail page, the decision page, the list-and-pane board,
@@ -109,7 +108,7 @@ Run it from a checkout:
 ./gradlew :catalog-app:installDebug
 ```
 
-It installs beside Binge and binge-seerr, with two launcher entries: a phone one, and a leanback one
+It installs beside Binge and its companions, with two launcher entries: a phone one, and a leanback one
 for Android TV.
 
 **An entry appears with nothing to register.** The app is generated from the sources:
@@ -165,14 +164,14 @@ has no width presets. Language works differently, by handing the sample a contex
 locale.
 
 **Never published.** There is no release variant, no signing configuration and no APK artifact.
-`./gradlew build` compiles, lints and tests it with everything else, and nothing in Binge or
-binge-seerr substitutes it, so a consumer never configures it. `checkTvMaterialSeparation` also scans
+`./gradlew build` compiles, lints and tests it with everything else, and no consumer substitutes
+it, so a consumer never configures it. `checkTvMaterialSeparation` also scans
 its `tv/` package.
 
 ## Status
 
-**Pre-alpha, and consumed.** Binge and binge-seerr both include this build; Binge's own
-`core/designsystem` keeps only the components that still name one of its types.
+**Pre-alpha, and consumed.** Binge, binge-seerr and binge-archive all include this build; Binge's
+own `core/designsystem` keeps only the components that still name one of its types.
 
 Four slices have landed: the theme, the preview scaffolding and the components that named nothing
 of Binge's; then the display formatters and the components they unlocked; then the settings group
@@ -186,7 +185,7 @@ moved.
 Source-level, via a git submodule plus `includeBuild` — not a published artifact.
 
 That is deliberate. Publishing to Maven Central commits to a stable public API, and these components
-are still moving. A submodule gives both consumers the same source with no version skew and no API
+are still moving. A submodule gives every consumer the same source with no version skew and no API
 promise to keep. Maven Central stays available later, when the surface has settled.
 
 The catalog at the root is load-bearing for the same reason: a consumer includes this build, so a
@@ -215,7 +214,7 @@ to `settings.gradle.kts` and nothing else.
 
 A submodule pins a commit, so a consumer updates deliberately — `git submodule update --remote` —
 rather than being moved by whatever landed here today. That is the property that makes source-level
-sharing survivable across three repositories.
+sharing survivable across four repositories.
 
 ## Test fixtures
 

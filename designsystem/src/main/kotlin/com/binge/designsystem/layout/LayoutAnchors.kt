@@ -81,13 +81,10 @@ object LayoutAnchors {
         /**
          * The first content carousel below the entry row.
          *
-         * Which carousel that is depends on the data — a watchlist row when the user has one, else the
-         * on-your-services row, else the category row, else the leading genre row — so this anchor rides
-         * whichever actually leads. That is the right reading: the skeleton promises *a* carousel there, and
-         * what has to hold is that the first one lands where the first plate did.
-         *
-         * All four cases are named deliberately: an earlier version stopped at the category row, leaving a
-         * genre-only hub with no anchored carousel while this KDoc still claimed one.
+         * Which carousel that is depends on the caller's data, so this anchor rides whichever actually
+         * leads. That is the right reading: the skeleton promises *a* carousel there, and what has to hold
+         * is that the first one lands where the first plate did. A caller that picks its leading carousel
+         * from several cases anchors every case, not only the common ones.
          */
         const val FIRST_CAROUSEL: String = "hub-first-carousel"
     }
