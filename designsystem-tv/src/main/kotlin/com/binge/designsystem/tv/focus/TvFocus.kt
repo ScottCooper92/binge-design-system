@@ -218,6 +218,20 @@ fun Modifier.tvClickable(
 fun Modifier.tvFocusGroup(): Modifier = this.focusRestorer().focusGroup()
 
 /**
+ * [tvFocusGroup] for a **lazy** row, column or grid, which is already its own focus group: the restorer alone, so
+ * the D-pad resumes on the child that last held focus rather than on the column's nearest cell.
+ *
+ * Not [tvFocusGroup] on a lazy container: the lazy layout installs its own focus group, so this adds only the
+ * restorer and leaves the focus tree as the layout built it, rather than wrapping it in a second group.
+ *
+ * [fallback] is where the **first** entry lands, before anything has been saved — a pane whose leading children are
+ * controls sends it to the first value below them. Re-entry still resumes on the saved child; the fallback only
+ * fills the gap [tvFocusGroup] leaves to geometry. Null leaves that first entry to geometry too. Not
+ * [tvEntryFocusGroup], which routes *every* entry to one child and so forgets where the user was.
+ */
+fun Modifier.tvLazyFocusGroup(fallback: FocusRequester? = null): Modifier = this.focusRestorer(fallback ?: FocusRequester.Default)
+
+/**
  * One focus unit whose **entry is routed to a chosen child** — the first cell of a lazy row/grid, or a
  * remembered one — instead of left to a directional search.
  *
