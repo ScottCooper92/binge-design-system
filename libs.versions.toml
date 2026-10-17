@@ -29,6 +29,7 @@ androidxWindow = "1.5.1"
 coreKtx = "1.19.1"
 activityCompose = "1.13.0"
 # Only the paged-list phase reads it, from load states; the version agrees with Binge's and binge-seerr's.
+# binge-archive declares no paging version of its own.
 paging = "3.5.2"
 kotlinxCoroutines = "1.11.0"
 junit5 = "6.1.3"
