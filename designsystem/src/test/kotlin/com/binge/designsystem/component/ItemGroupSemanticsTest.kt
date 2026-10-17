@@ -16,6 +16,7 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.testing.TestTheme
@@ -278,5 +279,21 @@ class ItemGroupSemanticsTest {
             .onNode(hasText("Watchlist"))
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.ToggleableState))
+    }
+
+    @Test
+    fun `a row whose detail is loading says so and still takes its tap`() {
+        var taps = 0
+        composeTestRule.setContent {
+            TestTheme {
+                ItemGroup(
+                    title = null,
+                    rows = listOf(ListItem(icon = Icons.Filled.Bookmark, label = "Sources", detailLoading = true, onClick = { taps++ })),
+                )
+            }
+        }
+        composeTestRule.onNodeWithContentDescription("In progress", useUnmergedTree = true).assertExists()
+        composeTestRule.onNode(hasText("Sources")).assertHasClickAction().performClick()
+        assertEquals(1, taps)
     }
 }

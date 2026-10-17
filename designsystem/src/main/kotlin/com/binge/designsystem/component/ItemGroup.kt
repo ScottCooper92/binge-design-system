@@ -48,7 +48,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
@@ -62,6 +64,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
+import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.tonalContainer
 import com.binge.designsystem.uppercaseLocalised
@@ -227,7 +230,10 @@ private fun ListItemView(
                             MaterialTheme.colorScheme.onSurface
                         },
                     )
-                    if (!row.detail.isNullOrBlank()) {
+                    if (row.detailLoading) {
+                        Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
+                        DetailSkeletonLine()
+                    } else if (!row.detail.isNullOrBlank()) {
                         Spacer(Modifier.size(dimensionResource(R.dimen.account_group_label_detail_spacing)))
                         Text(
                             text = row.detail,
@@ -474,3 +480,25 @@ private fun listItemConnector(connector: ListItemConnector): Modifier {
         }
     }
 }
+
+/**
+ * [ListItem.detailLoading]'s placeholder: a line of the detail's own type, so the row is as tall now as when the detail
+ * lands, under a skeleton about a short summary's width. A screen reader hears it as in progress.
+ */
+@Composable
+private fun DetailSkeletonLine() {
+    val inProgress = stringResource(R.string.cd_list_item_loading)
+    Text(
+        text = NBSP,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier
+            .fillMaxWidth(DETAIL_SKELETON_FRACTION)
+            .skeleton(visible = true, shape = BingeShapes.ElementSmall)
+            .clearAndSetSemantics { contentDescription = inProgress },
+    )
+}
+
+private const val DETAIL_SKELETON_FRACTION = 0.55f
+
+/** A line's height with nothing to read: the skeleton covers it. */
+private const val NBSP = "\u00A0"
