@@ -27,7 +27,7 @@ import com.binge.designsystem.tv.R as TvR
  * it first.
  */
 @Composable
-fun TvIllustration(icon: ImageVector, modifier: Modifier = Modifier) {
+internal fun TvIllustration(icon: ImageVector, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(dimensionResource(TvR.dimen.tv_illustration_plate))

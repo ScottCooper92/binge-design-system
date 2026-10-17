@@ -26,7 +26,7 @@ import com.binge.designsystem.R
  * What an open [BingeExpandableGroup] shows beneath its header: its rows, or the loading and failed bodies of rows
  * read when the group opens.
  */
-sealed interface BingeGroupContent {
+internal sealed interface BingeGroupContent {
     /** The rows are being read: a loading indicator. */
     data object Loading : BingeGroupContent
 
@@ -57,7 +57,7 @@ sealed interface BingeGroupContent {
  * [rowsAbove] are ordinary rows above the header, for a group the expandable entry is only part of.
  */
 @Composable
-fun BingeExpandableGroup(
+internal fun BingeExpandableGroup(
     title: String?,
     header: ListItem,
     content: BingeGroupContent,
@@ -91,7 +91,7 @@ fun BingeExpandableGroup(
  * The header row of a [BingeExpandableGroup]: [title], a chevron, and [collapsedDetail] beneath the title while the
  * group is shut — a hint at what opening it offers. A tap calls [onExpandedChange] with the state it asks for.
  */
-fun bingeExpandableItem(
+internal fun bingeExpandableItem(
     icon: ImageVector,
     title: String,
     expanded: Boolean,
