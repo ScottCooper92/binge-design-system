@@ -60,12 +60,18 @@ data class FormAction(
 
 /** Where a [FormScreen]'s [FormAction]s sit. */
 enum class FormActionPlacement {
-    /** The primary action as a text verb in the top bar: a multi-field edit whose fields must apply together. */
+    /**
+     * The primary action as a text verb in the top bar. Two cases: a multi-field edit whose fields must apply
+     * together, and the commit of a tab-root screen under the floating navigation pill
+     * ([com.binge.designsystem.component.BingeNavPresentation.FloatingBar]), which covers a pinned [Footer].
+     * There the verb is the screen's own, such as "Connect" or "Send".
+     */
     TopBar,
 
     /**
      * A bar pinned under the form, with the secondary action beside the primary: the action the screen exists for,
-     * such as connect, send, request, create or report. The default.
+     * such as connect, send, request, create or report. The default, except under the floating navigation pill,
+     * which covers it: a tab-root screen there commits from [TopBar].
      */
     Footer,
 }
