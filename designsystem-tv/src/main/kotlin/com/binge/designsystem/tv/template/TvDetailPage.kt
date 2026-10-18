@@ -24,7 +24,7 @@ import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.TvArrivalFocusEffect
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
-import com.binge.designsystem.tv.focus.tvArrivalObserver
+import com.binge.designsystem.tv.focus.tvArrivalTarget
 import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
@@ -60,6 +60,11 @@ import com.binge.designsystem.tv.R as TvR
  * [TvBoard]: [hosting] decides who places first focus. As an overlay (how a detail page is shown) it claims focus
  * itself, once, on arrival; in a rail destination the shell offers it.
  *
+ * A caller that owns the arrival places it itself: pass its [pageArrival] and the page aims that requester at the list and
+ * reports subtree focus into it, but does not claim focus on its own. [respectTopInset] false drops [LocalTvTopInset] from
+ * the anchor, for a host that already clears it. [anchorCorrectionEnabled] false stops the keeper's corrective scroll, so a
+ * test can read the list's own restored position.
+ *
  * [initialFocusedSectionKey] seeds both the anchor and the list position, which is what makes the
  * anchored (off-rest) states screenshot-testable: a static frame runs no coroutines, so a baseline
  * relying on the keeper's effect would quietly capture an unscrolled list.
@@ -69,6 +74,9 @@ fun TvDetailPage(
     modifier: Modifier = Modifier,
     entryFocus: FocusRequester? = null,
     hosting: TvPageHosting = currentTvPageHosting(),
+    pageArrival: TvArrivalFocus? = null,
+    respectTopInset: Boolean = true,
+    anchorCorrectionEnabled: Boolean = true,
     initialFocusedSectionKey: String? = null,
     listState: LazyListState? = null,
     contentPadding: PaddingValues = PaddingValues(bottom = dimensionResource(TvR.dimen.tv_detail_page_content_bottom)),
@@ -76,8 +84,9 @@ fun TvDetailPage(
 ) {
     val entries = TvDetailPageScope().apply(sections).entries
     if (entries.isEmpty()) return
+    val topInset = LocalTvTopInset.current
     val anchorTopPx = with(LocalDensity.current) {
-        (dimensionResource(TvR.dimen.tv_detail_page_section_anchor_top) + LocalTvTopInset.current).roundToPx()
+        dimensionResource(TvR.dimen.tv_detail_page_section_anchor_top).roundToPx() + if (respectTopInset) topInset.roundToPx() else 0
     }
     // Saveable so a drill-down push-and-pop (which disposes this composition) restores the browsed
     // section rather than presenting the page back at rest.
@@ -103,7 +112,8 @@ fun TvDetailPage(
         scrollTarget,
         focusedItemKey,
         shouldScroll = {
-            scrollTarget != state.firstVisibleItemIndex || scrollOffset != state.firstVisibleItemScrollOffset
+            anchorCorrectionEnabled &&
+                (scrollTarget != state.firstVisibleItemIndex || scrollOffset != state.firstVisibleItemScrollOffset)
         },
     ) {
         if (reduceMotion) {
@@ -120,9 +130,10 @@ fun TvDetailPage(
     // A page that is not a rail destination places its own first focus. The claim aims at the list node, a target that
     // does not move as the user browses, and the entry group routes it on — to the action row on a fresh page, to the
     // remembered section once the user has been below it.
-    val claimsFocus = hosting != TvPageHosting.RailDestination
-    val pageArrival = remember { TvArrivalFocus(FocusRequester()) }
-    if (claimsFocus) TvArrivalFocusEffect(pageArrival)
+    val ownArrival = pageArrival == null
+    val claimsFocus = ownArrival && hosting != TvPageHosting.RailDestination
+    val arrival = pageArrival ?: remember { TvArrivalFocus(FocusRequester()) }
+    if (claimsFocus) TvArrivalFocusEffect(arrival)
     TvStableFocusScroll {
         LazyColumn(
             state = state,
@@ -131,7 +142,7 @@ fun TvDetailPage(
             modifier = modifier
                 .fillMaxSize()
                 .onFocusChanged(reportBodyFocus)
-                .then(if (claimsFocus) Modifier.focusRequester(pageArrival.requester).tvArrivalObserver(pageArrival) else Modifier)
+                .then(if (claimsFocus || !ownArrival) Modifier.tvArrivalTarget(arrival) else Modifier)
                 .then(entryTarget?.let { Modifier.tvEntryFocusGroup(it) } ?: Modifier),
         ) {
             entries.forEach { entry ->
