@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +57,9 @@ import com.binge.designsystem.theme.BingeShapes
  * a [WrappingRow], not a `FlowRow`: `FlowRow` reports fewer lines than it draws, so the card comes out too short and
  * clips what sits below. An optional [footer] spans the full inner width below the main line (e.g. a progress bar that also
  * runs under the poster).
+ * A non-null [selected] makes the row one choice of a single-select list: it takes `Role.RadioButton` and the selected
+ * state, so a screen reader hears "Label, radio button, selected", and paints nothing itself (tint the row with
+ * [containerColor], or show a tick, as the caller likes).
  */
 @Composable
 fun ListRow(
@@ -71,9 +75,12 @@ fun ListRow(
     trailingContent: (@Composable () -> Unit)? = null,
     trailingGap: Dp = dimensionResource(R.dimen.list_row_gap),
     footer: (@Composable () -> Unit)? = null,
+    selected: Boolean? = null,
     content: @Composable RowScope.(Modifier) -> Unit,
 ) {
-    val clickable = if (onClick != null) {
+    val clickable = if (onClick != null && selected != null) {
+        Modifier.selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick)
+    } else if (onClick != null) {
         Modifier.clickable(enabled = enabled, role = Role.Button, onClick = onClick)
     } else {
         Modifier
