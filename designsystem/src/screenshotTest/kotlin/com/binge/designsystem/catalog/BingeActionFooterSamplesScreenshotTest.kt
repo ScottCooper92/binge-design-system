@@ -56,4 +56,12 @@ class BingeActionFooterSamplesScreenshotTest {
     fun FooterLoading() {
         BingeActionFooterLoadingSample()
     }
+
+    /** The `destructive` variant: the button in the error tone. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun FooterDestructive() {
+        BingeActionFooterDestructiveSample()
+    }
 }

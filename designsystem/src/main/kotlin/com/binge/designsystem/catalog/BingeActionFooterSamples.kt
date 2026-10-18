@@ -99,3 +99,14 @@ fun BingeActionFooterLoadingSample() {
         BingeActionFooter(label = "Show results", onClick = {}, loading = true)
     }
 }
+
+/**
+ * The footer for a sheet whose one action removes or declines something: the same band and button in
+ * the error tone, as on a request's decline-with-reason sheet.
+ */
+@Composable
+fun BingeActionFooterDestructiveSample() {
+    ScreenshotTheme {
+        BingeActionFooter(label = "Decline request", onClick = {}, destructive = true)
+    }
+}
