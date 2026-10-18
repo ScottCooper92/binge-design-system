@@ -25,9 +25,9 @@ import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
+import com.binge.designsystem.tv.component.tvDetailHeroBand
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
-import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -135,15 +135,16 @@ fun TvDetailPageSkeleton(
 /** `TvDetailHero`'s band: its height, its content padding, the poster and copy on the weighted row, the pills at the foot. */
 @Composable
 private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
+    val band = tvDetailHeroBand()
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(dimensionResource(TvR.dimen.tv_detail_page_hero_height) + LocalTvTopInset.current)
+                .height(band.height)
                 .padding(
                     start = tvContentGutterStart(),
                     end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                    top = dimensionResource(TvR.dimen.tv_detail_page_hero_content_top) + LocalTvTopInset.current,
+                    top = band.contentTop,
                 ),
     ) {
         Row(
