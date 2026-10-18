@@ -266,6 +266,30 @@ class ItemGroupSemanticsTest {
     }
 
     @Test
+    fun `a checked row is a checkbox that reads chosen or not and takes its tap`() {
+        var taps = 0
+        composeTestRule.setContent {
+            TestTheme {
+                ItemGroup(
+                    title = null,
+                    rows = listOf(
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Netflix", checked = true, onClick = { taps++ }),
+                        ListItem(icon = Icons.Filled.Bookmark, label = "Prime Video", checked = false),
+                    ),
+                )
+            }
+        }
+        val isCheckbox = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox)
+        composeTestRule
+            .onNode(hasText("Netflix"))
+            .assert(isCheckbox)
+            .assertIsOn()
+            .performClick()
+        composeTestRule.onNode(hasText("Prime Video")).assert(isCheckbox).assertIsOff()
+        assertEquals(1, taps)
+    }
+
+    @Test
     fun `a plain row is still a button with no toggle state`() {
         composeTestRule.setContent {
             TestTheme {

@@ -120,6 +120,13 @@ data class ListItem(
     val detailLoading: Boolean = false,
     /** A line of its own under [detail], never cut short by the label or the detail, but capped at two lines. See [ListItemNote]. */
     val note: ListItemNote? = null,
+    /**
+     * Makes this a tick row of a multi-select list: non-null is whether the row is chosen. The whole row is one
+     * `Role.Checkbox` node carrying that state, so a screen reader announces "Label, Checkbox, Checked". It draws
+     * nothing itself, since the caller shows the tick, and unlike [selected] it paints no wash. [toggled] and
+     * [toggleState] take precedence, and a checked row has no long-press.
+     */
+    val checked: Boolean? = null,
 )
 
 /**
