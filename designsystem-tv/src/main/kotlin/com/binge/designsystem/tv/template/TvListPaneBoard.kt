@@ -226,6 +226,9 @@ internal fun TvPaneList(
 ) {
     val endDirection = tvEndFocusDirection()
     var columnHasFocus by remember { mutableStateOf(initialColumnHasFocus) }
+    // Whether the described row itself holds focus, as opposed to another child of the column such as Clear all: the
+    // step-in is that row's, and the column's exit fires for whichever child the key leaves.
+    var describedRowHasFocus by remember { mutableStateOf(false) }
     val firstRowKey =
         groups
             .firstOrNull()
@@ -244,7 +247,7 @@ internal fun TvPaneList(
                     .focusProperties {
                         onEnter = { runCatching { describedRowFocus.requestFocus() } }
                         onExit = {
-                            if (onStepIn != null && requestedFocusDirection == endDirection) {
+                            if (onStepIn != null && describedRowHasFocus && requestedFocusDirection == endDirection) {
                                 cancelFocusChange()
                                 onStepIn()
                             }
@@ -266,7 +269,15 @@ internal fun TvPaneList(
                         modifier =
                             Modifier
                                 .tvListPaneFirstRowAnchor(row.key == firstRowKey)
-                                .then(if (described) Modifier.focusRequester(describedRowFocus) else Modifier),
+                                .then(
+                                    if (described) {
+                                        Modifier
+                                            .focusRequester(describedRowFocus)
+                                            .onFocusChanged { describedRowHasFocus = it.isFocused }
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
                     )
                 }
             }
