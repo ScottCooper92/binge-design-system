@@ -429,6 +429,40 @@ fun TvSwitchDestructiveSample() {
     }
 }
 
+/**
+ * A checked switch in a destructive row, focused and unfocused: the focused row fills with the error colour and its switch
+ * inverts, and the unfocused one keeps the error colour for its track, so the row is destructive from label to switch.
+ */
+@Composable
+fun TvSwitchDestructiveCheckedSample() {
+    var wipe by remember { mutableStateOf(true) }
+    var reset by remember { mutableStateOf(true) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("This app")
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Clear data on sign out",
+                    onClick = { wipe = !wipe },
+                    destructive = true,
+                    initiallyFocused = true,
+                    role = Role.Switch,
+                ) { isFocused ->
+                    TvSwitch(checked = wipe, isFocused = isFocused, destructive = true)
+                }
+                TvSideSheetRow(
+                    label = "Reset on update",
+                    onClick = { reset = !reset },
+                    destructive = true,
+                    role = Role.Switch,
+                ) { isFocused ->
+                    TvSwitch(checked = reset, isFocused = isFocused, destructive = true)
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun SwitchSheet(firstOn: Boolean) {
     var notify by remember { mutableStateOf(firstOn) }

@@ -27,7 +27,8 @@ import com.binge.designsystem.tv.R as TvR
  * so a screen reader calls it a switch rather than a button.
  *
  * Match the row it sits in. A switch in a row that is not [enabled] dims with the row. One in a destructive row is
- * [destructive]: focused, the row fills with the error colour, and the switch inverts against that instead of the accent.
+ * [destructive]: focused, the row fills with the error colour, and the switch inverts against that instead of the accent;
+ * unfocused, a checked switch has the error colour for its track rather than the accent.
  */
 @Composable
 fun TvSwitch(
@@ -38,7 +39,8 @@ fun TvSwitch(
     destructive: Boolean = false,
 ) {
     val scheme = MaterialTheme.colorScheme
-    // On a focused row the fill is the accent, so the switch inverts against it.
+    // On a focused row the fill is the accent, so the switch inverts against it. A destructive one reads in the error
+    // colour whether or not it is focused, so a checked switch is never half destructive beside its red label.
     val fill = if (destructive) scheme.error else scheme.primary
     val onFill = if (destructive) scheme.onError else scheme.onPrimary
     val (track, thumb, outline) =
@@ -47,7 +49,7 @@ fun TvSwitch(
             !enabled -> Triple(Color.Transparent, scheme.onSurface, scheme.onSurface)
             isFocused && checked -> Triple(onFill, fill, onFill)
             isFocused -> Triple(Color.Transparent, onFill, onFill)
-            checked -> Triple(scheme.primary, scheme.onPrimary, scheme.primary)
+            checked -> Triple(fill, onFill, fill)
             else -> Triple(Color.Transparent, scheme.onSurfaceVariant, scheme.onSurfaceVariant)
         }
     Box(
