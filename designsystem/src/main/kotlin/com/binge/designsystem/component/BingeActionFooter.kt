@@ -39,6 +39,8 @@ import com.binge.designsystem.theme.BingeShapes
  * [BingeShapes.HeroTop] and [R.dimen.snackbar_elevation] instead, so it reads as a raised band of
  * its own rather than the page's background continuing under the button.
  *
+ * [destructive] gives the button the error tone, for a sheet whose one action removes or declines something.
+ *
  * [bottomPadding] is spacing, not a safe area. A sheet's own `contentWindowInsets` already applies
  * `safeDrawing` around its content — `BottomSheet` calls `windowInsetsPadding` with it — so this
  * never stood in for the gesture area, and a host that reads the inset itself is not reading it
@@ -73,6 +75,7 @@ fun BingeActionFooter(
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
     clearsNavigationBar: Boolean = false,
     sidePadding: PaddingValues = PaddingValues(horizontal = horizontalPadding),
+    destructive: Boolean = false,
 ) {
     val direction = LocalLayoutDirection.current
     Surface(
@@ -87,6 +90,7 @@ fun BingeActionFooter(
             leadingIcon = leadingIcon,
             enabled = enabled,
             loading = loading,
+            destructive = destructive,
             modifier =
                 Modifier
                     .fillMaxWidth()
