@@ -16,7 +16,8 @@ import coil3.compose.LocalAsyncImagePreviewHandler
  * own shape in for the image asserts the stand-in rather than the production scaling. Give the size the
  * aspect ratio the real artwork has and the composable letterboxes, crops or fills for real.
  *
- * A null or blank model still takes the placeholder branch, as in production.
+ * Every model resolves to it, a null or blank one included, so a frame that needs the no-image fallback
+ * renders that cell outside this wrapper.
  *
  * The preview-handler API is `@ExperimentalCoilApi` (Coil 3.5.0) with no stable equivalent; the opt-in is
  * accepted for preview-only tooling.
