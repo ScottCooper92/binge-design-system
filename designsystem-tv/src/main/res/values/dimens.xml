@@ -90,6 +90,7 @@
     <!-- Detail page: the hero band, its copy column, the poster beside it, and how sections anchor under it. -->
     <dimen name="tv_detail_page_hero_height">424dp</dimen>
     <dimen name="tv_detail_page_hero_content_top">60dp</dimen>
+    <dimen name="tv_detail_page_hero_content_top_under_bar">16dp</dimen>
     <dimen name="tv_detail_page_poster_width">190dp</dimen>
     <dimen name="tv_detail_page_hero_gap">32dp</dimen>
     <dimen name="tv_detail_page_copy_width">460dp</dimen>

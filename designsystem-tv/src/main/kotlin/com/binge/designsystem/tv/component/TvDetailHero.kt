@@ -21,6 +21,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -74,6 +76,30 @@ data class TvHeroOverview(
     val onClickLabel: String? = null,
 )
 
+/** The hero band's height and the top of its content, which a skeleton reserves with the same numbers. */
+internal data class TvDetailHeroBand(
+    val height: Dp,
+    val contentTop: Dp,
+)
+
+/**
+ * With no top bar the band is `tv_detail_page_hero_height` and its content starts `tv_detail_page_hero_content_top` down.
+ * Under a host's top bar the content starts below the bar, and the bar already separates it from the content, so the
+ * usual gap is swapped for the tighter `tv_detail_page_hero_content_top_under_bar`. The band grows by the bar less what
+ * that gap gives back: the poster row keeps its height, and the first section still starts inside the screen, so it
+ * peeks as the cue that the page continues.
+ */
+@Composable
+internal fun tvDetailHeroBand(): TvDetailHeroBand {
+    val inset = LocalTvTopInset.current
+    val usualTop = dimensionResource(TvR.dimen.tv_detail_page_hero_content_top)
+    val contentTop = if (inset > 0.dp) inset + dimensionResource(TvR.dimen.tv_detail_page_hero_content_top_under_bar) else usualTop
+    return TvDetailHeroBand(
+        height = dimensionResource(TvR.dimen.tv_detail_page_hero_height) + (contentTop - usualTop),
+        contentTop = contentTop,
+    )
+}
+
 /**
  * A detail page's opening band: an end-aligned backdrop fading into the background on its left, the poster at
  * the gutter, and a copy column of overline, title, clamped synopsis and one line of facts, with the action row
@@ -92,12 +118,12 @@ fun TvDetailHero(
     overviewLines: Int = OVERVIEW_LINES,
     actions: @Composable () -> Unit,
 ) {
+    val band = tvDetailHeroBand()
     Box(
         modifier =
             modifier
                 .fillMaxWidth()
-                // The band grows by a host's top bar, as its content top moves down by it, so the poster row keeps its height.
-                .height(dimensionResource(TvR.dimen.tv_detail_page_hero_height) + LocalTvTopInset.current),
+                .height(band.height),
     ) {
         TvHeroArtworkPanel(
             veilColor = MaterialTheme.colorScheme.background,
@@ -112,7 +138,7 @@ fun TvDetailHero(
                     .padding(
                         start = tvContentGutterStart(),
                         end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                        top = dimensionResource(TvR.dimen.tv_detail_page_hero_content_top) + LocalTvTopInset.current,
+                        top = band.contentTop,
                     ),
         ) {
             Row(

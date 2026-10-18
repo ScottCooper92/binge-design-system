@@ -17,6 +17,11 @@ class TvDetailSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pageUnderTopBar() = Frame { TvDetailPageUnderTopBarSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun pageFocused() = Frame { TvDetailPageFocusedSample() }
 
     @PreviewTest
