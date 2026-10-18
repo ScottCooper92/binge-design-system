@@ -3,6 +3,7 @@ package com.binge.designsystem.preview
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,17 +50,28 @@ fun TaskSheetPreviewFrame(page: String = ROOT_PAGE, content: @Composable ColumnS
                 content()
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
-                    .fillMaxWidth()
-                    .clip(BingeShapes.HeroTop)
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh),
-            ) {
-                BottomSheetDefaults.DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
-                content()
-            }
+            TaskSheetBottomChrome(content)
         }
+    }
+}
+
+/**
+ * The top of a bottom sheet as the window shows it, anchored to the bottom of its [Box]: the rounded corners, the
+ * sheet's width cap and its drag handle. The one imitation of that chrome, shared by [TaskSheetPreviewFrame] and the
+ * catalog's menu sample.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun BoxScope.TaskSheetBottomChrome(content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
+            .fillMaxWidth()
+            .clip(BingeShapes.HeroTop)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+    ) {
+        BottomSheetDefaults.DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
+        content()
     }
 }

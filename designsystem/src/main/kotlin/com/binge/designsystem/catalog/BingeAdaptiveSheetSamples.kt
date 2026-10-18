@@ -4,29 +4,23 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
-import com.binge.designsystem.component.BingeSheetNav
-import com.binge.designsystem.component.BingeTaskSheetPanel
-import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.preview.ScreenshotTheme
-import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.preview.TaskSheetBottomChrome
+import com.binge.designsystem.preview.TaskSheetPreviewFrame
 
-private const val ROOT = "root"
 private const val DETAIL = "detail"
 
 /**
@@ -37,13 +31,7 @@ private const val DETAIL = "detail"
 @Composable
 fun BingeAdaptiveTaskSheetSample() {
     ScreenshotTheme {
-        SheetBackdrop {
-            if (isExpandedLayout()) {
-                BingeTaskSheetPanel(pages = listOf(ROOT), onPush = {}, onBack = {}) { SampleRootPage(it) }
-            } else {
-                BottomSheetChrome { SampleRootPage(null) }
-            }
-        }
+        SheetBackdrop { TaskSheetPreviewFrame { SampleRootPage() } }
     }
 }
 
@@ -54,61 +42,40 @@ fun BingeAdaptiveTaskSheetSample() {
 @Composable
 fun BingeAdaptiveTaskSheetStackedSample() {
     ScreenshotTheme {
-        SheetBackdrop {
-            if (isExpandedLayout()) {
-                BingeTaskSheetPanel(pages = listOf(ROOT, DETAIL), onPush = {}, onBack = {}) { SampleDetailPage() }
-            } else {
-                BottomSheetChrome { SampleDetailPage() }
-            }
-        }
+        SheetBackdrop { TaskSheetPreviewFrame(page = DETAIL) { SampleDetailPage() } }
     }
 }
 
 /** A menu sheet: a short choice, a capped bottom sheet at every width. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BingeAdaptiveMenuSheetSample() {
     ScreenshotTheme {
-        SheetBackdrop(sideSheet = false) {
-            BottomSheetChrome {
+        SheetBackdrop {
+            TaskSheetBottomChrome {
                 SampleRow("Open in browser")
                 SampleRow("Copy link")
                 SampleRow("Share")
+                SampleBottomSpace()
             }
         }
     }
 }
 
 @Composable
-private fun SheetBackdrop(sideSheet: Boolean = true, content: @Composable () -> Unit) {
+private fun SheetBackdrop(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-        contentAlignment = if (sideSheet && isExpandedLayout()) Alignment.CenterEnd else Alignment.BottomCenter,
-    ) { content() }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BottomSheetChrome(content: @Composable ColumnScope.() -> Unit) {
-    Column(
-        modifier = Modifier
-            .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
-            .fillMaxWidth()
-            .clip(BingeShapes.HeroTop)
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .padding(bottom = dimensionResource(R.dimen.padding_l)),
         content = content,
     )
 }
 
 @Composable
-private fun ColumnScope.SampleRootPage(nav: BingeSheetNav?) {
+private fun ColumnScope.SampleRootPage() {
     SampleTitle("Edit request")
     SampleRow("Seasons")
     SampleRow("Destination server")
     SampleRow("Quality profile")
-    // The depth is read so the root says where it sits in a stack, as an app's first page words itself.
-    if (nav != null && nav.depth == 1) SampleRow("Opens a page")
+    SampleBottomSpace()
 }
 
 @Composable
@@ -117,6 +84,7 @@ private fun ColumnScope.SampleDetailPage() {
     SampleRow("Season 1")
     SampleRow("Season 2")
     SampleRow("Season 3")
+    SampleBottomSpace()
 }
 
 @Composable
@@ -138,4 +106,10 @@ private fun SampleRow(text: String) {
             vertical = dimensionResource(R.dimen.padding_s),
         ),
     )
+}
+
+/** The space a real sheet keeps below its last row, which the frame's bare chrome does not add. */
+@Composable
+private fun SampleBottomSpace() {
+    Spacer(Modifier.height(dimensionResource(R.dimen.padding_l)))
 }
