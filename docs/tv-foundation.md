@@ -111,3 +111,14 @@ it holds focus and is expanded, and an accent *tint* on no fill when focus is ou
 and it is collapsed. That collapsed state is current-but-unfocused, expressed as fill-versus-tint
 rather than as two fills. A dim fill there would be a third mark for a state the rail already
 marks.
+
+## A refused save-as-made write is reported in place
+
+A TV page that saves each change as it is made has no Save button, no snackbar and no timed message. When the server
+*refuses* a write (a failure that would only be refused again, so there is nothing to retry), the page puts the saved
+value back and sets `SaveStatus.Refused(reason)`. `TvSaveStatus` draws it as an error-tone line with the reason and no
+Retry. The page owns the words.
+
+The line stays until the row is next changed or the page is left. There is no timer, because a timed message would
+expire unread on a screen nobody is holding. This applies to every TV save-as-made row. A transient failure, which keeps
+the change and can be sent again, is `SaveStatus.Failed` with Retry instead.
