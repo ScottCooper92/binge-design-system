@@ -65,6 +65,31 @@ class AvoidHorizontalFoldTest {
         assertEquals("the row stayed pushed down after the fold went", ROW_TOP, rowTop())
     }
 
+    @Test
+    fun `a row with a fixed outer height settles below the crease instead of oscillating`() {
+        compose.setContent {
+            Box(
+                Modifier
+                    .offset(y = FIXED_ROW_TOP)
+                    .fillMaxWidth()
+                    .height(FIXED_ROW_HEIGHT)
+                    .avoidHorizontalFold()
+                    .testTag(ROW),
+            )
+        }
+        publisher.overrideWindowLayoutInfo(TestWindowLayoutInfo(listOf(tabletopFold())))
+        compose.waitForIdle()
+        val settled = rowTop()
+        assertTrue("the row still crosses the crease at $settled", settled >= CREASE_BOTTOM)
+
+        repeat(SETTLE_PASSES) {
+            compose.mainClock.advanceTimeByFrame()
+            compose.waitForIdle()
+        }
+
+        assertEquals("the row moved again after it had settled", settled, rowTop())
+    }
+
     private fun rowTop() = compose.onNodeWithTag(ROW).getUnclippedBoundsInRoot().top
 
     private fun tabletopFold(): FoldingFeature =
@@ -86,5 +111,8 @@ class AvoidHorizontalFoldTest {
         val CREASE_BOTTOM = 510.dp
         val ROW_TOP = 470.dp
         val ROW_HEIGHT = 80.dp
+        val FIXED_ROW_TOP = 485.dp
+        val FIXED_ROW_HEIGHT = 30.dp
+        const val SETTLE_PASSES = 5
     }
 }

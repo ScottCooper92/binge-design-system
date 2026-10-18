@@ -124,7 +124,8 @@ internal fun foldSafeBottomHeight(
  *
  * For a compact control row or a short block of text, not a long scrolling column. A window with no
  * separating horizontal fold gets this modifier back unchanged, so every phone, tablet and flat-open
- * foldable is unaffected. Apply it before any padding or background that should move with the content.
+ * foldable is unaffected. A fixed size applied outside this modifier squeezes the content instead of
+ * moving it, so size the content inside it. Apply it before any padding or background that should move with the content.
  * Position is read in window pixels, the space the fold is reported in, so a node inside a dialog window
  * would measure the wrong thing.
  */
@@ -141,7 +142,8 @@ fun Modifier.avoidHorizontalFold(): Modifier {
         .padding(top = clearance)
         .onGloballyPositioned { coordinates ->
             unpaddedTopPx = coordinates.positionInWindow().y - with(density) { clearance.toPx() }
-            heightPx = coordinates.size.height
+            // The size is measured inside the padding; add it back so the straddle test sees the unpadded extent.
+            heightPx = coordinates.size.height + with(density) { clearance.roundToPx() }
         }
 }
 
