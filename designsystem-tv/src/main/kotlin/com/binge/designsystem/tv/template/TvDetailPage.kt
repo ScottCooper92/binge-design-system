@@ -65,6 +65,9 @@ import com.binge.designsystem.tv.R as TvR
  * the anchor, for a host that already clears it. [anchorCorrectionEnabled] false stops the keeper's corrective scroll, so a
  * test can read the list's own restored position.
  *
+ * Under a host's top bar ([LocalTvTopInset] above zero) the hero band tightens its content top, so the first section still peeks at
+ * rest instead of being pushed below the screen edge; with no bar the band is its usual height.
+ *
  * [initialFocusedSectionKey] seeds both the anchor and the list position, which is what makes the
  * anchored (off-rest) states screenshot-testable: a static frame runs no coroutines, so a baseline
  * relying on the keeper's effect would quietly capture an unscrolled list.

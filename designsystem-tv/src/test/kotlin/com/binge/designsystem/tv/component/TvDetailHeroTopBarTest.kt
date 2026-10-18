@@ -3,6 +3,8 @@ package com.binge.designsystem.tv.component
 import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -15,6 +17,7 @@ import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.nav.LocalTvTopInset
+import com.binge.designsystem.tv.template.TvDetailPage
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -28,6 +31,7 @@ import org.robolectric.annotation.GraphicsMode
 private const val HERO = "hero"
 private const val POSTER = "poster"
 private const val ACTIONS = "actions"
+private const val SECTION = "section"
 
 /** A real top bar's height: the top overscan, an icon button, and the bar's bottom gap. */
 private val TopBar = 95.dp
@@ -37,9 +41,20 @@ private val HeroHeight = 424.dp
 private val ActionHeight = 48.dp
 private const val TOLERANCE = 0.5f
 
+/** `tv_detail_page_hero_content_top` and `tv_detail_page_hero_content_top_under_bar`, as values. */
+private val UsualContentTop = 60.dp
+private val UnderBarContentTop = 16.dp
+private val SectionGap = 32.dp
+private val ScreenHeight = 540.dp
+
+/** The least the first section may show beneath the band at rest under a bar, for it to read as a cue that the page goes on. */
+private val MinPeek = 24.dp
+
 /**
- * Under a host's top bar the hero's content moves down by the bar, so the band grows by the bar too: the poster row keeps
- * its height, and the fixed-width poster ends above the action row rather than under it. With no bar the band is as it was.
+ * Under a host's top bar the hero's content starts below the bar, with a tighter gap than usual, since the bar already
+ * separates it. The band grows by the bar less what that gap gives back: the poster row keeps its height, the fixed-width
+ * poster ends above the action row rather than under it, and the first section still peeks at rest. With no bar the band
+ * is as it was.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(
@@ -63,11 +78,35 @@ class TvDetailHeroTopBarTest {
     }
 
     @Test
-    fun `under a top bar the band grows by the bar and the poster still ends above the actions`() {
+    fun `under a top bar the band grows by the bar less the gap it gives back, and the poster still ends above the actions`() {
         show(inset = TopBar)
 
         assertPosterAboveActions()
-        assertEquals((HeroHeight + TopBar).value, heroHeight().value, TOLERANCE)
+        assertEquals((HeroHeight + TopBar - (UsualContentTop - UnderBarContentTop)).value, heroHeight().value, TOLERANCE)
+        assertEquals((TopBar + UnderBarContentTop).value, bounds(POSTER).top.value, TOLERANCE)
+    }
+
+    @Test
+    fun `under a top bar the first section still peeks beneath the band at rest`() {
+        rule.setContent {
+            BingeTvTheme {
+                CompositionLocalProvider(LocalTvTopInset provides TopBar) {
+                    TvDetailPage(respectTopInset = true) {
+                        hero {
+                            TvDetailHero(item = TvDetailHeroItem(title = "Dune: Part Two"), artwork = {}, poster = {}) {
+                                Box(Modifier.size(ActionHeight).tvClickable(onFocusChanged = {}, onClick = {}))
+                            }
+                        }
+                        section("first") { Box(Modifier.fillMaxWidth().height(ScreenHeight).testTag(SECTION)) }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        val sectionTop = bounds(SECTION).top
+        assertEquals((HeroHeight + TopBar - (UsualContentTop - UnderBarContentTop) + SectionGap).value, sectionTop.value, TOLERANCE)
+        assertTrue("the first section starts at $sectionTop, leaving under $MinPeek of the screen", ScreenHeight - sectionTop >= MinPeek)
     }
 
     private fun show(inset: Dp) {

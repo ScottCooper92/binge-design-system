@@ -23,6 +23,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.theme.BingeShapes
@@ -35,6 +37,7 @@ import com.binge.designsystem.tv.component.TvHeroOverview
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.template.TvDetailPage
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
@@ -42,6 +45,9 @@ import com.binge.designsystem.tv.R as TvR
 
 private const val SAMPLE_CARD_COUNT = 8
 private const val SECTION_KEY = "seasons"
+
+/** A host's top bar as seerr draws it: the overscan, an icon button and the bar's bottom gap. */
+private val SAMPLE_TOP_BAR = 95.dp
 
 private val SampleHeroItem =
     TvDetailHeroItem(
@@ -59,8 +65,8 @@ private val BareHeroItem = TvDetailHeroItem(title = "A title with nothing else k
 
 /** Stands a page in for an overlay above the rail: nothing is cleared beside it, so every edge takes the overscan. */
 @Composable
-private fun OverlayHosted(content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalTvHostedAsOverlay provides true, content = content)
+private fun OverlayHosted(topInset: Dp = Dp.Hairline, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalTvHostedAsOverlay provides true, LocalTvTopInset provides topInset, content = content)
 }
 
 @Composable
@@ -104,12 +110,13 @@ private fun SampleHero(
 
 @Composable
 private fun SampleDetailPage(
+    topInset: Dp = Dp.Hairline,
     initialFocusedSectionKey: String? = null,
     synopsisFocused: Boolean = false,
     item: TvDetailHeroItem = SampleHeroItem,
 ) {
     val entryFocus = remember { FocusRequester() }
-    OverlayHosted {
+    OverlayHosted(topInset) {
         TvDetailPage(entryFocus = entryFocus, initialFocusedSectionKey = initialFocusedSectionKey) {
             hero { SampleHero(entryFocus, synopsisFocused, item) }
             section(SECTION_KEY) { onFocused ->
@@ -149,6 +156,12 @@ private const val SAMPLE_CARD_RATIO = 4f / 3f
 @Composable
 fun TvDetailPageSample() {
     SampleDetailPage()
+}
+
+/** A host's top bar (the height of seerr's) over the page at rest: the band's content tightens under it so the first row still peeks. */
+@Composable
+fun TvDetailPageUnderTopBarSample() {
+    SampleDetailPage(topInset = SAMPLE_TOP_BAR)
 }
 
 /** Focus in the first section: it is pulled to a fixed rest under where the hero was, the hero scrolled away above it. */
