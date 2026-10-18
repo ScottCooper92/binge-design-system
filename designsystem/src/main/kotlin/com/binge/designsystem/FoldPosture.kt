@@ -1,15 +1,24 @@
 package com.binge.designsystem
 
 import android.graphics.Rect
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
 
@@ -20,7 +29,7 @@ import androidx.window.layout.WindowInfoTracker
  * into an upright top half and a flat bottom half. The crease is a region to *stay out of*, because a control drawn across it is bent over
  * the hinge and half of it faces away from the user.
  */
-internal data class HorizontalHinge(
+data class HorizontalHinge(
     val top: Dp,
     val height: Dp,
 ) {
@@ -34,7 +43,7 @@ internal data class HorizontalHinge(
  * already had.
  */
 @Composable
-internal fun rememberHorizontalHinge(): HorizontalHinge? =
+fun rememberHorizontalHinge(): HorizontalHinge? =
     rememberSeparatingFold(FoldingFeature.Orientation.HORIZONTAL) { bounds ->
         HorizontalHinge(top = bounds.top.toDp(), height = bounds.height().toDp())
     }
@@ -107,4 +116,48 @@ internal fun foldSafeBottomHeight(
     if (hinge == null) return null
     val belowFold = windowHeight - hinge.bottom
     return if (belowFold < minHeight) null else belowFold
+}
+
+/**
+ * Keeps this node's content from straddling a tabletop crease: when the content would overlap the fold it
+ * starts below it instead, by adding top padding to the node.
+ *
+ * For a compact control row or a short block of text, not a long scrolling column. A window with no
+ * separating horizontal fold gets this modifier back unchanged, so every phone, tablet and flat-open
+ * foldable is unaffected. A fixed size applied outside this modifier squeezes the content instead of
+ * moving it, so size the content inside it. Apply it before any padding or background that should move with the content.
+ * Position is read in window pixels, the space the fold is reported in, so a node inside a dialog window
+ * would measure the wrong thing.
+ */
+@Composable
+fun Modifier.avoidHorizontalFold(): Modifier {
+    val hinge = rememberHorizontalHinge() ?: return this
+    val density = LocalDensity.current
+    var unpaddedTopPx by remember { mutableFloatStateOf(0f) }
+    var heightPx by remember { mutableIntStateOf(0) }
+    val clearance = with(density) {
+        foldClearancePadding(top = unpaddedTopPx.toDp(), height = heightPx.toDp(), hinge = hinge)
+    }
+    return this
+        .padding(top = clearance)
+        .onGloballyPositioned { coordinates ->
+            unpaddedTopPx = coordinates.positionInWindow().y - with(density) { clearance.toPx() }
+            // The size is measured inside the padding; add it back so the straddle test sees the unpadded extent.
+            heightPx = coordinates.size.height + with(density) { clearance.roundToPx() }
+        }
+}
+
+/**
+ * The top padding that moves content of [height], whose unpadded top is [top], from across [hinge] to just
+ * below it. Zero when there is no hinge or the content already sits wholly above or below the crease.
+ */
+internal fun foldClearancePadding(
+    top: Dp,
+    height: Dp,
+    hinge: HorizontalHinge?,
+): Dp {
+    if (hinge == null) return 0.dp
+    val bottom = top + height
+    val straddles = top < hinge.bottom && bottom > hinge.top
+    return if (straddles) hinge.bottom - top else 0.dp
 }
