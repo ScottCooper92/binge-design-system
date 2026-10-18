@@ -7,6 +7,7 @@ import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,8 +91,8 @@ class TvButtonColorsTest {
         lateinit var scheme: ColorScheme
         inTheme {
             scheme = it
-            solid = tvButtonColors(TvButtonStyle.Destructive, enabled = false, isFocused = true)
-            outline = tvButtonColors(TvButtonStyle.DestructiveOutline, enabled = false, isFocused = true)
+            solid = tvButtonColors(TvButtonStyle.Destructive, enabled = false, isFocused = false)
+            outline = tvButtonColors(TvButtonStyle.DestructiveOutline, enabled = false, isFocused = false)
         }
 
         listOf(solid, outline).forEach { disabled ->
@@ -138,20 +139,45 @@ class TvButtonColorsTest {
     }
 
     @Test
-    fun `a disabled text button is a dimmed label with no edge`() {
+    fun `a disabled text button is a dimmed label with no edge until focused`() {
         lateinit var plain: TvButtonColors
         lateinit var red: TvButtonColors
         lateinit var scheme: ColorScheme
         inTheme {
             scheme = it
-            plain = tvButtonColors(TvButtonStyle.Text, enabled = false, isFocused = true)
-            red = tvButtonColors(TvButtonStyle.TextDestructive, enabled = false, isFocused = true)
+            plain = tvButtonColors(TvButtonStyle.Text, enabled = false, isFocused = false)
+            red = tvButtonColors(TvButtonStyle.TextDestructive, enabled = false, isFocused = false)
         }
 
         listOf(plain, red).forEach { disabled ->
             assertEquals(Color.Transparent, disabled.container)
             assertEquals(Color.Transparent, disabled.border)
             assertEquals(scheme.onSurfaceVariant, disabled.content)
+        }
+    }
+
+    @Test
+    fun `a focused disabled control draws an opaque edge that is brighter than at rest, and no fill, on every style`() {
+        val rest = mutableMapOf<TvButtonStyle, TvButtonColors>()
+        val focused = mutableMapOf<TvButtonStyle, TvButtonColors>()
+        lateinit var scheme: ColorScheme
+        inTheme {
+            scheme = it
+            TvButtonStyle.entries.forEach { style ->
+                rest[style] = tvButtonColors(style, enabled = false, isFocused = false)
+                focused[style] = tvButtonColors(style, enabled = false, isFocused = true)
+            }
+        }
+
+        val red = setOf(TvButtonStyle.Destructive, TvButtonStyle.DestructiveOutline, TvButtonStyle.TextDestructive)
+        TvButtonStyle.entries.forEach { style ->
+            val edge = if (style in red) scheme.error else scheme.border.copy(alpha = 1f)
+            assertEquals(style.name, edge, focused.getValue(style).border)
+            assertEquals(style.name, Color.Transparent, focused.getValue(style).container)
+            assertEquals(style.name, scheme.onSurfaceVariant, focused.getValue(style).content)
+            assertNotEquals(style.name, rest.getValue(style).border, focused.getValue(style).border)
+            assertEquals(style.name, 1f, focused.getValue(style).border.alpha, 0f)
+            assertTrue(style.name, focused.getValue(style).border.alpha > rest.getValue(style).border.alpha)
         }
     }
 }
