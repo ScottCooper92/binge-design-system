@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +52,7 @@ fun TaskSheetPreviewFrame(page: String = ROOT_PAGE, content: @Composable ColumnS
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
+                    .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
                     .fillMaxWidth()
                     .clip(BingeShapes.HeroTop)
                     .background(MaterialTheme.colorScheme.surfaceContainerHigh),

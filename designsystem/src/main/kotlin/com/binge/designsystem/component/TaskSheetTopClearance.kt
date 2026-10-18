@@ -12,6 +12,6 @@ import com.binge.designsystem.R
  * sheet a task sheet becomes on a wide window has none, so a page written for the bottom sheet gets the same clearance.
  */
 @Composable
-fun TaskSheetTopClearance(nav: BingeSheetNav) {
-    if (nav.stacksPages) Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
+fun TaskSheetTopClearance(nav: BingeSheetNav, modifier: Modifier = Modifier) {
+    if (nav.stacksPages) Spacer(modifier.height(dimensionResource(R.dimen.padding_m)))
 }
