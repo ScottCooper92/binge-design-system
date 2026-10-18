@@ -88,8 +88,8 @@ Three rules follow, and they are the whole model.
    prevent: while the accent means both "primary" and "focused", an unfocused primary button looks
    focused.
    **A disabled control shows focus as an edge, not a fill.** It stays focusable so ↓ isn't a dead end, but a fill
-   would promise a press that does nothing. So a focused disabled control draws its border at full alpha, for every
-   style including `Text` and `TextDestructive`: `border` for the neutral styles, `error` for the red ones, so it still
+   would promise a press that does nothing. So a focused disabled control draws an opaque edge, for every
+   style including `Text` and `TextDestructive`: `border` with its alpha raised to 1 for the neutral styles (`border` itself is translucent, fainter than the dimmed resting edge), `error` for the red ones, so it still
    reads as destructive. The container stays transparent and the label stays dimmed.
 3. **Selected and focused are independent, and both can be true.** A chosen tile keeps its tick
    whether or not focus is on it, so a grid never loses which tiles are picked while the user moves

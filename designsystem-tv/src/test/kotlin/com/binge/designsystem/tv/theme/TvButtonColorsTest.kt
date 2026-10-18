@@ -7,6 +7,7 @@ import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -156,7 +157,7 @@ class TvButtonColorsTest {
     }
 
     @Test
-    fun `a focused disabled control draws a full-alpha edge and no fill, on every style`() {
+    fun `a focused disabled control draws an opaque edge that is brighter than at rest, and no fill, on every style`() {
         val rest = mutableMapOf<TvButtonStyle, TvButtonColors>()
         val focused = mutableMapOf<TvButtonStyle, TvButtonColors>()
         lateinit var scheme: ColorScheme
@@ -170,11 +171,13 @@ class TvButtonColorsTest {
 
         val red = setOf(TvButtonStyle.Destructive, TvButtonStyle.DestructiveOutline, TvButtonStyle.TextDestructive)
         TvButtonStyle.entries.forEach { style ->
-            val edge = if (style in red) scheme.error else scheme.border
+            val edge = if (style in red) scheme.error else scheme.border.copy(alpha = 1f)
             assertEquals(style.name, edge, focused.getValue(style).border)
             assertEquals(style.name, Color.Transparent, focused.getValue(style).container)
             assertEquals(style.name, scheme.onSurfaceVariant, focused.getValue(style).content)
             assertNotEquals(style.name, rest.getValue(style).border, focused.getValue(style).border)
+            assertEquals(style.name, 1f, focused.getValue(style).border.alpha, 0f)
+            assertTrue(style.name, focused.getValue(style).border.alpha > rest.getValue(style).border.alpha)
         }
     }
 }

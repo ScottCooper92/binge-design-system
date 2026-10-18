@@ -53,10 +53,12 @@ data class TvButtonColors(
  *   `onError` border; [TvButtonStyle.DestructiveOutline] rests as an `error` outline and fills solid `error` when focused.
  *   [TvButtonStyle.TextDestructive] rests as an `error` label alone.
  * - A text style ([TvButtonStyle.Text], [TvButtonStyle.TextDestructive]) has no edge at all, enabled or not: it sits on
- *   a dialog's panel, which is the shape. Disabled, it is its dimmed label alone until focused, when it takes the full-alpha edge.
+ *   a dialog's panel, which is the shape. Disabled, it is its dimmed label alone until focused, when it takes the opaque edge.
  * - A **disabled** control never takes the focus fill. It stays focusable so ↓ isn't a dead end, but a
  *   filled disabled button would promise a press that does nothing. Its focus cue is an edge instead: while focused it
- *   draws its border at full alpha, for every style including the text styles, in `error` for the red styles. Content
+ *   draws an opaque edge, for every style including the text styles: `border` with its alpha raised to 1 for the neutral
+ *   styles, `error` for the red styles. `border` is translucent, so the resting disabled edge (alpha [DISABLED_ALPHA]) is more
+ *   opaque than `border` itself, and only raising the alpha makes the focused edge the brighter of the two. Content
  *   stays dimmed and the container stays transparent.
  *
  * ## A disabled control is an outline, and it must not depend on what it sits on
@@ -115,12 +117,13 @@ fun tvButtonColors(
         border = when {
             // The solid style's fill is the same at rest and focused, so the border is what says it has focus.
             solidRed -> if (isFocused) colors.onError else Color.Transparent
-            // A focused disabled control gets no fill, so its focus cue is the edge at full alpha, on every style
-            // (the text styles included). The red styles take `error` so it still reads as destructive.
-            !enabled && isFocused -> if (redStyle) colors.error else colors.border
+            // A focused disabled control gets no fill, so its focus cue is an opaque edge, on every style
+            // (the text styles included). `border` is translucent, so its alpha is raised to 1: using it as is would be fainter
+            // than the dimmed resting edge below. The red styles take `error` so it still reads as destructive.
+            !enabled && isFocused -> if (redStyle) colors.error else colors.border.copy(alpha = 1f)
             focusFilled || filledAtRest || text -> Color.Transparent
             // The disabled control's only visible edge, so it is dimmed rather than removed: the line that keeps it a
-            // button on any panel. Applied to `border`, which is opaque, so the result is not a function of the backdrop.
+            // button on any panel. `border` is translucent, so this replaces its alpha rather than scaling it.
             !enabled -> colors.border.copy(alpha = DISABLED_ALPHA)
             outlineRed -> colors.error
             else -> colors.border
