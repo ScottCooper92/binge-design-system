@@ -9,9 +9,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.isFocused
@@ -72,6 +74,31 @@ class TvSaveStatusTest {
 
         composeTestRule.onNodeWithText("Saved").assertExists()
         composeTestRule.onNodeWithText(RETRY).assertDoesNotExist()
+    }
+
+    @Test
+    fun `a refusal shows its reason with no Retry, and takes no focus`() {
+        composeTestRule.setContent {
+            BingeTvTheme { TvSaveStatus(status = SaveStatus.Refused("Not allowed"), onRetry = {}) }
+        }
+
+        composeTestRule.onNodeWithText("Not allowed").assertExists()
+        composeTestRule.onNodeWithText(RETRY).assertDoesNotExist()
+        composeTestRule.onAllNodes(isFocusable()).assertCountEquals(0)
+    }
+
+    @Test
+    fun `a refusal is the same height as the other states, so the line does not jump`() {
+        var status by mutableStateOf<SaveStatus>(SaveStatus.Saved)
+        composeTestRule.setContent {
+            BingeTvTheme { Box(modifier = Modifier.testTag(LINE)) { TvSaveStatus(status = status, onRetry = {}) } }
+        }
+        val saved = composeTestRule.onNodeWithTag(LINE).getUnclippedBoundsInRoot().let { it.bottom - it.top }
+
+        status = SaveStatus.Refused("Not allowed")
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(LINE).assertHeightIsEqualTo(saved)
     }
 
     @Test

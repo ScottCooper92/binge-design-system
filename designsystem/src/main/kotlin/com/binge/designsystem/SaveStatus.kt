@@ -9,6 +9,9 @@ import androidx.compose.runtime.Immutable
  * This is the one model both platforms' renderers read, so a phone page and a TV page say the same thing. A
  * failed save keeps the change on screen and offers Retry; retrying is a callback on the renderer, not part of
  * the state.
+ *
+ * A write the server refuses is none of these: it would only be refused again, so there is nothing to retry. The page puts
+ * the saved value back and says why through [Refused].
  */
 @Immutable
 sealed interface SaveStatus {
@@ -23,4 +26,13 @@ sealed interface SaveStatus {
 
     /** The last change could not be stored. It stays on screen, unsaved, until a retry succeeds. */
     data object Failed : SaveStatus
+
+    /**
+     * The last change was refused for good, so the page put its saved value back. [reason] is the words for why, which the
+     * page owns. Unlike [Failed] there is nothing to retry, so a renderer offers no Retry; the page keeps this status until
+     * the row is next changed or the page is left, and there is no timer.
+     */
+    data class Refused(
+        val reason: String,
+    ) : SaveStatus
 }

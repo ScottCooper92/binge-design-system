@@ -7,7 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
-/** Screenshot coverage for the save status line: saving, saved, and a failure with Retry. */
+/** Screenshot coverage for the save status line: saving, saved, and a failure with Retry, and a refusal with its reason. */
 class TvSaveStatusSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
@@ -23,5 +23,13 @@ class TvSaveStatusSamplesScreenshotTest {
     fun saveStatusNarrow() =
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
             TvSaveStatusNarrowSample()
+        }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun saveStatusRefusedNarrow() =
+        TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+            TvSaveStatusRefusedNarrowSample()
         }
 }

@@ -19,7 +19,10 @@ import com.binge.designsystem.tv.component.TvSaveStatus
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
-/** The save status line in each state it draws: saving, saved, and a failure with Retry. Idle draws nothing. */
+/**
+ * The save status line in each state it draws: saving, saved, a failure with Retry, and a refusal with its reason and no
+ * Retry. Idle draws nothing. Press Retry to see the failure clear.
+ */
 @Composable
 fun TvSaveStatusStatesSample() {
     var failed by remember { mutableStateOf<SaveStatus>(SaveStatus.Failed) }
@@ -30,6 +33,7 @@ fun TvSaveStatusStatesSample() {
         TvSaveStatus(status = SaveStatus.Saving, onRetry = {})
         TvSaveStatus(status = SaveStatus.Saved, onRetry = {})
         TvSaveStatus(status = failed, onRetry = { failed = SaveStatus.Saved })
+        TvSaveStatus(status = SaveStatus.Refused(REFUSAL_REASON), onRetry = {})
     }
 }
 
@@ -44,3 +48,18 @@ fun TvSaveStatusNarrowSample() {
         )
     }
 }
+
+/** A refusal in a narrow panel, as in a side sheet: the reason wraps to a second line and there is no Retry. */
+@Composable
+fun TvSaveStatusRefusedNarrowSample() {
+    Column(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvSaveStatus(
+            status = SaveStatus.Refused(LONG_REFUSAL_REASON),
+            onRetry = {},
+            modifier = Modifier.width(dimensionResource(TvR.dimen.tv_save_status_narrow_sample_width)),
+        )
+    }
+}
+
+private const val REFUSAL_REASON = "The server refused that change"
+private const val LONG_REFUSAL_REASON = "The server refused that change because this setting is managed by an administrator"

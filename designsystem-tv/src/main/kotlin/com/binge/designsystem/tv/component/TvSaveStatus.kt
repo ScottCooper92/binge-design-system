@@ -27,8 +27,8 @@ import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /**
- * The inline status line of a TV page that saves each change as it is made: "Saving…", then "Saved", or a
- * failure with a Retry button. Such a page has no Save button.
+ * The inline status line of a TV page that saves each change as it is made: "Saving…", then "Saved", a failure
+ * with a Retry button, or a refusal with its reason. Such a page has no Save button.
  *
  * [SaveStatus.Idle] draws nothing and takes no space, so place the line where its arrival moves nothing that
  * matters, such as under a top-aligned copy column. The other three states share one height, the button's, so
@@ -38,6 +38,10 @@ import com.binge.designsystem.tv.R as TvR
  * the field they are on. Pressing Retry moves focus up and away from it before calling [onRetry], so the button
  * leaving the line when the status moves on does not send focus to the top of the page. The line is a polite live region, so each change of state is announced.
  * In a narrow panel the failure's words wrap before Retry gives up its width.
+ *
+ * A [SaveStatus.Refused] change was put back by the page, and asking again would be refused again, so the line is the
+ * reason in the error tone with no Retry. The TV has no snackbar and no timed message, so the reason stays in place until
+ * the page moves the status on, which is when the row is next changed or the page is left. The reason wraps in a narrow panel.
  */
 @Composable
 fun TvSaveStatus(
@@ -59,6 +63,10 @@ fun TvSaveStatus(
             SaveStatus.Saved -> {
                 StatusGlyph(Icons.Filled.Check, MaterialTheme.colorScheme.onSurfaceVariant)
                 StatusText(stringResource(DesR.string.save_status_saved))
+            }
+            is SaveStatus.Refused -> {
+                StatusGlyph(Icons.Filled.ErrorOutline, MaterialTheme.colorScheme.error)
+                StatusText(status.reason, MaterialTheme.colorScheme.error, Modifier.weight(1f, fill = false))
             }
             SaveStatus.Failed -> {
                 StatusGlyph(Icons.Filled.ErrorOutline, MaterialTheme.colorScheme.error)
