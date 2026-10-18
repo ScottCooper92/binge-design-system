@@ -35,13 +35,14 @@ private const val KEY_PREVIEWS = "previews"
 private const val ROW_OPENS = "Streamly"
 private const val ROW_PREVIEWS = "Cinebox"
 private const val PREVIEW_ROW = "New this week"
+private const val CLEAR_ALL = "Clear all"
 private const val OUTSIDE = "Outside"
 private const val INSIDE = "Inside"
 
 /**
  * [TvPaneRow.onClick], [TvListPaneListPreview] and [tvStepOutFocusGroup] under a real D-pad: OK on an opening row runs
- * it, → on a row whose pane previews where it leads runs it too, focus never enters a preview, and ← at a stepped-in
- * level's start edge steps back out.
+ * it, → on a row whose pane previews where it leads runs it too (and only on that row, never on Clear all), focus never
+ * enters a preview, and ← at a stepped-in level's start edge steps back out.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -89,6 +90,38 @@ class TvListPaneOpenFocusTest {
         focusRow(ROW_OPENS)
 
         press(Key.DirectionRight)
+
+        assertEquals(0, opened)
+    }
+
+    @Test
+    fun `right on Clear all does not step into the described row`() {
+        setBoard(describedKey = KEY_OPENS, paneContent = true, clearAll = true)
+        focusClearAll()
+
+        press(Key.DirectionRight)
+
+        assertEquals(0, opened)
+        composeTestRule.onNode(hasText(CLEAR_ALL) and isFocusable()).assertIsFocused()
+    }
+
+    @Test
+    fun `right on the described row still steps in when there is a Clear all`() {
+        setBoard(describedKey = KEY_OPENS, paneContent = true, clearAll = true)
+        focusRow(ROW_OPENS)
+
+        press(Key.DirectionRight)
+
+        assertEquals(1, opened)
+        row(ROW_OPENS).assertIsFocused()
+    }
+
+    @Test
+    fun `right on Clear all under RTL does not step in either`() {
+        setBoard(describedKey = KEY_OPENS, paneContent = true, clearAll = true, layoutDirection = LayoutDirection.Rtl)
+        focusClearAll()
+
+        press(Key.DirectionLeft)
 
         assertEquals(0, opened)
     }
@@ -143,8 +176,17 @@ class TvListPaneOpenFocusTest {
         describedKey: String,
         paneContent: Boolean,
         layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+        clearAll: Boolean = false,
     ) {
         val preview = listOf(TvPaneGroup(title = "Rows", rows = listOf(TvPaneRow(key = "row", label = PREVIEW_ROW))))
+        val opens =
+            TvPaneRow(
+                key = KEY_OPENS,
+                label = ROW_OPENS,
+                onClick = { opened++ },
+                paneContent = if (paneContent) ({ TvListPaneListPreview(preview) }) else null,
+            )
+        val previews = TvPaneRow(key = KEY_PREVIEWS, label = ROW_PREVIEWS, paneContent = { TvListPaneListPreview(preview) })
         composeTestRule.setContent {
             var focusedKey by remember { mutableStateOf<String?>(describedKey) }
             CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
@@ -155,24 +197,12 @@ class TvListPaneOpenFocusTest {
                             listOf(
                                 TvPaneGroup(
                                     title = "Installed",
-                                    rows =
-                                        listOf(
-                                            TvPaneRow(
-                                                key = KEY_OPENS,
-                                                label = ROW_OPENS,
-                                                onClick = { opened++ },
-                                                paneContent = if (paneContent) ({ TvListPaneListPreview(preview) }) else null,
-                                            ),
-                                            TvPaneRow(
-                                                key = KEY_PREVIEWS,
-                                                label = ROW_PREVIEWS,
-                                                paneContent = { TvListPaneListPreview(preview) },
-                                            ),
-                                        ),
+                                    rows = if (clearAll) listOf(previews, opens) else listOf(opens, previews),
                                 ),
                             ),
                         focusedKey = focusedKey,
                         onFocusRow = { focusedKey = it },
+                        clearAll = if (clearAll) TvPaneAction(label = CLEAR_ALL, onClick = {}) else null,
                     )
                 }
             }
@@ -195,6 +225,13 @@ class TvListPaneOpenFocusTest {
             }
         }
         composeTestRule.waitForIdle()
+    }
+
+    /** Walks down from the stepping-in row, which [setBoard] puts last when there is a Clear all, so it stays the described one. */
+    private fun focusClearAll() {
+        focusRow(ROW_OPENS)
+        press(Key.DirectionDown)
+        composeTestRule.onNode(hasText(CLEAR_ALL) and isFocusable()).assertIsFocused()
     }
 
     private fun focusRow(label: String) {
