@@ -386,8 +386,8 @@ private class LabelAndTrailingPolicy(
 }
 
 /**
- * The row's tap. A switch row is one `Role.Switch` toggleable so the state reaches a screen reader; every
- * other row keeps the `Role.Button` click and its long-press.
+ * The row's tap. A switch row is one `Role.Switch` toggleable and a tick row one `Role.Checkbox`, so the state
+ * reaches a screen reader; every other row keeps the `Role.Button` click and its long-press.
  */
 @OptIn(ExperimentalFoundationApi::class)
 private fun rowActionModifier(row: ListItem, interactive: Boolean): Modifier {
@@ -397,6 +397,13 @@ private fun rowActionModifier(row: ListItem, interactive: Boolean): Modifier {
             state = switchState,
             enabled = interactive,
             role = Role.Switch,
+            onClick = row.onClick,
+        )
+    } else if (row.checked != null) {
+        Modifier.triStateToggleable(
+            state = ToggleableState(row.checked),
+            enabled = interactive,
+            role = Role.Checkbox,
             onClick = row.onClick,
         )
     } else {
