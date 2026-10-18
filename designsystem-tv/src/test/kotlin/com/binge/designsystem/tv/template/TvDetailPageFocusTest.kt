@@ -17,16 +17,21 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.component.TvCardRow
+import com.binge.designsystem.tv.focus.TvArrivalFocus
+import com.binge.designsystem.tv.focus.rememberTvArrivalFocus
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.testing.ANCHOR_COALESCE_WAIT_MILLIS
 import com.binge.designsystem.tv.testing.LeanbackRule
 import com.binge.designsystem.tv.testing.settle
 import com.binge.designsystem.tv.theme.BingeTvTheme
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,6 +59,7 @@ class TvDetailPageFocusTest {
     val composeTestRule = createKeyboardComposeRule()
 
     private lateinit var focusManager: FocusManager
+    private lateinit var arrival: TvArrivalFocus
 
     @Test
     fun `entry from the rail lands on the action row, not the first focusable in the hero`() {
@@ -95,21 +101,39 @@ class TvDetailPageFocusTest {
         composeTestRule.onNodeWithTag(ACTION).assertIsFocused()
     }
 
+    @Test
+    fun `a caller-owned arrival is aimed at and observed by the page but never claimed by it`() {
+        setPage(hosting = TvPageHosting.Overlay, withRail = false, ownArrival = true)
+        composeTestRule.settle(ANCHOR_COALESCE_WAIT_MILLIS)
+
+        composeTestRule.onNodeWithTag(ACTION).assertIsNotFocused()
+        composeTestRule.runOnIdle { assertFalse(arrival.hasFocus) }
+
+        composeTestRule.runOnIdle { arrival.requester.requestFocus() }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(ACTION).assertIsFocused()
+        composeTestRule.runOnIdle { assertTrue(arrival.hasFocus) }
+    }
+
     private fun setPage(
         hosting: TvPageHosting = TvPageHosting.RailDestination,
         initialFocusedSectionKey: String? = null,
         withRail: Boolean = true,
+        ownArrival: Boolean = false,
     ) {
         composeTestRule.setContent {
             BingeTvTheme {
                 focusManager = LocalFocusManager.current
                 val actions = remember { FocusRequester() }
+                arrival = rememberTvArrivalFocus()
                 Row {
                     if (withRail) Box(Modifier.size(48.dp).testTag(RAIL).focusable())
                     TvDetailPage(
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         entryFocus = actions,
                         hosting = hosting,
+                        pageArrival = arrival.takeIf { ownArrival },
                         initialFocusedSectionKey = initialFocusedSectionKey,
                     ) {
                         hero {
