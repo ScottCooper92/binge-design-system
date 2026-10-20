@@ -6,6 +6,9 @@
     <dimen name="tv_overscan_horizontal">48dp</dimen>
     <dimen name="tv_overscan_vertical">27dp</dimen>
     <dimen name="tv_content_gutter_start">24dp</dimen>
+    <!-- Top navigation bar -->
+    <dimen name="tv_top_bar_avatar_ring">2dp</dimen>
+    <dimen name="tv_top_bar_item_padding_horizontal">23dp</dimen>
     <!-- Focus ring -->
     <dimen name="tv_focus_ring_width">3dp</dimen>
     <dimen name="tv_focus_ring_offset">4dp</dimen>
