@@ -1,3 +1,5 @@
+@file:SelfDescribing
+
 package com.binge.designsystem.tv.catalog
 
 import androidx.compose.foundation.background
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.nav.BingeTvTopBar
 import com.binge.designsystem.tv.nav.TvNavRailItem
 import com.binge.designsystem.tv.nav.TvTopBarSurface
@@ -67,11 +70,12 @@ internal fun TvTopBarSample(
     items: List<TvNavRailItem>,
     focusedKey: Any? = null,
     selectedKey: Any = "movies",
+    iconOnlyFooter: Boolean = true,
 ) {
     var selected by rememberSaveable { mutableStateOf(selectedKey) }
     val requesters = remember { (items + TopBarHeader + TopBarFooter).associate { it.key to FocusRequester() } }
     val down = remember { FocusRequester() }
-    val iconOnly = setOf<Any>(TopBarFooter.key)
+    val iconOnly = if (iconOnlyFooter) setOf<Any>(TopBarFooter.key) else emptySet()
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -80,7 +84,7 @@ internal fun TvTopBarSample(
                 .background(MaterialTheme.colorScheme.primary),
         )
         Text(
-            text = "Page",
+            text = "Page content under the bar",
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.Center),
@@ -121,4 +125,10 @@ internal fun TvTopBarSample(
 @Composable
 fun TvTopBarLongLabelsSample() {
     TvTopBarSample(items = TopBarLongItems)
+}
+
+/** The top bar with its footer left as a label pill, the default, and long tabs: the tabs keep clear of the wider end. */
+@Composable
+fun TvTopBarLabelFooterSample() {
+    TvTopBarSample(items = TopBarLongItems, iconOnlyFooter = false)
 }

@@ -37,6 +37,12 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun topBarLongLabels() = Frame { TvTopBarLongLabelsSample() }
 
+    /** The footer as a label pill, which is wider than the gear: the tabs must not run under it. */
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun topBarLabelFooter() = Frame { TvTopBarLabelFooterSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {

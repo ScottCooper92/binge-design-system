@@ -28,6 +28,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -62,7 +64,8 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  *
  * Unlike [BingeTvNavRail], focus never selects: OK on an item calls [onSelect] and nothing else does. Items named in
  * [iconOnlyKeys] (the header, an item or the footer) draw as their [TvNavRailItem.icon] alone; every other item is its
- * label on a single line, so a crowded bar never grows taller. [TvNavRailItem.badge] is not drawn.
+ * label on a single line, so a crowded bar never grows taller.
+ * The tabs keep clear of whichever end item is wider, however wide its label. [TvNavRailItem.badge] is not drawn.
  *
  * Every item in [itemFocusRequesters] is attached to its requester, so the caller can send focus to a tab. Down from any item
  * lands on [down], the current page's own entry. [onFocusedChange] reports whether the bar holds focus.
@@ -150,7 +153,8 @@ internal fun TvTopBarSurface(
         }
     }
     val spacing = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s))
-    Box(
+    val endClearance = dimensionResource(DesR.dimen.padding_m)
+    Layout(
         modifier = modifier
             .fillMaxWidth()
             .alpha(if (visible) 1f else 0f)
@@ -166,58 +170,72 @@ internal fun TvTopBarSurface(
                 start = dimensionResource(TvR.dimen.tv_overscan_horizontal),
                 end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
             ),
-    ) {
-        if (header != null) {
-            TvTopBarEntry(
-                item = header,
-                selected = header.key == selectedKey,
-                focused = header.key == focusedKey,
-                iconOnly = header.key in iconOnlyKeys,
-                onFocusChanged = { onItemFocusChanged(header.key, it) },
-                onClick = { onSelect(header.key) },
-                modifier = itemModifier(header).align(Alignment.CenterStart),
-            )
-        }
-        Row(
-            // Kept clear of the avatar and the end item, so a crowded bar shortens its labels instead of running under them.
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(
-                    horizontal =
-                        dimensionResource(TvR.dimen.tv_icon_button_diameter) + dimensionResource(DesR.dimen.padding_m),
-                ).graphicsLayer {
+        content = {
+            if (header != null) {
+                TvTopBarEntry(
+                    item = header,
+                    selected = header.key == selectedKey,
+                    focused = header.key == focusedKey,
+                    iconOnly = header.key in iconOnlyKeys,
+                    onFocusChanged = { onItemFocusChanged(header.key, it) },
+                    onClick = { onSelect(header.key) },
+                    modifier = itemModifier(header).layoutId(TvTopBarSlot.Start),
+                )
+            }
+            Row(
+                modifier = Modifier.layoutId(TvTopBarSlot.Tabs).graphicsLayer {
                     scaleX = scale
                     scaleY = scale
                 },
-            horizontalArrangement = spacing,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            items.forEach { item ->
+                horizontalArrangement = spacing,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                items.forEach { item ->
+                    TvTopBarEntry(
+                        item = item,
+                        selected = item.key == selectedKey,
+                        focused = item.key == focusedKey,
+                        iconOnly = item.key in iconOnlyKeys,
+                        onFocusChanged = { onItemFocusChanged(item.key, it) },
+                        onClick = { onSelect(item.key) },
+                        // Tabs share what width there is, each up to its own: none is starved to nothing by the ones before it.
+                        modifier = itemModifier(item).weight(1f, fill = false),
+                    )
+                }
+            }
+            if (footer != null) {
                 TvTopBarEntry(
-                    item = item,
-                    selected = item.key == selectedKey,
-                    focused = item.key == focusedKey,
-                    iconOnly = item.key in iconOnlyKeys,
-                    onFocusChanged = { onItemFocusChanged(item.key, it) },
-                    onClick = { onSelect(item.key) },
-                    // Tabs share what width there is, each up to its own: none is starved to nothing by the ones before it.
-                    modifier = itemModifier(item).weight(1f, fill = false),
+                    item = footer,
+                    selected = footer.key == selectedKey,
+                    focused = footer.key == focusedKey,
+                    iconOnly = footer.key in iconOnlyKeys,
+                    onFocusChanged = { onItemFocusChanged(footer.key, it) },
+                    onClick = { onSelect(footer.key) },
+                    modifier = itemModifier(footer).layoutId(TvTopBarSlot.End),
                 )
             }
-        }
-        if (footer != null) {
-            TvTopBarEntry(
-                item = footer,
-                selected = footer.key == selectedKey,
-                focused = footer.key == focusedKey,
-                iconOnly = footer.key in iconOnlyKeys,
-                onFocusChanged = { onItemFocusChanged(footer.key, it) },
-                onClick = { onSelect(footer.key) },
-                modifier = itemModifier(footer).align(Alignment.CenterEnd),
-            )
+        },
+    ) { measurables, constraints ->
+        // The ends are measured as they are, a 52dp avatar or a pill as wide as its label, and the tabs get what is left on
+        // both sides of the wider one so they stay centred. A crowded bar then shortens its tabs instead of running under an end.
+        val loose = constraints.copy(minWidth = 0, minHeight = 0)
+        val start = measurables.firstOrNull { it.layoutId == TvTopBarSlot.Start }?.measure(loose)
+        val end = measurables.firstOrNull { it.layoutId == TvTopBarSlot.End }?.measure(loose)
+        val clearance = if (start == null && end == null) 0 else endClearance.roundToPx()
+        val reserved = maxOf(start?.width ?: 0, end?.width ?: 0) + clearance
+        val tabs = measurables
+            .first { it.layoutId == TvTopBarSlot.Tabs }
+            .measure(loose.copy(maxWidth = (constraints.maxWidth - 2 * reserved).coerceAtLeast(0)))
+        val height = maxOf(start?.height ?: 0, tabs.height, end?.height ?: 0)
+        layout(constraints.maxWidth, height) {
+            start?.placeRelative(0, (height - start.height) / 2)
+            tabs.placeRelative((constraints.maxWidth - tabs.width) / 2, (height - tabs.height) / 2)
+            end?.placeRelative(constraints.maxWidth - end.width, (height - end.height) / 2)
         }
     }
 }
+
+private enum class TvTopBarSlot { Start, Tabs, End }
 
 /** One bar entry: an avatar for an item that carries a name, an icon for one in the icon-only set, a label pill otherwise. */
 @Composable
