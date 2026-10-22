@@ -29,11 +29,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.theme.tvStyle
 import androidx.compose.ui.semantics.onClick as semanticsOnClick
 import com.binge.designsystem.tv.R as TvR
 
 /**
- * The **border** focus treatment — an accent-coloured outline in a gap — for elements whose own content a fill would cover
+ * The **border** focus treatment — an outline in the style's focus-ring colour, in a gap — for elements whose own content a fill would cover
  * (a poster, a provider logo, anything image-bearing); text/icons take [tvFocusFill] instead. See
  * `docs/tv-foundation.md` > The accent model.
  *
@@ -70,7 +71,7 @@ import com.binge.designsystem.tv.R as TvR
 fun Modifier.tvFocusIndicator(
     isFocused: Boolean,
     shape: Shape = BingeShapes.MediaCard,
-    ringColor: Color = MaterialTheme.colorScheme.primary,
+    ringColor: Color = MaterialTheme.tvStyle.focusRing,
     restingColor: Color = Color.Unspecified,
 ): Modifier =
     this
@@ -84,9 +85,9 @@ fun Modifier.tvFocusIndicator(
         )
 
 /**
- * The **fill** focus treatment — a solid accent surface behind the element — and the default way focus
- * reads on TV (`docs/tv-foundation.md` > The accent model). Google TV's rail fills white with black
- * content; this is that, in the theme's accent.
+ * The **fill** focus treatment — a solid surface behind the element, in the style's focus container — and the
+ * default way focus reads on TV (`docs/tv-foundation.md` > The accent model). Google TV's rail fills white with black
+ * content; `TvStyle.Monochrome` is that, and `TvStyle.Accent` is that in the theme's accent.
  *
  * Pass [fillColor] to keep a control's own role when focused: a destructive action fills `error`, so
  * it stays dangerous exactly when the user is about to press it. The caller is responsible for the
@@ -101,16 +102,16 @@ fun Modifier.tvFocusIndicator(
 fun Modifier.tvFocusFill(
     isFocused: Boolean,
     shape: Shape = BingeShapes.Pill,
-    fillColor: Color = MaterialTheme.colorScheme.primary,
+    fillColor: Color = MaterialTheme.tvStyle.focusContainer,
 ): Modifier = this.then(if (isFocused) Modifier.background(color = fillColor, shape = shape) else Modifier)
 
 /**
- * The content colour to use on top of [tvFocusFill]: `onPrimary` (a near-black brown) when focused,
- * otherwise the caller's resting colour. Kept next to the fill so no screen re-derives the pairing
+ * The content colour to use on top of [tvFocusFill]: the style's content on focus when focused (`onPrimary` in
+ * `TvStyle.Accent`, `surface` in `TvStyle.Monochrome`), otherwise the caller's resting colour. Kept next to the fill so no screen re-derives the pairing
  * and a focused row can't end up accent-on-accent.
  */
 @Composable
-fun tvFocusContentColor(isFocused: Boolean, resting: Color): Color = if (isFocused) MaterialTheme.colorScheme.onPrimary else resting
+fun tvFocusContentColor(isFocused: Boolean, resting: Color): Color = if (isFocused) MaterialTheme.tvStyle.onFocusContainer else resting
 
 /** Strokes [shape]'s outline inflated by [gap], so the ring floats clear of the element. */
 private fun Modifier.focusRing(

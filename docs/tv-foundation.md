@@ -112,6 +112,26 @@ and it is collapsed. That collapsed state is current-but-unfocused, expressed as
 rather than as two fills. A dim fill there would be a third mark for a state the rail already
 marks.
 
+### TV styles: what colour focus is
+
+The model above is written for the accent, and `TvStyle.Accent` is that, and the default. `TvStyle.Monochrome` is
+Google TV's own look: focus fills white (`onSurface`) with dark content (`surface`), the focus ring is white, a
+switch is black and white, and a sheet's panel is `surfaceVariant`. The rules do not change, only the colour that
+means focus.
+
+A component reads focus, switch and panel colours from the style's roles (`MaterialTheme.tvStyle`), never from
+`primary`. The accent keeps every job that is not focus, in both styles: a rating, a selection tick, a count badge,
+the rail's current destination, the current row of a two-pane list. In the monochrome style that splits the two
+meanings cleanly. White is where you are, and the accent is what is chosen.
+
+Destructive focus is the error colour in both styles. A dangerous action stays red under focus whichever colour
+focus otherwise is.
+
+Set the style once, on the outermost `BingeTvTheme`. A nested `BingeTvTheme` with no `style` keeps the one around
+it, so a screen that wraps itself in the theme again still draws in the app's style. Do not fake a style by copying
+the colour scheme with a different `primary`: that also moves the accent, which is the collision the styles exist to
+avoid.
+
 ## A refused save-as-made write is reported in place
 
 A TV page that saves each change as it is made has no Save button, no snackbar and no timed message. When the server

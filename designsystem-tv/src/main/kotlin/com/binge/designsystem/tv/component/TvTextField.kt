@@ -66,6 +66,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.tvArrivalTarget
 import com.binge.designsystem.tv.focus.tvFocusIndicator
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -245,7 +246,8 @@ private fun TvFieldFrame(
             enabled = enabled,
             singleLine = true,
             textStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            // The caret shows while the field holds focus, so it takes the focus ring's colour.
+            cursorBrush = SolidColor(MaterialTheme.tvStyle.focusRing),
             visualTransformation = if (secret) PasswordVisualTransformation(SECRET_MASK) else VisualTransformation.None,
             keyboardOptions = keyboardOptions,
             keyboardActions = KeyboardActions(onAny = { finish() }),

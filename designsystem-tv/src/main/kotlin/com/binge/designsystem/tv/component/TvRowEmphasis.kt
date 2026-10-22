@@ -3,6 +3,7 @@ package com.binge.designsystem.tv.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.tv.material3.MaterialTheme
+import com.binge.designsystem.tv.theme.tvStyle
 
 /**
  * How strongly a row in a two-pane D-pad list is marked: resting, current, or focused.
@@ -55,7 +56,7 @@ fun TvRowEmphasis.containerColor(resting: Color): Color =
     when (this) {
         TvRowEmphasis.Resting -> resting
         TvRowEmphasis.Current -> MaterialTheme.colorScheme.primaryContainer
-        TvRowEmphasis.Focused -> MaterialTheme.colorScheme.primary
+        TvRowEmphasis.Focused -> MaterialTheme.tvStyle.focusContainer
     }
 
 /**
@@ -70,5 +71,5 @@ fun TvRowEmphasis.contentColor(resting: Color): Color =
     when (this) {
         TvRowEmphasis.Resting -> resting
         TvRowEmphasis.Current -> MaterialTheme.colorScheme.onPrimaryContainer
-        TvRowEmphasis.Focused -> MaterialTheme.colorScheme.onPrimary
+        TvRowEmphasis.Focused -> MaterialTheme.tvStyle.onFocusContainer
     }

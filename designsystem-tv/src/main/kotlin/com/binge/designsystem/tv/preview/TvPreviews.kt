@@ -13,6 +13,8 @@ import androidx.tv.material3.SurfaceDefaults
 import com.binge.designsystem.preview.SOURCE_LOCALE
 import com.binge.designsystem.tv.theme.BingeTvColorScheme
 import com.binge.designsystem.tv.theme.BingeTvTheme
+import com.binge.designsystem.tv.theme.LocalTvStyle
+import com.binge.designsystem.tv.theme.TvStyle
 
 /*
  * TV preview harness. Kept separate from the phone annotations in
@@ -115,14 +117,17 @@ annotation class TvPreviewsOnBlack
  * every frame render on `background` whether or not the composable under test paints anything, so a screen
  * that forgets its own base still looks right here while shipping on the window's black. Component
  * frames want this readable canvas; a **screen-root** frame should use the other one.
+ *
+ * [style] is the TV style the frame draws in, inherited like `BingeTvTheme`'s, so a frame for another style passes it.
  */
 @Composable
 fun TvScreenshotTheme(
     modifier: Modifier = Modifier,
     colorScheme: ColorScheme = BingeTvColorScheme,
+    style: TvStyle = LocalTvStyle.current,
     content: @Composable () -> Unit,
 ) {
-    TvScreenshotCanvas(modifier = modifier, canvas = null, colorScheme = colorScheme, content = content)
+    TvScreenshotCanvas(modifier = modifier, canvas = null, colorScheme = colorScheme, style = style, content = content)
 }
 
 /**
@@ -141,19 +146,21 @@ fun TvScreenshotTheme(
 fun TvScreenshotThemeOnBlack(
     modifier: Modifier = Modifier,
     colorScheme: ColorScheme = BingeTvColorScheme,
+    style: TvStyle = LocalTvStyle.current,
     content: @Composable () -> Unit,
 ) {
-    TvScreenshotCanvas(modifier = modifier, canvas = Color.Black, colorScheme = colorScheme, content = content)
+    TvScreenshotCanvas(modifier = modifier, canvas = Color.Black, colorScheme = colorScheme, style = style, content = content)
 }
 
 @Composable
 private fun TvScreenshotCanvas(
     canvas: Color?,
     colorScheme: ColorScheme,
+    style: TvStyle,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    BingeTvTheme(reduceMotion = true, colorScheme = colorScheme) {
+    BingeTvTheme(reduceMotion = true, colorScheme = colorScheme, style = style) {
         Surface(
             modifier = modifier,
             colors = SurfaceDefaults.colors(

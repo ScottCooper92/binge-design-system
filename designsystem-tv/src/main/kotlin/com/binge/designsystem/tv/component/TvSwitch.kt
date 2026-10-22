@@ -18,6 +18,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -27,8 +28,8 @@ import com.binge.designsystem.tv.R as TvR
  * so a screen reader calls it a switch rather than a button.
  *
  * Match the row it sits in. A switch in a row that is not [enabled] dims with the row. One in a destructive row is
- * [destructive]: focused, the row fills with the error colour, and the switch inverts against that instead of the accent;
- * unfocused, a checked switch has the error colour for its track rather than the accent.
+ * [destructive]: focused, the row fills with the error colour, and the switch inverts against that instead of the focus
+ * fill; unfocused, a checked switch has the error colour for its track. The other colours are the style's: see `TvStyle`.
  */
 @Composable
 fun TvSwitch(
@@ -39,19 +40,35 @@ fun TvSwitch(
     destructive: Boolean = false,
 ) {
     val scheme = MaterialTheme.colorScheme
-    // On a focused row the fill is the accent, so the switch inverts against it. A destructive one reads in the error
-    // colour whether or not it is focused, so a checked switch is never half destructive beside its red label.
-    val fill = if (destructive) scheme.error else scheme.primary
-    val onFill = if (destructive) scheme.onError else scheme.onPrimary
-    val (track, thumb, outline) =
-        when {
-            !enabled && checked -> Triple(scheme.onSurface, scheme.surface, scheme.onSurface)
-            !enabled -> Triple(Color.Transparent, scheme.onSurface, scheme.onSurface)
-            isFocused && checked -> Triple(onFill, fill, onFill)
-            isFocused -> Triple(Color.Transparent, onFill, onFill)
-            checked -> Triple(fill, onFill, fill)
-            else -> Triple(Color.Transparent, scheme.onSurfaceVariant, scheme.onSurfaceVariant)
+    val style = MaterialTheme.tvStyle
+    // On a focused row the fill is the style's focus container, so the switch inverts against it: the style's switch
+    // roles. A destructive one reads in the error colour whether or not it is focused, so a checked switch is never
+    // half destructive beside its red label.
+    val colors =
+        if (destructive) {
+            val fill = style.destructiveFocusContainer
+            val onFill = style.onDestructiveFocusContainer
+            style.switch.copy(
+                checkedTrack = fill,
+                checkedThumb = onFill,
+                focusedCheckedTrack = onFill,
+                focusedCheckedThumb = fill,
+                focusedUncheckedThumb = onFill,
+            )
+        } else {
+            style.switch
         }
+    val (track, thumb) =
+        when {
+            !enabled && checked -> scheme.onSurface to scheme.surface
+            !enabled -> Color.Transparent to scheme.onSurface
+            isFocused && checked -> colors.focusedCheckedTrack to colors.focusedCheckedThumb
+            isFocused -> colors.focusedUncheckedTrack to colors.focusedUncheckedThumb
+            checked -> colors.checkedTrack to colors.checkedThumb
+            else -> colors.uncheckedTrack to colors.uncheckedThumb
+        }
+    // The edge is the track when checked and the thumb when not, so an off switch still shows its shape.
+    val outline = if (checked) track else thumb
     Box(
         modifier =
             modifier
