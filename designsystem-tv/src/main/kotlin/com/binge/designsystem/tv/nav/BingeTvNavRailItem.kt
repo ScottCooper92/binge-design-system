@@ -88,7 +88,7 @@ internal fun RailItem(
 
 /**
  * The stateless item visuals. [selected] and [isFocused] coincide here (focus selects), so both drive one
- * treatment: an accent fill with `onPrimary` content while [expanded], and the accent on the bare icon
+ * treatment: the style's focus fill and its content colour while [expanded], and the accent on the bare icon
  * while collapsed. A collapsed strip gets no fill — a filled pill behind a lone icon reads as a button. The
  * label is shown per [showLabel], separate from [expanded]: while the rail is animating open it is held back
  * until the panel is wide enough to hold the label, so the label pops in rather than un-clipping left-to-right.
@@ -109,8 +109,8 @@ internal fun RailItemSurface(
     modifier: Modifier = Modifier,
     showLabel: Boolean = expanded,
 ) {
-    // Current-or-focused (they coincide) reads as the accent; expanded it becomes a fill, so the content
-    // flips to onPrimary to stay legible on it.
+    // Current-or-focused (they coincide) reads as the accent; expanded it becomes the focus fill, so the content
+    // flips to the style's content on focus to stay legible on it.
     val current = selected || isFocused
     val filled = current && expanded
     // onSurface, not onSurfaceVariant: the resting glass fill (RAIL_SCRIM_ALPHA/RAIL_SCRIM_HOLD_ALPHA in

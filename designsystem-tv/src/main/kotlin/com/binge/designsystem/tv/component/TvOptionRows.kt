@@ -42,6 +42,7 @@ import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.tvArrivalTarget
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -235,8 +236,8 @@ fun tvRowListItemColors(
 ): ListItemColors {
     val container = emphasis.containerColor(resting = restingContainer)
     val content = emphasis.contentColor(resting = restingContent)
-    val focusedContainer = MaterialTheme.colorScheme.primary
-    val focusedContent = MaterialTheme.colorScheme.onPrimary
+    val focusedContainer = MaterialTheme.tvStyle.focusContainer
+    val focusedContent = MaterialTheme.tvStyle.onFocusContainer
     return ListItemDefaults.colors(
         containerColor = container,
         contentColor = content,

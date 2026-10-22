@@ -26,8 +26,12 @@ import com.binge.designsystem.theme.systemReduceMotion
  * `BingeTheme.isDark` from falling back to Material 3's theme, which this tree does not have.
  *
  * [colorScheme] defaults to Binge's. An app with its own brand passes
- * `itsDarkScheme.toTvColorScheme()`, so its TV surface takes the same accent its phone screens do —
- * the focus fills and rings are drawn from `primary`, so nothing else has to be threaded through.
+ * `itsDarkScheme.toTvColorScheme()`, so its TV surface takes the same accent its phone screens do.
+ *
+ * [style] is how focus, switches and sheet panels are drawn: [TvStyle.Accent] fills focus with `primary`,
+ * [TvStyle.Monochrome] with white. Its roles are resolved from [colorScheme], so a brand's scheme reaches them too.
+ * It defaults to the style around this call, which is [TvStyle.Accent] at the root, so a nested theme keeps the
+ * style its app set rather than resetting it. Pass a style only where it should change.
  *
  * [reduceMotion] defaults to the system setting rather than `false`: that old default was the whole of a motion-sickness bug,
  * where no call site passed anything so `LocalReduceMotion` was permanently `false` on a TV and every gate
@@ -38,12 +42,14 @@ import com.binge.designsystem.theme.systemReduceMotion
 fun BingeTvTheme(
     reduceMotion: Boolean = systemReduceMotion(),
     colorScheme: ColorScheme = BingeTvColorScheme,
+    style: TvStyle = LocalTvStyle.current,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalBingeColors provides DarkBingeColors,
         LocalBingeDarkTheme provides true,
         LocalReduceMotion provides reduceMotion,
+        LocalTvStyle provides style,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
