@@ -24,6 +24,7 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
 import com.binge.designsystem.tv.theme.TvButtonStyle
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -91,7 +92,7 @@ fun TvConfirmDialogContent(
             modifier
                 .width(dimensionResource(TvR.dimen.tv_confirm_dialog_width))
                 .clip(BingeShapes.AccountCard)
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.tvStyle.panel)
                 .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeShapes.AccountCard)
                 .padding(dimensionResource(DesR.dimen.padding_l)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),

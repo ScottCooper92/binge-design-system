@@ -55,6 +55,7 @@ import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
 import com.binge.designsystem.tv.theme.TV_OVERLAY_SCRIM_ALPHA
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -124,7 +125,7 @@ fun TvSideSheetPanel(
             modifier
                 .fillMaxHeight()
                 .width(dimensionResource(TvR.dimen.tv_side_sheet_width))
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.tvStyle.panel)
                 .tvExitFocusGroup()
                 .padding(
                     start = dimensionResource(DesR.dimen.padding_l),
@@ -206,11 +207,12 @@ fun TvSideSheetRow(
             destructive -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurface
         }
+    val style = MaterialTheme.tvStyle
     val focusedDestructive = focused && destructive
-    val content = if (focusedDestructive) MaterialTheme.colorScheme.onError else tvFocusContentColor(isFocused = focused, resting = resting)
+    val content = if (focusedDestructive) style.onDestructiveFocusContainer else tvFocusContentColor(isFocused = focused, resting = resting)
     val supporting =
         if (focusedDestructive) {
-            MaterialTheme.colorScheme.onError
+            style.onDestructiveFocusContainer
         } else {
             tvFocusContentColor(
                 isFocused = focused,
@@ -234,7 +236,7 @@ fun TvSideSheetRow(
                 .tvFocusFill(
                     isFocused = focused,
                     shape = BingeShapes.TvListItem,
-                    fillColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                    fillColor = if (destructive) style.destructiveFocusContainer else style.focusContainer,
                 ).then(clickable)
                 .then(if (selected) Modifier.semantics { this.selected = true } else Modifier)
                 .then(if (saving) Modifier.semantics { stateDescription = savingDescription } else Modifier),
@@ -245,7 +247,7 @@ fun TvSideSheetRow(
                 destructive -> MaterialTheme.colorScheme.error
                 else -> MaterialTheme.colorScheme.primary
             },
-        focusedIconTint = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
+        focusedIconTint = if (destructive) style.onDestructiveFocusContainer else style.onFocusContainer,
         isFocused = focused,
         selected = selected,
         supportingText = supportingText,
@@ -318,7 +320,7 @@ private fun SideSheetRowLayout(
     leading: (@Composable () -> Unit)?,
     reserveSupportingLine: Boolean,
     trailing: (@Composable () -> Unit)? = null,
-    focusedIconTint: Color = MaterialTheme.colorScheme.onPrimary,
+    focusedIconTint: Color = MaterialTheme.tvStyle.onFocusContainer,
     chevronTint: Color? = null,
     saving: Boolean = false,
     note: TvSideSheetNote? = null,

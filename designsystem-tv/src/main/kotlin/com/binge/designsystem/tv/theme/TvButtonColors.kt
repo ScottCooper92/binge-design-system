@@ -39,7 +39,8 @@ data class TvButtonColors(
  * The TV accent model in one place — see `docs/tv-foundation.md`.
  *
  * **On a button, the accent means focus and nothing else.** No control carries the accent at rest; a focused
- * one fills solid with the accent and dark content. That is tv-material's own behaviour, and it keeps the accent
+ * one fills solid with the style's focus container and its content colour (the accent and dark content in
+ * [TvStyle.Accent], white and dark content in [TvStyle.Monochrome]). That is tv-material's own behaviour, and it keeps the accent
  * from having to mean "primary" and "focused" at once — the ambiguity that cost this model two rewrites.
  *
  * **Emphasis is shape, not colour.** Following the platform's button hierarchy, a
@@ -86,6 +87,7 @@ fun tvButtonColors(
     isFocused: Boolean,
 ): TvButtonColors {
     val colors = MaterialTheme.colorScheme
+    val style = MaterialTheme.tvStyle
     val focusFilled = isFocused && enabled
     val solidRed = enabled && style == TvButtonStyle.Destructive
     val outlineRed = enabled && (style == TvButtonStyle.DestructiveOutline || style == TvButtonStyle.TextDestructive)
@@ -98,7 +100,7 @@ fun tvButtonColors(
     return TvButtonColors(
         container = when {
             solidRed -> colors.error
-            focusFilled -> if (red) colors.error else colors.primary
+            focusFilled -> if (red) style.destructiveFocusContainer else style.focusContainer
             // Transparent, not `surface` — a disabled control is drawn as an outline so its shape cannot be
             // erased by a panel that happens to use the same token. See the KDoc for what that cost.
             !enabled -> Color.Transparent
@@ -108,8 +110,9 @@ fun tvButtonColors(
             else -> Color.Transparent
         },
         content = when {
-            red && (focusFilled || solidRed) -> colors.onError
-            focusFilled -> colors.onPrimary
+            red && focusFilled -> style.onDestructiveFocusContainer
+            solidRed -> colors.onError
+            focusFilled -> style.onFocusContainer
             !enabled -> colors.onSurfaceVariant
             outlineRed -> colors.error
             else -> colors.onSurface

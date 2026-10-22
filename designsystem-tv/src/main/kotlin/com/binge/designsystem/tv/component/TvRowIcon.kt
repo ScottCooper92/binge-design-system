@@ -13,6 +13,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.tv.R as TvR
 
 private const val PLATE_ALPHA = 0.16f
@@ -23,8 +24,8 @@ private const val FOCUSED_PLATE_ALPHA = 0.2f
  * low-alpha wash of the same colour. [tint] defaults to the accent.
  *
  * Focus is a parameter, as for the rows that host it. On the focus fill the plate becomes a wash of [focusedTint] and
- * the glyph takes it, so the icon inverts with the row instead of fighting its container. It defaults to `onPrimary`, the
- * ink on the accent fill; a row that fills with another colour, such as a destructive row's `error`, passes that fill's ink.
+ * the glyph takes it, so the icon inverts with the row instead of fighting its container. It defaults to the style's
+ * content on focus, the ink on the focus fill; a row that fills with another colour, such as a destructive row's `error`, passes that fill's ink.
  */
 @Composable
 fun TvRowIcon(
@@ -32,7 +33,7 @@ fun TvRowIcon(
     modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.primary,
     isFocused: Boolean = false,
-    focusedTint: Color = MaterialTheme.colorScheme.onPrimary,
+    focusedTint: Color = MaterialTheme.tvStyle.onFocusContainer,
 ) {
     val glyph = if (isFocused) focusedTint else tint
     val plate = glyph.copy(alpha = if (isFocused) FOCUSED_PLATE_ALPHA else PLATE_ALPHA)
