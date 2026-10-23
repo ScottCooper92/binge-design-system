@@ -32,7 +32,8 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * Facts as one tile: an optional [icon] at the top start, and a [title] over a column of [lines]. There is nothing to press,
  * but it takes focus, so the remote can scroll it into view in a sheet or a page; focused, it shows the primary ring a focused
- * button does, never a fill. A screen reader reads the title and lines together, as one item. Under [TvStyle.Monochrome] the card's
+ * button does, never a fill. [leading] replaces the icon with a mark of its own, such as an app's logo, and
+ * is sized by the caller. A screen reader reads the title and lines together, as one item. Under [TvStyle.Monochrome] the card's
  * fill matches the sheet's panel, so at rest it carries a faint outline; the accent styles draw none. [initiallyFocused] draws the
  * focused state, for a frame.
  */
@@ -42,6 +43,7 @@ fun TvInfoCard(
     lines: List<String>,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
+    leading: (@Composable () -> Unit)? = null,
     initiallyFocused: Boolean = false,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
@@ -58,13 +60,15 @@ fun TvInfoCard(
                 .padding(dimensionResource(DesR.dimen.padding_m)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
     ) {
-        icon?.let {
-            Icon(
-                imageVector = it,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
-            )
+        when {
+            leading != null -> leading()
+            icon != null ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
+                )
         }
         Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_xs))) {
             Text(text = title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)

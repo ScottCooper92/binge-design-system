@@ -87,6 +87,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun infoCardLeading() = Frame { TvInfoCardLeadingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun confirmDialog() = Frame { TvConfirmDialogSample() }
 
     @PreviewTest
