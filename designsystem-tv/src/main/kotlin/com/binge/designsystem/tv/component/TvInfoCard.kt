@@ -1,6 +1,8 @@
 package com.binge.designsystem.tv.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,6 +48,14 @@ fun TvInfoCard(
             modifier
                 .fillMaxWidth()
                 .tvFocusIndicator(isFocused = focused, shape = BingeShapes.TvListItem)
+                // Prototype: on a monochrome panel the card's fill matches the sheet, so it carries a faint outline at rest.
+                .then(
+                    if (!focused && com.binge.designsystem.tv.theme.LocalTvStyle.current == com.binge.designsystem.tv.theme.TvStyle.Monochrome) {
+                        Modifier.border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.14f), BingeShapes.TvListItem)
+                    } else {
+                        Modifier
+                    },
+                )
                 .clip(BingeShapes.TvListItem)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .tvFocusTarget { focused = it }

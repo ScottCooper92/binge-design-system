@@ -114,6 +114,7 @@ fun TvSideSheetStack(
 ) {
     val entries = rememberSaveable(root, saver = StackSaver) { mutableStateListOf(StackEntry(root, null)) }
     val pageStates = rememberSaveableStateHolder()
+    val pageTitles = remember { androidx.compose.runtime.mutableStateMapOf<String, String>() }
     var restoreTo by remember { mutableStateOf<String?>(null) }
     val back: () -> Unit = {
         if (entries.size > 1) {
@@ -132,6 +133,12 @@ fun TvSideSheetStack(
         val top = entries.last()
         key(top.page) {
             pageStates.SaveableStateProvider(top.page) {
+                val parentTitle = entries.getOrNull(entries.lastIndex - 1)?.let { pageTitles[it.page] }
+                val sink: (String) -> Unit = { title -> if (pageTitles[top.page] != title) pageTitles[top.page] = title }
+                androidx.compose.runtime.CompositionLocalProvider(
+                    LocalTvSideSheetTitleSink provides sink,
+                    LocalTvSideSheetParentTitle provides parentTitle,
+                ) {
                 val rows = remember { RowRequesters() }
                 currentRows = rows
                 val nav =
@@ -149,6 +156,7 @@ fun TvSideSheetStack(
                 // After the page's rows, which are what put their requesters in the map.
                 val target = rows.target(restoreTo)
                 if (target != null) LaunchedEffect(Unit) { restoreTvOverlayFocus(target) }
+                }
             }
         }
     }

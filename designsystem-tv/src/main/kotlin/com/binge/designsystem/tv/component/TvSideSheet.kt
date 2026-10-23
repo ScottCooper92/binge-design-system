@@ -141,6 +141,17 @@ fun TvSideSheetPanel(
 /** The sheet's heading: what its rows act on. */
 @Composable
 fun TvSideSheetTitle(text: String, modifier: Modifier = Modifier) {
+    // Prototype: a page opened over another names the page Back returns to, above its own title.
+    val sink = LocalTvSideSheetTitleSink.current
+    androidx.compose.runtime.SideEffect { sink?.invoke(text) }
+    LocalTvSideSheetParentTitle.current?.let { parent ->
+        Text(
+            text = "\u2039 " + parent,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+        )
+    }
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
@@ -148,6 +159,9 @@ fun TvSideSheetTitle(text: String, modifier: Modifier = Modifier) {
         modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs)),
     )
 }
+
+internal val LocalTvSideSheetTitleSink = androidx.compose.runtime.staticCompositionLocalOf<((String) -> Unit)?> { null }
+internal val LocalTvSideSheetParentTitle = androidx.compose.runtime.compositionLocalOf<String?> { null }
 
 /** A line under the title, such as what a confirm step is about to do. */
 @Composable
