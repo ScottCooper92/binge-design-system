@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import com.binge.designsystem.tv.focus.restoreTvOverlayFocus
+import com.binge.designsystem.tv.focus.tvLateEntryFocusGroup
 
 private const val ENTRY_SEPARATOR = '\u0001'
 
@@ -123,12 +124,16 @@ fun TvSideSheetStack(
             onDismissRequest()
         }
     }
-    TvSideSheet(onDismissRequest = back, modifier = modifier, toBottomEdge = toBottomEdge) {
+    // The sheet's window takes focus before the page's effect runs; routing entry to the target keeps it off the first row.
+    var currentRows by remember { mutableStateOf<RowRequesters?>(null) }
+    val routed = modifier.tvLateEntryFocusGroup { currentRows?.target(restoreTo) }
+    TvSideSheet(onDismissRequest = back, modifier = routed, toBottomEdge = toBottomEdge) {
         val column = this
         val top = entries.last()
         key(top.page) {
             pageStates.SaveableStateProvider(top.page) {
                 val rows = remember { RowRequesters() }
+                currentRows = rows
                 val nav =
                     TvSideSheetNav(
                         page = top.page,
