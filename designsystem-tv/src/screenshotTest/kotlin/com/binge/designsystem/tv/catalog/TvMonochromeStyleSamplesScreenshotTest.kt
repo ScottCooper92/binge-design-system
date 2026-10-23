@@ -27,6 +27,16 @@ class TvMonochromeStyleSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun infoCard() = Frame { TvMonochromeInfoCardSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun sideSheetNestedPage() = Frame { TvMonochromeSideSheetNestedPageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun rowIcon() = Frame { TvMonochromeRowIconSample() }
 
     @PreviewTest

@@ -20,10 +20,12 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +56,9 @@ import com.binge.designsystem.tv.focus.tvExitFocusGroup
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
+import com.binge.designsystem.tv.theme.LocalTvStyle
 import com.binge.designsystem.tv.theme.TV_OVERLAY_SCRIM_ALPHA
+import com.binge.designsystem.tv.theme.TvStyle
 import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -138,16 +142,49 @@ fun TvSideSheetPanel(
     }
 }
 
-/** The sheet's heading: what its rows act on. */
+/**
+ * The sheet's heading: what its rows act on. On a page opened over another in a [TvSideSheetStack], and under
+ * [TvStyle.Monochrome], a small line above it names the page Back returns to ("‹ Companions"). The line is no control and takes
+ * no focus; Back stays the way back.
+ */
 @Composable
 fun TvSideSheetTitle(text: String, modifier: Modifier = Modifier) {
+    val page = LocalTvSideSheetPage.current
+    SideEffect { page?.onTitle(text) }
+    val parent = page?.parentTitle?.takeIf { LocalTvStyle.current == TvStyle.Monochrome }
+    if (parent == null) {
+        SideSheetTitleText(text, modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs)))
+    } else {
+        Column(modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs))) {
+            Text(
+                text = stringResource(TvR.string.tv_side_sheet_parent_title, parent),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            SideSheetTitleText(text, Modifier)
+        }
+    }
+}
+
+@Composable
+private fun SideSheetTitleText(text: String, modifier: Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.onSurface,
-        modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs)),
+        modifier = modifier,
     )
 }
+
+/** What a page in a [TvSideSheetStack] knows of the stack: the title of the page it was opened from, and where to report its own. */
+internal class TvSideSheetPage(
+    val parentTitle: String?,
+    val onTitle: (String) -> Unit,
+)
+
+internal val LocalTvSideSheetPage = staticCompositionLocalOf<TvSideSheetPage?> { null }
 
 /** A line under the title, such as what a confirm step is about to do. */
 @Composable

@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.component
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -25,16 +26,25 @@ private const val ENTRY_SEPARATOR = '\u0001'
 private data class StackEntry(
     val page: String,
     val openedBy: String?,
+    val parentTitle: String? = null,
 )
 
 private val StackSaver =
     Saver<SnapshotStateList<StackEntry>, List<String>>(
-        save = { entries -> entries.map { "${it.page}$ENTRY_SEPARATOR${it.openedBy.orEmpty()}" } },
+        save = { entries ->
+            entries.map { "${it.page}$ENTRY_SEPARATOR${it.openedBy.orEmpty()}$ENTRY_SEPARATOR${it.parentTitle.orEmpty()}" }
+        },
         restore = { saved ->
             mutableStateListOf<StackEntry>().apply {
                 saved.forEach { line ->
-                    val page = line.substringBefore(ENTRY_SEPARATOR)
-                    add(StackEntry(page, line.substringAfter(ENTRY_SEPARATOR).takeIf { it.isNotEmpty() }))
+                    val fields = line.split(ENTRY_SEPARATOR)
+                    add(
+                        StackEntry(
+                            fields[0],
+                            fields.getOrNull(1)?.takeIf { it.isNotEmpty() },
+                            fields.getOrNull(2)?.takeIf { it.isNotEmpty() },
+                        ),
+                    )
                 }
             }
         },
@@ -115,6 +125,8 @@ fun TvSideSheetStack(
     val entries = rememberSaveable(root, saver = StackSaver) { mutableStateListOf(StackEntry(root, null)) }
     val pageStates = rememberSaveableStateHolder()
     var restoreTo by remember { mutableStateOf<String?>(null) }
+    // The title each page shows, read only when a page opens another, so the new page can name the one Back returns to.
+    val titles = remember { mutableMapOf<String, String>() }
     val back: () -> Unit = {
         if (entries.size > 1) {
             val left = entries.removeAt(entries.lastIndex)
@@ -134,18 +146,19 @@ fun TvSideSheetStack(
             pageStates.SaveableStateProvider(top.page) {
                 val rows = remember { RowRequesters() }
                 currentRows = rows
+                val page = remember(top.page, top.parentTitle) { TvSideSheetPage(top.parentTitle) { titles[top.page] = it } }
                 val nav =
                     TvSideSheetNav(
                         page = top.page,
                         depth = entries.size,
                         onPush = { page, openedBy ->
                             restoreTo = null
-                            entries.add(StackEntry(page, openedBy))
+                            entries.add(StackEntry(page, openedBy, titles[top.page]))
                         },
                         onBack = back,
                         requesters = rows,
                     )
-                column.content(nav)
+                CompositionLocalProvider(LocalTvSideSheetPage provides page) { column.content(nav) }
                 // After the page's rows, which are what put their requesters in the map.
                 val target = rows.target(restoreTo)
                 if (target != null) LaunchedEffect(Unit) { restoreTvOverlayFocus(target) }
