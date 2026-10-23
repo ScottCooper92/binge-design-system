@@ -1,5 +1,7 @@
 package com.binge.designsystem.tv.component
 
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -123,12 +125,20 @@ fun TvSideSheetStack(
             onDismissRequest()
         }
     }
-    TvSideSheet(onDismissRequest = back, modifier = modifier, toBottomEdge = toBottomEdge) {
+    // Focus entering the sheet, as its window first takes focus, goes straight to the row the page will settle on, rather than to
+    // the first row and then across.
+    var currentRows by remember { mutableStateOf<RowRequesters?>(null) }
+    val routed =
+        modifier
+            .focusProperties { onEnter = { currentRows?.target(restoreTo)?.let { runCatching { it.requestFocus() } } } }
+            .focusGroup()
+    TvSideSheet(onDismissRequest = back, modifier = routed, toBottomEdge = toBottomEdge) {
         val column = this
         val top = entries.last()
         key(top.page) {
             pageStates.SaveableStateProvider(top.page) {
                 val rows = remember { RowRequesters() }
+                currentRows = rows
                 val nav =
                     TvSideSheetNav(
                         page = top.page,
