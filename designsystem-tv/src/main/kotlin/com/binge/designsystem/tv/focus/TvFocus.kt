@@ -7,6 +7,7 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
@@ -253,6 +254,21 @@ fun Modifier.tvLazyFocusGroup(fallback: FocusRequester? = null): Modifier = this
 fun Modifier.tvEntryFocusGroup(entry: FocusRequester): Modifier =
     this
         .focusProperties { onEnter = { runCatching { entry.requestFocus() } } }
+        .focusGroup()
+
+/**
+ * A focus unit whose entry goes to a target that is only known **when focus arrives**, such as the row a side-sheet page
+ * registers as it composes. [entry] is read on every entry; null leaves the directional search to run.
+ *
+ * Not [tvEntryFocusGroup]'s `onEnter`: a request made from inside it is followed by the group's own entry, which moves
+ * focus on to the first child, and cancelling that reverts the request too. The `enter` redirect is the one the focus
+ * system honours as the answer, so the target is the only node that takes focus.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Suppress("DEPRECATION")
+fun Modifier.tvLateEntryFocusGroup(entry: () -> FocusRequester?): Modifier =
+    this
+        .focusProperties { enter = { entry() ?: FocusRequester.Default } }
         .focusGroup()
 
 /**
