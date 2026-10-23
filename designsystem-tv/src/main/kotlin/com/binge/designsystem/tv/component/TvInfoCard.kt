@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,13 +24,16 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.focus.tvFocusTarget
+import com.binge.designsystem.tv.theme.LocalTvStyle
+import com.binge.designsystem.tv.theme.TvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /**
  * Facts as one tile: an optional [icon] at the top start, and a [title] over a column of [lines]. There is nothing to press,
  * but it takes focus, so the remote can scroll it into view in a sheet or a page; focused, it shows the primary ring a focused
- * button does, never a fill. A screen reader reads the title and lines together, as one item. [initiallyFocused] draws the
+ * button does, never a fill. A screen reader reads the title and lines together, as one item. Under [TvStyle.Monochrome] the card's
+ * fill matches the sheet's panel, so at rest it carries a faint outline; the accent styles draw none. [initiallyFocused] draws the
  * focused state, for a frame.
  */
 @Composable
@@ -46,6 +50,7 @@ fun TvInfoCard(
             modifier
                 .fillMaxWidth()
                 .tvFocusIndicator(isFocused = focused, shape = BingeShapes.TvListItem)
+                .then(if (!focused && LocalTvStyle.current == TvStyle.Monochrome) restingOutline() else Modifier)
                 .clip(BingeShapes.TvListItem)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .tvFocusTarget { focused = it }
@@ -69,3 +74,14 @@ fun TvInfoCard(
         }
     }
 }
+
+/** The faint line that marks a card's edge where its fill is the panel's own. */
+@Composable
+private fun restingOutline(): Modifier =
+    Modifier.border(
+        width = dimensionResource(TvR.dimen.tv_info_card_outline_width),
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = INFO_CARD_OUTLINE_ALPHA),
+        shape = BingeShapes.TvListItem,
+    )
+
+private const val INFO_CARD_OUTLINE_ALPHA = 0.14f

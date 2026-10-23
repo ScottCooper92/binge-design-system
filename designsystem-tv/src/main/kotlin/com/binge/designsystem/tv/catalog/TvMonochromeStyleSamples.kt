@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.binge.designsystem.tv.component.LocalTvSideSheetPage
+import com.binge.designsystem.tv.component.TvSideSheetPage
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.component.TvSideSheetRows
@@ -133,6 +135,30 @@ fun TvMonochromeRowIconSample() {
 @Composable
 fun TvMonochromeRowIconSideSheetSample() {
     Monochrome { TvRowIconSideSheetSample() }
+}
+
+/** The info card in the monochrome style: a faint outline at rest, so the card reads against a panel of its own colour. */
+@Composable
+fun TvMonochromeInfoCardSample() {
+    Monochrome { TvInfoCardSample() }
+}
+
+/** A page opened over another, in the monochrome style: a small line above its title names the page Back returns to. */
+@Composable
+fun TvMonochromeSideSheetNestedPageSample() {
+    Monochrome {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+            TvSideSheetPanel {
+                CompositionLocalProvider(LocalTvSideSheetPage provides TvSideSheetPage(parentTitle = "Companions", onTitle = {})) {
+                    TvSideSheetTitle("Streaming")
+                    TvSideSheetRows {
+                        TvSideSheetRow(label = "Watch", supportingText = "3 sources", onClick = {}, initiallyFocused = true)
+                        TvSideSheetRow(label = "Open Streamer", onClick = {})
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
