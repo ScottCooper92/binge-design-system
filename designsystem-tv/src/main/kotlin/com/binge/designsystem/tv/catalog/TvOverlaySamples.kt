@@ -1,5 +1,6 @@
 package com.binge.designsystem.tv.catalog
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -504,6 +507,29 @@ fun TvInfoCardSample() {
                 initiallyFocused = true,
             )
             TvInfoCard(title = "Services", lines = listOf("Main · Default", "Main · 4K"), icon = Icons.Filled.Info)
+        }
+    }
+}
+
+/** A card led by a mark of its own, in place of the tinted icon: an app's logo, drawn on the plate a row's icon sits on. */
+@Composable
+fun TvInfoCardLeadingSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Streamer")
+            TvInfoCard(
+                title = "Streamer",
+                lines = listOf("Ready to play"),
+                leading = {
+                    Image(
+                        painter = rememberVectorPainter(Icons.Filled.Dns),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_row_icon_plate)),
+                    )
+                },
+                initiallyFocused = true,
+            )
         }
     }
 }
