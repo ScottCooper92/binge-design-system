@@ -21,7 +21,8 @@ private const val FOCUSED_PLATE_ALPHA = 0.2f
 
 /**
  * A row's leading icon on its tinted plate, the TV twin of the settings-row icon box: the glyph in [tint], on a
- * low-alpha wash of the same colour. [tint] defaults to the accent.
+ * low-alpha wash of the same colour. [tint] defaults to the style's row icon colour: the accent, or white in the
+ * monochrome style.
  *
  * Focus is a parameter, as for the rows that host it. On the focus fill the plate becomes a wash of [focusedTint] and
  * the glyph takes it, so the icon inverts with the row instead of fighting its container. It defaults to the style's
@@ -31,7 +32,7 @@ private const val FOCUSED_PLATE_ALPHA = 0.2f
 fun TvRowIcon(
     icon: ImageVector,
     modifier: Modifier = Modifier,
-    tint: Color = MaterialTheme.colorScheme.primary,
+    tint: Color = MaterialTheme.tvStyle.rowIcon,
     isFocused: Boolean = false,
     focusedTint: Color = MaterialTheme.tvStyle.onFocusContainer,
 ) {

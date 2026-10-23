@@ -56,6 +56,7 @@ data class TvSwitchColors(
  *   takes it too, since the caret shows while the field holds focus.
  * - [destructiveFocusContainer] fills a focused destructive control, and [onDestructiveFocusContainer] is its content.
  * - [panel] is the background of a side sheet and a confirm dialog.
+ * - [rowIcon] is the glyph of a row's leading icon at rest, and the wash behind it is that colour at low alpha.
  * - [switch] is a switch's track and thumb.
  */
 @Immutable
@@ -66,6 +67,7 @@ data class TvStyleColors(
     val destructiveFocusContainer: Color,
     val onDestructiveFocusContainer: Color,
     val panel: Color,
+    val rowIcon: Color,
     val switch: TvSwitchColors,
 )
 
@@ -76,6 +78,11 @@ fun TvStyle.colors(scheme: ColorScheme): TvStyleColors {
             TvStyle.Accent -> Triple(scheme.primary, scheme.onPrimary, scheme.surface)
             TvStyle.Monochrome -> Triple(scheme.onSurface, scheme.surface, scheme.surfaceVariant)
         }
+    val rowIcon =
+        when (this) {
+            TvStyle.Accent -> scheme.primary
+            TvStyle.Monochrome -> scheme.onSurface
+        }
     return TvStyleColors(
         focusContainer = focus,
         onFocusContainer = onFocus,
@@ -83,6 +90,7 @@ fun TvStyle.colors(scheme: ColorScheme): TvStyleColors {
         destructiveFocusContainer = scheme.error,
         onDestructiveFocusContainer = scheme.onError,
         panel = panel,
+        rowIcon = rowIcon,
         // A checked switch is the focus colour at rest, and inverts against the focus fill when its row is focused.
         switch =
             TvSwitchColors(

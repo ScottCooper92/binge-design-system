@@ -245,7 +245,7 @@ fun TvSideSheetRow(
             when {
                 !enabled -> resting
                 destructive -> MaterialTheme.colorScheme.error
-                else -> MaterialTheme.colorScheme.primary
+                else -> style.rowIcon
             },
         focusedIconTint = if (destructive) style.onDestructiveFocusContainer else style.onFocusContainer,
         isFocused = focused,
@@ -293,7 +293,7 @@ fun TvSideSheetReadout(
         supporting = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
         icon = icon,
-        iconTint = MaterialTheme.colorScheme.primary,
+        iconTint = MaterialTheme.tvStyle.rowIcon,
         isFocused = false,
         selected = false,
         supportingText = supportingText,
