@@ -27,6 +27,16 @@ class TvMonochromeStyleSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun rowIcon() = Frame { TvMonochromeRowIconSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun rowIconSideSheet() = Frame { TvMonochromeRowIconSideSheetSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun switch() = Frame { TvMonochromeSwitchSample() }
 
     @PreviewTest

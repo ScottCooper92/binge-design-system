@@ -123,6 +123,18 @@ fun TvMonochromeTextFieldSample() {
     Monochrome { TvTextFieldStatesSample() }
 }
 
+/** A row icon's plate in the monochrome style: a white glyph on a neutral wash at rest, and on the focus fill. */
+@Composable
+fun TvMonochromeRowIconSample() {
+    Monochrome { TvRowIconSample() }
+}
+
+/** The side sheet's rows with an icon in the monochrome style: white glyphs on a neutral plate, the focused row inverted. */
+@Composable
+fun TvMonochromeRowIconSideSheetSample() {
+    Monochrome { TvRowIconSideSheetSample() }
+}
+
 @Composable
 private fun Monochrome(content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalTvStyle provides TvStyle.Monochrome, content = content)
