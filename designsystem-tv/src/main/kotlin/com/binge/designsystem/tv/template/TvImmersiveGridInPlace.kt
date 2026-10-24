@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.R as TvR
 
-/** Rows of plates drawn while a grid with [TvImmersiveGridPlates] has no cells: enough to run past the bottom edge. */
+/** Rows of plates drawn while a grid with [TvImmersiveGridInPlace] has no cells: enough to run past the bottom edge. */
 internal const val PLATE_ROWS = 3
 
 private const val NO_CELL = -1
@@ -116,9 +116,16 @@ internal fun <T : Any> TvImmersiveGridBody(
         if (isMessage) {
             val direction = LocalLayoutDirection.current
             val inset = PaddingValues(start = cellPadding.calculateStartPadding(direction), end = messageEndInset)
+            val column = entryIndex % columns
             Row(Modifier.fillMaxSize().padding(inset)) {
-                Spacer(Modifier.weight(1f))
-                Box(Modifier.weight((columns - 1).toFloat()), contentAlignment = Alignment.TopStart) { message() }
+                // Never over the entry plate: after its column, or before it when it is in the last one.
+                if (column == columns - 1) {
+                    Box(Modifier.weight(column.toFloat()), contentAlignment = Alignment.TopEnd) { message() }
+                    Spacer(Modifier.weight(1f))
+                } else {
+                    Spacer(Modifier.weight((column + 1).toFloat()))
+                    Box(Modifier.weight((columns - column - 1).toFloat()), contentAlignment = Alignment.TopStart) { message() }
+                }
             }
         }
     }

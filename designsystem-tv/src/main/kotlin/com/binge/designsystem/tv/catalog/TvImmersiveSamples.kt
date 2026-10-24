@@ -457,6 +457,18 @@ fun TvImmersiveGridInPlaceMessageSample() {
     )
 }
 
+/** The same failure with focus on a later column: the message moves clear of the entry plate, after its column. */
+@Composable
+fun TvImmersiveGridInPlaceMessageLaterColumnSample() {
+    SampleInPlaceGrid(
+        content = TvImmersiveGridContent.Message(),
+        focusedIndex = LATER_COLUMN,
+        message = {
+            TvMessagePlate(body = "Check your connection and try again.", headline = "No connection", alignment = Alignment.TopStart)
+        },
+    )
+}
+
 /** Controls sharing the heading's row: a band of filters after the heading, and an action pinned to the end. */
 @Composable
 fun TvImmersiveGridHeadingControlsSample() {
@@ -511,3 +523,5 @@ private val DemoHubRows =
 fun TvImmersiveHubDemo() {
     SampleHub(hero = { SampleHero() }, rows = DemoHubRows)
 }
+
+private const val LATER_COLUMN = 2
