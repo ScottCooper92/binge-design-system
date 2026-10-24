@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -115,13 +116,20 @@ internal fun <T : Any> TvImmersiveGridBody(
         }
         if (isMessage) {
             val direction = LocalLayoutDirection.current
-            val inset = PaddingValues(start = cellPadding.calculateStartPadding(direction), end = messageEndInset)
+            // The same side padding as the cells, so the columns line up; the end inset only keeps the message itself clear.
+            val inset =
+                PaddingValues(start = cellPadding.calculateStartPadding(direction), end = cellPadding.calculateEndPadding(direction))
             Row(Modifier.fillMaxSize().padding(inset)) {
                 // The message takes the columns after the entry plate, or those before it when the entry is in the last column.
                 val entryColumn = entryIndex % columns
                 if (entryColumn < columns - 1) {
                     Spacer(Modifier.weight((entryColumn + 1).toFloat()))
-                    Box(Modifier.weight((columns - entryColumn - 1).toFloat()), contentAlignment = Alignment.TopStart) { message() }
+                    Box(
+                        Modifier.weight((columns - entryColumn - 1).toFloat()).padding(end = messageEndInset),
+                        contentAlignment = Alignment.TopStart,
+                    ) {
+                        message()
+                    }
                 } else {
                     Box(Modifier.weight(entryColumn.toFloat()), contentAlignment = Alignment.TopStart) { message() }
                     Spacer(Modifier.weight(1f))

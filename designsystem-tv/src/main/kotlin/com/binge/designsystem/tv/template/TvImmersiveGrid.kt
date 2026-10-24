@@ -70,7 +70,7 @@ private const val DEFAULT_COLUMNS = 6
  * @param loading the loading state, given the padding the cells will take.
  * @param message the message state, centred in the pane.
  * @param pendingCell a cell not loaded yet.
- * @param inPlace opts into one grid for every state, drawing plates in the cells loading and message use, so focus on a plate
+ * @param inPlace opts into one grid for every state (it needs at least two [columns]), drawing plates in the cells loading and message use, so focus on a plate
  * stays on the cell the item arrives in. [loading], [pendingCell] and [cell] are unused then, and [message] sits beside the entry plate.
  */
 @Composable
@@ -102,6 +102,7 @@ fun <T : Any> TvImmersiveGrid(
     inPlace: TvImmersiveGridInPlace<T>? = null,
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, onClick: () -> Unit, cellModifier: Modifier) -> Unit,
 ) {
+    require(inPlace == null || columns >= 2) { "An in-place grid needs at least two columns: its message sits beside the entry plate." }
     val items = content as? TvImmersiveGridContent.Items
     // A visit is the screen, not the query, so this is deliberately not keyed on queryKey.
     val depth = rememberTvVisitDepth(onVisitEnded)
