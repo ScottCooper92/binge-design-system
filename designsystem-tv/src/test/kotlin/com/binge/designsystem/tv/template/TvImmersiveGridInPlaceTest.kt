@@ -51,6 +51,7 @@ class TvImmersiveGridInPlaceTest {
 
     private var content by mutableStateOf<TvImmersiveGridContent<Int>>(TvImmersiveGridContent.Loading)
     private var actions = 0
+    private var leftGrid = 0
 
     @Test
     fun `focus on a loading plate is on the same node when the items arrive`() {
@@ -81,6 +82,49 @@ class TvImmersiveGridInPlaceTest {
     }
 
     @Test
+    fun `focus on a cell past the first is on the same node when the grid turns to a message`() {
+        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
+        setGrid()
+        enterFromRail()
+        press(Key.DirectionRight)
+        val cell = focusedId()
+        composeTestRule.onNodeWithTag("cell-1").assertExists()
+
+        content = TvImmersiveGridContent.Message()
+        composeTestRule.waitForIdle()
+
+        assertEquals(cell, focusedId())
+    }
+
+    @Test
+    fun `an end press on a loading plate moves along the row`() {
+        setGrid(onNavigateToEnd = { leftGrid++ })
+        enterFromRail()
+        val first = focusedId()
+
+        press(Key.DirectionRight)
+
+        assertEquals(0, leftGrid)
+        assertTrue(first != focusedId())
+    }
+
+    @Test
+    fun `a plate focused when its item arrives is where the grid re-enters`() {
+        setGrid()
+        enterFromRail()
+        press(Key.DirectionRight)
+        val plate = focusedId()
+
+        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        composeTestRule.waitForIdle()
+        press(Key.DirectionRight)
+
+        assertEquals(plate, focusedId())
+    }
+
+    @Test
     fun `a plate does nothing on OK while loading`() {
         setGrid()
         enterFromRail()
@@ -104,7 +148,7 @@ class TvImmersiveGridInPlaceTest {
         press(Key.DirectionRight)
     }
 
-    private fun setGrid() {
+    private fun setGrid(onNavigateToEnd: (() -> Unit)? = null) {
         composeTestRule.setContent {
             BingeTvTheme {
                 Row {
@@ -118,6 +162,7 @@ class TvImmersiveGridInPlaceTest {
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         columns = COLUMNS,
                         hosting = TvPageHosting.RailDestination,
+                        onNavigateToEnd = onNavigateToEnd,
                         inPlace = TvImmersiveGridInPlace<Int>(
                             cell = { item, _, onFocusChanged, onClick, cellModifier, _ ->
                                 Box(

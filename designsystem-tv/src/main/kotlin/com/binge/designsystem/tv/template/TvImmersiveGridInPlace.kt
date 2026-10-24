@@ -23,7 +23,7 @@ import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.R as TvR
 
 /** Rows of plates drawn while a grid with [TvImmersiveGridPlates] has no cells: enough to run past the bottom edge. */
-private const val PLATE_ROWS = 3
+internal const val PLATE_ROWS = 3
 
 /** What the entry plate of an in-place grid does in the message state: [label] drawn in it, [onClick] on OK. */
 class TvImmersiveGridAction(
