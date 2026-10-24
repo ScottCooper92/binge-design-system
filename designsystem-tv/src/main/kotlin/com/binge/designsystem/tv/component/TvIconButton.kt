@@ -41,8 +41,7 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * A circular, icon-only 10-foot control that expands into a labelled pill on focus — the same
- * expand-on-focus idiom [com.binge.designsystem.tv.nav.BingeTvNavRail] uses to reveal its destinations'
- * labels, so a user who has already learnt the rail has learnt this too.
+ * expand-on-focus idiom a navigation rail uses to reveal its destinations' labels.
  *
  * [label] never renders as its own [Text] node while resting, so it is required rather than optional, where the
  * phone's icon button takes a nullable description: a TV icon button must be named. It is the control's accessible

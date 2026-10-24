@@ -62,7 +62,7 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * tab for [selectedKey] keeps a faint pill while focus is elsewhere. Only the centred tabs scale, from 0.8 at rest to full
  * size while the bar holds focus, so the two ends stay pinned.
  *
- * Unlike [BingeTvNavRail], focus never selects: OK on an item calls [onSelect] and nothing else does. Items named in
+ * Focus never selects: OK on an item calls [onSelect] and nothing else does. Items named in
  * [iconOnlyKeys] (the header, an item or the footer) draw as their [TvNavRailItem.icon] alone; every other item is its
  * label on a single line, so a crowded bar never grows taller.
  * The tabs keep clear of whichever end item is wider, however wide its label. [TvNavRailItem.badge] is not drawn.

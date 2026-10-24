@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
-import com.binge.designsystem.tv.preview.TvRtlPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
 /** Screenshot coverage for the TV catalog samples: one frame per sample, each on the TV panel. */
@@ -144,78 +143,6 @@ class TvSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun pairingCardErrorLongMessage() = Frame { TvPairingCardErrorLongMessageSample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailExpanded() = Frame { TvNavRailSample(expanded = true) }
-
-    /** Right-to-left: the rail moves to the right edge and its labels read from the right. */
-    @PreviewTest
-    @TvRtlPreviews
-    @Composable
-    fun navRailExpandedRtl() = Frame { TvNavRailSample(expanded = true) }
-
-    @PreviewTest
-    @TvRtlPreviews
-    @Composable
-    fun navRailCollapsedRtl() = Frame { TvNavRailSample(expanded = false) }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailCollapsed() = Frame { TvNavRailSample(expanded = false) }
-
-    /** A short list with the footer pinned: it stays on the bottom edge instead of following the last destination. */
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailCollapsedPinnedFooter() = Frame { TvNavRailSample(expanded = false, pinFooter = true) }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun shellScaffoldOverlay() = Frame { TvShellScaffoldOverlaySample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailExpandedPinnedFooter() = Frame { TvNavRailSample(expanded = true, pinFooter = true) }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailCollapsedLastSelected() = Frame { TvNavRailSample(expanded = false, selectedKey = "lists") }
-
-    /** A companion's pending-attention count on a rail destination — the collapsed icon's corner. */
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailCollapsedBadge() = Frame { TvNavRailSample(expanded = false, badgedItemKey = "watchlist") }
-
-    /** The same badge with the rail open, beside the label rather than alone on the icon. */
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailExpandedBadge() = Frame { TvNavRailSample(expanded = true, badgedItemKey = "watchlist") }
-
-    /**
-     * The glass half of the fill, which no other frame reaches: production reports artwork from a
-     * `DisposableEffect`, and effects do not run in a preview, so every frame above renders at a solid panel.
-     *
-     * Both states show it: the ramp's hold is anchored in dp ([com.binge.designsystem.tv.nav.BingeTvNavRail]'s
-     * `tv_nav_rail_scrim_falloff`), not a fraction of width, so it reaches past the icon collapsed and past the label
-     * band expanded rather than forcing the panel solid while open.
-     */
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailExpandedOverArtwork() = Frame { TvNavRailSample(expanded = true, artworkBehind = true) }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun navRailCollapsedOverArtwork() = Frame { TvNavRailSample(expanded = false, artworkBehind = true) }
 
     @PreviewTest
     @TvPreviews

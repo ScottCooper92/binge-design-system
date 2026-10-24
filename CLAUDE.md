@@ -17,7 +17,7 @@ still holds the components that name its media-item model, its error model or th
 contract.
 
 The fourth slice is a second module, `designsystem-tv`: the tv-material theme, the focus units, the
-navigation rail shell, the button, the card row, the section title and the message plate — the TV
+top-bar shell, the button, the card row, the section title and the message plate — the TV
 foundation that names none of Binge's types. Material 3 and tv-material must not be mixed, so the
 TV layer is its own module and `checkTvMaterialSeparation` (wired into `check`) fails on an import
 across the seam; the colour-scheme adapter in `BingeTvTokens.kt` is the one sanctioned crossing.

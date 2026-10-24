@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Whether the current TV content is hosted as a **full-screen overlay above the shell** (a detail page, a
- * sub-page) rather than inside [BingeTvNavRail]'s content pane. The outer overlay host provides
+ * sub-page) rather than inside the shell's content pane. The outer overlay host provides
  * `true`; everywhere else it defaults to `false`.
  *
  * It exists because a single route/entry can be hosted **both** ways depending on how it was reached — e.g.

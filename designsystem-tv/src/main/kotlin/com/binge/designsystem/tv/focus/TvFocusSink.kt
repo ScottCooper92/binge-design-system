@@ -29,8 +29,8 @@ const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
  * focus leaves Compose's recovery search to place it, and with nothing else in the pane that is whatever sits beside
  * it: in a TV shell, the rail, every other frame for as long as the pane stays empty. Instead, while the sink holds
  * focus, offer it to a group around the real content: a request into a group with nothing focusable fails quietly and
- * leaves focus where it is, so the offer can repeat until the content grows a target. `BingeTvNavRail` does exactly
- * this for its content pane.
+ * leaves focus where it is, so the offer can repeat until the content grows a target. a shell's navigation does
+ * exactly this for its content pane.
  *
  * **Never calls `requestFocus` itself.** It only receives what a group's own entry redirect, an explicit
  * request, or Compose's own recovery search hands it — a puller here would reproduce the rail collapsing under

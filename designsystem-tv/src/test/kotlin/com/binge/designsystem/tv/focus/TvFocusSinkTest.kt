@@ -30,9 +30,8 @@ private const val ENTRY_TARGET = "entry-target"
 
 /**
  * [TvFocusSink]'s own directional contract: the key toward the start edge is the one sanctioned way out, and
- * every other direction is cancelled. [BingeTvNavRailAdverseScheduleFocusTest] and [BingeTvNavRailFocusTest]
- * cover the sink's integration into the rail's content group — presence keyed on the pane's own focus, convergence onto a
- * late-composing real target, and the parked-rail case landing on the sink instead.
+ * every other direction is cancelled. The sink's presence keyed on a pane's own focus, and its
+ * convergence onto a late-composing real target, belong to the shell that hosts it.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")

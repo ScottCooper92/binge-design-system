@@ -15,19 +15,9 @@
     <dimen name="tv_focus_ring_bleed">12dp</dimen>
     <!-- Focus sink: a real laid-out node, not zero-size, so it is a legitimate focus target -->
     <dimen name="tv_focus_sink_size">1dp</dimen>
-    <!-- Navigation rail -->
+    <!-- The account avatar's size, and the start inset the catalog samples reserve for a navigation strip -->
     <dimen name="tv_nav_rail_collapsed_width">72dp</dimen>
-    <dimen name="tv_nav_rail_expanded_width">220dp</dimen>
-    <dimen name="tv_nav_rail_padding">10dp</dimen>
-    <dimen name="tv_nav_rail_item_height">44dp</dimen>
-    <dimen name="tv_nav_rail_item_padding_h">14dp</dimen>
-    <dimen name="tv_nav_rail_item_gap">8dp</dimen>
-    <dimen name="tv_nav_rail_icon_label_gap">14dp</dimen>
     <dimen name="tv_nav_rail_avatar_size">32dp</dimen>
-    <dimen name="tv_nav_rail_badge_size">16dp</dimen>
-    <dimen name="tv_nav_rail_badge_padding_h">4dp</dimen>
-    <dimen name="tv_nav_rail_badge_offset">4dp</dimen>
-    <dimen name="tv_nav_rail_scrim_falloff">20dp</dimen>
     <!-- Button -->
     <dimen name="tv_button_height">52dp</dimen>
     <dimen name="tv_button_padding_horizontal">28dp</dimen>

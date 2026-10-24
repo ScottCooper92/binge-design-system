@@ -22,7 +22,7 @@ here, which is where it belongs, and the 40 components that only ever named Bing
 The television layer is a module of its own, `designsystem-tv`, because Material 3 and tv-material
 must not be mixed: they ship separate `MaterialTheme` trees, and the wrong import compiles cleanly
 and renders subtly wrong. It carries the TV foundation that names none of Binge's types — the theme,
-the focus units, the rail shell, the button, the card row and the message plate — and
+the focus units, the top-bar shell, the button, the card row and the message plate — and
 `checkTvMaterialSeparation` holds the line. Binge's TV media card and media row take its media-item
 model and stay there. The immersive backdrop and the error plate are here: the backdrop takes any item
 type, and the plate is built on `ErrorKind`.
@@ -68,14 +68,14 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── theme/       the tv-material theme, projected from the same tokens
 ├── focus/       the focus groups, the indicator, arrival and scroll units
-├── nav/         the navigation rail shell
+├── nav/         the top bar and the shell's settled-destination state
 ├── component/   the shared tv-material components, one file each: anything a TV screen places
 │                that names none of Binge's types, from a button to a side sheet or a stepper
 ├── layout/      layout anchors, so a skeleton can promise the geometry its content fills
 ├── template/    the whole-screen frames: the page hosting, the board, the two-pane page, the step
 │                flow, the message page, the error page, the detail page, the decision page, the list-and-pane board,
 │                the immersive hub and grid, the full-screen reader, and the skeleton pages
-├── Dimens.kt    the non-dp constants the TV components share, such as the nav rail's collapsed row cap
+├── Dimens.kt    the non-dp constants the TV components share
 ├── catalog/     the TV samples
 └── preview/     @TvPreviews and the TV screenshot theme
 
