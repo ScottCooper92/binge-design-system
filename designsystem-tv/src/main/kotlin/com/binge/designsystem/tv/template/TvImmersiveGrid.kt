@@ -117,11 +117,11 @@ fun <T : Any> TvImmersiveGrid(
     val reduceMotion = LocalReduceMotion.current
     ResetScrollWhenStale(memory.isStaleIn(content), gridState, reduceMotion)
 
-    // In place, a message keeps the cell focus was last on, which `remembered` cannot name once the items are gone;
-    // the body keeps that cell composed, so it holds even past the plate rows.
+    // In place, loading and a message keep the cell focus was last on, which `remembered` cannot name once the items are
+    // gone; the body keeps that cell composed, so it holds even past the plate rows.
     var lastFocused by remember(queryKey) { mutableStateOf(initialFocusedIndex) }
     val entryIndex =
-        remembered ?: if (inPlace != null && content is TvImmersiveGridContent.Message) {
+        remembered ?: if (inPlace != null && items == null) {
             lastFocused ?: 0
         } else {
             0

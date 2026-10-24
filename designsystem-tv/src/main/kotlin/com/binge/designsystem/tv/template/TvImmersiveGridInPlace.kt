@@ -25,6 +25,8 @@ import com.binge.designsystem.tv.R as TvR
 /** Rows of plates drawn while a grid with [TvImmersiveGridPlates] has no cells: enough to run past the bottom edge. */
 internal const val PLATE_ROWS = 3
 
+private const val NO_CELL = -1
+
 /** What the entry plate of an in-place grid does in the message state: [label] drawn in it, [onClick] on OK. */
 class TvImmersiveGridAction(
     val label: String,
@@ -83,12 +85,15 @@ internal fun <T : Any> TvImmersiveGridBody(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
             ) {
-                // A message keeps the cell focus is on composed, even past the plate rows.
-                items(count = items?.count ?: maxOf(columns * PLATE_ROWS, entryIndex + 1), key = { it }) { index ->
+                // Focus keeps its cell composed, even past the plate rows or fewer items than were focused: a cell past the
+                // items is a plate until focus leaves it.
+                val focused = ringIndex ?: NO_CELL
+                val drawn = maxOf(items?.count ?: maxOf(columns * PLATE_ROWS, entryIndex + 1), focused + 1)
+                items(count = drawn, key = { it }) { index ->
                     if (isMessage && index != entryIndex) {
                         Spacer(Modifier.fillMaxWidth())
                     } else {
-                        val item = items?.at(index)
+                        val item = items?.takeIf { index < it.count }?.at(index)
                         val isEntryMessage = isMessage && index == entryIndex
                         inPlace.cell(
                             item,

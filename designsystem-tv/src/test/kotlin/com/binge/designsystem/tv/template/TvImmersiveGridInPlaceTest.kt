@@ -34,6 +34,9 @@ import org.robolectric.annotation.Config
 private const val RAIL = "rail"
 private const val COLUMNS = 3
 private const val COUNT = 9
+private const val LONG = 30
+private const val FEW = 2
+private const val DOWN_PRESSES = 4
 
 /**
  * The in-place grid's contract: whatever the grid is showing, the cell focus is on is the cell the next state fills, so a
@@ -51,6 +54,7 @@ class TvImmersiveGridInPlaceTest {
 
     private var content by mutableStateOf<TvImmersiveGridContent<Int>>(TvImmersiveGridContent.Loading)
     private var actions = 0
+    private var afterAction: (() -> Unit)? = null
     private var leftGrid = 0
 
     @Test
@@ -142,6 +146,36 @@ class TvImmersiveGridInPlaceTest {
     }
 
     @Test
+    fun `retrying from a message past the plate rows keeps focus in the grid`() {
+        content = TvImmersiveGridContent.Items(count = LONG, key = { it }, at = { it })
+        afterAction = { content = TvImmersiveGridContent.Loading }
+        setGrid()
+        enterFromRail()
+        repeat(DOWN_PRESSES) { press(Key.DirectionDown) }
+        val cell = focusedId()
+        content = TvImmersiveGridContent.Message()
+        composeTestRule.waitForIdle()
+
+        press(Key.DirectionCenter)
+
+        assertEquals(cell, focusedId())
+    }
+
+    @Test
+    fun `items arriving under the plate focus is on keep focus in the grid`() {
+        setGrid()
+        enterFromRail()
+        press(Key.DirectionDown)
+        press(Key.DirectionRight)
+        press(Key.DirectionRight)
+
+        content = TvImmersiveGridContent.Items(count = FEW, key = { it }, at = { it })
+        composeTestRule.waitForIdle()
+
+        assertTrue(composeTestRule.onAllNodes(isFocused()).fetchSemanticsNodes().isNotEmpty())
+    }
+
+    @Test
     fun `a plate does nothing on OK while loading`() {
         setGrid()
         enterFromRail()
@@ -189,7 +223,10 @@ class TvImmersiveGridInPlaceTest {
                                         .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick),
                                 )
                             },
-                            messageAction = TvImmersiveGridAction("Retry") { actions++ },
+                            messageAction = TvImmersiveGridAction("Retry") {
+                                actions++
+                                afterAction?.invoke()
+                            },
                         ),
                     ) { item, _, onFocusChanged, onClick, cellModifier ->
                         Box(
