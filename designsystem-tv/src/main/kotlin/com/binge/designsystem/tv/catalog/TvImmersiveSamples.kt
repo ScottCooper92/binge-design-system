@@ -40,7 +40,9 @@ import com.binge.designsystem.tv.template.TvHubRow
 import com.binge.designsystem.tv.template.TvHubRowFailure
 import com.binge.designsystem.tv.template.TvImmersiveCopyLayout
 import com.binge.designsystem.tv.template.TvImmersiveGrid
+import com.binge.designsystem.tv.template.TvImmersiveGridAction
 import com.binge.designsystem.tv.template.TvImmersiveGridContent
+import com.binge.designsystem.tv.template.TvImmersiveGridInPlace
 import com.binge.designsystem.tv.template.TvImmersiveHub
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
@@ -383,6 +385,86 @@ fun TvImmersiveGridMessageSample() {
                 alignment = Alignment.Center,
                 actions = { TvButton(label = "Clear filters", onClick = {}, style = TvButtonStyle.Primary) },
             )
+        },
+    )
+}
+
+/** A grid of [content] that loads and fails in place: its plates are the cells, and the entry plate is the message's control. */
+@Composable
+private fun SampleInPlaceGrid(
+    content: TvImmersiveGridContent<SampleTitle>,
+    focusedIndex: Int?,
+    message: @Composable BoxScope.() -> Unit = {},
+) {
+    RailHosted {
+        TvImmersiveGrid(
+            heading = "All titles",
+            content = content,
+            onItemClick = {},
+            artwork = { title -> SampleArtwork(title) },
+            copy = { title -> SampleCopy(title) },
+            initialFocusedIndex = focusedIndex,
+            message = message,
+            inPlace = TvImmersiveGridInPlace<SampleTitle>(
+                cell = { title, isFocused, onFocusChanged, onClick, cellModifier, label ->
+                    SampleInPlaceCell(title, label, isFocused, onFocusChanged, onClick, cellModifier)
+                },
+                messageAction = TvImmersiveGridAction("Try again") {},
+            ),
+        ) { _, _, _, _, _ -> }
+    }
+}
+
+/** One cell of the in-place sample: the title's card, or a plate with the same node chain and its label. */
+@Composable
+private fun SampleInPlaceCell(
+    title: SampleTitle?,
+    label: String?,
+    isFocused: Boolean,
+    onFocusChanged: (Boolean) -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier,
+) {
+    Box(
+        modifier =
+            modifier
+                .aspectRatio(CARD_ASPECT_RATIO)
+                .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
+                .clip(BingeShapes.MediaCard)
+                .background(title?.let { sampleTone(it.id) } ?: MaterialTheme.colorScheme.surfaceVariant)
+                .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (label != null) Text(text = label, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+/** An in-place grid still loading, with focus already on its first plate: the plate takes focus, and the cell it becomes keeps it. */
+@Composable
+fun TvImmersiveGridInPlaceLoadingSample() {
+    SampleInPlaceGrid(content = TvImmersiveGridContent.Loading, focusedIndex = 0)
+}
+
+/** An in-place grid that failed: the entry plate is the control and says so, the message sits beside it, and the other cells are empty. */
+@Composable
+fun TvImmersiveGridInPlaceMessageSample() {
+    SampleInPlaceGrid(
+        content = TvImmersiveGridContent.Message(),
+        focusedIndex = 0,
+        message = {
+            TvMessagePlate(body = "Check your connection and try again.", headline = "No connection", alignment = Alignment.TopStart)
+        },
+    )
+}
+
+/** An in-place grid that failed with focus on a cell in the third column: the entry plate is that cell, and the message sits clear of it. */
+@Composable
+fun TvImmersiveGridInPlaceMessageMidRowSample() {
+    SampleInPlaceGrid(
+        content = TvImmersiveGridContent.Message(),
+        focusedIndex = 2,
+        message = {
+            TvMessagePlate(body = "Check your connection and try again.", headline = "No connection", alignment = Alignment.TopStart)
         },
     )
 }

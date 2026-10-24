@@ -70,6 +70,8 @@ private const val DEFAULT_COLUMNS = 6
  * @param loading the loading state, given the padding the cells will take.
  * @param message the message state, centred in the pane.
  * @param pendingCell a cell not loaded yet.
+ * @param inPlace opts into one grid for every state (it needs at least two [columns]), drawing plates in the cells loading and message use, so focus on a plate
+ * stays on the cell the item arrives in. [loading], [pendingCell] and [cell] are unused then, and [message] sits beside the entry plate.
  */
 @Composable
 fun <T : Any> TvImmersiveGrid(
@@ -97,8 +99,10 @@ fun <T : Any> TvImmersiveGrid(
     loading: @Composable (contentPadding: PaddingValues) -> Unit = { TvImmersiveGridSkeleton(columns, it) },
     message: @Composable BoxScope.() -> Unit = {},
     pendingCell: @Composable () -> Unit = {},
+    inPlace: TvImmersiveGridInPlace<T>? = null,
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, onClick: () -> Unit, cellModifier: Modifier) -> Unit,
 ) {
+    require(inPlace == null || columns >= 2) { "An in-place grid needs at least two columns: its message sits beside the entry plate." }
     val items = content as? TvImmersiveGridContent.Items
     // A visit is the screen, not the query, so this is deliberately not keyed on queryKey.
     val depth = rememberTvVisitDepth(onVisitEnded)
@@ -114,10 +118,19 @@ fun <T : Any> TvImmersiveGrid(
     val reduceMotion = LocalReduceMotion.current
     ResetScrollWhenStale(memory.isStaleIn(content), gridState, reduceMotion)
 
-    val anchor = anchorOf(remembered ?: 0, columns)
-    val keepBodyFocused = rememberBodyFocusKeeper(content.bodyKind(), entryFocusRequester)
+    // In place, loading and a message keep the cell focus was last on, which `remembered` cannot name once the items are
+    // gone; the body keeps that cell composed, so it holds even past the plate rows.
+    var lastFocused by remember(queryKey) { mutableStateOf(initialFocusedIndex) }
+    val entryIndex =
+        remembered ?: if (inPlace != null && items == null) {
+            lastFocused ?: 0
+        } else {
+            0
+        }
+    val anchor = anchorOf(entryIndex, columns)
+    val keepBodyFocused = rememberBodyFocusKeeper(content.bodyKind(), entryFocusRequester.takeIf { inPlace == null })
     val reportBodyFocus =
-        rememberAnchorKeeper(remembered, alsoReport = keepBodyFocused) {
+        rememberAnchorKeeper(entryIndex, alsoReport = keepBodyFocused) {
             if (reduceMotion) gridState.scrollToItem(anchor) else gridState.animateScrollToItem(anchor)
         }
     val bursting = rememberBursting(anchor)
@@ -127,8 +140,14 @@ fun <T : Any> TvImmersiveGrid(
     ReportBackdropItem(backdropItem, onBackdropItemChanged)
 
     val entry = remember { FocusRequester() }
-    val entryIndex = remembered ?: 0
-    val entryLoaded = items != null && entryIndex < items.count && items.at(entryIndex) != null
+    val ringLoaded = ringIndex?.takeIf { items != null && it < items.count && items.at(it) != null }
+    // A plate that had focus when its item arrived is now the remembered cell, though focus never changed.
+    LaunchedEffect(ringLoaded) {
+        if (inPlace == null || items == null || ringLoaded == null || memory?.index == ringLoaded) return@LaunchedEffect
+        memory = TvGridMemory(ringLoaded, items.key(ringLoaded))
+        depth.reach(ringLoaded)
+    }
+    val entryLoaded = inPlace != null || (items != null && entryIndex < items.count && items.at(entryIndex) != null)
     val padding = tvPagePadding(hosting)
     val direction = LocalLayoutDirection.current
 
@@ -172,7 +191,7 @@ fun <T : Any> TvImmersiveGrid(
                 Modifier
                     .fillMaxSize()
                     .then(
-                        if (content is TvImmersiveGridContent.Message) {
+                        if (content is TvImmersiveGridContent.Message && inPlace == null) {
                             Modifier.padding(start = LocalTvContentInset.current, end = messageEndInset)
                         } else {
                             // The ring's bleed goes into the cells' own padding, so the first row's ring is inside the viewport.
@@ -190,7 +209,13 @@ fun <T : Any> TvImmersiveGrid(
                         } else {
                             // On the body, not the root, so an end press on a control in the band moves along the band.
                             Modifier.onPreviewKeyEvent { event ->
-                                val edge = items == null || remembered?.let { atEndEdge(it, columns, items.count) } == true
+                                val edge =
+                                    when {
+                                        items != null -> remembered?.let { atEndEdge(it, columns, items.count) } == true
+                                        inPlace != null && content == TvImmersiveGridContent.Loading ->
+                                            atEndEdge(ringIndex ?: 0, columns, columns * PLATE_ROWS)
+                                        else -> true
+                                    }
                                 val press = event.type == KeyEventType.KeyDown && event.key == endKey
                                 if (press && edge) onNavigateToEnd()
                                 press && edge
@@ -198,63 +223,96 @@ fun <T : Any> TvImmersiveGrid(
                         },
                     ),
         ) {
-            when (content) {
-                TvImmersiveGridContent.Loading -> loading(cellPadding)
-                is TvImmersiveGridContent.Message -> message()
-                is TvImmersiveGridContent.Items ->
-                    TvStableFocusScroll {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(columns),
-                            state = gridState,
-                            modifier =
-                                Modifier
-                                    .fillMaxSize()
-                                    .then(entryFocusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
-                                    .then(tvPageArrival(hosting, entry, enabled = entryLoaded, key = queryKey)),
-                            contentPadding = cellPadding,
-                            verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
-                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
-                        ) {
-                            items(count = content.count, key = content.key) { index ->
-                                // Reading the item is what pages the next chunk in.
-                                val item = content.at(index)
-                                if (item == null) {
-                                    pendingCell()
-                                } else {
-                                    // The anchor rides a wrapper, so it does not displace a tag the cell sets on itself.
-                                    Box(
-                                        modifier = if (index == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier,
-                                        propagateMinConstraints = true,
-                                    ) {
-                                        cell(
-                                            item,
-                                            ringIndex == index,
-                                            { focused ->
-                                                if (focused) {
-                                                    ringIndex = index
-                                                    memory = TvGridMemory(index, content.key(index))
-                                                    depth.reach(index)
-                                                } else if (ringIndex == index) {
-                                                    ringIndex = null
-                                                }
-                                            },
-                                            {
-                                                onItemTapped(index)
-                                                onItemClick(item)
-                                            },
-                                            if (index ==
-                                                entryIndex
-                                            ) {
-                                                Modifier.focusRequester(entry).then(rememberedCellModifier)
-                                            } else {
-                                                Modifier
-                                            },
-                                        )
+            val itemCell: @Composable (Int, T, TvImmersiveGridContent.Items<T>) -> Unit = { index, item, source ->
+                // The anchor rides a wrapper, so it does not displace a tag the cell sets on itself.
+                Box(
+                    modifier = if (index == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier,
+                    propagateMinConstraints = true,
+                ) {
+                    cell(
+                        item,
+                        ringIndex == index,
+                        { focused ->
+                            if (focused) {
+                                ringIndex = index
+                                memory = TvGridMemory(index, source.key(index))
+                                depth.reach(index)
+                            } else if (ringIndex == index) {
+                                ringIndex = null
+                            }
+                        },
+                        {
+                            onItemTapped(index)
+                            onItemClick(item)
+                        },
+                        if (index == entryIndex) Modifier.focusRequester(entry).then(rememberedCellModifier) else Modifier,
+                    )
+                }
+            }
+            if (inPlace != null) {
+                TvImmersiveGridBody(
+                    content = content,
+                    inPlace = inPlace,
+                    columns = columns,
+                    gridState = gridState,
+                    cellPadding = cellPadding,
+                    gridModifier = Modifier
+                        .fillMaxSize()
+                        .then(entryFocusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+                        .then(tvPageArrival(hosting, entry, enabled = true, key = queryKey)),
+                    entryIndex = entryIndex,
+                    entryModifier = Modifier.focusRequester(entry).then(rememberedCellModifier),
+                    ringIndex = ringIndex,
+                    onCellFocused = { index, focused ->
+                        if (focused) lastFocused = index
+                        val source = items?.takeIf { index < it.count && it.at(index) != null }
+                        when {
+                            focused && source != null -> {
+                                ringIndex = index
+                                memory = TvGridMemory(index, source.key(index))
+                                depth.reach(index)
+                            }
+                            focused -> ringIndex = index
+                            ringIndex == index -> ringIndex = null
+                        }
+                    },
+                    onCellClick = { index, item ->
+                        onItemTapped(index)
+                        onItemClick(item)
+                    },
+                    messageEndInset = messageEndInset,
+                    message = message,
+                )
+            } else {
+                when (content) {
+                    TvImmersiveGridContent.Loading -> loading(cellPadding)
+                    is TvImmersiveGridContent.Message -> message()
+                    is TvImmersiveGridContent.Items ->
+                        TvStableFocusScroll {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(columns),
+                                state = gridState,
+                                modifier =
+                                    Modifier
+                                        .fillMaxSize()
+                                        .then(entryFocusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+                                        .then(tvPageArrival(hosting, entry, enabled = entryLoaded, key = queryKey)),
+                                contentPadding = cellPadding,
+                                verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
+                            ) {
+                                items(count = content.count, key = content.key) { index ->
+                                    // Reading the item is what pages the next chunk in.
+                                    val item = content.at(index)
+                                    if (item == null) {
+                                        pendingCell()
+                                    } else {
+                                        itemCell(index, item, content)
                                     }
                                 }
                             }
                         }
-                    }
+                }
             }
         }
     }
