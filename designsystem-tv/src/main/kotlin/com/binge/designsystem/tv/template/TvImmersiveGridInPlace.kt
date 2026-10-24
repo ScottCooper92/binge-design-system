@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.R as TvR
 
-/** Rows of plates drawn while a grid with [TvImmersiveGridPlates] has no cells: enough to run past the bottom edge. */
+/** Rows of plates drawn while a grid with [TvImmersiveGridInPlace] has no cells: enough to run past the bottom edge. */
 internal const val PLATE_ROWS = 3
 
 private const val NO_CELL = -1
@@ -55,7 +55,7 @@ class TvImmersiveGridInPlace<T : Any>(
 
 /**
  * The one grid for loading, message and cells. Cells are keyed by position, so the plate focus is on is the cell the item
- * arrives in; in the message state the entry plate stays, the other cells draw nothing, and the message sits beside it.
+ * arrives in; in the message state the entry plate stays, the other cells draw nothing, and the message sits in the columns beside it, never over it.
  */
 @Composable
 internal fun <T : Any> TvImmersiveGridBody(
@@ -117,8 +117,15 @@ internal fun <T : Any> TvImmersiveGridBody(
             val direction = LocalLayoutDirection.current
             val inset = PaddingValues(start = cellPadding.calculateStartPadding(direction), end = messageEndInset)
             Row(Modifier.fillMaxSize().padding(inset)) {
-                Spacer(Modifier.weight(1f))
-                Box(Modifier.weight((columns - 1).toFloat()), contentAlignment = Alignment.TopStart) { message() }
+                // The message takes the columns after the entry plate, or those before it when the entry is in the last column.
+                val entryColumn = entryIndex % columns
+                if (entryColumn < columns - 1) {
+                    Spacer(Modifier.weight((entryColumn + 1).toFloat()))
+                    Box(Modifier.weight((columns - entryColumn - 1).toFloat()), contentAlignment = Alignment.TopStart) { message() }
+                } else {
+                    Box(Modifier.weight(entryColumn.toFloat()), contentAlignment = Alignment.TopStart) { message() }
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
     }
