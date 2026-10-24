@@ -21,6 +21,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
+import com.binge.designsystem.tv.layout.TvLayoutAnchors
+import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.R as TvR
 
 /** Rows of plates drawn while a grid with [TvImmersiveGridInPlace] has no cells: enough to run past the bottom edge. */
@@ -96,20 +98,26 @@ internal fun <T : Any> TvImmersiveGridBody(
                     } else {
                         val item = items?.takeIf { index < it.count }?.at(index)
                         val isEntryMessage = isMessage && index == entryIndex
-                        inPlace.cell(
-                            item,
-                            ringIndex == index,
-                            { focused -> onCellFocused(index, focused) },
-                            {
-                                if (item != null) {
-                                    onCellClick(index, item)
-                                } else if (isEntryMessage) {
-                                    inPlace.messageAction?.onClick?.invoke()
-                                }
-                            },
-                            if (index == entryIndex) entryModifier else Modifier,
-                            inPlace.messageAction?.label.takeIf { isEntryMessage },
-                        )
+                        // The anchor rides a wrapper, plate or item, so the first cell is the one the skeleton is measured against.
+                        Box(
+                            modifier = if (index == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier,
+                            propagateMinConstraints = true,
+                        ) {
+                            inPlace.cell(
+                                item,
+                                ringIndex == index,
+                                { focused -> onCellFocused(index, focused) },
+                                {
+                                    if (item != null) {
+                                        onCellClick(index, item)
+                                    } else if (isEntryMessage) {
+                                        inPlace.messageAction?.onClick?.invoke()
+                                    }
+                                },
+                                if (index == entryIndex) entryModifier else Modifier,
+                                inPlace.messageAction?.label.takeIf { isEntryMessage },
+                            )
+                        }
                     }
                 }
             }
