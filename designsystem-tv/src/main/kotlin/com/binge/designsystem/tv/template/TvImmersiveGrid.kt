@@ -126,11 +126,19 @@ fun <T : Any> TvImmersiveGrid(
     val bursting = rememberBursting(anchor)
     // At rest, before focus has entered, the backdrop shows the first cell, where entry lands.
     val settled = rememberSettledFocus(remembered, reduceMotion)
+    // Focus that arrived on a plate has no key to remember; once the item is there, it is the cell the grid is built around.
+    LaunchedEffect(items, ringIndex) {
+        val plate = ringIndex
+        if (inPlace != null && items != null && memory == null && plate != null && plate < items.count && items.at(plate) != null) {
+            memory = TvGridMemory(plate, items.key(plate))
+        }
+    }
     val backdropItem = items?.takeIf { it.count > 0 }?.let { it.at(settled?.takeIf { s -> s < it.count } ?: 0) ?: it.at(0) }
     ReportBackdropItem(backdropItem, onBackdropItemChanged)
 
     val entry = remember { FocusRequester() }
-    val entryIndex = remembered ?: 0
+    // A message keeps the entry on the cell focus is on, which is what turns that cell into the message's control in place.
+    val entryIndex = if (inPlace != null && content is TvImmersiveGridContent.Message) ringIndex ?: memory?.index ?: 0 else remembered ?: 0
     val entryLoaded = inPlace != null || (items != null && entryIndex < items.count && items.at(entryIndex) != null)
     val padding = tvPagePadding(hosting)
     val direction = LocalLayoutDirection.current
@@ -193,7 +201,13 @@ fun <T : Any> TvImmersiveGrid(
                         } else {
                             // On the body, not the root, so an end press on a control in the band moves along the band.
                             Modifier.onPreviewKeyEvent { event ->
-                                val edge = items == null || remembered?.let { atEndEdge(it, columns, items.count) } == true
+                                val edge = when {
+                                    items != null -> remembered?.let { atEndEdge(it, columns, items.count) } == true
+                                    // Plates are cells with a row to move along; any other state has nothing to move to.
+                                    inPlace != null && content is TvImmersiveGridContent.Loading ->
+                                        ringIndex?.let { atEndEdge(it, columns, columns * PLATE_ROWS) } ?: true
+                                    else -> true
+                                }
                                 val press = event.type == KeyEventType.KeyDown && event.key == endKey
                                 if (press && edge) onNavigateToEnd()
                                 press && edge

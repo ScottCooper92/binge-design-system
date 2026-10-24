@@ -23,7 +23,7 @@ import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.R as TvR
 
 /** Rows of plates drawn while a grid with [TvImmersiveGridPlates] has no cells: enough to run past the bottom edge. */
-private const val PLATE_ROWS = 3
+internal const val PLATE_ROWS = 3
 
 /** What the entry plate of an in-place grid does in the message state: [label] drawn in it, [onClick] on OK. */
 class TvImmersiveGridAction(
@@ -83,7 +83,8 @@ internal fun <T : Any> TvImmersiveGridBody(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
             ) {
-                items(count = items?.count ?: (columns * PLATE_ROWS), key = { it }) { index ->
+                // A message keeps the cell focus is on composed, even past the plate rows.
+                items(count = items?.count ?: maxOf(columns * PLATE_ROWS, entryIndex + 1), key = { it }) { index ->
                     if (isMessage && index != entryIndex) {
                         Spacer(Modifier.fillMaxWidth())
                     } else {

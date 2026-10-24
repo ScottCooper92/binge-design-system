@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyInput
@@ -51,6 +52,7 @@ class TvImmersiveGridInPlaceTest {
 
     private var content by mutableStateOf<TvImmersiveGridContent<Int>>(TvImmersiveGridContent.Loading)
     private var actions = 0
+    private var endPresses = 0
 
     @Test
     fun `focus on a loading plate is on the same node when the items arrive`() {
@@ -78,6 +80,51 @@ class TvImmersiveGridInPlaceTest {
         assertEquals(cell, focusedId())
         press(Key.DirectionCenter)
         assertEquals(1, actions)
+    }
+
+    @Test
+    fun `focus on a cell other than the first is that cell's node when the grid turns to a message`() {
+        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
+        setGrid()
+        enterFromRail()
+        press(Key.DirectionRight)
+        press(Key.DirectionDown)
+        val cell = focusedId()
+
+        content = TvImmersiveGridContent.Message()
+        composeTestRule.waitForIdle()
+
+        assertEquals(cell, focusedId())
+        press(Key.DirectionCenter)
+        assertEquals(1, actions)
+    }
+
+    @Test
+    fun `right on a loading plate moves along the row instead of leaving the grid`() {
+        setGrid()
+        enterFromRail()
+        val first = focusedId()
+
+        press(Key.DirectionRight)
+
+        assertEquals(0, endPresses)
+        assertTrue(first != focusedId())
+    }
+
+    @Test
+    fun `a plate that had focus is the cell the grid is built around once its item arrives`() {
+        setGrid()
+        enterFromRail()
+        press(Key.DirectionRight)
+        press(Key.DirectionDown)
+
+        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        composeTestRule.waitForIdle()
+        press(Key.DirectionRight)
+
+        composeTestRule.onNodeWithTag("cell-4").assertIsFocused()
     }
 
     @Test
@@ -117,6 +164,7 @@ class TvImmersiveGridInPlaceTest {
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         columns = COLUMNS,
+                        onNavigateToEnd = { endPresses++ },
                         hosting = TvPageHosting.RailDestination,
                         inPlace = TvImmersiveGridInPlace<Int>(
                             cell = { item, _, onFocusChanged, onClick, cellModifier, _ ->
