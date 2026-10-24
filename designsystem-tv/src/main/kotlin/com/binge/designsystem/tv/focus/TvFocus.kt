@@ -356,8 +356,7 @@ suspend fun restoreTvOverlayFocus(target: FocusRequester): Boolean {
 /**
  * One focus unit whose **entry is routed to the selected child** rather than left to a directional search.
  *
- * For a surface where **focus is the commit** — moving onto a thing selects it, no OK — as `BingeTvNavRail`
- * and a tab row do. There an unrouted entry is not cosmetic: the geometric search picks
+ * For a surface where **focus is the commit** — moving onto a thing selects it, no OK — as a tab row does. There an unrouted entry is not cosmetic: the geometric search picks
  * whatever child sits nearest the beam, and arriving there *is* a selection change (the rail recorded it first —
  * "merely opening the menu navigated the user somewhere they hadn't asked to go"; since re-fixed on the tab row). This exists to stop the rediscovery.
  *

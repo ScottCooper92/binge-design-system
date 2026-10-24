@@ -40,9 +40,9 @@ A user-invoked overlay — a dialog, a filter panel, a setup step — is the opp
 precisely what they asked for. `TvOverlayArrivalFocusEffect` is that, packaged.
 
 The shell is the third case. Something must hold focus on a D-pad surface at startup and nothing
-else can yet, so the navigation rail hands focus *out* to the content on first composition. It
+else can yet, so the shell's navigation hands focus *out* to the content on first composition. It
 aims that request at the content group rather than at itself, so focus begins on the start
-destination's first item and the rail stays collapsed until the user navigates to it. The
+destination's first item until the user navigates to the bar. The
 destination is still not the one asking.
 
 ## Move focus a frame after the thing holding it goes
@@ -104,13 +104,13 @@ width and gap. That is why `tvFocusIndicator` draws *outside* the element's boun
 margins are measured to the outline rather than the element, and why a lazy container has to carry
 `contentPadding` for it or clip it off the first and last cell of every row.
 
-### The rail marks current-but-unfocused with tint, not a second fill
+### Current-but-unfocused is a tint, not a second fill
 
-The navigation rail selects on focus, so it already distinguishes two states: an accent fill while
-it holds focus and is expanded, and an accent *tint* on no fill when focus is out in the content
-and it is collapsed. That collapsed state is current-but-unfocused, expressed as fill-versus-tint
-rather than as two fills. A dim fill there would be a third mark for a state the rail already
-marks.
+The navigation rail this module used to carry selected on focus, so it already distinguished two states: an accent
+fill while it held focus and was expanded, and an accent *tint* on no fill when focus was out in the content and it
+was collapsed. That is current-but-unfocused, expressed as fill-versus-tint rather than as two fills. A dim fill
+there would have been a third mark for a state the rail already marked. The rule outlived the rail: a surface that
+shows a current item without focus uses a tint.
 
 ### TV styles: what colour focus is
 

@@ -14,23 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +34,6 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.ErrorKind
-import com.binge.designsystem.component.NavSuiteBadge
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvButton
@@ -69,9 +60,6 @@ import com.binge.designsystem.tv.component.TvVerticalDivider
 import com.binge.designsystem.tv.component.containerColor
 import com.binge.designsystem.tv.component.contentColor
 import com.binge.designsystem.tv.focus.tvFocusIndicator
-import com.binge.designsystem.tv.nav.BingeTvNavRail
-import com.binge.designsystem.tv.nav.TvNavRailItem
-import com.binge.designsystem.tv.nav.TvShellScaffold
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -80,9 +68,6 @@ import com.binge.designsystem.tv.R as TvR
  * The one public fixture per TV component, rendered by the screenshot frames. Focus is a parameter on every
  * sample that has a focused appearance, so the lit state is captured without a focus request.
  */
-
-/** Enough bands that the rail's ramp is legible against them, and an odd count so neither colour ends both edges. */
-private const val SAMPLE_ARTWORK_BANDS = 9
 
 /** The button across its roles, both focus states and disabled, through the stateless surface. */
 @Composable
@@ -328,56 +313,7 @@ fun TvFocusIndicatorSample() {
     }
 }
 
-/**
- * The rail shell expanded, with a header, destinations and a footer. The parameterised overload below
- * is the screenshot frames' fixture; this is the public no-argument form the catalog app lists.
- */
-@Composable
-fun TvNavRailSample() {
-    TvNavRailSample(expanded = true)
-}
-
-/**
- * The rail shell with a header, destinations and a footer; [expanded] pins which resting shape renders.
- *
- * [artworkBehind] pins the other half of the rail's fill, and puts something behind it worth seeing through
- * to — without both, a frame cannot tell a scrim from a solid panel. [badgedItemKey], when set, gives that
- * item's [NavSuiteBadge.Label] a sample count — a companion's pending-attention badge on the rail. [pinFooter] shows
- * the footer on the bottom edge with a short list, which would otherwise carry it up beside the last destination.
- */
-@Composable
-internal fun TvNavRailSample(
-    expanded: Boolean,
-    selectedKey: String = "movies",
-    artworkBehind: Boolean = false,
-    badgedItemKey: String? = null,
-    pinFooter: Boolean = false,
-) {
-    // Few enough destinations to fit, which is the case a pinned footer changes: the footer stays on the bottom edge
-    // rather than following the last destination.
-    val sampleItems = if (pinFooter) NavRailSampleItems.take(PINNED_FOOTER_SAMPLE_ITEMS) else NavRailSampleItems
-    val items = if (badgedItemKey == null) {
-        sampleItems
-    } else {
-        sampleItems.map {
-            if (it.key == badgedItemKey) it.copy(badge = NavSuiteBadge.Label("3")) else it
-        }
-    }
-    var selected by rememberSaveable { mutableStateOf<Any>(selectedKey) }
-    BingeTvNavRail(
-        header = NavRailSampleHeader,
-        items = items,
-        footer = NavRailSampleFooter,
-        selectedKey = selected,
-        onSelect = { selected = it },
-        expanded = expanded,
-        artworkBehind = artworkBehind,
-        pinFooter = pinFooter,
-        content = { NavRailSampleContent(artworkBehind = artworkBehind) },
-    )
-}
-
-/** The initials avatar at the rail's size, for a name with no artwork. */
+/** The initials avatar at the top bar's size, for a name with no artwork. */
 @Composable
 fun TvInitialsAvatarSample() {
     BingeTvInitialsAvatar(
@@ -385,94 +321,6 @@ fun TvInitialsAvatarSample() {
         size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
     )
-}
-
-/** The shell with a detail page open over it: the overlay covers the rail and the content alike. */
-@Composable
-fun TvShellScaffoldOverlaySample() {
-    var selected by rememberSaveable { mutableStateOf<Any>("movies") }
-    TvShellScaffold(
-        header = NavRailSampleHeader,
-        items = NavRailSampleItems,
-        footer = NavRailSampleFooter,
-        selectedKey = selected,
-        homeKey = "movies",
-        onSelect = { selected = it },
-        overlay = {
-            TvMessagePlate(
-                headline = "Dune: Part Two",
-                body = "A detail page, opened over the shell, owns the screen and Back until it closes.",
-                alignment = Alignment.Center,
-                modifier = Modifier.background(MaterialTheme.colorScheme.background),
-            )
-        },
-    ) { NavRailSampleContent() }
-}
-
-private const val PINNED_FOOTER_SAMPLE_ITEMS = 3
-
-private val NavRailSampleHeader: TvNavRailItem =
-    TvNavRailItem(
-        key = "account",
-        label = "Alexander Hamilton-Montgomery",
-        icon = Icons.Filled.Person,
-        displayName = "Alexander Hamilton-Montgomery",
-    )
-
-private val NavRailSampleItems: List<TvNavRailItem> =
-    listOf(
-        TvNavRailItem(key = "search", label = "Search", icon = Icons.Filled.Search),
-        TvNavRailItem(key = "movies", label = "Movies", icon = Icons.Filled.Movie),
-        TvNavRailItem(key = "tv", label = "TV shows", icon = Icons.Filled.Tv),
-        TvNavRailItem(key = "watchlist", label = "Watchlist", icon = Icons.Filled.Bookmark),
-        TvNavRailItem(key = "lists", label = "Lists", icon = Icons.AutoMirrored.Filled.FormatListBulleted),
-    )
-
-private val NavRailSampleFooter: TvNavRailItem = TvNavRailItem(key = "settings", label = "Settings", icon = Icons.Filled.Settings)
-
-@Composable
-private fun NavRailSampleContent(artworkBehind: Boolean = false) {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (artworkBehind) NavRailSampleArtwork()
-        Box(
-            modifier = Modifier.fillMaxSize().padding(dimensionResource(TvR.dimen.tv_overscan_horizontal)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "Content",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-/**
- * A stand-in for a backdrop: full-bleed bands that run under the rail, so a frame can read how much of them
- * the fill lets through. Bands rather than a picture — this repository's frames render with no network, and a
- * flat colour behind the rail cannot tell a third of a fill from all of it.
- */
-@Composable
-private fun NavRailSampleArtwork() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        repeat(SAMPLE_ARTWORK_BANDS) { index ->
-            Box(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .background(
-                            if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        ),
-            )
-        }
-    }
 }
 
 @Composable

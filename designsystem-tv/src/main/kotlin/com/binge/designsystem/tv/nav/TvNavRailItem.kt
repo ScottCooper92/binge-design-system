@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.binge.designsystem.component.NavSuiteBadge
 
 /**
- * One destination on the TV navigation rail. A non-null [displayName] renders a circular avatar in place
+ * One destination in a TV shell's navigation. A non-null [displayName] renders a circular avatar in place
  * of [icon] — the account item at the top of the rail: the image at [avatarUrl] when it resolves, the
  * name's initials while it loads, on failure, or when there is no image. Every other item shows [icon].
  *

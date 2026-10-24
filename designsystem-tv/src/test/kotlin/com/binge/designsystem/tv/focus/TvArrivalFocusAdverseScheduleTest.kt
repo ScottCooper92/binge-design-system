@@ -38,8 +38,8 @@ private val PAST_ARRIVAL_TIMEOUT = Duration.ofMillis(3_100)
 
 /**
  * The overlay-arrival adverse-schedule cases: [offerTvArrivalFocus] (via [TvArrivalFocusEffect])
- * converges on a target composed N frames past the disposing sibling, for N in {0, 1, 10, 60} — same ceiling
- * rationale as `BingeTvNavRailAdverseScheduleFocusTest`.
+ * converges on a target composed N frames past the disposing sibling, for N in {0, 1, 10, 60} — a frame
+ * budget well above what a real layout takes.
  *
  * [TvArrivalFocusEffect] is hoisted above [TvLateTarget] in every fixture here, exactly as a real screen wires
  * it: the offer starts the moment the screen composes, and only the requester's *target node* — not the offer
