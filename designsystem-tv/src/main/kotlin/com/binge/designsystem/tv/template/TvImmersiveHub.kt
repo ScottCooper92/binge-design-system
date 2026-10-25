@@ -61,6 +61,11 @@ data class TvHubRow<T>(
      * focus when the row is entered, rather than vanishing as an empty row does. Ignored while the row has items.
      */
     val failure: TvHubRowFailure? = null,
+    /**
+     * Whether a hub that wraps its rows may wrap this one. False for a list a user curates, which ends where it ends; true leaves
+     * it to the hub, which wraps a row only once it is long enough.
+     */
+    val loops: Boolean = true,
 )
 
 /** What a failed [TvHubRow] says, and the retry it offers. The caller owns the copy, as it does the row's title. */
