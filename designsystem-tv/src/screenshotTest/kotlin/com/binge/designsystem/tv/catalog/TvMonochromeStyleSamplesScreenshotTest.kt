@@ -103,6 +103,11 @@ class TvMonochromeStyleSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun textField() = Frame { TvMonochromeTextFieldSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun selectedTick() = Frame { TvMonochromeSelectedTickSample() }
 }
 
 @Composable

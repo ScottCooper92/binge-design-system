@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -67,21 +68,22 @@ fun TvExcludedMark(tint: Color, modifier: Modifier = Modifier) {
  * [TvSelectedTick] on its own accent disc, for placing over imagery — a logo, a poster — where a bare glyph
  * would be lost against whatever is behind it.
  *
- * Takes no tint: the primary disc with its onPrimary glyph stays legible over any artwork and over a focus
- * fill, so there is no decision to hand the caller.
+ * Takes no tint. The disc is the TV style's focus fill and the glyph its focus content colour, so the badge is the
+ * accent under `TvStyle.Accent` and white on black under `TvStyle.Monochrome`. Either pair stays legible over any
+ * artwork, so there is no decision to hand the caller.
  */
 @Composable
 fun TvSelectedTickBadge(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(dimensionResource(TvR.dimen.tv_selected_tick_size))
-            .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
+            .background(color = MaterialTheme.tvStyle.focusContainer, shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = Icons.Filled.Check,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = MaterialTheme.tvStyle.onFocusContainer,
             modifier = Modifier.size(dimensionResource(TvR.dimen.tv_selected_tick_glyph_size)),
         )
     }
