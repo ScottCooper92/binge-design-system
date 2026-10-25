@@ -34,14 +34,11 @@ import org.robolectric.annotation.Config
 private const val RAIL = "rail"
 private const val COLUMNS = 3
 private const val COUNT = 9
-private const val LONG = 30
 private const val FEW = 2
-private const val DOWN_PRESSES = 4
 
 /**
  * The in-place grid's contract: whatever the grid is showing, the cell focus is on is the cell the next state fills, so a
- * plate that has focus keeps it when the items arrive, and an item that has focus keeps it when the grid turns to a message
- * whose entry plate is the control.
+ * plate that has focus keeps it when the items arrive. A message is not drawn in place: it takes the pane.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -53,8 +50,7 @@ class TvImmersiveGridInPlaceTest {
     val composeTestRule = createKeyboardComposeRule()
 
     private var content by mutableStateOf<TvImmersiveGridContent<Int>>(TvImmersiveGridContent.Loading)
-    private var actions = 0
-    private var afterAction: (() -> Unit)? = null
+    private var clicks = 0
     private var leftGrid = 0
 
     @Test
@@ -68,36 +64,6 @@ class TvImmersiveGridInPlaceTest {
 
         assertEquals(plate, focusedId())
         composeTestRule.onNodeWithTag("cell-0").assertExists()
-    }
-
-    @Test
-    fun `focus on a cell is on the same node when the grid turns to a message, and OK runs the action`() {
-        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
-        setGrid()
-        enterFromRail()
-        val cell = focusedId()
-
-        content = TvImmersiveGridContent.Message()
-        composeTestRule.waitForIdle()
-
-        assertEquals(cell, focusedId())
-        press(Key.DirectionCenter)
-        assertEquals(1, actions)
-    }
-
-    @Test
-    fun `focus on a cell past the first is on the same node when the grid turns to a message`() {
-        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
-        setGrid()
-        enterFromRail()
-        press(Key.DirectionRight)
-        val cell = focusedId()
-        composeTestRule.onNodeWithTag("cell-1").assertExists()
-
-        content = TvImmersiveGridContent.Message()
-        composeTestRule.waitForIdle()
-
-        assertEquals(cell, focusedId())
     }
 
     @Test
@@ -129,39 +95,6 @@ class TvImmersiveGridInPlaceTest {
     }
 
     @Test
-    fun `focus on a cell in a lower row keeps its node when the grid turns to a message, and OK runs the action`() {
-        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
-        setGrid()
-        enterFromRail()
-        press(Key.DirectionRight)
-        press(Key.DirectionDown)
-        val cell = focusedId()
-
-        content = TvImmersiveGridContent.Message()
-        composeTestRule.waitForIdle()
-
-        assertEquals(cell, focusedId())
-        press(Key.DirectionCenter)
-        assertEquals(1, actions)
-    }
-
-    @Test
-    fun `retrying from a message past the plate rows keeps focus in the grid`() {
-        content = TvImmersiveGridContent.Items(count = LONG, key = { it }, at = { it })
-        afterAction = { content = TvImmersiveGridContent.Loading }
-        setGrid()
-        enterFromRail()
-        repeat(DOWN_PRESSES) { press(Key.DirectionDown) }
-        val cell = focusedId()
-        content = TvImmersiveGridContent.Message()
-        composeTestRule.waitForIdle()
-
-        press(Key.DirectionCenter)
-
-        assertEquals(cell, focusedId())
-    }
-
-    @Test
     fun `items arriving under the plate focus is on keep focus in the grid`() {
         setGrid()
         enterFromRail()
@@ -176,13 +109,26 @@ class TvImmersiveGridInPlaceTest {
     }
 
     @Test
+    fun `a message takes the pane instead of the cells`() {
+        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
+        setGrid()
+        composeTestRule.onNodeWithTag("cell-0").assertExists()
+
+        content = TvImmersiveGridContent.Message()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("cell-0").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("message").assertExists()
+    }
+
+    @Test
     fun `a plate does nothing on OK while loading`() {
         setGrid()
         enterFromRail()
 
         press(Key.DirectionCenter)
 
-        assertEquals(0, actions)
+        assertEquals(0, clicks)
         assertTrue(composeTestRule.onAllNodes(isFocused()).fetchSemanticsNodes().isNotEmpty())
     }
 
@@ -207,25 +153,22 @@ class TvImmersiveGridInPlaceTest {
                     TvImmersiveGrid(
                         heading = "Heading",
                         content = content,
-                        onItemClick = {},
+                        onItemClick = { clicks++ },
                         artwork = {},
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         columns = COLUMNS,
                         hosting = TvPageHosting.RailDestination,
                         onNavigateToEnd = onNavigateToEnd,
+                        message = { Box(Modifier.size(48.dp).testTag("message")) },
                         inPlace = TvImmersiveGridInPlace<Int>(
-                            cell = { item, _, onFocusChanged, onClick, cellModifier, _ ->
+                            cell = { item, _, onFocusChanged, onClick, cellModifier ->
                                 Box(
                                     cellModifier
                                         .height(24.dp)
                                         .testTag(if (item == null) "plate" else "cell-$item")
                                         .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick),
                                 )
-                            },
-                            messageAction = TvImmersiveGridAction("Retry") {
-                                actions++
-                                afterAction?.invoke()
                             },
                         ),
                     ) { item, _, onFocusChanged, onClick, cellModifier ->
