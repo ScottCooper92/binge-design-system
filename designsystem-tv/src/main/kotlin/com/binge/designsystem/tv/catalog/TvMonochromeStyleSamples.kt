@@ -24,6 +24,12 @@ import com.binge.designsystem.tv.theme.TvStyle
  * with the TvStyle.Accent frame of the same sample.
  */
 
+/** A message plate in the monochrome style: the art glyph draws in `onSurface`, not the accent. */
+@Composable
+fun TvMonochromeMessagePlateSample() {
+    Monochrome { TvMessagePlateSample() }
+}
+
 /** A sheet in the monochrome style: the focused row fills white, while the tick stays in the row's content colour. */
 @Composable
 fun TvMonochromeSideSheetSample() {
