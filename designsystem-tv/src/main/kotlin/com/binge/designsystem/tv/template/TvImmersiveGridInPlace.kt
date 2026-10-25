@@ -58,7 +58,7 @@ class TvImmersiveGridInPlace<T : Any>(
 
 /**
  * The one grid for loading, message and cells. Cells are keyed by position, so the plate focus is on is the cell the item
- * arrives in; in the message state the entry plate stays, the other cells draw nothing, and the message sits under it, never over it.
+ * arrives in; in the message state the entry plate stays, the other cells draw nothing, and the message sits beside it, never over it.
  */
 @Composable
 internal fun <T : Any> TvImmersiveGridBody(
@@ -127,10 +127,11 @@ internal fun <T : Any> TvImmersiveGridBody(
 }
 
 /**
- * The message under the entry plate, placed from the plate's own laid-out cell so it follows wherever focus is and however far the
- * grid has scrolled. It starts at the plate's column; a plate in the last column has no room to its right, so it starts one column
- * earlier and runs to the grid's end. Read in the layout phase, after the grid has measured, so the first frame has the plate's cell.
- * Item offsets exclude the grid's content padding, so it is added back; placement is left-to-right only.
+ * The message beside the entry plate, top-aligned with it and placed from the plate's own laid-out cell so it follows wherever
+ * focus is and however far the grid has scrolled. It runs from the plate's end edge to the grid's end; a plate in the last column
+ * has nothing to its right, so the message sits on its start side, end-aligned against the plate. Beside rather than under, because a
+ * poster-sized cell leaves no room below it. Read in the layout phase, after the grid has measured, so the first frame has the
+ * plate's cell. Item offsets exclude the grid's content padding, so it is added back; placement is left-to-right only.
  */
 @Composable
 private fun TvImmersiveGridMessage(
@@ -143,7 +144,6 @@ private fun TvImmersiveGridMessage(
 ) {
     val direction = LocalLayoutDirection.current
     val columnGap = dimensionResource(TvR.dimen.tv_media_row_card_gap)
-    val rowGap = dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)
     val startPadding = cellPadding.calculateStartPadding(direction)
     val topPadding = cellPadding.calculateTopPadding()
     val endPadding = cellPadding.calculateEndPadding(direction)
@@ -153,14 +153,20 @@ private fun TvImmersiveGridMessage(
             if (plate == null) {
                 layout(constraints.maxWidth, constraints.maxHeight) {}
             } else {
-                val column = entryIndex % columns
-                val startColumn = column.coerceAtMost(columns - 2)
-                val startX = startPadding.roundToPx() + plate.offset.x - (column - startColumn) * (plate.size.width + columnGap.roundToPx())
-                val startY = topPadding.roundToPx() + plate.offset.y + plate.size.height + rowGap.roundToPx()
-                val width = (constraints.maxWidth - endPadding.roundToPx() - endInset.roundToPx() - startX).coerceAtLeast(0)
+                val gap = columnGap.roundToPx()
+                val plateStart = startPadding.roundToPx() + plate.offset.x
+                val gridStart = startPadding.roundToPx()
+                val gridEnd = constraints.maxWidth - endPadding.roundToPx() - endInset.roundToPx()
+                val isLastColumn = entryIndex % columns == columns - 1
+                val startX = if (isLastColumn) gridStart else plateStart + plate.size.width + gap
+                val endX = if (isLastColumn) plateStart - gap else gridEnd
+                val startY = topPadding.roundToPx() + plate.offset.y
+                val room = (endX - startX).coerceAtLeast(0)
                 val height = (constraints.maxHeight - startY).coerceAtLeast(0)
+                val width = if (isLastColumn) measurable.maxIntrinsicWidth(height).coerceIn(0, room) else room
                 val placeable = measurable.measure(Constraints(maxWidth = width, maxHeight = height))
-                layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(startX, startY) }
+                val placeX = if (isLastColumn) endX - placeable.width else startX
+                layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(placeX, startY) }
             }
         },
     ) { Box(contentAlignment = Alignment.TopStart, content = message) }
