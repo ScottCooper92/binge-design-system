@@ -12,6 +12,11 @@ class TvMonochromeStyleSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun messagePlate() = Frame { TvMonochromeMessagePlateSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun sideSheet() = Frame { TvMonochromeSideSheetSample() }
 
     @PreviewTest

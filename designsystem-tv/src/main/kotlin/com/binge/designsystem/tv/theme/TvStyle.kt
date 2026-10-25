@@ -56,7 +56,8 @@ data class TvSwitchColors(
  *   takes it too, since the caret shows while the field holds focus.
  * - [destructiveFocusContainer] fills a focused destructive control, and [onDestructiveFocusContainer] is its content.
  * - [panel] is the background of a side sheet and a confirm dialog.
- * - [rowIcon] is the glyph of a row's leading icon at rest, and the wash behind it is that colour at low alpha.
+ * - [rowIcon] is the glyph of a row's leading icon at rest, and the wash behind it is that colour at low alpha. A
+ *   `TvIllustration` draws its glyph in it too.
  * - [switch] is a switch's track and thumb.
  */
 @Immutable
