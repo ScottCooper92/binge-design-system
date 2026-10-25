@@ -102,6 +102,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetConfirmKeep() = Frame { TvSideSheetConfirmKeepSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun errorPlateNoRetry() = Frame { TvErrorPlateNoRetrySample() }
 
     @PreviewTest

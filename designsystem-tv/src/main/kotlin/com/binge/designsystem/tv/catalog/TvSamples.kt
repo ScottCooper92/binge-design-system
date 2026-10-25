@@ -430,7 +430,7 @@ fun TvSideSheetSample() {
     }
 }
 
-/** The confirm step: what is about to happen, then the confirm row and Cancel, with focus on Cancel. */
+/** The confirm step: what is about to happen, then Cancel, first and focused, and the destructive confirm last. */
 @Composable
 fun TvSideSheetConfirmSample() {
     val entry = remember { FocusRequester() }
@@ -464,6 +464,26 @@ fun TvSideSheetConfirmNeutralSample() {
                 entryFocus = entry,
                 cancelInitiallyFocused = true,
                 destructive = false,
+            )
+        }
+    }
+}
+
+/** The confirm step with a safe answer that is not "Cancel": withdrawing a request offers "Keep" first. */
+@Composable
+fun TvSideSheetConfirmKeepSample() {
+    val entry = remember { FocusRequester() }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetConfirm(
+                title = "Cancel this request?",
+                message = "It is withdrawn from the server.",
+                confirmLabel = "Cancel request",
+                onConfirm = {},
+                onCancel = {},
+                entryFocus = entry,
+                cancelInitiallyFocused = true,
+                dismissLabel = "Keep",
             )
         }
     }
