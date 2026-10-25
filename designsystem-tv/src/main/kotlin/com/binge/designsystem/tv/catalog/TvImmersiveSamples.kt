@@ -457,12 +457,24 @@ fun TvImmersiveGridInPlaceMessageSample() {
     )
 }
 
-/** An in-place grid that failed with focus on a cell in the third column: the entry plate is that cell, and the message sits clear of it. */
+/** An in-place grid that failed with focus on a cell in the third column: the entry plate is that cell, and the message sits under it. */
 @Composable
 fun TvImmersiveGridInPlaceMessageMidRowSample() {
     SampleInPlaceGrid(
         content = TvImmersiveGridContent.Message(),
         focusedIndex = 2,
+        message = {
+            TvMessagePlate(body = "Check your connection and try again.", headline = "No connection", alignment = Alignment.TopStart)
+        },
+    )
+}
+
+/** An in-place grid that failed with focus on the last column: the message starts one column earlier, under the entry plate. */
+@Composable
+fun TvImmersiveGridInPlaceMessageLastColumnSample() {
+    SampleInPlaceGrid(
+        content = TvImmersiveGridContent.Message(),
+        focusedIndex = 4,
         message = {
             TvMessagePlate(body = "Check your connection and try again.", headline = "No connection", alignment = Alignment.TopStart)
         },
