@@ -129,7 +129,7 @@ internal fun <T : Any> TvImmersiveGridBody(
 /**
  * The message beside the entry plate, top-aligned with it and placed from the plate's own laid-out cell so it follows wherever
  * focus is and however far the grid has scrolled. It runs from the plate's end edge to the grid's end; a plate in the last column
- * has nothing to its right, so the message runs from the grid's start to the plate instead. Beside rather than under, because a
+ * has nothing to its right, so the message sits on its start side, end-aligned against the plate. Beside rather than under, because a
  * poster-sized cell leaves no room below it. Read in the layout phase, after the grid has measured, so the first frame has the
  * plate's cell. Item offsets exclude the grid's content padding, so it is added back; placement is left-to-right only.
  */
@@ -161,13 +161,12 @@ private fun TvImmersiveGridMessage(
                 val startX = if (isLastColumn) gridStart else plateStart + plate.size.width + gap
                 val endX = if (isLastColumn) plateStart - gap else gridEnd
                 val startY = topPadding.roundToPx() + plate.offset.y
-                val placeable = measurable.measure(
-                    Constraints(
-                        maxWidth = (endX - startX).coerceAtLeast(0),
-                        maxHeight = (constraints.maxHeight - startY).coerceAtLeast(0),
-                    ),
-                )
-                layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(startX, startY) }
+                val room = (endX - startX).coerceAtLeast(0)
+                val height = (constraints.maxHeight - startY).coerceAtLeast(0)
+                val width = if (isLastColumn) measurable.maxIntrinsicWidth(height).coerceIn(0, room) else room
+                val placeable = measurable.measure(Constraints(maxWidth = width, maxHeight = height))
+                val placeX = if (isLastColumn) endX - placeable.width else startX
+                layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(placeX, startY) }
             }
         },
     ) { Box(contentAlignment = Alignment.TopStart, content = message) }
