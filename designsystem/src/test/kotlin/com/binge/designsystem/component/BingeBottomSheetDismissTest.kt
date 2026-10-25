@@ -9,6 +9,8 @@ import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
@@ -35,16 +37,22 @@ class BingeBottomSheetDismissTest {
 
     private var dismissed = 0
 
-    private fun showSheet(gesturesEnabled: Boolean, dismissOnClickOutside: Boolean = gesturesEnabled) {
+    private fun showSheet(
+        gesturesEnabled: Boolean,
+        dismissOnClickOutside: Boolean = gesturesEnabled,
+        skipPartiallyExpanded: Boolean = true,
+        contentHeight: Dp = SHEET_CONTENT_SIZE,
+    ) {
         dismissed = 0
         rule.setContent {
             TestTheme {
                 BingeBottomSheet(
                     onDismissRequest = { dismissed++ },
+                    skipPartiallyExpanded = skipPartiallyExpanded,
                     gesturesEnabled = gesturesEnabled,
                     dismissOnClickOutside = dismissOnClickOutside,
                 ) {
-                    Box(Modifier.size(SHEET_CONTENT_SIZE))
+                    Box(Modifier.size(width = SHEET_CONTENT_SIZE, height = contentHeight))
                 }
             }
         }
@@ -117,7 +125,39 @@ class BingeBottomSheetDismissTest {
         assertEquals(1, dismissed)
     }
 
+    @Test
+    fun `Back on a sheet that opens part way dismisses it`() {
+        showSheet(gesturesEnabled = true, skipPartiallyExpanded = false, contentHeight = TALL_CONTENT)
+
+        pressBack()
+
+        assertEquals(1, dismissed)
+    }
+
+    @Test
+    fun `a locked sheet that can part-way open ignores Back at full height`() {
+        showSheet(gesturesEnabled = false, skipPartiallyExpanded = false, contentHeight = TALL_CONTENT)
+        rule.onAllNodes(isRoot()).onLast().performTouchInput { swipeUp() }
+        rule.waitForIdle()
+
+        pressBack()
+
+        assertEquals(0, dismissed)
+    }
+
+    @Test
+    fun `Back on a sheet dragged to full height dismisses it`() {
+        showSheet(gesturesEnabled = true, skipPartiallyExpanded = false, contentHeight = TALL_CONTENT)
+        rule.onAllNodes(isRoot()).onLast().performTouchInput { swipeUp() }
+        rule.waitForIdle()
+
+        pressBack()
+
+        assertEquals(1, dismissed)
+    }
+
     private companion object {
+        val TALL_CONTENT = 2000.dp
         val SHEET_CONTENT_SIZE = 120.dp
         const val SCRIM_TAP_Y = 20f
     }
