@@ -67,6 +67,9 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * label on a single line, so a crowded bar never grows taller.
  * The tabs keep clear of whichever end item is wider, however wide its label. [TvNavItem.badge] is not drawn.
  *
+ * A destination is a tab, so a screen reader reads its selection as selected (on a button it reads as checked). Items named
+ * in [actionKeys] open something rather than navigate (a Settings sheet, say): those are buttons with no selection.
+ *
  * Every item in [itemFocusRequesters] is attached to its requester, so the caller can send focus to a tab. Down from any item
  * lands on [down], the current page's own entry. [onFocusedChange] reports whether the bar holds focus.
  *
@@ -88,6 +91,7 @@ fun BingeTvTopBar(
     iconOnlyKeys: Set<Any> = emptySet(),
     visible: Boolean = true,
     scrim: Boolean = true,
+    actionKeys: Set<Any> = emptySet(),
 ) {
     var barFocused by remember { mutableStateOf(false) }
     var focusedKey by remember { mutableStateOf<Any?>(null) }
@@ -111,6 +115,7 @@ fun BingeTvTopBar(
         iconOnlyKeys = iconOnlyKeys,
         visible = visible,
         scrim = scrim,
+        actionKeys = actionKeys,
         modifier = modifier.onFocusChanged {
             barFocused = it.hasFocus
             onFocusedChange(it.hasFocus)
@@ -138,6 +143,7 @@ internal fun TvTopBarSurface(
     visible: Boolean,
     scrim: Boolean,
     modifier: Modifier = Modifier,
+    actionKeys: Set<Any> = emptySet(),
 ) {
     val background = MaterialTheme.colorScheme.background
     val scale by animateFloatAsState(
@@ -174,7 +180,7 @@ internal fun TvTopBarSurface(
             if (header != null) {
                 TvTopBarEntry(
                     item = header,
-                    selected = header.key == selectedKey,
+                    selected = (header.key == selectedKey).takeUnless { header.key in actionKeys },
                     focused = header.key == focusedKey,
                     iconOnly = header.key in iconOnlyKeys,
                     onFocusChanged = { onItemFocusChanged(header.key, it) },
@@ -193,7 +199,7 @@ internal fun TvTopBarSurface(
                 items.forEach { item ->
                     TvTopBarEntry(
                         item = item,
-                        selected = item.key == selectedKey,
+                        selected = (item.key == selectedKey).takeUnless { item.key in actionKeys },
                         focused = item.key == focusedKey,
                         iconOnly = item.key in iconOnlyKeys,
                         onFocusChanged = { onItemFocusChanged(item.key, it) },
@@ -206,7 +212,7 @@ internal fun TvTopBarSurface(
             if (footer != null) {
                 TvTopBarEntry(
                     item = footer,
-                    selected = footer.key == selectedKey,
+                    selected = (footer.key == selectedKey).takeUnless { footer.key in actionKeys },
                     focused = footer.key == focusedKey,
                     iconOnly = footer.key in iconOnlyKeys,
                     onFocusChanged = { onItemFocusChanged(footer.key, it) },
@@ -237,11 +243,14 @@ internal fun TvTopBarSurface(
 
 private enum class TvTopBarSlot { Start, Tabs, End }
 
-/** One bar entry: an avatar for an item that carries a name, an icon for one in the icon-only set, a label pill otherwise. */
+/**
+ * One bar entry: an avatar for an item that carries a name, an icon for one in the icon-only set, a label pill otherwise.
+ * [selected] is null for an action, which is a button with no selection.
+ */
 @Composable
 private fun TvTopBarEntry(
     item: TvNavItem,
-    selected: Boolean,
+    selected: Boolean?,
     focused: Boolean,
     iconOnly: Boolean,
     onFocusChanged: (Boolean) -> Unit,
@@ -297,11 +306,14 @@ private fun TvTopBarAvatar(
     }
 }
 
-/** A tab as a text pill, or, when [iconOnly], as its icon alone; named for a screen reader either way. */
+/**
+ * A tab as a text pill, or, when [iconOnly], as its icon alone; named for a screen reader either way. A null [selected] makes
+ * it an action's button.
+ */
 @Composable
 private fun TvTopBarPill(
     item: TvNavItem,
-    selected: Boolean,
+    selected: Boolean?,
     focused: Boolean,
     iconOnly: Boolean,
     onFocusChanged: (Boolean) -> Unit,
@@ -311,7 +323,7 @@ private fun TvTopBarPill(
     val scheme = MaterialTheme.colorScheme
     val container = when {
         focused -> scheme.onSurface
-        selected -> scheme.onSurface.copy(alpha = CURRENT_TAB_ALPHA)
+        selected == true -> scheme.onSurface.copy(alpha = CURRENT_TAB_ALPHA)
         else -> Color.Transparent
     }
     val content = if (focused) scheme.surface else scheme.onSurface
@@ -320,10 +332,10 @@ private fun TvTopBarPill(
             .heightIn(min = dimensionResource(TvR.dimen.tv_icon_button_diameter))
             .clip(BingeShapes.Pill)
             .background(container)
-            .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
+            .tvClickable(role = if (selected == null) Role.Button else Role.Tab, onFocusChanged = onFocusChanged, onClick = onClick)
             .clearAndSetSemantics {
                 contentDescription = item.label
-                this.selected = selected
+                if (selected != null) this.selected = selected
             }.padding(horizontal = dimensionResource(TvR.dimen.tv_top_bar_item_padding_horizontal)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
