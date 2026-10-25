@@ -474,9 +474,9 @@ fun TvImmersiveGridInPlaceMessageMidRowSample() {
 fun TvImmersiveGridInPlaceMessageLastColumnSample() {
     SampleInPlaceGrid(
         content = TvImmersiveGridContent.Message(),
-        focusedIndex = 4,
+        focusedIndex = 5,
         message = {
-            TvMessagePlate(body = "Check your connection and try again.", headline = "No connection", alignment = Alignment.TopStart)
+            TvMessagePlate(body = "Try again shortly.", headline = "No connection", alignment = Alignment.TopStart)
         },
     )
 }

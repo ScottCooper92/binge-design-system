@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -129,6 +130,7 @@ internal fun <T : Any> TvImmersiveGridBody(
  * The message under the entry plate, placed from the plate's own laid-out cell so it follows wherever focus is and however far the
  * grid has scrolled. It starts at the plate's column; a plate in the last column has no room to its right, so it starts one column
  * earlier and runs to the grid's end. Read in the layout phase, after the grid has measured, so the first frame has the plate's cell.
+ * Item offsets exclude the grid's content padding, so it is added back; placement is left-to-right only.
  */
 @Composable
 private fun TvImmersiveGridMessage(
@@ -142,6 +144,8 @@ private fun TvImmersiveGridMessage(
     val direction = LocalLayoutDirection.current
     val columnGap = dimensionResource(TvR.dimen.tv_media_row_card_gap)
     val rowGap = dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)
+    val startPadding = cellPadding.calculateStartPadding(direction)
+    val topPadding = cellPadding.calculateTopPadding()
     val endPadding = cellPadding.calculateEndPadding(direction)
     Box(
         Modifier.fillMaxSize().layout { measurable, constraints ->
@@ -151,8 +155,8 @@ private fun TvImmersiveGridMessage(
             } else {
                 val column = entryIndex % columns
                 val startColumn = column.coerceAtMost(columns - 2)
-                val startX = plate.offset.x - (column - startColumn) * (plate.size.width + columnGap.roundToPx())
-                val startY = plate.offset.y + plate.size.height + rowGap.roundToPx()
+                val startX = startPadding.roundToPx() + plate.offset.x - (column - startColumn) * (plate.size.width + columnGap.roundToPx())
+                val startY = topPadding.roundToPx() + plate.offset.y + plate.size.height + rowGap.roundToPx()
                 val width = (constraints.maxWidth - endPadding.roundToPx() - endInset.roundToPx() - startX).coerceAtLeast(0)
                 val height = (constraints.maxHeight - startY).coerceAtLeast(0)
                 val placeable = measurable.measure(Constraints(maxWidth = width, maxHeight = height))
