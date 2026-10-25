@@ -35,7 +35,8 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * A compact, squarer button, the v2 look against [TvButton]'s tall pill. Same states (disabled stays focusable and
  * inert, as [TvButton]'s does); shorter, tighter, and small-radius corners. [loading] hides the label and shows a spinner in
- * its place, keeping the width, and ignores presses while keeping focus. [initiallyFocused] seeds the focused look for frames.
+ * its place, keeping the width, and ignores presses while keeping focus. The primary and secondary styles fill white on
+ * focus; the destructive and text styles keep [TvButton]'s palette. [initiallyFocused] seeds the focused look for frames.
  */
 @Composable
 fun TvCompactButton(
@@ -57,8 +58,8 @@ fun TvCompactButton(
             .clip(shape)
             .background(palette.container)
             .border(dimensionResource(TvR.dimen.tv_button_border_width), palette.border, shape)
-            // Always focusable: a disabled button that drops focus (mid-request, say) throws it out of the page. It is inert instead.
-            .tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = { if (enabled && !loading) onClick() })
+            // A disabled tvClickable stays focusable, so a button that goes inert mid-request does not throw focus out of the page.
+            .tvClickable(enabled = enabled, role = Role.Button, onFocusChanged = { focused = it }, onClick = { if (!loading) onClick() })
             .padding(horizontal = dimensionResource(TvR.dimen.tv_compact_button_padding_horizontal))
             .semantics { if (loading) progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate },
         contentAlignment = Alignment.Center,
