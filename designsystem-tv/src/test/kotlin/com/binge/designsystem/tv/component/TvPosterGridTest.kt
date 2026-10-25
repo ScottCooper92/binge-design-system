@@ -1,11 +1,17 @@
 package com.binge.designsystem.tv.component
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.isFocusable
+import androidx.compose.ui.test.isFocused
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
@@ -43,7 +49,7 @@ class TvPosterGridTest {
 
     /** Coil writes painter state off the composition thread, which can kill a Robolectric run, so no image loads at all. */
     @get:Rule
-    val imageLoaderRule = NoImagesRule()
+    val imageLoaderRule: TestRule = NoImagesRule()
 
     private val entry = FocusRequester()
     private val focusedCells = mutableListOf<Int>()
@@ -125,6 +131,41 @@ class TvPosterGridTest {
         composeTestRule.waitForIdle()
     }
 
+    @Test
+    fun `a stable-plate grid keeps the focused plate when the results end before it`() {
+        var count by mutableIntStateOf(0)
+        var loading by mutableStateOf(true)
+        composeTestRule.setContent {
+            BingeTvTheme {
+                TvPosterGrid(
+                    count = count,
+                    posterAt = { index -> TvPosterCell(imageUrl = null, title = "Title $index", onClick = {}) },
+                    loading = loading,
+                    entry = remember { entry },
+                    entryIndex = 0,
+                    listKey = Unit,
+                    onCellFocused = {},
+                    stablePlates = true,
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle { entry.requestFocus() }
+        composeTestRule.waitForIdle()
+        repeat(2) {
+            composeTestRule.onAllNodes(isFocusable() and isFocused()).onFirst().performKeyInput { pressKey(Key.DirectionDown) }
+            composeTestRule.waitForIdle()
+        }
+
+        composeTestRule.runOnIdle {
+            count = 3
+            loading = false
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onAllNodes(isFocusable() and isFocused()).assertCountEquals(1)
+    }
+
     private fun setGrid(
         entryIndex: Int,
         loading: Boolean = false,
@@ -150,7 +191,7 @@ class TvPosterGridTest {
 }
 
 /** Fails every Coil request on the calling thread for the test's duration, so a poster takes its error branch and draws its title. */
-class NoImagesRule : TestRule {
+internal class NoImagesRule : TestRule {
     override fun apply(base: Statement, description: Description): Statement =
         object : Statement() {
             override fun evaluate() {

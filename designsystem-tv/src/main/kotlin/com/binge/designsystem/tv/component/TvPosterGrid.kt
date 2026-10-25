@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,11 +41,13 @@ import kotlinx.coroutines.launch
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
-/** Posters across the v2 grid. */
+/** Posters across the poster grid. */
 const val TV_POSTER_GRID_COLUMNS = 4
 
 /** Rows of plates drawn while the grid loads: enough to run past the bottom edge, the way a resolved grid does. */
 private const val LOADING_ROWS = 3
+
+private const val NO_CELL = -1
 
 /** One poster of a [TvPosterGrid]: its art, the name that stands in for it when there is none, and what OK does. */
 class TvPosterCell(
@@ -54,11 +57,11 @@ class TvPosterCell(
 )
 
 /**
- * The v2 poster grid (search's results, Discover's): [count] cells in [TV_POSTER_GRID_COLUMNS] columns, or the same number of
- * plates in the same cells while [loading]. Cells are read through [posterAt] by index; a null poster draws as a plate. [keyOf]
+ * A grid of posters: [count] cells in [TV_POSTER_GRID_COLUMNS] columns, or a fixed block of plates (whatever [count] is) while
+ * [loading]. Cells are read through [posterAt] by index; a null poster draws as a plate. [keyOf]
  * is each cell's key (default: its index). [entryIndex] is the cell that takes [entry]; [listKey] resets the scroll.
  * With [stablePlates] a plate takes focus (ring, OK does nothing) and a cell keeps its node as its poster arrives, so a grid
- * that loads in place keeps focus where it was; plates and posters are then positional, never keyed by [keyOf].
+ * that loads in place keeps focus where it was, even if the results end before the focused plate; plates and posters are then positional, never keyed by [keyOf].
  */
 @Composable
 fun TvPosterGrid(
@@ -80,6 +83,9 @@ fun TvPosterGrid(
     val scope = rememberCoroutineScope()
     val gap = dimensionResource(DesR.dimen.padding_m)
     val cells = if (loading) LOADING_ROWS * TV_POSTER_GRID_COLUMNS else count
+    // The focused cell, for a stable-plate grid: it stays composed (as a plate) when the results end before it.
+    var focusedIndex by remember(listKey) { mutableIntStateOf(NO_CELL) }
+    val drawn = if (stablePlates) maxOf(cells, focusedIndex + 1) else cells
     val entryCell = entryIndex.coerceIn(0, (cells - 1).coerceAtLeast(0))
     TvStableFocusScroll {
         LazyVerticalGrid(
@@ -94,13 +100,15 @@ fun TvPosterGrid(
             verticalArrangement = Arrangement.spacedBy(gap),
             modifier = modifier.fillMaxSize(),
         ) {
-            items(cells, key = cellKeys(stablePlates, loading, keyOf)) { index ->
+            items(drawn, key = cellKeys(stablePlates, loading, keyOf)) { index ->
                 val poster = if (loading || index >= count) null else posterAt(index)
                 TvPosterGridCell(
                     poster = poster,
                     initiallyFocused = index == seededIndex,
                     focusablePlate = stablePlates,
+                    onBlurred = { if (focusedIndex == index) focusedIndex = NO_CELL },
                     onFocused = {
+                        focusedIndex = index
                         if (reportsFocus(poster != null, stablePlates)) onCellFocused(index)
                         scope.launch { state.animateScrollToItem(index / TV_POSTER_GRID_COLUMNS * TV_POSTER_GRID_COLUMNS) }
                     },
@@ -150,6 +158,7 @@ private fun TvPosterGridCell(
     initiallyFocused: Boolean,
     focusablePlate: Boolean,
     onFocused: () -> Unit,
+    onBlurred: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (poster == null && !focusablePlate) {
@@ -167,7 +176,7 @@ private fun TvPosterGridCell(
         interaction = Modifier.tvClickable(
             onFocusChanged = {
                 focused = it
-                if (it) onFocused()
+                if (it) onFocused() else onBlurred()
             },
             onClick = { poster?.onClick?.invoke() },
         ),
@@ -187,7 +196,7 @@ private fun TvPosterGridCell(
                 },
             )
         }
-        // The v2 focus: a white ring over the art, as the hub's rows draw it, not the yellow indicator.
+        // A white ring over the art, as the hub's rows draw it, not the yellow indicator.
         if (focused) {
             Box(
                 Modifier
