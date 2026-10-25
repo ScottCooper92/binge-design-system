@@ -4,21 +4,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
@@ -58,7 +58,7 @@ class TvImmersiveGridInPlace<T : Any>(
 
 /**
  * The one grid for loading, message and cells. Cells are keyed by position, so the plate focus is on is the cell the item
- * arrives in; in the message state the entry plate stays, the other cells draw nothing, and the message sits in the columns beside it, never over it.
+ * arrives in; in the message state the entry plate stays, the other cells draw nothing, and the message sits under it, never over it.
  */
 @Composable
 internal fun <T : Any> TvImmersiveGridBody(
@@ -122,27 +122,46 @@ internal fun <T : Any> TvImmersiveGridBody(
                 }
             }
         }
-        if (isMessage) {
-            val direction = LocalLayoutDirection.current
-            // The same side padding as the cells, so the columns line up; the end inset only keeps the message itself clear.
-            val inset =
-                PaddingValues(start = cellPadding.calculateStartPadding(direction), end = cellPadding.calculateEndPadding(direction))
-            Row(Modifier.fillMaxSize().padding(inset)) {
-                // The message takes the columns after the entry plate, or those before it when the entry is in the last column.
-                val entryColumn = entryIndex % columns
-                if (entryColumn < columns - 1) {
-                    Spacer(Modifier.weight((entryColumn + 1).toFloat()))
-                    Box(
-                        Modifier.weight((columns - entryColumn - 1).toFloat()).padding(end = messageEndInset),
-                        contentAlignment = Alignment.TopStart,
-                    ) {
-                        message()
-                    }
-                } else {
-                    Box(Modifier.weight(entryColumn.toFloat()), contentAlignment = Alignment.TopStart) { message() }
-                    Spacer(Modifier.weight(1f))
-                }
-            }
-        }
+        if (isMessage) TvImmersiveGridMessage(gridState, entryIndex, columns, cellPadding, messageEndInset, message)
     }
+}
+
+/**
+ * The message under the entry plate, placed from the plate's own laid-out cell so it follows wherever focus is and however far the
+ * grid has scrolled. It starts at the plate's column; a plate in the last column has no room to its right, so it starts one column
+ * earlier and runs to the grid's end. Read in the layout phase, after the grid has measured, so the first frame has the plate's cell.
+ * Item offsets exclude the grid's content padding, so it is added back; placement is left-to-right only.
+ */
+@Composable
+private fun TvImmersiveGridMessage(
+    state: LazyGridState,
+    entryIndex: Int,
+    columns: Int,
+    cellPadding: PaddingValues,
+    endInset: Dp,
+    message: @Composable BoxScope.() -> Unit,
+) {
+    val direction = LocalLayoutDirection.current
+    val columnGap = dimensionResource(TvR.dimen.tv_media_row_card_gap)
+    val rowGap = dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)
+    val startPadding = cellPadding.calculateStartPadding(direction)
+    val topPadding = cellPadding.calculateTopPadding()
+    val endPadding = cellPadding.calculateEndPadding(direction)
+    Box(
+        Modifier.fillMaxSize().layout { measurable, constraints ->
+            val plate = state.layoutInfo.visibleItemsInfo.firstOrNull { it.index == entryIndex }
+            if (plate == null) {
+                layout(constraints.maxWidth, constraints.maxHeight) {}
+            } else {
+                val column = entryIndex % columns
+                val startColumn = column.coerceAtMost(columns - 2)
+                val startX = startPadding.roundToPx() + plate.offset.x - (column - startColumn) * (plate.size.width + columnGap.roundToPx())
+                val startY = topPadding.roundToPx() + plate.offset.y + plate.size.height + rowGap.roundToPx()
+                val width = (constraints.maxWidth - endPadding.roundToPx() - endInset.roundToPx() - startX).coerceAtLeast(0)
+                val height = (constraints.maxHeight - startY).coerceAtLeast(0)
+                val placeable = measurable.measure(Constraints(maxWidth = width, maxHeight = height))
+                layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(startX, startY) }
+            }
+        },
+    ) { Box(contentAlignment = Alignment.TopStart, content = message) }
 }
