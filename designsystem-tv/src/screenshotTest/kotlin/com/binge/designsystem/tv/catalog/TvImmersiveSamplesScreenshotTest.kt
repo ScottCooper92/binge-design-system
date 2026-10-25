@@ -77,21 +77,6 @@ class TvImmersiveSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
-    fun gridInPlaceMessage() = Frame { TvImmersiveGridInPlaceMessageSample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun gridInPlaceMessageMidRow() = Frame { TvImmersiveGridInPlaceMessageMidRowSample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun gridInPlaceMessageLastColumn() = Frame { TvImmersiveGridInPlaceMessageLastColumnSample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
     fun gridMessage() = Frame { TvImmersiveGridMessageSample() }
 
     @PreviewTest

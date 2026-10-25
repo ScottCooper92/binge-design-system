@@ -70,8 +70,9 @@ private const val DEFAULT_COLUMNS = 6
  * @param loading the loading state, given the padding the cells will take.
  * @param message the message state, centred in the pane.
  * @param pendingCell a cell not loaded yet.
- * @param inPlace opts into one grid for every state (it needs at least two [columns]), drawing plates in the cells loading and message use, so focus on a plate
- * stays on the cell the item arrives in. [loading], [pendingCell] and [cell] are unused then, and [message] sits beside the entry plate.
+ * @param inPlace opts into one grid for loading and cells, drawing plates in the cells loading uses, so focus on a plate
+ * stays on the cell the item arrives in. [loading], [pendingCell] and [cell] are unused then. A message is not drawn in place: [message]
+ * takes the pane, and the entry plate leaves with the grid.
  */
 @Composable
 fun <T : Any> TvImmersiveGrid(
@@ -102,7 +103,8 @@ fun <T : Any> TvImmersiveGrid(
     inPlace: TvImmersiveGridInPlace<T>? = null,
     cell: @Composable (item: T, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, onClick: () -> Unit, cellModifier: Modifier) -> Unit,
 ) {
-    require(inPlace == null || columns >= 2) { "An in-place grid needs at least two columns: its message sits beside the entry plate." }
+    // A message is never drawn in place: it takes the pane, as it does without [inPlace].
+    val inPlaceBody = inPlace?.takeUnless { content is TvImmersiveGridContent.Message }
     val items = content as? TvImmersiveGridContent.Items
     // A visit is the screen, not the query, so this is deliberately not keyed on queryKey.
     val depth = rememberTvVisitDepth(onVisitEnded)
@@ -122,13 +124,13 @@ fun <T : Any> TvImmersiveGrid(
     // gone; the body keeps that cell composed, so it holds even past the plate rows.
     var lastFocused by remember(queryKey) { mutableStateOf(initialFocusedIndex) }
     val entryIndex =
-        remembered ?: if (inPlace != null && items == null) {
+        remembered ?: if (inPlaceBody != null && items == null) {
             lastFocused ?: 0
         } else {
             0
         }
     val anchor = anchorOf(entryIndex, columns)
-    val keepBodyFocused = rememberBodyFocusKeeper(content.bodyKind(), entryFocusRequester.takeIf { inPlace == null })
+    val keepBodyFocused = rememberBodyFocusKeeper(content.bodyKind(), entryFocusRequester.takeIf { inPlaceBody == null })
     val reportBodyFocus =
         rememberAnchorKeeper(entryIndex, alsoReport = keepBodyFocused) {
             if (reduceMotion) gridState.scrollToItem(anchor) else gridState.animateScrollToItem(anchor)
@@ -143,11 +145,11 @@ fun <T : Any> TvImmersiveGrid(
     val ringLoaded = ringIndex?.takeIf { items != null && it < items.count && items.at(it) != null }
     // A plate that had focus when its item arrived is now the remembered cell, though focus never changed.
     LaunchedEffect(ringLoaded) {
-        if (inPlace == null || items == null || ringLoaded == null || memory?.index == ringLoaded) return@LaunchedEffect
+        if (inPlaceBody == null || items == null || ringLoaded == null || memory?.index == ringLoaded) return@LaunchedEffect
         memory = TvGridMemory(ringLoaded, items.key(ringLoaded))
         depth.reach(ringLoaded)
     }
-    val entryLoaded = inPlace != null || (items != null && entryIndex < items.count && items.at(entryIndex) != null)
+    val entryLoaded = inPlaceBody != null || (items != null && entryIndex < items.count && items.at(entryIndex) != null)
     val padding = tvPagePadding(hosting)
     val direction = LocalLayoutDirection.current
 
@@ -191,7 +193,7 @@ fun <T : Any> TvImmersiveGrid(
                 Modifier
                     .fillMaxSize()
                     .then(
-                        if (content is TvImmersiveGridContent.Message && inPlace == null) {
+                        if (content is TvImmersiveGridContent.Message && inPlaceBody == null) {
                             Modifier.padding(start = LocalTvContentInset.current, end = messageEndInset)
                         } else {
                             // The ring's bleed goes into the cells' own padding, so the first row's ring is inside the viewport.
@@ -212,7 +214,7 @@ fun <T : Any> TvImmersiveGrid(
                                 val edge =
                                     when {
                                         items != null -> remembered?.let { atEndEdge(it, columns, items.count) } == true
-                                        inPlace != null && content == TvImmersiveGridContent.Loading ->
+                                        inPlaceBody != null && content == TvImmersiveGridContent.Loading ->
                                             atEndEdge(ringIndex ?: 0, columns, columns * PLATE_ROWS)
                                         else -> true
                                     }
@@ -249,10 +251,10 @@ fun <T : Any> TvImmersiveGrid(
                     )
                 }
             }
-            if (inPlace != null) {
+            if (inPlaceBody != null) {
                 TvImmersiveGridBody(
                     content = content,
-                    inPlace = inPlace,
+                    inPlace = inPlaceBody,
                     columns = columns,
                     gridState = gridState,
                     cellPadding = cellPadding,
@@ -280,8 +282,6 @@ fun <T : Any> TvImmersiveGrid(
                         onItemTapped(index)
                         onItemClick(item)
                     },
-                    messageEndInset = messageEndInset,
-                    message = message,
                 )
             } else {
                 when (content) {
