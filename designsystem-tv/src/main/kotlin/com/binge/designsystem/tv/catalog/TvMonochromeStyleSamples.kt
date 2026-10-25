@@ -167,6 +167,12 @@ fun TvMonochromeSideSheetNestedPageSample() {
     }
 }
 
+/** The selection marks in the monochrome style: the badge's disc is the white focus fill, with a dark tick on it. */
+@Composable
+fun TvMonochromeSelectedTickSample() {
+    Monochrome { TvSelectedTickSample() }
+}
+
 @Composable
 private fun Monochrome(content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalTvStyle provides TvStyle.Monochrome, content = content)
