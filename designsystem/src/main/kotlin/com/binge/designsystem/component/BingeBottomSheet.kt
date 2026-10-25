@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -118,6 +119,10 @@ fun BingeBottomSheet(
             shouldDismissOnClickOutside = dismissOnClickOutside,
         ),
     ) {
+        // Material steps Back from Expanded to PartiallyExpanded when the sheet can part-way open; here one Back closes.
+        BackHandler(enabled = gesturesEnabled && sheetState.currentValue == SheetValue.Expanded && sheetState.hasPartiallyExpandedState) {
+            scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
+        }
         CompositionLocalProvider(LocalBingeSheetDock provides dock) { content() }
     }
 }
