@@ -471,12 +471,12 @@ private fun RowNote(note: TvSideSheetNote, color: Color) {
 }
 
 /**
- * A sheet's second step, for an action that deletes or blocks: what is about to happen, then the confirm and
- * Cancel rows. Focus lands on Cancel, so a stray OK does nothing. [cancelInitiallyFocused] draws that, for a frame.
+ * A sheet's second step, for an action that deletes or blocks: what is about to happen, then the safe answer first and the
+ * confirm last. Focus lands on the safe answer, so a stray OK does nothing; [cancelInitiallyFocused] draws that, for a frame.
  * The confirm row rests in the error colour; pass `destructive = false` for a step that asks first but destroys nothing.
+ * [dismissLabel] is for a step whose safe answer is not "Cancel" ("Keep", for a request someone might withdraw).
  *
- * On a [TvSideSheetStack] page there is no [entryFocus]: pass null, give Cancel `nav.row("cancel")` as [cancelModifier] and
- * call `nav.arriveAt("cancel")`, and the stack lands focus there.
+ * On a [TvSideSheetStack] page pass a null [entryFocus], `nav.row("cancel")` as [cancelModifier] and call `nav.arriveAt("cancel")`.
  *
  * @param entryFocus the request [TvSideSheet] hands its content. Null only on a [TvSideSheetStack] page: anywhere else
  * a null leaves the step taking no focus.
@@ -492,17 +492,18 @@ fun ColumnScope.TvSideSheetConfirm(
     cancelInitiallyFocused: Boolean = false,
     destructive: Boolean = true,
     cancelModifier: Modifier = Modifier,
+    dismissLabel: String = stringResource(DesR.string.action_cancel),
 ) {
     TvSideSheetTitle(title)
     TvSideSheetBody(message)
     TvSideSheetRows {
-        TvSideSheetRow(label = confirmLabel, onClick = onConfirm, destructive = destructive)
         TvSideSheetRow(
-            label = stringResource(DesR.string.action_cancel),
+            label = dismissLabel,
             onClick = onCancel,
             initiallyFocused = cancelInitiallyFocused,
             modifier = (if (entryFocus != null) Modifier.focusRequester(entryFocus) else Modifier).then(cancelModifier),
         )
+        TvSideSheetRow(label = confirmLabel, onClick = onConfirm, destructive = destructive)
     }
     if (entryFocus != null) TvSideSheetStepFocus(entryFocus)
 }

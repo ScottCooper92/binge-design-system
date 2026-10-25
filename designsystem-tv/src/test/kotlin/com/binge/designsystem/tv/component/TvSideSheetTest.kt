@@ -118,6 +118,34 @@ class TvSideSheetTest {
     }
 
     @Test
+    fun `the confirm step puts the safe answer first and focused, and the confirm below it`() {
+        var confirmed = 0
+        composeTestRule.setContent {
+            BingeTvTheme {
+                TvSideSheet(onDismissRequest = {}) { entry ->
+                    TvSideSheetConfirm(
+                        title = "Cancel this request?",
+                        message = "It is withdrawn.",
+                        confirmLabel = "Cancel request",
+                        onConfirm = { confirmed++ },
+                        onCancel = {},
+                        entryFocus = entry,
+                        dismissLabel = "Keep",
+                    )
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Keep").assertIsFocused().performKeyInput { pressKey(Key.DirectionDown) }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Cancel request").assertIsFocused().performKeyInput { pressKey(Key.DirectionCenter) }
+        composeTestRule.waitForIdle()
+
+        assertEquals(1, confirmed)
+    }
+
+    @Test
     fun `a disabled row is a read-out, not a control`() {
         composeTestRule.setContent {
             BingeTvTheme { TvSideSheetPanel { TvSideSheetRow(label = "Not available", onClick = {}, enabled = false) } }
