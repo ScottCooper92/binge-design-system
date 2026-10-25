@@ -318,7 +318,7 @@ fun TvFocusIndicatorSample() {
 fun TvInitialsAvatarSample() {
     BingeTvInitialsAvatar(
         name = "Alexander Hamilton-Montgomery",
-        size = dimensionResource(TvR.dimen.tv_nav_rail_avatar_size),
+        size = dimensionResource(TvR.dimen.tv_nav_avatar_size),
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
     )
 }

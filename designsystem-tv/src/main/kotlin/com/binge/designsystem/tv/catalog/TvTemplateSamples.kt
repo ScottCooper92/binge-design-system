@@ -119,7 +119,7 @@ fun TvTwoPanePageFormSample() {
 /** A rail destination's list beside what its focused row describes, under the page title. */
 @Composable
 fun TvTwoPanePageListDetailSample() {
-    RailHosted {
+    InsetHosted {
         TvTwoPanePage(
             title = "Settings",
             split = TvTwoPaneSplit.ListDetail,
@@ -320,7 +320,7 @@ fun TvStepFlowChromeOverContentSample() {
 /** A rail destination's board: the rail cleared, its title on the rail's header line, the content below. */
 @Composable
 fun TvBoardSample() {
-    RailHosted {
+    InsetHosted {
         TvBoard(
             title = "Requests",
             hosting = TvPageHosting.RailDestination,
@@ -400,11 +400,11 @@ fun TvMessagePageLoadingSample() {
     TvMessagePage(body = "Loading…", loading = true, hosting = TvPageHosting.Overlay)
 }
 
-/** Stands a page in for a rail destination: the rail's collapsed width is cleared, as the shell provides it. */
+/** Stands a page in for a shell destination whose host provides a start inset, so the frame shows the page clearing it. */
 @Composable
-private fun RailHosted(content: @Composable () -> Unit) {
+private fun InsetHosted(content: @Composable () -> Unit) {
     CompositionLocalProvider(
-        LocalTvContentInset provides dimensionResource(TvR.dimen.tv_nav_rail_collapsed_width),
+        LocalTvContentInset provides dimensionResource(TvR.dimen.tv_sample_content_inset),
         content = content,
     )
 }

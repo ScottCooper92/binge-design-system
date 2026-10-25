@@ -25,7 +25,10 @@ import com.binge.designsystem.tv.R as TvR
  * requests focus, an overlay must.
  */
 enum class TvPageHosting {
-    /** In the rail's content pane. The shell offers focus; the page only routes it to its entry target. */
+    /**
+     * In a shell's content pane, a destination of its navigation. The shell offers focus; the page only routes it to
+     * its entry target. The name is from the rail this pane once sat beside.
+     */
     RailDestination,
 
     /** Full-screen above the shell. The page claims focus itself, every frame until it holds it. */
@@ -35,14 +38,14 @@ enum class TvPageHosting {
     PreShell,
 }
 
-/** What [LocalTvHostedAsOverlay] says the host is: an overlay, or a rail destination. */
+/** What [LocalTvHostedAsOverlay] says the host is: an overlay, or a shell destination. */
 @Composable
 @ReadOnlyComposable
 fun currentTvPageHosting(): TvPageHosting = if (LocalTvHostedAsOverlay.current) TvPageHosting.Overlay else TvPageHosting.RailDestination
 
 /**
- * The overscan-safe padding for a page hosted as [hosting]. In-pane the start edge clears the rail plus the
- * content gutter; anywhere else nothing sits beside the page, so every edge takes the overscan margin.
+ * The overscan-safe padding for a page hosted as [hosting]. In-pane the start edge clears the host's start inset plus
+ * the content gutter; anywhere else nothing sits beside the page, so every edge takes the overscan margin.
  */
 @Composable
 fun tvPagePadding(hosting: TvPageHosting): PaddingValues {
