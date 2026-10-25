@@ -34,9 +34,7 @@ import org.robolectric.annotation.Config
 private const val RAIL = "rail"
 private const val COLUMNS = 3
 private const val COUNT = 9
-private const val LONG = 30
 private const val FEW = 2
-private const val DOWN_PRESSES = 4
 
 /**
  * The in-place grid's contract: whatever the grid is showing, the cell focus is on is the cell the next state fills, so a

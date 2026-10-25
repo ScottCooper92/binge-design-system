@@ -32,7 +32,7 @@ typealias TvInPlaceCell<T> = @Composable (
     cellModifier: Modifier,
 ) -> Unit
 
-/** Opts a [TvImmersiveGrid] into one grid for every state, drawing each cell, plate or item, with [cell]. */
+/** Opts a [TvImmersiveGrid] into one grid for loading and cells, drawing each cell, plate or item, with [cell]. */
 class TvImmersiveGridInPlace<T : Any>(
     val cell: TvInPlaceCell<T>,
 )

@@ -120,7 +120,7 @@ fun <T : Any> TvImmersiveGrid(
     val reduceMotion = LocalReduceMotion.current
     ResetScrollWhenStale(memory.isStaleIn(content), gridState, reduceMotion)
 
-    // In place, loading and a message keep the cell focus was last on, which `remembered` cannot name once the items are
+    // In place, loading keeps the cell focus was last on, which `remembered` cannot name once the items are
     // gone; the body keeps that cell composed, so it holds even past the plate rows.
     var lastFocused by remember(queryKey) { mutableStateOf(initialFocusedIndex) }
     val entryIndex =
@@ -193,7 +193,7 @@ fun <T : Any> TvImmersiveGrid(
                 Modifier
                     .fillMaxSize()
                     .then(
-                        if (content is TvImmersiveGridContent.Message && inPlaceBody == null) {
+                        if (content is TvImmersiveGridContent.Message) {
                             Modifier.padding(start = LocalTvContentInset.current, end = messageEndInset)
                         } else {
                             // The ring's bleed goes into the cells' own padding, so the first row's ring is inside the viewport.
