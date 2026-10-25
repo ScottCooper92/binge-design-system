@@ -457,7 +457,7 @@ fun TvImmersiveGridInPlaceMessageSample() {
     )
 }
 
-/** An in-place grid that failed with focus on a cell in the third column: the entry plate is that cell, and the message sits under it. */
+/** An in-place grid that failed with focus on a cell in the third column: the entry plate is that cell, and the message sits beside it. */
 @Composable
 fun TvImmersiveGridInPlaceMessageMidRowSample() {
     SampleInPlaceGrid(
@@ -469,7 +469,7 @@ fun TvImmersiveGridInPlaceMessageMidRowSample() {
     )
 }
 
-/** An in-place grid that failed with focus on the last column: the message starts one column earlier, under the entry plate. */
+/** An in-place grid that failed with focus on the last column: the message sits on the plate's start side. */
 @Composable
 fun TvImmersiveGridInPlaceMessageLastColumnSample() {
     SampleInPlaceGrid(
