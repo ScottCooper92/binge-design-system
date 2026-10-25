@@ -27,18 +27,17 @@ const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
  * **Keep it mounted while it holds focus, and hand focus on explicitly.** Gate its presence on the pane's *real*
  * content having focus, not on the pane's own `hasFocus`, which the sink itself satisfies. Removing a sink that holds
  * focus leaves Compose's recovery search to place it, and with nothing else in the pane that is whatever sits beside
- * it: in a TV shell, the rail, every other frame for as long as the pane stays empty. Instead, while the sink holds
- * focus, offer it to a group around the real content: a request into a group with nothing focusable fails quietly and
- * leaves focus where it is, so the offer can repeat until the content grows a target. a shell's navigation does
- * exactly this for its content pane.
+ * it: in a TV shell, its navigation, every other frame for as long as the pane stays empty. Instead, while the sink
+ * holds focus, offer it to a group around the real content: a request into a group with nothing focusable fails
+ * quietly and leaves focus where it is, so the offer can repeat until the content grows a target.
  *
  * **Never calls `requestFocus` itself.** It only receives what a group's own entry redirect, an explicit
- * request, or Compose's own recovery search hands it — a puller here would reproduce the rail collapsing under
- * a user still walking it. [startEntry] is the one sanctioned way out by D-pad: the content pane passes
- * its rail's selected-item requester so the key toward the layout's start edge still opens the rail — ← under
- * LTR, → under RTL, where the rail is drawn on the right; the overlay host leaves it `null`, since Back is the
- * only way out of an overlay. Every other direction is cancelled, so a stray press during a skeleton
- * does nothing rather than landing on a geometric pick behind the pane.
+ * request, or Compose's own recovery search hands it — a puller here would take focus from a user still walking
+ * the navigation. [startEntry] is the one sanctioned way out by D-pad: a host with navigation at the layout's
+ * start edge passes that navigation's requester, so the key toward the start edge reaches it — ← under LTR,
+ * → under RTL. Leave it `null` where there is no such navigation: in an overlay, Back is the only way out.
+ * Every other direction is cancelled, so a stray press during a skeleton does nothing rather than landing on a
+ * geometric pick behind the pane.
  *
  * 1dp and fully transparent rather than zero-size: some Compose versions drop zero-size nodes from directional
  * search, so this stays a real laid-out node. No `Modifier` parameter — the geometry, alpha and semantics here

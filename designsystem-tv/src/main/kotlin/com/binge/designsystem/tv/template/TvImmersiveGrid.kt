@@ -63,7 +63,7 @@ private const val DEFAULT_COLUMNS = 6
  * @param onNavigateToEnd an end-direction press from the grid's end edge, or from any non-cell state.
  * @param entryFocusRequester a requester on the grid's body, for a caller restoring focus to it; entry still routes
  * to the remembered cell. It reaches the cells only: in the message state, attach the same requester inside [message]
- * or focus falls to the rail.
+ * or focus has no target in the pane.
  * @param queryKey the content's identity: a new one resets the focus memory and the scroll to the top.
  * @param drawBackdrop false when a host draws the backdrop itself; [onBackdropItemChanged] tells it which item.
  * @param messageEndInset keeps a centred message clear of a pane drawn over this one's end.

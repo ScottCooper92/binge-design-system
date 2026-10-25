@@ -57,15 +57,15 @@ private const val CURRENT_TAB_ALPHA = 0.2f
 private const val BAR_SCRIM_TOP_ALPHA = 0.9f
 
 /**
- * The bar over every page: [header] at the start (an item with a [TvNavRailItem.displayName] draws as a circular avatar, any
+ * The bar over every page: [header] at the start (an item with a [TvNavItem.displayName] draws as a circular avatar, any
  * other as a pill), [items] as tabs centred, and [footer] at the end. A focused item is a light pill with dark text, and the
  * tab for [selectedKey] keeps a faint pill while focus is elsewhere. Only the centred tabs scale, from 0.8 at rest to full
  * size while the bar holds focus, so the two ends stay pinned.
  *
  * Focus never selects: OK on an item calls [onSelect] and nothing else does. Items named in
- * [iconOnlyKeys] (the header, an item or the footer) draw as their [TvNavRailItem.icon] alone; every other item is its
+ * [iconOnlyKeys] (the header, an item or the footer) draw as their [TvNavItem.icon] alone; every other item is its
  * label on a single line, so a crowded bar never grows taller.
- * The tabs keep clear of whichever end item is wider, however wide its label. [TvNavRailItem.badge] is not drawn.
+ * The tabs keep clear of whichever end item is wider, however wide its label. [TvNavItem.badge] is not drawn.
  *
  * Every item in [itemFocusRequesters] is attached to its requester, so the caller can send focus to a tab. Down from any item
  * lands on [down], the current page's own entry. [onFocusedChange] reports whether the bar holds focus.
@@ -76,9 +76,9 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  */
 @Composable
 fun BingeTvTopBar(
-    header: TvNavRailItem?,
-    items: List<TvNavRailItem>,
-    footer: TvNavRailItem?,
+    header: TvNavItem?,
+    items: List<TvNavItem>,
+    footer: TvNavItem?,
     selectedKey: Any,
     onSelect: (Any) -> Unit,
     itemFocusRequesters: Map<Any, FocusRequester>,
@@ -124,9 +124,9 @@ fun BingeTvTopBar(
  */
 @Composable
 internal fun TvTopBarSurface(
-    header: TvNavRailItem?,
-    items: List<TvNavRailItem>,
-    footer: TvNavRailItem?,
+    header: TvNavItem?,
+    items: List<TvNavItem>,
+    footer: TvNavItem?,
     selectedKey: Any,
     barFocused: Boolean,
     focusedKey: Any?,
@@ -145,7 +145,7 @@ internal fun TvTopBarSurface(
         animationSpec = if (LocalReduceMotion.current) snap() else tween(TAB_SCALE_MILLIS),
         label = "tvTopBarTabScale",
     )
-    val itemModifier = { item: TvNavRailItem ->
+    val itemModifier = { item: TvNavItem ->
         val requester = itemFocusRequesters[item.key]
         (if (requester != null) Modifier.focusRequester(requester) else Modifier).focusProperties {
             canFocus = visible
@@ -240,7 +240,7 @@ private enum class TvTopBarSlot { Start, Tabs, End }
 /** One bar entry: an avatar for an item that carries a name, an icon for one in the icon-only set, a label pill otherwise. */
 @Composable
 private fun TvTopBarEntry(
-    item: TvNavRailItem,
+    item: TvNavItem,
     selected: Boolean,
     focused: Boolean,
     iconOnly: Boolean,
@@ -274,7 +274,7 @@ private fun TvTopBarEntry(
 /** The signed-in user's picture, or their initials, ringed in the focused pill's colour when focused. */
 @Composable
 private fun TvTopBarAvatar(
-    item: TvNavRailItem,
+    item: TvNavItem,
     name: String,
     focused: Boolean,
     onFocusChanged: (Boolean) -> Unit,
@@ -300,7 +300,7 @@ private fun TvTopBarAvatar(
 /** A tab as a text pill, or, when [iconOnly], as its icon alone; named for a screen reader either way. */
 @Composable
 private fun TvTopBarPill(
-    item: TvNavRailItem,
+    item: TvNavItem,
     selected: Boolean,
     focused: Boolean,
     iconOnly: Boolean,

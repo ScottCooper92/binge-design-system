@@ -16,7 +16,6 @@ import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.focus.TvFocusSink
-import com.binge.designsystem.tv.nav.LocalTvRailEntry
 import com.binge.designsystem.tv.theme.TvButtonStyle
 
 /** An [action] as a TV button: its label, icon and modifier, with [modifier] added for the page's own focus wiring. */
@@ -85,9 +84,7 @@ fun TvMessagePage(
                 .then(arrival)
                 .padding(tvPagePadding(hosting)),
     ) {
-        // In a rail destination the sink is all there is to focus, so the key toward the rail opens it (#368).
-        val railEntry = LocalTvRailEntry.current.takeIf { hosting == TvPageHosting.RailDestination }
-        if (!hasAction) Box(Modifier.focusRequester(sinkEntry)) { TvFocusSink(startEntry = railEntry) }
+        if (!hasAction) Box(Modifier.focusRequester(sinkEntry)) { TvFocusSink() }
         TvMessagePlate(
             body = body,
             headline = headline,

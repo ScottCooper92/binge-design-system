@@ -18,7 +18,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
@@ -27,8 +26,6 @@ import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.TV_IMMERSIVE_CROSSFADE_MILLIS
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
-import com.binge.designsystem.tv.nav.LocalTvPaneShift
-import com.binge.designsystem.tv.nav.ReportTvRailArtwork
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
 
@@ -99,14 +96,9 @@ internal fun <T : Any> TvImmersiveBackdrop(
         label = "tv-immersive-backdrop",
     ) { focused ->
         if (focused != null) {
-            val paneShift = LocalTvPaneShift.current
             Box(modifier = Modifier.fillMaxSize()) {
-                // Cancel the pane's expansion shift so the artwork holds still while rows and copy slide over it.
-                Box(modifier = Modifier.fillMaxSize().graphicsLayer { translationX = -paneShift.value.toPx() }) {
-                    artwork(focused)
-                    TvImmersiveScrim(layout)
-                }
-                ReportTvRailArtwork()
+                artwork(focused)
+                TvImmersiveScrim(layout)
                 TvImmersiveCopyBand(copyTopInset, bandHeight, copyStart, layout.copyWidthFraction) { copy(focused) }
             }
         }

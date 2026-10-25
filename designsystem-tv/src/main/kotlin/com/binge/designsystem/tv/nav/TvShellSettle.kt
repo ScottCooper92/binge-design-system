@@ -9,8 +9,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 
 /**
- * The destination a TV shell's content shows, which may trail the navigation's selection while the selection is still
- * moving. [jumpTo] settles on a key at once, for a deep link or a Back to home that should not wait.
+ * The destination a TV shell's content shows. Only [jumpTo] moves it: the shell calls it when its navigation selects a
+ * destination, and for a deep link or a Back to home. It is saved across recreation by [rememberTvShellSettle].
  */
 @Stable
 class TvShellSettle internal constructor(
@@ -20,7 +20,7 @@ class TvShellSettle internal constructor(
     var settledKey: Any by mutableStateOf(initialKey)
         internal set
 
-    /** Settles on [key] now, skipping any delay. */
+    /** Makes [key] the destination the content shows. */
     fun jumpTo(key: Any) {
         settledKey = key
     }

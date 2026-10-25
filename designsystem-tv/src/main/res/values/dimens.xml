@@ -15,9 +15,9 @@
     <dimen name="tv_focus_ring_bleed">12dp</dimen>
     <!-- Focus sink: a real laid-out node, not zero-size, so it is a legitimate focus target -->
     <dimen name="tv_focus_sink_size">1dp</dimen>
-    <!-- The account avatar's size, and the start inset the catalog samples reserve for a navigation strip -->
-    <dimen name="tv_nav_rail_collapsed_width">72dp</dimen>
-    <dimen name="tv_nav_rail_avatar_size">32dp</dimen>
+    <!-- The catalog samples' stand-in for a host's start inset, and the account avatar's size -->
+    <dimen name="tv_sample_content_inset">72dp</dimen>
+    <dimen name="tv_nav_avatar_size">32dp</dimen>
     <!-- Button -->
     <dimen name="tv_button_height">52dp</dimen>
     <dimen name="tv_button_padding_horizontal">28dp</dimen>

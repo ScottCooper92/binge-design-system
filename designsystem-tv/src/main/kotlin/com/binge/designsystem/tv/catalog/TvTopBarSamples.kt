@@ -28,31 +28,31 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.nav.BingeTvTopBar
-import com.binge.designsystem.tv.nav.TvNavRailItem
+import com.binge.designsystem.tv.nav.TvNavItem
 import com.binge.designsystem.tv.nav.TvTopBarSurface
 
 private const val TOP_BAR_ART_FRACTION = 0.3f
 
-private val TopBarHeader = TvNavRailItem(
+private val TopBarHeader = TvNavItem(
     key = "account",
     label = "Account",
     icon = Icons.Filled.Person,
     displayName = "Alexander Hamilton",
 )
-private val TopBarFooter = TvNavRailItem(key = "settings", label = "Settings", icon = Icons.Filled.Settings)
+private val TopBarFooter = TvNavItem(key = "settings", label = "Settings", icon = Icons.Filled.Settings)
 internal val TopBarSampleItems = listOf(
-    TvNavRailItem(key = "home", label = "Home", icon = Icons.Filled.Home),
-    TvNavRailItem(key = "movies", label = "Movies", icon = Icons.Filled.Movie),
-    TvNavRailItem(key = "tv", label = "TV shows", icon = Icons.Filled.Tv),
-    TvNavRailItem(key = "requests", label = "Requests", icon = Icons.Filled.Bookmark),
-    TvNavRailItem(key = "search", label = "Search", icon = Icons.Filled.Search),
+    TvNavItem(key = "home", label = "Home", icon = Icons.Filled.Home),
+    TvNavItem(key = "movies", label = "Movies", icon = Icons.Filled.Movie),
+    TvNavItem(key = "tv", label = "TV shows", icon = Icons.Filled.Tv),
+    TvNavItem(key = "requests", label = "Requests", icon = Icons.Filled.Bookmark),
+    TvNavItem(key = "search", label = "Search", icon = Icons.Filled.Search),
 )
 private val TopBarLongItems = listOf(
-    TvNavRailItem(key = "home", label = "Recently added", icon = Icons.Filled.Home),
-    TvNavRailItem(key = "movies", label = "Popular movies", icon = Icons.Filled.Movie),
-    TvNavRailItem(key = "tv", label = "Trending TV shows", icon = Icons.Filled.Tv),
-    TvNavRailItem(key = "requests", label = "Pending requests", icon = Icons.Filled.Bookmark),
-    TvNavRailItem(key = "search", label = "Search the library", icon = Icons.Filled.Search),
+    TvNavItem(key = "home", label = "Recently added", icon = Icons.Filled.Home),
+    TvNavItem(key = "movies", label = "Popular movies", icon = Icons.Filled.Movie),
+    TvNavItem(key = "tv", label = "Trending TV shows", icon = Icons.Filled.Tv),
+    TvNavItem(key = "requests", label = "Pending requests", icon = Icons.Filled.Bookmark),
+    TvNavItem(key = "search", label = "Search the library", icon = Icons.Filled.Search),
 )
 
 /** The top bar over page art: an avatar at the start, five tabs centred, a gear at the end. Click a tab to select it. */
@@ -67,7 +67,7 @@ fun TvTopBarSample() {
  */
 @Composable
 internal fun TvTopBarSample(
-    items: List<TvNavRailItem>,
+    items: List<TvNavItem>,
     focusedKey: Any? = null,
     selectedKey: Any = "movies",
     iconOnlyFooter: Boolean = true,

@@ -84,11 +84,11 @@ private val SampleRows =
         sampleRow("available", "Available (31)", firstId = 300),
     )
 
-/** Stands a page in for a rail destination: the rail's collapsed width is cleared, as the shell provides it. */
+/** Stands a page in for a shell destination whose host provides a start inset, so the frame shows the page clearing it. */
 @Composable
-private fun RailHosted(content: @Composable () -> Unit) {
+private fun InsetHosted(content: @Composable () -> Unit) {
     CompositionLocalProvider(
-        LocalTvContentInset provides dimensionResource(TvR.dimen.tv_nav_rail_collapsed_width),
+        LocalTvContentInset provides dimensionResource(TvR.dimen.tv_sample_content_inset),
         content = content,
     )
 }
@@ -110,7 +110,7 @@ private fun SampleHub(
     rows: List<TvHubRow<SampleTitle>> = SampleRows,
     copyLayout: TvImmersiveCopyLayout = TvImmersiveCopyLayout.Wide,
 ) {
-    RailHosted {
+    InsetHosted {
         TvImmersiveHub(
             rows = rows,
             itemId = { it.id },
@@ -302,7 +302,7 @@ private fun SampleGrid(
         if (asOverlay) {
             { content -> CompositionLocalProvider(LocalTvHostedAsOverlay provides true, content = content) }
         } else {
-            { content -> RailHosted(content) }
+            { content -> InsetHosted(content) }
         }
     host {
         TvImmersiveGrid(
@@ -351,7 +351,7 @@ private fun SampleStateGrid(
     trailingAction: (@Composable () -> Unit)? = null,
     message: @Composable BoxScope.() -> Unit = {},
 ) {
-    RailHosted {
+    InsetHosted {
         TvImmersiveGrid(
             heading = "All titles",
             content = content,
@@ -391,7 +391,7 @@ fun TvImmersiveGridMessageSample() {
 /** A grid of [content] that loads in place: its plates are the cells the titles arrive in. */
 @Composable
 private fun SampleInPlaceGrid(content: TvImmersiveGridContent<SampleTitle>, focusedIndex: Int?) {
-    RailHosted {
+    InsetHosted {
         TvImmersiveGrid(
             heading = "All titles",
             content = content,
