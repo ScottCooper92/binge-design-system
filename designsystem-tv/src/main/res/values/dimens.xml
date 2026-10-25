@@ -24,6 +24,9 @@
     <dimen name="tv_button_icon">22dp</dimen>
     <dimen name="tv_button_icon_gap">10dp</dimen>
     <dimen name="tv_button_border_width">1dp</dimen>
+    <!-- Compact button: the v2 shape, shorter and tighter than the pill -->
+    <dimen name="tv_compact_button_height">40dp</dimen>
+    <dimen name="tv_compact_button_padding_horizontal">20dp</dimen>
     <!-- The busy spinner a loading button shows: it sits in tv_button_icon's box, with a stroke heavy
          enough to read at ten feet. -->
     <dimen name="tv_button_spinner_stroke">3dp</dimen>

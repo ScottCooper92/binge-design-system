@@ -17,6 +17,21 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun compactButton() = Frame { TvCompactButtonSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun compactButtonLoading() = Frame { TvCompactButtonLoadingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun messagePlateCompactButton() = Frame { TvMessagePlateCompactButtonSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun buttonLoading() = Frame { TvButtonLoadingSample() }
 
     @PreviewTest
