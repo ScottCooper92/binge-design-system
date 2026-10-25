@@ -1,16 +1,17 @@
 package com.binge.designsystem
 
 import android.graphics.Rect
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -18,9 +19,13 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.offset
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
+import kotlin.math.abs
 
 /**
  * A horizontal fold crossing the window, measured from the window's top edge.
@@ -128,23 +133,95 @@ internal fun foldSafeBottomHeight(
  * moving it, so size the content inside it. Apply it before any padding or background that should move with the content.
  * Position is read in window pixels, the space the fold is reported in, so a node inside a dialog window
  * would measure the wrong thing.
+ *
+ * The straddle test reads the node's unpadded geometry, never its own padded output, so the padding cannot
+ * feed back into itself. A node in a scrolling column is held below the crease only while its unpadded
+ * place still crosses it, and lets go once it scrolls clear. Top padding moves content only when the node's
+ * place in its parent does not depend on its own height. A node aligned to its parent's bottom or centre
+ * grows upward instead of moving, so the modifier sees that and leaves it unpadded.
  */
 @Composable
 fun Modifier.avoidHorizontalFold(): Modifier {
     val hinge = rememberHorizontalHinge() ?: return this
     val density = LocalDensity.current
-    var unpaddedTopPx by remember { mutableFloatStateOf(0f) }
-    var heightPx by remember { mutableIntStateOf(0) }
-    val clearance = with(density) {
-        foldClearancePadding(top = unpaddedTopPx.toDp(), height = heightPx.toDp(), hinge = hinge)
-    }
+    val clearance = remember(hinge, density) { FoldClearance(hinge, density) }
     return this
-        .padding(top = clearance)
-        .onGloballyPositioned { coordinates ->
-            unpaddedTopPx = coordinates.positionInWindow().y - with(density) { clearance.toPx() }
-            // The size is measured inside the padding; add it back so the straddle test sees the unpadded extent.
-            heightPx = coordinates.size.height + with(density) { clearance.roundToPx() }
+        // Before the layout below, so these are the outer coordinates: their top is the unpadded top.
+        .onGloballyPositioned(clearance::onPositioned)
+        .layout { measurable, constraints ->
+            val clearancePx = clearance.clearancePx
+            val placeable = measurable.measure(constraints.offset(vertical = -clearancePx))
+            clearance.onMeasured(
+                clearancePx = clearancePx,
+                // The height the node would have with no padding. A fixed outer height keeps its full size
+                // here, although the content inside it shrinks by the padding.
+                unpaddedHeightPx = constraints.constrainHeight(placeable.height),
+            )
+            layout(constraints.constrainWidth(placeable.width), constraints.constrainHeight(placeable.height + clearancePx)) {
+                placeable.place(0, clearancePx)
+            }
         }
+}
+
+/**
+ * The padding [avoidHorizontalFold] applies, and what it learned about the node from the last layout.
+ *
+ * Only [clearancePx] is snapshot state. The rest is written during measure and read after placement,
+ * so it never invalidates a layout on its own.
+ */
+private class FoldClearance(
+    private val hinge: HorizontalHinge,
+    private val density: Density,
+) {
+    var clearancePx by mutableIntStateOf(0)
+        private set
+
+    private var measuredClearancePx = 0
+    private var unpaddedHeightPx = 0
+    private var positionedClearancePx: Int? = null
+    private var positionedParentTop = 0f
+    private var growsUpward = false
+
+    fun onMeasured(clearancePx: Int, unpaddedHeightPx: Int) {
+        measuredClearancePx = clearancePx
+        this.unpaddedHeightPx = unpaddedHeightPx
+    }
+
+    fun onPositioned(outer: LayoutCoordinates) {
+        val parentTop = outer.positionInParent().y
+        val previousClearancePx = positionedClearancePx
+        if (previousClearancePx != null) {
+            val parentMoved = abs(parentTop - positionedParentTop) >= MOVE_THRESHOLD_PX
+            val clearanceChanged = measuredClearancePx != previousClearancePx
+            // A node that moves in its parent when only its own padding changed is placed by its own height,
+            // so padding cannot move its content. Movement with no padding change is the layout around it
+            // changing, so the node is judged afresh.
+            if (clearanceChanged && parentMoved) {
+                growsUpward = true
+            } else if (parentMoved) {
+                growsUpward = false
+            }
+        }
+        positionedClearancePx = measuredClearancePx
+        positionedParentTop = parentTop
+
+        clearancePx =
+            if (growsUpward) {
+                0
+            } else {
+                with(density) {
+                    foldClearancePadding(
+                        top = outer.positionInWindow().y.toDp(),
+                        height = unpaddedHeightPx.toDp(),
+                        hinge = hinge,
+                    ).roundToPx()
+                }
+            }
+    }
+
+    private companion object {
+        const val MOVE_THRESHOLD_PX = 0.5f
+    }
 }
 
 /**
