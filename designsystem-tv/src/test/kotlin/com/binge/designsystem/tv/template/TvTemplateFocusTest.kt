@@ -80,7 +80,7 @@ class TvTemplateFocusTest {
     @Test
     fun `a rail destination never claims focus, but routes entry from the rail to its target`() {
         composeTestRule.setContent {
-            Hosted { TwoPane(hosting = TvPageHosting.RailDestination) }
+            Hosted { TwoPane(hosting = TvPageHosting.Destination) }
         }
         composeTestRule.onNodeWithTag(RAIL).requestFocus()
         composeTestRule.waitForIdle()

@@ -158,7 +158,7 @@ class TvImmersiveGridInPlaceTest {
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         columns = COLUMNS,
-                        hosting = TvPageHosting.RailDestination,
+                        hosting = TvPageHosting.Destination,
                         onNavigateToEnd = onNavigateToEnd,
                         message = { Box(Modifier.size(48.dp).testTag("message")) },
                         inPlace = TvImmersiveGridInPlace<Int>(

@@ -51,7 +51,7 @@ class TvImmersiveHubSkeletonGeometryTest {
     val composeTestRule = createKeyboardComposeRule()
 
     @Test
-    fun `the skeleton reserves the hub's copy band and rows in the rail's pane`() = assertReserved(TvPageHosting.RailDestination)
+    fun `the skeleton reserves the hub's copy band and rows in the rail's pane`() = assertReserved(TvPageHosting.Destination)
 
     @Test
     fun `the skeleton reserves the hub's copy band and rows as an overlay`() = assertReserved(TvPageHosting.Overlay)
@@ -67,7 +67,7 @@ class TvImmersiveHubSkeletonGeometryTest {
         composeTestRule.assertSkeletonReservesGeometry(Anchors, checkStartEdge = true) { resolved ->
             BingeTvTheme {
                 CompositionLocalProvider(
-                    LocalTvContentInset provides if (hosting == TvPageHosting.RailDestination) RailWidth else 0.dp,
+                    LocalTvContentInset provides if (hosting == TvPageHosting.Destination) RailWidth else 0.dp,
                     LocalTvHostedAsOverlay provides (hosting == TvPageHosting.Overlay),
                     LocalTvTopInset provides topInset,
                 ) {

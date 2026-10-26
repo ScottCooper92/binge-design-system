@@ -117,7 +117,7 @@ class TvDetailPageFocusTest {
     }
 
     private fun setPage(
-        hosting: TvPageHosting = TvPageHosting.RailDestination,
+        hosting: TvPageHosting = TvPageHosting.Destination,
         initialFocusedSectionKey: String? = null,
         withRail: Boolean = true,
         ownArrival: Boolean = false,

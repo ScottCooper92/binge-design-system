@@ -27,9 +27,9 @@ import com.binge.designsystem.tv.R as TvR
 enum class TvPageHosting {
     /**
      * In a shell's content pane, a destination of its navigation. The shell offers focus; the page only routes it to
-     * its entry target. The name is from the rail this pane once sat beside.
+     * its entry target.
      */
-    RailDestination,
+    Destination,
 
     /** Full-screen above the shell. The page claims focus itself, every frame until it holds it. */
     Overlay,
@@ -41,7 +41,7 @@ enum class TvPageHosting {
 /** What [LocalTvHostedAsOverlay] says the host is: an overlay, or a shell destination. */
 @Composable
 @ReadOnlyComposable
-fun currentTvPageHosting(): TvPageHosting = if (LocalTvHostedAsOverlay.current) TvPageHosting.Overlay else TvPageHosting.RailDestination
+fun currentTvPageHosting(): TvPageHosting = if (LocalTvHostedAsOverlay.current) TvPageHosting.Overlay else TvPageHosting.Destination
 
 /**
  * The overscan-safe padding for a page hosted as [hosting]. In-pane the start edge clears the host's start inset plus
@@ -52,7 +52,7 @@ fun tvPagePadding(hosting: TvPageHosting): PaddingValues {
     val horizontal = dimensionResource(TvR.dimen.tv_overscan_horizontal)
     val vertical = dimensionResource(TvR.dimen.tv_overscan_vertical)
     return PaddingValues(
-        start = if (hosting == TvPageHosting.RailDestination) tvContentGutterStart() else horizontal,
+        start = if (hosting == TvPageHosting.Destination) tvContentGutterStart() else horizontal,
         top = vertical + LocalTvTopInset.current,
         end = horizontal,
         bottom = vertical,
@@ -73,7 +73,7 @@ internal fun tvPageArrival(
 ): Modifier {
     if (entry == null) return Modifier
     return when (hosting) {
-        TvPageHosting.RailDestination -> Modifier.tvEntryFocusGroup(entry)
+        TvPageHosting.Destination -> Modifier.tvEntryFocusGroup(entry)
         TvPageHosting.Overlay -> {
             // A tab's page is entered from its tab, so it claims no focus of its own: that would pull focus off the tab.
             if (LocalTvTabHosted.current) return Modifier.tvEntryFocusGroup(entry)

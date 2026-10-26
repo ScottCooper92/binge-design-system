@@ -122,7 +122,7 @@ class TvImmersiveHubPendingRowTest {
                         artwork = {},
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
-                        hosting = TvPageHosting.RailDestination,
+                        hosting = TvPageHosting.Destination,
                         // As tall as a loaded row here, as the default skeleton is as tall as a poster row.
                         pendingRow = { rowModifier ->
                             Box(rowModifier.fillMaxWidth().height(ROW_HEIGHT)) { Box(Modifier.fillMaxSize().testTag(PENDING)) }

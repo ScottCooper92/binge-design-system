@@ -134,7 +134,7 @@ fun TvDetailPage(
     // does not move as the user browses, and the entry group routes it on — to the action row on a fresh page, to the
     // remembered section once the user has been below it.
     val ownArrival = pageArrival == null
-    val claimsFocus = ownArrival && hosting != TvPageHosting.RailDestination
+    val claimsFocus = ownArrival && hosting != TvPageHosting.Destination
     val arrival = pageArrival ?: remember { TvArrivalFocus(FocusRequester()) }
     if (claimsFocus) TvArrivalFocusEffect(arrival)
     TvStableFocusScroll {

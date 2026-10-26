@@ -62,7 +62,7 @@ class TvImmersiveGridFocusTest {
 
     @Test
     fun `re-entry from the rail lands on the cell last focused`() {
-        setGrid(TvPageHosting.RailDestination)
+        setGrid(TvPageHosting.Destination)
         composeTestRule.onNodeWithTag(RAIL).requestFocus()
         composeTestRule.waitForIdle()
 

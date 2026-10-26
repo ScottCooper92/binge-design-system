@@ -183,7 +183,7 @@ class TvImmersiveGridStateTest {
                             copy = {},
                             modifier = Modifier.weight(1f).fillMaxHeight(),
                             columns = COLUMNS,
-                            hosting = TvPageHosting.RailDestination,
+                            hosting = TvPageHosting.Destination,
                             onItemTapped = { tapped += it },
                             onVisitEnded = { deepest += it },
                             onNavigateToEnd = { endPresses++ },

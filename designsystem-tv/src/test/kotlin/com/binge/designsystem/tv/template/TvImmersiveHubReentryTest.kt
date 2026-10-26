@@ -152,7 +152,7 @@ class TvImmersiveHubReentryTest {
                         artwork = {},
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
-                        hosting = TvPageHosting.RailDestination,
+                        hosting = TvPageHosting.Destination,
                         seeAllLabel = SEE_ALL,
                     ) { item, _, onFocusChanged, onClick, cellModifier ->
                         Card(item, onFocusChanged, onClick, cellModifier)

@@ -159,7 +159,7 @@ class TvImmersiveHubFailedRowTest {
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         hero = if (hero) ({ Box(Modifier.size(width = 320.dp, height = 96.dp).testTag(HERO).focusable()) }) else null,
-                        hosting = TvPageHosting.RailDestination,
+                        hosting = TvPageHosting.Destination,
                     ) { item, _, onFocusChanged, onClick, cellModifier ->
                         Card(item, onFocusChanged, onClick, cellModifier)
                     }

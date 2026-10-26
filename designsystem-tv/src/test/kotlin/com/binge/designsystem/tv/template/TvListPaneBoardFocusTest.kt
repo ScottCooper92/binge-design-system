@@ -111,7 +111,7 @@ class TvListPaneBoardFocusTest {
 
     private fun setBoard(
         describedKey: String,
-        hosting: TvPageHosting = TvPageHosting.RailDestination,
+        hosting: TvPageHosting = TvPageHosting.Destination,
         layoutDirection: LayoutDirection = LayoutDirection.Ltr,
     ) {
         composeTestRule.setContent {
