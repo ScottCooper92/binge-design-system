@@ -123,7 +123,7 @@ fun TvTwoPanePageListDetailSample() {
         TvTwoPanePage(
             title = "Settings",
             split = TvTwoPaneSplit.ListDetail,
-            hosting = TvPageHosting.RailDestination,
+            hosting = TvPageHosting.Destination,
             actionScrolls = false,
             copy = {
                 repeat(SAMPLE_ROWS) { index ->
@@ -323,7 +323,7 @@ fun TvBoardSample() {
     InsetHosted {
         TvBoard(
             title = "Requests",
-            hosting = TvPageHosting.RailDestination,
+            hosting = TvPageHosting.Destination,
             trailingContent = { TvButtonSurface("Sort", TvButtonStyle.Secondary, enabled = true, isFocused = false) },
         ) {
             Text(text = "Pending", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)

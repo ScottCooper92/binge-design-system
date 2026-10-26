@@ -121,7 +121,7 @@ class TvImmersiveHubHeroTest {
                         copy = {},
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         hero = { Box(Modifier.size(width = 320.dp, height = 96.dp).testTag(HERO_TARGET).focusable()) },
-                        hosting = TvPageHosting.RailDestination,
+                        hosting = TvPageHosting.Destination,
                     ) { item, _, onFocusChanged, onClick, cellModifier ->
                         Card(item, onFocusChanged, onClick, cellModifier)
                     }

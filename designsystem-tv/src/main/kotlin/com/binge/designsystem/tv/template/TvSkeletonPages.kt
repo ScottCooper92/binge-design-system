@@ -91,7 +91,7 @@ fun TvImmersiveHubSkeleton(
                     ).height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
             )
         }
-        if (hosting == TvPageHosting.RailDestination) Spacer(Modifier.height(dimensionResource(TvR.dimen.tv_immersive_row_gap)))
+        if (hosting == TvPageHosting.Destination) Spacer(Modifier.height(dimensionResource(TvR.dimen.tv_immersive_row_gap)))
         // Measured at their own height and clipped by the screen: a loaded hub's rows run off the bottom, and a row
         // squeezed into what is left would draw its heading over its cards.
         Column(

@@ -19,7 +19,3 @@ data class TvNavItem(
     val avatarUrl: String? = null,
     val badge: NavSuiteBadge = NavSuiteBadge.None,
 )
-
-/** The name [TvNavItem] had while a navigation rail drew it. */
-@Deprecated("Renamed: the item is the top bar's, not a rail's.", ReplaceWith("TvNavItem", "com.binge.designsystem.tv.nav.TvNavItem"))
-typealias TvNavRailItem = TvNavItem

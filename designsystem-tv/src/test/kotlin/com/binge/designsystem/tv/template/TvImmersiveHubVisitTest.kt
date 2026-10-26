@@ -152,7 +152,7 @@ class TvImmersiveHubVisitTest {
                                 } else {
                                     null
                                 },
-                            hosting = TvPageHosting.RailDestination,
+                            hosting = TvPageHosting.Destination,
                             onHeroVisible = { visible += "hero" },
                             onRowVisible = { visible += it },
                             onItemTapped = { row, index -> tapped += row to index },

@@ -70,7 +70,7 @@ class TvDetailActionRowEntryTest {
         composeTestRule.onNode(hasText("Play") and isFocusable()).assertIsFocused()
     }
 
-    private fun setPage(hosting: TvPageHosting = TvPageHosting.RailDestination, withRail: Boolean = true) {
+    private fun setPage(hosting: TvPageHosting = TvPageHosting.Destination, withRail: Boolean = true) {
         composeTestRule.setContent {
             BingeTvTheme {
                 focusManager = LocalFocusManager.current
