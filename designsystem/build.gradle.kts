@@ -56,6 +56,7 @@ android {
                 implementation(project.dependencies.platform(libs.compose.bom))
                 implementation(libs.compose.ui.tooling)
                 implementation(libs.screenshot.validation.api)
+                implementation(project.files(layout.buildDirectory.file("intermediates/compile_and_runtime_r_class_jar/debugScreenshotTest/processDebugScreenshotTestResources/R.jar")))
             }
         }
         // The fold and window tests drive Robolectric on the JVM against components built out of
