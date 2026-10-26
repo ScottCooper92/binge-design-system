@@ -137,6 +137,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun selectedTickBadgeLarge() = Frame { TvSelectedTickBadgeLargeSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun qrCode() = Frame { TvQrCodeSample() }
 
     @PreviewTest

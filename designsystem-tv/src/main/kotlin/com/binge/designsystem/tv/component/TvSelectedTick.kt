@@ -1,5 +1,6 @@
 package com.binge.designsystem.tv.component
 
+import androidx.annotation.DimenRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -71,12 +72,15 @@ fun TvExcludedMark(tint: Color, modifier: Modifier = Modifier) {
  * Takes no tint. The disc is the TV style's focus fill and the glyph its focus content colour, so the badge is the
  * accent under `TvStyle.Accent` and white on black under `TvStyle.Monochrome`. Either pair stays legible over any
  * artwork, so there is no decision to hand the caller.
+ *
+ * [size] is [TvSelectedTickBadgeSize.Standard] for a tile in a grid. Use [TvSelectedTickBadgeSize.Large] on a
+ * large card that is read from across the room.
  */
 @Composable
-fun TvSelectedTickBadge(modifier: Modifier = Modifier) {
+fun TvSelectedTickBadge(modifier: Modifier = Modifier, size: TvSelectedTickBadgeSize = TvSelectedTickBadgeSize.Standard) {
     Box(
         modifier = modifier
-            .size(dimensionResource(TvR.dimen.tv_selected_tick_size))
+            .size(dimensionResource(size.discSize))
             .background(color = MaterialTheme.tvStyle.focusContainer, shape = CircleShape),
         contentAlignment = Alignment.Center,
     ) {
@@ -84,9 +88,21 @@ fun TvSelectedTickBadge(modifier: Modifier = Modifier) {
             imageVector = Icons.Filled.Check,
             contentDescription = null,
             tint = MaterialTheme.tvStyle.onFocusContainer,
-            modifier = Modifier.size(dimensionResource(TvR.dimen.tv_selected_tick_glyph_size)),
+            modifier = Modifier.size(dimensionResource(size.glyphSize)),
         )
     }
+}
+
+/** The sizes of [TvSelectedTickBadge]: the disc and the tick inside it. */
+enum class TvSelectedTickBadgeSize(
+    @param:DimenRes internal val discSize: Int,
+    @param:DimenRes internal val glyphSize: Int,
+) {
+    /** The tile size, the same disc as [TvSelectedTick]. */
+    Standard(TvR.dimen.tv_selected_tick_size, TvR.dimen.tv_selected_tick_glyph_size),
+
+    /** For a large card, such as a full-height choice card, where the standard badge is too small to read. */
+    Large(TvR.dimen.tv_selected_tick_badge_large_size, TvR.dimen.tv_selected_tick_badge_large_glyph_size),
 }
 
 /**
