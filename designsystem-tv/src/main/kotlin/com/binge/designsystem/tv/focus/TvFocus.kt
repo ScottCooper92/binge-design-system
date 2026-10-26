@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.theme.tvStyle
-import androidx.compose.ui.semantics.onClick as semanticsOnClick
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -163,7 +162,10 @@ fun Modifier.tvFocusTarget(onFocusChanged: (Boolean) -> Unit): Modifier =
  *
  * A **disabled** control stays focusable but inert: `clickable(enabled = false)` drops focusability
  * too, which on a D-pad turns ↓ into a dead end rather than landing on a control that isn't ready yet.
- * So disabled falls back to a bare `focusable()`.
+ * So the `clickable` stays enabled whatever [enabled] says, and [enabled] gates [onClick] and marks the
+ * semantics disabled. That keeps **one** focus node across a change of [enabled]: swapping `clickable` for
+ * a separate `focusable()` would replace the node, and a control that goes inert while it holds focus (a
+ * Retry whose request is now in flight) would throw focus out of the page.
  *
  * [role] is what a screen reader announces the control as. It defaults to none, because a tile or a card has no
  * one answer; a control that acts like a button passes [Role.Button]. A disabled control keeps its role and is
@@ -186,25 +188,16 @@ fun Modifier.tvClickable(
 ): Modifier =
     this
         .onFocusChanged { onFocusChanged(it.isFocused) }
-        .then(
-            if (enabled) {
-                // No indication: every TV component draws its own focus, and the default one is a square over the bounds (#839).
-                Modifier.clickable(
-                    interactionSource = null,
-                    indication = null,
-                    role = role,
-                    onClickLabel = onClickLabel,
-                    onClick = onClick,
-                )
-            } else {
-                // Still focusable, so it must say it is unavailable: focusable() alone announces an enabled control.
-                Modifier.focusable().semantics {
-                    if (role != null) this.role = role
-                    if (onClickLabel != null) semanticsOnClick(label = onClickLabel, action = null)
-                    disabled()
-                }
-            },
+        // No indication: every TV component draws its own focus, and the default one is a square over the bounds (#839).
+        .clickable(
+            interactionSource = null,
+            indication = null,
+            role = role,
+            onClickLabel = onClickLabel,
+            onClick = { if (enabled) onClick() },
         )
+        // An enabled clickable announces an enabled control, so a disabled one must say it is unavailable.
+        .semantics { if (!enabled) disabled() }
 
 /**
  * Marks a row/grid as one focus unit so the D-pad restores the child that last held focus instead of snapping
