@@ -51,6 +51,7 @@ import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvSectionTitle
 import com.binge.designsystem.tv.component.TvSelectedTick
 import com.binge.designsystem.tv.component.TvSelectedTickBadge
+import com.binge.designsystem.tv.component.TvSelectedTickBadgeSize
 import com.binge.designsystem.tv.component.TvSideSheetConfirm
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetRow
@@ -399,6 +400,14 @@ fun TvSelectedTickSample() {
         TvSelectedTick(tint = MaterialTheme.colorScheme.primary)
         TvExcludedMark(tint = MaterialTheme.colorScheme.onSurfaceVariant)
         TvSelectedTickBadge()
+    }
+}
+
+/** The large selected-tick badge, for a big card read from across the room. */
+@Composable
+fun TvSelectedTickBadgeLargeSample() {
+    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
+        TvSelectedTickBadge(size = TvSelectedTickBadgeSize.Large)
     }
 }
 

@@ -41,6 +41,9 @@
     <!-- Selected tick -->
     <dimen name="tv_selected_tick_size">24dp</dimen>
     <dimen name="tv_selected_tick_glyph_size">16dp</dimen>
+    <!-- The large selected-tick badge, for a big card read from across the room. -->
+    <dimen name="tv_selected_tick_badge_large_size">44dp</dimen>
+    <dimen name="tv_selected_tick_badge_large_glyph_size">22dp</dimen>
     <!-- Message plate and illustration -->
     <dimen name="tv_message_plate_max_width">520dp</dimen>
     <dimen name="tv_pairing_qr_size">200dp</dimen>
