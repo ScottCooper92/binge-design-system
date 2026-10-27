@@ -1,5 +1,7 @@
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -113,5 +115,49 @@ fun MediaCardStatusSample() {
             status = MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive),
             modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
         )
+    }
+}
+
+/** A title the user is part-way through: the bar along the poster's bottom edge says how far, here 40%. */
+@Composable
+fun MediaCardProgressSample() {
+    ScreenshotTheme {
+        MediaCard(
+            posterUrl = null,
+            title = "Arrival",
+            rating = 7.9f,
+            onClick = {},
+            progress = 0.4f,
+            modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+        )
+    }
+}
+
+/**
+ * A series card that opens one episode: the title keeps one line and the episode takes the second, so the caption
+ * stays the height of a plain card's. One with a bar is part-way through that episode; one without is the next to watch.
+ */
+@Composable
+fun MediaCardEpisodeSample() {
+    ScreenshotTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            MediaCard(
+                posterUrl = null,
+                title = "Severance",
+                rating = 8.7f,
+                onClick = {},
+                progress = 0.7f,
+                subtitle = "S2 E4",
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+            MediaCard(
+                posterUrl = null,
+                title = "A Very Long Series Title That Should Truncate",
+                rating = null,
+                onClick = {},
+                subtitle = "S2 E5",
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+        }
     }
 }
