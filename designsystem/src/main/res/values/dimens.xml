@@ -208,6 +208,8 @@
     <dimen name="card_title_padding_h">8dp</dimen>
     <dimen name="card_title_padding_v">6dp</dimen>
     <dimen name="card_rating_padding">8dp</dimen>
+    <!-- How far into a title the user is: a bar inset from the poster's bottom edge by card_rating_padding. -->
+    <dimen name="card_progress_height">4dp</dimen>
     <!-- Optional top-end contextual action on a poster card (Library mark-watched / remove). The 40dp
          box is the real tap target; the glyph sits smaller inside its scrim-backed circle. -->
     <dimen name="card_action_button_size">40dp</dimen>

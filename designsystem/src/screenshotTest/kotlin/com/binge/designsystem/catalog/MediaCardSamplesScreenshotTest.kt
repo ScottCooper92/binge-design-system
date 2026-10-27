@@ -54,4 +54,20 @@ class MediaCardSamplesScreenshotTest {
     fun Status() {
         MediaCardStatusSample()
     }
+
+    @PreviewTest
+    @Preview(name = "progress", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "progress-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun Progress() {
+        MediaCardProgressSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "episode", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "episode-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun Episode() {
+        MediaCardEpisodeSample()
+    }
 }

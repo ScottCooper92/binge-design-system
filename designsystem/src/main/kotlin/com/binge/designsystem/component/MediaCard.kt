@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -33,7 +35,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import coil3.compose.SubcomposeAsyncImage
@@ -60,6 +65,8 @@ fun MediaCard(
     typeBadge: MediaTypeTagType? = null,
     userRating: Float? = null,
     status: MediaCardStatus? = null,
+    progress: Float? = null,
+    subtitle: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -118,10 +125,39 @@ fun MediaCard(
                     typeBadge = typeBadge,
                     status = status,
                     topEndAction = topEndAction,
+                    liftChips = progress != null,
                 )
+                if (progress != null) {
+                    MediaCardProgress(progress = progress, modifier = Modifier.align(Alignment.BottomCenter))
+                }
             }
         }
-        MediaCardTitle(title)
+        if (subtitle == null) MediaCardTitle(title) else MediaCardTitle(title, subtitle)
+    }
+}
+
+/**
+ * How far into the title the user is, as a pill inset from the poster's bottom edge, clear of its rounded corners.
+ * [progress] is clamped to 0..1. It reports itself as a progress bar, so a screen reader says how far along the title is.
+ */
+@Composable
+private fun MediaCardProgress(progress: Float, modifier: Modifier = Modifier) {
+    val fraction = progress.coerceIn(0f, 1f)
+    Box(
+        modifier = modifier
+            .padding(dimensionResource(R.dimen.card_rating_padding))
+            .fillMaxWidth()
+            .height(dimensionResource(R.dimen.card_progress_height))
+            .clip(BingeShapes.Pill)
+            .background(BingeTheme.colors.onScrim.copy(alpha = PROGRESS_TRACK_ALPHA))
+            .semantics { progressBarRangeInfo = ProgressBarRangeInfo(fraction, 0f..1f) },
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(fraction)
+                .fillMaxHeight()
+                .background(MaterialTheme.colorScheme.primary),
+        )
     }
 }
 
@@ -147,6 +183,38 @@ private fun MediaCardTitle(title: String) {
                 vertical = dimensionResource(R.dimen.card_title_padding_v),
             ),
     )
+}
+
+/**
+ * The caption with a second line under the title, such as the episode a card opens: the title and [subtitle] take a
+ * line each, so the band keeps the two-line height of a plain caption.
+ */
+@Composable
+private fun MediaCardTitle(title: String, subtitle: String) {
+    val style = MaterialTheme.typography.bodySmall
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = dimensionResource(R.dimen.card_title_padding_h),
+                vertical = dimensionResource(R.dimen.card_title_padding_v),
+            ),
+    ) {
+        Text(
+            text = title,
+            style = style.copy(fontWeight = FontWeight.Medium),
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = subtitle,
+            style = style,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 /**
@@ -185,14 +253,25 @@ private fun MediaCardOverlays(
     typeBadge: MediaTypeTagType?,
     status: MediaCardStatus?,
     topEndAction: MediaCardAction?,
+    liftChips: Boolean,
 ) {
     val badgeInset = dimensionResource(R.dimen.card_badge_inset)
+    // Over a progress bar the rating chips sit just above it rather than on it.
+    val chipLift =
+        if (liftChips) {
+            Modifier.padding(
+                bottom = dimensionResource(R.dimen.card_progress_height) + dimensionResource(R.dimen.padding_xs),
+            )
+        } else {
+            Modifier
+        }
     Box(modifier = Modifier.fillMaxSize()) {
         if (rating != null) {
             RatingChip(
                 rating = rating,
                 modifier = Modifier
                     .align(Alignment.BottomStart)
+                    .then(chipLift)
                     .padding(dimensionResource(R.dimen.card_rating_padding)),
             )
         }
@@ -202,6 +281,7 @@ private fun MediaCardOverlays(
                 tone = RatingChipTone.Accent,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
+                    .then(chipLift)
                     .padding(dimensionResource(R.dimen.card_rating_padding)),
             )
         }
@@ -260,3 +340,4 @@ private fun MediaCardActionButton(action: MediaCardAction, modifier: Modifier = 
 }
 
 private const val ACTION_SCRIM_ALPHA = 0.65f
+private const val PROGRESS_TRACK_ALPHA = 0.35f
