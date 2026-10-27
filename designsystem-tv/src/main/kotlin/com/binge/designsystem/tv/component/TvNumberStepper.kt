@@ -47,7 +47,7 @@ import com.binge.designsystem.tv.R as TvR
  * [onValueChange]. [step] must be positive. [initiallyFocused] seeds the lit state for a frame; production passes false.
  */
 @Composable
-internal fun TvNumberStepper(
+fun TvNumberStepper(
     value: Int,
     onValueChange: (Int) -> Unit,
     range: IntRange,
