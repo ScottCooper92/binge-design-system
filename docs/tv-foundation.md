@@ -58,7 +58,7 @@ are the frame wait, so a caller does not re-derive it.
 
 Bound any such wait. Prefer wall-clock time: `withFrameNanos` resumes only on frames the app
 actually draws, so a frame budget against a static screen never expires. The startup handoff to
-content counts frames instead, and stops early once focus is taken or the rail is yielded to.
+content counts frames instead, and stops early once focus is taken or the user moves up to the top bar.
 
 ## The accent model: the accent is focus, a tick is selection
 

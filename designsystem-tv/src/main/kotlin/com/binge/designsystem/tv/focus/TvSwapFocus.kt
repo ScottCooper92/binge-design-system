@@ -12,7 +12,7 @@ import androidx.compose.ui.focus.FocusRequester
 /**
  * Re-claims focus after **this press** swaps the focused subtree out from under itself — sign-in mints a confirm
  * button, confirm/sign-out swaps in the other signed state, Back rebuilds the home destination. Compose's
- * focus-recovery search otherwise lands on the nav rail; the fix each time was the same
+ * focus-recovery search otherwise lands on the shell's top bar; the fix each time was the same
  * arm-a-latch-then-refocus dance, hand-copied across two files.
  *
  * The latch is **armed by the action**, not by mount or by the state change itself. That is load-bearing: a
@@ -54,8 +54,8 @@ fun rememberTvSwapFocus(): TvSwapFocus {
 
 /**
  * A swap-focus holder that drives an **existing** [requester] rather than minting its own — for a replacement
- * control whose requester is owned elsewhere (the shell's rail requester, aimed by the rail itself as well as
- * by the go-home swap).
+ * control whose requester is owned elsewhere (a requester the shell owns and aims itself, as well as
+ * through the go-home swap).
  */
 @Composable
 fun rememberTvSwapFocus(requester: FocusRequester): TvSwapFocus = remember(requester) { TvSwapFocus(requester) }

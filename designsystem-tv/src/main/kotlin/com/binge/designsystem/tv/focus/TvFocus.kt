@@ -307,8 +307,8 @@ suspend fun offerTvArrivalFocus(target: FocusRequester, taken: () -> Boolean) {
 }
 
 /**
- * The shell's drill-down budgets (TvNavRailFocus), restated here because those are internal to the
- * nav package's callers: a frame count to ride "retry when the content changes", a time cap so a
+ * The shell's drill-down budgets (its `offerFocusToContent`), restated here because the shell lives in the
+ * host app, not in this module: a frame count to ride "retry when the content changes", a time cap so a
  * static destination cannot keep the loop alive past its window.
  */
 private const val FOCUS_OFFER_FRAMES = 600
@@ -350,8 +350,8 @@ suspend fun restoreTvOverlayFocus(target: FocusRequester): Boolean {
  * One focus unit whose **entry is routed to the selected child** rather than left to a directional search.
  *
  * For a surface where **focus is the commit** — moving onto a thing selects it, no OK — as a tab row does. There an unrouted entry is not cosmetic: the geometric search picks
- * whatever child sits nearest the beam, and arriving there *is* a selection change (the rail recorded it first —
- * "merely opening the menu navigated the user somewhere they hadn't asked to go"; since re-fixed on the tab row). This exists to stop the rediscovery.
+ * whatever child sits nearest the beam, and arriving there *is* a selection change (the bug this was written for —
+ * "merely opening the menu navigated the user somewhere they hadn't asked to go"). This exists to stop the rediscovery.
  *
  * Not [tvFocusGroup]: `focusRestorer` has nothing saved until the group has held focus once, the first-entry
  * case that breaks — and it is less correct even afterwards, since when focus is the commit the selected child
@@ -376,7 +376,7 @@ fun Modifier.tvSelectionFocusGroup(selected: FocusRequester): Modifier =
  *
  * Applied conditionally rather than to a fixed child so it **follows the selection** — entry always lands on what
  * is currently on screen rather than on whatever was selected when the group was composed. Safe against fighting
- * the user for the reason the rail records: on these surfaces the selection only ever moves *because* focus moved,
+ * the user for the reason [tvSelectionFocusGroup] records: on these surfaces the selection only ever moves *because* focus moved,
  * and `onEnter` does not fire for moves within the group.
  */
 fun Modifier.tvSelectionTarget(isSelected: Boolean, selected: FocusRequester): Modifier =

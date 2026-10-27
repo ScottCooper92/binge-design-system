@@ -325,7 +325,10 @@ fun TvImmersiveGridSample() {
     SampleGrid()
 }
 
-/** The grid as an overlay, how a see-all page is shown: no rail beside it, so the copy starts at the overscan margin with the heading and cards. */
+/**
+ * The grid as an overlay, how a see-all page is shown: no start inset to clear, so the copy starts at the overscan margin
+ * with the heading and cards.
+ */
 @Composable
 fun TvImmersiveGridOverlaySample() {
     SampleGrid(asOverlay = true)
@@ -343,7 +346,7 @@ fun TvImmersiveGridFocusedSample() {
     SampleGrid(initialFocusedIndex = GRID_FOCUSED_INDEX)
 }
 
-/** A grid of [content], rail-hosted, with the sample cells and the given heading controls and message. */
+/** A grid of [content], hosted as a shell destination, with the sample cells and the given heading controls and message. */
 @Composable
 private fun SampleStateGrid(
     content: TvImmersiveGridContent<SampleTitle>,

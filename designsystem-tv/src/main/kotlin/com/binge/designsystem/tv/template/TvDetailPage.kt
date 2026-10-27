@@ -58,7 +58,7 @@ import com.binge.designsystem.tv.R as TvR
  * [entryFocus] rides the list as a [tvEntryFocusGroup] target: focus entering the group is routed to wherever
  * the caller attached the requester — the action row — instead of a geometric pick. A page is a template like
  * [TvBoard]: [hosting] decides who places first focus. As an overlay (how a detail page is shown) it claims focus
- * itself, once, on arrival; in a rail destination the shell offers it.
+ * itself, once, on arrival; in a shell destination the shell offers it.
  *
  * A caller that owns the arrival places it itself: pass its [pageArrival] and the page aims that requester at the list and
  * reports subtree focus into it, but does not claim focus on its own. [respectTopInset] false drops [LocalTvTopInset] from
@@ -95,7 +95,7 @@ fun TvDetailPage(
     // section rather than presenting the page back at rest.
     var focusedSectionKey by rememberSaveable { mutableStateOf(initialFocusedSectionKey) }
     // The focused cell within the section — an anchor re-key only, so a focus return that changes no
-    // section (a sheet round trip, a rail round trip) still re-asserts the rest position.
+    // section (a sheet round trip, a round trip to the top bar) still re-asserts the rest position.
     var focusedItemKey by remember { mutableStateOf<Any?>(null) }
     // Where an arriving focus lands, following the browse like the hub's entry slot follows its rows: the remembered section's
     // wrapper once the user has left the band, the caller's action row before. It rides the wrapper with a focusGroup to delegate
@@ -130,7 +130,7 @@ fun TvDetailPage(
     // target (a bare wrapper delegation could land on the synopsis). Below it, the remembered section.
     val rememberedSectionKey = focusedSectionKey?.takeIf { entries.indexOfKeyOrZero(it) != 0 }
     val entryTarget = if (rememberedSectionKey != null) sectionEntry else entryFocus
-    // A page that is not a rail destination places its own first focus. The claim aims at the list node, a target that
+    // A page that is not a shell destination places its own first focus. The claim aims at the list node, a target that
     // does not move as the user browses, and the entry group routes it on — to the action row on a fresh page, to the
     // remembered section once the user has been below it.
     val ownArrival = pageArrival == null

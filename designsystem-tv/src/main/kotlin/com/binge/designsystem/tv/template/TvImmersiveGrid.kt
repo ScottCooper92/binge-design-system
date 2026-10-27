@@ -354,7 +354,7 @@ fun <T : Any> TvImmersiveGrid(
 }
 
 /**
- * The heading's band, as tall as the rail's header line. With a [band] or a [trailingAction] the heading is capped,
+ * The heading's band, as tall as [TvScreenHeading]'s. With a [band] or a [trailingAction] the heading is capped,
  * the band takes what is left, and the action keeps its own width, so neither a long heading nor a long band can
  * push the action off the edge.
  */

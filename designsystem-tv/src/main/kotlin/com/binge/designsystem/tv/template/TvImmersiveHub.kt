@@ -98,7 +98,7 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
  * holds its place, unfocusable, until its items arrive. An empty row with a [TvHubRow.failure] keeps its slot too, and says
  * why in place of its cards, with a retry that is the row's one focus stop.
  *
- * A page template, like [TvBoard]: [hosting] decides who places first focus on it — in a rail destination the
+ * A page template, like [TvBoard]: [hosting] decides who places first focus on it — in a shell destination the
  * shell offers focus and the hub only routes it to the hero or first row, as an overlay it claims focus itself
  * once it has something to hold it. [entryFocusRequester] is the requester that arrival aims at, for a caller
  * that needs to aim it elsewhere (back onto the hub when a page opened from it closes).
@@ -210,7 +210,7 @@ fun <T : Any> TvImmersiveHub(
                 listState.animateScrollToItem(scrollTarget, scrollOffset)
             }
         }
-    // Without a hero, entry from outside (the rail) lands on the first row.
+    // Without a hero, entry from outside (the top bar) lands on the first row.
     val effectiveEntryKey =
         entryRowKey ?: if (hasHero) null else visibleRows.firstOrNull { it.items.isNotEmpty() || it.failure != null }?.key
 

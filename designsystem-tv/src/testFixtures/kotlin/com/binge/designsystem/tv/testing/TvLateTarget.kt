@@ -30,7 +30,7 @@ const val TV_LATE_TARGET_SIBLING_TAG = "tv-late-target-sibling"
  * requester resolves to, so delaying *composition* of [content] — rather than merely its focus attachment —
  * is the most adverse schedule that retry loop can be asked to survive: the requester has nothing to attach to
  * at all until the delay elapses. [delayFrames] is a frame count, not a duration, matching the production
- * loops it exercises (see `TvNavRailFocus.kt`'s header comment).
+ * loops it exercises (see the comment on `TvFocus.kt`'s `FOCUS_OFFER_FRAMES` budget).
  *
  * `dispose` is a caller-driven `Boolean` rather than an internal timer so a test can hold it with
  * `mainClock.autoAdvance = false` and step frames between the flip and the delayed composition — the ordering

@@ -69,7 +69,7 @@ annotation class TvPreviews
 annotation class TvWorstCaseFontPreviews
 
 /**
- * [TvPreviews] under a right-to-left locale (`ar`), for a frame that checks a layout mirrors: a rail on the right edge,
+ * [TvPreviews] under a right-to-left locale (`ar`), for a frame that checks a layout mirrors: the start inset on the right edge,
  * arrows and chevrons flipped. A real locale rather than a pseudolocale, because the screenshot renderer does not apply
  * the latter. A single cell, as [TvPreviews] is; put it on a component or a screen whose start edge matters.
  */

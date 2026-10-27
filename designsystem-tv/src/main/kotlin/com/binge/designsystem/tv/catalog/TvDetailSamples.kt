@@ -63,7 +63,7 @@ private val SampleHeroItem =
 /** A title the data says little about: no synopsis, no facts and no certification. */
 private val BareHeroItem = TvDetailHeroItem(title = "A title with nothing else known", overline = "Movie")
 
-/** Stands a page in for an overlay above the rail: nothing is cleared beside it, so every edge takes the overscan. */
+/** Stands a page in for an overlay above the shell: nothing is cleared beside it, so every edge takes the overscan. */
 @Composable
 private fun OverlayHosted(topInset: Dp = Dp.Hairline, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalTvHostedAsOverlay provides true, LocalTvTopInset provides topInset, content = content)

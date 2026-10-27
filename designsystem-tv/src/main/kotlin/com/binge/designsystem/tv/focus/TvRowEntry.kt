@@ -38,7 +38,7 @@ import androidx.compose.ui.focus.focusRequester
  * The remembered index rides [rememberSaveable], which the enclosing `LazyColumn` item's `SaveableStateProvider`
  * preserves across the scroll-out disposal that wipes a plain `remember` (the failure a plain row first hit). So
  * the memory is **caller-transparent**: a row inside a lazy column restores itself with no id threaded through
- * the screen. A caller that must steer entry across containers — a hub, entered from the nav rail rather than
+ * the screen. A caller that must steer entry across containers — a hub, entered from the top bar rather than
  * by scrolling — passes [rememberTvRowEntry]'s `overrideIndex` instead.
  *
  * Three lines of wiring, all required (a requester with no attached node does not throw — it warns and returns
