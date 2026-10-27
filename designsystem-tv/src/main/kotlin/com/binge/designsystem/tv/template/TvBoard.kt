@@ -24,7 +24,7 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * A TV page's frame: the theme background, the overscan-safe insets [hosting] calls for, an optional
- * [TvScreenHeading] on the rail's top line, and [content] below it.
+ * [TvScreenHeading] on the page's top line, and [content] below it.
  *
  * The frame every board, list and form page sits in, so none of them hand-roll the padding and background.
  * [entry] is where focus lands when it enters the page; whether the page also claims it is [hosting]'s call
@@ -56,7 +56,7 @@ fun TvBoard(
 }
 
 /**
- * A page's title, in a band as tall as the rail's header line so the two share a centre line. [trailingContent] sits
+ * A page's title, in a band of the same height on every page so titles share a line. [trailingContent] sits
  * at the band's end, unweighted, so an action there is never squeezed out by a long title.
  */
 @Composable

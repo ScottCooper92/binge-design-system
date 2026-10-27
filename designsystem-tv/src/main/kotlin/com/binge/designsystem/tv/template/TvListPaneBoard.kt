@@ -243,7 +243,7 @@ internal fun TvPaneList(
                     // Outside the group, so it observes the group itself: focused while any row holds focus.
                     .onFocusChanged { columnHasFocus = it.hasFocus }
                     // Routes focus as it enters rather than requesting it on mount, so it never takes focus from a
-                    // rail that still holds it. It is also what sends ← from an option back to the described row.
+                    // top bar that still holds it. It is also what sends ← from an option back to the described row.
                     .focusProperties {
                         onEnter = { runCatching { describedRowFocus.requestFocus() } }
                         onExit = {

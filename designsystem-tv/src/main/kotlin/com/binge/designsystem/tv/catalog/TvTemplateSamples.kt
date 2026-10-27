@@ -116,7 +116,7 @@ fun TvTwoPanePageFormSample() {
     )
 }
 
-/** A rail destination's list beside what its focused row describes, under the page title. */
+/** A shell destination's list beside what its focused row describes, under the page title. */
 @Composable
 fun TvTwoPanePageListDetailSample() {
     InsetHosted {
@@ -317,7 +317,7 @@ fun TvStepFlowChromeOverContentSample() {
     }
 }
 
-/** A rail destination's board: the rail cleared, its title on the rail's header line, the content below. */
+/** A shell destination's board: the host's start inset cleared, its title in the heading band, the content below. */
 @Composable
 fun TvBoardSample() {
     InsetHosted {
@@ -334,7 +334,7 @@ fun TvBoardSample() {
     }
 }
 
-/** The same frame pushed as an overlay: no rail beside it, so every edge takes the overscan margin. */
+/** The same frame pushed as an overlay: no start inset to clear, so every edge takes the overscan margin. */
 @Composable
 fun TvBoardOverlaySample() {
     TvBoard(title = "Watch providers", hosting = TvPageHosting.Overlay) {

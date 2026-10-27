@@ -16,7 +16,7 @@ import androidx.compose.ui.focus.FocusRequester
  *
  * That four-step latch is easy to copy-paste per screen. It
  * exists because acting inline loses the disposal race — an inline `restoreTvOverlayFocus` fires while the
- * focus-trapped overlay is still composed and is swallowed, the "focus falls to the rail" class. Each
+ * focus-trapped overlay is still composed and is swallowed, the "focus falls to the shell" class. Each
  * copy is another place to forget a teardown path, or to leave a latch armed to fire a stale request later.
  * This is that latch, once.
  *

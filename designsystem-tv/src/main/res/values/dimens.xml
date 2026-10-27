@@ -57,7 +57,7 @@
     <dimen name="tv_search_field_icon">24dp</dimen>
     <dimen name="tv_illustration_plate">128dp</dimen>
     <dimen name="tv_illustration_icon">64dp</dimen>
-    <!-- Page templates. The heading band matches the rail header's avatar line (avatar plus its padding). -->
+    <!-- Page templates. The band a page's title sits in, the same height on every page so titles share a line. -->
     <dimen name="tv_screen_heading_height">52dp</dimen>
     <!-- An immersive grid's heading when controls share its row: capped, so the controls keep their room. -->
     <dimen name="tv_immersive_grid_heading_max_width">320dp</dimen>

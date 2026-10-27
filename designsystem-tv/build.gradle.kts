@@ -11,7 +11,7 @@ plugins {
 /**
  * The design system's television layer: the tv-material components and the focus units a companion's TV
  * surface is built from — the theme projected from the same tokens as the phone theme, the focus groups and
- * indicator, the navigation rail shell, the button, the card row, the message plate, and the preview matrix.
+ * indicator, the shell's top bar, the button, the card row, the message plate, and the preview matrix.
  *
  * A module of its own rather than more of `:designsystem` because Material 3 and tv-material must not be
  * mixed: they ship separate `MaterialTheme` trees, and the wrong import compiles cleanly and renders subtly

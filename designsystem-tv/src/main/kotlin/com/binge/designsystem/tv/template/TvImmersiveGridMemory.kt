@@ -67,7 +67,7 @@ internal fun ResetScrollWhenStale(
 
 /**
  * Keeps focus in the grid's body when the body is swapped for another state, such as cells replaced by a message.
- * The old body leaves with the focus it held, so focus would otherwise fall to the rail. Returns the callback the
+ * The old body leaves with the focus it held, so focus would otherwise fall out of the grid. Returns the callback the
  * body reports its focus through.
  */
 @Composable

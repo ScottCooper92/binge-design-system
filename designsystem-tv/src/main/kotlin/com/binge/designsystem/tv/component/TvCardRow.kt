@@ -97,9 +97,9 @@ fun <T> TvCardRow(
     // scroll-out disposal). Seed the row state to it so it is laid out before entry arrives.
     val entry = rememberTvRowEntry(if (trailingContent != null) trailingIndex + 1 else trailingIndex, overrideIndex = overrideIndex)
     val rowState = rememberLazyListState(initialFirstVisibleItemIndex = entry.entryIndex)
-    // Start is the in-pane content gutter (inset + gutter under the overlay rail), end the panel's overscan.
-    // The row is full panel width, so cells scrolled off the front pass *under* the rail rather than clipping
-    // at its edge, while the first cell rests on the gutter exactly as before.
+    // Start is the in-pane content gutter (the host's start inset, LocalTvContentInset, plus the gutter), end the panel's
+    // overscan. The row is full panel width, so cells scrolled off the front pass *under* the host's start-edge chrome
+    // rather than clipping at the inset, while the first cell rests on the gutter exactly as before.
     val rowPadding = PaddingValues(
         start = tvContentGutterStart(),
         end = dimensionResource(TvR.dimen.tv_overscan_horizontal),

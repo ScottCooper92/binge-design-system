@@ -10,9 +10,10 @@ import androidx.compose.ui.unit.dp
  * `true`; everywhere else it defaults to `false`.
  *
  * It exists because a single route/entry can be hosted **both** ways depending on how it was reached — e.g.
- * a page is in-pane when selected from the rail, but an overlay when pushed from another screen — so only the host can say which, not the content. Boards read it to choose their
- * overscan: in-pane the rail already offsets the start edge, but an overlay is panel-edge-to-panel-edge and
- * must carry overscan itself.
+ * a page is in-pane when selected from the shell's top bar, but an overlay when pushed from another screen — so only
+ * the host can say which, not the content. Boards read it to choose their overscan: in-pane the host's start inset
+ * ([LocalTvContentInset]) already offsets the start edge, but an overlay is panel-edge-to-panel-edge and must carry
+ * overscan itself.
  *
  * A screen that is *always* overlay-hosted (a picker that is only ever pushed) passes its board `hostedAsOverlay = true`
  * explicitly, so its screenshot renders the real state without the host present; a dual-hosted board omits
