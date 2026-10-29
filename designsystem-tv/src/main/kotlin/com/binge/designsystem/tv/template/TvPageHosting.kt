@@ -76,7 +76,8 @@ internal fun tvPageArrival(
         TvPageHosting.Overlay -> {
             // A tab's page is entered from its tab, so it claims no focus of its own: that would pull focus off the tab.
             if (LocalTvTabHosted.current) return Modifier.tvEntryFocusGroup(entry)
-            val arrival = remember(entry, key) { TvArrivalFocus(entry) }
+            // The page group is already composed when the key changes, so its observer does not report again for the new holder.
+            val arrival = remember(entry, key) { TvArrivalFocus(entry).also { it.attached = true } }
             TvArrivalFocusEffect(arrival, enabled)
             Modifier.tvArrivalObserver(arrival).tvEntryFocusGroup(entry)
         }
