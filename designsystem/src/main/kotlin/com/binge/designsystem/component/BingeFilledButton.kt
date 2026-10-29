@@ -26,6 +26,9 @@ import com.binge.designsystem.theme.BingeShapes
  * something irreversible. It chooses the [colors] default rather than being read separately, so an
  * explicit [colors] still wins and a caller that already passes one renders exactly as before.
  *
+ * While [loading] the button shows a spinner and swallows taps, so an in-flight action cannot be re-triggered; set
+ * [tapsWhileLoading] for a button whose tap is not that action, such as one that opens a sheet that shows the loading itself.
+ *
  * The fill is the fixed amber, the same in both themes. Light `primary` is a darker amber tuned for
  * text, and as a large fill it reads muddy.
  */
@@ -37,6 +40,7 @@ fun BingeFilledButton(
     leadingIcon: ImageVector? = null,
     enabled: Boolean = true,
     loading: Boolean = false,
+    tapsWhileLoading: Boolean = false,
     destructive: Boolean = false,
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primaryFixedDim,
@@ -46,7 +50,7 @@ fun BingeFilledButton(
     Button(
         // Swallow taps while loading so the in-flight action can't be re-triggered,
         // without greying the button out (it stays filled with a spinner in place of the label).
-        onClick = { if (!loading) onClick() },
+        onClick = { if (!loading || tapsWhileLoading) onClick() },
         modifier = modifier.defaultMinSize(
             minWidth = ButtonDefaults.MinWidth,
             minHeight = dimensionResource(R.dimen.button_filled_height),
