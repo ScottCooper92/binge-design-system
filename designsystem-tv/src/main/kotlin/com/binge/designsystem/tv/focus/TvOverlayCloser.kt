@@ -40,11 +40,12 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
     val currentOnClose by rememberUpdatedState(onClose)
     LaunchedEffect(closing) {
         if (!closing) return@LaunchedEffect
-        // The trap is already released (see [TvOverlayCloser.trapping]), so a trap wired to it grants this at once. An overlay whose
-        // trap is not wired still refuses it, and the offer after the dispose is what lands.
-        val granted = restoreTo.tryRequestFocus()
+        // The trap is already released (see [TvOverlayCloser.trapping]), so a trap wired to it grants this at once. A grant while
+        // the overlay is still composed is not the restore, though: its disposal can hand focus elsewhere, so the offer after it
+        // always runs.
+        restoreTo.tryRequestFocus()
         currentOnClose()
-        if (!granted) restoreTvOverlayFocus(restoreTo)
+        restoreTvOverlayFocus(restoreTo)
         // Reset so the overlay can be opened and closed again — an un-reset latch stays armed and either never
         // re-fires (a stuck close) or fires a stale request on a later recomposition.
         closing = false
