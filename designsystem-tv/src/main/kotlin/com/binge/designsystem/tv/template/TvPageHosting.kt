@@ -3,7 +3,6 @@ package com.binge.designsystem.tv.template
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -31,7 +30,7 @@ enum class TvPageHosting {
      */
     Destination,
 
-    /** Full-screen above the shell. The page claims focus itself, every frame until it holds it. */
+    /** Full-screen above the shell. The page claims focus itself, with one request once its target has attached. */
     Overlay,
 
     /** Before the shell exists — onboarding, a gate. The page places first focus once it has laid out. */
@@ -77,9 +76,9 @@ internal fun tvPageArrival(
         TvPageHosting.Overlay -> {
             // A tab's page is entered from its tab, so it claims no focus of its own: that would pull focus off the tab.
             if (LocalTvTabHosted.current) return Modifier.tvEntryFocusGroup(entry)
-            val arrival = remember(entry, key) { TvArrivalFocus(entry) }
-            // The effect is keyed on `enabled` alone, so a new holder needs a fresh effect to be offered.
-            key(arrival) { TvArrivalFocusEffect(arrival, enabled) }
+            // The page group is already composed when the key changes, so its observer does not report again for the new holder.
+            val arrival = remember(entry, key) { TvArrivalFocus(entry).also { it.attached = true } }
+            TvArrivalFocusEffect(arrival, enabled)
             Modifier.tvArrivalObserver(arrival).tvEntryFocusGroup(entry)
         }
         TvPageHosting.PreShell -> {

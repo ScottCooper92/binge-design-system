@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -197,19 +198,19 @@ class TvArrivalFocusTest {
     }
 
     /**
-     * The offer claims focus **before** the outgoing screen disposes, which is the whole fix rather than a
+     * The arrival claims focus **before** the outgoing screen disposes, which is the whole fix rather than a
      * detail of it: once the surface holds focus the outgoing nodes are already unfocused when they go, so
-     * their geometric reassignment never runs. The device measurement this models is a disposal landing
-     * ~300 ms after the incoming screen mounts.
+     * their geometric reassignment never runs. The outgoing screen holds focus when the incoming one mounts,
+     * and its disposal lands a transition later.
      *
      * `autoAdvance = false` is what makes that orderable: the assertion sits *between* the mount and the
-     * disposal, so it fails for a mount-time single-shot request that lost the race rather than merely
-     * reporting where focus ended up. Running the clock forward lets the disposal land where the device
-     * puts it instead of at the next idle.
+     * disposal, so it fails for a request that waits for the disposal rather than merely reporting where focus
+     * ended up.
      */
     @Test
-    fun `the offer claims focus before a sibling disposes a transition later`() {
+    fun `the arrival claims focus while the outgoing screen still holds it, and keeps it when that screen disposes`() {
         var siblingPresent by mutableStateOf(true)
+        var incomingPresent by mutableStateOf(false)
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
             BingeTvTheme {
@@ -218,20 +219,153 @@ class TvArrivalFocusTest {
                     if (siblingPresent) {
                         Box(Modifier.testTag(SIBLING).size(80.dp).focusable())
                     }
-                    ArrivalContent()
+                    if (incomingPresent) ArrivalContent()
                 }
             }
         }
         composeTestRule.onNodeWithTag(SIBLING).requestFocus()
         repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.onNodeWithTag(SIBLING).assertIsFocused()
+
+        composeTestRule.runOnUiThread { incomingPresent = true }
+        repeat(PUMP_FRAMES) {
+            composeTestRule.mainClock.advanceTimeByFrame()
+            composeTestRule.waitForIdle()
+        }
 
         // Mid-transition: the outgoing screen is still composed and its node still exists.
+        composeTestRule.onNodeWithTag(SIBLING).assertExists()
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
 
         composeTestRule.mainClock.advanceTimeBy(DISPOSAL_DELAY_MS)
-        siblingPresent = false
+        composeTestRule.runOnIdle { siblingPresent = false }
         repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
 
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+    }
+
+    /**
+     * The arrival is one request. Once it has claimed focus and the user has moved on, the target attaching again
+     * (the same holder, the node composed out and back) does not claim it back.
+     */
+    @Test
+    fun `the arrival fires once, so a target that attaches again does not take focus back`() {
+        var targetPresent by mutableStateOf(true)
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.setContent {
+            BingeTvTheme {
+                Row {
+                    RailStandIn()
+                    val arrival = rememberTvArrivalFocus()
+                    TvArrivalFocusEffect(arrival)
+                    if (targetPresent) {
+                        Box(
+                            Modifier
+                                .testTag(CONTENT)
+                                .size(80.dp)
+                                .tvArrivalTarget(arrival)
+                                .focusable(),
+                        )
+                    }
+                }
+            }
+        }
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        targetPresent = false
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        targetPresent = true
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+        composeTestRule.onNodeWithTag(CONTENT).assertIsNotFocused()
+    }
+
+    /**
+     * A direction press by the user since the arrival composed cancels the request, so an arrival whose target
+     * attaches late never pulls focus back from where the user went (the bar, above all).
+     */
+    @Test
+    fun `a user move since the arrival cancels it`() {
+        val moves = TvUserMoves()
+        var enabled by mutableStateOf(false)
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.setContent {
+            CompositionLocalProvider(LocalTvUserMoves provides moves) {
+                BingeTvTheme {
+                    Row {
+                        RailStandIn()
+                        val arrival = rememberTvArrivalFocus()
+                        TvArrivalFocusEffect(arrival, enabled = enabled)
+                        Box(
+                            Modifier
+                                .testTag(CONTENT)
+                                .size(80.dp)
+                                .tvArrivalTarget(arrival)
+                                .focusable(),
+                        )
+                    }
+                }
+            }
+        }
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+
+        moves.note()
+        enabled = true
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+        composeTestRule.onNodeWithTag(CONTENT).assertIsNotFocused()
+    }
+
+    /**
+     * A surface that arrives again without leaving the composition (controls coming back after a sheet closes) passes a
+     * new [arrivalKey]; a changed key is a fresh request, and recomposing with the same key is not. Only the last key
+     * is remembered, so returning to an earlier key is a fresh request too.
+     */
+    @Test
+    fun `a changed arrival key is a fresh request, and an unchanged key is not`() {
+        var key by mutableStateOf(1)
+        var unrelated by mutableStateOf(0)
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.setContent {
+            BingeTvTheme {
+                Row {
+                    RailStandIn()
+                    val arrival = rememberTvArrivalFocus()
+                    TvArrivalFocusEffect(arrival, arrivalKey = key)
+                    Box(
+                        Modifier
+                            .testTag(CONTENT)
+                            .size((80 + unrelated).dp)
+                            .tvArrivalTarget(arrival)
+                            .focusable(),
+                    )
+                }
+            }
+        }
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+
+        composeTestRule.runOnUiThread { unrelated = 1 }
+        repeat(PUMP_FRAMES) {
+            composeTestRule.mainClock.advanceTimeByFrame()
+            composeTestRule.waitForIdle()
+        }
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+
+        composeTestRule.runOnUiThread { key = 2 }
+        repeat(PUMP_FRAMES) {
+            composeTestRule.mainClock.advanceTimeByFrame()
+            composeTestRule.waitForIdle()
+        }
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
     }
 

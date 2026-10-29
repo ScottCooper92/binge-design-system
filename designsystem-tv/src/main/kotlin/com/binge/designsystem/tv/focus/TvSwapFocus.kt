@@ -20,7 +20,7 @@ import androidx.compose.ui.focus.FocusRequester
  * focus. Only the press that caused the swap arms the latch, so only it re-focuses — once per arm, via a
  * retry that keeps offering focus until the replacement takes it or the retry window runs out. This is why
  * neither `restoreTvOverlayFocus`/`TvOverlayArrivalFocusEffect` (unconditional on mount/key) nor
- * `TvArrivalFocusEffect` (offered every frame until taken) fit — both would fire on a background change.
+ * `TvArrivalFocusEffect` (one request when its target attaches) fit — both would fire on a background change.
  *
  * @see TvSwapFocusEffect for the driving effect and the frame-wait reasoning.
  */

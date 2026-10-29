@@ -186,6 +186,40 @@ class TvTemplateFocusTest {
     }
 
     @Test
+    fun `an overlay step flow moves focus off a footer action that stays put when the step changes`() {
+        var step by mutableIntStateOf(0)
+        composeTestRule.setContent {
+            Hosted {
+                val first = remember { FocusRequester() }
+                val second = remember { FocusRequester() }
+                TvStepFlow(
+                    stepCount = 2,
+                    currentStep = step,
+                    progressLabel = "Step ${step + 1} of 2",
+                    hosting = TvPageHosting.Overlay,
+                    entry = if (step == 0) first else second,
+                    footerActions = { Box(Modifier.testTag(PINNED).size(40.dp).focusable()) },
+                ) {
+                    if (step == 0) {
+                        Target(ENTRY, first)
+                    } else {
+                        Target(SECOND_ENTRY, second)
+                    }
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(PINNED).requestFocus()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(PINNED).assertIsFocused()
+
+        composeTestRule.runOnUiThread { step = 1 }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(SECOND_ENTRY).assertIsFocused()
+    }
+
+    @Test
     fun `an overlay message page with no action claims focus on its sink`() {
         composeTestRule.setContent {
             Hosted { TvMessagePage(body = "Body", hosting = TvPageHosting.Overlay) }

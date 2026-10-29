@@ -24,8 +24,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowSystemClock
-import java.time.Duration
 
 private const val RAIL = "rail"
 private const val TARGET = "target"
@@ -33,25 +31,14 @@ private const val TARGET = "target"
 /** Frames to settle the offer loop after its target should already hold focus, or should have given up. */
 private const val SETTLE_FRAMES = 10
 
-/** Past [FOCUS_OFFER_TIMEOUT_MS] (3s), well short of exhausting [FOCUS_OFFER_FRAMES] (600) — the deadline's own case. */
-private val PAST_ARRIVAL_TIMEOUT = Duration.ofMillis(3_100)
-
 /**
- * The overlay-arrival adverse-schedule cases: [offerTvArrivalFocus] (via [TvArrivalFocusEffect])
- * converges on a target composed N frames past the disposing sibling, for N in {0, 1, 10, 60} — a frame
+ * The overlay-arrival adverse-schedule cases: [TvArrivalFocusEffect] claims a target composed N
+ * frames past the disposing sibling, once the target is placed, for N in {0, 1, 10, 60} — a frame
  * budget well above what a real layout takes.
  *
  * [TvArrivalFocusEffect] is hoisted above [TvLateTarget] in every fixture here, exactly as a real screen wires
- * it: the offer starts the moment the screen composes, and only the requester's *target node* — not the offer
- * itself — is what [TvLateTarget] delays. Nesting the effect inside the delayed content would start the retry
- * loop late too, so it would always find its own target already attached and never exercise a lateness the
- * loop has to survive.
- *
- * The wall-clock case below is decision 2's second named trap: [offerTvArrivalFocus] reads
- * `SystemClock.uptimeMillis()`, which Robolectric does not advance on its own — a test that only steps
- * `mainClock` would never see the deadline fire, and the loop would look bounded only because its frame budget
- * also happens to be finite. Advancing [ShadowSystemClock] is what makes the deadline itself the thing under
- * test.
+ * it: the effect is there from the first frame, and only the requester's *target node* is what [TvLateTarget]
+ * delays, so the claim has to wait for the node to be placed.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -70,47 +57,6 @@ class TvArrivalFocusAdverseScheduleTest {
 
     @Test
     fun `the arrival offer converges on a target composed 60 frames late`() = assertArrivalConverges(60)
-
-    /**
-     * The wall-clock deadline's own case: [ShadowSystemClock] moves past [FOCUS_OFFER_TIMEOUT_MS] while the
-     * target is still 200 frames from composing — far short of [FOCUS_OFFER_FRAMES] exhausting on its own, so
-     * only the deadline can explain the loop exiting. Pumping the remaining 200 frames afterward and finding
-     * the target still unfocused is the proof: nothing was left retrying to claim it once it finally composed.
-     */
-    @Test
-    fun `the offer gives up once its wall-clock deadline passes, never claiming a later target`() {
-        val delayFrames = 200
-        composeTestRule.mainClock.autoAdvance = false
-        composeTestRule.setContent {
-            BingeTvTheme {
-                Row {
-                    Box(Modifier.testTag(RAIL).size(80.dp).focusable())
-                    val arrival = rememberTvArrivalFocus()
-                    TvArrivalFocusEffect(arrival)
-                    TvLateTarget(delayFrames = delayFrames, dispose = true) {
-                        Box(
-                            Modifier
-                                .testTag(TARGET)
-                                .size(80.dp)
-                                .tvArrivalTarget(arrival)
-                                .focusable(),
-                        )
-                    }
-                }
-            }
-        }
-        composeTestRule.onNodeWithTag(RAIL).requestFocus()
-        repeat(SETTLE_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
-        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
-
-        ShadowSystemClock.advanceBy(PAST_ARRIVAL_TIMEOUT)
-        repeat(delayFrames) { composeTestRule.mainClock.advanceTimeByFrame() }
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithTag(TARGET).assertExists()
-        composeTestRule.onNodeWithTag(TARGET).assertIsNotFocused()
-        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
-    }
 
     private fun assertArrivalConverges(delayFrames: Int) {
         var dispose by mutableStateOf(false)

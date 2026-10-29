@@ -53,12 +53,22 @@ stays focused, until it is disposed, and Compose's own focus recovery for it the
 top of the request.
 
 This fails silently, which is what makes the class expensive — the fix looks applied, and the
-symptom is focus landing somewhere odd. `TvArrivalFocusEffect` and `TvOverlayArrivalFocusEffect`
-are the frame wait, so a caller does not re-derive it.
+symptom is focus landing somewhere odd. `TvArrivalFocusEffect` is the arrival half: one request, made
+once the surface's target has reported it is attached, while the outgoing screen may still hold focus.
+Claiming early means the outgoing nodes are already unfocused when they dispose, so Compose's recovery
+never runs. It does not wait or retry, so the target must be attached from the first frame (a plate
+that becomes the real control in place), and it makes the request once per arrival: a surface that
+arrives again without leaving the composition passes a new `arrivalKey`.
 
-Bound any such wait. Prefer wall-clock time: `withFrameNanos` resumes only on frames the app
-actually draws, so a frame budget against a static screen never expires. The startup handoff to
-content counts frames instead, and stops early once focus is taken or the user moves up to the top bar.
+A user's own direction press since the arrival composed cancels the request, so it never pulls focus
+back from the bar. That guard acts only when the host provides `LocalTvUserMoves` and feeds it from the
+key handler that sees every press; without a host nothing is noted and the arrival always claims.
+
+`TvOverlayArrivalFocusEffect` and `restoreTvOverlayFocus` are the older frame-wait-then-retry shape.
+Bound any such wait, in wall-clock time where the thing waited on can stop drawing: `withFrameNanos`
+resumes only on frames the app actually draws, so a frame budget against a static screen never expires.
+The startup handoff to content counts frames instead, and stops early once focus is taken or the user moves up
+to the top bar.
 
 ## The accent model: the accent is focus, a tick is selection
 

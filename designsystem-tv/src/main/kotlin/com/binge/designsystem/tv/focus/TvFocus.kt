@@ -287,7 +287,8 @@ fun Modifier.tvExitFocusGroup(trapping: () -> Boolean = { true }): Modifier =
         .focusGroup()
 
 /**
- * Offer arrival focus to [target] each frame until [taken] reports the surface holds it — the
+ * The retrying primitive: offer arrival focus to [target] each frame until [taken] reports the surface holds it. The
+ * arrival effect no longer uses it (it makes one request); it stays for callers that need the retry. It is the
  * screen-side sibling of the shell's `offerFocusToContent`, and retried for the same measured reason:
  * a single mount-time request fires inside the push transition and fails silently, ~300ms before the
  * outgoing screen's disposal hands focus over. By then the disposal's own geometric reassignment is
