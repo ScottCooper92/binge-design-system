@@ -3,7 +3,6 @@ package com.binge.designsystem.tv.template
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -78,8 +77,7 @@ internal fun tvPageArrival(
             // A tab's page is entered from its tab, so it claims no focus of its own: that would pull focus off the tab.
             if (LocalTvTabHosted.current) return Modifier.tvEntryFocusGroup(entry)
             val arrival = remember(entry, key) { TvArrivalFocus(entry) }
-            // The effect is keyed on `enabled` alone, so a new holder needs a fresh effect to be offered.
-            key(arrival) { TvArrivalFocusEffect(arrival, enabled) }
+            TvArrivalFocusEffect(arrival, enabled)
             Modifier.tvArrivalObserver(arrival).tvEntryFocusGroup(entry)
         }
         TvPageHosting.PreShell -> {

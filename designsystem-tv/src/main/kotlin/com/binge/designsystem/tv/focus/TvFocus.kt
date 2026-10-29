@@ -287,8 +287,9 @@ fun Modifier.tvExitFocusGroup(trapping: () -> Boolean = { true }): Modifier =
         .focusGroup()
 
 /**
- * Offer arrival focus to [target] each frame until [taken] reports the surface holds it — the
- * screen-side sibling of the shell's `offerFocusToContent`, and retried for the same measured reason:
+ * Offer arrival focus to [target] each frame until [taken] reports the surface holds it. No arrival effect uses it any more
+ * (`TvArrivalFocusEffect` makes one request); it stays as the retrying primitive for a caller that still needs a bounded
+ * offer. The screen-side sibling of the shell's `offerFocusToContent`, retried for the same measured reason:
  * a single mount-time request fires inside the push transition and fails silently, ~300ms before the
  * outgoing screen's disposal hands focus over. By then the disposal's own geometric reassignment is
  * the writer, and an `onEnter` redirect does not reliably cancel it — logged on a Shield as the

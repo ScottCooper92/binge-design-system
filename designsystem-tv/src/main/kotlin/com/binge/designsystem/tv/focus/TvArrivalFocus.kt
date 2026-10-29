@@ -22,7 +22,7 @@ import androidx.compose.ui.focus.onFocusChanged
  * has been placed, while the outgoing screen may still hold focus; claiming early means the outgoing screen's nodes
  * are already unfocused when they dispose, so no geometric reassignment runs. See [TvArrivalFocusEffect].
  *
- Ten screens carried this as a hand-copied requester + `mutableStateOf` + `LaunchedEffect`, each with its own
+ * Ten screens carried this as a hand-copied requester + `mutableStateOf` + `LaunchedEffect`, each with its own
  * KDoc restating the same race; this is that, once. A screen keeps a single [rememberTvArrivalFocus], threads
  * its [requester] into the entry group (or attaches [tvArrivalTarget] on its own root), wires the observer with
  * [tvArrivalObserver] or `onFocusChanged = holder::onFocusChanged`, and drives it with one [TvArrivalFocusEffect].
