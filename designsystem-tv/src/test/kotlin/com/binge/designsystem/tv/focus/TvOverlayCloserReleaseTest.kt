@@ -22,9 +22,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.theme.BingeTvTheme
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,13 +37,14 @@ private const val OVERLAY = "overlay"
 private const val EXIT_MILLIS = 300
 private const val FRAME_MILLIS = 16L
 private const val LATCH_FRAMES = 2
+private const val MID_EXIT_FRAME = 8
 
 /**
- * **A trap wired to its closer lets focus go as the exit starts, so the restore is a single request.**
+ * **A panel wired to its closer lets focus go as the exit starts, so the restore is a single request.**
  *
  * [TvOverlayExitTransitionFocusTest] shows a trapped overlay refusing a request from outside for its whole exit. Here the
- * trap reads [TvOverlayCloser.trapping], and the closer's one request is granted in the frame the exit starts, with focus on
- * the content on every frame of the fade after it.
+ * real [TvSideSheetPanel] takes the closer: the closer's one request is granted once its latch frame has run, focus stays on the
+ * content on every frame of the fade after it, and the trap is back when the panel has gone.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -67,7 +69,7 @@ class TvOverlayCloserReleaseTest {
                             .focusable(),
                     )
                     AnimatedVisibility(visible = open, enter = fadeIn(tween(EXIT_MILLIS)), exit = fadeOut(tween(EXIT_MILLIS))) {
-                        Box(Modifier.size(80.dp).tvExitFocusGroup(trapping = { !wired || closer.trapping })) {
+                        TvSideSheetPanel(closer = closer.takeIf { wired }) {
                             Box(Modifier.testTag(OVERLAY).size(40.dp).focusable())
                         }
                     }
@@ -75,6 +77,10 @@ class TvOverlayCloserReleaseTest {
             }
         }
         composeTestRule.waitForIdle()
+        openAndFocusOverlay()
+    }
+
+    private fun openAndFocusOverlay() {
         composeTestRule.runOnIdle { open = true }
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag(OVERLAY).requestFocus()
@@ -82,31 +88,37 @@ class TvOverlayCloserReleaseTest {
         composeTestRule.onNodeWithTag(OVERLAY).assertIsFocused()
     }
 
+    private fun advanceFrames(frames: Int) =
+        repeat(frames) {
+            composeTestRule.mainClock.advanceTimeByFrame()
+            composeTestRule.waitForIdle()
+        }
+
     @Test
-    fun `a wired trap lets the closer's single request through, and focus stays on the content through the exit`() {
+    fun `a wired panel lets the closer's single request through, and focus stays on the content through the exit`() {
         setContent(wired = true)
         composeTestRule.mainClock.autoAdvance = false
 
         composeTestRule.runOnIdle { closer.close() }
         // The close arms a latch and the closer's effect runs on the next frame; the exit then has nearly all its length to go.
-        repeat(LATCH_FRAMES) {
-            composeTestRule.mainClock.advanceTimeByFrame()
-            composeTestRule.waitForIdle()
-        }
+        advanceFrames(LATCH_FRAMES)
 
-        repeat((EXIT_MILLIS / FRAME_MILLIS).toInt() - LATCH_FRAMES) {
+        repeat((EXIT_MILLIS / FRAME_MILLIS).toInt() - LATCH_FRAMES) { frame ->
             composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
-            composeTestRule.mainClock.advanceTimeByFrame()
-            composeTestRule.waitForIdle()
+            if (frame == MID_EXIT_FRAME) {
+                assertFalse("The trap must stay released in the middle of the exit, after the closer's latch has reset", closer.trapping)
+            }
+            advanceFrames(1)
         }
         composeTestRule.mainClock.advanceTimeBy(EXIT_MILLIS.toLong())
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+        assertTrue("The trap is back once the panel is gone", closer.trapping)
     }
 
     @Test
-    fun `an unwired trap still refuses, and the offer after the dispose lands`() {
+    fun `an unwired panel still refuses, and the offer after the dispose lands`() {
         setContent(wired = false)
 
         composeTestRule.runOnIdle { closer.close() }
@@ -117,13 +129,18 @@ class TvOverlayCloserReleaseTest {
     }
 
     @Test
-    fun `trapping is false from close until the overlay has gone, then true again for the next open`() {
+    fun `a second open traps again, and its close is released again`() {
         setContent(wired = true)
-        assertEquals(true, closer.trapping)
+        composeTestRule.runOnIdle { closer.close() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+
+        openAndFocusOverlay()
+        assertTrue("A reopened panel must trap, not inherit the last close's release", closer.trapping)
 
         composeTestRule.runOnIdle { closer.close() }
         composeTestRule.waitForIdle()
-
-        assertFalse("A second open must trap again, not inherit the closed latch", !closer.trapping)
+        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
     }
 }

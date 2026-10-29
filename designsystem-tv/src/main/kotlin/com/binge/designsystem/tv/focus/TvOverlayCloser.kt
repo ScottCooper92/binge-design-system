@@ -51,20 +51,35 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
     }
     // Stable identity so a `BackHandler`/`onDismissRequest` holding [TvOverlayCloser.close] is not re-armed every
     // recomposition; it wraps the one latch setter above.
-    return remember { TvOverlayCloser(arm = { closing = true }, isClosing = { closing }) }
+    return remember { TvOverlayCloser(arm = { closing = true }) }
 }
 
 /** Handle for [rememberTvOverlayCloser]. [close] arms the close latch; safe to call from any dismissal path. */
 @Stable
 class TvOverlayCloser internal constructor(
     private val arm: () -> Unit,
-    private val isClosing: () -> Boolean,
 ) {
-    /** False from [close] until the overlay has gone: pass it to the overlay's `tvExitFocusGroup` so the trap lets go as the exit starts. */
-    val trapping: Boolean get() = !isClosing()
+    private var released by mutableStateOf(false)
 
-    /** Arm the close: dispose the overlay, then return focus a frame later. Idempotent within one close. */
+    /**
+     * False from [close] until the overlay's panel has been disposed, so the trap stays open for the whole exit transition. Read by
+     * the panel's `tvExitFocusGroup`; pass the closer to `TvSideSheet`, which wires it.
+     */
+    val trapping: Boolean get() = !released
+
+    /** Arm the close: release the trap, return focus, dispose the overlay. Idempotent within one close. */
     fun close() {
+        released = true
         arm()
+    }
+
+    /** The overlay's panel composed: trap again, whatever an earlier close left behind. */
+    internal fun overlayShown() {
+        released = false
+    }
+
+    /** The overlay's panel was disposed, at the end of its exit: the next open traps again. */
+    internal fun overlayGone() {
+        released = false
     }
 }
