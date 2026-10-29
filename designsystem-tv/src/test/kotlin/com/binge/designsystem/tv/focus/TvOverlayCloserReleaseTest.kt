@@ -9,6 +9,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -140,6 +141,65 @@ class TvOverlayCloserReleaseTest {
 
         composeTestRule.runOnIdle { closer.close() }
         composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+    }
+}
+
+/**
+ * **A request granted while the overlay is still composed is not the restore.**
+ *
+ * The overlay's disposal can hand focus somewhere else after the closer's first request was granted (the geometric recovery
+ * of a window or a focused node leaving). The closer therefore always restores once the overlay is gone, whatever the first
+ * request answered.
+ */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
+class TvOverlayCloserRecoveryTest {
+    @get:Rule
+    val composeTestRule = createKeyboardComposeRule()
+
+    private var open by mutableStateOf(false)
+    private lateinit var closer: TvOverlayCloser
+
+    @Test
+    fun `a disposal that steals focus after the first request is undone by the restore after it`() {
+        val stray = FocusRequester()
+        composeTestRule.setContent {
+            val content = remember { FocusRequester() }
+            closer = rememberTvOverlayCloser(restoreTo = content) { open = false }
+            BingeTvTheme {
+                Row {
+                    Box(
+                        Modifier
+                            .testTag("stray")
+                            .size(80.dp)
+                            .focusRequester(stray)
+                            .focusable(),
+                    )
+                    Box(
+                        Modifier
+                            .testTag(CONTENT)
+                            .size(80.dp)
+                            .focusRequester(content)
+                            .focusable(),
+                    )
+                    if (open) {
+                        DisposableEffect(Unit) { onDispose { stray.requestFocus() } }
+                        Box(Modifier.testTag(OVERLAY).size(40.dp).focusable())
+                    }
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnUiThread { open = true }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(OVERLAY).requestFocus()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnUiThread { closer.close() }
+        composeTestRule.waitForIdle()
+
         composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
     }
