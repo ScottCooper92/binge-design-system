@@ -71,13 +71,15 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [content] gets the entry requester. Each step it shows pins the requester to its first row and pulls it
  * there with [TvSideSheetStepFocus]. The caller owns the visibility flag, and returns focus to what opened
- * the sheet, with `rememberTvOverlayCloser`. [toBottomEdge] is the panel's: see [TvSideSheetPanel].
+ * the sheet, with `rememberTvOverlayCloser`; pass `closer::trapping` as [trapping] so the sheet lets focus go as it closes.
+ * [toBottomEdge] is the panel's: see [TvSideSheetPanel].
  */
 @Composable
 fun TvSideSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     toBottomEdge: Boolean = false,
+    trapping: () -> Boolean = { true },
     content: @Composable ColumnScope.(entryFocus: FocusRequester) -> Unit,
 ) {
     val entryFocus = remember { FocusRequester() }
@@ -97,7 +99,11 @@ fun TvSideSheet(
                     }
                 },
     ) {
-        TvSideSheetPanel(modifier = Modifier.align(Alignment.CenterEnd), toBottomEdge = toBottomEdge) { content(entryFocus) }
+        TvSideSheetPanel(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            toBottomEdge = toBottomEdge,
+            trapping = trapping,
+        ) { content(entryFocus) }
     }
 }
 
@@ -122,6 +128,7 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
 fun TvSideSheetPanel(
     modifier: Modifier = Modifier,
     toBottomEdge: Boolean = false,
+    trapping: () -> Boolean = { true },
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -130,7 +137,7 @@ fun TvSideSheetPanel(
                 .fillMaxHeight()
                 .width(dimensionResource(TvR.dimen.tv_side_sheet_width))
                 .background(MaterialTheme.tvStyle.panel)
-                .tvExitFocusGroup()
+                .tvExitFocusGroup(trapping)
                 .padding(
                     start = dimensionResource(DesR.dimen.padding_l),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical),
