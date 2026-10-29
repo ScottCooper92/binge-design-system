@@ -14,6 +14,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import org.robolectric.annotation.Config
 private const val RAIL = "rail"
 private const val GRID = "grid"
 private const val OVERLAY = "overlay"
+private const val FRAMES = 20
 
 /**
  * The contract for [rememberTvOverlayCloser], the one closer the thirteen hand-copied `closing*` latches fold
@@ -114,7 +116,59 @@ class TvOverlayCloserTest {
         composeTestRule.onNodeWithTag(GRID).assertIsFocused()
     }
 
-    private fun fixture(trapped: Boolean = false): Fixture {
+    /**
+     * An overlay that reports its disposal gets its one request in the frame it is gone, where an offer that retried could land a
+     * frame or more later. Stepped a frame at a time, with the rail the nearest node focus can park on, the grid holds focus from
+     * the first frame without the overlay and never leaves it.
+     */
+    @Test
+    fun `a reporting overlay's close puts focus on the entry in the frame the overlay is gone`() {
+        val fixture = fixture(reports = true, grouped = true)
+        fixture.openAndFocusOverlay()
+        composeTestRule.mainClock.autoAdvance = false
+
+        composeTestRule.runOnUiThread { fixture.closer.close() }
+        var gone = false
+        repeat(FRAMES) {
+            composeTestRule.mainClock.advanceTimeByFrame()
+            val overlay = composeTestRule.onAllNodesWithTag(OVERLAY).fetchSemanticsNodes().size
+            if (overlay == 0) gone = true
+            if (gone) composeTestRule.onNodeWithTag(GRID).assertIsFocused()
+        }
+
+        assertEquals(true, gone)
+        assertEquals(1, fixture.closeCount)
+    }
+
+    @Test
+    fun `a reporting focus-trapped overlay restores focus too`() {
+        val fixture = fixture(trapped = true, reports = true)
+        fixture.openAndFocusOverlay()
+
+        composeTestRule.runOnIdle { fixture.closer.close() }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(GRID).assertIsFocused()
+    }
+
+    @Test
+    fun `a reporting overlay closes and restores again on the next open`() {
+        val fixture = fixture(reports = true)
+        repeat(2) {
+            fixture.openAndFocusOverlay()
+            composeTestRule.runOnIdle { fixture.closer.close() }
+            composeTestRule.waitForIdle()
+            composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+            composeTestRule.onNodeWithTag(GRID).assertIsFocused()
+        }
+    }
+
+    private fun fixture(
+        trapped: Boolean = false,
+        reports: Boolean = false,
+        grouped: Boolean = false,
+    ): Fixture {
         val fixture = Fixture()
         composeTestRule.setContent {
             BingeTvTheme {
@@ -128,14 +182,23 @@ class TvOverlayCloserTest {
                     // other than the grid — otherwise Compose recovers onto the grid unaided and the test passes
                     // for the wrong reason.
                     Box(Modifier.testTag(RAIL).size(80.dp).focusable())
-                    Box(
-                        Modifier
-                            .testTag(GRID)
-                            .size(80.dp)
-                            .focusRequester(entry)
-                            .focusable(),
-                    )
+                    val decoy = remember { FocusRequester() }
+                    val grid = Modifier
+                        .testTag(GRID)
+                        .size(80.dp)
+                        .focusRequester(entry)
+                        .focusable()
+                    if (grouped) {
+                        // A request from outside the group is routed to the decoy, as a card list's entry routes it to card 1.
+                        Row(Modifier.tvEntryFocusGroup(decoy)) {
+                            Box(Modifier.size(80.dp).focusRequester(decoy).focusable())
+                            Box(grid)
+                        }
+                    } else {
+                        Box(grid)
+                    }
                     if (fixture.overlayOpen) {
+                        if (reports) fixture.closer.ReportDisposal()
                         if (trapped) {
                             Box(Modifier.size(80.dp).tvExitFocusGroup()) {
                                 Box(Modifier.testTag(OVERLAY).size(40.dp).focusable())

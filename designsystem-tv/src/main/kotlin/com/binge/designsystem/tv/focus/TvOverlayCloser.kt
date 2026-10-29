@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.focus
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -8,7 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.focus.FocusRequester
+import kotlinx.coroutines.flow.first
 
 /**
  * Closes a TV overlay (a sheet, filter panel, or debug pane) the one correct way: latch the close, release the
@@ -19,6 +22,10 @@ import androidx.compose.ui.focus.FocusRequester
  * focus-trapped overlay is still composed and is swallowed, the "focus falls to the shell" class. Each
  * copy is another place to forget a teardown path, or to leave a latch armed to fire a stale request later.
  * This is that latch, once.
+ *
+ * An overlay that reports its disposal (a sheet given the closer, or any overlay calling [TvOverlayCloser.ReportDisposal]) gets
+ * one request the moment it is gone, which lands in the frame it leaves. One that does not report keeps the offer after the
+ * dispose, as before. Either way [onClose] must dispose the overlay.
  *
  * An overlay whose `tvExitFocusGroup` reads [TvOverlayCloser.trapping] lets that request through as the exit starts. One
  * that does not still refuses it, and the offer after the dispose is what lands, as before.
@@ -38,21 +45,28 @@ import androidx.compose.ui.focus.FocusRequester
 fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvOverlayCloser {
     var closing by remember { mutableStateOf(false) }
     val currentOnClose by rememberUpdatedState(onClose)
+    val closer = remember { TvOverlayCloser(arm = { closing = true }) }
     LaunchedEffect(closing) {
         if (!closing) return@LaunchedEffect
         // The trap is already released (see [TvOverlayCloser.trapping]), so a trap wired to it grants this at once. A grant while
         // the overlay is still composed is not the restore, though: its disposal can hand focus elsewhere, so the offer after it
         // always runs.
         restoreTo.tryRequestFocus()
+        val reportsDisposal = closer.reportsDisposal
         currentOnClose()
-        restoreTvOverlayFocus(restoreTo)
+        if (reportsDisposal) {
+            snapshotFlow { closer.disposed }.first { it }
+            restoreTo.tryRequestFocus()
+        } else {
+            restoreTvOverlayFocus(restoreTo)
+        }
         // Reset so the overlay can be opened and closed again — an un-reset latch stays armed and either never
         // re-fires (a stuck close) or fires a stale request on a later recomposition.
         closing = false
     }
     // Stable identity so a `BackHandler`/`onDismissRequest` holding [TvOverlayCloser.close] is not re-armed every
     // recomposition; it wraps the one latch setter above.
-    return remember { TvOverlayCloser(arm = { closing = true }) }
+    return closer
 }
 
 /** Handle for [rememberTvOverlayCloser]. [close] arms the close latch; safe to call from any dismissal path. */
@@ -61,6 +75,26 @@ class TvOverlayCloser internal constructor(
     private val arm: () -> Unit,
 ) {
     private var released by mutableStateOf(false)
+
+    /** Whether an overlay that reports its disposal is composed now, so the close waits for it instead of retrying. */
+    internal var reportsDisposal by mutableStateOf(false)
+        private set
+
+    /** Whether that overlay has been disposed since it was last shown. */
+    internal var disposed by mutableStateOf(false)
+        private set
+
+    /**
+     * Tells the closer this overlay is composed, and when it is disposed, so the close makes its one request then. Call it
+     * from inside the overlay, for one that does not take the closer itself (a full-screen reader).
+     */
+    @Composable
+    fun ReportDisposal() {
+        DisposableEffect(this) {
+            overlayShown()
+            onDispose { overlayGone() }
+        }
+    }
 
     /**
      * False from [close] until the overlay's panel has been disposed, so the trap stays open for the whole exit transition. Read by
@@ -77,10 +111,14 @@ class TvOverlayCloser internal constructor(
     /** The overlay's panel composed: trap again, whatever an earlier close left behind. */
     internal fun overlayShown() {
         released = false
+        reportsDisposal = true
+        disposed = false
     }
 
     /** The overlay's panel was disposed, at the end of its exit: the next open traps again. */
     internal fun overlayGone() {
         released = false
+        reportsDisposal = false
+        disposed = true
     }
 }
