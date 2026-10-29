@@ -276,10 +276,14 @@ fun Modifier.tvLateEntryFocusGroup(entry: () -> FocusRequester?): Modifier =
  * `onExit` **before** `focusGroup()`, not after: the boundary callback belongs to the node that owns the group,
  * so the two must sit on that one node in this order. That ordering is the easy half to get wrong, and both modal
  * surfaces were open-coding it — naming the pair once is the point.
+ *
+ * [trapping] is read on every attempt to leave. A surface that is closing returns false from the composition that starts
+ * its exit (`TvOverlayCloser.trapping`), so the request that returns focus is granted at once instead of being refused
+ * until the surface is disposed.
  */
-fun Modifier.tvExitFocusGroup(): Modifier =
+fun Modifier.tvExitFocusGroup(trapping: () -> Boolean = { true }): Modifier =
     this
-        .focusProperties { onExit = { cancelFocusChange() } }
+        .focusProperties { onExit = { if (trapping()) cancelFocusChange() } }
         .focusGroup()
 
 /**
@@ -322,7 +326,7 @@ private const val FOCUS_OFFER_TIMEOUT_MS = 3_000L
  * [FocusRequester.Cancel] `check`. So the `runCatching` that wrapped every call site here was discarding a
  * *result*, not catching an exception, and every one of those discards was a retry thrown away.
  */
-private fun FocusRequester.tryRequestFocus(): Boolean = runCatching { requestFocus() }.getOrDefault(false)
+internal fun FocusRequester.tryRequestFocus(): Boolean = runCatching { requestFocus() }.getOrDefault(false)
 
 /**
  * Offer focus back to [target] until it is granted — the close half of every sheet/panel round trip, and the

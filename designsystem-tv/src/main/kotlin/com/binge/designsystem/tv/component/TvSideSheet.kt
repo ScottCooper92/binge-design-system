@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +52,7 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
+import com.binge.designsystem.tv.focus.TvOverlayCloser
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvExitFocusGroup
 import com.binge.designsystem.tv.focus.tvFocusContentColor
@@ -71,13 +73,15 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [content] gets the entry requester. Each step it shows pins the requester to its first row and pulls it
  * there with [TvSideSheetStepFocus]. The caller owns the visibility flag, and returns focus to what opened
- * the sheet, with `rememberTvOverlayCloser`. [toBottomEdge] is the panel's: see [TvSideSheetPanel].
+ * the sheet, with `rememberTvOverlayCloser`; pass the closer as [closer] so the sheet lets focus go as it closes and traps again once it is gone.
+ * [toBottomEdge] is the panel's: see [TvSideSheetPanel].
  */
 @Composable
 fun TvSideSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     toBottomEdge: Boolean = false,
+    closer: TvOverlayCloser? = null,
     content: @Composable ColumnScope.(entryFocus: FocusRequester) -> Unit,
 ) {
     val entryFocus = remember { FocusRequester() }
@@ -97,7 +101,11 @@ fun TvSideSheet(
                     }
                 },
     ) {
-        TvSideSheetPanel(modifier = Modifier.align(Alignment.CenterEnd), toBottomEdge = toBottomEdge) { content(entryFocus) }
+        TvSideSheetPanel(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            toBottomEdge = toBottomEdge,
+            closer = closer,
+        ) { content(entryFocus) }
     }
 }
 
@@ -117,20 +125,28 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
  * so it pulls focus to Cancel wherever it composes; on a stack page the stack does that. The panel is flush to the screen's end, top and bottom edges, so its content keeps
  * the overscan margin from them. [toBottomEdge] drops the bottom margin, for content that scrolls: it runs to the screen's
  * edge, and [TvSideSheetRows] carries the bottom overscan inside its scroll, so its last row can still scroll clear of the edge.
+ * Given the [closer] that closes it, the panel stops trapping focus as the close starts and traps again once it is disposed.
  */
 @Composable
 fun TvSideSheetPanel(
     modifier: Modifier = Modifier,
     toBottomEdge: Boolean = false,
+    closer: TvOverlayCloser? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    if (closer != null) {
+        DisposableEffect(closer) {
+            closer.overlayShown()
+            onDispose { closer.overlayGone() }
+        }
+    }
     Column(
         modifier =
             modifier
                 .fillMaxHeight()
                 .width(dimensionResource(TvR.dimen.tv_side_sheet_width))
                 .background(MaterialTheme.tvStyle.panel)
-                .tvExitFocusGroup()
+                .tvExitFocusGroup { closer?.trapping ?: true }
                 .padding(
                     start = dimensionResource(DesR.dimen.padding_l),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical),
