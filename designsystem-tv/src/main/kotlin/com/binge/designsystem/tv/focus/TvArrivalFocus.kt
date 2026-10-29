@@ -131,18 +131,15 @@ fun TvArrivalFocusEffect(
 private val UNSEEN = Any()
 
 /**
- * Place first focus on an overlay one frame after it mounts — the sanctioned effect for a modal/gate/step that
- * pulls focus on open (the overlay case in `docs/tv-foundation.md`, the one thing allowed to), replacing the
- * bare `LaunchedEffect { requestFocus() }`
- * five overlays open-coded.
+ * Place first focus on an overlay or a plate the moment it composes: one request, no wait and no retry. It is the sanctioned
+ * effect for a modal, gate or step that pulls focus on open (the overlay case in `docs/tv-foundation.md`), replacing the bare
+ * `LaunchedEffect { requestFocus() }` five overlays open-coded.
  *
- * The frame wait is [restoreTvOverlayFocus]'s and is load-bearing: an overlay mounted mid-transition (a dialog
- * inside an `AnimatedContent`, an onboarding step swapping in) has no laid-out node to take a synchronous
- * request, so the bare request fires into that gap and is lost. Named for "first focus" rather than "restore"
- * so arrival and focus-*return* call sites grep apart, over the one implementation. [key] re-runs the placement
- * when the overlay's identity changes (a settings pane re-shown for a different link).
+ * The target must be attached from the first frame, which is what lets one request land, including on a node mounted
+ * mid-transition. Named for "first focus" rather than "restore" so arrival and focus-*return* call sites grep apart. [key]
+ * re-places the focus when the overlay's identity changes (a settings pane re-shown for a different link).
  */
 @Composable
 fun TvOverlayArrivalFocusEffect(target: FocusRequester, key: Any? = Unit) {
-    LaunchedEffect(key) { restoreTvOverlayFocus(target) }
+    LaunchedEffect(key) { target.tryRequestFocus() }
 }
