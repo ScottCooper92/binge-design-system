@@ -323,11 +323,11 @@ class TvArrivalFocusTest {
 
     /**
      * A surface that arrives again without leaving the composition (controls coming back after a sheet closes) passes a
-     * changed [arrivalKey]: a changed key is a fresh request, and recomposing with the same key is not. The effect remembers
-     * the last key only, so going back to an earlier key is a fresh arrival too.
+     * new [arrivalKey]; a changed key is a fresh request, and recomposing with the same key is not. Only the last key
+     * is remembered, so returning to an earlier key is a fresh request too.
      */
     @Test
-    fun `a changed arrival key is a fresh request, and the same key is not`() {
+    fun `a changed arrival key is a fresh request, and an unchanged key is not`() {
         var key by mutableStateOf(1)
         var unrelated by mutableStateOf(0)
         composeTestRule.mainClock.autoAdvance = false
@@ -340,12 +340,10 @@ class TvArrivalFocusTest {
                     Box(
                         Modifier
                             .testTag(CONTENT)
-                            .size(80.dp)
+                            .size((80 + unrelated).dp)
                             .tvArrivalTarget(arrival)
                             .focusable(),
-                    ) {
-                        Box(Modifier.size((80 + unrelated).dp))
-                    }
+                    )
                 }
             }
         }
