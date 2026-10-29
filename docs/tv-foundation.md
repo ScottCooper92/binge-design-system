@@ -53,10 +53,14 @@ stays focused, until it is disposed, and Compose's own focus recovery for it the
 top of the request.
 
 This fails silently, which is what makes the class expensive — the fix looks applied, and the
-symptom is focus landing somewhere odd. `TvArrivalFocusEffect` and `TvOverlayArrivalFocusEffect`
-are the frame wait, so a caller does not re-derive it.
+symptom is focus landing somewhere odd. `TvOverlayArrivalFocusEffect` is the frame wait, so a
+caller does not re-derive it.
 
-Bound any such wait. Prefer wall-clock time: `withFrameNanos` resumes only on frames the app
+`TvArrivalFocusEffect` does not wait or retry. It makes one request, once its target reports
+attached, so the target must be attached from the first frame. A user move cancels the request,
+but only when the host provides `LocalTvUserMoves`. Without one, the request always goes.
+
+Bound any other wait. Prefer wall-clock time: `withFrameNanos` resumes only on frames the app
 actually draws, so a frame budget against a static screen never expires. The startup handoff to
 content counts frames instead, and stops early once focus is taken or the user moves up to the top bar.
 
