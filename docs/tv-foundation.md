@@ -67,6 +67,8 @@ key handler that sees every press; without a host nothing is noted and the arriv
 `TvOverlayArrivalFocusEffect` and `restoreTvOverlayFocus` are the older frame-wait-then-retry shape.
 Bound any such wait, in wall-clock time where the thing waited on can stop drawing: `withFrameNanos`
 resumes only on frames the app actually draws, so a frame budget against a static screen never expires.
+The startup handoff to content counts frames instead, and stops early once focus is taken or the user moves up
+to the top bar.
 
 ## The accent model: the accent is focus, a tick is selection
 
