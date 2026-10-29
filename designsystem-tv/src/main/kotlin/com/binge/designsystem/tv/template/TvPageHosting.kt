@@ -30,7 +30,7 @@ enum class TvPageHosting {
      */
     Destination,
 
-    /** Full-screen above the shell. The page claims focus itself, every frame until it holds it. */
+    /** Full-screen above the shell. The page claims focus itself, with one request once its target has attached. */
     Overlay,
 
     /** Before the shell exists — onboarding, a gate. The page places first focus once it has laid out. */
