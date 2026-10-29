@@ -321,6 +321,45 @@ class TvArrivalFocusTest {
         composeTestRule.onNodeWithTag(CONTENT).assertIsNotFocused()
     }
 
+    /**
+     * A surface that arrives again without leaving the composition (controls coming back after a sheet closes) passes a
+     * new [arrivalKey]; each key is its own arrival, and returning to a key already spent is not.
+     */
+    @Test
+    fun `a new arrival key is a fresh request, and the same key is not`() {
+        var key by mutableStateOf(1)
+        composeTestRule.mainClock.autoAdvance = false
+        composeTestRule.setContent {
+            BingeTvTheme {
+                Row {
+                    RailStandIn()
+                    val arrival = rememberTvArrivalFocus()
+                    TvArrivalFocusEffect(arrival, arrivalKey = key)
+                    Box(
+                        Modifier
+                            .testTag(CONTENT)
+                            .size(80.dp)
+                            .tvArrivalTarget(arrival)
+                            .focusable(),
+                    )
+                }
+            }
+        }
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+
+        composeTestRule.onNodeWithTag(RAIL).requestFocus()
+        repeat(PUMP_FRAMES) { composeTestRule.mainClock.advanceTimeByFrame() }
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+
+        composeTestRule.runOnUiThread { key = 2 }
+        repeat(PUMP_FRAMES) {
+            composeTestRule.mainClock.advanceTimeByFrame()
+            composeTestRule.waitForIdle()
+        }
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+    }
+
     /** The stand-in the offer moves focus away from — the rail every arrival surface sits beside. */
     @Composable
     private fun RailStandIn() {
