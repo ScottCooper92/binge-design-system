@@ -3,14 +3,9 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -185,7 +180,7 @@ fun BingeTaskSheetPanel(
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     BingeSideSheetPanel(modifier = modifier, width = dimensionResource(R.dimen.task_sheet_width)) {
-        Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical))) {
+        Column(modifier = Modifier.fillMaxSize()) {
             val nav =
                 BingeSheetNav(
                     page = pages.last(),
