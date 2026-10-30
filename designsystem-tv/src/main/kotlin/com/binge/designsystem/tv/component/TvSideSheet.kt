@@ -30,6 +30,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -140,12 +145,21 @@ fun TvSideSheetPanel(
             onDispose { closer.overlayGone() }
         }
     }
+    val wash = remember { TvSideSheetWash() }
     Column(
         modifier =
             modifier
                 .fillMaxHeight()
                 .width(dimensionResource(TvR.dimen.tv_side_sheet_width))
                 .background(MaterialTheme.tvStyle.panel)
+                .drawBehind {
+                    val tint = wash.tint ?: return@drawBehind
+                    val bottom = wash.bottom + 32.dp.toPx()
+                    drawRect(
+                        brush = Brush.verticalGradient(0f to tint.copy(alpha = 0.6f), 0.55f to tint.copy(alpha = 0.25f), 1f to Color.Transparent, endY = bottom),
+                        size = Size(size.width, bottom),
+                    )
+                }
                 .tvExitFocusGroup { closer?.trapping ?: true }
                 .padding(
                     start = dimensionResource(DesR.dimen.padding_l),
@@ -154,9 +168,17 @@ fun TvSideSheetPanel(
                 ).then(if (toBottomEdge) Modifier else Modifier.padding(bottom = dimensionResource(TvR.dimen.tv_overscan_vertical))),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
-        CompositionLocalProvider(LocalTvSideSheetToBottomEdge provides toBottomEdge) { content() }
+        CompositionLocalProvider(LocalTvSideSheetToBottomEdge provides toBottomEdge, LocalTvSideSheetWash provides wash) { content() }
     }
 }
+
+/** PROTOTYPE: a colour a page asks its panel to wash its top with, down to [bottom] px in the panel. */
+class TvSideSheetWash {
+    var tint by mutableStateOf<Color?>(null)
+    var bottom by mutableStateOf(0f)
+}
+
+val LocalTvSideSheetWash = androidx.compose.runtime.staticCompositionLocalOf<TvSideSheetWash?> { null }
 
 /**
  * The sheet's heading: what its rows act on. On a page opened over another in a [TvSideSheetStack], and under
@@ -167,20 +189,37 @@ fun TvSideSheetPanel(
 fun TvSideSheetTitle(text: String, modifier: Modifier = Modifier) {
     val page = LocalTvSideSheetPage.current
     SideEffect { page?.onTitle(text) }
-    val parent = page?.parentTitle?.takeIf { LocalTvStyle.current == TvStyle.Monochrome }
-    if (parent == null) {
-        SideSheetTitleText(text, modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs)))
-    } else {
-        Column(modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs))) {
-            Text(
-                text = stringResource(TvR.string.tv_side_sheet_parent_title, parent),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            SideSheetTitleText(text, Modifier)
-        }
+    Column(modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs))) {
+        TvSideSheetBack()
+        SideSheetTitleText(text, Modifier)
+    }
+}
+
+/**
+ * PROTOTYPE: a page's way back as a top app bar draws it: an arrow and the name of the page Back returns to. Nothing on the
+ * root page. It is not a focus stop: the remote's Back is the action.
+ */
+@Composable
+fun TvSideSheetBack(modifier: Modifier = Modifier) {
+    val parent = LocalTvSideSheetPage.current?.parentTitle ?: return
+    Row(
+        modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_s)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+    ) {
+        Icon(
+            imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
+        )
+        Text(
+            text = parent,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
