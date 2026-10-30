@@ -149,7 +149,7 @@ internal fun BingeSideSheetPanel(
                 .width(width)
                 .clip(BingeShapes.HeroStart)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical))
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.End))
                 // Swallow taps on the panel so they don't fall through to the scrim, with no semantics node of its own.
                 .pointerInput(Unit) { detectTapGestures {} },
         content = content,

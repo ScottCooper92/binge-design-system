@@ -63,4 +63,31 @@ class BingeSideSheetSystemBarsTest {
         assertEquals(statusPx.toFloat(), bounds.top, 1f)
         assertEquals(windowHeight - navPx, bounds.bottom, 1f)
     }
+
+    @Test
+    fun `the panel's content stops short of a navigation bar or cutout on the end edge`() {
+        var endPx = 0
+        rule.setContent {
+            WithWindowInsets({
+                endPx = NavigationBar.roundToPx()
+                WindowInsetsCompat
+                    .Builder()
+                    .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(0, 0, endPx, 0))
+                    .build()
+            }) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    BingeSideSheetPanel {
+                        Box(Modifier.fillMaxSize().testTag(CONTENT_TAG))
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        val bounds = rule.onNodeWithTag(CONTENT_TAG).fetchSemanticsNode().boundsInRoot
+        val windowWidth = rule
+            .onRoot()
+            .fetchSemanticsNode()
+            .boundsInRoot.right
+        assertEquals(windowWidth - endPx, bounds.right, 1f)
+    }
 }
