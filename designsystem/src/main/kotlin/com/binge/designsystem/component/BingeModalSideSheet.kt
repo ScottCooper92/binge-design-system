@@ -13,9 +13,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -81,6 +86,7 @@ internal fun BingeSideSheetWindow(
                 usePlatformDefaultWidth = false,
                 dismissOnBackPress = true,
                 dismissOnClickOutside = false,
+                decorFitsSystemWindows = false,
             ),
     ) {
         var visible by rememberSideSheetShown()
@@ -143,6 +149,7 @@ internal fun BingeSideSheetPanel(
                 .width(width)
                 .clip(BingeShapes.HeroStart)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.End))
                 // Swallow taps on the panel so they don't fall through to the scrim, with no semantics node of its own.
                 .pointerInput(Unit) { detectTapGestures {} },
         content = content,
