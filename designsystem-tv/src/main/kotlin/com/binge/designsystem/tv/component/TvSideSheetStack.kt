@@ -3,7 +3,6 @@ package com.binge.designsystem.tv.component
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -18,7 +17,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import com.binge.designsystem.tv.focus.restoreTvOverlayFocus
+import androidx.compose.ui.layout.onGloballyPositioned
+import com.binge.designsystem.tv.focus.tryRequestFocus
 import com.binge.designsystem.tv.focus.tvLateEntryFocusGroup
 
 private const val ENTRY_SEPARATOR = '\u0001'
@@ -51,8 +51,11 @@ private val StackSaver =
     )
 
 /** The focus requesters of one page's rows, by the key each row gave itself. */
-internal class RowRequesters {
+internal class RowRequesters(
+    private val restoreKey: () -> String? = { null },
+) {
     private val requesters = mutableMapOf<String, FocusRequester>()
+    private var claimed = false
     var first: String? = null
         private set
     var arrival: String? = null
@@ -64,7 +67,18 @@ internal class RowRequesters {
 
     fun contains(key: String) = key in requesters
 
-    fun target(restoreTo: String?): FocusRequester? = (restoreTo?.takeIf(::contains) ?: arrival ?: first)?.let(requesters::get)
+    private fun targetKey(restoreTo: String?): String? = restoreTo?.takeIf(::contains) ?: arrival ?: first
+
+    fun target(restoreTo: String?): FocusRequester? = targetKey(restoreTo)?.let(requesters::get)
+
+    /**
+     * Called as the row [key] is placed. The page's target row takes focus the first time it is, once and only once, so the
+     * page that opens or comes back to is never first seen with focus on some other row.
+     */
+    fun placed(key: String) {
+        if (claimed || key != targetKey(restoreKey())) return
+        claimed = requesters.getValue(key).tryRequestFocus()
+    }
 }
 
 /**
@@ -90,7 +104,10 @@ class TvSideSheetNav internal constructor(
      * Marks a row so the stack can focus it, and goes on its `modifier`. Keys are unique within a page. The first row to
      * ask is where focus lands when the page opens, unless [arriveAt] names another.
      */
-    fun row(key: String): Modifier = Modifier.focusRequester(requesters.requesterFor(key))
+    fun row(key: String): Modifier =
+        Modifier
+            .focusRequester(requesters.requesterFor(key))
+            .onGloballyPositioned { requesters.placed(key) }
 
     /**
      * Where focus lands when this page opens, in place of its first row: the Cancel of a confirm, say, which
@@ -127,8 +144,11 @@ fun TvSideSheetStack(
     var restoreTo by remember { mutableStateOf<String?>(null) }
     // The title each page shows, read only when a page opens another, so the new page can name the one Back returns to.
     val titles = remember { mutableMapOf<String, String>() }
+    // Focus rests here while one page's rows replace another's, so no row takes it by chance as the old ones dispose.
+    val anchor = remember { FocusRequester() }
     val back: () -> Unit = {
         if (entries.size > 1) {
+            anchor.tryRequestFocus()
             val left = entries.removeAt(entries.lastIndex)
             restoreTo = left.openedBy
             pageStates.removeState(left.page)
@@ -139,12 +159,12 @@ fun TvSideSheetStack(
     // The sheet's window takes focus before the page's effect runs; routing entry to the target keeps it off the first row.
     var currentRows by remember { mutableStateOf<RowRequesters?>(null) }
     val routed = modifier.tvLateEntryFocusGroup { currentRows?.target(restoreTo) }
-    TvSideSheet(onDismissRequest = back, modifier = routed, toBottomEdge = toBottomEdge) {
+    TvSideSheetHost(onDismissRequest = back, modifier = routed, toBottomEdge = toBottomEdge, closer = null, anchor = anchor) {
         val column = this
         val top = entries.last()
         key(top.page) {
             pageStates.SaveableStateProvider(top.page) {
-                val rows = remember { RowRequesters() }
+                val rows = remember { RowRequesters { restoreTo } }
                 currentRows = rows
                 val page = remember(top.page, top.parentTitle) { TvSideSheetPage(top.parentTitle) { titles[top.page] = it } }
                 val nav =
@@ -152,6 +172,7 @@ fun TvSideSheetStack(
                         page = top.page,
                         depth = entries.size,
                         onPush = { page, openedBy ->
+                            anchor.tryRequestFocus()
                             restoreTo = null
                             entries.add(StackEntry(page, openedBy, titles[top.page]))
                         },
@@ -159,9 +180,6 @@ fun TvSideSheetStack(
                         requesters = rows,
                     )
                 CompositionLocalProvider(LocalTvSideSheetPage provides page) { column.content(nav) }
-                // After the page's rows, which are what put their requesters in the map.
-                val target = rows.target(restoreTo)
-                if (target != null) LaunchedEffect(Unit) { restoreTvOverlayFocus(target) }
             }
         }
     }

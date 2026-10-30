@@ -68,6 +68,12 @@ key handler that sees every press; without a host nothing is noted and the arriv
 composes, so its target must be attached from the first frame. `restoreTvOverlayFocus` is the older
 frame-wait-then-retry shape, still used where focus returns after an overlay goes. Bound any such wait, in wall-clock time where the thing waited on can stop drawing: `withFrameNanos`
 resumes only on frames the app actually draws, so a frame budget against a static screen never expires.
+A `TvSideSheetStack` moves between pages the same way. The panel carries an anchor that holds focus while one page's
+rows replace another's, so none of the old rows is focused as it disposes and Compose has nothing to reassign. The page's
+target row (its arrival row, or the row that opened the page Back returns from) then takes focus once, the first time it is
+placed. The JVM cannot show the reassignment, so the page-change test checks that focus never rests on another row, and the
+frame-level result is a device check.
+
 The startup handoff to content counts frames instead, and stops early once focus is taken or the user moves up
 to the top bar.
 
