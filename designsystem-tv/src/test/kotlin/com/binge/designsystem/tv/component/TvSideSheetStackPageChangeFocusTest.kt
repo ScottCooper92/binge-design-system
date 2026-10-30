@@ -1,7 +1,10 @@
 package com.binge.designsystem.tv.component
 
 import android.app.Application
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
@@ -31,8 +34,11 @@ class TvSideSheetStackPageChangeFocusTest {
     val composeTestRule = createKeyboardComposeRule()
 
     private val focused = mutableStateListOf<String>()
+    private var openerEnabled by mutableStateOf(true)
 
     private fun Modifier.record(label: String): Modifier = onFocusChanged { if (it.isFocused) focused.add(label) }
+
+    private var disableOpener = false
 
     private fun setSheet() {
         composeTestRule.setContent {
@@ -43,7 +49,13 @@ class TvSideSheetStackPageChangeFocusTest {
                         val key = "${nav.page}-$index"
                         TvSideSheetRow(
                             label = "${nav.page} $index",
-                            onClick = { if (nav.page == "root") nav.push("child", key) },
+                            enabled = nav.page != "root" || index != OPENER || openerEnabled,
+                            onClick = {
+                                if (nav.page == "root") {
+                                    if (disableOpener) openerEnabled = false
+                                    nav.push("child", key)
+                                }
+                            },
                             modifier = nav.row(key).record(key),
                         )
                     }
@@ -83,6 +95,18 @@ class TvSideSheetStackPageChangeFocusTest {
         composeTestRule.onNodeWithText("root $OPENER").assertIsFocused()
         assertFalse("the first row took focus on the way back: $focused", focused.contains("root-1"))
         assertEquals("focus order: $focused", listOf("root-$OPENER"), focused.toList())
+    }
+
+    @Test
+    fun `an opener that cannot take focus on the way back hands it to the first row, not to nothing`() {
+        disableOpener = true
+        setSheet()
+        press(Key.DirectionCenter, on = "root $OPENER")
+
+        press(Key.DirectionLeft, on = "child $ARRIVAL")
+
+        composeTestRule.onNodeWithText("root 1").assertIsFocused()
+        assertEquals("focus order: $focused", listOf("root-1"), focused.toList())
     }
 
     private companion object {

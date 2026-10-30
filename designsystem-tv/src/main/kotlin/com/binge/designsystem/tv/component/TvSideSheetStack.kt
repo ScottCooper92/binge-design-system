@@ -56,6 +56,8 @@ internal class RowRequesters(
 ) {
     private val requesters = mutableMapOf<String, FocusRequester>()
     private var claimed = false
+    private val placedKeys = mutableSetOf<String>()
+    private val refused = mutableSetOf<String>()
     var first: String? = null
         private set
     var arrival: String? = null
@@ -69,15 +71,28 @@ internal class RowRequesters(
 
     private fun targetKey(restoreTo: String?): String? = restoreTo?.takeIf(::contains) ?: arrival ?: first
 
+    private fun candidates(): List<String> = listOfNotNull(restoreKey()?.takeIf(::contains), arrival, first).distinct()
+
     fun target(restoreTo: String?): FocusRequester? = targetKey(restoreTo)?.let(requesters::get)
 
     /**
      * Called as the row [key] is placed. The page's target row takes focus the first time it is, once and only once, so the
-     * page that opens or comes back to is never first seen with focus on some other row.
+     * page that opens or comes back to is never first seen with focus on some other row. A target that refuses focus (a row
+     * disabled meanwhile) passes it to the next candidate, the arrival row and then the first, once that one is placed, so
+     * focus never stays on the anchor.
      */
     fun placed(key: String) {
-        if (claimed || key != targetKey(restoreKey())) return
-        claimed = requesters.getValue(key).tryRequestFocus()
+        placedKeys += key
+        if (claimed) return
+        for (candidate in candidates()) {
+            if (candidate !in placedKeys) return
+            if (candidate in refused) continue
+            if (requesters.getValue(candidate).tryRequestFocus()) {
+                claimed = true
+                return
+            }
+            refused += candidate
+        }
     }
 }
 
