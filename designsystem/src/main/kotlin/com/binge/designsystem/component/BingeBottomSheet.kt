@@ -19,6 +19,14 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.composed
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -100,6 +108,7 @@ fun BingeBottomSheet(
             null
         }
     val dockFraction by remember(dock) { derivedStateOf { dock?.fraction ?: 0f } }
+    val wash = remember { BingeSheetWash() }
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         // heightIn caps rather than sets, so a sheet already shorter than the crease is untouched.
@@ -110,7 +119,20 @@ fun BingeBottomSheet(
         contentColor = MaterialTheme.colorScheme.onSurface,
         shape = if (dock != null) DockingSheetShape(dockFraction) else BingeShapes.HeroTop,
         // A docking sheet draws its drag handle itself, inside BingeSheetDockingHeader, so it can fade into the bar.
-        dragHandle = if (dock != null) null else ({ BottomSheetDefaults.DragHandle() }),
+        // PROTOTYPE: the handle's strip carries the page's wash, so a hero's colour runs to the sheet's top edge.
+        dragHandle = if (dock != null) {
+            null
+        } else {
+            {
+                val tint = wash.tint
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(if (tint != null) Modifier.background(tint.copy(alpha = BingeSheetWash.TOP_ALPHA)) else Modifier),
+                    contentAlignment = androidx.compose.ui.Alignment.Center,
+                ) { BottomSheetDefaults.DragHandle() }
+            }
+        },
         // A confirm sheet suppresses only scrim-tap dismiss (so an accidental outside tap can't
         // discard an in-progress choice) while leaving back-press and drag as deliberate cancels —
         // pass dismissOnClickOutside = false with gesturesEnabled = true for that.
@@ -123,7 +145,9 @@ fun BingeBottomSheet(
         BackHandler(enabled = gesturesEnabled && sheetState.currentValue == SheetValue.Expanded && sheetState.hasPartiallyExpandedState) {
             scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
         }
-        CompositionLocalProvider(LocalBingeSheetDock provides dock) { content() }
+        CompositionLocalProvider(LocalBingeSheetDock provides dock, LocalBingeSheetWash provides wash) {
+            androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth().bingeSheetWash(wash)) { content() }
+        }
     }
 }
 
@@ -184,3 +208,43 @@ internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
 
 /** The gap, in pixels, between a centred sheet at most [sheetMaxWidth] wide and each side of a [windowWidth] window. */
 internal fun sheetSideMargin(windowWidth: Int, sheetMaxWidth: Int): Int = ((windowWidth - sheetMaxWidth) / 2).coerceAtLeast(0)
+
+
+/** PROTOTYPE: a colour a sheet's page asks the sheet to carry up to its top edge, behind the drag handle. */
+class BingeSheetWash {
+    var tint by androidx.compose.runtime.mutableStateOf<androidx.compose.ui.graphics.Color?>(null)
+
+    /** What the side sheet's Back bar names: where Back goes, when the page knows. */
+    var backLabel by androidx.compose.runtime.mutableStateOf<String?>(null)
+
+    /** Where the page's header ends, in the root's pixels: the wash fades out just under it. */
+    var bottomInRoot by androidx.compose.runtime.mutableStateOf(0f)
+
+    companion object {
+        /** The wash's strength at the sheet's top, where a page's own wash must start to meet it. */
+        const val TOP_ALPHA = 0.5f
+    }
+}
+
+val LocalBingeSheetWash = androidx.compose.runtime.staticCompositionLocalOf<BingeSheetWash?> { null }
+
+/** PROTOTYPE: draws [wash] behind a sheet's content, from its top edge down to just under the page's header. */
+fun Modifier.bingeSheetWash(wash: BingeSheetWash): Modifier =
+    this.composed {
+        var top by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0f) }
+        this
+            .onGloballyPositioned { top = it.positionInRoot().y }
+            .drawBehind {
+                val tint = wash.tint ?: return@drawBehind
+                val end = (wash.bottomInRoot - top + 24.dp.toPx()).coerceAtLeast(1f)
+                drawRect(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        0f to tint.copy(alpha = BingeSheetWash.TOP_ALPHA),
+                        0.7f to tint.copy(alpha = 0.18f),
+                        1f to androidx.compose.ui.graphics.Color.Transparent,
+                        endY = end,
+                    ),
+                    size = androidx.compose.ui.geometry.Size(size.width, end),
+                )
+            }
+    }

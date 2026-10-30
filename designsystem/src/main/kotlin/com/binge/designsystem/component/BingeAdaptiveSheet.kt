@@ -16,6 +16,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
@@ -185,7 +189,9 @@ fun BingeTaskSheetPanel(
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     BingeSideSheetPanel(modifier = modifier, width = dimensionResource(R.dimen.task_sheet_width)) {
-        Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical))) {
+        val wash = androidx.compose.runtime.remember { BingeSheetWash() }
+        androidx.compose.runtime.CompositionLocalProvider(LocalBingeSheetWash provides wash) {
+        Column(modifier = Modifier.fillMaxSize().bingeSheetWash(wash).windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical))) {
             val nav =
                 BingeSheetNav(
                     page = pages.last(),
@@ -197,15 +203,24 @@ fun BingeTaskSheetPanel(
             if (pages.size > 1) BingeSheetBackBar(onBack, enabled = backEnabled)
             key(nav.page) { content(nav) }
         }
+        }
     }
 }
 
 /** The bar above a stacked page: Back at the start, as a sheet that is not the first page of its stack has no other way out but the scrim. */
 @Composable
 private fun BingeSheetBackBar(onBack: () -> Unit, enabled: Boolean) {
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.padding_xs))) {
-        IconButton(onClick = onBack, enabled = enabled) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_navigate_back))
+    // PROTOTYPE: the arrow and, when the page names where Back goes, that name: one tap target, in the content colour.
+    val label = LocalBingeSheetWash.current?.backLabel
+    TextButton(
+        onClick = onBack,
+        enabled = enabled,
+        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_xs)),
+        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+    ) {
+        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_navigate_back))
+        if (label != null) {
+            Text(text = label, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_sm)))
         }
     }
 }

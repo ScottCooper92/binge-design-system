@@ -81,6 +81,8 @@ internal fun BingeSideSheetWindow(
                 usePlatformDefaultWidth = false,
                 dismissOnBackPress = true,
                 dismissOnClickOutside = false,
+                // Edge to edge, so the scrim and the panel run under the status bar; the panel pads its own content.
+                decorFitsSystemWindows = false,
             ),
     ) {
         var visible by rememberSideSheetShown()
