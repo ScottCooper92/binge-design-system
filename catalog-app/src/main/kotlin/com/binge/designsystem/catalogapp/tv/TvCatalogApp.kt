@@ -49,6 +49,7 @@ fun TvCatalogApp(entries: List<CatalogEntry> = TvCatalogRegistry) {
             onOpen = { selectedId = it.id },
         )
         if (selected != null) {
+            closer.ReportDisposal()
             BackHandler { closer.close() }
             TvSampleDetail(
                 entry = selected,

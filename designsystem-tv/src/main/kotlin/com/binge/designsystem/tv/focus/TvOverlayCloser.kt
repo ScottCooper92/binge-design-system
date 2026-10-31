@@ -1,5 +1,7 @@
 package com.binge.designsystem.tv.focus
 
+import android.content.pm.ApplicationInfo
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +13,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.flow.first
 
 /**
@@ -45,6 +48,7 @@ import kotlinx.coroutines.flow.first
 fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvOverlayCloser {
     var closing by remember { mutableStateOf(false) }
     val currentOnClose by rememberUpdatedState(onClose)
+    val debuggable = (LocalContext.current.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
     val closer = remember { TvOverlayCloser(arm = { closing = true }) }
     LaunchedEffect(closing) {
         if (!closing) return@LaunchedEffect
@@ -58,6 +62,7 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
             snapshotFlow { closer.disposed }.first { it }
             restoreTo.tryRequestFocus()
         } else {
+            if (debuggable) Log.w(TAG, FALLBACK_MESSAGE)
             restoreTvOverlayFocus(restoreTo)
         }
         // Reset so the overlay can be opened and closed again — an un-reset latch stays armed and either never
@@ -122,3 +127,8 @@ class TvOverlayCloser internal constructor(
         disposed = true
     }
 }
+
+private const val TAG = "TvOverlayCloser"
+private const val FALLBACK_MESSAGE =
+    "Closed an overlay that never reported its disposal, so focus is retried instead of returned once: " +
+        "give the overlay the closer, or call ReportDisposal() inside it."

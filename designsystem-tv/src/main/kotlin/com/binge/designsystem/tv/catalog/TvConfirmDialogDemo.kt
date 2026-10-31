@@ -28,6 +28,7 @@ fun TvConfirmDialogDemo() {
         TvButton(label = "Open dialog", onClick = { open = true }, modifier = Modifier.focusRequester(opener))
     }
     if (open) {
+        closer.ReportDisposal()
         TvConfirmDialog(
             title = "Delete this request?",
             message = "It is removed from the server for everyone.",
