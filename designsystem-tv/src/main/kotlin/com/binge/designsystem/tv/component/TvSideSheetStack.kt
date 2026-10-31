@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
+import com.binge.designsystem.tv.focus.TvOverlayCloser
 import com.binge.designsystem.tv.focus.tryRequestFocus
 import com.binge.designsystem.tv.focus.tvLateEntryFocusGroup
 
@@ -153,7 +154,8 @@ class TvSideSheetNav internal constructor(
  * list scrolled down comes back where it was, the default scroll of [TvSideSheetRows] included; a page gone back from forgets
  * its own. Pages are keyed by name, so the stack survives a rotation, and no page
  * opens another of the same name; what a page shows is the caller's to read from its own
- * state. [content] draws the page named by [TvSideSheetNav.page], and gives every row [TvSideSheetNav.row].
+ * state. [content] draws the page named by [TvSideSheetNav.page], and gives every row [TvSideSheetNav.row]. Pass the
+ * [closer] the caller closes it with, so it lets focus go as the sheet closes and returns it once the sheet is gone.
  */
 @Composable
 fun TvSideSheetStack(
@@ -161,6 +163,7 @@ fun TvSideSheetStack(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     toBottomEdge: Boolean = false,
+    closer: TvOverlayCloser? = null,
     content: @Composable ColumnScope.(nav: TvSideSheetNav) -> Unit,
 ) {
     val entries = rememberSaveable(root, saver = StackSaver) { mutableStateListOf(StackEntry(root, null)) }
@@ -183,7 +186,7 @@ fun TvSideSheetStack(
     // The sheet's window takes focus before the page's effect runs; routing entry to the target keeps it off the first row.
     var currentRows by remember { mutableStateOf<RowRequesters?>(null) }
     val routed = modifier.tvLateEntryFocusGroup { currentRows?.target(restoreTo) }
-    TvSideSheetHost(onDismissRequest = back, modifier = routed, toBottomEdge = toBottomEdge, closer = null, anchor = anchor) {
+    TvSideSheetHost(onDismissRequest = back, modifier = routed, toBottomEdge = toBottomEdge, closer = closer, anchor = anchor) {
         val column = this
         val top = entries.last()
         key(top.page) {

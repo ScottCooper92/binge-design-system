@@ -45,7 +45,7 @@ fun TvSideSheetDemo() {
         TvButton(label = "Open sheet", onClick = { open = true }, modifier = Modifier.focusRequester(opener))
     }
     if (open) {
-        TvSideSheet(onDismissRequest = closer::close) { entryFocus ->
+        TvSideSheet(onDismissRequest = closer::close, closer = closer) { entryFocus ->
             if (confirming) {
                 TvSideSheetConfirm(
                     title = "Delete this request?",
@@ -93,7 +93,7 @@ fun TvSideSheetStackDemo() {
         TvButton(label = "Open settings", onClick = { open = true }, modifier = Modifier.focusRequester(opener))
     }
     if (open) {
-        TvSideSheetStack(root = "settings", onDismissRequest = closer::close) { nav ->
+        TvSideSheetStack(root = "settings", onDismissRequest = closer::close, closer = closer) { nav ->
             when (nav.page) {
                 "settings" -> {
                     TvSideSheetTitle("Settings")
