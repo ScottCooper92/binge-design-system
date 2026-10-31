@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.component
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -83,6 +85,17 @@ fun TvSideSheet(
     toBottomEdge: Boolean = false,
     closer: TvOverlayCloser? = null,
     content: @Composable ColumnScope.(entryFocus: FocusRequester) -> Unit,
+) = TvSideSheetHost(onDismissRequest, modifier, toBottomEdge, closer, anchor = null, content)
+
+/** [TvSideSheet] with the panel's [anchor], which a stack holds focus on while one page replaces another. */
+@Composable
+internal fun TvSideSheetHost(
+    onDismissRequest: () -> Unit,
+    modifier: Modifier,
+    toBottomEdge: Boolean,
+    closer: TvOverlayCloser?,
+    anchor: FocusRequester?,
+    content: @Composable ColumnScope.(entryFocus: FocusRequester) -> Unit,
 ) {
     val entryFocus = remember { FocusRequester() }
     val dismissKey = tvStartDirectionKey()
@@ -96,15 +109,20 @@ fun TvSideSheet(
                     if (event.type == KeyEventType.KeyDown && event.key == dismissKey) {
                         onDismissRequest()
                         true
+                    } else if (anchor != null && event.key == Key.Back) {
+                        // The anchor makes the panel a focusable ancestor, which can swallow a Back that nothing below it handles; take it here.
+                        if (event.type == KeyEventType.KeyDown) onDismissRequest()
+                        true
                     } else {
                         false
                     }
                 },
     ) {
-        TvSideSheetPanel(
+        TvSideSheetPanelHost(
             modifier = Modifier.align(Alignment.CenterEnd),
             toBottomEdge = toBottomEdge,
             closer = closer,
+            anchor = anchor,
         ) { content(entryFocus) }
     }
 }
@@ -133,6 +151,20 @@ fun TvSideSheetPanel(
     toBottomEdge: Boolean = false,
     closer: TvOverlayCloser? = null,
     content: @Composable ColumnScope.() -> Unit,
+) = TvSideSheetPanelHost(modifier, toBottomEdge, closer, anchor = null, content)
+
+/**
+ * [TvSideSheetPanel] with an [anchor]: a focus target on the panel itself, inside its trap, that holds focus while rows
+ * are swapped so none of them takes it by chance as the old ones dispose. It encloses every row, so a directional search
+ * never lands on it.
+ */
+@Composable
+internal fun TvSideSheetPanelHost(
+    modifier: Modifier,
+    toBottomEdge: Boolean,
+    closer: TvOverlayCloser?,
+    anchor: FocusRequester?,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     if (closer != null) {
         DisposableEffect(closer) {
@@ -147,6 +179,7 @@ fun TvSideSheetPanel(
                 .width(dimensionResource(TvR.dimen.tv_side_sheet_width))
                 .background(MaterialTheme.tvStyle.panel)
                 .tvExitFocusGroup { closer?.trapping ?: true }
+                .then(if (anchor == null) Modifier else Modifier.focusRequester(anchor).focusable())
                 .padding(
                     start = dimensionResource(DesR.dimen.padding_l),
                     top = dimensionResource(TvR.dimen.tv_overscan_vertical),

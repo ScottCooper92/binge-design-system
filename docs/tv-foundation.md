@@ -71,6 +71,13 @@ resumes only on frames the app actually draws, so a frame budget against a stati
 The startup handoff to content counts frames instead, and stops early once focus is taken or the user moves up
 to the top bar.
 
+A `TvSideSheetStack` claims early in the same way when it changes pages. The panel carries an anchor that holds focus while
+one page's rows replace another's, so none of the old rows is focused as it disposes and Compose has nothing to reassign. The
+page's target row (its arrival row, or the row that opened the page Back returns from) then takes focus once, the first time it
+is placed, and a target that refuses focus passes it to the arrival row and then the first row. The JVM cannot show the
+reassignment, so the page-change test checks that focus never rests on another row, and the frame-level result is a device
+check.
+
 ## The accent model: the accent is focus, a tick is selection
 
 The reference is Google TV's own rail. There, focus is a solid white fill — white surface, black
