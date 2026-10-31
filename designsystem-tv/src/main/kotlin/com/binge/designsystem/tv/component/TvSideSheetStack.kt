@@ -131,6 +131,12 @@ class TvSideSheetNav internal constructor(
     fun arriveAt(key: String) {
         requesters.arrival = key
     }
+
+    /**
+     * Puts focus where this page puts it when it opens: its arrival row, else its first. For a page whose focused row has
+     * gone (an answer replaced, an action done) and which has no row of its own to hand focus to. Returns whether a row took it.
+     */
+    fun focusEntry(): Boolean = requesters.target(null)?.tryRequestFocus() ?: false
 }
 
 /**
