@@ -60,9 +60,7 @@ import com.binge.designsystem.tv.focus.tvExitFocusGroup
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
-import com.binge.designsystem.tv.theme.LocalTvStyle
 import com.binge.designsystem.tv.theme.TV_OVERLAY_SCRIM_ALPHA
-import com.binge.designsystem.tv.theme.TvStyle
 import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -172,12 +170,14 @@ internal fun TvSideSheetPanelHost(
             onDispose { closer.overlayGone() }
         }
     }
+    val wash = remember { TvSideSheetWash() }
     Column(
         modifier =
             modifier
                 .fillMaxHeight()
                 .width(dimensionResource(TvR.dimen.tv_side_sheet_width))
                 .background(MaterialTheme.tvStyle.panel)
+                .tvSideSheetWashBehind(wash)
                 .tvExitFocusGroup { closer?.trapping ?: true }
                 .then(if (anchor == null) Modifier else Modifier.focusRequester(anchor).focusable())
                 .padding(
@@ -187,33 +187,21 @@ internal fun TvSideSheetPanelHost(
                 ).then(if (toBottomEdge) Modifier else Modifier.padding(bottom = dimensionResource(TvR.dimen.tv_overscan_vertical))),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
-        CompositionLocalProvider(LocalTvSideSheetToBottomEdge provides toBottomEdge) { content() }
+        CompositionLocalProvider(LocalTvSideSheetToBottomEdge provides toBottomEdge, LocalTvSideSheetWash provides wash) { content() }
     }
 }
 
 /**
- * The sheet's heading: what its rows act on. On a page opened over another in a [TvSideSheetStack], and under
- * [TvStyle.Monochrome], a small line above it names the page Back returns to ("‹ Companions"). The line is no control and takes
- * no focus; Back stays the way back.
+ * The sheet's heading: what its rows act on. On a page opened over another in a [TvSideSheetStack] it carries [TvSideSheetBack]
+ * above its text, which names the page Back returns to.
  */
 @Composable
 fun TvSideSheetTitle(text: String, modifier: Modifier = Modifier) {
     val page = LocalTvSideSheetPage.current
     SideEffect { page?.onTitle(text) }
-    val parent = page?.parentTitle?.takeIf { LocalTvStyle.current == TvStyle.Monochrome }
-    if (parent == null) {
-        SideSheetTitleText(text, modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs)))
-    } else {
-        Column(modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs))) {
-            Text(
-                text = stringResource(TvR.string.tv_side_sheet_parent_title, parent),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            SideSheetTitleText(text, Modifier)
-        }
+    Column(modifier = modifier.padding(bottom = dimensionResource(DesR.dimen.padding_xs))) {
+        TvSideSheetBack()
+        SideSheetTitleText(text, Modifier)
     }
 }
 

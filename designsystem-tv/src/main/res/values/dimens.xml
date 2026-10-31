@@ -125,6 +125,8 @@
     <dimen name="tv_switch_thumb">16dp</dimen>
     <!-- TvSideSheet: the end-edge panel's width -->
     <dimen name="tv_side_sheet_width">420dp</dimen>
+    <!-- How far below a washed header the sheet's wash keeps fading before it reaches the panel's own colour. -->
+    <dimen name="tv_side_sheet_wash_fade">32dp</dimen>
     <dimen name="tv_info_card_outline_width">1dp</dimen>
     <!-- TvDecisionPage: the copy's gaps, a point row's padding, and its icon plate -->
     <dimen name="tv_decision_heading_gap">10dp</dimen>
