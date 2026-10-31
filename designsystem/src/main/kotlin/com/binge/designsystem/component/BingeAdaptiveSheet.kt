@@ -79,6 +79,10 @@ class BingeSheetNav internal constructor(
  * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it, and [gesturesEnabled] false
  * locks it like the bottom sheet: system Back and the Back bar do nothing, so a write in flight is not walked away from.
  *
+ * [backLabel] names the page Back returns to, shown beside the arrow of a pushed page's Back bar. It is called with the page now
+ * showing and returns the title of the page below it, or null for the icon-only bar. It reaches the side sheet only: the bottom
+ * form has no Back bar, so a caller draws its own back row there.
+ *
  * The page stack is saved and shared by both forms, so a rotation or a fold keeps the sheet on the page it was on. If the
  * window narrows with pages open, the bottom sheet shows the top one; it opens no more, a drag or system Back closes it
  * outright, and [BingeSheetNav.pop] steps back through the rest. A caller whose pages are backed by its own state (a view
@@ -246,7 +250,7 @@ private fun BingeSheetBackBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_navigate_back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(

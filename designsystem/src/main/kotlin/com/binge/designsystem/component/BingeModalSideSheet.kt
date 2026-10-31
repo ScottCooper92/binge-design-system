@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -154,6 +155,6 @@ internal fun BingeSideSheetPanel(
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.End))
                 // Swallow taps on the panel so they don't fall through to the scrim, with no semantics node of its own.
                 .pointerInput(Unit) { detectTapGestures {} },
-        content = content,
+        content = { CompositionLocalProvider(LocalBingeSheetWash provides wash) { content() } },
     )
 }

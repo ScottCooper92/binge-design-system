@@ -1,14 +1,18 @@
 package com.binge.designsystem.component
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -18,7 +22,7 @@ class BingeSheetBackLabelTest {
     val rule = createComposeRule()
 
     @Test
-    fun `a pushed page names where Back returns to, and the label is the target`() {
+    fun `a labelled Back keeps its Back description, and the label is the target`() {
         var backs = 0
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
@@ -26,6 +30,7 @@ class BingeSheetBackLabelTest {
             }
         }
 
+        rule.onNodeWithContentDescription(RuntimeEnvironment.getApplication().getString(R.string.cd_navigate_back)).assertIsDisplayed()
         rule.onNodeWithText("Companions").performClick()
 
         assertEquals(1, backs)
