@@ -1,5 +1,7 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -10,15 +12,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.isExpandedLayout
 
@@ -70,6 +79,10 @@ class BingeSheetNav internal constructor(
  * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it, and [gesturesEnabled] false
  * locks it like the bottom sheet: system Back and the Back bar do nothing, so a write in flight is not walked away from.
  *
+ * [backLabel] names the page Back returns to, shown beside the arrow of a pushed page's Back bar. It is called with the page now
+ * showing and returns the title of the page below it, or null for the icon-only bar. It reaches the side sheet only: the bottom
+ * form has no Back bar, so a caller draws its own back row there.
+ *
  * The page stack is saved and shared by both forms, so a rotation or a fold keeps the sheet on the page it was on. If the
  * window narrows with pages open, the bottom sheet shows the top one; it opens no more, a drag or system Back closes it
  * outright, and [BingeSheetNav.pop] steps back through the rest. A caller whose pages are backed by its own state (a view
@@ -89,6 +102,7 @@ fun BingeAdaptiveSheet(
     dismissOnClickOutside: Boolean = gesturesEnabled,
     dockable: Boolean = false,
     edgeToEdge: Boolean = false,
+    backLabel: (page: String) -> String? = { null },
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
@@ -102,6 +116,7 @@ fun BingeAdaptiveSheet(
             popPage = popPage,
             locked = !gesturesEnabled,
             scrimDismisses = dismissOnClickOutside,
+            backLabel = backLabel,
             modifier = modifier,
             content = content,
         )
@@ -124,7 +139,12 @@ fun BingeAdaptiveSheet(
             dismissOnClickOutside = dismissOnClickOutside,
             dockable = dockable,
             edgeToEdge = edgeToEdge,
-        ) { content(nav) }
+        ) {
+            val wash = rememberBingeSheetWash()
+            CompositionLocalProvider(LocalBingeSheetWash provides wash) {
+                Column(modifier = Modifier.fillMaxWidth().bingeSheetWashBehind(wash, overdrawTop = true)) { content(nav) }
+            }
+        }
     }
 }
 
@@ -138,6 +158,7 @@ private fun BingeTaskSideSheet(
     popPage: () -> Unit,
     locked: Boolean,
     scrimDismisses: Boolean,
+    backLabel: (page: String) -> String?,
     modifier: Modifier,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
@@ -151,6 +172,7 @@ private fun BingeTaskSideSheet(
                 onPush = { page -> pages.add(page) },
                 onBack = popPage,
                 backEnabled = !locked,
+                backLabel = backLabel(pages.last()),
                 modifier = modifier,
                 content = content,
             )
@@ -177,30 +199,68 @@ fun BingeTaskSheetPanel(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     backEnabled: Boolean = true,
+    backLabel: String? = null,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
-    BingeSideSheetPanel(modifier = modifier, width = dimensionResource(R.dimen.task_sheet_width)) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            val nav =
-                BingeSheetNav(
-                    page = pages.last(),
-                    depth = pages.size,
-                    stacksPages = true,
-                    onPush = onPush,
-                    onBack = onBack,
-                )
-            if (pages.size > 1) BingeSheetBackBar(onBack, enabled = backEnabled)
-            key(nav.page) { content(nav) }
+    val wash = rememberBingeSheetWash()
+    BingeSideSheetPanel(modifier = modifier, width = dimensionResource(R.dimen.task_sheet_width), wash = wash) {
+        CompositionLocalProvider(LocalBingeSheetWash provides wash) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                val nav =
+                    BingeSheetNav(
+                        page = pages.last(),
+                        depth = pages.size,
+                        stacksPages = true,
+                        onPush = onPush,
+                        onBack = onBack,
+                    )
+                if (pages.size > 1) BingeSheetBackBar(onBack, enabled = backEnabled, label = backLabel)
+                key(nav.page) { content(nav) }
+            }
         }
     }
 }
 
-/** The bar above a stacked page: Back at the start, as a sheet that is not the first page of its stack has no other way out but the scrim. */
+/**
+ * The bar above a stacked page: Back at the start, as a sheet that is not the first page of its stack has no other way out
+ * but the scrim. With a [label], the name of the page Back returns to sits beside the arrow and the pair is one target.
+ */
 @Composable
-private fun BingeSheetBackBar(onBack: () -> Unit, enabled: Boolean) {
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.padding_xs))) {
-        IconButton(onClick = onBack, enabled = enabled) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_navigate_back))
+private fun BingeSheetBackBar(
+    onBack: () -> Unit,
+    enabled: Boolean,
+    label: String?,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.padding_xs)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (label == null) {
+            IconButton(onClick = onBack, enabled = enabled) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_navigate_back))
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .clickable(enabled = enabled, role = Role.Button, onClick = onBack)
+                    .minimumInteractiveComponentSize()
+                    .padding(horizontal = dimensionResource(R.dimen.padding_s)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.cd_navigate_back),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

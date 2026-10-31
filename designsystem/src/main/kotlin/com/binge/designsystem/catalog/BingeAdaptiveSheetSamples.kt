@@ -15,13 +15,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
+import com.binge.designsystem.component.bingeSheetWash
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.preview.TaskSheetBottomChrome
 import com.binge.designsystem.preview.TaskSheetPreviewFrame
 
 private const val DETAIL = "detail"
+private const val SAMPLE_WASH = 0xFFB3261EL
 
 /**
  * A task sheet, as the window shows it: a side sheet on the end edge at the expanded width (840dp and up), the bottom
@@ -43,6 +46,39 @@ fun BingeAdaptiveTaskSheetSample() {
 fun BingeAdaptiveTaskSheetStackedSample() {
     ScreenshotTheme {
         SheetBackdrop { TaskSheetPreviewFrame(page = DETAIL) { SampleDetailPage() } }
+    }
+}
+
+/**
+ * The task sheet with its header washed: the block that leads the page asks the sheet to take its colour, from the top of the
+ * sheet down behind the header, fading into the sheet below it.
+ */
+@Composable
+fun BingeAdaptiveTaskSheetWashSample() {
+    ScreenshotTheme {
+        SheetBackdrop {
+            TaskSheetPreviewFrame {
+                SampleWashedHeader()
+                SampleRow("Seasons")
+                SampleRow("Quality profile")
+                SampleBottomSpace()
+            }
+        }
+    }
+}
+
+/** A page opened over a washed one: Back names the page it returns to, and the page brings its own wash. */
+@Composable
+fun BingeAdaptiveTaskSheetBackLabelSample() {
+    ScreenshotTheme {
+        SheetBackdrop {
+            TaskSheetPreviewFrame(page = DETAIL, backLabel = "Companions") {
+                SampleWashedHeader()
+                SampleRow("Season 1")
+                SampleRow("Season 2")
+                SampleBottomSpace()
+            }
+        }
     }
 }
 
@@ -85,6 +121,15 @@ private fun ColumnScope.SampleDetailPage() {
     SampleRow("Season 2")
     SampleRow("Season 3")
     SampleBottomSpace()
+}
+
+@Composable
+private fun SampleWashedHeader() {
+    Text(
+        text = "Washed header",
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.fillMaxWidth().bingeSheetWash(Color(SAMPLE_WASH)).padding(dimensionResource(R.dimen.padding_m)),
+    )
 }
 
 @Composable
