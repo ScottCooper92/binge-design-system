@@ -78,8 +78,8 @@ internal class RowRequesters(
     /**
      * Called as the row [key] is placed. The page's target row takes focus the first time it is, once and only once, so the
      * page that opens or comes back to is never first seen with focus on some other row. A target that refuses focus (a row
-     * disabled meanwhile) passes it to the next candidate, the arrival row and then the first, once that one is placed, so
-     * focus never stays on the anchor.
+     * disabled meanwhile) passes it to the next candidate, the arrival row and then the first, once that one is placed. Only
+     * when every candidate refuses does focus stay on the anchor.
      */
     fun placed(key: String) {
         placedKeys += key
