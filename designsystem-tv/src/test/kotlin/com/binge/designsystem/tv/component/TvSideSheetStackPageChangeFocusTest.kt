@@ -17,6 +17,7 @@ import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -118,6 +119,61 @@ class TvSideSheetStackPageChangeFocusTest {
 
         composeTestRule.onNodeWithText("root $OPENER").assertIsFocused()
         assertEquals("focus order: $focused", listOf("root-$OPENER"), focused.toList())
+    }
+
+    private fun showFocusEntry(arrival: String?, disabled: String? = null): () -> Boolean {
+        lateinit var focusEntry: () -> Boolean
+        composeTestRule.setContent {
+            BingeTvTheme {
+                TvSideSheetStack(root = "page", onDismissRequest = {}) { nav ->
+                    focusEntry = nav::focusEntry
+                    (1..ROWS).forEach { index ->
+                        TvSideSheetRow(
+                            label = "row $index",
+                            enabled = "page-$index" != disabled,
+                            onClick = {},
+                            modifier = nav.row("page-$index"),
+                        )
+                    }
+                    arrival?.let(nav::arriveAt)
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("row 5").requestFocus()
+        composeTestRule.waitForIdle()
+        return focusEntry
+    }
+
+    /** A page whose focused row has gone hands focus back to where the page opens: its arrival row. */
+    @Test
+    fun `focusEntry puts focus on the page's arrival row`() {
+        val focusEntry = showFocusEntry(arrival = "page-3")
+
+        composeTestRule.runOnUiThread { assertTrue(focusEntry()) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("row 3").assertIsFocused()
+    }
+
+    @Test
+    fun `focusEntry puts focus on the page's first row when it names no arrival`() {
+        val focusEntry = showFocusEntry(arrival = null)
+
+        composeTestRule.runOnUiThread { assertTrue(focusEntry()) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("row 1").assertIsFocused()
+    }
+
+    @Test
+    fun `focusEntry hands focus to the first row when the arrival row is disabled`() {
+        val focusEntry = showFocusEntry(arrival = "page-3", disabled = "page-3")
+
+        composeTestRule.runOnUiThread { assertTrue(focusEntry()) }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("row 1").assertIsFocused()
     }
 
     private companion object {
