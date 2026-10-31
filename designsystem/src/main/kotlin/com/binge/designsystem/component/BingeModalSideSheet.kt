@@ -140,6 +140,7 @@ internal fun rememberSideSheetShown(): MutableState<Boolean> = rememberSaveable 
 internal fun BingeSideSheetPanel(
     modifier: Modifier = Modifier,
     width: Dp = dimensionResource(R.dimen.side_sheet_width),
+    wash: BingeSheetWash? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -149,6 +150,7 @@ internal fun BingeSideSheetPanel(
                 .width(width)
                 .clip(BingeShapes.HeroStart)
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .then(if (wash != null) Modifier.bingeSheetWashBehind(wash) else Modifier)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.End))
                 // Swallow taps on the panel so they don't fall through to the scrim, with no semantics node of its own.
                 .pointerInput(Unit) { detectTapGestures {} },

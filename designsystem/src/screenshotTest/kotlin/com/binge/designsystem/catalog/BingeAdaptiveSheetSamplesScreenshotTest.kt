@@ -38,6 +38,24 @@ class BingeAdaptiveSheetSamplesScreenshotTest {
         BingeAdaptiveTaskSheetStackedSample()
     }
 
+    /** The wash runs to the top of the sheet; under the system bars the side sheet's panel reserves them and the wash still starts at the edge. */
+    @PreviewTest
+    @Preview(name = "compact-dark", device = COMPACT_DEVICE, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "compact-light", device = COMPACT_DEVICE, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "expanded-dark", device = EXPANDED_DEVICE, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun TaskWash() {
+        PreviewSystemBarInsets { BingeAdaptiveTaskSheetWashSample() }
+    }
+
+    @PreviewTest
+    @Preview(name = "expanded-dark", device = EXPANDED_DEVICE, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "expanded-font2", device = EXPANDED_DEVICE, uiMode = UI_MODE_NIGHT_YES, fontScale = 2f)
+    @Composable
+    fun TaskBackLabel() {
+        BingeAdaptiveTaskSheetBackLabelSample()
+    }
+
     @PreviewTest
     @Preview(name = "compact-dark", device = COMPACT_DEVICE, uiMode = UI_MODE_NIGHT_YES)
     @Preview(name = "expanded-dark", device = EXPANDED_DEVICE, uiMode = UI_MODE_NIGHT_YES)

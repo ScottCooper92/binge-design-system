@@ -182,6 +182,10 @@
     <dimen name="side_sheet_width">340dp</dimen>
     <!-- A task sheet's side-sheet form: wide enough for a form row and a picker, narrow enough to leave the list beside it. -->
     <dimen name="task_sheet_width">420dp</dimen>
+    <!-- How far below a washed header a sheet's wash keeps fading before it reaches the sheet's own colour. -->
+    <dimen name="sheet_wash_fade">32dp</dimen>
+    <!-- How far above a bottom sheet's content its wash starts, so it covers the drag handle; the sheet's shape clips the excess. -->
+    <dimen name="sheet_wash_overdraw">48dp</dimen>
     <dimen name="discover_filter_chip_padding_h">14dp</dimen>
     <dimen name="discover_filter_chip_padding_v">8dp</dimen>
     <dimen name="discover_filter_chip_icon">14dp</dimen>

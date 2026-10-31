@@ -13,14 +13,18 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.binge.designsystem.component.BingeTaskSheetPanel
+import com.binge.designsystem.component.LocalBingeSheetWash
 import com.binge.designsystem.component.ROOT_PAGE
 import com.binge.designsystem.component.TaskSheetTopClearance
+import com.binge.designsystem.component.bingeSheetWashBehind
+import com.binge.designsystem.component.rememberBingeSheetWash
 import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.theme.BingeShapes
 
@@ -40,12 +44,22 @@ annotation class TaskSheetPreviews
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskSheetPreviewFrame(page: String = ROOT_PAGE, content: @Composable ColumnScope.() -> Unit) {
+fun TaskSheetPreviewFrame(
+    page: String = ROOT_PAGE,
+    backLabel: String? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Box(Modifier.fillMaxSize()) {
         if (isExpandedLayout()) {
             // A page past the root draws the side sheet's Back bar over it, as a pushed page does.
             val pages = if (page == ROOT_PAGE) listOf(ROOT_PAGE) else listOf(ROOT_PAGE, page)
-            BingeTaskSheetPanel(pages = pages, onPush = {}, onBack = {}, modifier = Modifier.align(Alignment.CenterEnd)) {
+            BingeTaskSheetPanel(
+                pages = pages,
+                onPush = {},
+                onBack = {},
+                backLabel = backLabel,
+                modifier = Modifier.align(Alignment.CenterEnd),
+            ) {
                 TaskSheetTopClearance(it)
                 content()
             }
@@ -63,15 +77,18 @@ fun TaskSheetPreviewFrame(page: String = ROOT_PAGE, content: @Composable ColumnS
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BoxScope.TaskSheetBottomChrome(content: @Composable ColumnScope.() -> Unit) {
-    Column(
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
-            .fillMaxWidth()
-            .clip(BingeShapes.HeroTop)
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
-    ) {
-        BottomSheetDefaults.DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
-        content()
+    val wash = rememberBingeSheetWash()
+    CompositionLocalProvider(LocalBingeSheetWash provides wash) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
+                .fillMaxWidth()
+                .clip(BingeShapes.HeroTop)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+        ) {
+            BottomSheetDefaults.DragHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
+            Column(modifier = Modifier.fillMaxWidth().bingeSheetWashBehind(wash, overdrawTop = true)) { content() }
+        }
     }
 }
