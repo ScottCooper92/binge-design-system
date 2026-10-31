@@ -75,7 +75,7 @@ internal class RowRequesters(
 
     fun target(restoreTo: String?): FocusRequester? = targetKey(restoreTo)?.let(requesters::get)
 
-    /** The arrival row, else the first, taking focus from the first of them that accepts it. */
+    /** Gives focus to the arrival row, else the first when that one refuses it. Returns whether a row took it. */
     fun focusEntry(): Boolean = listOfNotNull(arrival, first).distinct().any { requesters[it]?.tryRequestFocus() == true }
 
     /**
@@ -136,9 +136,8 @@ class TvSideSheetNav internal constructor(
     }
 
     /**
-     * Puts focus where this page puts it when it opens: its arrival row, else its first, and the first when the arrival row
-     * refuses it (disabled meanwhile, or gone). For a page whose focused row has gone (an answer replaced, an action done)
-     * and which has no row of its own to hand focus to. Returns whether a row took it.
+     * Puts focus where this page puts it when it opens: its arrival row, else its first when the arrival row refuses focus. For a page whose focused row has
+     * gone (an answer replaced, an action done) and which has no row of its own to hand focus to. Returns whether a row took it.
      */
     fun focusEntry(): Boolean = requesters.focusEntry()
 }

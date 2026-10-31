@@ -121,14 +121,19 @@ class TvSideSheetStackPageChangeFocusTest {
         assertEquals("focus order: $focused", listOf("root-$OPENER"), focused.toList())
     }
 
-    private fun showFocusEntry(arrival: String?, disabled: Int? = null): () -> Boolean {
+    private fun showFocusEntry(arrival: String?, disabled: String? = null): () -> Boolean {
         lateinit var focusEntry: () -> Boolean
         composeTestRule.setContent {
             BingeTvTheme {
                 TvSideSheetStack(root = "page", onDismissRequest = {}) { nav ->
                     focusEntry = nav::focusEntry
                     (1..ROWS).forEach { index ->
-                        TvSideSheetRow(label = "row $index", onClick = {}, enabled = index != disabled, modifier = nav.row("page-$index"))
+                        TvSideSheetRow(
+                            label = "row $index",
+                            enabled = "page-$index" != disabled,
+                            onClick = {},
+                            modifier = nav.row("page-$index"),
+                        )
                     }
                     arrival?.let(nav::arriveAt)
                 }
@@ -152,8 +157,8 @@ class TvSideSheetStackPageChangeFocusTest {
     }
 
     @Test
-    fun `focusEntry falls back to the first row when the arrival row cannot take focus`() {
-        val focusEntry = showFocusEntry(arrival = "page-3", disabled = 3)
+    fun `focusEntry puts focus on the page's first row when it names no arrival`() {
+        val focusEntry = showFocusEntry(arrival = null)
 
         composeTestRule.runOnUiThread { assertTrue(focusEntry()) }
         composeTestRule.waitForIdle()
@@ -162,8 +167,8 @@ class TvSideSheetStackPageChangeFocusTest {
     }
 
     @Test
-    fun `focusEntry puts focus on the page's first row when it names no arrival`() {
-        val focusEntry = showFocusEntry(arrival = null)
+    fun `focusEntry hands focus to the first row when the arrival row is disabled`() {
+        val focusEntry = showFocusEntry(arrival = "page-3", disabled = "page-3")
 
         composeTestRule.runOnUiThread { assertTrue(focusEntry()) }
         composeTestRule.waitForIdle()
