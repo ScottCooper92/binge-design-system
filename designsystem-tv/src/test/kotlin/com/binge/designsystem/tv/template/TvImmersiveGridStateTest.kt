@@ -19,7 +19,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertIsNotFocused
+import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyInput
@@ -166,6 +171,30 @@ class TvImmersiveGridStateTest {
 
         composeTestRule.onNodeWithTag(RETRY).assertIsFocused()
     }
+
+    /**
+     * The way back: a retry that works swaps the message for cells while focus is on the message's button. The cells compose
+     * during measure, so the one request waits for the entry cell to be placed; with that request gone, focus falls to
+     * the rail instead of staying in the body.
+     */
+    @Test
+    fun `swapping a message back for cells keeps focus in the body`() {
+        setGrid()
+        focusRemembered()
+        content = TvImmersiveGridContent.Message()
+        composeTestRule.settle(SETTLE_MILLIS)
+        composeTestRule.onNodeWithTag(RETRY).assertIsFocused()
+
+        content = cells(firstId = 0)
+        composeTestRule.settle(SETTLE_MILLIS)
+
+        composeTestRule.onNodeWithTag(RETRY).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(RAIL).assertIsNotFocused()
+        composeTestRule.onNode(isFocused() and aCell).assertExists()
+    }
+
+    private val aCell =
+        SemanticsMatcher("a grid cell") { it.config.getOrNull(SemanticsProperties.TestTag)?.startsWith("cell-") == true }
 
     private fun setGrid() {
         composeTestRule.setContent {

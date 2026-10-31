@@ -4,10 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import kotlinx.coroutines.delay
 
 /**
  * Re-claims focus after **this press** swaps the focused subtree out from under itself — sign-in mints a confirm
@@ -18,11 +22,11 @@ import androidx.compose.ui.focus.FocusRequester
  * The latch is **armed by the action**, not by mount or by the state change itself. That is load-bearing: a
  * background state change (a stats refresh, a session poll) must reach the same "signed in" state without yanking
  * focus. Only the press that caused the swap arms the latch, so only it re-focuses — once per arm, via a
- * retry that keeps offering focus until the replacement takes it or the retry window runs out. This is why
- * neither `restoreTvOverlayFocus`/`TvOverlayArrivalFocusEffect` (unconditional on mount/key) nor
- * `TvArrivalFocusEffect` (one request when its target attaches) fit — both would fire on a background change.
+ * request made when the replacement attaches. This is why neither `TvOverlayArrivalFocusEffect` (unconditional on
+ * mount/key) nor `TvArrivalFocusEffect` (one request when its target attaches, armed by nothing) fit — both would fire
+ * on a background change.
  *
- * @see TvSwapFocusEffect for the driving effect and the frame-wait reasoning.
+ * @see TvSwapFocusEffect for the driving effect.
  */
 @Stable
 class TvSwapFocus internal constructor(
@@ -34,11 +38,24 @@ class TvSwapFocus internal constructor(
 
     /** Record that this press caused a subtree swap; the effect re-focuses once the replacement is ready. */
     fun arm() {
+        attachesAtArm = attaches
         armed = true
     }
 
     internal fun disarm() {
         armed = false
+    }
+
+    /** How many [tvSwapTarget] controls have attached, ever, and how many had when [arm] was called. */
+    internal var attaches by mutableIntStateOf(0)
+        private set
+    private var attachesAtArm = 0
+
+    /** True once a target has attached since the arm: a target already on screen is the control being swapped out. */
+    internal val replacementAttached: Boolean get() = attaches > attachesAtArm
+
+    internal fun targetAttached() {
+        attaches++
     }
 }
 
@@ -61,28 +78,33 @@ fun rememberTvSwapFocus(): TvSwapFocus {
 fun rememberTvSwapFocus(requester: FocusRequester): TvSwapFocus = remember(requester) { TvSwapFocus(requester) }
 
 /**
- * Offer focus to the replacement until it lands, once [ready] becomes true while [swap] is armed — then disarm.
- * Keyed on [ready] and [key], so a caller that gates on a recomposition label (the shell's
- * `currentKey == homeKey`) passes that key to re-evaluate when it changes rather than on a frame wait alone.
- *
- * Delegates to [restoreTvOverlayFocus] for the frame-wait-then-retry shape, load-bearing for the same measured
- * reason: the press disposes the focused node and swaps a new subtree in, so a request fired before the
- * replacement control is laid out is lost — and a single retry one frame later is not guaranteed either, since
- * the replacement may take longer than one frame to compose (a reload racing the arrival). Offering until
- * granted, bounded the same way [restoreTvOverlayFocus] is, is what the single mount-time request never was.
+ * Marks the replacement control as [swap]'s target: it carries the requester and tells [swap] it is attached, so the
+ * effect makes its one request once there is a node to take it. Put it on every control that can be the replacement; they
+ * never compose together.
  */
 @Composable
-fun TvSwapFocusEffect(
-    swap: TvSwapFocus,
-    ready: Boolean,
-    key: Any? = Unit,
-) {
-    LaunchedEffect(ready, key) {
-        if (!swap.armed || !ready) return@LaunchedEffect
-        try {
-            restoreTvOverlayFocus(swap.requester)
-        } finally {
-            swap.disarm()
-        }
+fun Modifier.tvSwapTarget(swap: TvSwapFocus): Modifier {
+    LaunchedEffect(swap) { swap.targetAttached() }
+    return focusRequester(swap.requester)
+}
+
+/**
+ * Claims focus for the replacement, once, when its [tvSwapTarget] is attached while [swap] is armed, then disarms. One
+ * request, no retry: the arm outlives the press by [SWAP_WINDOW_MS], so a replacement that composes a little later
+ * still gets it, and a swap that never produces a target lets go instead of pulling focus on a later, unrelated change.
+ */
+@Composable
+fun TvSwapFocusEffect(swap: TvSwapFocus) {
+    LaunchedEffect(swap.armed) {
+        if (!swap.armed) return@LaunchedEffect
+        delay(SWAP_WINDOW_MS)
+        swap.disarm()
+    }
+    LaunchedEffect(swap.armed, swap.attaches) {
+        if (!swap.armed || !swap.replacementAttached) return@LaunchedEffect
+        swap.disarm()
+        swap.requester.tryRequestFocus()
     }
 }
+
+private const val SWAP_WINDOW_MS = 3_000L

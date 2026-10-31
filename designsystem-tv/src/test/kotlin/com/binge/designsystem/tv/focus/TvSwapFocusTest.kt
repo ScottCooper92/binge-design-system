@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,12 +31,14 @@ import org.robolectric.annotation.Config
 private const val RAIL = "rail"
 private const val OLD = "old"
 private const val REPLACEMENT = "replacement"
+private const val LATE_ATTACH_FRAMES = 10
+private const val PAST_THE_WINDOW_MS = 3_500L
 
 /**
- * The contract for [TvSwapFocus]/[TvSwapFocusEffect], the swap-focus latch the sign-in/out and go-home
- * hand-rolled `pending*Focus` flags fold into: [TvSwapFocus.arm] on the press, then the effect re-focuses the
- * replacement once `ready` arrives and disarms — and, crucially, a `ready` transition with *no* prior arm never
- * fires, so a background state change can't steal focus.
+ * The contract for [TvSwapFocus]/[TvSwapFocusEffect]: [TvSwapFocus.arm] on the press, then one request when a
+ * [tvSwapTarget] attaches after the arm, then disarm. A replacement with no prior arm never gets focus, so a background
+ * state change can't steal it; a target already on screen at the arm is the control being swapped out, not the
+ * replacement; and an arm that no replacement answers expires instead of waiting for a later, unrelated change.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -44,7 +47,7 @@ class TvSwapFocusTest {
     val composeTestRule = createKeyboardComposeRule()
 
     @Test
-    fun `an armed swap focuses the replacement once ready and disarms`() {
+    fun `an armed swap focuses the replacement when it attaches and disarms`() {
         val fixture = fixture()
         fixture.focusOld()
 
@@ -55,9 +58,9 @@ class TvSwapFocusTest {
         composeTestRule.runOnIdle { assertFalse("swap must disarm after firing", fixture.swap.armed) }
     }
 
-    /** With no arm, a `ready` transition must leave focus alone — the background-change guard. */
+    /** With no arm, a replacement attaching must leave focus alone: the background-change guard. */
     @Test
-    fun `an unarmed swap does not steal focus when ready`() {
+    fun `an unarmed swap does not steal focus when the replacement attaches`() {
         val fixture = fixture()
         fixture.focusRail()
 
@@ -67,7 +70,6 @@ class TvSwapFocusTest {
         composeTestRule.onNodeWithTag(REPLACEMENT).assertIsNotFocused()
     }
 
-    /** The latch re-arms across swaps, so a second press re-focuses too. */
     @Test
     fun `the swap re-arms across presses`() {
         val fixture = fixture()
@@ -76,8 +78,7 @@ class TvSwapFocusTest {
         fixture.swapInReplacement()
         composeTestRule.onNodeWithTag(REPLACEMENT).assertIsFocused()
 
-        // Return to the old subtree, then arm and swap again.
-        composeTestRule.runOnIdle { fixture.ready = false }
+        composeTestRule.runOnIdle { fixture.replaced = false }
         composeTestRule.waitForIdle()
         fixture.focusOld()
         composeTestRule.runOnIdle { fixture.swap.arm() }
@@ -87,64 +88,56 @@ class TvSwapFocusTest {
     }
 
     /**
-     * The replacement may take longer than one frame to compose (a reload racing the arrival) — the case a
-     * single retry cannot cover. Adverse-schedule fixture per CLAUDE.md's "Compose UI and focus tests": the
-     * replacement's own focus target attaches [LATE_ATTACH_FRAMES] frames after it mounts, standing in for that
-     * slower compose. Reverting [TvSwapFocusEffect] to its old one-shot body fails this test — the request fires
-     * into the gap before the target attaches and is never retried, so focus never lands and the swap never
-     * disarms.
+     * The replacement may compose a while after the press (a reload racing the arrival). The arm waits for its target to
+     * attach, so the one request still lands. Making the effect request at the arm instead fails this test: it fires at
+     * the old control and the replacement is never focused.
      */
     @Test
-    fun `the swap keeps offering until the replacement's focus target attaches`() {
+    fun `a replacement that composes late still gets the one request`() {
         val fixture = fixture()
-        fixture.requesterAttached = false
+        fixture.lateReplacement = true
         fixture.focusOld()
 
         composeTestRule.runOnIdle { fixture.swap.arm() }
-        composeTestRule.runOnIdle { fixture.ready = true }
-        composeTestRule.waitForIdle()
+        fixture.swapInReplacement()
 
         composeTestRule.onNodeWithTag(REPLACEMENT).assertIsFocused()
         composeTestRule.runOnIdle { assertFalse("swap must disarm once it lands", fixture.swap.armed) }
     }
 
-    /**
-     * The retry the effect delegates to can suspend for up to [restoreTvOverlayFocus]'s own budget, so a `ready`/
-     * `key` change while it is still in flight — a second press, a back navigation, before the replacement ever
-     * attaches — cancels the coroutine mid-`restoreTvOverlayFocus`. That must still disarm; otherwise the latch
-     * is left `armed` for whichever `ready`/`key` change fires next, and that unrelated background transition
-     * steals focus exactly as the class docs promise it never does.
-     */
+    /** The old control is a target too (a "new code" button that is swapped for a QR confirm): arming beside it requests nothing. */
     @Test
-    fun `disarms even when the retry is cancelled mid-flight`() {
+    fun `a target already on screen when the swap is armed is not taken for the replacement`() {
         val fixture = fixture()
-        fixture.requesterAttached = false
+        fixture.oldIsTarget = true
         fixture.focusRail()
 
-        // Stop auto-advancing before arming, so setting `ready` doesn't run the retry to completion before this
-        // test gets a chance to cancel it mid-flight.
+        composeTestRule.runOnIdle { fixture.swap.arm() }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+        composeTestRule.runOnIdle { assertTrue("still waiting for the replacement", fixture.swap.armed) }
+
+        fixture.swapInReplacement()
+
+        composeTestRule.onNodeWithTag(REPLACEMENT).assertIsFocused()
+    }
+
+    @Test
+    fun `an arm no replacement answers expires and a later change does not steal focus`() {
+        val fixture = fixture()
+        fixture.focusRail()
+
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.runOnUiThread { fixture.swap.arm() }
-        composeTestRule.runOnUiThread { fixture.ready = true }
-        // With auto-advance off, idling only drains synchronous composition work — it launches the effect and
-        // runs it to its first frame-bound suspension, without letting the retry run to completion.
-        composeTestRule.waitForIdle()
-        // One more frame resolves that first suspension and re-suspends mid-retry-loop, short of the replacement
-        // ever attaching.
         composeTestRule.mainClock.advanceTimeByFrame()
-
-        // A `ready` change while the retry is still in flight cancels the coroutine before it reaches disarm().
-        composeTestRule.runOnUiThread { fixture.ready = false }
-        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.runOnIdle { assertTrue("armed until the window passes", fixture.swap.armed) }
+        composeTestRule.mainClock.advanceTimeBy(PAST_THE_WINDOW_MS)
         composeTestRule.mainClock.autoAdvance = true
+        composeTestRule.waitForIdle()
+        composeTestRule.runOnIdle { assertFalse("the arm must expire", fixture.swap.armed) }
 
-        composeTestRule.runOnIdle {
-            assertFalse("cancelling the in-flight retry must still disarm", fixture.swap.armed)
-        }
-
-        // An unrelated `ready` transition with no fresh arm() must not steal focus onto the replacement, even
-        // though it can now attach — that would only happen if the latch were left stuck armed.
-        fixture.requesterAttached = true
         fixture.swapInReplacement()
 
         composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
@@ -156,35 +149,36 @@ class TvSwapFocusTest {
         composeTestRule.setContent {
             BingeTvTheme {
                 fixture.swap = rememberTvSwapFocus()
-                TvSwapFocusEffect(swap = fixture.swap, ready = fixture.ready)
+                TvSwapFocusEffect(swap = fixture.swap)
                 Row {
-                    // A focusable elsewhere, so a failed/absent request has somewhere for focus to be other than
-                    // the replacement — otherwise Compose recovers onto it unaided and the guard test passes for
-                    // the wrong reason.
+                    // A focusable elsewhere, so an absent request has somewhere for focus to be other than the
+                    // replacement; otherwise Compose recovers onto it unaided and the guard tests pass for the wrong reason.
                     Box(Modifier.testTag(RAIL).size(80.dp).focusable())
-                    if (fixture.ready) {
-                        if (!fixture.requesterAttached) {
-                            // Stands in for a replacement whose own compose takes longer than one frame: attach
-                            // its focus target several frames after it mounts rather than on the same frame.
+                    if (fixture.replaced) {
+                        var mounted by remember { mutableStateOf(!fixture.lateReplacement) }
+                        if (!mounted) {
                             LaunchedEffect(Unit) {
                                 repeat(LATE_ATTACH_FRAMES) { withFrameNanos { } }
-                                fixture.requesterAttached = true
+                                mounted = true
                             }
                         }
+                        if (mounted) {
+                            Box(
+                                Modifier
+                                    .testTag(REPLACEMENT)
+                                    .size(80.dp)
+                                    .tvSwapTarget(fixture.swap)
+                                    .focusable(),
+                            )
+                        }
+                    } else {
                         Box(
                             Modifier
-                                .testTag(REPLACEMENT)
+                                .testTag(OLD)
                                 .size(80.dp)
-                                .then(
-                                    if (fixture.requesterAttached) {
-                                        Modifier.focusRequester(fixture.swap.requester)
-                                    } else {
-                                        Modifier
-                                    },
-                                ).focusable(),
+                                .then(if (fixture.oldIsTarget) Modifier.tvSwapTarget(fixture.swap) else Modifier)
+                                .focusable(),
                         )
-                    } else {
-                        Box(Modifier.testTag(OLD).size(80.dp).focusable())
                     }
                 }
             }
@@ -194,11 +188,12 @@ class TvSwapFocusTest {
     }
 
     private inner class Fixture {
-        var ready by mutableStateOf(false)
-        var requesterAttached by mutableStateOf(true)
+        var replaced by mutableStateOf(false)
+        var lateReplacement by mutableStateOf(false)
+        var oldIsTarget by mutableStateOf(false)
         lateinit var swap: TvSwapFocus
 
-        /** Plant focus on the pre-swap control — the state a press starts from. */
+        /** Plant focus on the pre-swap control: the state a press starts from. */
         fun focusOld() {
             composeTestRule.onNodeWithTag(OLD).requestFocus()
             composeTestRule.onNodeWithTag(OLD).assertIsFocused()
@@ -211,13 +206,8 @@ class TvSwapFocusTest {
 
         /** Swap the replacement subtree in, as the press's state change does. */
         fun swapInReplacement() {
-            composeTestRule.runOnIdle { ready = true }
+            composeTestRule.runOnIdle { replaced = true }
             composeTestRule.waitForIdle()
         }
-    }
-
-    private companion object {
-        /** Comfortably past one frame, short of the loop's own multi-second budget. */
-        const val LATE_ATTACH_FRAMES = 10
     }
 }

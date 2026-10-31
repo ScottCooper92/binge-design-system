@@ -3,15 +3,14 @@ package com.binge.designsystem.tv.template
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
-import com.binge.designsystem.tv.focus.restoreTvOverlayFocus
 
 /**
  * The cell a grid is built around, by index and by the key the content gives it. The key is what retires the memory
@@ -67,23 +66,52 @@ internal fun ResetScrollWhenStale(
 
 /**
  * Keeps focus in the grid's body when the body is swapped for another state, such as cells replaced by a message.
- * The old body leaves with the focus it held, so focus would otherwise fall out of the grid. Returns the callback the
- * body reports its focus through.
+ * The old body leaves with the focus it held, so focus would otherwise fall out of the grid.
+ *
+ * One request, made when the new body's entry cell is placed: the body's lazy cells compose during measure, after any
+ * effect, so a request before that finds no cell to take it. [onFocusChanged] is the callback the body reports its focus
+ * through; [entryPlaced] is called by the entry cell as it is placed.
  */
-@Composable
-internal fun rememberBodyFocusKeeper(bodyKind: Any, entryFocusRequester: FocusRequester?): (FocusState) -> Unit {
-    var bodyHasFocus by remember { mutableStateOf(false) }
-    var settled by remember { mutableStateOf(true) }
-    val owed = remember(bodyKind) { bodyHasFocus || !settled }
-    LaunchedEffect(bodyKind) {
-        if (entryFocusRequester == null || !owed) return@LaunchedEffect
-        settled = false
+@Stable
+internal class TvBodyFocusKeeper(
+    private val entryFocusRequester: FocusRequester?,
+) {
+    private var bodyHasFocus = false
+    private var owed = false
+
+    fun onFocusChanged(state: FocusState) {
+        bodyHasFocus = state.hasFocus
+    }
+
+    /** Called as the body's kind changes: focus is owed if the old body held it, or an earlier swap never got its request. */
+    fun bodyChanged() {
+        owed = entryFocusRequester != null && (bodyHasFocus || owed)
+    }
+
+    fun entryPlaced() {
+        if (!owed) return
+        owed = false
         // Only if nothing else got there first: requesting focus on a group that already holds it skips its entry
         // routing and lands on the first cell, off the one the user left.
-        if (!bodyHasFocus) restoreTvOverlayFocus(entryFocusRequester)
-        settled = true
+        if (!bodyHasFocus) runCatching { entryFocusRequester?.requestFocus() }
     }
-    return { state -> bodyHasFocus = state.hasFocus }
+}
+
+/**
+ * The keeper for one grid, told of each change of [bodyKind] while the grid composes, before the new body is laid out. A body
+ * with [waitsForCells] gets its request from the entry cell's placement; any other, a message or a skeleton, has nothing lazy
+ * to wait for and gets it as soon as the swap is applied.
+ */
+@Composable
+internal fun rememberBodyFocusKeeper(
+    bodyKind: Any,
+    entryFocusRequester: FocusRequester?,
+    waitsForCells: Boolean,
+): TvBodyFocusKeeper {
+    val keeper = remember(entryFocusRequester) { TvBodyFocusKeeper(entryFocusRequester) }
+    remember(keeper, bodyKind) { keeper.bodyChanged() }
+    LaunchedEffect(keeper, bodyKind) { if (!waitsForCells) keeper.entryPlaced() }
+    return keeper
 }
 
 /** The body's identity for [rememberBodyFocusKeeper]: a swap between kinds, or between two messages, is a new body. */
