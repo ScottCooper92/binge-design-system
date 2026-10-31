@@ -109,6 +109,17 @@ class TvSideSheetStackPageChangeFocusTest {
         assertEquals("focus order: $focused", listOf("root-1"), focused.toList())
     }
 
+    @Test
+    fun `one Back pops a pushed page and focus lands on the row that opened it`() {
+        setSheet()
+        press(Key.DirectionCenter, on = "root $OPENER")
+
+        press(Key.Back, on = "child $ARRIVAL")
+
+        composeTestRule.onNodeWithText("root $OPENER").assertIsFocused()
+        assertEquals("focus order: $focused", listOf("root-$OPENER"), focused.toList())
+    }
+
     private companion object {
         const val ROWS = 5
         const val OPENER = 4

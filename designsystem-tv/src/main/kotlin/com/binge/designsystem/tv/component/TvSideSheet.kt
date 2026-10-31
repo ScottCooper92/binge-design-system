@@ -35,6 +35,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -107,6 +108,10 @@ internal fun TvSideSheetHost(
                 .onKeyEvent { event ->
                     if (event.type == KeyEventType.KeyDown && event.key == dismissKey) {
                         onDismissRequest()
+                        true
+                    } else if (anchor != null && event.key == Key.Back) {
+                        // The anchor makes the panel a focusable ancestor, which can swallow a Back that nothing below it handles; take it here.
+                        if (event.type == KeyEventType.KeyDown) onDismissRequest()
                         true
                     } else {
                         false
