@@ -2,7 +2,9 @@ package com.binge.designsystem.tv.component
 
 import android.app.Application
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyInput
@@ -17,8 +19,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * A page opened over another names the page Back returns to, in the monochrome style only: a small line above its own
- * title, no control and no focus of its own.
+ * A page opened over another carries an app bar's back: an arrow and the name of the page Back returns to, in every style, no
+ * control and no focus of its own. The root has none.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -48,40 +50,40 @@ class TvSideSheetParentTitleTest {
         composeTestRule.waitForIdle()
     }
 
+    private fun backNamesSettings() = composeTestRule.onAllNodesWithText("Settings")
+
     @Test
-    fun `a page opened over another names its parent under the monochrome style, and the root names none`() {
+    fun `a page opened over another names its parent in the back, and the root has none`() {
         show(TvStyle.Monochrome)
-        composeTestRule.onNodeWithText(PARENT_LINE).assertDoesNotExist()
+        backNamesSettings().assertCountEquals(1)
+        composeTestRule.onNodeWithText("Alpha page").assertDoesNotExist()
 
         press(Key.DirectionCenter)
 
         composeTestRule.onNodeWithText("Alpha page").assertExists()
-        composeTestRule.onNodeWithText(PARENT_LINE).assertExists()
+        backNamesSettings().assertCountEquals(1)
         composeTestRule.onNodeWithText("First").assertIsFocused()
     }
 
     @Test
-    fun `going back drops the parent line`() {
+    fun `going back drops the back from the page`() {
         show(TvStyle.Monochrome)
         press(Key.DirectionCenter)
 
         press(Key.DirectionLeft)
 
-        composeTestRule.onNodeWithText(PARENT_LINE).assertDoesNotExist()
+        composeTestRule.onNodeWithText("Alpha page").assertDoesNotExist()
+        backNamesSettings().assertCountEquals(1)
         composeTestRule.onNodeWithText("Alpha").assertIsFocused()
     }
 
     @Test
-    fun `the accent style draws no parent line`() {
+    fun `the accent style draws the back too`() {
         show(TvStyle.Accent)
 
         press(Key.DirectionCenter)
 
         composeTestRule.onNodeWithText("Alpha page").assertExists()
-        composeTestRule.onNodeWithText(PARENT_LINE).assertDoesNotExist()
-    }
-
-    private companion object {
-        const val PARENT_LINE = "‹ Settings"
+        backNamesSettings().assertCountEquals(1)
     }
 }

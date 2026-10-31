@@ -149,7 +149,7 @@ fun TvMonochromeInfoCardSample() {
     Monochrome { TvInfoCardSample() }
 }
 
-/** A page opened over another, in the monochrome style: a small line above its title names the page Back returns to. */
+/** A page opened over another, in the monochrome style: the app bar's back above its title names the page Back returns to. */
 @Composable
 fun TvMonochromeSideSheetNestedPageSample() {
     Monochrome {

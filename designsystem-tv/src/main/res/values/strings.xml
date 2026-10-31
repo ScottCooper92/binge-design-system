@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- A tab's count before it is known: format-only, so there is nothing to translate. -->
-    <string name="tv_side_sheet_parent_title" translatable="false">‹ %1$s</string>
     <string name="tv_tab_count_unknown" translatable="false">—</string>
     <!-- A list row's count badge, read in place of the number it shows. A count of things waiting for the user. -->
     <plurals name="tv_pane_row_badge_count">
