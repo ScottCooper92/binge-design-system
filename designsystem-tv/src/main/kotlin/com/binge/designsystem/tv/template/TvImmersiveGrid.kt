@@ -33,6 +33,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -130,9 +131,13 @@ fun <T : Any> TvImmersiveGrid(
             0
         }
     val anchor = anchorOf(entryIndex, columns)
-    val keepBodyFocused = rememberBodyFocusKeeper(content.bodyKind(), entryFocusRequester.takeIf { inPlaceBody == null })
+    val keepBodyFocused = rememberBodyFocusKeeper(
+        content.bodyKind(),
+        entryFocusRequester.takeIf { inPlaceBody == null },
+        waitsForCells = content is TvImmersiveGridContent.Items,
+    )
     val reportBodyFocus =
-        rememberAnchorKeeper(entryIndex, alsoReport = keepBodyFocused) {
+        rememberAnchorKeeper(entryIndex, alsoReport = keepBodyFocused::onFocusChanged) {
             if (reduceMotion) gridState.scrollToItem(anchor) else gridState.animateScrollToItem(anchor)
         }
     val bursting = rememberBursting(anchor)
@@ -247,7 +252,14 @@ fun <T : Any> TvImmersiveGrid(
                             onItemTapped(index)
                             onItemClick(item)
                         },
-                        if (index == entryIndex) Modifier.focusRequester(entry).then(rememberedCellModifier) else Modifier,
+                        if (index == entryIndex) {
+                            Modifier
+                                .focusRequester(entry)
+                                .then(rememberedCellModifier)
+                                .onGloballyPositioned { keepBodyFocused.entryPlaced() }
+                        } else {
+                            Modifier
+                        },
                     )
                 }
             }
