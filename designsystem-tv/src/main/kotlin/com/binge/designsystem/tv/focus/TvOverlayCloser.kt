@@ -21,17 +21,18 @@ import kotlinx.coroutines.flow.first
  * overlay's trap and return focus in one request, dispose the overlay, then reset the latch.
  *
  * That four-step latch is easy to copy-paste per screen. It
- * exists because acting inline loses the disposal race — an inline `restoreTvOverlayFocus` fires while the
+ * exists because acting inline loses the disposal race — an inline request fires while the
  * focus-trapped overlay is still composed and is swallowed, the "focus falls to the shell" class. Each
  * copy is another place to forget a teardown path, or to leave a latch armed to fire a stale request later.
  * This is that latch, once.
  *
  * An overlay that reports its disposal (a sheet given the closer, or any overlay calling [TvOverlayCloser.ReportDisposal]) gets
- * one request the moment it is gone, which lands in the frame it leaves. One that does not report keeps the offer after the
- * dispose, as before. Either way [onClose] must dispose the overlay.
+ * one request the moment it is gone, which lands in the frame it leaves. One that does not report gets a single request
+ * as [onClose] runs, which a focus trap still composed will swallow; a debug build logs that, so report. Either way
+ * [onClose] must dispose the overlay.
  *
- * An overlay whose `tvExitFocusGroup` reads [TvOverlayCloser.trapping] lets that request through as the exit starts. One
- * that does not still refuses it, and the offer after the dispose is what lands, as before.
+ * An overlay whose `tvExitFocusGroup` reads [TvOverlayCloser.trapping] lets the request before [onClose] through as the exit
+ * starts. One that does not refuses it, and only a reporting overlay's request after the dispose lands.
  *
  * Call [TvOverlayCloser.close] from every dismissal path — the `BackHandler`, the sheet `onDismissRequest`, a
  * navigate-away. It is idempotent within one close (a second [TvOverlayCloser.close] mid-flight is a no-op) and
@@ -53,7 +54,7 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
     LaunchedEffect(closing) {
         if (!closing) return@LaunchedEffect
         // The trap is already released (see [TvOverlayCloser.trapping]), so a trap wired to it grants this at once. A grant while
-        // the overlay is still composed is not the restore, though: its disposal can hand focus elsewhere, so the offer after it
+        // the overlay is still composed is not the restore, though: its disposal can hand focus elsewhere, so the request after it
         // always runs.
         restoreTo.tryRequestFocus()
         val reportsDisposal = closer.reportsDisposal
@@ -63,7 +64,7 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
             restoreTo.tryRequestFocus()
         } else {
             if (debuggable) Log.w(TAG, FALLBACK_MESSAGE)
-            restoreTvOverlayFocus(restoreTo)
+            restoreTo.tryRequestFocus()
         }
         // Reset so the overlay can be opened and closed again — an un-reset latch stays armed and either never
         // re-fires (a stuck close) or fires a stale request on a later recomposition.
@@ -130,5 +131,5 @@ class TvOverlayCloser internal constructor(
 
 private const val TAG = "TvOverlayCloser"
 private const val FALLBACK_MESSAGE =
-    "Closed an overlay that never reported its disposal, so focus is retried instead of returned once: " +
-        "give the overlay the closer, or call ReportDisposal() inside it."
+    "Closed an overlay that never reported its disposal, so focus was requested once as it closed and a focus trap " +
+        "can swallow it: give the overlay the closer, or call ReportDisposal() inside it."

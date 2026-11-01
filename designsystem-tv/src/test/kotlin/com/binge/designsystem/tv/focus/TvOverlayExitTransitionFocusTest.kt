@@ -9,7 +9,6 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +24,6 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
@@ -34,40 +32,17 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * **A focus restore must outlive the exit transition of the surface it is restoring from.**
+ * **A focus trap refuses a request from outside it for as long as it is composed.**
  *
- * [TvOverlayCloserTest] proves the one-frame wait matters when the overlay disposes on the close. The pop is the
- * harder shape and the one that reached a device: nav3 keeps the outgoing surface composed for its whole exit
- * transition, and a `tvExitFocusGroup` refuses every request from outside it for that whole window. So a restore
- * that fires once, a frame after the stack empties, aims into a window where it cannot succeed — and its result
- * was discarded, so nothing noticed.
- *
- * The overlay here leaves through an [AnimatedVisibility] exit rather than disposing on the state change, which
- * is what makes the window real: the trapped node stays composed and focused for [EXIT_MILLIS] after the close.
- *
- * Assertions are on the **returned grant**, not on where focus ends up. Recovery after the disposal picks
- * geometrically and this harness does not reproduce a device's pick, so a focus assertion alone would pass
- * whether or not the restore did anything. Fault injection, run against this fixture: reverting
- * `restoreTvOverlayFocus` to a single request makes `granted` false and fails the first test.
+ * The overlay here leaves through an [AnimatedVisibility] exit rather than disposing on the state change, so the trapped node
+ * stays composed and focused for [EXIT_MILLIS] after the close. A request aimed into that window is cancelled however well
+ * timed, which is why an overlay must report its disposal and take the request after it is gone, not retry during the exit.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvOverlayExitTransitionFocusTest {
     @get:Rule
     val composeTestRule = createKeyboardComposeRule()
-
-    @Test
-    fun `restore keeps offering across the exit transition and lands when the trap disposes`() {
-        val fixture = fixture()
-        fixture.openAndFocusOverlay()
-
-        fixture.closeOverlay()
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
-        assertEquals("The restore must land once the trap's exit transition finishes", true, fixture.granted)
-        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
-    }
 
     /**
      * The premise, as a unit fact: a focus trap refuses a request from outside it, so a single-shot restore aimed
@@ -92,9 +67,6 @@ class TvOverlayExitTransitionFocusTest {
             val content = remember { FocusRequester() }
             fixture.contentFocus = content
             BingeTvTheme {
-                LaunchedEffect(fixture.restoring) {
-                    if (fixture.restoring) fixture.granted = restoreTvOverlayFocus(content)
-                }
                 Row {
                     // A focusable elsewhere, so the disposal has somewhere to recover to other than the content.
                     Box(Modifier.testTag(RAIL).size(80.dp).focusable())
@@ -123,8 +95,6 @@ class TvOverlayExitTransitionFocusTest {
 
     private inner class Fixture {
         var overlayOpen by mutableStateOf(false)
-        var restoring by mutableStateOf(false)
-        var granted: Boolean? = null
         lateinit var contentFocus: FocusRequester
 
         fun openAndFocusOverlay() {
@@ -133,14 +103,6 @@ class TvOverlayExitTransitionFocusTest {
             composeTestRule.onNodeWithTag(OVERLAY).requestFocus()
             composeTestRule.waitForIdle()
             composeTestRule.onNodeWithTag(OVERLAY).assertIsFocused()
-        }
-
-        /** Both in one frame, as a pop does: the stack empties and the host's restore effect arms together. */
-        fun closeOverlay() {
-            composeTestRule.runOnIdle {
-                overlayOpen = false
-                restoring = true
-            }
         }
 
         fun requestContentFocusOnce(): Boolean = composeTestRule.runOnIdle { contentFocus.requestFocus() }

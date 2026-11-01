@@ -92,31 +92,6 @@ class TvOverlayCloserTest {
     }
 
     /**
-     * The close restores focus out of a **focus-trapped** overlay — the shape a side sheet or filter panel
-     * ships, and the one the frame wait inside [restoreTvOverlayFocus] exists for.
-     *
-     * The other tests here open an untrapped overlay, where there is nothing to swallow a request and the wait is
-     * therefore inert: both orderings pass, so none of them can fail if it is removed. Add [tvExitFocusGroup] and
-     * the difference appears. Fault injection, run against this fixture: replacing `restoreTvOverlayFocus(entry)`
-     * with a bare `entry.requestFocus()` on the close leaves the grid unfocused and fails this test alone.
-     *
-     * That contradicts a caveat this suite and `TvArrivalFocusTest` both carried — that the wait's necessity is a
-     * device-timing property the JVM harness cannot reproduce. It reproduces; what it needed was the trap,
-     * not a device.
-     */
-    @Test
-    fun `close restores focus out of a focus-trapped overlay`() {
-        val fixture = fixture(trapped = true)
-        fixture.openAndFocusOverlay()
-
-        composeTestRule.runOnIdle { fixture.closer.close() }
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(GRID).assertIsFocused()
-    }
-
-    /**
      * An overlay that reports its disposal gets its one request in the frame it is gone, where an offer that retried could land a
      * frame or more later. Stepped a frame at a time, with the rail the nearest node focus can park on, the grid holds focus from
      * the first frame without the overlay and never leaves it.

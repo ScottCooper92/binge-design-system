@@ -1,12 +1,10 @@
 package com.binge.designsystem.tv.focus
 
-import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -287,39 +285,6 @@ fun Modifier.tvExitFocusGroup(trapping: () -> Boolean = { true }): Modifier =
         .focusGroup()
 
 /**
- * The retrying primitive: offer arrival focus to [target] each frame until [taken] reports the surface holds it. The
- * arrival effect no longer uses it (it makes one request); it stays for callers that need the retry. It is the
- * screen-side sibling of the shell's `offerFocusToContent`, and retried for the same measured reason:
- * a single mount-time request fires inside the push transition and fails silently, ~300ms before the
- * outgoing screen's disposal hands focus over. By then the disposal's own geometric reassignment is
- * the writer, and an `onEnter` redirect does not reliably cancel it — logged on a Shield as the
- * action row gaining focus for 5ms before the original move continued into the cast row.
- *
- * Claiming early is the whole fix: once the surface holds focus, the outgoing screen's nodes are
- * unfocused when they dispose, so no reassignment ever runs. The loop stops the moment [taken] is
- * true, so it cannot fight the user, and a surface that never takes focus stops it at the same
- * frame/time budget the shell's drill-down handoff uses.
- */
-suspend fun offerTvArrivalFocus(target: FocusRequester, taken: () -> Boolean) {
-    val deadline = SystemClock.uptimeMillis() + FOCUS_OFFER_TIMEOUT_MS
-    repeat(FOCUS_OFFER_FRAMES) {
-        if (taken() || SystemClock.uptimeMillis() > deadline) return
-        // Deliberately not stopping on the granted request: [taken] is the caller's own "my subtree holds it"
-        // and is strictly better informed, because a grant can still be reassigned within the same frame.
-        target.tryRequestFocus()
-        withFrameNanos { }
-    }
-}
-
-/**
- * The shell's drill-down budgets (its `offerFocusToContent`), restated here because the shell lives in the
- * host app, not in this module: a frame count to ride "retry when the content changes", a time cap so a
- * static destination cannot keep the loop alive past its window.
- */
-private const val FOCUS_OFFER_FRAMES = 600
-private const val FOCUS_OFFER_TIMEOUT_MS = 3_000L
-
-/**
  * Requests focus and answers whether it was granted, without letting a sentinel requester throw.
  *
  * `requestFocus()` returns `false` for a requester with no attached node — it prints a warning and does **not**
@@ -328,28 +293,6 @@ private const val FOCUS_OFFER_TIMEOUT_MS = 3_000L
  * *result*, not catching an exception, and every one of those discards was a retry thrown away.
  */
 internal fun FocusRequester.tryRequestFocus(): Boolean = runCatching { requestFocus() }.getOrDefault(false)
-
-/**
- * Offer focus back to [target] until it is granted — the close half of every sheet/panel round trip, and the
- * return half of an overlay pop.
- *
- * **Offered, not fired once, because one frame is reliably too early**: the outgoing surface stays composed and
- * focus-trapped for its whole exit transition, and a trap *cancels* a request from outside it, so a single shot
- * into that window cannot succeed however well timed. Stopping on the grant rather than on a caller
- * predicate means it cannot fight a user who got there first. Bounded in wall-clock as well as frames.
- *
- * @return whether focus was granted within the budget; `false` means the target never attached.
- */
-suspend fun restoreTvOverlayFocus(target: FocusRequester): Boolean {
-    withFrameNanos { }
-    val deadline = SystemClock.uptimeMillis() + FOCUS_OFFER_TIMEOUT_MS
-    repeat(FOCUS_OFFER_FRAMES) {
-        if (target.tryRequestFocus()) return true
-        if (SystemClock.uptimeMillis() > deadline) return false
-        withFrameNanos { }
-    }
-    return false
-}
 
 /**
  * One focus unit whose **entry is routed to the selected child** rather than left to a directional search.
