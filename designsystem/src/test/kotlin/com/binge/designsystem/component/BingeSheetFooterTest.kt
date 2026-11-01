@@ -11,10 +11,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -126,7 +126,7 @@ class BingeSheetFooterTest {
     fun `no edge shows while the page fits`() {
         showPanel(rows = 2)
 
-        rule.onNodeWithTag(SHEET_FOOTER_EDGE_TAG).assertDoesNotExist()
+        rule.onNode(SemanticsMatcher.expectValue(SheetFooterEdgeShown, false)).assertExists()
     }
 
     @Test
@@ -134,7 +134,7 @@ class BingeSheetFooterTest {
         showPanel(rows = 60)
 
         rule.onNodeWithText(FOOTER).assertIsDisplayed()
-        rule.onNodeWithTag(SHEET_FOOTER_EDGE_TAG).assertExists()
+        rule.onNode(SemanticsMatcher.expectValue(SheetFooterEdgeShown, true)).assertExists()
     }
 
     @Test

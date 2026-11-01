@@ -19,7 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.semantics.semantics
 
 /**
  * Where a page's primary action goes. In the side sheet the footer is pinned to the foot of the sheet and the page scrolls
@@ -74,8 +77,20 @@ internal val LocalSheetFooterHost = compositionLocalOf<SheetFooterHost?> { null 
 
 internal val LocalSheetScroll = compositionLocalOf<ScrollState?> { null }
 
-/** Tags the edge drawn above a pinned footer while content is under it, for a test to find. */
-internal const val SHEET_FOOTER_EDGE_TAG = "sheet-footer-edge"
+/** Whether content is under the footer. A [ScrollState] reports `Int.MAX_VALUE` as its bound until its first layout. */
+private fun ScrollState.hasContentUnderFooter(): Boolean = maxValue != Int.MAX_VALUE && canScrollForward
+
+/** Read by tests: true while the edge above the pinned footer is showing. */
+internal val SheetFooterEdgeShown = SemanticsPropertyKey<Boolean>("SheetFooterEdgeShown")
+private var SemanticsPropertyReceiver.sheetFooterEdgeShown by SheetFooterEdgeShown
+
+/**
+ * The edge keeps its 1dp whether or not it shows, so the page does not shift as content scrolls under it; whether it
+ * shows is read in the draw phase, so a scroll redraws it rather than recomposing the panel.
+ */
+private fun Modifier.sheetFooterEdge(scroll: ScrollState): Modifier =
+    graphicsLayer { alpha = if (scroll.hasContentUnderFooter()) 1f else 0f }
+        .semantics { sheetFooterEdgeShown = scroll.hasContentUnderFooter() }
 
 /**
  * A side sheet page: [content] above, and the footer a page pinned below it. The content takes what the footer leaves and
@@ -92,9 +107,10 @@ internal fun ColumnScope.SheetPageWithFooter(content: @Composable ColumnScope.()
     ) {
         Column(modifier = Modifier.weight(1f)) { content() }
         host.content?.let { footer ->
-            if (scroll.canScrollForward) {
-                HorizontalDivider(modifier = Modifier.testTag(SHEET_FOOTER_EDGE_TAG), color = MaterialTheme.colorScheme.outlineVariant)
-            }
+            HorizontalDivider(
+                modifier = Modifier.sheetFooterEdge(scroll),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
             Column(modifier = Modifier.fillMaxWidth()) { footer() }
         }
     }
