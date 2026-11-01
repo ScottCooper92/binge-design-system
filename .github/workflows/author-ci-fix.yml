@@ -59,8 +59,8 @@ jobs:
         when you push.
 
         You cannot compile the consumers from here. This build is included by Binge,
-        binge-seerr and binge-archive, so a change that is green here can still break
-        theirs. CI compiles binge-seerr and binge-archive informationally; Binge is
+        binge-seerr, binge-archive and binge-jellyfin, so a change that is green here can still break
+        theirs. CI compiles binge-seerr, binge-archive and binge-jellyfin informationally; Binge is
         not compiled. If a fix
         changes a public signature, say so rather than assuming green means safe.
       gate_rules: |
@@ -74,14 +74,14 @@ jobs:
         A failing screenshot test means the rendering changed. Re-recording
         the baseline makes CI green while accepting whatever was rendered,
         which is how a real visual regression gets merged, and here it lands
-        in three other codebases that never agreed to it. A baseline is a
+        in four other codebases that never agreed to it. A baseline is a
         deliberate human decision, not a repair.
 
         Formatting failures are the cheapest class of failure to fix
         properly. A lint baseline is worse than it looks: it silences the
         finding permanently and silently, in a repository whose whole purpose
         is to be included by other builds. A baseline here is a finding
-        suppressed in three codebases that never agreed to it.
+        suppressed in four codebases that never agreed to it.
 
         If the only way to green is through one of those, that is a stop:
         make no changes and say so.

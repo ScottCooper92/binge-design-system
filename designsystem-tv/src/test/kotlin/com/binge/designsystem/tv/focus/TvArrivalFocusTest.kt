@@ -33,7 +33,7 @@ private const val RAIL = "rail"
 private const val SIBLING = "sibling"
 private const val CONTENT = "content"
 
-/** Frames to run the offer loop over — a handful, since it claims on its first pass or not at all. */
+/** Frames to run after a change — a handful, since the effect makes its one request on the first pass or not at all. */
 private const val PUMP_FRAMES = 5
 
 /** The measured gap between an incoming screen's mount and the outgoing screen's disposal, on a Shield. */
@@ -41,19 +41,17 @@ private const val DISPOSAL_DELAY_MS = 300L
 
 /**
  * The contract for the arrival triple consolidated in [TvArrivalFocus]/[TvArrivalFocusEffect]/
- * [TvOverlayArrivalFocusEffect]: the offer claims focus for the target, claims it *before* the outgoing screen
- * disposes, stops the frame the target takes it, re-offers when its data gate opens, and the overlay effect
- * lands focus a frame after a mid-transition mount.
+ * [TvOverlayArrivalFocusEffect]. Each effect makes one request and never retries: the arrival effect claims focus
+ * for its target *before* the outgoing screen disposes, waits for its `enabled` gate, makes that request once per
+ * arrival, and stands down for a user move or a target that already holds focus; the overlay effect makes its
+ * request when it composes, including on a node mounted mid-transition.
  *
- * The last two of those were once filed as device-only, on the grounds that Robolectric lays out
- * synchronously. They are not: holding the clock with `autoAdvance = false` and stepping frames orders the
- * mount, the claim and the disposal deliberately, which is what those assertions actually need. Both are
- * fault-proven — removing the `taken()` early-return fails the stop test, and replacing the per-frame offer with
- * a single mount-time request fails the disposal-race test.
+ * The ordering assertions look device-only, since Robolectric lays out synchronously. They are not: holding the
+ * clock with `autoAdvance = false` and stepping frames orders the mount, the claim and the disposal deliberately.
  *
  * Every fixture keeps a **rail stand-in** holding focus first: without a focusable elsewhere, Compose
  * recovers focus onto the sole remaining node unaided and a no-op effect would pass for the wrong reason. The
- * rail is where focus sits until the offer moves it, so asserting the content holds focus proves the offer ran.
+ * rail is where focus sits until the request moves it, so asserting the content holds focus proves the request ran.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -62,7 +60,7 @@ class TvArrivalFocusTest {
     val composeTestRule = createKeyboardComposeRule()
 
     /**
-     * The offer claims focus for the content even with other focusables present (the rail, a not-yet-disposed
+     * The arrival claims focus for the content even with other focusables present (the rail, a not-yet-disposed
      * sibling), and keeps it once that sibling disposes — the "claim early so the outgoing screen's disposal
      * finds our nodes already unfocused" behaviour. A no-op effect leaves the content unfocused: nothing else
      * requests it, and the rail stand-in stops Compose recovering focus onto it unaided.
@@ -84,7 +82,7 @@ class TvArrivalFocusTest {
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
 
-        // The outgoing screen tearing down must not knock focus off the content the offer placed.
+        // The outgoing screen tearing down must not knock focus off the content the request placed.
         siblingPresent = false
         composeTestRule.waitForIdle()
 
@@ -92,12 +90,12 @@ class TvArrivalFocusTest {
     }
 
     /**
-     * With the gate shut the offer never runs, so the rail keeps focus; opening it (false→true) re-offers and the
-     * content claims focus. Keying the effect on `Unit` instead of `enabled` fails this — the offer would run once
+     * With the gate shut no request is made, so the rail keeps focus; opening it (false→true) makes it and the
+     * content claims focus. Keying the effect on `Unit` instead of `enabled` fails this — the request would run once
      * against the shut gate and never retry.
      */
     @Test
-    fun `the arrival effect re-offers when enabled flips false to true`() {
+    fun `the arrival effect requests when enabled flips false to true`() {
         var enabled by mutableStateOf(false)
         composeTestRule.setContent {
             BingeTvTheme {
@@ -127,12 +125,8 @@ class TvArrivalFocusTest {
 
     /**
      * The overlay effect lands focus on a node mounted mid-transition (an `AnimatedContent` swap) — the
-     * regression net for the five overlays migrated onto it. This pins that the effect *places* focus after such
-     * a mount — red when it is a no-op.
-     *
-     * It does not pin the frame wait, which this mount has nothing to swallow a request with. That took a
-     * focus-trapped overlay and is now covered in `TvOverlayCloserTest`; the caveat that used to sit here, saying
-     * the wait's necessity was a device-timing property no JVM harness could reproduce, was wrong.
+     * regression net for the five overlays migrated onto it. Its one request, made as the overlay composes, must
+     * place focus after such a mount — red when the effect is a no-op.
      */
     @Test
     fun `the overlay effect lands focus after a mid-transition mount`() {
@@ -169,14 +163,14 @@ class TvArrivalFocusTest {
     }
 
     /**
-     * The request stops once its target holds focus, so it never fights the user. A request that kept being
-     * made would undo a move back to the rail within a frame or two, and a held D-pad press would stutter.
+     * The arrival makes no further request once its target has held focus, so it never fights the user. A request
+     * made again would undo a move back to the rail within a frame or two, and a held D-pad press would stutter.
      *
-     * Pumping frames after the move is the assertion: `waitForIdle` alone would pass even against a loop
-     * that re-requests, because the re-request itself settles.
+     * Pumping frames after the move is the assertion: `waitForIdle` alone would pass even against a repeating
+     * request, because the repeat itself settles.
      */
     @Test
-    fun `the offer stops once its target holds focus, so a move away is not fought`() {
+    fun `the arrival stops once its target holds focus, so a move away is not fought`() {
         composeTestRule.mainClock.autoAdvance = false
         composeTestRule.setContent {
             BingeTvTheme {
@@ -368,7 +362,7 @@ class TvArrivalFocusTest {
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
     }
 
-    /** The stand-in the offer moves focus away from — the rail every arrival surface sits beside. */
+    /** The stand-in the request moves focus away from — the rail every arrival surface sits beside. */
     @Composable
     private fun RailStandIn() {
         Box(Modifier.testTag(RAIL).size(80.dp).focusable())

@@ -23,9 +23,9 @@ default value that only makes sense for Binge's data.
 
 ## 2. What does this do to the consumers?
 
-**A green build here says nothing about Binge, binge-seerr or binge-archive.** CI compiles
-binge-seerr and binge-archive informationally (`consumer-check`); Binge is private and is not
-compiled. All three include this repository directly.
+**A green build here says nothing about Binge, binge-seerr, binge-archive or binge-jellyfin.** CI
+compiles binge-seerr, binge-archive and binge-jellyfin informationally (`consumer-check`); Binge is
+private and is not compiled. All four include this repository directly.
 
 So on any change to a public signature — a parameter added or removed, a type changed, a component
 renamed or deleted — check that the PR body says what it means for them. A PR that changes the

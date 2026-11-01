@@ -170,7 +170,7 @@ its `tv/` package.
 
 ## Status
 
-**Pre-alpha, and consumed.** Binge, binge-seerr and binge-archive all include this build; Binge's
+**Pre-alpha, and consumed.** Binge, binge-seerr, binge-archive and binge-jellyfin all include this build; Binge's
 own `core/designsystem` keeps only the components that still name one of its types.
 
 Four slices have landed: the theme, the preview scaffolding and the components that named nothing
