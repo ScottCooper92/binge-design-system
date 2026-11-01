@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
@@ -93,6 +94,44 @@ fun TvCheckboxRowSample() {
             icon = Icons.Filled.Dns,
         )
         TvCheckboxRow(label = "Not available here", checked = false, onCheckedChange = {}, enabled = false, icon = Icons.Filled.Block)
+    }
+}
+
+/**
+ * Option rows whose second line wraps rather than ellipsizing: servers found on the network, each with an address the
+ * user has to read in full before picking one.
+ */
+@Composable
+fun TvOptionRowWrappingSupportingSample() {
+    // The canvas hands its content min constraints; the wrapping box lets the column keep its own width.
+    Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+        Column(
+            modifier =
+                Modifier
+                    .padding(dimensionResource(DesR.dimen.padding_l))
+                    .width(dimensionResource(TvR.dimen.tv_text_field_width)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
+        ) {
+            TvOptionRow(
+                label = "Living room",
+                selected = false,
+                onClick = {},
+                initiallyFocused = true,
+                icon = Icons.Filled.LockOpen,
+                supportingText = "Not encrypted · http://living-room-media-server.local:8096/web/index.html",
+                supportingLines = 2,
+            )
+            TvOptionRow(
+                label = "Cabin",
+                selected = false,
+                onClick = {},
+                icon = Icons.Filled.Dns,
+                supportingText =
+                    "Not encrypted · http://jellyfin-upstairs-cabin-media-server.local:8096/web/index.html" +
+                        "#/home?serverId=0123456789abcdef0123456789abcdef",
+                supportingLines = 2,
+            )
+        }
     }
 }
 
