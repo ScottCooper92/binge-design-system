@@ -61,8 +61,19 @@ that becomes the real control in place), and it makes the request once per arriv
 arrives again without leaving the composition passes a new `arrivalKey`.
 
 A user's own direction press since the arrival composed cancels the request, so it never pulls focus
-back from the bar. That guard acts only when the host provides `LocalTvUserMoves` and feeds it from the
-key handler that sees every press; without a host nothing is noted and the arrival always claims.
+back from the bar. That guard is opt-in. `TvUserMoves` is a counter: `note()` records one direction press,
+and `TvArrivalFocusEffect` reads the count when the arrival composes and again just before it would claim.
+If the count moved, or the arrival already holds focus, it makes no request. The design system never calls
+`note()` itself, and `LocalTvUserMoves` has no provider by default, so without a host nothing is noted and the
+arrival always claims, even if the user has already moved on.
+
+A host that wants the guard provides one `TvUserMoves` for its lifetime and calls `note()` from the key
+handler that sees every press, without consuming the key:
+
+```kotlin
+val moves = remember { TvUserMoves() }
+CompositionLocalProvider(LocalTvUserMoves provides moves) { /* the shell; on each direction KeyDown: moves.note() */ }
+```
 
 `TvOverlayArrivalFocusEffect` is the same single request for an overlay or a plate: it makes one request when it
 composes, so its target must be attached from the first frame. Focus returns after an overlay goes through
