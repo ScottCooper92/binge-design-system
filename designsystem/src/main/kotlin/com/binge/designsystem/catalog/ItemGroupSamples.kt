@@ -608,3 +608,40 @@ fun ItemGroupPainterIconSample() {
         )
     }
 }
+
+/**
+ * Rows whose text wraps: the leading icon stays level with the first line, at two lines and at three, and a
+ * [ListItem.connector] child row's curve still meets its icon.
+ */
+@Composable
+fun ItemGroupWrappingRowsSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Logs",
+            rows = listOf(
+                ListItem(
+                    icon = Icons.Filled.Folder,
+                    label = "Transcode log for the last playback",
+                    detail = "Written when the server last re-encoded a stream",
+                ),
+                ListItem(
+                    icon = Icons.Filled.Folder,
+                    label = "FFmpeg.Transcode-2026-10-31_19-40-56_3f9a1c7e5b2d4a60.log",
+                    detail = "Written when the server last re-encoded a stream",
+                ),
+                ListItem(
+                    icon = Icons.Filled.Dns,
+                    label = "Server",
+                    detail = "Home",
+                    connector = ListItemConnector.Continue,
+                ),
+                ListItem(
+                    icon = Icons.Filled.Folder,
+                    label = "FFmpeg.Transcode-2026-10-31_19-40-56_3f9a1c7e5b2d4a60.log",
+                    detail = "Written when the server last re-encoded a stream",
+                    connector = ListItemConnector.End,
+                ),
+            ),
+        )
+    }
+}

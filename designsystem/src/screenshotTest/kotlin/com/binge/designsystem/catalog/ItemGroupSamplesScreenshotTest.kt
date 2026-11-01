@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 /** Screenshot coverage for the [ItemGroup] catalog samples. */
 class ItemGroupSamplesScreenshotTest {
@@ -170,5 +171,14 @@ class ItemGroupSamplesScreenshotTest {
     @Composable
     fun PainterIcon() {
         ItemGroupPainterIconSample()
+    }
+
+    /** Wrapping rows at 1x, 1.3x and 2x: the leading icon stays at the top, and a connector still meets it. */
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun wrappingRows() {
+        ItemGroupWrappingRowsSample()
     }
 }

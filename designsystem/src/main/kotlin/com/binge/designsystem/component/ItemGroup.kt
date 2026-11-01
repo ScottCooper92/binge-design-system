@@ -147,7 +147,7 @@ private fun ListItemView(
     val externalDescription = stringResource(R.string.cd_list_item_external)
     val loadingDescription = stringResource(R.string.cd_list_item_loading)
     val expandedDescription = stringResource(if (row.expanded == true) R.string.cd_group_expanded else R.string.cd_group_collapsed)
-    val connectorModifier = row.connector?.let { listItemConnector(it) } ?: Modifier
+    val connectorModifier = row.connector?.let { listItemConnector(it, verticalPadding) } ?: Modifier
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -197,13 +197,16 @@ private fun ListItemView(
                 ),
             )
         }
-        if (row.leadingContent != null) {
-            row.leadingContent.invoke()
-        } else {
-            BingeIconPlate(
-                painter = row.iconPainter?.invoke() ?: rememberVectorPainter(row.icon),
-                tint = row.iconTint,
-            )
+        // Level with the first line of text, so a wrapping row's icon does not drift to its middle.
+        Box(Modifier.align(Alignment.Top)) {
+            if (row.leadingContent != null) {
+                row.leadingContent.invoke()
+            } else {
+                BingeIconPlate(
+                    painter = row.iconPainter?.invoke() ?: rememberVectorPainter(row.icon),
+                    tint = row.iconTint,
+                )
+            }
         }
         Spacer(Modifier.width(dimensionResource(R.dimen.account_card_spacing)))
         val chevron = interactive && row.destination != ListItemDestination.Action
@@ -458,23 +461,27 @@ private fun CountBadge(count: Int, tint: Color?) {
 /**
  * Draws [connector] across the row's full height, past its vertical padding and over the divider
  * below, so the line stays continuous down a run of rows. It sits on the parent icon's axis and
- * mirrors in right-to-left layouts.
+ * mirrors in right-to-left layouts. The curve turns at the child icon's axis: the row's middle while the row is
+ * one icon tall, and [verticalPadding] plus half the icon once the text wraps and the icon stays at the top.
  */
 @Composable
-private fun listItemConnector(connector: ListItemConnector): Modifier {
+private fun listItemConnector(connector: ListItemConnector, verticalPadding: Dp): Modifier {
     val color = MaterialTheme.colorScheme.outline
     val strokeWidth = with(LocalDensity.current) { dimensionResource(R.dimen.hairline_thickness).toPx() }
     val axis = with(LocalDensity.current) {
         (dimensionResource(R.dimen.item_group_row_padding_h) + dimensionResource(R.dimen.item_group_icon_size) / 2).toPx()
     }
     // The curve ends where it turns; the child's icon starts a small gap after it.
+    val iconAxisY = with(LocalDensity.current) {
+        (verticalPadding + dimensionResource(R.dimen.item_group_icon_size) / 2).toPx()
+    }
     val reach = with(LocalDensity.current) { dimensionResource(R.dimen.item_group_connector_radius).toPx() }
     val radius = with(LocalDensity.current) { dimensionResource(R.dimen.item_group_connector_radius).toPx() }
     return Modifier.drawBehind {
         val rtl = layoutDirection == LayoutDirection.Rtl
 
         fun x(value: Float) = if (rtl) size.width - value else value
-        val midY = size.height / 2
+        val midY = minOf(size.height / 2, iconAxisY)
         val curve = Path().apply {
             moveTo(x(axis), 0f)
             lineTo(x(axis), midY - radius)
