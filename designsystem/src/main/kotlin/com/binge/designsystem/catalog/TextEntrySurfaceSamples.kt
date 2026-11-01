@@ -278,7 +278,7 @@ fun TextEntrySurfaceSingleLineErrorSample() {
     ScreenshotTheme {
         TextEntrySurface(
             title = "Threads",
-            supportingText = "Separate with commas",
+            supportingText = "Simultaneous downloads",
             value = value,
             onValueChange = { value = it },
             onSubmit = {},
