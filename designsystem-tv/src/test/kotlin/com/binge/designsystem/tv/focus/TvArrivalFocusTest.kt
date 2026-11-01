@@ -169,9 +169,8 @@ class TvArrivalFocusTest {
     }
 
     /**
-     * The offer stops the frame its target takes focus, so it never fights the user. With the loop still
-     * running, a move back to the rail is undone within a frame or two and a held D-pad press stutters —
-     * the reason `offerTvArrivalFocus` early-returns on `taken()` rather than always burning its budget.
+     * The request stops once its target holds focus, so it never fights the user. A request that kept being
+     * made would undo a move back to the rail within a frame or two, and a held D-pad press would stutter.
      *
      * Pumping frames after the move is the assertion: `waitForIdle` alone would pass even against a loop
      * that re-requests, because the re-request itself settles.

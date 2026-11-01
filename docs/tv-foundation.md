@@ -65,8 +65,9 @@ back from the bar. That guard acts only when the host provides `LocalTvUserMoves
 key handler that sees every press; without a host nothing is noted and the arrival always claims.
 
 `TvOverlayArrivalFocusEffect` is the same single request for an overlay or a plate: it makes one request when it
-composes, so its target must be attached from the first frame. `restoreTvOverlayFocus` is the older
-frame-wait-then-retry shape, still used where focus returns after an overlay goes. Bound any such wait, in wall-clock time where the thing waited on can stop drawing: `withFrameNanos`
+composes, so its target must be attached from the first frame. Focus returns after an overlay goes through
+`rememberTvOverlayCloser`, which makes one request in the frame an overlay that reports its disposal is gone. There is
+no retry helper. Bound any wait on the frame clock in wall-clock time where the thing waited on can stop drawing: `withFrameNanos`
 resumes only on frames the app actually draws, so a frame budget against a static screen never expires.
 The startup handoff to content counts frames instead, and stops early once focus is taken or the user moves up
 to the top bar.

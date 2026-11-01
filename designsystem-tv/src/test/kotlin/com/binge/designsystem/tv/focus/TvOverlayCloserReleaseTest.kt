@@ -150,8 +150,8 @@ class TvOverlayCloserReleaseTest {
  * **A request granted while the overlay is still composed is not the restore.**
  *
  * The overlay's disposal can hand focus somewhere else after the closer's first request was granted (the geometric recovery
- * of a window or a focused node leaving). The closer therefore always restores once the overlay is gone, whatever the first
- * request answered.
+ * of a window or a focused node leaving). The closer therefore always restores once a reporting overlay is gone, whatever the
+ * first request answered. An overlay that does not report gets no request after it is gone.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -185,6 +185,7 @@ class TvOverlayCloserRecoveryTest {
                             .focusable(),
                     )
                     if (open) {
+                        closer.ReportDisposal()
                         DisposableEffect(Unit) { onDispose { stray.requestFocus() } }
                         Box(Modifier.testTag(OVERLAY).size(40.dp).focusable())
                     }
