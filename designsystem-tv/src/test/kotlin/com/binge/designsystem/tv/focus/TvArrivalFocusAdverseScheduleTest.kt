@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 private const val RAIL = "rail"
 private const val TARGET = "target"
 
-/** Frames to settle the offer loop after its target should already hold focus, or should have given up. */
+/** Frames to run after the target is placed, enough for the effect to have made its one request or ruled it out. */
 private const val SETTLE_FRAMES = 10
 
 /**
@@ -47,16 +47,16 @@ class TvArrivalFocusAdverseScheduleTest {
     val composeTestRule = createKeyboardComposeRule()
 
     @Test
-    fun `the arrival offer converges on a target composed 0 frames late`() = assertArrivalConverges(0)
+    fun `the arrival claims focus for a target composed 0 frames late`() = assertArrivalConverges(0)
 
     @Test
-    fun `the arrival offer converges on a target composed 1 frame late`() = assertArrivalConverges(1)
+    fun `the arrival claims focus for a target composed 1 frame late`() = assertArrivalConverges(1)
 
     @Test
-    fun `the arrival offer converges on a target composed 10 frames late`() = assertArrivalConverges(10)
+    fun `the arrival claims focus for a target composed 10 frames late`() = assertArrivalConverges(10)
 
     @Test
-    fun `the arrival offer converges on a target composed 60 frames late`() = assertArrivalConverges(60)
+    fun `the arrival claims focus for a target composed 60 frames late`() = assertArrivalConverges(60)
 
     private fun assertArrivalConverges(delayFrames: Int) {
         var dispose by mutableStateOf(false)
