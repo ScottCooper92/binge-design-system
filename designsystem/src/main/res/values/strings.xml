@@ -140,4 +140,12 @@
     <string name="save_status_saved">Saved</string>
     <string name="save_status_failed">Couldn\'t save your change</string>
     <string name="save_status_retry">Retry</string>
+    <string name="log_row_copy">Copy line</string>
+    <string name="log_row_expand">Show details</string>
+    <string name="log_row_collapse">Hide details</string>
+    <string name="log_row_meta_separator" translatable="false">" · "</string>
+    <string name="log_level_debug">Debug</string>
+    <string name="log_level_info">Info</string>
+    <string name="log_level_warn">Warning</string>
+    <string name="log_level_error">Error</string>
 </resources>
