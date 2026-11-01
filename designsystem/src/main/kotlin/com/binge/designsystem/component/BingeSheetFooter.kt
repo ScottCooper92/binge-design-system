@@ -53,6 +53,9 @@ fun BingeSheetFooter(content: @Composable () -> Unit) {
 /**
  * A vertical scroll for a page's content that the side sheet can see, so it knows when content is under the footer and draws
  * the edge. Outside the side sheet it is an ordinary `verticalScroll` with its own state.
+ *
+ * Use it on one node per page: inside the side sheet every call shares the one scroll state, so two scrolling nodes would
+ * move together.
  */
 @Composable
 fun Modifier.bingeSheetScroll(): Modifier = verticalScroll(LocalSheetScroll.current ?: rememberScrollState())
