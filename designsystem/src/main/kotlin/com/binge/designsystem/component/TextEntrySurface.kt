@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloseFullscreen
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.binge.designsystem.R
@@ -55,6 +57,11 @@ private const val TEXT_ENTRY_MAX_LINES = 6
  *   secret, pair `KeyboardType.Password` with [visualTransformation].
  * @param visualTransformation how the value is drawn: `PasswordVisualTransformation()` masks an API
  *   key or a password, which the keyboard type alone does not. The default draws it as typed.
+ * @param singleLine one line for a single value (a count, a name, a short list), not a paragraph: the
+ *   field has no line floor, a long value scrolls sideways rather than wrapping, the keyboard's Done
+ *   action submits while [submitEnabled], and the expand toggle is not offered. [minLines], [maxLines],
+ *   [expanded] and [onExpandToggle] are ignored.
+ * @param supportingText a line under the title for the unit or the format ("In milliseconds").
  */
 @Composable
 fun TextEntrySurface(
@@ -78,7 +85,16 @@ fun TextEntrySurface(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     header: @Composable ColumnScope.() -> Unit = {},
+    singleLine: Boolean = false,
+    supportingText: String? = null,
 ) {
+    val expanded = expanded && !singleLine
+    val submit = submitEnabled && !isSubmitting
+    val fieldMaxLines = when {
+        singleLine -> 1
+        expanded -> Int.MAX_VALUE
+        else -> maxLines
+    }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -86,7 +102,12 @@ fun TextEntrySurface(
             .padding(dimensionResource(R.dimen.padding_m)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
     ) {
-        TextEntryTitleRow(title = title, expanded = expanded, onExpandToggle = onExpandToggle)
+        TextEntryTitleRow(
+            title = title,
+            supportingText = supportingText,
+            expanded = expanded,
+            onExpandToggle = onExpandToggle.takeUnless { singleLine },
+        )
         header()
         OutlinedTextField(
             value = value,
@@ -100,10 +121,12 @@ fun TextEntrySurface(
             isError = error != null,
             placeholder = hint?.let { { Text(it) } },
             shape = BingeShapes.Medium,
-            minLines = minLines,
-            maxLines = if (expanded) Int.MAX_VALUE else maxLines,
+            singleLine = singleLine,
+            minLines = if (singleLine) 1 else minLines,
+            maxLines = fieldMaxLines,
             supportingText = textEntrySupport(error, value.length, maxLength),
-            keyboardOptions = keyboardOptions,
+            keyboardOptions = if (singleLine) keyboardOptions.copy(imeAction = ImeAction.Done) else keyboardOptions,
+            keyboardActions = if (singleLine) KeyboardActions(onDone = { if (submit) onSubmit() }) else KeyboardActions.Default,
             visualTransformation = visualTransformation,
         )
         Row(
@@ -119,7 +142,7 @@ fun TextEntrySurface(
             BingeFilledButton(
                 label = submitLabel,
                 onClick = onSubmit,
-                enabled = submitEnabled && !isSubmitting,
+                enabled = submit,
                 loading = isSubmitting,
                 modifier = Modifier.weight(1f),
             )
@@ -127,10 +150,11 @@ fun TextEntrySurface(
     }
 }
 
-/** Title plus, when the host opts in, the expand/collapse affordance that drives full-screen mode. */
+/** Title, its optional supporting line and, when the host opts in, the expand/collapse affordance that drives full-screen mode. */
 @Composable
 private fun TextEntryTitleRow(
     title: String,
+    supportingText: String?,
     expanded: Boolean,
     onExpandToggle: (() -> Unit)?,
 ) {
@@ -138,12 +162,20 @@ private fun TextEntryTitleRow(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            if (supportingText != null) {
+                Text(
+                    text = supportingText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         if (onExpandToggle != null) {
             IconButton(onClick = onExpandToggle) {
                 Icon(

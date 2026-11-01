@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 /**
  * Screenshot coverage for the [TextEntrySurface] catalog samples — renders the shared samples, the
@@ -77,5 +78,45 @@ class TextEntrySurfaceSamplesScreenshotTest {
     @Composable
     fun Expanded() {
         TextEntrySurfaceExpandedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun SingleLine() {
+        TextEntrySurfaceSingleLineSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun SingleLineUnit() {
+        TextEntrySurfaceSingleLineUnitSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun SingleLineError() {
+        TextEntrySurfaceSingleLineErrorSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun SingleLineEmpty() {
+        TextEntrySurfaceSingleLineEmptySample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun SingleLineLongValue() {
+        TextEntrySurfaceSingleLineLongValueSample()
     }
 }
