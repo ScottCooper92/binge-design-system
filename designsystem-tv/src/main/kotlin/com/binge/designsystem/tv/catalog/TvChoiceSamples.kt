@@ -103,30 +103,35 @@ fun TvCheckboxRowSample() {
  */
 @Composable
 fun TvOptionRowWrappingSupportingSample() {
-    Column(
-        modifier =
-            Modifier
-                .padding(dimensionResource(DesR.dimen.padding_l))
-                .width(dimensionResource(TvR.dimen.tv_text_field_width)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
-    ) {
-        TvOptionRow(
-            label = "Living room",
-            selected = false,
-            onClick = {},
-            initiallyFocused = true,
-            icon = Icons.Filled.LockOpen,
-            supportingText = "Not encrypted · http://living-room-media-server.local:8096",
-            supportingLines = 2,
-        )
-        TvOptionRow(
-            label = "Cabin",
-            selected = false,
-            onClick = {},
-            icon = Icons.Filled.Dns,
-            supportingText = "https://jellyfin.cabin.example.org",
-            supportingLines = 2,
-        )
+    // The canvas hands its content min constraints; the wrapping box lets the column keep its own width.
+    Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+        Column(
+            modifier =
+                Modifier
+                    .padding(dimensionResource(DesR.dimen.padding_l))
+                    .width(dimensionResource(TvR.dimen.tv_text_field_width)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_option_row_gap)),
+        ) {
+            TvOptionRow(
+                label = "Living room",
+                selected = false,
+                onClick = {},
+                initiallyFocused = true,
+                icon = Icons.Filled.LockOpen,
+                supportingText = "Not encrypted · http://living-room-media-server.local:8096/web/index.html",
+                supportingLines = 2,
+            )
+            TvOptionRow(
+                label = "Cabin",
+                selected = false,
+                onClick = {},
+                icon = Icons.Filled.Dns,
+                supportingText =
+                    "Not encrypted · http://jellyfin-upstairs-cabin-media-server.local:8096/web/index.html" +
+                        "#/home?serverId=0123456789abcdef0123456789abcdef",
+                supportingLines = 2,
+            )
+        }
     }
 }
 

@@ -252,7 +252,7 @@ fun tvRowListItemColors(
     )
 }
 
-/** A row's second line: one line, ellipsized, saying what the option does. */
+/** A row's second line, saying what the option does: one line by default, ellipsized after [maxLines]. */
 @Composable
 private fun SupportingLine(text: String, maxLines: Int = 1) {
     Text(text = text, style = MaterialTheme.typography.bodyMedium, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
