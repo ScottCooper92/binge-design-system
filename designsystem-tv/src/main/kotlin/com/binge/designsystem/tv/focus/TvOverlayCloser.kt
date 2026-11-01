@@ -27,8 +27,8 @@ import kotlinx.coroutines.flow.first
  * This is that latch, once.
  *
  * An overlay that reports its disposal (a sheet given the closer, or any overlay calling [TvOverlayCloser.ReportDisposal]) gets
- * one request the moment it is gone, which lands in the frame it leaves. One that does not report gets a single request
- * as [onClose] runs, which a focus trap still composed will swallow; a debug build logs that, so report. Either way
+ * one request the moment it is gone, which lands in the frame it leaves. One that does not report gets only the request made
+ * before [onClose] runs, which a focus trap still composed will swallow; a debug build logs that, so report. Either way
  * [onClose] must dispose the overlay.
  *
  * An overlay whose `tvExitFocusGroup` reads [TvOverlayCloser.trapping] lets the request before [onClose] through as the exit
@@ -64,7 +64,6 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
             restoreTo.tryRequestFocus()
         } else {
             if (debuggable) Log.w(TAG, FALLBACK_MESSAGE)
-            restoreTo.tryRequestFocus()
         }
         // Reset so the overlay can be opened and closed again — an un-reset latch stays armed and either never
         // re-fires (a stuck close) or fires a stale request on a later recomposition.
