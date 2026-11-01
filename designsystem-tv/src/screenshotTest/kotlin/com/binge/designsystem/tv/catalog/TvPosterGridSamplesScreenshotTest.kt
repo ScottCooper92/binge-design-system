@@ -7,7 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
-/** The poster grid: resolved, a focused cell, the loading plates, and a focused stable plate. */
+/** The poster grid: resolved, a focused cell, the loading plates, a ringed skeleton plate, and a focused stable plate. */
 class TvPosterGridSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
@@ -23,6 +23,11 @@ class TvPosterGridSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun loading() = Frame { TvPosterGridLoadingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun skeletonFocused() = Frame { TvPosterGridSkeletonFocusedSample() }
 
     @PreviewTest
     @TvPreviews
