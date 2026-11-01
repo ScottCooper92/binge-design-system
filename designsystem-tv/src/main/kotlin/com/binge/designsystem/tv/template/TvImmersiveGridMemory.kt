@@ -73,9 +73,8 @@ internal fun ResetScrollWhenStale(
  * through; [entryPlaced] is called by the entry cell as it is placed.
  */
 @Stable
-internal class TvBodyFocusKeeper(
-    private val entryFocusRequester: FocusRequester?,
-) {
+internal class TvBodyFocusKeeper {
+    private var entryFocusRequester: FocusRequester? = null
     private var bodyHasFocus = false
     private var owed = false
     private var lastKind: Any? = null
@@ -85,7 +84,8 @@ internal class TvBodyFocusKeeper(
     }
 
     /** Called as the body's kind changes: focus is owed if the old body held it, or an earlier swap never got its request. */
-    fun bodyChanged(kind: Any) {
+    fun bodyChanged(kind: Any, requester: FocusRequester?) {
+        entryFocusRequester = requester
         if (kind == lastKind) return
         lastKind = kind
         owed = entryFocusRequester != null && (bodyHasFocus || owed)
@@ -111,8 +111,10 @@ internal fun rememberBodyFocusKeeper(
     entryFocusRequester: FocusRequester?,
     waitsForCells: Boolean,
 ): TvBodyFocusKeeper {
-    val keeper = remember(entryFocusRequester) { TvBodyFocusKeeper(entryFocusRequester) }
-    keeper.bodyChanged(bodyKind)
+    // One keeper for the grid's life: the requester can change in the same composition that swaps the body, and a new
+    // keeper would forget that the old body held focus.
+    val keeper = remember { TvBodyFocusKeeper() }
+    keeper.bodyChanged(bodyKind, entryFocusRequester)
     LaunchedEffect(keeper, bodyKind) { if (!waitsForCells) keeper.entryPlaced() }
     return keeper
 }

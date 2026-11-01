@@ -60,8 +60,10 @@ class TvSwapFocus internal constructor(
 }
 
 /**
- * The swap-focus holder for one surface, stable across recomposition. Thread [requester][TvSwapFocus.requester]
- * onto the replacement control, [arm][TvSwapFocus.arm] it on the press, and drive it with [TvSwapFocusEffect].
+ * The swap-focus holder for one surface, stable across recomposition. Put [tvSwapTarget] on the
+ * replacement control (it carries the requester and counts the attach), [arm][TvSwapFocus.arm] it on the press, and drive
+ * it with [TvSwapFocusEffect]. A control that only takes the requester never counts as attached, so the swap expires
+ * without focusing.
  */
 @Composable
 fun rememberTvSwapFocus(): TvSwapFocus {
@@ -72,7 +74,8 @@ fun rememberTvSwapFocus(): TvSwapFocus {
 /**
  * A swap-focus holder that drives an **existing** [requester] rather than minting its own — for a replacement
  * control whose requester is owned elsewhere (a requester the shell owns and aims itself, as well as
- * through the go-home swap).
+ * through the go-home swap). [tvSwapTarget] attaches this same [requester], so the replacement takes the modifier and
+ * must not also apply the requester itself.
  */
 @Composable
 fun rememberTvSwapFocus(requester: FocusRequester): TvSwapFocus = remember(requester) { TvSwapFocus(requester) }

@@ -9,10 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.isFocused
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyInput
@@ -122,6 +126,19 @@ class TvImmersiveGridInPlaceTest {
     }
 
     @Test
+    fun `swapping cells for a message keeps focus in the body when a requester is given`() {
+        content = TvImmersiveGridContent.Items(count = COUNT, key = { it }, at = { it })
+        setGrid(withEntryRequester = true)
+        enterFromRail()
+        composeTestRule.onNode(isFocused()).assertExists()
+
+        content = TvImmersiveGridContent.Message()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("message").assertIsFocused()
+    }
+
+    @Test
     fun `a plate does nothing on OK while loading`() {
         setGrid()
         enterFromRail()
@@ -145,9 +162,10 @@ class TvImmersiveGridInPlaceTest {
         press(Key.DirectionRight)
     }
 
-    private fun setGrid(onNavigateToEnd: (() -> Unit)? = null) {
+    private fun setGrid(onNavigateToEnd: (() -> Unit)? = null, withEntryRequester: Boolean = false) {
         composeTestRule.setContent {
             BingeTvTheme {
+                val entry = remember { FocusRequester() }
                 Row {
                     Box(Modifier.size(48.dp).testTag(RAIL).focusable())
                     TvImmersiveGrid(
@@ -160,7 +178,16 @@ class TvImmersiveGridInPlaceTest {
                         columns = COLUMNS,
                         hosting = TvPageHosting.Destination,
                         onNavigateToEnd = onNavigateToEnd,
-                        message = { Box(Modifier.size(48.dp).testTag("message")) },
+                        entryFocusRequester = entry.takeIf { withEntryRequester },
+                        message = {
+                            Box(
+                                Modifier
+                                    .size(48.dp)
+                                    .testTag("message")
+                                    .focusRequester(entry)
+                                    .focusable(),
+                            )
+                        },
                         inPlace = TvImmersiveGridInPlace<Int>(
                             cell = { item, _, onFocusChanged, onClick, cellModifier ->
                                 Box(
