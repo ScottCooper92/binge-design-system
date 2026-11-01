@@ -24,8 +24,9 @@ import com.binge.designsystem.preview.TaskSheetPreviewFrame
 private const val LONG_PAGE_ROWS = 24
 
 /**
- * A short page with its primary in the sheet's footer, called from inside the page's own scrolling column as a page does. At the expanded width the side sheet pins the primary to the foot of
- * the sheet, so it is in the same place as on a long page; below it the bottom sheet draws it in place, under the last row.
+ * A short page with its primary in the sheet's footer, a sibling of the page's scrolling column. At the expanded width
+ * the side sheet pins the primary to the foot of the sheet, so it is in the same place as on a long page; below it the
+ * bottom sheet draws it in place, under the content.
  */
 @Composable
 fun BingeSheetFooterSample() {
@@ -60,7 +61,7 @@ private fun FooterBackdrop(content: @Composable () -> Unit) {
 
 @Composable
 private fun ColumnScope.FooterPage(rows: Int) {
-    Column(modifier = Modifier.bingeSheetScroll()) {
+    Column(modifier = Modifier.weight(1f, fill = false).bingeSheetScroll()) {
         Text(
             text = "Request",
             style = MaterialTheme.typography.titleLarge,
@@ -76,6 +77,6 @@ private fun ColumnScope.FooterPage(rows: Int) {
                 ),
             )
         }
-        BingeSheetFooter { BingeActionFooter(label = "Request", onClick = {}) }
     }
+    BingeSheetFooter { BingeActionFooter(label = "Request", onClick = {}) }
 }
