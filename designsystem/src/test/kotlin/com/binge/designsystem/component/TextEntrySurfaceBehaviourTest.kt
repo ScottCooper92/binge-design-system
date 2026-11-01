@@ -14,7 +14,9 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
 import com.binge.designsystem.testing.TestTheme
 import org.junit.Assert.assertEquals
@@ -37,6 +39,10 @@ class TextEntrySurfaceBehaviourTest {
         maxLength: Int? = null,
         error: String? = null,
         isSubmitting: Boolean = false,
+        singleLine: Boolean = false,
+        submitEnabled: Boolean = initial.isNotBlank(),
+        onExpandToggle: (() -> Unit)? = null,
+        onSubmit: () -> Unit = {},
     ) = rule.setContent {
         var value by remember { mutableStateOf(initial) }
         current = value
@@ -45,9 +51,12 @@ class TextEntrySurfaceBehaviourTest {
                 title = "Note",
                 value = value,
                 onValueChange = { value = it },
-                onSubmit = {},
+                onSubmit = onSubmit,
                 onCancel = {},
                 submitLabel = "Save",
+                singleLine = singleLine,
+                submitEnabled = submitEnabled,
+                onExpandToggle = onExpandToggle,
                 maxLength = maxLength,
                 error = error,
                 isSubmitting = isSubmitting,
@@ -106,5 +115,41 @@ class TextEntrySurfaceBehaviourTest {
         rule.onNodeWithText("Cancel").assertIsNotEnabled()
         rule.onAllNodes(isButton() and isNotEnabled()).assertCountEquals(2)
         rule.onNode(hasText("abc")).assertIsNotEnabled()
+    }
+
+    @Test
+    fun `the Done action submits a single line field while submit is enabled`() {
+        var submitted = 0
+        show(initial = "abc", singleLine = true, onSubmit = { submitted++ })
+
+        rule.onNode(hasSetTextAction()).performImeAction()
+        rule.waitForIdle()
+
+        assertEquals(1, submitted)
+    }
+
+    @Test
+    fun `the Done action does nothing while submit is disabled`() {
+        var submitted = 0
+        show(initial = "abc", singleLine = true, submitEnabled = false, onSubmit = { submitted++ })
+
+        rule.onNode(hasSetTextAction()).performImeAction()
+        rule.waitForIdle()
+
+        assertEquals(0, submitted)
+    }
+
+    @Test
+    fun `a single line field offers no expand toggle`() {
+        show(initial = "abc", singleLine = true, onExpandToggle = {})
+
+        rule.onNodeWithContentDescription("Expand to full screen").assertDoesNotExist()
+    }
+
+    @Test
+    fun `a multi line field offers the expand toggle when the host gives one`() {
+        show(initial = "abc", onExpandToggle = {})
+
+        rule.onNodeWithContentDescription("Expand to full screen").assertExists()
     }
 }

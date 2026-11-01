@@ -234,3 +234,97 @@ fun TextEntrySurfaceExpandedSample() {
         )
     }
 }
+
+/** Single line, a plain name: one value in a one-line field, with no line floor, and no expand toggle. */
+@Composable
+fun TextEntrySurfaceSingleLineSample() {
+    var value by remember { mutableStateOf("Living room TV") }
+    ScreenshotTheme {
+        TextEntrySurface(
+            title = "Rename device",
+            value = value,
+            onValueChange = { value = it },
+            onSubmit = {},
+            onCancel = {},
+            submitLabel = SUBMIT_LABEL,
+            singleLine = true,
+        )
+    }
+}
+
+/** Single line with [TextEntrySurface]'s supporting text under the title for the unit, and a number keyboard. */
+@Composable
+fun TextEntrySurfaceSingleLineUnitSample() {
+    var value by remember { mutableStateOf("2500") }
+    ScreenshotTheme {
+        TextEntrySurface(
+            title = "Read timeout",
+            supportingText = "In milliseconds",
+            value = value,
+            onValueChange = { value = it },
+            onSubmit = {},
+            onCancel = {},
+            submitLabel = SUBMIT_LABEL,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        )
+    }
+}
+
+/** Single line, error state: the message replaces the support line under the field and the outline turns red. */
+@Composable
+fun TextEntrySurfaceSingleLineErrorSample() {
+    var value by remember { mutableStateOf("0") }
+    ScreenshotTheme {
+        TextEntrySurface(
+            title = "Threads",
+            supportingText = "Simultaneous downloads",
+            value = value,
+            onValueChange = { value = it },
+            onSubmit = {},
+            onCancel = {},
+            submitLabel = SUBMIT_LABEL,
+            singleLine = true,
+            error = "Use a number from 1 to 16",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        )
+    }
+}
+
+/** Single line with an empty field: only the hint shows and submit, and the keyboard's Done, do nothing until there is text. */
+@Composable
+fun TextEntrySurfaceSingleLineEmptySample() {
+    var value by remember { mutableStateOf("") }
+    ScreenshotTheme {
+        TextEntrySurface(
+            title = "Server name",
+            value = value,
+            onValueChange = { value = it },
+            onSubmit = {},
+            onCancel = {},
+            submitLabel = SUBMIT_LABEL,
+            hint = "Empty: Save stays off until there is text.",
+            singleLine = true,
+        )
+    }
+}
+
+/** Single line with a value longer than the field: it stays on one line and scrolls sideways instead of wrapping. */
+@Composable
+fun TextEntrySurfaceSingleLineLongValueSample() {
+    var value by remember {
+        mutableStateOf("https://jellyfin.home.example.org:8920/web/index.html#!/dashboard/settings?section=playback&profile=living-room")
+    }
+    ScreenshotTheme {
+        TextEntrySurface(
+            title = "Server address",
+            value = value,
+            onValueChange = { value = it },
+            onSubmit = {},
+            onCancel = {},
+            submitLabel = SUBMIT_LABEL,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+        )
+    }
+}
