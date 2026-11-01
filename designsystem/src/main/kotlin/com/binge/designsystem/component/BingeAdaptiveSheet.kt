@@ -215,7 +215,7 @@ fun BingeTaskSheetPanel(
                         onBack = onBack,
                     )
                 if (pages.size > 1) BingeSheetBackBar(onBack, enabled = backEnabled, label = backLabel)
-                key(nav.page) { content(nav) }
+                key(nav.page) { SheetPageWithFooter { content(nav) } }
             }
         }
     }
