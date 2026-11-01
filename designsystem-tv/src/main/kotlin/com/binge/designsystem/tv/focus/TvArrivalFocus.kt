@@ -54,7 +54,8 @@ class TvArrivalFocus internal constructor(
 
 /**
  * The arrival-focus holder for one surface, stable across recomposition. Fresh per composition entry, so a
- * drill-down pop (which disposes and re-runs) starts with [TvArrivalFocus.hasFocus] false and re-offers.
+ * drill-down pop (which disposes and re-runs) starts a fresh arrival with [TvArrivalFocus.hasFocus] false, so the effect
+ * makes its one request again.
  */
 @Composable
 fun rememberTvArrivalFocus(): TvArrivalFocus {
