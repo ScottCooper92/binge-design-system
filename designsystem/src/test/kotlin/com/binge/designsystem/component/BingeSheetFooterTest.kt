@@ -104,6 +104,25 @@ class BingeSheetFooterTest {
     }
 
     @Test
+    fun `a footer the page starts showing after the first frame is pinned`() {
+        var shown by mutableStateOf(false)
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeTaskSheetPanel(pages = listOf(ROOT_PAGE), onPush = {}, onBack = {}) {
+                    Text("Body")
+                    if (shown) BingeSheetFooter { Text(FOOTER) }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        shown = true
+        rule.waitForIdle()
+
+        rule.onNodeWithText(FOOTER).assertIsDisplayed()
+    }
+
+    @Test
     fun `no edge shows while the page fits`() {
         showPanel(rows = 2)
 

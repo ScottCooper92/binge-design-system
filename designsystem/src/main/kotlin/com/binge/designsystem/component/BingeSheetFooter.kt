@@ -14,7 +14,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -39,12 +39,12 @@ fun BingeSheetFooter(content: @Composable () -> Unit) {
     val current by rememberUpdatedState(content)
     val pinned = remember(host) { @Composable { current() } }
     // Handed over while composing, so the panel, which composes the footer after the page, has it on the first frame.
+    // The field is state, so a footer registered later invalidates the panel.
     host.content = pinned
     DisposableEffect(host) {
         onDispose {
             if (host.content === pinned) {
                 host.content = null
-                host.version++
             }
         }
     }
@@ -59,13 +59,12 @@ fun Modifier.bingeSheetScroll(): Modifier = verticalScroll(LocalSheetScroll.curr
 
 /**
  * The footer a page handed to [BingeSheetFooter], held by the side sheet's panel; absent where nothing pins it. [content] is a
- * plain field, written as the page composes and read as the panel composes after it; [version] is what tells the panel it was
- * taken away later.
+ * snapshot state, written as the page composes and read as the panel composes after it, so a footer that appears or goes
+ * after the first frame recomposes the panel too.
  */
 @Stable
 internal class SheetFooterHost {
-    var content: (@Composable () -> Unit)? = null
-    var version by mutableIntStateOf(0)
+    var content by mutableStateOf<(@Composable () -> Unit)?>(null)
 }
 
 internal val LocalSheetFooterHost = compositionLocalOf<SheetFooterHost?> { null }
@@ -84,8 +83,6 @@ internal const val SHEET_FOOTER_EDGE_TAG = "sheet-footer-edge"
 internal fun ColumnScope.SheetPageWithFooter(content: @Composable ColumnScope.() -> Unit) {
     val scroll = rememberScrollState()
     val host = remember { SheetFooterHost() }
-    // Read so a footer taken away after the first frame is noticed.
-    host.version
     CompositionLocalProvider(
         LocalSheetFooterHost provides host,
         LocalSheetScroll provides scroll,
