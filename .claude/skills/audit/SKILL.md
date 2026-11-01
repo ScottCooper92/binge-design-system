@@ -10,7 +10,7 @@ and `checkTvMaterialSeparation` (wired into `designsystem-tv`'s `check`), plus s
 against the committed PNGs. There is **no** coverage floor, detekt, baseline or custom convention task
 here — do not look for one and do not report a finding as though one had caught it. The audit's value
 is what those don't decide: whether a component belongs here at all, whether every component has its
-catalog fixture and frame, and what the three consumers (Binge, binge-seerr, binge-archive) will trip over.
+catalog fixture and frame, and what the four consumers (Binge, binge-seerr, binge-archive, binge-jellyfin) will trip over.
 
 Scope to both modules or one: `designsystem/` (`com.binge.designsystem`) and `designsystem-tv/`
 (`com.binge.designsystem.tv`). Skip `build/`.
@@ -105,11 +105,11 @@ an absent one.
 
 ## Dimension 5 — consumer impact and API drift
 
-A green build here does not mean a green build in Binge, binge-seerr or binge-archive. `consumer-check` compiles
-binge-seerr's and binge-archive's main and unit-test sources against a PR's head, informationally; Binge is private and is not compiled.
+A green build here does not mean a green build in Binge, binge-seerr, binge-archive or binge-jellyfin. `consumer-check` compiles
+binge-seerr's, binge-archive's and binge-jellyfin's main and unit-test sources against a PR's head, informationally; Binge is private and is not compiled.
 
 - Compare the public surface against what the consumers use: look in the sibling checkouts
-  (`../Binge`, `../binge-seerr`, `../binge-archive`) for imports of `com.binge.designsystem` symbols that no longer exist,
+  (`../Binge`, `../binge-seerr`, `../binge-archive`, `../binge-jellyfin`) for imports of `com.binge.designsystem` symbols that no longer exist,
   changed signatures, renamed resources (`R.string.*`, `R.dimen.*`) or removed catalog samples. Report
   drift with the consumer file and line.
 - Resource names consumers reference via `DesR.dimen.*` / `DesR.string.*` that are missing or renamed.
@@ -122,7 +122,7 @@ binge-seerr's and binge-archive's main and unit-test sources against a PR's head
 
 Nothing here gates unused symbols, and Android lint's `UnusedResources` cannot see a resource used only
 by a consumer, so **default to reporting "referenced by no code in any repo" not "unused here"**.
-Check `../Binge`, `../binge-seerr` and `../binge-archive` before calling anything dead.
+Check `../Binge`, `../binge-seerr`, `../binge-archive` and `../binge-jellyfin` before calling anything dead.
 
 - **Unreferenced value resources** (`dimen`/`string`/`plurals`/`color`/`integer`/`bool`): 1 occurrence
   repo-wide (the declaration) is unused *in this repo*; then grep the consumers. Check every

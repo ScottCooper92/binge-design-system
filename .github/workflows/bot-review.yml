@@ -17,11 +17,11 @@ run-name: >-
 
 # Thin caller. The workflow itself lives in ScottCooper92/binge-ci.
 #
-# PUBLIC repository, and one that three other builds include directly. `./gradlew build`
+# PUBLIC repository, and one that four other builds include directly. `./gradlew build`
 # here cannot see every consumer, so a change that compiles fine in this repository can
 # still break a consuming app at its next sync. auto_merge was off until the review had a
 # track record here. It is on now. The `Consumer check` workflow, kept apart from `CI`,
-# compiles binge-seerr and binge-archive against a change that touches what they compile, and a red or pending
+# compiles binge-seerr, binge-archive and binge-jellyfin against a change that touches what they compile, and a red or pending
 # run there holds auto-merge at UNSTABLE. A consumer break that gets through surfaces at that
 # consumer's own submodule bump.
 on:

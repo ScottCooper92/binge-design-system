@@ -33,7 +33,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 
-    // Catalog at the root rather than gradle/, matching Binge, binge-seerr and binge-archive, so a version bump
+    // Catalog at the root rather than gradle/, matching Binge, binge-seerr, binge-archive and binge-jellyfin, so a version bump
     // can be applied to every repository the same way. This one matters more than most: a consumer
     // includes this build, so a version disagreement here is a version disagreement in their build.
     versionCatalogs {
