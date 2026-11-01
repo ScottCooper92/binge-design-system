@@ -62,6 +62,8 @@ class TvPosterCell(
  * is each cell's key (default: its index). [entryIndex] is the cell that takes [entry]; [listKey] resets the scroll.
  * With [stablePlates] a plate takes focus (ring, OK does nothing) and a cell keeps its node as its poster arrives, so a grid
  * that loads in place keeps focus where it was, even if the results end before the focused plate; plates and posters are then positional, never keyed by [keyOf].
+ * [seededIndex] draws that cell's ring before it holds focus, on a skeleton plate too, so focus is visible while a hold in
+ * front of the grid has it.
  */
 @Composable
 fun TvPosterGrid(
@@ -162,7 +164,8 @@ private fun TvPosterGridCell(
     modifier: Modifier = Modifier,
 ) {
     if (poster == null && !focusablePlate) {
-        TvPosterPlate(modifier = modifier)
+        // A skeleton takes no focus itself, but may stand in front of a node that has it, so it can draw the ring.
+        TvPosterPlate(modifier = modifier) { if (initiallyFocused) PosterFocusRing() }
         return
     }
     // One node chain for the plate and the poster, so focus on a plate stays on it when the poster arrives.
@@ -196,13 +199,16 @@ private fun TvPosterGridCell(
                 },
             )
         }
-        // A white ring over the art, as the hub's rows draw it, not the yellow indicator.
-        if (focused) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .border(dimensionResource(TvR.dimen.tv_focus_ring_width), MaterialTheme.colorScheme.onSurface, BingeShapes.MediaCard),
-            )
-        }
+        if (focused) PosterFocusRing()
     }
+}
+
+/** A white ring over the art, as the hub's rows draw it, not the yellow indicator. */
+@Composable
+private fun PosterFocusRing() {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .border(dimensionResource(TvR.dimen.tv_focus_ring_width), MaterialTheme.colorScheme.onSurface, BingeShapes.MediaCard),
+    )
 }

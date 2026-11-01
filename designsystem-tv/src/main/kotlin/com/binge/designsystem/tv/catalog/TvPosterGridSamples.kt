@@ -32,6 +32,12 @@ fun TvPosterGridLoadingSample() {
     PosterGrid(loading = true)
 }
 
+/** The loading plates with the first one ringed: where focus is shown while a hold in front of the grid has it. */
+@Composable
+fun TvPosterGridSkeletonFocusedSample() {
+    PosterGrid(loading = true, seededIndex = 0)
+}
+
 /** A grid that loads in place (`stablePlates`): a plate takes focus and shows the ring before its poster arrives. */
 @Composable
 fun TvPosterGridFocusedPlateSample() {
