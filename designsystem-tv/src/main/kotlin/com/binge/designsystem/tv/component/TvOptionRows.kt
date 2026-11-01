@@ -98,8 +98,9 @@ fun <T> TvOptionGroup(
  * Focus is the fill and selection is the tick, and the two are independent: the current value keeps its tick while
  * focus passes over it. The chosen option's label and tick take the accent at rest, and invert with the fill. The
  * row never scales on focus. [trailingContent] sits before the tick, for a short value the option carries. [initiallyFocused]
- * paints the row focused for a frame, which fires no focus events; production passes false. [supportingText] is one line
- * under the label, ellipsized: what choosing the option does. While [saving], the tick's place holds a spinner instead, in
+ * paints the row focused for a frame, which fires no focus events; production passes false. [supportingText] sits
+ * under the label: what choosing the option does, on one ellipsized line. [supportingLines] lets it wrap, for a line
+ * that has to be read in full, such as an address the user is about to trust; the row grows with it. While [saving], the tick's place holds a spinner instead, in
  * the tick's box so nothing moves, and the row announces that it is in progress: for a choice that applies at once but takes
  * a moment to land. The caller decides what a press does meanwhile.
  */
@@ -115,6 +116,7 @@ fun TvOptionRow(
     icon: ImageVector? = null,
     supportingText: String? = null,
     saving: Boolean = false,
+    supportingLines: Int = 1,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     val savingDescription = stringResource(DesR.string.cd_list_item_loading)
@@ -126,7 +128,7 @@ fun TvOptionRow(
         headlineContent = {
             Text(text = label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },
-        supportingContent = supportingText?.let { { SupportingLine(it) } },
+        supportingContent = supportingText?.let { { SupportingLine(it, supportingLines) } },
         leadingContent = icon?.let { { TvRowIcon(icon = it, isFocused = focused) } },
         trailingContent =
             if (selected || saving || trailingContent != null) {
@@ -250,10 +252,10 @@ fun tvRowListItemColors(
     )
 }
 
-/** A row's second line: one line, ellipsized, saying what the option does. */
+/** A row's second line, saying what the option does: one line by default, ellipsized after [maxLines]. */
 @Composable
-private fun SupportingLine(text: String) {
-    Text(text = text, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+private fun SupportingLine(text: String, maxLines: Int = 1) {
+    Text(text = text, style = MaterialTheme.typography.bodyMedium, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
 }
 
 /** The tick reads `ListItem`'s content colour rather than re-deriving it, so it inverts with the focus fill. */
