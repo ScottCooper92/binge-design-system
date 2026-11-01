@@ -128,4 +128,11 @@
     <string name="save_status_saved">Guardado</string>
     <string name="save_status_failed">No se ha podido guardar el cambio</string>
     <string name="save_status_retry">Reintentar</string>
+    <string name="log_row_copy">Copiar la línea</string>
+    <string name="log_row_expand">Mostrar detalles</string>
+    <string name="log_row_collapse">Ocultar detalles</string>
+    <string name="log_level_debug">Depuración</string>
+    <string name="log_level_info">Información</string>
+    <string name="log_level_warn">Aviso</string>
+    <string name="log_level_error">Error</string>
 </resources>
