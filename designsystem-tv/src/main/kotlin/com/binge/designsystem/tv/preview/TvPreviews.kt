@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.preview
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -170,7 +171,9 @@ private fun TvScreenshotCanvas(
                 contentColor = MaterialTheme.colorScheme.onBackground,
             ),
         ) {
-            content()
+            // tv-material's Surface lays its content out with propagateMinConstraints, so a frame's own width cap would
+            // be raised to the whole canvas. This Box fills the canvas and hands its child loose minimums.
+            Box { content() }
         }
     }
 }
