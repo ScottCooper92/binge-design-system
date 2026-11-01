@@ -78,13 +78,16 @@ internal class TvBodyFocusKeeper(
 ) {
     private var bodyHasFocus = false
     private var owed = false
+    private var lastKind: Any? = null
 
     fun onFocusChanged(state: FocusState) {
         bodyHasFocus = state.hasFocus
     }
 
     /** Called as the body's kind changes: focus is owed if the old body held it, or an earlier swap never got its request. */
-    fun bodyChanged() {
+    fun bodyChanged(kind: Any) {
+        if (kind == lastKind) return
+        lastKind = kind
         owed = entryFocusRequester != null && (bodyHasFocus || owed)
     }
 
@@ -109,7 +112,7 @@ internal fun rememberBodyFocusKeeper(
     waitsForCells: Boolean,
 ): TvBodyFocusKeeper {
     val keeper = remember(entryFocusRequester) { TvBodyFocusKeeper(entryFocusRequester) }
-    remember(keeper, bodyKind) { keeper.bodyChanged() }
+    keeper.bodyChanged(bodyKind)
     LaunchedEffect(keeper, bodyKind) { if (!waitsForCells) keeper.entryPlaced() }
     return keeper
 }
