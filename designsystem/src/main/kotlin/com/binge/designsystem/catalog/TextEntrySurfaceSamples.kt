@@ -118,6 +118,27 @@ fun TextEntrySurfaceMaskedSample() {
     }
 }
 
+/**
+ * Secret mode: the surface masks the value, asks for the password keyboard and draws the eye, so the value can be checked
+ * before it is saved. Tap the eye on a device to reveal it.
+ */
+@Composable
+fun TextEntrySurfaceSecretSample() {
+    var value by remember { mutableStateOf("4f9c2a7e1b") }
+    ScreenshotTheme {
+        TextEntrySurface(
+            title = "Secret: an API key, with a reveal toggle",
+            value = value,
+            onValueChange = { value = it },
+            onSubmit = {},
+            onCancel = {},
+            submitLabel = SUBMIT_LABEL,
+            singleLine = true,
+            secret = true,
+        )
+    }
+}
+
 /** Empty state: only the hint shows, and the submit button stays disabled until there is text. */
 @Composable
 fun TextEntrySurfaceEmptySample() {
