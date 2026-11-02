@@ -291,6 +291,9 @@
     <!-- BingeInitialsAvatar sample sizes for the catalog screenshot test -->
     <dimen name="avatar_size_md">44dp</dimen>
     <dimen name="avatar_size_lg">72dp</dimen>
+    <!-- ServerCard -->
+    <dimen name="server_card_logo">40dp</dimen>
+    <dimen name="server_card_section_spacing">14dp</dimen>
     <!-- DetailStatRow -->
     <dimen name="detail_stat_icon_size">20dp</dimen>
     <dimen name="detail_stat_divider_height">40dp</dimen>
