@@ -150,4 +150,9 @@
     <string name="log_level_error">Error</string>
     <!-- ServerCard: a stat whose value has not arrived yet -->
     <string name="server_card_stat_placeholder" translatable="false">—</string>
+    <!-- BingeTextField and a secret TextEntrySurface -->
+    <string name="field_secret_show">Show the value</string>
+    <string name="field_secret_hide">Hide the value</string>
+    <string name="field_clear">Clear the value</string>
+    <string name="field_required_label" translatable="false">%1$s *</string>
 </resources>

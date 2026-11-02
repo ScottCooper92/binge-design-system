@@ -119,4 +119,11 @@ class TextEntrySurfaceSamplesScreenshotTest {
     fun SingleLineLongValue() {
         TextEntrySurfaceSingleLineLongValueSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Secret() {
+        TextEntrySurfaceSecretSample()
+    }
 }

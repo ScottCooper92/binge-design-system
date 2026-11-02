@@ -135,4 +135,7 @@
     <string name="log_level_info">Información</string>
     <string name="log_level_warn">Aviso</string>
     <string name="log_level_error">Error</string>
+    <string name="field_secret_show">Mostrar el valor</string>
+    <string name="field_secret_hide">Ocultar el valor</string>
+    <string name="field_clear">Borrar el valor</string>
 </resources>

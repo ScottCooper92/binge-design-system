@@ -18,11 +18,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.binge.designsystem.R
@@ -54,14 +60,17 @@ private const val TEXT_ENTRY_MAX_LINES = 6
  *   edits, "changed". @param maxLength when set, caps input and shows an `n / max` counter.
  * @param keyboardOptions the keyboard the field asks for: a number pad for a count, `Uri` for an
  *   address, autocorrect off for a username or a key. The default is a plain text keyboard. For a
- *   secret, pair `KeyboardType.Password` with [visualTransformation].
+ *   secret, set [secret] instead of choosing the keyboard type yourself.
  * @param visualTransformation how the value is drawn: `PasswordVisualTransformation()` masks an API
- *   key or a password, which the keyboard type alone does not. The default draws it as typed.
+ *   key or a password, which the keyboard type alone does not; [secret] does this for you. The default
+ *   draws it as typed.
  * @param singleLine one line for a single value (a count, a name, a short list), not a paragraph: the
  *   field has no line floor, a long value scrolls sideways rather than wrapping, the keyboard's Done
  *   action submits while [submitEnabled], and the expand toggle is not offered. [minLines], [maxLines],
  *   [expanded] and [onExpandToggle] are ignored.
  * @param supportingText a line under the title for the unit or the format ("In milliseconds").
+ * @param secret masks the value, asks for a password keyboard and gives the field a reveal toggle, so a pasted key can be checked
+ *   before it is saved. Replaces [visualTransformation] and [keyboardOptions]' keyboard type while on.
  */
 @Composable
 fun TextEntrySurface(
@@ -87,7 +96,9 @@ fun TextEntrySurface(
     header: @Composable ColumnScope.() -> Unit = {},
     singleLine: Boolean = false,
     supportingText: String? = null,
+    secret: Boolean = false,
 ) {
+    var revealed by remember { mutableStateOf(false) }
     val expanded = expanded && !singleLine
     val submit = submitEnabled && !isSubmitting
     val fieldMaxLines = when {
@@ -125,9 +136,19 @@ fun TextEntrySurface(
             minLines = if (singleLine) 1 else minLines,
             maxLines = fieldMaxLines,
             supportingText = textEntrySupport(error, value.length, maxLength),
-            keyboardOptions = if (singleLine) keyboardOptions.copy(imeAction = ImeAction.Done) else keyboardOptions,
+            keyboardOptions = (
+                if (secret) {
+                    keyboardOptions.copy(
+                        keyboardType = KeyboardType.Password,
+                        autoCorrectEnabled = false,
+                    )
+                } else {
+                    keyboardOptions
+                }
+            ).let { if (singleLine) it.copy(imeAction = ImeAction.Done) else it },
             keyboardActions = if (singleLine) KeyboardActions(onDone = { if (submit) onSubmit() }) else KeyboardActions.Default,
-            visualTransformation = visualTransformation,
+            visualTransformation = if (secret && !revealed) PasswordVisualTransformation() else visualTransformation,
+            trailingIcon = if (secret) ({ RevealToggle(revealed = revealed, enabled = !isSubmitting) { revealed = !revealed } }) else null,
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
