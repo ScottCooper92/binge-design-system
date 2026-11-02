@@ -33,4 +33,12 @@ class BingeMessageDialogSamplesScreenshotTest {
     fun SnackbarResultFitsAtLargeFonts() {
         BingeSnackbarWorstCaseSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun ShownOnce() {
+        BingeMessageDialogShownOnceSample()
+    }
 }
