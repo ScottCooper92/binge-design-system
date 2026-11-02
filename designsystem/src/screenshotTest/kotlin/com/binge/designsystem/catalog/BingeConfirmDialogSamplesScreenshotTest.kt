@@ -21,9 +21,23 @@ class BingeConfirmDialogSamplesScreenshotTest {
     }
 
     @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Severe() {
+        BingeConfirmDialogSevereSample()
+    }
+
+    @PreviewTest
     @WorstCaseFontPreviews
     @Composable
     fun WorstCase() {
         BingeConfirmDialogWorstCaseSample()
+    }
+
+    @PreviewTest
+    @WorstCaseFontPreviews
+    @Composable
+    fun SevereWorstCase() {
+        BingeConfirmDialogSevereWorstCaseSample()
     }
 }
