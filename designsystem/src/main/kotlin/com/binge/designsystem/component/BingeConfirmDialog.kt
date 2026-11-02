@@ -2,7 +2,8 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -116,6 +117,7 @@ data class BingeConfirmSevereAction(
     val onClick: () -> Unit,
 )
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ConfirmActions(
     confirmLabel: String,
@@ -126,10 +128,12 @@ private fun ConfirmActions(
     onDismissRequest: () -> Unit,
 ) {
     if (severeAction == null) {
-        Row(
+        // A wrapping row: side by side while both fit, and one per line, still end-aligned, when a long label or a large
+        // font would squeeze the confirm into a few words a line.
+        FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
         ) {
             BingeTextButton(label = dismissLabel, onClick = onDismissRequest)
             BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = destructive)
