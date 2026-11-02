@@ -1,5 +1,6 @@
 package com.binge.designsystem.refresh
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
@@ -55,6 +56,40 @@ class RefreshTrackerTest {
 
             job.cancelAndJoin()
 
+            assertFalse(tracker.isRefreshing.value)
+        }
+
+    @Test
+    fun `a cancellation is rethrown, never swallowed, and the refresh still ends`() =
+        runTest {
+            val gate = CompletableDeferred<Unit>()
+            var seen: Throwable? = null
+            val job =
+                launch {
+                    try {
+                        tracker.track { gate.await() }
+                    } catch (e: CancellationException) {
+                        seen = e
+                        throw e
+                    }
+                }
+            testScheduler.runCurrent()
+
+            job.cancelAndJoin()
+
+            assertTrue(seen is CancellationException, "track let the cancellation through: $seen")
+            assertTrue(job.isCancelled)
+            assertFalse(tracker.isRefreshing.value)
+        }
+
+    @Test
+    fun `a CancellationException the block throws itself comes out as the very same instance`() =
+        runTest {
+            val cancellation = CancellationException("stop")
+
+            val thrown = runCatching { tracker.track<Unit> { throw cancellation } }.exceptionOrNull()
+
+            assertSame(cancellation, thrown)
             assertFalse(tracker.isRefreshing.value)
         }
 
