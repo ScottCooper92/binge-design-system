@@ -75,8 +75,16 @@ fun BingeTextFieldSecretSample() {
 @Composable
 fun BingeTextFieldRevealedSample() {
     var key by remember { mutableStateOf("4f9c2a7e1b") }
+    var revealed by remember { mutableStateOf(true) }
     ScreenshotTheme {
-        BingeTextField(value = key, onValueChange = { key = it }, label = "API key", secret = true, revealed = true, onToggleReveal = {})
+        BingeTextField(
+            value = key,
+            onValueChange = { key = it },
+            label = "API key",
+            secret = true,
+            revealed = revealed,
+            onToggleReveal = { revealed = !revealed },
+        )
     }
 }
 

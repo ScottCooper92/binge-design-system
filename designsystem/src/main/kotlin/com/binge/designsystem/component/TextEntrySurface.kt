@@ -60,9 +60,10 @@ private const val TEXT_ENTRY_MAX_LINES = 6
  *   edits, "changed". @param maxLength when set, caps input and shows an `n / max` counter.
  * @param keyboardOptions the keyboard the field asks for: a number pad for a count, `Uri` for an
  *   address, autocorrect off for a username or a key. The default is a plain text keyboard. For a
- *   secret, pair `KeyboardType.Password` with [visualTransformation].
+ *   secret, set [secret] instead of choosing the keyboard type yourself.
  * @param visualTransformation how the value is drawn: `PasswordVisualTransformation()` masks an API
- *   key or a password, which the keyboard type alone does not. The default draws it as typed.
+ *   key or a password, which the keyboard type alone does not; [secret] does this for you. The default
+ *   draws it as typed.
  * @param singleLine one line for a single value (a count, a name, a short list), not a paragraph: the
  *   field has no line floor, a long value scrolls sideways rather than wrapping, the keyboard's Done
  *   action submits while [submitEnabled], and the expand toggle is not offered. [minLines], [maxLines],
