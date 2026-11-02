@@ -144,6 +144,52 @@ class TvOverlayCloserReleaseTest {
         composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
     }
+
+    @Test
+    fun `focus pushed back into the fading panel mid-exit ends on the content once the panel is gone (#975)`() {
+        setContent(wired = true)
+        composeTestRule.mainClock.autoAdvance = false
+
+        composeTestRule.runOnIdle { closer.close() }
+        advanceFrames(LATCH_FRAMES)
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+        // A D-pad press toward the panel during its exit: the released trap lets it in.
+        composeTestRule.onNodeWithTag(OVERLAY).requestFocus()
+        advanceFrames(1)
+
+        composeTestRule.mainClock.advanceTimeBy(EXIT_MILLIS.toLong() * 2)
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+    }
+
+    @Test
+    fun `reopening the panel mid-exit traps again, and a later close still returns focus (#975)`() {
+        setContent(wired = true)
+        composeTestRule.mainClock.autoAdvance = false
+
+        composeTestRule.runOnIdle { closer.close() }
+        advanceFrames(LATCH_FRAMES + MID_EXIT_FRAME)
+        assertFalse("The trap is released during the exit", closer.trapping)
+        composeTestRule.runOnIdle {
+            open = true
+            closer.reopen()
+        }
+        composeTestRule.mainClock.advanceTimeBy(EXIT_MILLIS.toLong())
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(OVERLAY).assertExists()
+        assertTrue("A panel reopened during its exit must trap, not stay released", closer.trapping)
+
+        composeTestRule.onNodeWithTag(OVERLAY).requestFocus()
+        advanceFrames(1)
+        composeTestRule.runOnIdle { closer.close() }
+        advanceFrames(LATCH_FRAMES)
+        composeTestRule.mainClock.advanceTimeBy(EXIT_MILLIS.toLong() * 2)
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+    }
 }
 
 /**
