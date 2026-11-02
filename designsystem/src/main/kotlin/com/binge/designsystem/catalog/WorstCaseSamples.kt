@@ -33,6 +33,8 @@ import com.binge.designsystem.component.BingeChoiceList
 import com.binge.designsystem.component.BingeChoiceSheetContent
 import com.binge.designsystem.component.BingeConfirmDialogContent
 import com.binge.designsystem.component.BingeInitialsAvatar
+import com.binge.designsystem.component.BingeMessageDialogContent
+import com.binge.designsystem.component.BingeSnackbar
 import com.binge.designsystem.component.BingeTag
 import com.binge.designsystem.component.CheckboxRow
 import com.binge.designsystem.component.ItemGroup
@@ -275,6 +277,36 @@ fun BingeConfirmDialogWorstCaseSample() {
             onConfirm = {},
             onDismissRequest = {},
             destructive = true,
+        )
+    }
+}
+
+/** A message dialog with a long title, a long body and a long label on its one button, for the large-font frames. */
+@Composable
+fun BingeMessageDialogWorstCaseSample() {
+    ScreenshotTheme {
+        BingeMessageDialogContent(
+            title = "The backup could not be made on this server",
+            message = "The server may need 5 GiB free where it keeps backups. Free up space there, then try again.",
+            confirmLabel = "I understand",
+            onDismiss = {},
+        )
+    }
+}
+
+/**
+ * The snackbar's own example of a result: one short sentence and its action. It must read in full at 1.3x font, which a
+ * frame and a fixture test hold; a longer message belongs in a message dialog.
+ */
+@Composable
+fun BingeSnackbarWorstCaseSample() {
+    ScreenshotTheme {
+        BingeSnackbar(
+            message = "Not changed. Couldn't reach your server.",
+            actionLabel = "Retry",
+            onActionClick = {},
+            showDismissAction = false,
+            onDismissRequest = {},
         )
     }
 }
