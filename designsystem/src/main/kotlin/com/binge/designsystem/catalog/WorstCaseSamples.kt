@@ -31,6 +31,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeChoice
 import com.binge.designsystem.component.BingeChoiceList
 import com.binge.designsystem.component.BingeChoiceSheetContent
+import com.binge.designsystem.component.BingeConfirmDialogContent
 import com.binge.designsystem.component.BingeInitialsAvatar
 import com.binge.designsystem.component.BingeTag
 import com.binge.designsystem.component.CheckboxRow
@@ -258,6 +259,22 @@ fun FormFooterWorstCaseSample() {
         FormFooter(
             primary = FormAction(label = "Send", onClick = {}),
             secondary = FormAction(label = "Report this on GitHub instead", onClick = {}),
+        )
+    }
+}
+
+/** A confirm dialog with a long title, a long message and long labels on both actions, for the large-font frames. */
+@Composable
+fun BingeConfirmDialogWorstCaseSample() {
+    ScreenshotTheme {
+        BingeConfirmDialogContent(
+            title = "Remove this request and everything attached to it?",
+            message = "Removing it keeps the files on the server and cannot be undone once the server has finished.",
+            confirmLabel = "Remove the request",
+            dismissLabel = "Keep the request",
+            onConfirm = {},
+            onDismissRequest = {},
+            destructive = true,
         )
     }
 }
