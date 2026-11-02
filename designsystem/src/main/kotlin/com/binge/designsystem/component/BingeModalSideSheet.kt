@@ -93,6 +93,7 @@ internal fun BingeSideSheetWindow(
         var visible by rememberSideSheetShown()
         val closeLabel = stringResource(R.string.cd_close_sheet)
         LaunchedEffect(Unit) { visible = true }
+        HideImeOnBack()
 
         Box(modifier = Modifier.fillMaxSize()) {
             AnimatedVisibility(

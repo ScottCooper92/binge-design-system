@@ -123,6 +123,7 @@ fun BingeBottomSheet(
         BackHandler(enabled = gesturesEnabled && sheetState.currentValue == SheetValue.Expanded && sheetState.hasPartiallyExpandedState) {
             scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
         }
+        if (gesturesEnabled) HideImeOnBack()
         CompositionLocalProvider(LocalBingeSheetDock provides dock) { content() }
     }
 }
