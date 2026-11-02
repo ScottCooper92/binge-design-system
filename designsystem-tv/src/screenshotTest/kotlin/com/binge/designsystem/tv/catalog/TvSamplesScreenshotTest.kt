@@ -162,6 +162,16 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pairingCardShortPane() = Frame { TvPairingCardShortPaneSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun pairingCardLoadingLongMessage() = Frame { TvPairingCardLoadingLongMessageSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun pairingCardError() = Frame { TvPairingCardErrorSample() }
 
     @PreviewTest
