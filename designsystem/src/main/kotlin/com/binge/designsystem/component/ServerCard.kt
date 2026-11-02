@@ -116,18 +116,18 @@ fun ServerCard(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
                 itemVerticalAlignment = Alignment.CenterVertically,
             ) {
-                chips.forEach { StatusChip(label = it.label, sentiment = it.sentiment) }
+                chips.forEach { StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true) }
             }
         }
         if (stacked) {
             ServerCardText(title, subtitle, address)
-            statusChip?.let { StatusChip(label = it.label, sentiment = it.sentiment) }
+            statusChip?.let { StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true) }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ServerCardText(title, subtitle, address, Modifier.weight(1f))
                 statusChip?.let {
                     Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
-                    StatusChip(label = it.label, sentiment = it.sentiment)
+                    StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true)
                 }
             }
         }
