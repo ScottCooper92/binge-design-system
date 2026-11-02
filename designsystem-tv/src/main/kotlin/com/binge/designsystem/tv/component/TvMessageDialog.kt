@@ -21,7 +21,7 @@ import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 
 /**
- * A centred message dialog for the 10-foot screen, the TV's [BingeMessageDialog][com.binge.designsystem.component]: a [title]
+ * A centred message dialog for the 10-foot screen, the TV's [BingeMessageDialog][com.binge.designsystem.component.BingeMessageDialog]: a [title]
  * saying what happened, a [message] with the cause and the next step, and one text button that acknowledges it. Focus arrives
  * on the button, and OK, Back and a press outside all call [onDismiss]. It is an acknowledgement, so it has one action; a
  * choice is a [TvConfirmDialog].
