@@ -16,12 +16,12 @@ import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
 
 /**
- * Canonical Binge confirm dialog: a title, a body message, and a confirm/dismiss action pair.
- * Stateless — the caller owns the visibility flag and reacts to [onConfirm]/[onDismissRequest].
+ * Canonical Binge confirm dialog: a title, a body message, and Cancel and confirm as plain text buttons, the
+ * platform's own dialog shape. Stateless — the caller owns the visibility flag and reacts to
+ * [onConfirm]/[onDismissRequest].
  *
- * Set [destructive] for irreversible actions (sign-out, delete) to tone the confirm action with
- * the error colour. The visible body is delegated to [BingeConfirmDialogContent] so it can be
- * rendered directly in screenshot tests (the [AlertDialog] modal window does not capture).
+ * Set [destructive] for irreversible actions (sign-out, delete): the confirm text takes the error colour. The visible body is delegated to
+ * [BingeConfirmDialogContent] so screenshot tests can render it (the [AlertDialog] window does not capture).
  */
 @Composable
 fun BingeConfirmDialog(
@@ -110,17 +110,10 @@ private fun ConfirmActions(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(
-            dimensionResource(R.dimen.padding_s),
-            Alignment.End,
-        ),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        BingeOutlinedButton(label = dismissLabel, onClick = onDismissRequest)
-        BingeFilledButton(
-            label = confirmLabel,
-            onClick = onConfirm,
-            destructive = destructive,
-        )
+        BingeTextButton(label = dismissLabel, onClick = onDismissRequest)
+        BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = destructive)
     }
 }

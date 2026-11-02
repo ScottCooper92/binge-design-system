@@ -23,7 +23,7 @@ fun BingeConfirmDialogSample() {
     }
 }
 
-/** Destructive tone — the confirm action is tinted with the error colour for irreversible actions. */
+/** Destructive tone — the confirm text takes the error colour for irreversible actions. */
 @Composable
 fun BingeConfirmDialogDestructiveSample() {
     ScreenshotTheme {
