@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * swapping its content for a skeleton. It owns no content and no trigger: it wraps whatever reload a view model already runs.
  *
  * ```
- * suspend fun refresh() = refreshing.track { repository.load() }
+ * suspend fun refresh() = refreshTracker.track { repository.load() }
  * ```
  *
  * [isRefreshing] is true from the start of a [track]ed block until it ends, however it ends: it returns, throws or is cancelled.

@@ -37,7 +37,12 @@ re-collected flow) expose no in-progress signal. A pull would then flash the ske
 ```kotlin
 class ThingsViewModel(private val repository: ThingsRepository) : ViewModel() {
     private val refreshTracker = RefreshTracker()
+    private val reloadFailures = Channel<Unit>(Channel.BUFFERED)
 
+    /** One event per failed reload; the screen shows its usual message. */
+    val reloadFailed: Flow<Unit> = reloadFailures.receiveAsFlow()
+
+    // `things` emits Failed only when the first load fails. A failed reload throws from `reload()` instead.
     val uiState: StateFlow<ThingsUiState> =
         combine(things, refreshTracker.isRefreshing) { result, refreshing ->
             when (result) {
@@ -46,7 +51,15 @@ class ThingsViewModel(private val repository: ThingsRepository) : ViewModel() {
             }
         }.stateIn(viewModelScope, SharingStarted.Lazily, ThingsUiState.Loading)
 
-    fun refresh() = viewModelScope.launch { refreshTracker.track { repository.reload() } }
+    fun refresh() {
+        viewModelScope.launch {
+            try {
+                refreshTracker.track { repository.reload() }
+            } catch (e: IOException) {
+                reloadFailures.send(Unit)
+            }
+        }
+    }
 }
 ```
 
@@ -57,6 +70,7 @@ BingePullToRefresh(isRefreshing = state.isRefreshing, onRefresh = viewModel::ref
 ```
 
 `track` reports the end however the reload ends: it returns, it throws (the exception passes through unchanged) or it is
-cancelled. Reloads that overlap, such as a pull while a trigger-driven reload is running, keep `isRefreshing` true until the
+cancelled. Because it rethrows, the caller must catch: `viewModelScope` has no exception handler, so an uncaught failure
+from a pull with no network would end the process. Reloads that overlap, such as a pull while a trigger-driven reload is running, keep `isRefreshing` true until the
 last of them ends. A failed reload leaves the last content in place; show the failure as the screen's usual message, not as an
-`Error` that replaces the list.
+`Error` that replaces the list. `Error` is for a failed first load only.
