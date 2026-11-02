@@ -36,7 +36,8 @@ import kotlinx.coroutines.flow.first
  *
  * Call [TvOverlayCloser.close] from every dismissal path — the `BackHandler`, the sheet `onDismissRequest`, a
  * navigate-away. It is idempotent within one close (a second [TvOverlayCloser.close] mid-flight is a no-op) and
- * re-armable across opens (the latch resets so the next open closes too).
+ * re-armable across opens (the latch resets so the next open closes too). A caller that shows the overlay again while its exit is
+ * still running calls [TvOverlayCloser.reopen]: the panel never left, so it is the only way the closer learns of it.
  *
  * Closing always restores focus. A screen that must hold back a re-request until its content has loaded owns
  * that as a separate re-focus of its own, not as part of the close, so there is no `shouldRestore` parameter
@@ -50,7 +51,7 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
     var closing by remember { mutableStateOf(false) }
     val currentOnClose by rememberUpdatedState(onClose)
     val debuggable = (LocalContext.current.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-    val closer = remember { TvOverlayCloser(arm = { closing = true }) }
+    val closer = remember { TvOverlayCloser(arm = { closing = true }, disarm = { closing = false }) }
     LaunchedEffect(closing) {
         if (!closing) return@LaunchedEffect
         // The trap is already released (see [TvOverlayCloser.trapping]), so a trap wired to it grants this at once. A grant while
@@ -78,6 +79,7 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
 @Stable
 class TvOverlayCloser internal constructor(
     private val arm: () -> Unit,
+    private val disarm: () -> Unit,
 ) {
     private var released by mutableStateOf(false)
 
@@ -111,6 +113,16 @@ class TvOverlayCloser internal constructor(
     fun close() {
         released = true
         arm()
+    }
+
+    /**
+     * Call it when the caller shows the overlay again while its exit is still running: the panel stays composed, so nothing else
+     * tells the closer. It traps again and drops the pending close, so the reopened overlay is held like a fresh one and the next
+     * [close] works. A no-op when no close is in flight.
+     */
+    fun reopen() {
+        released = false
+        disarm()
     }
 
     /** The overlay's panel composed: trap again, whatever an earlier close left behind. */
