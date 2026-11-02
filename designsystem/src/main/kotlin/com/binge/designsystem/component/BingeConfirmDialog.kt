@@ -2,17 +2,18 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 
 /**
@@ -111,14 +112,50 @@ private fun ConfirmActions(
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    // One row whatever the labels: each button takes at most its share of the width, so a long label wraps inside its button
-    // rather than pushing the confirm onto a line of its own.
-    Row(
+    TwoActionRow(
+        gap = dimensionResource(R.dimen.padding_s),
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        BingeTextButton(label = dismissLabel, onClick = onDismissRequest, modifier = Modifier.weight(1f, fill = false))
-        BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = destructive, modifier = Modifier.weight(1f, fill = false))
+        first = { BingeTextButton(label = dismissLabel, onClick = onDismissRequest) },
+        second = { BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = destructive) },
+    )
+}
+
+/**
+ * Two buttons on one row, end-aligned, whatever their labels. Each takes the width its label wants while both fit; past that
+ * the shorter takes only what it needs, up to half the row, and the longer gets the rest, so a long label wraps inside its
+ * button and a short one never does while the other has room to give.
+ */
+@Composable
+private fun TwoActionRow(
+    gap: Dp,
+    first: @Composable () -> Unit,
+    second: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Layout(content = {
+        first()
+        second()
+    }, modifier = modifier) { measurables, constraints ->
+        val gapPx = gap.roundToPx()
+        val room = (constraints.maxWidth - gapPx).coerceAtLeast(0)
+        val wantFirst = measurables[0].maxIntrinsicWidth(Constraints.Infinity)
+        val wantSecond = measurables[1].maxIntrinsicWidth(Constraints.Infinity)
+        val half = room / 2
+        val firstWidth =
+            when {
+                wantFirst + wantSecond <= room -> wantFirst
+                wantFirst <= half -> wantFirst
+                wantSecond <= half -> room - wantSecond
+                else -> half
+            }
+        val secondWidth = if (wantFirst + wantSecond <= room) wantSecond else room - firstWidth
+        val firstPlaceable = measurables[0].measure(Constraints(maxWidth = firstWidth))
+        val secondPlaceable = measurables[1].measure(Constraints(maxWidth = secondWidth))
+        val height = maxOf(firstPlaceable.height, secondPlaceable.height)
+        layout(constraints.maxWidth, height) {
+            val startX = constraints.maxWidth - firstPlaceable.width - gapPx - secondPlaceable.width
+            firstPlaceable.placeRelative(startX, (height - firstPlaceable.height) / 2)
+            secondPlaceable.placeRelative(startX + firstPlaceable.width + gapPx, (height - secondPlaceable.height) / 2)
+        }
     }
 }

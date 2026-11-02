@@ -47,4 +47,11 @@ class BingeConfirmDialogSamplesScreenshotTest {
     fun SwitchWorstCase() {
         BingeConfirmDialogSwitchWorstCaseSample()
     }
+
+    @PreviewTest
+    @WorstCaseFontPreviews
+    @Composable
+    fun ShortActionsWorstCase() {
+        BingeConfirmDialogShortActionsWorstCaseSample()
+    }
 }

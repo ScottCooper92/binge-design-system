@@ -281,6 +281,21 @@ fun BingeConfirmDialogWorstCaseSample() {
     }
 }
 
+/** A confirm dialog with short action labels at a large font: the short confirm keeps one line while Cancel leaves room for it. */
+@Composable
+fun BingeConfirmDialogShortActionsWorstCaseSample() {
+    ScreenshotTheme {
+        BingeConfirmDialogContent(
+            title = "Include copies whatever their licence?",
+            message = "These copies may not be licensed for viewing. You can change this back at any time.",
+            confirmLabel = "Include them",
+            onConfirm = {},
+            onDismissRequest = {},
+            destructive = true,
+        )
+    }
+}
+
 /** A message dialog with a long title, a long body and a long label on its one button, for the large-font frames. */
 @Composable
 fun BingeMessageDialogWorstCaseSample() {
