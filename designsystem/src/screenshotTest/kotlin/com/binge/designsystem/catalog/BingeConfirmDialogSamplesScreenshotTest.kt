@@ -18,4 +18,11 @@ class BingeConfirmDialogSamplesScreenshotTest {
     fun Destructive() {
         BingeConfirmDialogDestructiveSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Severe() {
+        BingeConfirmDialogSevereSample()
+    }
 }
