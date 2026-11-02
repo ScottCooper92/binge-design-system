@@ -100,7 +100,9 @@ fun ServerCard(
                 modifier = Modifier.size(dimensionResource(R.dimen.server_card_logo)),
             )
             Spacer(Modifier.weight(1f))
-            chips.forEach { StatusChip(label = it.label, sentiment = it.sentiment) }
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+                chips.forEach { StatusChip(label = it.label, sentiment = it.sentiment) }
+            }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {

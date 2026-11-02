@@ -44,4 +44,11 @@ class ServerCardSamplesScreenshotTest {
     fun Bare() {
         ServerCardBareSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Hub() {
+        HubCardSample()
+    }
 }

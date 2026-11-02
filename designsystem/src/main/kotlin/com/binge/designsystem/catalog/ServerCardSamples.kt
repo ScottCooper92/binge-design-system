@@ -5,9 +5,12 @@ import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import com.binge.designsystem.component.HubCard
 import com.binge.designsystem.component.ServerCard
 import com.binge.designsystem.component.ServerCardChip
 import com.binge.designsystem.component.ServerCardStat
@@ -91,4 +94,15 @@ fun ServerCardLoadingStatsSample() {
 @Composable
 fun ServerCardBareSample() {
     ScreenshotTheme { ServerCard(title = "Home server", logo = logo()) }
+}
+
+/** A hub card holding plain content: the surface, the side inset and the section spacing, with the caller's own slot. */
+@Composable
+fun HubCardSample() {
+    ScreenshotTheme {
+        HubCard {
+            Text("Recently added", style = MaterialTheme.typography.titleMedium)
+            Text("Whatever the app wants to show goes in this slot.", style = MaterialTheme.typography.bodyMedium)
+        }
+    }
 }
