@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.LocalReduceMotion
+import com.binge.designsystem.tv.component.tvGridPlateCells
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.focus.tvEndDirectionKey
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
@@ -220,7 +221,7 @@ fun <T : Any> TvImmersiveGrid(
                                     when {
                                         items != null -> remembered?.let { atEndEdge(it, columns, items.count) } == true
                                         inPlaceBody != null && content == TvImmersiveGridContent.Loading ->
-                                            atEndEdge(ringIndex ?: 0, columns, columns * PLATE_ROWS)
+                                            atEndEdge(ringIndex ?: 0, columns, tvGridPlateCells(columns))
                                         else -> true
                                     }
                                 val press = event.type == KeyEventType.KeyDown && event.key == endKey

@@ -44,11 +44,6 @@ import com.binge.designsystem.tv.R as TvR
 /** Posters across the poster grid. */
 const val TV_POSTER_GRID_COLUMNS = 4
 
-/** Rows of plates drawn while the grid loads: enough to run past the bottom edge, the way a resolved grid does. */
-private const val LOADING_ROWS = 3
-
-private const val NO_CELL = -1
-
 /** One poster of a [TvPosterGrid]: its art, the name that stands in for it when there is none, and what OK does. */
 class TvPosterCell(
     val imageUrl: String?,
@@ -64,6 +59,10 @@ class TvPosterCell(
  * that loads in place keeps focus where it was, even if the results end before the focused plate; plates and posters are then positional, never keyed by [keyOf].
  * [seededIndex] draws that cell's ring before it holds focus, on a skeleton plate too, so focus is visible while a hold in
  * front of the grid has it.
+ *
+ * This is the bare grid: it owns its scroll state, draws the poster and its focus ring itself, and has a keyed mode a screen
+ * that re-orders its results can use. A grid inside the immersive hub's template, whose parent owns the scroll and the focus
+ * and whose cell is the caller's own, is `TvImmersiveGridInPlace` instead. Both share the cell-count rule in `TvPlateGrid.kt`.
  */
 @Composable
 fun TvPosterGrid(
@@ -84,10 +83,10 @@ fun TvPosterGrid(
     val state = rememberSaveable(listKey, saver = LazyGridState.Saver) { LazyGridState() }
     val scope = rememberCoroutineScope()
     val gap = dimensionResource(DesR.dimen.padding_m)
-    val cells = if (loading) LOADING_ROWS * TV_POSTER_GRID_COLUMNS else count
+    val cells = if (loading) tvGridPlateCells(TV_POSTER_GRID_COLUMNS) else count
     // The focused cell, for a stable-plate grid: it stays composed (as a plate) when the results end before it.
-    var focusedIndex by remember(listKey) { mutableIntStateOf(NO_CELL) }
-    val drawn = if (stablePlates) maxOf(cells, focusedIndex + 1) else cells
+    var focusedIndex by remember(listKey) { mutableIntStateOf(TV_GRID_NO_CELL) }
+    val drawn = if (stablePlates) tvGridCellsDrawn(cells, focusedIndex) else cells
     val entryCell = entryIndex.coerceIn(0, (cells - 1).coerceAtLeast(0))
     TvStableFocusScroll {
         LazyVerticalGrid(
@@ -108,7 +107,7 @@ fun TvPosterGrid(
                     poster = poster,
                     initiallyFocused = index == seededIndex,
                     focusablePlate = stablePlates,
-                    onBlurred = { if (focusedIndex == index) focusedIndex = NO_CELL },
+                    onBlurred = { if (focusedIndex == index) focusedIndex = TV_GRID_NO_CELL },
                     onFocused = {
                         focusedIndex = index
                         if (reportsFocus(poster != null, stablePlates)) onCellFocused(index)

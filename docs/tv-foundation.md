@@ -174,3 +174,16 @@ Retry. The page owns the words.
 The line stays until the row is next changed or the page is left. There is no timer, because a timed message would
 expire unread on a screen nobody is holding. This applies to every TV save-as-made row. A transient failure, which keeps
 the change and can be sent again, is `SaveStatus.Failed` with Retry instead.
+
+## Two in-place poster grids, on purpose
+
+`designsystem-tv` has two grids that draw plates while they load and keep focus on the node an item arrives in. They are separate because they own different things.
+
+| | `TvPosterGrid` (`component/`) | `TvImmersiveGridInPlace` (`template/`, inside `TvImmersiveGrid`) |
+| --- | --- | --- |
+| Use it for | A bare grid of posters on a page of its own, such as Search or Discover | The grid under the immersive hub, where the page and the grid act together |
+| Scroll and focus state | The grid owns its own saved scroll state and draws its own focus ring | The parent `TvImmersiveGrid` owns the scroll, the ring, the entry cell and the memory of where focus was |
+| The cell | The grid draws the poster and its fallback title | The caller draws the cell, plate or item, from a slot |
+| Keyed cells | A keyed mode, for a screen whose results re-order | Always positional |
+
+They are not merged: a template cell is the caller's own card, so a template built on `TvPosterGrid` would lose that slot, and the two differ in their gaps and in how they route entry. What they do share is one rule, in `TvPlateGrid.kt`: three rows of plates fill a loading grid, and the grid composes at least enough cells to reach the focused one, so focus stays on its node when the results end before it. Change that rule there and both grids follow.
