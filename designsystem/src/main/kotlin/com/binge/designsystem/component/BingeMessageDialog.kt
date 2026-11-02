@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.DialogProperties
 import com.binge.designsystem.R
 
 /**
@@ -22,6 +23,9 @@ import com.binge.designsystem.R
  * with the cause and the next step, and one text button that acknowledges it. It is an acknowledgement, not a confirmation, so
  * it has exactly one action; for a choice use [BingeConfirmDialog]. It does not go away by itself. [onDismiss] runs for the
  * button, Back and a tap outside. A long [message] scrolls rather than clipping.
+ *
+ * With [dismissible] false, only the button closes it: Back and a tap outside do nothing. For a message the user must not
+ * lose by a stray tap, such as a secret shown once (an API key). The button then needs a label that says what closing means.
  *
  * Use it for any message the user must read to act, however short. A result that needs no action is a snackbar: see
  * `docs/messages.md`. The visible body is [BingeMessageDialogContent], so screenshot tests can render it.
@@ -33,10 +37,12 @@ fun BingeMessageDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     confirmLabel: String = stringResource(R.string.action_ok),
+    dismissible: Boolean = true,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
+        properties = DialogProperties(dismissOnBackPress = dismissible, dismissOnClickOutside = dismissible),
         title = { Text(title) },
         text = { MessageBody(message, Modifier.verticalScroll(rememberScrollState())) },
         confirmButton = { BingeTextButton(label = confirmLabel, onClick = onDismiss) },

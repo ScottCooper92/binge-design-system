@@ -22,6 +22,7 @@ The TV has no snackbars. It shows a result in place, and an acknowledgement that
 - It does not go away by itself. The button, Back and a tap outside dismiss it.
 - It is an acknowledgement, not a confirmation, so it has exactly one action. A choice is `BingeConfirmDialog`: at most two actions, on one row.
 - A long body scrolls inside the dialog rather than clipping.
+- A message the user must not lose to a stray tap, such as a secret shown once (an API key), passes `dismissible = false`: Back and a tap outside do nothing, and only the button closes it. Give that button a label that says what closing means, such as "I have copied it".
 
 ## Worked example: a failed backup
 

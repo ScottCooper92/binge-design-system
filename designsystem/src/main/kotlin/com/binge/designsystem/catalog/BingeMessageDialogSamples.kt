@@ -30,3 +30,23 @@ fun BingeMessageDialogLongSample() {
 }
 
 private const val LONG_PARAGRAPHS = 6
+
+/**
+ * A secret shown once, the case for a dialog that only its button closes (`dismissible = false`): a long key with no spaces,
+ * which must wrap rather than clip, and a label that says what closing means. A frame cannot show that Back and a tap outside
+ * do nothing; the live demo does.
+ */
+@Composable
+fun BingeMessageDialogShownOnceSample() {
+    ScreenshotTheme {
+        BingeMessageDialogContent(
+            title = "Copy your API key now",
+            message = SHOWN_ONCE_MESSAGE,
+            confirmLabel = "I have copied it",
+            onDismiss = {},
+        )
+    }
+}
+
+internal const val SHOWN_ONCE_MESSAGE =
+    "This is the only time it is shown.\n\njf_7c1e9a40b2d84f6a9e3b5c0d1f2a8b647c1e9a40b2d84f6a9e3b5c0d1f2a8b64"

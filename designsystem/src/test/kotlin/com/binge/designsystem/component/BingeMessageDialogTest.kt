@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import androidx.activity.ComponentDialog
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -10,7 +11,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowDialog
 
 /** A message dialog has one action, which dismisses it once, and a body too long for it scrolls. */
 @RunWith(RobolectricTestRunner::class)
@@ -32,6 +35,49 @@ class BingeMessageDialogTest {
     @Test
     fun `the one button dismisses it once, labelled OK by default`() {
         show("Short.")
+
+        rule.onNodeWithText("OK").performClick()
+
+        assertEquals(1, dismissed)
+    }
+
+    private fun showInWindow(dismissible: Boolean) {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeMessageDialog(title = "Title", message = "Body", onDismiss = { dismissed++ }, dismissible = dismissible)
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    private fun pressBack() {
+        rule.runOnIdle { (ShadowDialog.getLatestDialog() as ComponentDialog).onBackPressedDispatcher.onBackPressed() }
+        rule.waitForIdle()
+    }
+
+    @Test
+    fun `Back dismisses a dialog by default, and a tap outside is allowed to`() {
+        showInWindow(dismissible = true)
+
+        pressBack()
+
+        assertEquals(1, dismissed)
+        assertEquals(true, shadowOf(ShadowDialog.getLatestDialog()).isCancelableOnTouchOutside)
+    }
+
+    @Test
+    fun `a dialog that is not dismissible ignores Back, and a tap outside cannot cancel it`() {
+        showInWindow(dismissible = false)
+
+        pressBack()
+
+        assertEquals(0, dismissed)
+        assertEquals(false, shadowOf(ShadowDialog.getLatestDialog()).isCancelableOnTouchOutside)
+    }
+
+    @Test
+    fun `the button still closes a dialog that is not dismissible, once`() {
+        showInWindow(dismissible = false)
 
         rule.onNodeWithText("OK").performClick()
 

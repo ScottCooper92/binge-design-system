@@ -28,7 +28,7 @@ import kotlinx.coroutines.delay
 private const val SUBMIT_DEMO_MILLIS = 2_000L
 private val DEMO_YEARS = 1990..2030
 
-private enum class OpenDialog { Message, Confirm, Destructive, CreateList, MonthYear }
+private enum class OpenDialog { Message, ShownOnce, Confirm, Destructive, CreateList, MonthYear }
 
 /**
  * Every dialog in the design system, the month and year picker among them, each opened for real from its own button, which a screenshot of
@@ -52,6 +52,7 @@ fun DialogsDemo() {
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
             BingeOutlinedButton(label = "Message dialog", onClick = { open = OpenDialog.Message })
+            BingeOutlinedButton(label = "Message dialog, only OK closes it", onClick = { open = OpenDialog.ShownOnce })
             BingeOutlinedButton(label = "Confirm dialog", onClick = { open = OpenDialog.Confirm })
             BingeOutlinedButton(label = "Destructive confirm dialog", onClick = { open = OpenDialog.Destructive })
             BingeOutlinedButton(label = "Create list dialog", onClick = { open = OpenDialog.CreateList })
@@ -64,6 +65,14 @@ fun DialogsDemo() {
                     title = "The backup wasn't made",
                     message = "The server may need 5 GiB free where it keeps backups. Free up space there, then try again.",
                     onDismiss = { close("Dismissed") },
+                )
+            OpenDialog.ShownOnce ->
+                BingeMessageDialog(
+                    title = "Copy your API key now",
+                    message = SHOWN_ONCE_MESSAGE,
+                    confirmLabel = "I have copied it",
+                    onDismiss = { close("Closed with the button") },
+                    dismissible = false,
                 )
             OpenDialog.Confirm ->
                 BingeConfirmDialog(

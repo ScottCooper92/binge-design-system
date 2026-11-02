@@ -24,7 +24,8 @@ import com.binge.designsystem.R as DesR
  * A centred message dialog for the 10-foot screen, the TV's [BingeMessageDialog][com.binge.designsystem.component.BingeMessageDialog]: a [title]
  * saying what happened, a [message] with the cause and the next step, and one text button that acknowledges it. Focus arrives
  * on the button, and OK, Back and a press outside all call [onDismiss]. It is an acknowledgement, so it has one action; a
- * choice is a [TvConfirmDialog].
+ * choice is a [TvConfirmDialog]. With [dismissible] false, only the button closes it: Back and a press outside do nothing,
+ * for a message the user must not lose by a stray press, such as a secret shown once.
  */
 @Composable
 fun TvMessageDialog(
@@ -33,8 +34,17 @@ fun TvMessageDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     confirmLabel: String = stringResource(DesR.string.action_ok),
+    dismissible: Boolean = true,
 ) {
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnBackPress = dismissible,
+                dismissOnClickOutside = dismissible,
+            ),
+    ) {
         TvMessageDialogContent(title = title, message = message, confirmLabel = confirmLabel, onDismiss = onDismiss, modifier = modifier)
     }
 }

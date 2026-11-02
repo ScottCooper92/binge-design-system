@@ -36,3 +36,27 @@ fun TvMessageDialogDemo() {
         )
     }
 }
+
+/**
+ * The same dialog with `dismissible = false`: BACK and a press outside do nothing, and only OK closes it. For a message the
+ * user must not lose by a stray press, such as a secret shown once.
+ */
+@Composable
+fun TvMessageDialogNotDismissibleDemo() {
+    var open by remember { mutableStateOf(false) }
+    val opener = remember { FocusRequester() }
+    val closer = rememberTvOverlayCloser(restoreTo = opener) { open = false }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvButton(label = "Open dialog, only OK closes it", onClick = { open = true }, modifier = Modifier.focusRequester(opener))
+    }
+    if (open) {
+        closer.ReportDisposal()
+        TvMessageDialog(
+            title = "Copy your API key now",
+            message = "This is the only time it is shown.",
+            confirmLabel = "I have copied it",
+            onDismiss = closer::close,
+            dismissible = false,
+        )
+    }
+}
