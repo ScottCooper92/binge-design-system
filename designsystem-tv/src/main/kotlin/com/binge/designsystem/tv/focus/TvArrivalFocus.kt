@@ -1,6 +1,8 @@
 package com.binge.designsystem.tv.focus
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -12,6 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 
 /**
  * The arrival-focus triple — a requester to aim at, a subtree observer that says whether the surface has
@@ -92,6 +99,26 @@ class TvUserMoves {
         count++
     }
 }
+
+/**
+ * The one wrapper a shell puts at its root to switch the user-move guard on: it provides one [TvUserMoves] for its lifetime
+ * through [LocalTvUserMoves] and notes each direction press on its way down, without consuming it. A host that already owns the
+ * key handler that sees every press can provide [LocalTvUserMoves] and call [TvUserMoves.note] itself instead.
+ */
+@Composable
+fun TvUserMovesHost(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val moves = remember { TvUserMoves() }
+    CompositionLocalProvider(LocalTvUserMoves provides moves) {
+        Box(
+            modifier.onPreviewKeyEvent { event ->
+                if (event.type == KeyEventType.KeyDown && event.key in DIRECTION_KEYS) moves.note()
+                false
+            },
+        ) { content() }
+    }
+}
+
+private val DIRECTION_KEYS = setOf(Key.DirectionUp, Key.DirectionDown, Key.DirectionLeft, Key.DirectionRight)
 
 /** The [TvUserMoves] the host feeds. The default is never fed, so an arrival without a host claims unconditionally. */
 val LocalTvUserMoves = staticCompositionLocalOf { TvUserMoves() }
