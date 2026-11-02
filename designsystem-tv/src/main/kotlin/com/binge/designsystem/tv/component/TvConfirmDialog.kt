@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -87,16 +88,7 @@ fun TvConfirmDialogContent(
 ) {
     val dismissFocus = remember { FocusRequester() }
     TvOverlayArrivalFocusEffect(dismissFocus)
-    Column(
-        modifier =
-            modifier
-                .width(dimensionResource(TvR.dimen.tv_confirm_dialog_width))
-                .clip(BingeShapes.AccountCard)
-                .background(MaterialTheme.tvStyle.panel)
-                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeShapes.AccountCard)
-                .padding(dimensionResource(DesR.dimen.padding_l)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
-    ) {
+    TvDialogCard(modifier) {
         Text(text = title, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
         Text(text = message, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         extraContent?.invoke()
@@ -118,4 +110,20 @@ fun TvConfirmDialogContent(
             )
         }
     }
+}
+
+/** The card both TV dialogs draw: the confirm dialog's width, panel, border and padding, with [content] stacked in it. */
+@Composable
+internal fun TvDialogCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier =
+            modifier
+                .width(dimensionResource(TvR.dimen.tv_confirm_dialog_width))
+                .clip(BingeShapes.AccountCard)
+                .background(MaterialTheme.tvStyle.panel)
+                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeShapes.AccountCard)
+                .padding(dimensionResource(DesR.dimen.padding_l)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
+        content = content,
+    )
 }

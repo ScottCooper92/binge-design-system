@@ -23,6 +23,7 @@
     <string name="action_see_all_in_section">See all in %1$s</string>
     <string name="action_more">See all</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
     <string name="cd_clear_query">Clear search</string>
     <string name="cd_remove_filter">Remove filter</string>
     <string name="cd_list_item_external">Opens in browser</string>

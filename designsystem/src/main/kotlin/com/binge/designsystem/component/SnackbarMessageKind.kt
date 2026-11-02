@@ -31,7 +31,9 @@ enum class SnackbarMessageKind {
 
 /**
  * Shows [message] with the [SnackbarDuration] dictated by [kind], so call sites express the message
- * *type* and never re-litigate the duration. [actionLabel] forces [SnackbarMessageKind.Error] so an
+ * *type* and never re-litigate the duration. A snackbar is for a result: one short sentence, readable in full at 1.3x
+ * font, with at most one action. Text the user must read to act (why it failed and what to do) is a [BingeMessageDialog], not a longer snackbar;
+ * see `docs/messages.md`. [actionLabel] forces [SnackbarMessageKind.Error] so an
  * actionable snackbar is always readable long enough to tap its action.
  */
 suspend fun SnackbarHostState.showSnackbar(

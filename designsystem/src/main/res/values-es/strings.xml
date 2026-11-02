@@ -21,6 +21,7 @@
     <string name="action_see_all_in_section">Ver todo en %1$s</string>
     <string name="action_more">Ver todo</string>
     <string name="action_cancel">Cancelar</string>
+    <string name="action_ok">Aceptar</string>
     <string name="cd_clear_query">Borrar búsqueda</string>
     <string name="cd_remove_filter">Quitar filtro</string>
     <string name="cd_list_item_external">Se abre en el navegador</string>
