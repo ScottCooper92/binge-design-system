@@ -663,7 +663,13 @@ private fun TopBarSaveForm(savedAddress: String, address: String) {
         ) {
             FormSection(title = "Server") {
                 BingeTextField(value = addressField, onValueChange = { addressField = it }, label = "Address")
-                BingeTextField(value = portField, onValueChange = { portField = it }, label = "Port", keyboardType = KeyboardType.Number)
+                BingeTextField(
+                    value = portField,
+                    onValueChange = { portField = it },
+                    label = "Port",
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                )
             }
         }
     }
