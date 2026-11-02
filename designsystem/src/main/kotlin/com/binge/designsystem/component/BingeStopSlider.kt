@@ -33,11 +33,16 @@ import kotlin.math.roundToInt
 /** How a [BingeStop] reads: [Warning] draws the track, thumb and the selected stop in the error colour. */
 enum class BingeStopEmphasis { Normal, Warning }
 
-/** One labelled stop on a [BingeStopSlider]: its short [label], the [icon] above it, and how it reads when selected. */
+/**
+ * One labelled stop on a [BingeStopSlider]: its short [label], the [icon] above it, and how it reads when selected.
+ * [contentDescription] is what a screen reader hears as the slider's state in place of [label], for a stop whose short name
+ * drops part of its meaning ("CC BY" for "Public domain and CC BY"); null reads the [label].
+ */
 data class BingeStop(
     val label: String,
     val icon: ImageVector,
     val emphasis: BingeStopEmphasis = BingeStopEmphasis.Normal,
+    val contentDescription: String? = null,
 )
 
 /**
@@ -50,7 +55,7 @@ data class BingeStop(
  * clears, the thumb stays there whatever [selectedIndex] is, and returns to [selectedIndex] when it does. Without a hold, the
  * caller must accept a commit by setting [selectedIndex] to it: a caller that declines and changes nothing leaves the thumb
  * on the stop it was dragged to. Tapping the stop already selected commits that index again. [description]
- * names the slider for a screen reader, which hears the shown stop's label as its state. Needs at least two [stops]. Keep a
+ * names the slider for a screen reader, which hears the shown stop's [BingeStop.contentDescription], else its label, as its state. Needs at least two [stops]. Keep a
  * stop's name to a short word or two: it wraps inside the room its stop owns, and at the largest font a single long word breaks
  * across lines there rather than clipping.
  */
@@ -98,7 +103,7 @@ fun BingeStopSlider(
             modifier =
                 Modifier.semantics {
                     contentDescription = description
-                    stateDescription = shown.label
+                    stateDescription = shown.contentDescription ?: shown.label
                 },
         )
         StopLabels(stops = stops, selectedIndex = current, accent = accent, enabled = enabled) { index ->

@@ -78,6 +78,24 @@ class BingeStopSliderTest {
     }
 
     @Test
+    fun `a stop with a content description is announced by it, not by its short label`() {
+        selected = 0
+        composeTestRule.setContent {
+            TestTheme {
+                BingeStopSlider(
+                    stops = listOf(BingeStop("CC BY", Icons.Filled.Star, contentDescription = "Public domain and CC BY")) + stops.drop(1),
+                    selectedIndex = selected,
+                    onCommit = { selected = it },
+                    description = "Licences",
+                )
+            }
+        }
+
+        assertEquals("Public domain and CC BY", announced())
+        composeTestRule.onNodeWithText("CC BY").assertExists()
+    }
+
+    @Test
     fun `a drag across the track commits once, where the thumb lands, and not on every step`() {
         setSlider()
 

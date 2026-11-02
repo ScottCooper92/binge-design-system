@@ -2,21 +2,13 @@
 
 package com.binge.designsystem.catalog
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import com.binge.designsystem.component.BingeConfirmDialogContent
-import com.binge.designsystem.component.bingeSwitchColors
+import com.binge.designsystem.component.SwitchRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
@@ -90,16 +82,11 @@ private fun SwitchDialogFrame(initiallyOn: Boolean, longLabels: Boolean = false)
             onDismissRequest = {},
             destructive = true,
             extraContent = {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .toggleable(value = deleteFiles, role = Role.Switch, onValueChange = { deleteFiles = it }),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text("Also delete the files from the server", modifier = Modifier.weight(1f))
-                    Switch(checked = deleteFiles, onCheckedChange = null, colors = bingeSwitchColors())
-                }
+                SwitchRow(
+                    label = "Also delete the files from the server",
+                    checked = deleteFiles,
+                    onCheckedChange = { deleteFiles = it },
+                )
             },
         )
     }

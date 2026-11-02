@@ -22,7 +22,7 @@ import com.binge.designsystem.R
  *
  * **At most two actions, always on one row**: Cancel, then the confirm. A long label or a large font wraps inside its button,
  * never onto a second row. Set [destructive] for irreversible actions: the confirm text takes the error colour. When the
- * dialog could do a milder or a more severe thing, the choice is a switch in [extraContent], off by default: the caller owns
+ * dialog could do a milder or a more severe thing, the choice is a [SwitchRow] in [extraContent], off by default: the caller owns
  * its state and passes [confirmLabel] and [destructive] from it, and the body says what the switch adds. The visible body
  * is delegated to [BingeConfirmDialogContent] so screenshot tests can render it (the [AlertDialog] window does not capture).
  */
