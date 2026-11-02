@@ -4,6 +4,7 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.BingeConfirmDialogContent
+import com.binge.designsystem.component.BingeConfirmSevereAction
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
@@ -23,7 +24,7 @@ fun BingeConfirmDialogSample() {
     }
 }
 
-/** Destructive tone — the confirm action is tinted with the error colour for irreversible actions. */
+/** Destructive tone — the confirm text takes the error colour for irreversible actions. */
 @Composable
 fun BingeConfirmDialogDestructiveSample() {
     ScreenshotTheme {
@@ -34,6 +35,22 @@ fun BingeConfirmDialogDestructiveSample() {
             onConfirm = {},
             onDismissRequest = {},
             destructive = true,
+        )
+    }
+}
+
+/** Two destructive outcomes: the actions stack, Cancel first, and the worse one is set apart by a tonal red container. */
+@Composable
+fun BingeConfirmDialogSevereSample() {
+    ScreenshotTheme {
+        BingeConfirmDialogContent(
+            title = "Remove this request?",
+            message = "Removing it keeps the files on the server. Removing and deleting the files cannot be undone.",
+            confirmLabel = "Remove request",
+            onConfirm = {},
+            onDismissRequest = {},
+            destructive = true,
+            severeAction = BingeConfirmSevereAction(label = "Remove and delete files", onClick = {}),
         )
     }
 }
