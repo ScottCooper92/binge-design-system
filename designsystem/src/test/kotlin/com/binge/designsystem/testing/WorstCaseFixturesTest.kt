@@ -10,6 +10,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalog.BingeChoiceWorstCaseSample
+import com.binge.designsystem.catalog.BingeConfirmDialogShortActionsWorstCaseSample
 import com.binge.designsystem.catalog.BingeConfirmDialogSwitchWorstCaseSample
 import com.binge.designsystem.catalog.BingeConfirmDialogWorstCaseSample
 import com.binge.designsystem.catalog.BingeStopSliderWorstCaseSample
@@ -82,6 +83,10 @@ class WorstCaseFixturesTest {
     @Test fun `a confirm dialog with its switch on at 1_3`() = check(FONT_13) { BingeConfirmDialogSwitchWorstCaseSample() }
 
     @Test fun `a confirm dialog with its switch on at 2_0`() = check(FONT_20) { BingeConfirmDialogSwitchWorstCaseSample() }
+
+    @Test fun `a confirm dialog with short actions at 1_3`() = check(FONT_13) { BingeConfirmDialogShortActionsWorstCaseSample() }
+
+    @Test fun `a confirm dialog with short actions at 2_0`() = check(FONT_20) { BingeConfirmDialogShortActionsWorstCaseSample() }
 
     @Test fun `a media card at 1_3`() = check(FONT_13) { MediaCardWorstCaseSample() }
 

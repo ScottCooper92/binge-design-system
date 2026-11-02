@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertIsDisplayed
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalog.BingeConfirmDialogSwitchOffSample
@@ -58,6 +60,41 @@ class BingeConfirmDialogRowTest {
         val confirm = rule.onNodeWithText("Remove it and delete the files from the server").getUnclippedBoundsInRoot()
         assertTrue("Cancel and the confirm are on different rows", cancel.top < confirm.bottom && confirm.top < cancel.bottom)
         assertTrue("the confirm sits after Cancel", confirm.left >= cancel.right)
+    }
+
+    @Test
+    fun `a short confirm keeps one line at twice the font when Cancel leaves room`() {
+        rule.setContent {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = 2f)) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    Box(Modifier.width(360.dp)) {
+                        BingeConfirmDialogContent(
+                            title = "Include copies whatever their licence?",
+                            message = "These copies may not be licensed for viewing.",
+                            confirmLabel = "Include them",
+                            onConfirm = {},
+                            onDismissRequest = {},
+                            destructive = true,
+                        )
+                    }
+                }
+            }
+        }
+        val layouts = mutableListOf<TextLayoutResult>()
+        rule
+            .onNode(
+                hasText("Include them"),
+            ).fetchSemanticsNode()
+            .config
+            .getOrNull(SemanticsActions.GetTextLayoutResult)
+            ?.action
+            ?.invoke(layouts)
+
+        assertEquals("the confirm wrapped: ${layouts.single().lineCount} lines", 1, layouts.single().lineCount)
+        val cancel = rule.onNodeWithText("Cancel").getUnclippedBoundsInRoot()
+        val confirm = rule.onNodeWithText("Include them").getUnclippedBoundsInRoot()
+        assertTrue("Cancel and the confirm are on different rows", cancel.top < confirm.bottom && confirm.top < cancel.bottom)
     }
 
     @Test
