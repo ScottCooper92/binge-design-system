@@ -3,6 +3,8 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,12 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeSentiment
+
+/** The font scale from which the health pill drops under the address instead of sitting beside the name. */
+private const val SERVER_CARD_STACK_FONT_SCALE = 1.5f
 
 /** A status pill on a [ServerCard]: [label] names the state and [sentiment] colours it. */
 data class ServerCardChip(
@@ -75,10 +81,14 @@ fun HubCard(
  * (edition and version) and [address], status pills, and a strip of [stats].
  *
  * @param chips pills in the top row, beside the logo, for what the viewer may need to act on: "Demo", "Update available".
+ *   They flow onto further lines, end-aligned, when they do not fit one; the logo stays at the top, and no pill shrinks or
+ *   wraps its label.
  * @param statusChip the one pill beside the title, for the server's health: "Connected". Kept apart from [chips] so
- *   the two read as a flag on the app and a state of the server.
+ *   the two read as a flag on the app and a state of the server. From a font scale of 1.5 it drops under the address, so the
+ *   name and address keep the width; below that it sits beside the name, which a long name ellipsises against.
  * @param stats up to four totals, shown as the design system's [DetailStatRow]; empty hides the strip.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ServerCard(
     title: String,
@@ -91,34 +101,34 @@ fun ServerCard(
     stats: List<ServerCardStat> = emptyList(),
     sides: PaddingValues = resolvedContentPadding(),
 ) {
+    val stacked = LocalDensity.current.fontScale >= SERVER_CARD_STACK_FONT_SCALE
     HubCard(modifier, sides) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = logo,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(dimensionResource(R.dimen.server_card_logo)),
+                modifier = Modifier.size(dimensionResource(R.dimen.server_card_logo)).align(Alignment.Top),
             )
-            Spacer(Modifier.weight(1f))
-            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            FlowRow(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+                itemVerticalAlignment = Alignment.CenterVertically,
+            ) {
                 chips.forEach { StatusChip(label = it.label, sentiment = it.sentiment) }
             }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                subtitle?.let { CardCaption(it, singleLine = false) }
-                address?.let { CardCaption(it, singleLine = true) }
-            }
-            statusChip?.let {
-                Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
-                StatusChip(label = it.label, sentiment = it.sentiment)
+        if (stacked) {
+            ServerCardText(title, subtitle, address)
+            statusChip?.let { StatusChip(label = it.label, sentiment = it.sentiment) }
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ServerCardText(title, subtitle, address, Modifier.weight(1f))
+                statusChip?.let {
+                    Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
+                    StatusChip(label = it.label, sentiment = it.sentiment)
+                }
             }
         }
         if (stats.isNotEmpty()) {
@@ -128,6 +138,27 @@ fun ServerCard(
                 contentPadding = PaddingValues(),
             )
         }
+    }
+}
+
+/** The name, the edition and the address: one line each for the name and address, ellipsised, the edition free to wrap. */
+@Composable
+private fun ServerCardText(
+    title: String,
+    subtitle: String?,
+    address: String?,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        subtitle?.let { CardCaption(it, singleLine = false) }
+        address?.let { CardCaption(it, singleLine = true) }
     }
 }
 

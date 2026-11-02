@@ -106,3 +106,24 @@ fun HubCardSample() {
         }
     }
 }
+
+/** Three pills beside the logo: they flow onto a second line, end-aligned, with the logo held at the top and no label broken. */
+@Composable
+fun ServerCardManyChipsSample() {
+    ScreenshotTheme {
+        ServerCard(
+            title = "Home server",
+            logo = logo(),
+            subtitle = "Jellyfin 10.11.0",
+            address = "http://192.168.1.20:8096",
+            chips =
+                listOf(
+                    ServerCardChip("Not encrypted", BingeSentiment.Caution),
+                    ServerCardChip("Update available", BingeSentiment.Caution),
+                    ServerCardChip("Restart pending", BingeSentiment.Info),
+                ),
+            statusChip = health,
+            stats = threeStats,
+        )
+    }
+}
