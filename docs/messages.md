@@ -23,6 +23,7 @@ The TV has no snackbars. It shows a result in place, and an acknowledgement that
 - It is an acknowledgement, not a confirmation, so it has exactly one action. A choice is `BingeConfirmDialog`: at most two actions, on one row.
 - A long body scrolls inside the dialog rather than clipping.
 - A message the user must not lose to a stray tap, such as a secret shown once (an API key), passes `dismissible = false`: Back and a tap outside do nothing, and only the button closes it. Give that button a label that says what closing means, such as "I have copied it".
+- What the message is about and the user acts on, such as that key and its Copy button, goes in `extraContent`, under the message and inside the same scroll. The caller owns its state and what the button does. The TV dialog has the same slot, between the message and the button, and focus still arrives on the button.
 
 ## Worked example: a failed backup
 

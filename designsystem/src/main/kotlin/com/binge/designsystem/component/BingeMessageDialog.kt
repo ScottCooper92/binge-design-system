@@ -27,6 +27,9 @@ import com.binge.designsystem.R
  * With [dismissible] false, only the button closes it: Back and a tap outside do nothing. For a message the user must not
  * lose by a stray tap, such as a secret shown once (an API key). The button then needs a label that says what closing means.
  *
+ * [extraContent] sits under the message, inside the same scroll, as on [BingeConfirmDialog]: something the message is about and
+ * the user acts on, such as a shown-once key with its Copy button. The caller owns its state and its click handling.
+ *
  * Use it for any message the user must read to act, however short. A result that needs no action is a snackbar: see
  * `docs/messages.md`. The visible body is [BingeMessageDialogContent], so screenshot tests can render it.
  */
@@ -38,13 +41,14 @@ fun BingeMessageDialog(
     modifier: Modifier = Modifier,
     confirmLabel: String = stringResource(R.string.action_ok),
     dismissible: Boolean = true,
+    extraContent: @Composable (() -> Unit)? = null,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
         properties = DialogProperties(dismissOnBackPress = dismissible, dismissOnClickOutside = dismissible),
         title = { Text(title) },
-        text = { MessageBody(message, Modifier.verticalScroll(rememberScrollState())) },
+        text = { MessageBody(message, extraContent, Modifier.verticalScroll(rememberScrollState())) },
         confirmButton = { BingeTextButton(label = confirmLabel, onClick = onDismiss) },
     )
 }
@@ -57,6 +61,7 @@ fun BingeMessageDialogContent(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     confirmLabel: String = stringResource(R.string.action_ok),
+    extraContent: @Composable (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -67,6 +72,7 @@ fun BingeMessageDialogContent(
         Text(text = title, style = MaterialTheme.typography.headlineSmall)
         MessageBody(
             message,
+            extraContent,
             Modifier
                 .heightIn(max = dimensionResource(R.dimen.message_dialog_body_max_height))
                 .verticalScroll(rememberScrollState()),
@@ -78,11 +84,17 @@ fun BingeMessageDialogContent(
 }
 
 @Composable
-private fun MessageBody(message: String, modifier: Modifier) {
-    Text(
-        text = message,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = modifier,
-    )
+private fun MessageBody(
+    message: String,
+    extraContent: @Composable (() -> Unit)?,
+    modifier: Modifier,
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        extraContent?.invoke()
+    }
 }

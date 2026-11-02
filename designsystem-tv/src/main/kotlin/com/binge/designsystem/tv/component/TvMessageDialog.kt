@@ -25,7 +25,8 @@ import com.binge.designsystem.R as DesR
  * saying what happened, a [message] with the cause and the next step, and one text button that acknowledges it. Focus arrives
  * on the button, and OK, Back and a press outside all call [onDismiss]. It is an acknowledgement, so it has one action; a
  * choice is a [TvConfirmDialog]. With [dismissible] false, only the button closes it: Back and a press outside do nothing,
- * for a message the user must not lose by a stray press, such as a secret shown once.
+ * for a message the user must not lose by a stray press, such as a secret shown once. [extraContent] sits between the message
+ * and the button, as on [TvConfirmDialog]; focus still arrives on the button, whatever the slot holds.
  */
 @Composable
 fun TvMessageDialog(
@@ -35,6 +36,7 @@ fun TvMessageDialog(
     modifier: Modifier = Modifier,
     confirmLabel: String = stringResource(DesR.string.action_ok),
     dismissible: Boolean = true,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -45,7 +47,14 @@ fun TvMessageDialog(
                 dismissOnClickOutside = dismissible,
             ),
     ) {
-        TvMessageDialogContent(title = title, message = message, confirmLabel = confirmLabel, onDismiss = onDismiss, modifier = modifier)
+        TvMessageDialogContent(
+            title = title,
+            message = message,
+            confirmLabel = confirmLabel,
+            onDismiss = onDismiss,
+            modifier = modifier,
+            extraContent = extraContent,
+        )
     }
 }
 
@@ -62,12 +71,14 @@ fun TvMessageDialogContent(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     initiallyFocused: Boolean = false,
+    extraContent: (@Composable () -> Unit)? = null,
 ) {
     val focus = remember { FocusRequester() }
     TvOverlayArrivalFocusEffect(focus)
     TvDialogCard(modifier) {
         Text(text = title, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
         Text(text = message, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        extraContent?.invoke()
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(DesR.dimen.padding_s)),
             horizontalArrangement = Arrangement.End,

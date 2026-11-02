@@ -41,4 +41,12 @@ class BingeMessageDialogSamplesScreenshotTest {
     fun ShownOnce() {
         BingeMessageDialogShownOnceSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun KeyWithCopy() {
+        BingeMessageDialogKeyWithCopySample()
+    }
 }

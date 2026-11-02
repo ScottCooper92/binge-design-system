@@ -74,4 +74,23 @@ class TvMessageDialogTest {
         rule.waitForIdle()
         assertEquals(1, dismissed)
     }
+
+    @Test
+    fun `extra content shows and focus still arrives on OK, not on it`() {
+        rule.setContent {
+            BingeTvTheme {
+                TvMessageDialogContent(
+                    title = "Title",
+                    message = "Body",
+                    confirmLabel = "OK",
+                    onDismiss = { dismissed++ },
+                    extraContent = { TvButton(label = "Copy", onClick = {}) },
+                )
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Copy").assertExists()
+        rule.onNodeWithText("OK").assertIsFocused()
+    }
 }

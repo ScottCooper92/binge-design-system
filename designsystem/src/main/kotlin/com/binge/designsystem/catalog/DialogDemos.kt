@@ -28,7 +28,7 @@ import kotlinx.coroutines.delay
 private const val SUBMIT_DEMO_MILLIS = 2_000L
 private val DEMO_YEARS = 1990..2030
 
-private enum class OpenDialog { Message, ShownOnce, Confirm, Destructive, CreateList, MonthYear }
+private enum class OpenDialog { Message, ShownOnce, KeyWithCopy, Confirm, Destructive, CreateList, MonthYear }
 
 /**
  * Every dialog in the design system, the month and year picker among them, each opened for real from its own button, which a screenshot of
@@ -53,6 +53,7 @@ fun DialogsDemo() {
         ) {
             BingeOutlinedButton(label = "Message dialog", onClick = { open = OpenDialog.Message })
             BingeOutlinedButton(label = "Message dialog, only OK closes it", onClick = { open = OpenDialog.ShownOnce })
+            BingeOutlinedButton(label = "Message dialog, key with Copy", onClick = { open = OpenDialog.KeyWithCopy })
             BingeOutlinedButton(label = "Confirm dialog", onClick = { open = OpenDialog.Confirm })
             BingeOutlinedButton(label = "Destructive confirm dialog", onClick = { open = OpenDialog.Destructive })
             BingeOutlinedButton(label = "Create list dialog", onClick = { open = OpenDialog.CreateList })
@@ -73,6 +74,15 @@ fun DialogsDemo() {
                     confirmLabel = "I have copied it",
                     onDismiss = { close("Closed with the button") },
                     dismissible = false,
+                )
+            OpenDialog.KeyWithCopy ->
+                BingeMessageDialog(
+                    title = "Copy your API key now",
+                    message = "This is the only time it is shown.",
+                    confirmLabel = "I have copied it",
+                    onDismiss = { close("Closed with the button") },
+                    dismissible = false,
+                    extraContent = { ShownOnceKey() },
                 )
             OpenDialog.Confirm ->
                 BingeConfirmDialog(
