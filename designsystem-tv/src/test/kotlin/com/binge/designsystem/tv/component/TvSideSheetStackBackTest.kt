@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.component
 
 import android.app.Application
+import android.os.SystemClock
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.input.key.Key
@@ -40,11 +41,16 @@ class TvSideSheetStackBackTest {
                         val key = "${nav.page}-$index"
                         TvSideSheetRow(
                             label = "${nav.page} $index",
-                            onClick = { if (nav.page == "root") nav.push("child", key) },
+                            onClick = {
+                                when (nav.page) {
+                                    "root" -> nav.push("child", key)
+                                    "child" -> nav.push("grand", key)
+                                }
+                            },
                             modifier = nav.row(key),
                         )
                     }
-                    if (nav.page == "child") nav.arriveAt("child-$ARRIVAL")
+                    if (nav.page != "root") nav.arriveAt("${nav.page}-$ARRIVAL")
                 }
             }
         }
@@ -84,6 +90,30 @@ class TvSideSheetStackBackTest {
 
         assertTrue("the views took Back's key-down, so the activity never handled the press", handledByActivity)
         composeTestRule.onNodeWithText("root $OPENER").assertIsFocused()
+        assertEquals("the sheet must not close", 0, dismissed)
+    }
+
+    @Test
+    fun `a held Back pops one page, not one per auto-repeat`() {
+        setSheet()
+        openChild()
+        composeTestRule.onNodeWithText("child $OPENER").requestFocus()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("child $OPENER").performKeyInput { pressKey(Key.DirectionCenter) }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("grand $ARRIVAL").assertIsFocused()
+
+        composeTestRule.runOnIdle {
+            val decor = composeTestRule.activity.window.decorView
+            val downTime = SystemClock.uptimeMillis()
+            decor.dispatchKeyEvent(KeyEvent(downTime, downTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK, 0))
+            decor.dispatchKeyEvent(KeyEvent(downTime, downTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK, 1))
+            decor.dispatchKeyEvent(KeyEvent(downTime, downTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK, 2))
+            decor.dispatchKeyEvent(KeyEvent(downTime, downTime, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK, 0))
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("child $OPENER").assertIsFocused()
         assertEquals("the sheet must not close", 0, dismissed)
     }
 
