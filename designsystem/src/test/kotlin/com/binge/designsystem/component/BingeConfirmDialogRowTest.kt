@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -65,6 +68,18 @@ class BingeConfirmDialogRowTest {
         rule.onNodeWithText("Remove and delete files").assertIsDisplayed()
         rule.onNodeWithText("Cancel").assertIsDisplayed()
         assertEquals(0, rule.onAllNodesWithTextCount("Remove request"))
+    }
+
+    @Test
+    fun `a screen reader meets the switch, then Cancel, then the confirm`() {
+        rule.setContent { BingeConfirmDialogSwitchOffSample() }
+        val labels = listOf("Also delete the files from the server", "Cancel", "Remove request")
+        val inOrder =
+            rule
+                .onAllNodes(labels.map { hasText(it) }.reduce { a, b -> a or b })
+                .fetchSemanticsNodes()
+                .map { node -> labels.first { label -> node.config.getOrNull(SemanticsProperties.Text)?.any { it.text == label } == true } }
+        assertEquals(labels, inOrder)
     }
 
     private fun androidx.compose.ui.test.junit4.ComposeContentTestRule.onAllNodesWithTextCount(text: String): Int =
