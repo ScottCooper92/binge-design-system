@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeSentiment
 import com.binge.designsystem.theme.BingeShapes
@@ -30,7 +31,8 @@ private const val STATUS_CHIP_DOT_HALO_ALPHA = 0.30f
  * A small pill saying where something stands: a request, an issue, a job. The [label] names the state and the
  * [sentiment] colours it, so colour reinforces the words rather than carrying them alone. The label and the wash take
  * the sentiment's accent; the dot, which is graphical and needs only 3:1, takes its brighter fill inside a soft halo.
- * [showDot] false leaves the label and wash alone, for a row that already shows a state glyph of its own.
+ * The label holds to one line and ends in an ellipsis rather than wrapping inside its pill, so a pill a row cannot fit moves to
+ * the next line (see a flow row) or is cut, never broken into a column of letters. [showDot] false leaves the label and wash alone, for a row that already shows a state glyph of its own.
  *
  * The consumer maps its own states onto [BingeSentiment], one line per state, so the same state reads the same in
  * every app.
@@ -58,7 +60,13 @@ fun StatusChip(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.status_chip_dot_spacing)),
     ) {
         if (showDot) StatusDot(sentiment.fill())
-        Text(text = label, style = MaterialTheme.typography.labelMedium, color = accent)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = accent,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
