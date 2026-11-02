@@ -291,6 +291,8 @@
     <!-- BingeInitialsAvatar sample sizes for the catalog screenshot test -->
     <dimen name="avatar_size_md">44dp</dimen>
     <dimen name="avatar_size_lg">72dp</dimen>
+    <!-- PageIntro: the gap between the intro line and what follows it -->
+    <dimen name="page_intro_spacing_bottom">16dp</dimen>
     <!-- ServerCard -->
     <dimen name="server_card_logo">40dp</dimen>
     <dimen name="server_card_section_spacing">14dp</dimen>
