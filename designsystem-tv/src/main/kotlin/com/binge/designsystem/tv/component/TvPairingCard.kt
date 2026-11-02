@@ -20,11 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
@@ -41,6 +43,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The card is as wide as its widest line and no wider. [codeDescription] is what a screen reader says for
  * [code], for a code read better as words than as its characters.
+ *
+ * [qrSize] is the code's side where there is room for it. In a card whose height or width is bounded, the code
+ * gives up size first and the lines around it keep theirs, so a card in a short pane fits it; measured with unbounded
+ * room, as in a scrolling pane, it keeps the full [qrSize].
  */
 @Composable
 fun TvPairingCard(
@@ -53,8 +59,8 @@ fun TvPairingCard(
     address: String? = null,
     qrSize: Dp = dimensionResource(TvR.dimen.tv_pairing_qr_size),
 ) {
-    PairingCardSurface(modifier) {
-        TvQrCode(content = payload, contentDescription = qrDescription, modifier = Modifier.size(qrSize))
+    FittedPairingCard(modifier) { bounded ->
+        TvQrCode(content = payload, contentDescription = qrDescription, modifier = fitSquare(qrSize, bounded))
         instruction?.let {
             Text(
                 text = it,
@@ -89,7 +95,9 @@ fun TvPairingCard(
 
 /**
  * [TvPairingCard] before it has a code: the same card with a shimmering block where the code to scan goes, and a
- * [message] such as "Getting a code". A sign-in panel keeps the card in place while it asks for one.
+ * [message] such as "Getting a code". A sign-in panel keeps the card in place while it asks for one. The block is
+ * [qrSize] square where there is room and gives up size first where there is not, as the code does in [TvPairingCard];
+ * the message wraps at [qrSize], so a long one is as tall as it is on the card that follows.
  */
 @Composable
 fun TvPairingCardLoading(
@@ -97,8 +105,8 @@ fun TvPairingCardLoading(
     modifier: Modifier = Modifier,
     qrSize: Dp = dimensionResource(TvR.dimen.tv_pairing_qr_size),
 ) {
-    PairingCardSurface(modifier) {
-        TvSkeletonBlock(modifier = Modifier.size(qrSize))
+    FittedPairingCard(modifier) { bounded ->
+        TvSkeletonBlock(modifier = fitSquare(qrSize, bounded))
         PairingMessage(message, qrSize)
     }
 }
@@ -144,6 +152,32 @@ fun TvPairingCardError(
         }
     }
 }
+
+/**
+ * [PairingCardSurface] that says whether its height is bounded. A column hands a weighted child no height when its own is
+ * unbounded, so the code can only be weighted where [content] is told it is.
+ */
+@Composable
+private fun FittedPairingCard(modifier: Modifier, content: @Composable ColumnScope.(bounded: Boolean) -> Unit) {
+    BoxWithConstraints(modifier = modifier, propagateMinConstraints = true) {
+        val bounded = constraints.hasBoundedHeight
+        PairingCardSurface(Modifier) { content(bounded) }
+    }
+}
+
+/**
+ * A square no bigger than [max], shrunk where the card is [bounded] to the height it has left once its other lines are
+ * placed, and to the width it is bounded to. Unbounded, it stays [max].
+ */
+private fun ColumnScope.fitSquare(max: Dp, bounded: Boolean): Modifier =
+    (if (bounded) Modifier.weight(1f, fill = false) else Modifier).layout { measurable, constraints ->
+        val limit = max.roundToPx()
+        val height = if (constraints.hasBoundedHeight) constraints.maxHeight else limit
+        val width = if (constraints.hasBoundedWidth) constraints.maxWidth else limit
+        val side = minOf(limit, height, width)
+        val placeable = measurable.measure(Constraints.fixed(side, side))
+        layout(side, side) { placeable.place(0, 0) }
+    }
 
 /** The card's chrome, shared by every state so the card keeps its shape as it changes state. */
 @Composable

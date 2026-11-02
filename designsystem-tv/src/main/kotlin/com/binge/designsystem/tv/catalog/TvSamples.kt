@@ -568,6 +568,41 @@ fun TvPairingCardErrorLongMessageSample() {
     }
 }
 
+/**
+ * The full card in a pane too short for it at the size the caller asked for. The code gives up size and the instruction,
+ * the PIN and the address keep theirs, so the card fits the pane instead of overflowing it.
+ */
+@Composable
+fun TvPairingCardShortPaneSample() {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvPairingCard(
+            payload = "http://192.168.1.20:8080/link?code=4821",
+            qrDescription = "Scan to open the sign-in page on your phone",
+            instruction = "Scan with your phone, or open the address below",
+            code = "PIN 4 8 2 1",
+            codeDescription = "PIN 4, 8, 2, 1",
+            address = "http://192.168.1.20:8080",
+            qrSize = maxWidth,
+        )
+    }
+}
+
+/**
+ * The card asking for a code, with a message that wraps to four lines, in a pane shorter than the code and message
+ * together. The message is measured at the code's width and keeps its lines; the shimmer gives up size.
+ */
+@Composable
+fun TvPairingCardLoadingLongMessageSample() {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvPairingCardLoading(
+            message =
+                "Getting a code to sign in with. This can take a moment on a slow connection, " +
+                    "and the code appears here as soon as it is ready.",
+            qrSize = minOf(maxWidth, maxHeight) * PAIRING_QR_SHARE,
+        )
+    }
+}
+
 @Composable
 private fun PaneSampleColumn(label: String) {
     Box(
