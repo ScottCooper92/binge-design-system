@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
 import com.binge.designsystem.R
+import kotlin.math.roundToInt
 
 /** How a [BingeStop] reads: [Warning] draws the track, thumb and the selected stop in the error colour. */
 enum class BingeStopEmphasis { Normal, Warning }
@@ -46,7 +47,9 @@ data class BingeStop(
  * thumb lands or a stop is tapped, never per step. A level the caller must ask about before applying is the case it is for.
  *
  * [holdIndex] keeps the thumb on a stop while the caller asks a question about it (a confirm), and is null otherwise: until it
- * clears, the thumb stays there whatever [selectedIndex] is, and returns to [selectedIndex] when it does. [description]
+ * clears, the thumb stays there whatever [selectedIndex] is, and returns to [selectedIndex] when it does. Without a hold, the
+ * caller must accept a commit by setting [selectedIndex] to it: a caller that declines and changes nothing leaves the thumb
+ * on the stop it was dragged to. Tapping the stop already selected commits that index again. [description]
  * names the slider for a screen reader, which hears the shown stop's label as its state. Needs at least two [stops]. Keep a
  * stop's name to a short word or two: it wraps inside the room its stop owns, and at the largest font a single long word breaks
  * across lines there rather than clipping.
@@ -66,7 +69,7 @@ fun BingeStopSlider(
     val last = stops.lastIndex
     val shownIndex = (holdIndex ?: selectedIndex).coerceIn(0, last)
     var position by remember(shownIndex) { mutableFloatStateOf(shownIndex.toFloat()) }
-    val current = position.toInt().coerceIn(0, last)
+    val current = position.roundToInt().coerceIn(0, last)
     val shown = stops[current]
     val accent = if (shown.emphasis == BingeStopEmphasis.Warning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     val move = { index: Int ->
@@ -78,9 +81,9 @@ fun BingeStopSlider(
             value = position,
             onValueChange = { moved ->
                 position = moved
-                onPositionChange(moved.toInt().coerceIn(0, last))
+                onPositionChange(moved.roundToInt().coerceIn(0, last))
             },
-            onValueChangeFinished = { onCommit(position.toInt().coerceIn(0, last)) },
+            onValueChangeFinished = { onCommit(position.roundToInt().coerceIn(0, last)) },
             enabled = enabled,
             valueRange = 0f..last.toFloat(),
             steps = stops.size - 2,
@@ -119,7 +122,8 @@ private fun StopLabels(
     Layout(
         content = {
             stops.forEachIndexed { index, stop ->
-                val tint = if (index == selectedIndex) accent else MaterialTheme.colorScheme.onSurfaceVariant
+                val base = if (index == selectedIndex) accent else MaterialTheme.colorScheme.onSurfaceVariant
+                val tint = if (enabled) base else base.copy(alpha = DISABLED_LABEL_ALPHA)
                 // The slider above announces the stop and is the one control for a screen reader, so the labels stay out of its way.
                 val pick = Modifier.clickable(enabled = enabled) { onPick(index) }.semantics { invisibleToUser() }
                 Icon(
@@ -170,3 +174,6 @@ private fun StopLabels(
 
 /** The unfilled part of the track, a tint of the filled part as Material draws it. */
 private const val INACTIVE_TRACK_ALPHA = 0.24f
+
+/** The stop icons and names while the slider is disabled, dimmed as Material dims the track and thumb. */
+private const val DISABLED_LABEL_ALPHA = 0.38f
