@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalog.BingeChoiceWorstCaseSample
 import com.binge.designsystem.catalog.BingeConfirmDialogSevereWorstCaseSample
 import com.binge.designsystem.catalog.BingeConfirmDialogWorstCaseSample
+import com.binge.designsystem.catalog.BingeStopSliderWorstCaseSample
 import com.binge.designsystem.catalog.CheckboxRowWorstCaseSample
 import com.binge.designsystem.catalog.ItemGroupWideTrailingWorstCaseSample
 import com.binge.designsystem.catalog.ItemGroupWorstCaseSample
@@ -73,6 +74,10 @@ class WorstCaseFixturesTest {
     @Test fun `a confirm dialog at 1_3`() = check(FONT_13) { BingeConfirmDialogWorstCaseSample() }
 
     @Test fun `a confirm dialog at 2_0`() = check(FONT_20) { BingeConfirmDialogWorstCaseSample() }
+
+    @Test fun `a stop slider at 1_3`() = check(FONT_13) { BingeStopSliderWorstCaseSample() }
+
+    @Test fun `a stop slider at 2_0`() = check(FONT_20) { BingeStopSliderWorstCaseSample() }
 
     @Test fun `a stacked confirm dialog at 1_3`() = check(FONT_13) { BingeConfirmDialogSevereWorstCaseSample() }
 
