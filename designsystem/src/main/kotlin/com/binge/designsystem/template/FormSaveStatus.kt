@@ -18,6 +18,8 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
+import com.binge.designsystem.SaveStatus
+import com.binge.designsystem.save.SaveAsMade
 
 /**
  * Where a save-as-made form stands: an edit screen applies each change as it is made, with no Save button, and
@@ -43,6 +45,23 @@ sealed interface FormSaveStatus {
         val onRetry: () -> Unit,
     ) : FormSaveStatus
 }
+
+/**
+ * The [SaveAsMade] engine's output as a [FormSaveStatus]: the engine reports a failure through its `failed` flag, never
+ * through [SaveStatus], so [failed] is checked first and the status is only Idle, Saving or Saved. [onRetry] is what the
+ * snackbar's Retry sends, usually the engine's `now`.
+ */
+fun formSaveStatus(
+    status: SaveStatus,
+    failed: Boolean,
+    onRetry: () -> Unit,
+): FormSaveStatus =
+    when {
+        failed -> FormSaveStatus.Failed(onRetry)
+        status == SaveStatus.Saving -> FormSaveStatus.Saving
+        status == SaveStatus.Saved -> FormSaveStatus.Saved
+        else -> FormSaveStatus.Idle
+    }
 
 /**
  * The inline "Saving…" or "Saved", for a bar's trailing slot. A failure has no inline text: [FormSaveFailureSnackbar]
