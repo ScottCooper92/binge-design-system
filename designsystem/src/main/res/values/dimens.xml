@@ -401,4 +401,6 @@
     <dimen name="decision_hero_badge_icon_size">16dp</dimen>
     <dimen name="decision_point_icon_size">40dp</dimen>
     <dimen name="decision_landscape_points_top">48dp</dimen>
+    <!-- How far a stop slider draws its first and last tick in from its edges: half its thumb. -->
+    <dimen name="stop_slider_inset">10dp</dimen>
 </resources>
