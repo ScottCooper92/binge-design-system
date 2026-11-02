@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudOff
@@ -31,7 +30,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +46,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.ErrorKind
@@ -58,6 +58,7 @@ import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeSnackbar
 import com.binge.designsystem.component.BingeTextButton
+import com.binge.designsystem.component.BingeTextField
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.ListRow
@@ -650,9 +651,9 @@ fun FormScreenTopBarUnchangedSample() {
 @Composable
 private fun TopBarSaveForm(savedAddress: String, address: String) {
     var saved by remember { mutableStateOf(savedAddress to "5055") }
-    val addressField = rememberTextFieldState(address)
-    val portField = rememberTextFieldState(saved.second)
-    val current = addressField.text.toString() to portField.text.toString()
+    var addressField by remember { mutableStateOf(address) }
+    var portField by remember { mutableStateOf(saved.second) }
+    val current = addressField to portField
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         FormScreen(
             title = "Server",
@@ -661,8 +662,14 @@ private fun TopBarSaveForm(savedAddress: String, address: String) {
             primaryAction = FormAction("Save", onClick = { saved = current }, enabled = current != saved),
         ) {
             FormSection(title = "Server") {
-                OutlinedTextField(state = addressField, label = { Text("Address") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(state = portField, label = { Text("Port") }, modifier = Modifier.fillMaxWidth())
+                BingeTextField(value = addressField, onValueChange = { addressField = it }, label = "Address")
+                BingeTextField(
+                    value = portField,
+                    onValueChange = { portField = it },
+                    label = "Port",
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                )
             }
         }
     }
@@ -874,16 +881,15 @@ private fun SampleCopy() {
 
 @Composable
 private fun SampleForm() {
+    var address by remember { mutableStateOf("media.example.com") }
+    var port by remember { mutableStateOf("5055") }
+    var proxy by remember { mutableStateOf("") }
     FormSection(title = "Server") {
-        OutlinedTextField(
-            state = rememberTextFieldState("media.example.com"),
-            label = { Text("Address") },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        OutlinedTextField(state = rememberTextFieldState("5055"), label = { Text("Port") }, modifier = Modifier.fillMaxWidth())
+        BingeTextField(value = address, onValueChange = { address = it }, label = "Address")
+        BingeTextField(value = port, onValueChange = { port = it }, label = "Port", keyboardType = KeyboardType.Number)
     }
     FormSection(title = "Proxy") {
-        OutlinedTextField(state = rememberTextFieldState(), label = { Text("Proxy address") }, modifier = Modifier.fillMaxWidth())
+        BingeTextField(value = proxy, onValueChange = { proxy = it }, label = "Proxy address", imeAction = ImeAction.Done)
     }
 }
 
