@@ -6,6 +6,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.resolvedContentInset
@@ -15,6 +16,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * The tab strip on its own: a scrollable row of text tabs with the active indicator.
  * Stateless — the caller owns [selectedIndex] and reacts to [onSelect]. Kept separate from
  * [BingeTabbedPager] so it can be previewed and screenshot-tested without a pager.
+ *
+ * The row is transparent by default, so it takes the colour of the page behind it. Material's own default is the
+ * theme's `surface`, which in a dark scheme is not the scaffold's `background`, and read as a band across the page.
+ * Pass [containerColor] for a row that sits on a surface of its own.
  */
 @Composable
 fun BingeTabRow(
@@ -22,10 +27,12 @@ fun BingeTabRow(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    containerColor: Color = Color.Transparent,
 ) {
     PrimaryScrollableTabRow(
         selectedTabIndex = selectedIndex.coerceIn(0, (tabs.size - 1).coerceAtLeast(0)),
         modifier = modifier,
+        containerColor = containerColor,
         edgePadding = resolvedContentInset(),
     ) {
         tabs.forEachIndexed { index, title ->
