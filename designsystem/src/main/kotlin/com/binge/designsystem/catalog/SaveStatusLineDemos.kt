@@ -23,7 +23,7 @@ import com.binge.designsystem.component.ListItem
 import com.binge.designsystem.component.SaveStatusLine
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.save.SaveAsMade
-import com.binge.designsystem.template.FormSaveStatus
+import com.binge.designsystem.template.formSaveStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 
@@ -64,13 +64,7 @@ fun SaveStatusLineDemo() {
                     status = { status = it },
                 )
             }
-        val shown =
-            when {
-                failed -> FormSaveStatus.Failed(onRetry = engine::now)
-                status == SaveStatus.Saving -> FormSaveStatus.Saving
-                status == SaveStatus.Saved -> FormSaveStatus.Saved
-                else -> FormSaveStatus.Idle
-            }
+        val shown = formSaveStatus(status, failed, onRetry = engine::now)
         Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_m))) {
             ItemGroup(
                 title = null,
