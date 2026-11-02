@@ -38,6 +38,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvInfoCard
+import com.binge.designsystem.tv.component.TvMessageDialogContent
 import com.binge.designsystem.tv.component.TvSideSheetNote
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.component.TvSideSheetReadout
@@ -270,6 +271,20 @@ fun TvConfirmDialogExtraContentSample() {
             extraContent = {
                 TvCheckboxRow(label = "Also block this title", checked = alsoBlock, onCheckedChange = { alsoBlock = it })
             },
+        )
+    }
+}
+
+/** A message dialog: what happened, the cause and the next step, and one button that acknowledges it, focused. */
+@Composable
+fun TvMessageDialogSample() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvMessageDialogContent(
+            title = "The backup wasn't made",
+            message = "The server may need 5 GiB free where it keeps backups. Free up space there, then try again.",
+            confirmLabel = "OK",
+            onDismiss = {},
+            initiallyFocused = true,
         )
     }
 }

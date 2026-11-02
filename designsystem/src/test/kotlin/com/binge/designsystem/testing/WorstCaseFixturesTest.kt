@@ -13,6 +13,7 @@ import com.binge.designsystem.catalog.BingeChoiceWorstCaseSample
 import com.binge.designsystem.catalog.BingeConfirmDialogShortActionsWorstCaseSample
 import com.binge.designsystem.catalog.BingeConfirmDialogSwitchWorstCaseSample
 import com.binge.designsystem.catalog.BingeConfirmDialogWorstCaseSample
+import com.binge.designsystem.catalog.BingeMessageDialogWorstCaseSample
 import com.binge.designsystem.catalog.BingeStopSliderWorstCaseSample
 import com.binge.designsystem.catalog.CheckboxRowWorstCaseSample
 import com.binge.designsystem.catalog.ItemGroupWideTrailingWorstCaseSample
@@ -87,6 +88,10 @@ class WorstCaseFixturesTest {
     @Test fun `a confirm dialog with short actions at 1_3`() = check(FONT_13) { BingeConfirmDialogShortActionsWorstCaseSample() }
 
     @Test fun `a confirm dialog with short actions at 2_0`() = check(FONT_20) { BingeConfirmDialogShortActionsWorstCaseSample() }
+
+    @Test fun `a message dialog at 1_3`() = check(FONT_13) { BingeMessageDialogWorstCaseSample() }
+
+    @Test fun `a message dialog at 2_0`() = check(FONT_20) { BingeMessageDialogWorstCaseSample() }
 
     @Test fun `a media card at 1_3`() = check(FONT_13) { MediaCardWorstCaseSample() }
 

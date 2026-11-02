@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeConfirmDialog
+import com.binge.designsystem.component.BingeMessageDialog
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.CreateListDialog
 import com.binge.designsystem.component.MonthYearPickerDialog
@@ -27,7 +28,7 @@ import kotlinx.coroutines.delay
 private const val SUBMIT_DEMO_MILLIS = 2_000L
 private val DEMO_YEARS = 1990..2030
 
-private enum class OpenDialog { Confirm, Destructive, CreateList, MonthYear }
+private enum class OpenDialog { Message, Confirm, Destructive, CreateList, MonthYear }
 
 /**
  * Every dialog in the design system, the month and year picker among them, each opened for real from its own button, which a screenshot of
@@ -50,6 +51,7 @@ fun DialogsDemo() {
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
+            BingeOutlinedButton(label = "Message dialog", onClick = { open = OpenDialog.Message })
             BingeOutlinedButton(label = "Confirm dialog", onClick = { open = OpenDialog.Confirm })
             BingeOutlinedButton(label = "Destructive confirm dialog", onClick = { open = OpenDialog.Destructive })
             BingeOutlinedButton(label = "Create list dialog", onClick = { open = OpenDialog.CreateList })
@@ -57,6 +59,12 @@ fun DialogsDemo() {
             Text(outcome)
         }
         when (open) {
+            OpenDialog.Message ->
+                BingeMessageDialog(
+                    title = "The backup wasn't made",
+                    message = "The server may need 5 GiB free where it keeps backups. Free up space there, then try again.",
+                    onDismiss = { close("Dismissed") },
+                )
             OpenDialog.Confirm ->
                 BingeConfirmDialog(
                     title = "Remove from list?",

@@ -10,15 +10,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.tv.component.TV_GRID_NO_CELL
+import com.binge.designsystem.tv.component.tvGridCellsDrawn
+import com.binge.designsystem.tv.component.tvGridPlateCells
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.R as TvR
-
-/** Rows of plates drawn while a grid with [TvImmersiveGridInPlace] has no cells: enough to run past the bottom edge. */
-internal const val PLATE_ROWS = 3
-
-private const val NO_CELL = -1
 
 /**
  * Draws one cell of an in-place [TvImmersiveGrid], with an [item] or without ([item] null: a plate). It is one composable for
@@ -32,7 +30,12 @@ typealias TvInPlaceCell<T> = @Composable (
     cellModifier: Modifier,
 ) -> Unit
 
-/** Opts a [TvImmersiveGrid] into one grid for loading and cells, drawing each cell, plate or item, with [cell]. */
+/**
+ * Opts a [TvImmersiveGrid] into one grid for loading and cells, drawing each cell, plate or item, with [cell].
+ *
+ * The cell is the caller's own, and the parent [TvImmersiveGrid] owns the scroll state and the focus ring, which is what
+ * separates this from the bare `TvPosterGrid`; both share the cell-count rule in `TvPlateGrid.kt`.
+ */
 class TvImmersiveGridInPlace<T : Any>(
     val cell: TvInPlaceCell<T>,
 )
@@ -65,8 +68,8 @@ internal fun <T : Any> TvImmersiveGridBody(
             ) {
                 // Focus keeps its cell composed, even past the plate rows or fewer items than were focused: a cell past the
                 // items is a plate until focus leaves it.
-                val focused = ringIndex ?: NO_CELL
-                val drawn = maxOf(items?.count ?: maxOf(columns * PLATE_ROWS, entryIndex + 1), focused + 1)
+                val focused = ringIndex ?: TV_GRID_NO_CELL
+                val drawn = tvGridCellsDrawn(items?.count ?: maxOf(tvGridPlateCells(columns), entryIndex + 1), focused)
                 items(count = drawn, key = { it }) { index ->
                     val item = items?.takeIf { index < it.count }?.at(index)
                     // The anchor rides a wrapper, plate or item, so the first cell is the one the skeleton is measured against.

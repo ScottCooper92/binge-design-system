@@ -83,6 +83,7 @@ catalog-app/        the debug-only catalog app, with a phone activity and a TV o
 catalog-registry/   the generator that lists the catalog's samples and demos for that app
 
 docs/
+├── messages.md          a snackbar for a result, a dialog for a cause and a next step
 ├── pull-to-refresh.md   where to use BingePullToRefresh, and how a view model reports the reload
 └── tv-foundation.md     why focus is a parameter, and the accent model the TV components share
 ```
