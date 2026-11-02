@@ -73,12 +73,14 @@ fun BingeModalSideSheet(
 /**
  * The window, scrim and slide behind a side sheet, with the [panel] it slides in. Back press goes to [onDismissRequest];
  * a tap on the scrim goes to [onScrimTap], which a sheet of pages sends past its own Back to close the whole sheet.
+ * Back hides the keyboard first unless [hideImeOnBack] is false, as it is for a locked sheet.
  */
 @Composable
 internal fun BingeSideSheetWindow(
     onDismissRequest: () -> Unit,
     onScrimTap: () -> Unit,
     panel: @Composable () -> Unit,
+    hideImeOnBack: Boolean = true,
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -93,7 +95,7 @@ internal fun BingeSideSheetWindow(
         var visible by rememberSideSheetShown()
         val closeLabel = stringResource(R.string.cd_close_sheet)
         LaunchedEffect(Unit) { visible = true }
-        HideImeOnBack()
+        HideImeOnBack(enabled = hideImeOnBack)
 
         Box(modifier = Modifier.fillMaxSize()) {
             AnimatedVisibility(

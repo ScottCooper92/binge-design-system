@@ -125,4 +125,22 @@ class BingeSheetImeBackTest {
         pressSideSheetBack()
         assertEquals(1, dismissed)
     }
+
+    @Test
+    @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w900dp-h900dp")
+    fun `Back with the keyboard up on a locked side sheet leaves the keyboard alone`() {
+        dismissed = 0
+        rule.setContent {
+            TestTheme {
+                BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = { dismissed++ }, gesturesEnabled = false) {
+                    Draft(keyboardUp = true)
+                }
+            }
+        }
+        rule.waitForIdle()
+        assertTrue("The draft field never took focus, so the test cannot show it keeping it", fieldFocused)
+        pressSideSheetBack()
+        assertEquals(0, dismissed)
+        assertTrue(fieldFocused)
+    }
 }
