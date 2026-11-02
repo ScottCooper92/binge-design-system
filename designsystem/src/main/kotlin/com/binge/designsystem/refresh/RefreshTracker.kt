@@ -16,6 +16,9 @@ import kotlinx.coroutines.flow.asStateFlow
  * Reloads that overlap (a pull while a trigger-driven reload runs) keep it true until the last of them ends. The screen
  * state keeps its last content while it is true, and carries the flag as a field of its data variant, so the screen still has
  * the one state stream. See `docs/pull-to-refresh.md`.
+ *
+ * It has no Compose in it, and is the one such class in this module: every app's view models already sit in modules that depend on
+ * `designsystem`, so a module of its own would cost each of them a dependency for one small class.
  */
 class RefreshTracker {
     private val lock = Any()

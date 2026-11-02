@@ -63,7 +63,14 @@ class ThingsViewModel(private val repository: ThingsRepository) : ViewModel() {
 }
 ```
 
-`isRefreshing` is a field of the data variant, so the screen keeps its one state stream. The screen passes it on:
+`isRefreshing` is a field of the data variant, so the screen keeps its one state stream. A companion's per-screen `Ready`
+carries it, as above. **In Binge** the shared `UiState.Success` already has the field, so the same view model reads:
+
+```kotlin
+combine(things, refreshTracker.isRefreshing) { loaded, refreshing -> UiState.Success(loaded, isRefreshing = refreshing) }
+```
+
+The screen passes it on:
 
 ```kotlin
 BingePullToRefresh(isRefreshing = state.isRefreshing, onRefresh = viewModel::refresh) { ThingsList(state.things) }
