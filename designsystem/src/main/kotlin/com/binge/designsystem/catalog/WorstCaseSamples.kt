@@ -32,7 +32,6 @@ import com.binge.designsystem.component.BingeChoice
 import com.binge.designsystem.component.BingeChoiceList
 import com.binge.designsystem.component.BingeChoiceSheetContent
 import com.binge.designsystem.component.BingeConfirmDialogContent
-import com.binge.designsystem.component.BingeConfirmSevereAction
 import com.binge.designsystem.component.BingeInitialsAvatar
 import com.binge.designsystem.component.BingeTag
 import com.binge.designsystem.component.CheckboxRow
@@ -276,23 +275,6 @@ fun BingeConfirmDialogWorstCaseSample() {
             onConfirm = {},
             onDismissRequest = {},
             destructive = true,
-        )
-    }
-}
-
-/** The stacked two-destructive-action dialog with long labels on all three actions, for the large-font frames. */
-@Composable
-fun BingeConfirmDialogSevereWorstCaseSample() {
-    ScreenshotTheme {
-        BingeConfirmDialogContent(
-            title = "Remove this request and everything attached to it?",
-            message = "Removing it keeps the files on the server. Removing and deleting the files cannot be undone.",
-            confirmLabel = "Remove the request only",
-            dismissLabel = "Keep the request",
-            onConfirm = {},
-            onDismissRequest = {},
-            destructive = true,
-            severeAction = BingeConfirmSevereAction(label = "Remove it and delete the files from the server", onClick = {}),
         )
     }
 }

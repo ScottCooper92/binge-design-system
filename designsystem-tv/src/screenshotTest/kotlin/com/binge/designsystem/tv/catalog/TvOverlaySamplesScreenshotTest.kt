@@ -99,6 +99,11 @@ class TvOverlaySamplesScreenshotTest {
     @Composable
     fun confirmDialogExtraContent() = Frame { TvConfirmDialogExtraContentSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun confirmDialogSwitch() = Frame { TvConfirmDialogSwitchSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
