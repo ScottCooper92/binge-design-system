@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * state keeps its last content while it is true, and carries the flag as a field of its data variant, so the screen still has
  * the one state stream. See `docs/pull-to-refresh.md`.
  *
- * It has no Compose in it, and is the one such class in this module: every app's view models already sit in modules that depend on
+ * Like [com.binge.designsystem.save.SaveAsMade], it has no Compose in it: every app's view models already sit in modules that depend on
  * `designsystem`, so a module of its own would cost each of them a dependency for one small class.
  */
 class RefreshTracker {
