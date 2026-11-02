@@ -109,6 +109,11 @@ class TvOverlaySamplesScreenshotTest {
     @Composable
     fun messageDialog() = Frame { TvMessageDialogSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun messageDialogKeyWithCopy() = Frame { TvMessageDialogKeyWithCopySample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {

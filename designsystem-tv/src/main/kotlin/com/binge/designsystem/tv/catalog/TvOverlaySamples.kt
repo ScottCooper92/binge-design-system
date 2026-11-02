@@ -31,10 +31,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvInfoCard
@@ -47,6 +49,7 @@ import com.binge.designsystem.tv.component.TvSideSheetRows
 import com.binge.designsystem.tv.component.TvSideSheetTitle
 import com.binge.designsystem.tv.component.TvSwitch
 import com.binge.designsystem.tv.focus.tvFocusContentColor
+import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.tv.R as TvR
 
 /**
@@ -288,6 +291,30 @@ fun TvMessageDialogSample() {
         )
     }
 }
+
+/**
+ * A message with something the user acts on between it and the button, a shown-once key and a Copy button: focus still arrives on
+ * the message's own button, and the key does not take it.
+ */
+@Composable
+fun TvMessageDialogKeyWithCopySample() {
+    var copied by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvMessageDialogContent(
+            title = "Copy your API key now",
+            message = "This is the only time it is shown.",
+            confirmLabel = "I have copied it",
+            onDismiss = {},
+            initiallyFocused = true,
+            extraContent = {
+                Text(text = TV_SHOWN_ONCE_KEY, style = MaterialTheme.typography.bodyLarge, fontFamily = FontFamily.Monospace)
+                TvButton(label = if (copied) "Copied" else "Copy", onClick = { copied = true }, style = TvButtonStyle.Secondary)
+            },
+        )
+    }
+}
+
+private const val TV_SHOWN_ONCE_KEY = "jf_7c1e9a40b2d84f6a9e3b5c0d1f2a8b647c1e9a40b2d84f6a9e3b5c0d1f2a8b64"
 
 /**
  * A milder or a more severe outcome as a switch row between the message and the buttons, off by default: the confirm names

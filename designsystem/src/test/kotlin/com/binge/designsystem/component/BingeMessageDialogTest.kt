@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.activity.ComponentDialog
+import androidx.compose.material3.Text
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -89,5 +90,53 @@ class BingeMessageDialogTest {
         show((1..60).joinToString(" ") { "A long line of explanation number $it." })
 
         rule.onNode(hasScrollAction()).assertExists()
+    }
+
+    @Test
+    fun `extra content sits in the body, its button works, and OK still dismisses once`() {
+        var copied = 0
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeMessageDialogContent(
+                    title = "Title",
+                    message = "Body",
+                    onDismiss = { dismissed++ },
+                    extraContent = {
+                        Text("the-key")
+                        BingeOutlinedButton(label = "Copy", onClick = { copied++ })
+                    },
+                )
+            }
+        }
+
+        rule.onNodeWithText("the-key").assertExists()
+        rule.onNodeWithText("Copy").performClick()
+        assertEquals(0, dismissed)
+        assertEquals(1, copied)
+        rule.onNodeWithText("OK").performClick()
+        assertEquals(1, dismissed)
+    }
+
+    @Test
+    fun `extra content in a dialog that is not dismissible does not close it, and Back still does nothing`() {
+        var copied = 0
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeMessageDialog(
+                    title = "Title",
+                    message = "Body",
+                    onDismiss = { dismissed++ },
+                    dismissible = false,
+                    extraContent = { BingeOutlinedButton(label = "Copy", onClick = { copied++ }) },
+                )
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Copy").performClick()
+        pressBack()
+
+        assertEquals(1, copied)
+        assertEquals(0, dismissed)
     }
 }
