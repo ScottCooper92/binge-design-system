@@ -18,8 +18,16 @@ import com.binge.designsystem.R
 /**
  * Pull down on [content] to re-read it: past the threshold, a release calls [onRefresh]. Phone only; a TV has no pull.
  *
+ * **Use it** on a screen that lists or summarises server data that others can change while the user is away: dashboards and
+ * hubs, request and issue lists, detail pages with live status, device, user and task lists. **Not** on a form or an edit
+ * screen (a refresh would clobber what is being edited), a save-as-made page, a drag-to-reorder list, a loading or error state
+ * (not scrollable; keep Retry), or a screen that already updates live (an event feed, a poll while something runs). In a pager,
+ * wrap each page, not the pager, and set [indicatorTopInset] so the spinner clears a chip header or a transparent bar.
+ *
  * [isRefreshing] is the caller's own refreshing state, such as a paged list's refresh in progress, and the spinner shows
- * while it is true. So a screen shows this spinner instead of an in-list refresh indicator for the same read, never both.
+ * while it is true. So a screen shows this spinner instead of an in-list refresh indicator for the same read, never both. A
+ * reload that swaps the content for a skeleton would flash it under the pull: keep the last content while it runs, and report
+ * the reload with `RefreshTracker`. `docs/pull-to-refresh.md` has the pattern.
  *
  * [state] is M3's own, for a caller that drives or reads the pull itself; most leave it to the default.
  *
