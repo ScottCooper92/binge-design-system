@@ -166,6 +166,7 @@ private fun BingeTaskSideSheet(
         // The lock stops the user's Back; a caller's own nav.pop() goes through popPage and is not held by it.
         onDismissRequest = { if (!locked) popPage() },
         onScrimTap = { if (scrimDismisses) onDismissRequest() },
+        hideImeOnBack = !locked,
         panel = {
             BingeTaskSheetPanel(
                 pages = pages,
