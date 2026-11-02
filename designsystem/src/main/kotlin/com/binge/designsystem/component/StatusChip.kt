@@ -31,8 +31,9 @@ private const val STATUS_CHIP_DOT_HALO_ALPHA = 0.30f
  * A small pill saying where something stands: a request, an issue, a job. The [label] names the state and the
  * [sentiment] colours it, so colour reinforces the words rather than carrying them alone. The label and the wash take
  * the sentiment's accent; the dot, which is graphical and needs only 3:1, takes its brighter fill inside a soft halo.
- * The label holds to one line and ends in an ellipsis rather than wrapping inside its pill, so a pill a row cannot fit moves to
- * the next line (see a flow row) or is cut, never broken into a column of letters. [showDot] false leaves the label and wash alone, for a row that already shows a state glyph of its own.
+ * [singleLine] holds the label to one line and ends it in an ellipsis rather than wrapping inside its pill, for a pill in a flow
+ * row, where one that does not fit moves to the next line. Left false, a long label wraps, so a state is never cut off in a
+ * list row at a large font. [showDot] false leaves the label and wash alone, for a row that already shows a state glyph of its own.
  *
  * The consumer maps its own states onto [BingeSentiment], one line per state, so the same state reads the same in
  * every app.
@@ -45,6 +46,7 @@ fun StatusChip(
     sentiment: BingeSentiment,
     modifier: Modifier = Modifier,
     showDot: Boolean = true,
+    singleLine: Boolean = false,
 ) {
     val accent = sentiment.accent()
     Row(
@@ -64,8 +66,8 @@ fun StatusChip(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = accent,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+            overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
         )
     }
 }
