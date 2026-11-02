@@ -2,12 +2,10 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,10 +20,11 @@ import com.binge.designsystem.R
  * platform's own dialog shape. Stateless — the caller owns the visibility flag and reacts to
  * [onConfirm]/[onDismissRequest].
  *
- * Set [destructive] for irreversible actions (sign-out, delete): the confirm text takes the error colour. When
- * the dialog offers a second, worse outcome, pass it as [severeAction]; the actions then stack, Cancel first and
- * the severe one last, so two red actions are never mistaken for each other. The visible body is delegated to
- * [BingeConfirmDialogContent] so screenshot tests can render it (the [AlertDialog] window does not capture).
+ * **At most two actions, always on one row**: Cancel, then the confirm. A long label or a large font wraps inside its button,
+ * never onto a second row. Set [destructive] for irreversible actions: the confirm text takes the error colour. When the
+ * dialog could do a milder or a more severe thing, the choice is a switch in [extraContent], off by default: the caller owns
+ * its state and passes [confirmLabel] and [destructive] from it, and the body says what the switch adds. The visible body
+ * is delegated to [BingeConfirmDialogContent] so screenshot tests can render it (the [AlertDialog] window does not capture).
  */
 @Composable
 fun BingeConfirmDialog(
@@ -37,7 +36,6 @@ fun BingeConfirmDialog(
     modifier: Modifier = Modifier,
     dismissLabel: String = stringResource(R.string.action_cancel),
     destructive: Boolean = false,
-    severeAction: BingeConfirmSevereAction? = null,
     extraContent: @Composable (() -> Unit)? = null,
 ) {
     AlertDialog(
@@ -59,7 +57,6 @@ fun BingeConfirmDialog(
                 confirmLabel = confirmLabel,
                 dismissLabel = dismissLabel,
                 destructive = destructive,
-                severeAction = severeAction,
                 onConfirm = onConfirm,
                 onDismissRequest = onDismissRequest,
             )
@@ -81,7 +78,6 @@ fun BingeConfirmDialogContent(
     modifier: Modifier = Modifier,
     dismissLabel: String = stringResource(R.string.action_cancel),
     destructive: Boolean = false,
-    severeAction: BingeConfirmSevereAction? = null,
     extraContent: @Composable (() -> Unit)? = null,
 ) {
     Column(
@@ -101,60 +97,28 @@ fun BingeConfirmDialogContent(
             confirmLabel = confirmLabel,
             dismissLabel = dismissLabel,
             destructive = destructive,
-            severeAction = severeAction,
             onConfirm = onConfirm,
             onDismissRequest = onDismissRequest,
         )
     }
 }
 
-/**
- * A second destructive outcome offered beside [BingeConfirmDialog]'s confirm, worse than it (remove a request, against
- * remove it and delete its files). Its label says in full what it does.
- */
-data class BingeConfirmSevereAction(
-    val label: String,
-    val onClick: () -> Unit,
-)
-
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ConfirmActions(
     confirmLabel: String,
     dismissLabel: String,
     destructive: Boolean,
-    severeAction: BingeConfirmSevereAction?,
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    if (severeAction == null) {
-        // A wrapping row: side by side while both fit, and one per line, still end-aligned, when a long label or a large
-        // font would squeeze the confirm into a few words a line.
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
-        ) {
-            BingeTextButton(label = dismissLabel, onClick = onDismissRequest)
-            BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = destructive)
-        }
-    } else {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
-            horizontalAlignment = Alignment.End,
-        ) {
-            BingeTextButton(label = dismissLabel, onClick = onDismissRequest)
-            BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = true)
-            // Weight, not colour alone, tells the worse action apart: a tonal red container survives a themed palette.
-            BingeTextButton(
-                label = severeAction.label,
-                onClick = severeAction.onClick,
-                colors = ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                ),
-            )
-        }
+    // One row whatever the labels: each button takes at most its share of the width, so a long label wraps inside its button
+    // rather than pushing the confirm onto a line of its own.
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s), Alignment.End),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BingeTextButton(label = dismissLabel, onClick = onDismissRequest, modifier = Modifier.weight(1f, fill = false))
+        BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = destructive, modifier = Modifier.weight(1f, fill = false))
     }
 }

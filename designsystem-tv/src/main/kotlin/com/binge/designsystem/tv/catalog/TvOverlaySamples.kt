@@ -275,6 +275,37 @@ fun TvConfirmDialogExtraContentSample() {
 }
 
 /**
+ * A milder or a more severe outcome as a switch row between the message and the buttons, off by default: the confirm names
+ * the milder one until the switch is on. Still two buttons on one row, and focus arrives on Cancel.
+ */
+@Composable
+fun TvConfirmDialogSwitchSample() {
+    var deleteFiles by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvConfirmDialogContent(
+            title = "Remove this request?",
+            message =
+                if (deleteFiles) {
+                    "The request and its files on the server are removed."
+                } else {
+                    "The request is removed. Its files stay on the server."
+                },
+            confirmLabel = if (deleteFiles) "Remove and delete files" else "Remove request",
+            dismissLabel = "Cancel",
+            destructive = true,
+            onConfirm = {},
+            onDismissRequest = {},
+            initiallyDismissFocused = true,
+            extraContent = {
+                TvSideSheetRow(label = "Also delete the files", onClick = { deleteFiles = !deleteFiles }, role = Role.Switch) { isFocused ->
+                    TvSwitch(checked = deleteFiles, isFocused = isFocused)
+                }
+            },
+        )
+    }
+}
+
+/**
  * A row that opens a page, ending in its chevron, beside a destructive row that is focused: the destructive row fills with
  * the error colour, as a destructive button does, not with the accent.
  */

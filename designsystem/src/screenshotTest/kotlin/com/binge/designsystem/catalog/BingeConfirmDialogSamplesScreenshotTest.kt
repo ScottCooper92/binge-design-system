@@ -23,8 +23,15 @@ class BingeConfirmDialogSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
-    fun Severe() {
-        BingeConfirmDialogSevereSample()
+    fun SwitchOff() {
+        BingeConfirmDialogSwitchOffSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun SwitchOn() {
+        BingeConfirmDialogSwitchOnSample()
     }
 
     @PreviewTest
@@ -37,7 +44,7 @@ class BingeConfirmDialogSamplesScreenshotTest {
     @PreviewTest
     @WorstCaseFontPreviews
     @Composable
-    fun SevereWorstCase() {
-        BingeConfirmDialogSevereWorstCaseSample()
+    fun SwitchWorstCase() {
+        BingeConfirmDialogSwitchWorstCaseSample()
     }
 }
