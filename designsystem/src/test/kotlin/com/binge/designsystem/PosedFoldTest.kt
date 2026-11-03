@@ -1,11 +1,11 @@
 package com.binge.designsystem
 
 import android.graphics.Rect
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.window.layout.FoldingFeature
 import androidx.window.testing.layout.TestWindowLayoutInfo
 import androidx.window.testing.layout.WindowLayoutInfoPublisherRule
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -41,7 +41,7 @@ import androidx.window.testing.layout.FoldingFeature as posedFold
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w800dp-h1000dp-xhdpi")
 class PosedFoldTest {
     private val publisher = WindowLayoutInfoPublisherRule()
-    private val compose = createComposeRule()
+    private val compose = createTakeDownComposeRule()
 
     @get:Rule
     val rules: RuleChain = RuleChain.outerRule(publisher).around(compose)

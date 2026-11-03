@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.component.TvDetailHero
 import com.binge.designsystem.tv.component.TvDetailHeroItem
@@ -53,7 +53,7 @@ private val TopBar = 95.dp
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvDetailPageSkeletonGeometryTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `the skeleton's hero band is the loaded band's size, in its place`() =

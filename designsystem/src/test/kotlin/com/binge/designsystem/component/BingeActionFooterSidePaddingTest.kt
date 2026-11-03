@@ -3,12 +3,12 @@ package com.binge.designsystem.component
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -24,7 +24,7 @@ private const val TOLERANCE = 1f
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeActionFooterSidePaddingTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private fun buttonLeft(innerEdge: PaneEdge?): Dp {
         rule.setContent {

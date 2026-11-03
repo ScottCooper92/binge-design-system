@@ -13,10 +13,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollToIndex
 import com.binge.designsystem.component.FilterChipItem
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -45,7 +45,7 @@ private const val PAGE_TAG = "pager-page"
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeFilterChipPagerTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     @Test
     fun `a settled swipe forward then back reports both selections`() {

@@ -21,7 +21,7 @@ import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.rememberTvArrivalFocus
@@ -56,7 +56,7 @@ class TvDetailPageFocusTest {
     val leanback = LeanbackRule()
 
     @get:Rule(order = 1)
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     private lateinit var focusManager: FocusManager
     private lateinit var arrival: TvArrivalFocus

@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.height
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.template.ScreenAction
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
@@ -83,7 +83,7 @@ private val Rows = listOf(TvHubRow(key = "trending", title = "Trending", items =
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvTopInsetTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     private var inset by mutableStateOf(0.dp)
 

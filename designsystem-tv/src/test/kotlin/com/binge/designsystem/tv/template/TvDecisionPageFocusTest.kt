@@ -12,7 +12,7 @@ import androidx.compose.ui.test.pressKey
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
 import com.binge.designsystem.template.ScreenAction
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +33,7 @@ private const val POINT_COUNT = 10
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvDecisionPageFocusTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `every point of a page taller than the panel is reached in order`() {

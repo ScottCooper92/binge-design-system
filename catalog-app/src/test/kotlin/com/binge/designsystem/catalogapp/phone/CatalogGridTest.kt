@@ -23,7 +23,7 @@ import com.binge.designsystem.catalogapp.registry.CatalogComponent
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.CatalogKind
 import com.binge.designsystem.catalogapp.registry.components
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -38,7 +38,7 @@ import org.robolectric.annotation.Config
 @Config(qualifiers = "w411dp-h900dp-xxhdpi")
 class CatalogGridTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     private val samples =
         (0 until SAMPLE_COUNT).map { index ->

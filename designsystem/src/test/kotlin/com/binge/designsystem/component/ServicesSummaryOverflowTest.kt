@@ -1,11 +1,11 @@
 package com.binge.designsystem.component
 
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,7 +24,7 @@ private fun providers(count: Int) = (1..count).map { WatchProviderUi(id = it, na
 @Config(sdk = [34], application = android.app.Application::class)
 class ServicesSummaryOverflowTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     private fun setSelection(count: Int) {
         composeTestRule.setContent {

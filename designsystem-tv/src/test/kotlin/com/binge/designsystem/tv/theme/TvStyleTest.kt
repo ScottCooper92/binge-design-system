@@ -2,8 +2,8 @@ package com.binge.designsystem.tv.theme
 
 import android.app.Application
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.tv.material3.MaterialTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvStyleTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private val scheme = BingeTvColorScheme
 

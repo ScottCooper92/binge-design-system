@@ -2,7 +2,7 @@ package com.binge.designsystem.tv.template
 
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.isFocusable
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvOverviewScreenArrivalFocusTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `the reader is focused once it opens`() {

@@ -6,9 +6,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +31,7 @@ private const val FILLER = " words that run on well past the end of a narrow row
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class SupportingMaxLinesTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private fun heightOf(text: String) = rule.onNodeWithText(text, substring = true).getUnclippedBoundsInRoot().let { it.bottom - it.top }
 

@@ -1,7 +1,7 @@
 package com.binge.designsystem.component
 
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -18,7 +18,7 @@ import org.robolectric.shadows.ShadowDialog
 @Config(sdk = [34], application = android.app.Application::class)
 class CreateListDialogDismissTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     private fun backPressDismisses(isSubmitting: Boolean): Int {
         var dismissed = 0
