@@ -3,6 +3,7 @@
 
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,8 +54,8 @@ fun HeroDetailScreenRefreshingSample() {
 }
 
 /**
- * A pulled page with no image under the bar, as a person's is: the hero is only the clearance below the bar, and the name
- * starts the content. The spinner rests in the bar's row, clear of the name; [HeroPullIndicator.BelowBar] would land it on the
+ * A pulled page with no image under the bar, as a person's is: the hero is only the clearance below the bar, and an eyebrow
+ * and the name start the content. The spinner rests in the bar's row, clear of the name; [HeroPullIndicator.BelowBar] would land it on the
  * name's line.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,11 +77,15 @@ fun HeroDetailScreenNoImageRefreshingSample() {
                 )
             },
         ) {
-            Text(
-                text = "Joe Performer",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
-            )
+            Column(Modifier.padding(horizontal = dimensionResource(R.dimen.padding_m)).padding(top = dimensionResource(R.dimen.padding_s))) {
+                Text(
+                    text = "ACTING",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_xs)))
+                Text(text = "Joe Performer", style = MaterialTheme.typography.headlineMedium)
+            }
             SampleCopy()
         }
     }
