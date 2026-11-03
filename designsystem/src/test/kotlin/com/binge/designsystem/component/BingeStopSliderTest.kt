@@ -10,14 +10,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -30,7 +29,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeStopSliderTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     private val stops =
         listOf(
@@ -134,14 +133,5 @@ class BingeStopSliderTest {
         hold = null
         composeTestRule.waitForIdle()
         assertEquals("Default", announced())
-    }
-
-    @Test
-    fun `fewer than two stops is a mistake`() {
-        assertThrows(IllegalArgumentException::class.java) {
-            composeTestRule.setContent {
-                TestTheme { BingeStopSlider(stops = stops.take(1), selectedIndex = 0, onCommit = {}, description = "Licences") }
-            }
-        }
     }
 }

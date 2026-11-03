@@ -14,10 +14,14 @@ class ComposeRuleGuardTest {
     private val sourceRoots = listOf("designsystem/src/test", "designsystem-tv/src/test", "catalog-app/src/test")
 
     /**
-     * Tests that assert a throw from composition itself, which leave nothing pending and where the wrapper moves the throw,
-     * and this file, which names the rules it forbids.
+     * By path from the repository root: the one test that asserts a throw from composition itself, which leaves nothing
+     * pending and where the wrapper would move the throw, and this file, which names the rules it forbids.
      */
-    private val allowed = setOf("BingeStopSliderTest.kt", "ComposeRuleGuardTest.kt")
+    private val allowed =
+        setOf(
+            "designsystem/src/test/kotlin/com/binge/designsystem/component/BingeStopSliderMistakeTest.kt",
+            "designsystem/src/test/kotlin/com/binge/designsystem/testing/ComposeRuleGuardTest.kt",
+        )
 
     private val plainRule = Regex("""\b(createComposeRule|createKeyboardComposeRule)\(|\bcreateAndroidComposeRule[<(]""")
 
@@ -29,9 +33,9 @@ class ComposeRuleGuardTest {
                 .map { File(repoRoot, it) }
                 .filter { it.exists() }
                 .flatMap { root -> root.walkTopDown().filter { it.isFile && it.extension == "kt" }.toList() }
-                .filter { it.name !in allowed }
                 .filter { plainRule.containsMatchIn(it.readText()) }
                 .map { it.relativeTo(repoRoot).path }
+                .filter { it !in allowed }
 
         assertTrue(
             "Use createTakeDownComposeRule(), createTakeDownKeyboardComposeRule() or createTakeDownAndroidComposeRule() (#1067), not a plain rule, in: $offenders",
