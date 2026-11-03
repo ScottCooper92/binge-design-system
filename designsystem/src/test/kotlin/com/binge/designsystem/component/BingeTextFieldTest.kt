@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -16,6 +15,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.input.ImeAction
 import com.binge.designsystem.R
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeTextFieldTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private fun text(id: Int) = RuntimeEnvironment.getApplication().getString(id)
 

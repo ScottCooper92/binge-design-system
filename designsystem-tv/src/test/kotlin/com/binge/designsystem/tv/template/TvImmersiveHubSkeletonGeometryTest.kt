@@ -9,7 +9,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.nav.LocalTvContentInset
@@ -48,7 +48,7 @@ private val Anchors = listOf(TvLayoutAnchors.HUB_COPY, TvLayoutAnchors.hubRow(0)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvImmersiveHubSkeletonGeometryTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `the skeleton reserves the hub's copy band and rows in the rail's pane`() = assertReserved(TvPageHosting.Destination)

@@ -3,9 +3,9 @@ package com.binge.designsystem.component
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,7 +17,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class SectionHeaderSemanticsTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private val isHeading = SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
 

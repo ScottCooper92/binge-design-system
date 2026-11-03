@@ -8,10 +8,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +23,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class DetailOverlayTopBarSemanticsTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private val hidden = SemanticsMatcher.keyIsDefined(SemanticsProperties.HideFromAccessibility)
 

@@ -12,7 +12,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -30,6 +29,7 @@ import com.binge.designsystem.catalog.SheetsDemo
 import com.binge.designsystem.catalogapp.overrides.SampleLocale
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.overrides.WithOverrides
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -44,7 +44,7 @@ import com.binge.designsystem.R as DesR
 @Config(qualifiers = "w411dp-h900dp-xxhdpi")
 class DemosTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     /** Taps the one clickable and steps a frame, since a paused test clock does not recompose on its own. */
     private fun tapOnPausedClock() {

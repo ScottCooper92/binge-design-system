@@ -11,13 +11,13 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalog.BingeConfirmDialogSwitchOffSample
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -34,7 +34,7 @@ import org.robolectric.annotation.GraphicsMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class BingeConfirmDialogRowTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `long labels at twice the font still sit on one row`() {

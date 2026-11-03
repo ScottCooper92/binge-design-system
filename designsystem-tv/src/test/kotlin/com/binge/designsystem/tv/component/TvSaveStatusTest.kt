@@ -24,7 +24,7 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.SaveStatus
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -45,7 +45,7 @@ private const val FIELD = "Field"
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvSaveStatusTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `idle draws nothing and takes no space`() {

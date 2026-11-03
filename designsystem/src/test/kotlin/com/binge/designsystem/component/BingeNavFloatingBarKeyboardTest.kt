@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -20,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -36,7 +36,7 @@ private val Keyboard = 300.dp
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w411dp-h891dp-xhdpi")
 class BingeNavFloatingBarKeyboardTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private var overlay = PaddingValues()
     private var keyboardHeight by mutableStateOf(0.dp)

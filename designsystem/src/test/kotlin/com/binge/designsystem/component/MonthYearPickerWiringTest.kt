@@ -4,10 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -27,7 +27,7 @@ import java.util.Locale
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w600dp-h1200dp")
 class MonthYearPickerWiringTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private val confirmed = mutableListOf<MonthYearSelection>()
     private var dismissals = 0

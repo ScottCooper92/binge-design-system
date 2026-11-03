@@ -2,12 +2,12 @@ package com.binge.designsystem.template
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class StateScreensTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private fun string(id: Int) = RuntimeEnvironment.getApplication().getString(id)
 

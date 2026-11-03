@@ -22,7 +22,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -49,7 +49,7 @@ private const val GENRE_BODY = "Pick the genres."
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvListPaneFilterBoardTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     private val described = mutableListOf<String>()
     private var genres by mutableStateOf(setOf(DRAMA))

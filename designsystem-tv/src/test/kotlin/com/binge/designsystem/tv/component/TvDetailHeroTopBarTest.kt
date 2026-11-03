@@ -14,7 +14,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.ShadowMeshSpecification
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.template.TvDetailPage
@@ -67,7 +67,7 @@ private val MinPeek = 24.dp
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvDetailHeroTopBarTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `with no top bar the band is its usual height and the poster ends above the actions`() {

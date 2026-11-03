@@ -2,9 +2,9 @@ package com.binge.designsystem.component
 
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,7 +15,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class BingePinFieldFocusTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private fun show(autoFocus: Boolean) =
         rule.setContent {

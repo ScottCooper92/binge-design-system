@@ -20,7 +20,7 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.tv.material3.Button
 import androidx.tv.material3.Text
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvStepOutFocusGroup
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
@@ -48,7 +48,7 @@ private const val INSIDE = "Inside"
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvListPaneOpenFocusTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     private var opened = 0
     private var steppedOut = 0

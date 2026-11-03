@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class SkeletonGeometryTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private val anchor = LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)
 

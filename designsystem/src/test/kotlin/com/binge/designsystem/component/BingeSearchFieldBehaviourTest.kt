@@ -9,7 +9,6 @@ import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -17,6 +16,7 @@ import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.input.ImeAction
 import com.binge.designsystem.R
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -36,7 +36,7 @@ private const val PILL_EDGE_PX = 4f
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeSearchFieldBehaviourTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private val clear = RuntimeEnvironment.getApplication().getString(R.string.cd_clear_query)
 

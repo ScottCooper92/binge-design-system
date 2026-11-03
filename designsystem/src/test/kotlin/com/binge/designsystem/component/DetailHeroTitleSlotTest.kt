@@ -4,10 +4,10 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.text.TextStyle
 import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class, shadows = [ShadowMeshSpecification::class])
 class DetailHeroTitleSlotTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `the detail hero's title slot inherits the hero's title style and colour`() {

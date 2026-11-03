@@ -12,7 +12,7 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -30,7 +30,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvCatalogAppFocusTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     private val entries =
         listOf("Alpha", "Beta", "Gamma").map { name ->

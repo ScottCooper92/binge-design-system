@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.Dp
@@ -21,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -51,7 +51,7 @@ private data class KeyboardFrame(
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w690dp-h840dp")
 class StepFlowImeHoldTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private var keyboard by mutableStateOf(KeyboardFrame(0.dp, visible = false))
 

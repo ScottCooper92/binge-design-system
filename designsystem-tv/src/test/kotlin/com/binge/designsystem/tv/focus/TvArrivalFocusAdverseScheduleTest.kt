@@ -15,7 +15,7 @@ import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.testing.TV_LATE_TARGET_SIBLING_TAG
 import com.binge.designsystem.tv.testing.TvLateTarget
 import com.binge.designsystem.tv.theme.BingeTvTheme
@@ -44,7 +44,7 @@ private const val SETTLE_FRAMES = 10
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvArrivalFocusAdverseScheduleTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `the arrival claims focus for a target composed 0 frames late`() = assertArrivalConverges(0)

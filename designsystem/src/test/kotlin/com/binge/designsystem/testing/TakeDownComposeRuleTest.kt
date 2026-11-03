@@ -2,7 +2,7 @@ package com.binge.designsystem.testing
 
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
@@ -34,7 +34,7 @@ class TakeDownComposeRuleTest {
 
     @Test
     fun `the content has left the composition before the rule disposes it`() {
-        val inner = createComposeRule()
+        val inner = createTakeDownComposeRule()
         var disposed = false
         var disposedBeforeTeardown = false
         // Looks at the content after the take-down but before the inner rule's own teardown, which would dispose it anyway.

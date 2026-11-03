@@ -1,6 +1,6 @@
 package com.binge.designsystem.component
 
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeNavPresentationTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     private fun resolved(): BingeNavPresentation {
         var presentation: BingeNavPresentation? = null

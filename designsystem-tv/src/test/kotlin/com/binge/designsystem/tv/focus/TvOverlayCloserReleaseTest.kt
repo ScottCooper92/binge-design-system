@@ -22,7 +22,7 @@ import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.component.TvSideSheetPanel
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertFalse
@@ -51,7 +51,7 @@ private const val MID_EXIT_FRAME = 8
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvOverlayCloserReleaseTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     private var open by mutableStateOf(false)
     private lateinit var closer: TvOverlayCloser
@@ -203,7 +203,7 @@ class TvOverlayCloserReleaseTest {
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvOverlayCloserRecoveryTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     private var open by mutableStateOf(false)
     private lateinit var closer: TvOverlayCloser

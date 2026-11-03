@@ -3,7 +3,6 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -11,6 +10,7 @@ import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.R
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +38,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "sw800dp-w1280dp-h800dp-xhdpi")
 class BingeFilterChipRowOverlayInsetTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     private fun chipRow(overlayStart: Dp) {
         composeTestRule.setContent {

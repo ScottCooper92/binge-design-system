@@ -1,13 +1,13 @@
 package com.binge.designsystem.component
 
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -26,7 +26,7 @@ private val Cutout = 32.dp
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeSheetContentInsetsTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private fun assertLeftInset(edgeToEdge: Boolean, expected: Dp) {
         var left = -1

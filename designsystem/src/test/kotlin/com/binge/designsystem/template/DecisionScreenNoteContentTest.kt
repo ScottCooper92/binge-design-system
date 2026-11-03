@@ -3,11 +3,11 @@ package com.binge.designsystem.template
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Text
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ private const val SLOT_SECOND = "Nothing is kept for longer than ninety days."
 @Config(sdk = [34], application = android.app.Application::class)
 class DecisionScreenNoteContentTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     @Config(qualifiers = "w411dp-h891dp")

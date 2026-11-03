@@ -5,7 +5,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +28,7 @@ private const val IN_PROGRESS = "In progress"
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvPaneRowStatusTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     private val inProgress = SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, IN_PROGRESS)
 

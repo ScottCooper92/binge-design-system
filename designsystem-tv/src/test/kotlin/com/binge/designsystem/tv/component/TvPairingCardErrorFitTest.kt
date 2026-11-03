@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvPairingCardErrorFitTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     private val paneHeight = 230.dp
 
