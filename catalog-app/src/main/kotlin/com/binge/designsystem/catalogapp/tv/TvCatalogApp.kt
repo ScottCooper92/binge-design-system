@@ -49,7 +49,6 @@ fun TvCatalogApp(entries: List<CatalogEntry> = TvCatalogRegistry) {
             onOpen = { selectedId = it.id },
         )
         if (selected != null) {
-            closer.ReportDisposal()
             BackHandler { closer.close() }
             TvSampleDetail(
                 entry = selected,
@@ -57,6 +56,7 @@ fun TvCatalogApp(entries: List<CatalogEntry> = TvCatalogRegistry) {
                 onFontScaleChange = { fontScale = it },
                 onRtlChange = { rtl = it },
                 onBack = closer::close,
+                closer = closer,
             )
         }
     }

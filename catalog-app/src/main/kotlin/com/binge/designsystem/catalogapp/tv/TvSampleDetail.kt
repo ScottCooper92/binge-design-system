@@ -24,6 +24,7 @@ import com.binge.designsystem.catalogapp.overrides.WithOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
+import com.binge.designsystem.tv.focus.TvOverlayCloser
 import com.binge.designsystem.tv.focus.tvExitFocusGroup
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.tv.R as TvR
@@ -31,6 +32,10 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * One sample full screen, laid over the list. It traps focus, so the D-pad cannot reach the list
  * beneath, and takes first focus on open as a user-invoked overlay should. Back is the first control.
+ *
+ * It is the pattern for a trapped overlay that is not a sheet: given the [closer] that closes it, it reports its
+ * own disposal, so the close makes its one request once it is gone, and its exit group reads
+ * [TvOverlayCloser.trapping], so the request made as the close starts is let through.
  */
 @Composable
 fun TvSampleDetail(
@@ -39,14 +44,16 @@ fun TvSampleDetail(
     onFontScaleChange: (Float) -> Unit,
     onRtlChange: (Boolean) -> Unit,
     onBack: () -> Unit,
+    closer: TvOverlayCloser,
 ) {
+    closer.ReportDisposal()
     val firstControl = remember { FocusRequester() }
     TvOverlayArrivalFocusEffect(target = firstControl, key = entry.id)
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .tvExitFocusGroup()
+            .tvExitFocusGroup { closer.trapping }
             .padding(
                 horizontal = dimensionResource(TvR.dimen.tv_overscan_horizontal),
                 vertical = dimensionResource(TvR.dimen.tv_overscan_vertical),
