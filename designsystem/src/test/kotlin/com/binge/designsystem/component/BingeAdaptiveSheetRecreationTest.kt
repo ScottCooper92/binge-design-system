@@ -141,6 +141,28 @@ class BingeAdaptiveSheetRecreationTest {
             BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}) { content() }
         }
     }
+
+    @Test
+    fun `a sheet whose root changes does not bring the old stack's page state back`() {
+        var root by mutableStateOf("a")
+        val controller = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+        controller.get().setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}, root = root) { SavedValue() }
+            }
+        }
+        settle()
+        write(7)
+        settle()
+        assertEquals(7, seen)
+
+        root = "b"
+        settle()
+        root = "a"
+        settle()
+
+        assertEquals("a page of a stack that was replaced came back with its old state", 0, seen)
+    }
 }
 
 private const val SETTLE_MILLIS = 500L
