@@ -25,6 +25,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.catalog.ScreenshotOnly
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvChoiceRow
@@ -189,6 +190,39 @@ fun TvListPaneBoardWorstCaseSample() {
                                 note = LONG_SUPPORT,
                             ),
                             TvPaneRow(key = "other", label = LONG_LABEL, detail = LONG_SUPPORT, badgeAlert = true),
+                        ),
+                ),
+            ),
+        focusedKey = "quality",
+        onFocusRow = {},
+    )
+}
+
+/**
+ * The pane of a row whose save failed, with the longest words the pane holds: the failure wraps before Retry gives up its
+ * width, under a long body, long options and a long note, at a large font.
+ */
+@Composable
+fun TvListPaneBoardSaveFailedWorstCaseSample() {
+    TvListPaneBoard(
+        title = "Settings and everything that decides how a request is sent",
+        groups =
+            listOf(
+                TvPaneGroup(
+                    title = "Playback and the quality every new request asks for",
+                    rows =
+                        listOf(
+                            TvPaneRow(
+                                key = "quality",
+                                label = LONG_LABEL,
+                                detail = LONG_LABEL,
+                                options =
+                                    listOf(
+                                        TvPaneOption(label = LONG_LABEL, selected = true, icon = Icons.Filled.Folder),
+                                    ),
+                                note = "Connects without encryption.",
+                                saveStatus = SaveStatus.Failed,
+                            ),
                         ),
                 ),
             ),

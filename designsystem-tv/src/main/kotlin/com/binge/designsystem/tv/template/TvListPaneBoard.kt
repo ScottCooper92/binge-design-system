@@ -37,6 +37,7 @@ import androidx.tv.material3.ListItemDefaults
 import androidx.tv.material3.ListItemScale
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvRowEmphasis
 import com.binge.designsystem.tv.component.TvRowStatus
@@ -102,6 +103,10 @@ data class TvPaneOption(
  * [paneContent] replaces the whole pane description, such as a [TvListPaneListPreview] of the list OK opens, and a
  * row with both steps in on → as well as OK, since its pane shows the next level rather than controls to move into.
  * [iconPainter] leads the row in place of [icon], for a glyph the caller resolves itself, such as an app's own.
+ *
+ * A row whose options save as they are chosen shows how the save went in its own pane, through [saveStatus]: a [TvSaveStatus]
+ * after the note, so its arrival moves nothing above it. A failure puts Retry, calling [onRetry], in that line. The caller sets
+ * it on the row it just changed and moves it on, as [TvSaveStatus] says; the board holds no status of its own.
  */
 @Immutable
 data class TvPaneRow(
@@ -123,6 +128,8 @@ data class TvPaneRow(
     val onClick: (() -> Unit)? = null,
     val iconPainter: (@Composable () -> Painter)? = null,
     val paneContent: (@Composable () -> Unit)? = null,
+    val saveStatus: SaveStatus = SaveStatus.Idle,
+    val onRetry: () -> Unit = {},
 )
 
 /** Whether → on the row runs its [TvPaneRow.onClick] rather than moving into a pane that has nothing to focus. */
