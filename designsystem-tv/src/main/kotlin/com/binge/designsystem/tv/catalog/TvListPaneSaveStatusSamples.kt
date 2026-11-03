@@ -27,19 +27,19 @@ private const val SAVE_MILLIS = 900L
 /** A row whose last change is being saved: "Saving…" after the pane's options, where nothing above it moves. */
 @Composable
 fun TvListPaneBoardSavingSample() {
-    SaveStatusBoard(SaveStatus.Saving)
+    SeededSaveStatusBoard(SaveStatus.Saving)
 }
 
 /** A change that did not save: the failure with its Retry in the pane, and the chosen option still on screen. */
 @Composable
 fun TvListPaneBoardSaveFailedSample() {
-    SaveStatusBoard(SaveStatus.Failed)
+    SeededSaveStatusBoard(SaveStatus.Failed)
 }
 
 /** A change the page put back, and asking again would be refused again: the reason, with no Retry. */
 @Composable
 fun TvListPaneBoardSaveRefusedSample() {
-    SaveStatusBoard(SaveStatus.Refused(REFUSAL_REASON))
+    SeededSaveStatusBoard(SaveStatus.Refused(REFUSAL_REASON))
 }
 
 /**
@@ -51,30 +51,43 @@ fun TvListPaneBoardSaveRefusedSample() {
 fun TvListPaneBoardSaveStatusDemo() {
     var language by remember { mutableStateOf(OPTION_ENGLISH) }
     var status by remember { mutableStateOf<SaveStatus>(SaveStatus.Idle) }
-    var attempts by remember { mutableIntStateOf(0) }
-    LaunchedEffect(attempts) {
-        if (attempts == 0) return@LaunchedEffect
+    var saves by remember { mutableIntStateOf(0) }
+    LaunchedEffect(saves) {
+        if (saves == 0) return@LaunchedEffect
         status = SaveStatus.Saving
         delay(SAVE_MILLIS)
-        status = if (attempts == 1) SaveStatus.Failed else SaveStatus.Saved
+        status = if (saves == 1) SaveStatus.Failed else SaveStatus.Saved
     }
     SaveStatusBoard(
         status = status,
         selected = language,
         onSelect = {
             language = it
-            attempts = 1
+            saves++
         },
-        onRetry = { attempts++ },
+        onRetry = { saves++ },
+    )
+}
+
+/** Seeded with the status its frame shows; choosing an option ticks it, and Retry moves a failure on to Saved. */
+@Composable
+private fun SeededSaveStatusBoard(seed: SaveStatus) {
+    var language by remember { mutableStateOf(OPTION_SPANISH) }
+    var status by remember { mutableStateOf(seed) }
+    SaveStatusBoard(
+        status = status,
+        selected = language,
+        onSelect = { language = it },
+        onRetry = { status = SaveStatus.Saved },
     )
 }
 
 @Composable
 private fun SaveStatusBoard(
     status: SaveStatus,
-    selected: String = OPTION_SPANISH,
-    onSelect: (String) -> Unit = {},
-    onRetry: () -> Unit = {},
+    selected: String,
+    onSelect: (String) -> Unit,
+    onRetry: () -> Unit,
 ) {
     TvListPaneBoard(
         title = "Settings",
