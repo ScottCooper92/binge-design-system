@@ -111,7 +111,7 @@ fun BingeAdaptiveSheet(
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
-    val pageContent = rememberSheetPageContent(content)
+    val pageContent = rememberSheetPageContent(root, content)
     val popPage: () -> Unit = {
         if (pages.size > 1) {
             val popped = pages.removeAt(pages.lastIndex)
@@ -174,11 +174,15 @@ private class SheetPageContent(
 )
 
 @Composable
-private fun rememberSheetPageContent(content: @Composable ColumnScope.(BingeSheetNav) -> Unit): SheetPageContent {
-    val saveableState = rememberSaveableStateHolder()
+private fun rememberSheetPageContent(
+    root: String,
+    content: @Composable ColumnScope.(BingeSheetNav) -> Unit,
+): SheetPageContent {
+    // A new root resets the page stack, so the pages' saved state goes with it and a later push starts fresh.
+    val saveableState = key(root) { rememberSaveableStateHolder() }
     val latest = rememberUpdatedState(content)
     val movable =
-        remember {
+        remember(saveableState) {
             movableContentOf<ColumnScope, BingeSheetNav> { scope, nav ->
                 val body = latest.value
                 key(nav.page) { saveableState.SaveableStateProvider(nav.page) { with(scope) { body(nav) } } }
