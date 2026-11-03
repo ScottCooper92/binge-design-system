@@ -6,16 +6,20 @@ import java.io.File
 
 /**
  * A test that leaves work pending on Compose's shared UI dispatcher when its rule disposes breaks later tests in the same
- * JVM, depending on order (#1067). The take-down rules drain it, so a plain `createComposeRule()` or
- * `createKeyboardComposeRule()` in these modules' tests is a hazard that CI cannot see until some other test falls over.
+ * JVM, depending on order (#1067). The take-down rules drain it, so a plain `createComposeRule()`,
+ * `createKeyboardComposeRule()` or `createAndroidComposeRule()` in these modules' tests is a hazard that CI cannot see until
+ * some other test falls over.
  */
 class ComposeRuleGuardTest {
     private val sourceRoots = listOf("designsystem/src/test", "designsystem-tv/src/test", "catalog-app/src/test")
 
-    /** Tests that assert a throw from composition itself, which leave nothing pending and where the wrapper moves the throw, and this file, which names the rules it forbids. */
+    /**
+     * Tests that assert a throw from composition itself, which leave nothing pending and where the wrapper moves the throw,
+     * and this file, which names the rules it forbids.
+     */
     private val allowed = setOf("BingeStopSliderTest.kt", "ComposeRuleGuardTest.kt")
 
-    private val plainRule = Regex("""\b(createComposeRule|createKeyboardComposeRule)\(""")
+    private val plainRule = Regex("""\b(createComposeRule|createKeyboardComposeRule)\(|\bcreateAndroidComposeRule[<(]""")
 
     @Test
     fun `no test builds a plain compose rule`() {
@@ -30,7 +34,7 @@ class ComposeRuleGuardTest {
                 .map { it.relativeTo(repoRoot).path }
 
         assertTrue(
-            "Use createTakeDownComposeRule() or createTakeDownKeyboardComposeRule() (#1067), not a plain rule, in: $offenders",
+            "Use createTakeDownComposeRule(), createTakeDownKeyboardComposeRule() or createTakeDownAndroidComposeRule() (#1067), not a plain rule, in: $offenders",
             offenders.isEmpty(),
         )
     }

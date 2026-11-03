@@ -8,8 +8,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createTakeDownAndroidComposeRule
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class ScrollDepthRecreationTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createTakeDownAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun `a recreation reports nothing`() {
@@ -39,7 +39,7 @@ class ScrollDepthRecreationTest {
         }
         rule.waitForIdle()
 
-        rule.activityRule.scenario.recreate()
+        rule.scenario.recreate()
         rule.waitForIdle()
 
         assertTrue("reported on recreation: $reported", reported.isEmpty())

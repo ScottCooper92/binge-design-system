@@ -15,13 +15,13 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
-import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalIsSinglePaneNav
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownAndroidComposeRule
 import com.binge.designsystem.theme.LocalReduceMotion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -45,7 +45,7 @@ private const val MID_SLIDE_MILLIS = 100L
 @Config(sdk = [34])
 class StepFlowScreenTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val composeTestRule = createTakeDownAndroidComposeRule<ComponentActivity>()
 
     private var step by mutableIntStateOf(0)
     private var backs = 0
