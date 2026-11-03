@@ -66,7 +66,7 @@ import com.binge.designsystem.paneSideInsets
  * edge of the window, so it clears the navigation bar and a side cutout itself, by
  * [com.binge.designsystem.bottomBarInsets], as [ScreenFooter] does. [inFlight] draws a thin
  * bar under the top bar without reflowing the page. A non-null [onRefresh] lets the page be pulled down to reload, with
- * [isRefreshing] showing the spinner under the bar; `null`, the default, adds no pull. [onBack] is dropped in a pane whose list already offers it.
+ * [isRefreshing] showing the spinner under the bar, or in it with [pullIndicator] for a page with no image there; `null`, the default, adds no pull. [onBack] is dropped in a pane whose list already offers it.
  * The hero runs full-bleed; [content] centres at [contentMaxWidth] on a wide window. A page whose rails bleed to the
  * edge passes `Dp.Infinity`: [content] then fills the width, and pads each section by [LocalHeroReadingMargin].
  */
@@ -86,6 +86,7 @@ fun HeroDetailScreen(
     onRefresh: (() -> Unit)? = null,
     isRefreshing: Boolean = false,
     pullState: PullToRefreshState? = null,
+    pullIndicator: HeroPullIndicator = HeroPullIndicator.BelowBar,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     footer: (@Composable () -> Unit)? = null,
     hero: @Composable () -> Unit,
@@ -93,7 +94,7 @@ fun HeroDetailScreen(
 ) {
     val measured = rememberMeasuredHeroHeight()
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
-        HeroDetailPull(onRefresh, isRefreshing, pullState) {
+        HeroDetailPull(onRefresh, isRefreshing, pullState, pullIndicator) {
             Column(
                 modifier =
                     Modifier
@@ -108,6 +109,14 @@ fun HeroDetailScreen(
         HeroDetailBar(title, onBack, measured.height(heroHeight), horizontalInset, inFlight, actions) { scrollState.value.toFloat() }
     }
 }
+
+/**
+ * Where a hero page's resting pull spinner sits. [BelowBar], the default, is under the overlay bar, over the hero, which is
+ * where an image or a title card has room for it. [InBar] is for a page with no image under the bar, a person's, whose first
+ * line of copy starts where the spinner would rest: the spinner sits in the bar's own row, clear of the copy and of the back
+ * control at the start.
+ */
+enum class HeroPullIndicator { BelowBar, InBar }
 
 /**
  * The side margin that centres a reading column of `content_max_width` in the width a [HeroDetailScreen] page's
@@ -169,6 +178,7 @@ fun HeroDetailLazyScreen(
     onRefresh: (() -> Unit)? = null,
     isRefreshing: Boolean = false,
     pullState: PullToRefreshState? = null,
+    pullIndicator: HeroPullIndicator = HeroPullIndicator.BelowBar,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     footer: (@Composable () -> Unit)? = null,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -180,7 +190,7 @@ fun HeroDetailLazyScreen(
     val measured = rememberMeasuredHeroHeight()
     val bottomInset = if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
-        HeroDetailPull(onRefresh, isRefreshing, pullState) {
+        HeroDetailPull(onRefresh, isRefreshing, pullState, pullIndicator) {
             ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
                 LazyColumn(
                     state = listState,
@@ -238,23 +248,28 @@ private fun BoxScope.HeroDetailPull(
     onRefresh: (() -> Unit)?,
     isRefreshing: Boolean,
     pullState: PullToRefreshState?,
+    placement: HeroPullIndicator,
     page: @Composable BoxScope.() -> Unit,
 ) {
     if (onRefresh == null) {
         page()
         return
     }
-    val barBottom =
-        WindowInsets.safeDrawing
-            .only(WindowInsetsSides.Top)
-            .asPaddingValues()
-            .calculateTopPadding() +
-            dimensionResource(R.dimen.person_profile_top_bar_offset)
+    val statusTop = WindowInsets.safeDrawing
+        .only(WindowInsetsSides.Top)
+        .asPaddingValues()
+        .calculateTopPadding()
+    val indicatorTopInset =
+        when (placement) {
+            HeroPullIndicator.BelowBar -> statusTop + dimensionResource(R.dimen.person_profile_top_bar_offset)
+            // The spinner rests this far below its inset, so lifting by it puts the spinner in the bar's own row.
+            HeroPullIndicator.InBar -> (statusTop - dimensionResource(R.dimen.hero_pull_in_bar_lift)).coerceAtLeast(0.dp)
+        }
     BingePullToRefresh(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize(),
-        indicatorTopInset = barBottom,
+        indicatorTopInset = indicatorTopInset,
         state = pullState ?: rememberPullToRefreshState(),
         content = page,
     )

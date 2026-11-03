@@ -200,6 +200,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun heroDetailRefreshingUnderSystemBars() = PreviewSystemBarInsets { HeroDetailScreenRefreshingSample() }
 
+    /** A page with no image under the bar: the resting spinner at the template's default, over the first line of the name. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailNoImageRefreshing() = PreviewSystemBarInsets { HeroDetailScreenNoImageRefreshingSample() }
+
     /** Wide enough that the reading margin is not zero: the copy sits at it and the rail runs past the window's end. */
     @PreviewTest
     @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)

@@ -313,6 +313,8 @@
     <!-- Clears the floating glass back/share control row (top_bar_icon_size + 2*padding_s) so the
          bounded profile body isn't occluded by it; applied on top of the consumed status-bar inset. -->
     <dimen name="person_profile_top_bar_offset">64dp</dimen>
+    <!-- How far a hero page lifts its resting pull spinner to centre it in the bar's row: the spinner rests 40dp below its inset, and the 64dp bar row centres a 40dp spinner 12dp below its top. -->
+    <dimen name="hero_pull_in_bar_lift">28dp</dimen>
     <!-- Episode list row: the backdrop still's width (the rest of the chrome comes from ListRow). -->
     <dimen name="episode_row_still_width">132dp</dimen>
     <dimen name="icon_size_m">18dp</dimen>
