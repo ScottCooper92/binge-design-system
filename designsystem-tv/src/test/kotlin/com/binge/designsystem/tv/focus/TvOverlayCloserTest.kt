@@ -139,16 +139,52 @@ class TvOverlayCloserTest {
         }
     }
 
+    /**
+     * With no `restoreTo` the close still releases the trap for the whole exit, runs `onClose` once, takes the overlay down
+     * and re-arms, but asks for no focus: the rail, where the test parks focus before the close, keeps it.
+     */
+    @Test
+    fun `a close with no restore target releases the trap and requests no focus`() {
+        val fixture = fixture(trapped = true, reports = true, restore = false)
+        fixture.openAndFocusOverlay()
+        composeTestRule.runOnIdle { composeTestRule.onNodeWithTag(RAIL).requestFocus() }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnIdle {
+            fixture.closer.close()
+            assertEquals("the trap is released as the close starts", false, fixture.closer.trapping)
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(RAIL).assertIsFocused()
+        assertEquals(1, fixture.closeCount)
+        assertEquals("the trap is back once the overlay is gone", true, fixture.closer.trapping)
+    }
+
+    @Test
+    fun `a close with no restore target re-arms across opens`() {
+        val fixture = fixture(reports = true, restore = false)
+        repeat(2) {
+            fixture.openAndFocusOverlay()
+            composeTestRule.runOnIdle { fixture.closer.close() }
+            composeTestRule.waitForIdle()
+            composeTestRule.onNodeWithTag(OVERLAY).assertDoesNotExist()
+        }
+        assertEquals(2, fixture.closeCount)
+    }
+
     private fun fixture(
         trapped: Boolean = false,
         reports: Boolean = false,
         grouped: Boolean = false,
+        restore: Boolean = true,
     ): Fixture {
         val fixture = Fixture()
         composeTestRule.setContent {
             BingeTvTheme {
                 val entry = remember { FocusRequester() }
-                fixture.closer = rememberTvOverlayCloser(restoreTo = entry) {
+                fixture.closer = rememberTvOverlayCloser(restoreTo = entry.takeIf { restore }) {
                     fixture.closeCount++
                     fixture.overlayOpen = false
                 }
