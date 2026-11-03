@@ -240,7 +240,7 @@ fun HeroDetailStateScreen(
 
 /**
  * [page] as is, or, when [onRefresh] is set, inside a pull to refresh whose spinner rests below the overlay bar, so it is
- * neither behind the bar nor over the hero's copy. The bar stays outside, over the pulled page.
+ * neither behind the bar nor over the hero's copy, or in the bar's row for [HeroPullIndicator.InBar]. The bar stays outside, over the pulled page.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -262,8 +262,9 @@ private fun BoxScope.HeroDetailPull(
     val indicatorTopInset =
         when (placement) {
             HeroPullIndicator.BelowBar -> statusTop + dimensionResource(R.dimen.person_profile_top_bar_offset)
-            // The spinner rests this far below its inset, so lifting by it puts the spinner in the bar's own row.
-            HeroPullIndicator.InBar -> (statusTop - dimensionResource(R.dimen.hero_pull_in_bar_lift)).coerceAtLeast(0.dp)
+            // The spinner rests this far below its inset, so lifting by it puts the spinner in the bar's own row. The inset
+            // goes negative under a status bar shorter than the lift, which is why the pull's inset is an offset, not padding.
+            HeroPullIndicator.InBar -> statusTop - dimensionResource(R.dimen.hero_pull_in_bar_lift)
         }
     BingePullToRefresh(
         isRefreshing = isRefreshing,

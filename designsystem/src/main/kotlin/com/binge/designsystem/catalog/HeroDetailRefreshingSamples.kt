@@ -77,7 +77,9 @@ fun HeroDetailScreenNoImageRefreshingSample() {
                 )
             },
         ) {
-            Column(Modifier.padding(horizontal = dimensionResource(R.dimen.padding_m)).padding(top = dimensionResource(R.dimen.padding_s))) {
+            Column(
+                Modifier.padding(horizontal = dimensionResource(R.dimen.padding_m)).padding(top = dimensionResource(R.dimen.padding_s)),
+            ) {
                 Text(
                     text = "ACTING",
                     style = MaterialTheme.typography.labelSmall,
