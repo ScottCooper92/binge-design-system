@@ -39,15 +39,17 @@ import kotlinx.coroutines.flow.first
  * re-armable across opens (the latch resets so the next open closes too). A caller that shows the overlay again while its exit is
  * still running calls [TvOverlayCloser.reopen]: the panel never left, so it is the only way the closer learns of it.
  *
- * Closing always restores focus. A screen that must hold back a re-request until its content has loaded owns
+ * Closing restores focus to [restoreTo]. A screen that must hold back a re-request until its content has loaded owns
  * that as a separate re-focus of its own, not as part of the close, so there is no `shouldRestore` parameter
- * here.
+ * here. A screen whose own hand-off decides where focus lands passes `null`: the close then releases the trap, runs [onClose],
+ * waits for the disposal and resets the latch, and requests no focus at all.
  *
- * @param restoreTo the requester focus returns to once the overlay disposes (the grid/action-row entry).
+ * @param restoreTo the requester focus returns to once the overlay disposes (the grid/action-row entry), or `null` when
+ * the caller places focus itself.
  * @param onClose disposes the overlay (`sheet = null`, `debugOpen = false`), run before the focus return.
  */
 @Composable
-fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvOverlayCloser {
+fun rememberTvOverlayCloser(restoreTo: FocusRequester?, onClose: () -> Unit): TvOverlayCloser {
     var closing by remember { mutableStateOf(false) }
     val currentOnClose by rememberUpdatedState(onClose)
     val debuggable = (LocalContext.current.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
@@ -57,14 +59,14 @@ fun rememberTvOverlayCloser(restoreTo: FocusRequester, onClose: () -> Unit): TvO
         // The trap is already released (see [TvOverlayCloser.trapping]), so a trap wired to it grants this at once. A grant while
         // the overlay is still composed is not the restore, though: its disposal can hand focus elsewhere, so the request after it
         // always runs.
-        restoreTo.tryRequestFocus()
+        restoreTo?.tryRequestFocus()
         val reportsDisposal = closer.reportsDisposal
         currentOnClose()
         if (reportsDisposal) {
             snapshotFlow { closer.disposed }.first { it }
-            restoreTo.tryRequestFocus()
-        } else {
-            if (debuggable) Log.w(TAG, FALLBACK_MESSAGE)
+            restoreTo?.tryRequestFocus()
+        } else if (restoreTo != null && debuggable) {
+            Log.w(TAG, FALLBACK_MESSAGE)
         }
         // Reset so the overlay can be opened and closed again — an un-reset latch stays armed and either never
         // re-fires (a stuck close) or fires a stale request on a later recomposition.
