@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.zIndex
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.modifier.describedAs
@@ -290,7 +291,12 @@ internal fun TvImmersiveGridSkeleton(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
     ) {
         repeat(GRID_SKELETON_ROWS) { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap))) {
+            // The seeded row draws over the rows after it, so a later row's block cannot cover the ring's bottom edge.
+            val holdsSeed = seededIndex != null && seededIndex / columns == row
+            Row(
+                modifier = if (holdsSeed) Modifier.zIndex(1f) else Modifier,
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
+            ) {
                 repeat(columns) { column ->
                     // The ring is on the block's own chain, outside the shimmer, which draws its own background and drops any content.
                     TvSkeletonBlock(
