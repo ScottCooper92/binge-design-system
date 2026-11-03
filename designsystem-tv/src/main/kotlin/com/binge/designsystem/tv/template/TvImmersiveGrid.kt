@@ -72,6 +72,9 @@ private const val DEFAULT_COLUMNS = 6
  * @param loading the loading state, given the padding the cells will take.
  * @param message the message state, centred in the pane.
  * @param pendingCell a cell not loaded yet.
+ * @param seededIndex draws that cell's ring before any cell holds focus, on a plate too, for a hold in front of the grid that
+ * has focus while the cells load. It applies to the default skeleton and to [inPlace] plates and cells; a custom [loading]
+ * slot draws its own. Real focus takes over as soon as a cell has it.
  * @param inPlace opts into one grid for loading and cells, drawing plates in the cells loading uses, so focus on a plate
  * stays on the cell the item arrives in. [loading], [pendingCell] and [cell] are unused then. A message is not drawn in place: [message]
  * takes the pane, and the entry plate leaves with the grid.
@@ -99,7 +102,8 @@ fun <T : Any> TvImmersiveGrid(
     messageEndInset: Dp = Dp.Hairline,
     rememberedCellModifier: Modifier = Modifier,
     initialFocusedIndex: Int? = null,
-    loading: @Composable (contentPadding: PaddingValues) -> Unit = { TvImmersiveGridSkeleton(columns, it) },
+    seededIndex: Int? = null,
+    loading: @Composable (contentPadding: PaddingValues) -> Unit = { TvImmersiveGridSkeleton(columns, it, seededIndex = seededIndex) },
     message: @Composable BoxScope.() -> Unit = {},
     pendingCell: @Composable () -> Unit = {},
     inPlace: TvImmersiveGridInPlace<T>? = null,
@@ -114,6 +118,7 @@ fun <T : Any> TvImmersiveGrid(
         mutableStateOf(initialFocusedIndex?.let { TvGridMemory(it, items?.takeIf { s -> it < s.count }?.key?.invoke(it)) })
     }
     var ringIndex by remember(queryKey) { mutableStateOf(initialFocusedIndex) }
+    val shownRing = ringIndex ?: seededIndex
     val remembered = memory.resolveIn(content)
     val gridState =
         rememberSaveable(queryKey, saver = LazyGridState.Saver) {
@@ -239,7 +244,7 @@ fun <T : Any> TvImmersiveGrid(
                 ) {
                     cell(
                         item,
-                        ringIndex == index,
+                        shownRing == index,
                         { focused ->
                             if (focused) {
                                 ringIndex = index
@@ -277,7 +282,7 @@ fun <T : Any> TvImmersiveGrid(
                         .then(tvPageArrival(hosting, entry, enabled = true, key = queryKey)),
                     entryIndex = entryIndex,
                     entryModifier = Modifier.focusRequester(entry).then(rememberedCellModifier),
-                    ringIndex = ringIndex,
+                    ringIndex = shownRing,
                     onCellFocused = { index, focused ->
                         if (focused) lastFocused = index
                         val source = items?.takeIf { index < it.count && it.at(index) != null }

@@ -204,10 +204,11 @@ private fun TvPosterGridCell(
 
 /** A white ring over the art, as the hub's rows draw it, not the yellow indicator. */
 @Composable
-private fun PosterFocusRing() {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .border(dimensionResource(TvR.dimen.tv_focus_ring_width), MaterialTheme.colorScheme.onSurface, BingeShapes.MediaCard),
-    )
+internal fun PosterFocusRing() {
+    Box(Modifier.fillMaxSize().posterFocusRing())
 }
+
+/** The poster ring as a modifier, for a node that cannot hold it as content. */
+@Composable
+internal fun Modifier.posterFocusRing(): Modifier =
+    border(dimensionResource(TvR.dimen.tv_focus_ring_width), MaterialTheme.colorScheme.onSurface, BingeShapes.MediaCard)
