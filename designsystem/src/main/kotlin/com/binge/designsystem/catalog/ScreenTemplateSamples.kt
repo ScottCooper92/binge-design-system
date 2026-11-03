@@ -864,7 +864,7 @@ internal fun SampleRows(padding: PaddingValues, descending: Boolean = false) {
 }
 
 @Composable
-private fun SampleCopy() {
+internal fun SampleCopy() {
     Column(
         modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),

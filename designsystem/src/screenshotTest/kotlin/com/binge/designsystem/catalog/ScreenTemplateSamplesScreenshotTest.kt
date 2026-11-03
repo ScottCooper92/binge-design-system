@@ -189,6 +189,17 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun heroDetailFooter() = HeroDetailScreenFooterSample()
 
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailRefreshing() = HeroDetailScreenRefreshingSample()
+
+    /** The spinner clears the status bar the page reserves: with the inset gone it would sit behind the bar. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailRefreshingUnderSystemBars() = PreviewSystemBarInsets { HeroDetailScreenRefreshingSample() }
+
     /** Wide enough that the reading margin is not zero: the copy sits at it and the rail runs past the window's end. */
     @PreviewTest
     @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
