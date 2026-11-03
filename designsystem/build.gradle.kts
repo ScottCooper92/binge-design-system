@@ -89,6 +89,10 @@ tasks.withType<Test>().configureEach {
     if (name.startsWith("validate") && name.contains("ScreenshotTest")) {
         doNotTrackState("Renders against live sources; a cached render gives a false pass or fail")
     }
+    // ComposeRuleGuardTest reads the other modules' test sources, which Gradle would not otherwise see as inputs.
+    if (name == "testDebugUnitTest") {
+        inputs.files(fileTree("../designsystem-tv/src/test"), fileTree("../catalog-app/src/test")).withPropertyName("guardedTestSources")
+    }
 }
 
 dependencies {
