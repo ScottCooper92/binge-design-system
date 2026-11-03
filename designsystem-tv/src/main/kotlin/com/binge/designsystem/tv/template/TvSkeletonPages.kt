@@ -20,11 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.zIndex
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
+import com.binge.designsystem.tv.component.posterFocusRing
 import com.binge.designsystem.tv.component.tvDetailHeroBand
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
@@ -275,25 +277,34 @@ private const val GRID_SKELETON_ROWS = 2
 /**
  * [TvImmersiveGrid]'s loading cells: two rows of poster blocks in the padding the cells will take, so the first
  * resolved cell lands where the first block was. Two rows, because the grid cannot know how many results are coming.
+ * [seededIndex] rings the block at that row-major index, for a hold in front of the grid that has focus.
  */
 @Composable
 internal fun TvImmersiveGridSkeleton(
     columns: Int,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    seededIndex: Int? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
     ) {
         repeat(GRID_SKELETON_ROWS) { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap))) {
+            // The seeded row draws over the rows after it, so a later row's block cannot cover the ring's bottom edge.
+            val holdsSeed = seededIndex != null && seededIndex / columns == row
+            Row(
+                modifier = if (holdsSeed) Modifier.zIndex(1f) else Modifier,
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
+            ) {
                 repeat(columns) { column ->
+                    // The ring is on the block's own chain, outside the shimmer, which draws its own background and drops any content.
                     TvSkeletonBlock(
                         Modifier
                             .weight(1f)
                             .aspectRatio(CARD_ASPECT_RATIO)
-                            .then(if (row == 0 && column == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier),
+                            .then(if (row == 0 && column == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier)
+                            .then(if (row * columns + column == seededIndex) Modifier.posterFocusRing() else Modifier),
                         shape = BingeShapes.MediaCard,
                     )
                 }

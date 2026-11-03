@@ -353,6 +353,7 @@ private fun SampleStateGrid(
     band: (@Composable () -> Unit)? = null,
     trailingAction: (@Composable () -> Unit)? = null,
     message: @Composable BoxScope.() -> Unit = {},
+    seededIndex: Int? = null,
 ) {
     InsetHosted {
         TvImmersiveGrid(
@@ -363,6 +364,7 @@ private fun SampleStateGrid(
             copy = { title -> SampleCopy(title) },
             band = band,
             trailingAction = trailingAction,
+            seededIndex = seededIndex,
             message = message,
         ) { title, isFocused, onFocusChanged, onClick, cellModifier ->
             SampleCard(title, isFocused, onFocusChanged, onClick = onClick, modifier = cellModifier)
@@ -374,6 +376,12 @@ private fun SampleStateGrid(
 @Composable
 fun TvImmersiveGridLoadingSample() {
     SampleStateGrid(content = TvImmersiveGridContent.Loading)
+}
+
+/** The loading blocks with the first one ringed, as a retry hold in front of the grid shows focus while the cells load. */
+@Composable
+fun TvImmersiveGridSeededLoadingSample() {
+    SampleStateGrid(content = TvImmersiveGridContent.Loading, seededIndex = 0)
 }
 
 /** Nothing to show as cells: the caller's message is centred in the pane, with the one action that resolves it. */
@@ -393,7 +401,11 @@ fun TvImmersiveGridMessageSample() {
 
 /** A grid of [content] that loads in place: its plates are the cells the titles arrive in. */
 @Composable
-private fun SampleInPlaceGrid(content: TvImmersiveGridContent<SampleTitle>, focusedIndex: Int?) {
+private fun SampleInPlaceGrid(
+    content: TvImmersiveGridContent<SampleTitle>,
+    focusedIndex: Int?,
+    seededIndex: Int? = null,
+) {
     InsetHosted {
         TvImmersiveGrid(
             heading = "All titles",
@@ -402,6 +414,7 @@ private fun SampleInPlaceGrid(content: TvImmersiveGridContent<SampleTitle>, focu
             artwork = { title -> SampleArtwork(title) },
             copy = { title -> SampleCopy(title) },
             initialFocusedIndex = focusedIndex,
+            seededIndex = seededIndex,
             inPlace = TvImmersiveGridInPlace<SampleTitle>(
                 cell = { title, isFocused, onFocusChanged, onClick, cellModifier ->
                     SampleInPlaceCell(title, isFocused, onFocusChanged, onClick, cellModifier)
@@ -437,6 +450,12 @@ private fun SampleInPlaceCell(
 @Composable
 fun TvImmersiveGridInPlaceLoadingSample() {
     SampleInPlaceGrid(content = TvImmersiveGridContent.Loading, focusedIndex = 0)
+}
+
+/** An in-place grid still loading with its second plate ringed by a seed, before any cell holds focus. */
+@Composable
+fun TvImmersiveGridInPlaceSeededSample() {
+    SampleInPlaceGrid(content = TvImmersiveGridContent.Loading, focusedIndex = null, seededIndex = 1)
 }
 
 /** Controls sharing the heading's row: a band of filters after the heading, and an action pinned to the end. */
