@@ -24,7 +24,7 @@ fun BingePullToRefreshSample() {
  * frame never runs, so the frame would show no spinner at all.
  */
 @OptIn(ExperimentalMaterial3Api::class)
-private object RestingAtThreshold : PullToRefreshState {
+internal object RestingAtThreshold : PullToRefreshState {
     override val distanceFraction: Float = 1f
     override val isAnimating: Boolean = false
 
