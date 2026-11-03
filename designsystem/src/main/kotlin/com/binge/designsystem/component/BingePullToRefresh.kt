@@ -1,7 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -53,7 +53,7 @@ fun BingePullToRefresh(
             PullToRefreshDefaults.Indicator(
                 state = state,
                 isRefreshing = isRefreshing,
-                modifier = Modifier.align(Alignment.TopCenter).padding(top = indicatorTopInset),
+                modifier = Modifier.align(Alignment.TopCenter).offset(y = indicatorTopInset),
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 color = MaterialTheme.colorScheme.primary,
             )

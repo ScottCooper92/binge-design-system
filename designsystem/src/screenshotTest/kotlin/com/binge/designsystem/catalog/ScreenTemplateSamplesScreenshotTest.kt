@@ -200,11 +200,17 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun heroDetailRefreshingUnderSystemBars() = PreviewSystemBarInsets { HeroDetailScreenRefreshingSample() }
 
-    /** A page with no image under the bar: the resting spinner at the template's default, over the first line of the name. */
+    /** A page with no image under the bar: the resting spinner in the bar's row, clear of the eyebrow and the name. */
     @PreviewTest
     @ScreenStatePreview
     @Composable
     fun heroDetailNoImageRefreshing() = PreviewSystemBarInsets { HeroDetailScreenNoImageRefreshingSample() }
+
+    /** The same page with no status-bar inset, where the spinner's lift runs past zero: it must still clear the eyebrow. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailNoImageRefreshingNoInset() = HeroDetailScreenNoImageRefreshingSample()
 
     /** Wide enough that the reading margin is not zero: the copy sits at it and the rail runs past the window's end. */
     @PreviewTest
