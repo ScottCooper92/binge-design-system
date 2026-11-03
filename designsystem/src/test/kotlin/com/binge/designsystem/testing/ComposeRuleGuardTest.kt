@@ -34,7 +34,7 @@ class ComposeRuleGuardTest {
                 .filter { it.exists() }
                 .flatMap { root -> root.walkTopDown().filter { it.isFile && it.extension == "kt" }.toList() }
                 .filter { plainRule.containsMatchIn(it.readText()) }
-                .map { it.relativeTo(repoRoot).path }
+                .map { it.relativeTo(repoRoot).invariantSeparatorsPath }
                 .filter { it !in allowed }
 
         assertTrue(
