@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,9 +35,18 @@ import org.robolectric.annotation.Config
 class BingeAdaptiveSheetRecreationTest {
     private var write: (Int) -> Unit = {}
     private var seen = 0
+    private var opened: ActivityController<ComponentActivity>? = null
+
+    @After
+    fun tearDown() {
+        opened?.destroy()
+        shadowOf(Looper.getMainLooper()).idle()
+        opened = null
+    }
 
     private fun open(sheet: @Composable (@Composable () -> Unit) -> Unit): ActivityController<ComponentActivity> {
         val controller = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+        opened = controller
         show(controller, sheet)
         return controller
     }
