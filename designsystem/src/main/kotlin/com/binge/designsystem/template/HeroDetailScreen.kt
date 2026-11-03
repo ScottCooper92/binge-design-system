@@ -178,20 +178,13 @@ fun HeroDetailLazyScreen(
     content: LazyListScope.() -> Unit,
 ) {
     val measured = rememberMeasuredHeroHeight()
+    val bottomInset = if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         HeroDetailPull(onRefresh, isRefreshing, pullState) {
             ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize().then(
-                        if (footer ==
-                            null
-                        ) {
-                            Modifier.windowInsetsPadding(pageBottomInset())
-                        } else {
-                            Modifier
-                        },
-                    ),
+                    modifier = Modifier.fillMaxSize().then(bottomInset),
                     contentPadding = contentPadding,
                     verticalArrangement = verticalArrangement,
                     horizontalAlignment = horizontalAlignment,

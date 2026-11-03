@@ -73,6 +73,31 @@ class HeroDetailScreenTest {
     }
 
     @Test
+    fun `a lazy page with no onRefresh lays out exactly as one with a pull`() {
+        fun lazyPage(onRefresh: (() -> Unit)?) =
+            rule.setContent {
+                BingeExpressiveTheme {
+                    HeroDetailLazyScreen(
+                        title = "Title",
+                        onBack = null,
+                        onRefresh = onRefresh,
+                        isRefreshing = onRefresh != null,
+                        hero = { Box(Modifier.height(HERO)) },
+                    ) {
+                        item { Text("Short") }
+                    }
+                }
+            }
+        lazyPage(onRefresh = null)
+        val without = rule.onNodeWithText("Short").getBoundsInRoot()
+
+        rule.activityRule.scenario.recreate()
+        lazyPage(onRefresh = {})
+
+        assertEquals(without, rule.onNodeWithText("Short").getBoundsInRoot())
+    }
+
+    @Test
     fun `an unbounded page starts a narrow section at its edge, not in the middle`() {
         page(contentMaxWidth = Dp.Infinity)
 
