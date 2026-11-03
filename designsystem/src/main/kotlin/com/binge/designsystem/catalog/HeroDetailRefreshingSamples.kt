@@ -59,7 +59,7 @@ fun HeroDetailScreenRefreshingSample() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HeroDetailScreenNoImageRefreshingSample(pullIndicator: HeroPullIndicator = HeroPullIndicator.InBar) {
+fun HeroDetailScreenNoImageRefreshingSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         HeroDetailScreen(
             title = "Joe Performer",
@@ -67,7 +67,7 @@ fun HeroDetailScreenNoImageRefreshingSample(pullIndicator: HeroPullIndicator = H
             onRefresh = {},
             isRefreshing = true,
             pullState = RestingAtThreshold,
-            pullIndicator = pullIndicator,
+            pullIndicator = HeroPullIndicator.InBar,
             hero = {
                 Spacer(
                     Modifier
