@@ -174,8 +174,11 @@ private class SheetPageContent(
 )
 
 @Composable
-private fun rememberSheetPageContent(root: String, content: @Composable ColumnScope.(BingeSheetNav) -> Unit): SheetPageContent {
-    // A new root starts a new stack, so pages left over from the old one must not be restored into it.
+private fun rememberSheetPageContent(
+    root: String,
+    content: @Composable ColumnScope.(BingeSheetNav) -> Unit,
+): SheetPageContent {
+    // A new root resets the page stack, so the pages' saved state goes with it and a later push starts fresh.
     val saveableState = key(root) { rememberSaveableStateHolder() }
     val latest = rememberUpdatedState(content)
     val movable =
