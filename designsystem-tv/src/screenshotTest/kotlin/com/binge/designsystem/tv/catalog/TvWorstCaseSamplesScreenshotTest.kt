@@ -45,6 +45,11 @@ class TvWorstCaseSamplesScreenshotTest {
     @PreviewTest
     @TvWorstCaseFontPreviews
     @Composable
+    fun listPaneBoardSaveFailed() = Frame { TvListPaneBoardSaveFailedWorstCaseSample() }
+
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
     fun hubFailedRow() = Frame { TvHubFailedRowWorstCaseSample() }
 
     @PreviewTest

@@ -30,6 +30,21 @@ class TvListPaneSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun saveStatusSaving() = Frame { TvListPaneBoardSavingSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun saveStatusFailed() = Frame { TvListPaneBoardSaveFailedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun saveStatusRefused() = Frame { TvListPaneBoardSaveRefusedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun filterBoard() = Frame { TvListPaneFilterBoardSample() }
 
     @PreviewTest

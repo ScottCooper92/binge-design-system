@@ -31,10 +31,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
+import com.binge.designsystem.tv.component.TvSaveStatus
 import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.focus.tvLazyFocusGroup
@@ -178,6 +180,10 @@ internal fun TvListPane(
                 }
                 row.note?.let { note ->
                     item(key = "note") { PaneNote(note = note, announce = row.announceNote, modifier = Modifier.padding(top = sectionGap)) }
+                }
+                // Last, so its arrival moves nothing above it. Idle draws nothing, so the item is only added once there is a status.
+                if (row.saveStatus != SaveStatus.Idle) {
+                    item(key = "save-status") { TvSaveStatus(row.saveStatus, row.onRetry, Modifier.padding(top = sectionGap)) }
                 }
             }
         }
