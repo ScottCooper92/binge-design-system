@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,14 @@ import java.time.Duration
 class BingeAdaptiveSheetRecreationTest {
     private var write: (Int) -> Unit = {}
     private var seen = 0
+    private var opened: ActivityController<ComponentActivity>? = null
+
+    @After
+    fun tearDown() {
+        opened?.destroy()
+        shadowOf(Looper.getMainLooper()).idle()
+        opened = null
+    }
 
     /** Frames run on the Choreographer, whose pace another test in the module may have changed; give them time rather than a bare idle. */
     private fun settle() {
@@ -46,6 +55,7 @@ class BingeAdaptiveSheetRecreationTest {
 
     private fun open(sheet: @Composable (@Composable () -> Unit) -> Unit): ActivityController<ComponentActivity> {
         val controller = Robolectric.buildActivity(ComponentActivity::class.java).setup()
+        opened = controller
         show(controller, sheet)
         return controller
     }
