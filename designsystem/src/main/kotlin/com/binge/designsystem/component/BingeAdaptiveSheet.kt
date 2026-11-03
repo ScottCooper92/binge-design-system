@@ -19,9 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.key
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -106,9 +111,17 @@ fun BingeAdaptiveSheet(
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
     val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
+    val pageContent = rememberSheetPageContent(root, content)
     val popPage: () -> Unit = {
-        if (pages.size > 1) onPageBack(pages.removeAt(pages.lastIndex)) else onDismissRequest()
+        if (pages.size > 1) {
+            val popped = pages.removeAt(pages.lastIndex)
+            pageContent.drop(popped)
+            onPageBack(popped)
+        } else {
+            onDismissRequest()
+        }
     }
+    val hosted = pageContent.hosted
     if (kind == BingeSheetKind.Task && isExpandedLayout()) {
         BingeTaskSideSheet(
             pages = pages,
@@ -118,7 +131,7 @@ fun BingeAdaptiveSheet(
             scrimDismisses = dismissOnClickOutside,
             backLabel = backLabel,
             modifier = modifier,
-            content = content,
+            content = hosted,
         )
     } else {
         // A stack carried over from the side sheet (a fold, a rotation) keeps its top page here. The bottom sheet opens no
@@ -142,9 +155,41 @@ fun BingeAdaptiveSheet(
         ) {
             val wash = rememberBingeSheetWash()
             CompositionLocalProvider(LocalBingeSheetWash provides wash) {
-                Column(modifier = Modifier.fillMaxWidth().bingeSheetWashBehind(wash, overdrawTop = true)) { content(nav) }
+                Column(modifier = Modifier.fillMaxWidth().bingeSheetWashBehind(wash, overdrawTop = true)) { hosted(nav) }
             }
         }
+    }
+}
+
+/**
+ * Draws a sheet's pages so one survives the sheet turning from a bottom sheet into a side sheet or back (a rotation, a fold;
+ * jellyfin#301). The two draw in different windows, so a `rememberSaveable` in the content has a different positional key in
+ * each and is not found again after the activity is recreated. A [movableContentOf] made above both composes the
+ * pages under the same key wherever they are shown, and a [SaveableStateHolder] keeps each page's saved state.
+ */
+@Stable
+private class SheetPageContent(
+    val hosted: @Composable ColumnScope.(BingeSheetNav) -> Unit,
+    val drop: (page: String) -> Unit,
+)
+
+@Composable
+private fun rememberSheetPageContent(root: String, content: @Composable ColumnScope.(BingeSheetNav) -> Unit): SheetPageContent {
+    // A new root resets the page stack, so the pages' saved state goes with it and a later push starts fresh.
+    val saveableState = key(root) { rememberSaveableStateHolder() }
+    val latest = rememberUpdatedState(content)
+    val movable =
+        remember(saveableState) {
+            movableContentOf<ColumnScope, BingeSheetNav> { scope, nav ->
+                val body = latest.value
+                key(nav.page) { saveableState.SaveableStateProvider(nav.page) { with(scope) { body(nav) } } }
+            }
+        }
+    return remember(saveableState) {
+        SheetPageContent(
+            hosted = { nav -> movable(this, nav) },
+            drop = { page -> saveableState.removeState(page) },
+        )
     }
 }
 
