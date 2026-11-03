@@ -75,7 +75,8 @@ private const val DEFAULT_COLUMNS = 6
  * @param seededIndex draws that cell's ring whenever no cell holds the ring, on a plate too, for a hold in front of the grid
  * that has focus while the cells load. The caller clears it when its hold ends. It applies to the default skeleton, to
  * [inPlace] plates and cells, and to a plain [cell]; a custom [loading] slot draws its own. Real focus takes over as soon
- * as a cell has it.
+ * as a cell has it. An in-place seed also keeps cells composed up to its index, as real focus does, so a seed past the
+ * items draws plates until the caller clears it. The default skeleton has two rows, so a seed past two rows rings nothing.
  * @param inPlace opts into one grid for loading and cells, drawing plates in the cells loading uses, so focus on a plate
  * stays on the cell the item arrives in. [loading], [pendingCell] and [cell] are unused then. A message is not drawn in place: [message]
  * takes the pane, and the entry plate leaves with the grid.

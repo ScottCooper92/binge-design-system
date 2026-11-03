@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.template
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,9 +19,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.zIndex
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.modifier.describedAs
@@ -286,15 +287,25 @@ internal fun TvImmersiveGridSkeleton(
     modifier: Modifier = Modifier,
     seededIndex: Int? = null,
 ) {
+    // The rows are measured without the pane's height and clipped at its edge, so each keeps its own 2:3 height and the gap
+    // between them shows, rather than the second being squeezed into whatever the first left and drawn over it.
+    Box(modifier = modifier.fillMaxSize().clipToBounds()) {
+        SkeletonRows(columns, contentPadding, seededIndex)
+    }
+}
+
+@Composable
+private fun SkeletonRows(
+    columns: Int,
+    contentPadding: PaddingValues,
+    seededIndex: Int?,
+) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(contentPadding),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight(align = Alignment.Top, unbounded = true).padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_grid_row_gap)),
     ) {
         repeat(GRID_SKELETON_ROWS) { row ->
-            // The seeded row draws over the rows after it, so a later row's block cannot cover the ring's bottom edge.
-            val holdsSeed = seededIndex != null && seededIndex / columns == row
             Row(
-                modifier = if (holdsSeed) Modifier.zIndex(1f) else Modifier,
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
             ) {
                 repeat(columns) { column ->
