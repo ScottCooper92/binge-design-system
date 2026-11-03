@@ -46,6 +46,32 @@ class HeroDetailScreenTest {
         }
     }
 
+    private fun refreshablePage(onRefresh: (() -> Unit)?, isRefreshing: Boolean = false) =
+        rule.setContent {
+            BingeExpressiveTheme {
+                HeroDetailScreen(
+                    title = "Title",
+                    onBack = null,
+                    onRefresh = onRefresh,
+                    isRefreshing = isRefreshing,
+                    hero = { Box(Modifier.height(HERO)) },
+                ) {
+                    Text("Short")
+                }
+            }
+        }
+
+    @Test
+    fun `a page with no onRefresh lays out exactly as one with a pull`() {
+        refreshablePage(onRefresh = null)
+        val without = rule.onNodeWithText("Short").getBoundsInRoot()
+
+        rule.activityRule.scenario.recreate()
+        refreshablePage(onRefresh = {}, isRefreshing = true)
+
+        assertEquals(without, rule.onNodeWithText("Short").getBoundsInRoot())
+    }
+
     @Test
     fun `an unbounded page starts a narrow section at its edge, not in the middle`() {
         page(contentMaxWidth = Dp.Infinity)

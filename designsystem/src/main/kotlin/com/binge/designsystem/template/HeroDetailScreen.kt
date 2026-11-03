@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
@@ -26,9 +27,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -41,6 +45,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingePullToRefresh
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.DarkStatusBarEffect
 import com.binge.designsystem.component.DetailOverlayTopBar
@@ -60,10 +65,12 @@ import com.binge.designsystem.paneSideInsets
  * [footer] sits below the scroll rather than over it, so the scroll always clears it. It reaches the true
  * edge of the window, so it clears the navigation bar and a side cutout itself, by
  * [com.binge.designsystem.bottomBarInsets], as [ScreenFooter] does. [inFlight] draws a thin
- * bar under the top bar without reflowing the page. [onBack] is dropped in a pane whose list already offers it.
+ * bar under the top bar without reflowing the page. A non-null [onRefresh] lets the page be pulled down to reload, with
+ * [isRefreshing] showing the spinner under the bar; `null`, the default, adds no pull. [onBack] is dropped in a pane whose list already offers it.
  * The hero runs full-bleed; [content] centres at [contentMaxWidth] on a wide window. A page whose rails bleed to the
  * edge passes `Dp.Infinity`: [content] then fills the width, and pads each section by [LocalHeroReadingMargin].
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeroDetailScreen(
     title: String,
@@ -76,6 +83,9 @@ fun HeroDetailScreen(
     contentMaxWidth: Dp = dimensionResource(R.dimen.content_max_width),
     darkStatusBar: Boolean = true,
     inFlight: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+    isRefreshing: Boolean = false,
+    pullState: PullToRefreshState? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     footer: (@Composable () -> Unit)? = null,
     hero: @Composable () -> Unit,
@@ -83,15 +93,17 @@ fun HeroDetailScreen(
 ) {
     val measured = rememberMeasuredHeroHeight()
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
-        ) {
-            MeasuredHero(measured, hero)
-            HeroDetailContent(contentMaxWidth, content)
+        HeroDetailPull(onRefresh, isRefreshing, pullState) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
+            ) {
+                MeasuredHero(measured, hero)
+                HeroDetailContent(contentMaxWidth, content)
+            }
         }
         HeroDetailBar(title, onBack, measured.height(heroHeight), horizontalInset, inFlight, actions) { scrollState.value.toFloat() }
     }
@@ -142,6 +154,7 @@ private fun ProvideHeroReadingMargin(modifier: Modifier, content: @Composable ()
  * capped and centred on a wide window, a gap under the last one. Its items read [LocalHeroReadingMargin] as an
  * eager page's sections do, measured inside the page.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeroDetailLazyScreen(
     title: String,
@@ -153,6 +166,9 @@ fun HeroDetailLazyScreen(
     horizontalInset: Dp = dimensionResource(R.dimen.padding_m),
     darkStatusBar: Boolean = true,
     inFlight: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+    isRefreshing: Boolean = false,
+    pullState: PullToRefreshState? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     footer: (@Composable () -> Unit)? = null,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -163,16 +179,26 @@ fun HeroDetailLazyScreen(
 ) {
     val measured = rememberMeasuredHeroHeight()
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
-        ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize().then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
-                contentPadding = contentPadding,
-                verticalArrangement = verticalArrangement,
-                horizontalAlignment = horizontalAlignment,
-            ) {
-                item(key = HERO_ITEM_KEY) { MeasuredHero(measured, hero) }
-                content()
+        HeroDetailPull(onRefresh, isRefreshing, pullState) {
+            ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize().then(
+                        if (footer ==
+                            null
+                        ) {
+                            Modifier.windowInsetsPadding(pageBottomInset())
+                        } else {
+                            Modifier
+                        },
+                    ),
+                    contentPadding = contentPadding,
+                    verticalArrangement = verticalArrangement,
+                    horizontalAlignment = horizontalAlignment,
+                ) {
+                    item(key = HERO_ITEM_KEY) { MeasuredHero(measured, hero) }
+                    content()
+                }
             }
         }
         HeroDetailBar(title, onBack, measured.height(heroHeight), horizontalInset, inFlight, actions) {
@@ -207,6 +233,38 @@ fun HeroDetailStateScreen(
             actions = {},
         ) { 0f }
     }
+}
+
+/**
+ * [page] as is, or, when [onRefresh] is set, inside a pull to refresh whose spinner rests below the overlay bar, so it is
+ * neither behind the bar nor over the hero's copy. The bar stays outside, over the pulled page.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BoxScope.HeroDetailPull(
+    onRefresh: (() -> Unit)?,
+    isRefreshing: Boolean,
+    pullState: PullToRefreshState?,
+    page: @Composable BoxScope.() -> Unit,
+) {
+    if (onRefresh == null) {
+        page()
+        return
+    }
+    val barBottom =
+        WindowInsets.safeDrawing
+            .only(WindowInsetsSides.Top)
+            .asPaddingValues()
+            .calculateTopPadding() +
+            dimensionResource(R.dimen.person_profile_top_bar_offset)
+    BingePullToRefresh(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize(),
+        indicatorTopInset = barBottom,
+        state = pullState ?: rememberPullToRefreshState(),
+        content = page,
+    )
 }
 
 /** [hero], reporting its laid-out height to [measured]. */
