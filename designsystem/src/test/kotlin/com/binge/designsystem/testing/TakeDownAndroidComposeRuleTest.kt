@@ -1,7 +1,6 @@
 package com.binge.designsystem.testing
 
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
@@ -15,8 +14,8 @@ import org.robolectric.annotation.Config
 
 /**
  * The take-down Android rule hands out the scenario, so a test can recreate its activity with `scenario.recreate()` and needs no
- * wrapper of its own. A recreated activity has no content; the test sets it again through the scenario, and the rule still takes
- * that content down when the test ends.
+ * wrapper of its own. A recreated activity has no content; the test sets it again with the rule's own `setContent`, so the rule still
+ * takes that content down when the test ends.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
@@ -39,8 +38,7 @@ class TakeDownAndroidComposeRuleTest {
         val first = rule.activity
 
         rule.scenario.recreate()
-        rule.scenario.onActivity { it.setContent { Text("after") } }
-        rule.waitForIdle()
+        rule.setContent { Text("after") }
 
         assertNotSame(first, rule.activity)
         rule.onNodeWithText("after").assertIsDisplayed()

@@ -45,7 +45,9 @@ class TakeDownAndroidComposeRule<A : ComponentActivity>(
 
     /**
      * The scenario hosting [activity], for a test that recreates it (`scenario.recreate()`). The recreated activity has no
-     * content, so a test that wants some sets it again with `scenario.onActivity { it.setContent { … } }`.
+     * content, so a test that wants some calls the rule's own `setContent { … }` again, which the take-down covers. Content
+     * set straight on the activity (`scenario.onActivity { it.setContent { … } }`) never reads the take-down, so it is still
+     * composed when the rule disposes.
      */
     val scenario: ActivityScenario<A> get() = rule.activityRule.scenario
 }
