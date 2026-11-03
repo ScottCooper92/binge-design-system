@@ -9,6 +9,8 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.test.core.app.ActivityScenario
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
@@ -37,9 +39,17 @@ inline fun <reified A : ComponentActivity> createTakeDownKeyboardAndroidComposeR
 
 /** An activity-hosted compose rule whose content is taken down before it disposes; see [createTakeDownComposeRule]. */
 class TakeDownAndroidComposeRule<A : ComponentActivity>(
-    private val rule: AndroidComposeTestRule<*, A>,
+    private val rule: AndroidComposeTestRule<ActivityScenarioRule<A>, A>,
 ) : ComposeContentTestRule by TakeDownComposeRule(rule) {
     val activity: A get() = rule.activity
+
+    /**
+     * The scenario hosting [activity], for a test that recreates it (`scenario.recreate()`). The recreated activity has no
+     * content, so a test that wants some calls the rule's own `setContent { … }` again, which the take-down covers. Content
+     * set straight on the activity (`scenario.onActivity { it.setContent { … } }`) never reads the take-down, so it is still
+     * composed when the rule disposes.
+     */
+    val scenario: ActivityScenario<A> get() = rule.activityRule.scenario
 }
 
 /** Wraps [rule] so its content is removed, and the looper drained, before the rule disposes it. */

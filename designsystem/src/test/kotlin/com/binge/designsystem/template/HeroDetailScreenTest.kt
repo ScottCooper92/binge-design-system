@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createTakeDownAndroidComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], qualifiers = "w1000dp-h800dp")
 class HeroDetailScreenTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createTakeDownAndroidComposeRule<ComponentActivity>()
 
     private fun page(
         contentMaxWidth: Dp,
@@ -66,7 +66,7 @@ class HeroDetailScreenTest {
         refreshablePage(onRefresh = null)
         val without = rule.onNodeWithText("Short").getBoundsInRoot()
 
-        rule.activityRule.scenario.recreate()
+        rule.scenario.recreate()
         refreshablePage(onRefresh = {}, isRefreshing = true)
 
         assertEquals(without, rule.onNodeWithText("Short").getBoundsInRoot())
@@ -91,7 +91,7 @@ class HeroDetailScreenTest {
         lazyPage(onRefresh = null)
         val without = rule.onNodeWithText("Short").getBoundsInRoot()
 
-        rule.activityRule.scenario.recreate()
+        rule.scenario.recreate()
         lazyPage(onRefresh = {})
 
         assertEquals(without, rule.onNodeWithText("Short").getBoundsInRoot())
