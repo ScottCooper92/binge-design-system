@@ -14,7 +14,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -36,7 +36,7 @@ private const val TOLERANCE = 0.5f
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvSideSheetEdgeAndTrailingTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `the trailing slot follows the row's focus`() {

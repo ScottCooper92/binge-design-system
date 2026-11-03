@@ -1,7 +1,7 @@
 package com.binge.designsystem.tv.theme
 
 import android.app.Application
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class BingeTvThemeDarkTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `BingeTheme isDark is true under BingeTvTheme`() {

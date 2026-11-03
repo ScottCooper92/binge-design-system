@@ -9,7 +9,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.onNodeWithText
 import com.binge.designsystem.testing.ShadowMeshSpecification
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -30,7 +30,7 @@ private const val SYNOPSIS = "A spice war on a desert world."
 )
 class TvDetailHeroSemanticsTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `a pressable synopsis announces as a button`() {

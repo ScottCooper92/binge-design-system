@@ -9,7 +9,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -28,7 +28,7 @@ private const val ADDRESS = "Not encrypted · http://living-room-media-server.lo
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvOptionRowSupportingLinesTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `a supporting line given two lines wraps, and one left at the default stays on one`() {

@@ -5,9 +5,9 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +27,7 @@ private const val ACCOUNT = "Account"
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w411dp-h891dp-xhdpi")
 class NavSuiteItemSemanticsTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     private fun render(
         presentation: BingeNavPresentation,

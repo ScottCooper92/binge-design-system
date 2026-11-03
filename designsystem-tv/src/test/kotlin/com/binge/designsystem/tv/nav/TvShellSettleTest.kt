@@ -2,7 +2,7 @@ package com.binge.designsystem.tv.nav
 
 import android.app.Application
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.createComposeRule
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -18,7 +18,7 @@ private const val SEARCH = "search"
 @Config(sdk = [34], application = Application::class)
 class TvShellSettleTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `it starts on the key it is given`() {

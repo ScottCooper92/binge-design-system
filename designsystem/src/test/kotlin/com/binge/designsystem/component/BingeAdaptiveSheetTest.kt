@@ -20,12 +20,12 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import com.binge.designsystem.R
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -50,7 +50,7 @@ private const val SCRIM_TOUCH_FRACTION = 0.1f
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w900dp-h900dp")
 class BingeAdaptiveSheetExpandedTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private var dismissals = 0
     private val leftPages = mutableListOf<String>()
@@ -250,7 +250,7 @@ class BingeAdaptiveSheetExpandedTest {
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w412dp-h900dp")
 class BingeAdaptiveSheetCompactTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private var stacks: Boolean? = null
 
@@ -283,7 +283,7 @@ class BingeAdaptiveSheetCompactTest {
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w900dp-h900dp")
 class BingeAdaptiveSheetResizeTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `a pushed page survives the window narrowing and widening`() {

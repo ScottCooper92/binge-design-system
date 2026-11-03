@@ -14,12 +14,12 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -45,7 +45,7 @@ private const val TOLERANCE = 0.5f
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvSideSheetRowsRingTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `the first and last rings show in full`() = checkRings(fontScale = 1f)

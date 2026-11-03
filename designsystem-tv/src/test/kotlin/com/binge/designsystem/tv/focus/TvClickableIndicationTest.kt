@@ -13,7 +13,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -35,7 +35,7 @@ private val Backdrop = Color(0xFF336699)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class TvClickableIndicationTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `a focused tvClickable leaves its bounds unpainted`() {

@@ -1,8 +1,8 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,7 +19,7 @@ private const val FAILED = "Couldn't save your change"
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w400dp-h800dp")
 class FormScreenSaveFailedSampleTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `the live sample shows the failure once`() {

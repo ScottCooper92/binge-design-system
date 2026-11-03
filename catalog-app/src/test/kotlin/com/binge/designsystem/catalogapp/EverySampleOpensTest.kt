@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.binge.designsystem.catalogapp.overrides.FontScalePresets
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.overrides.WithOverrides
@@ -17,6 +16,7 @@ import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.CatalogRegistry
 import com.binge.designsystem.catalogapp.registry.TvCatalogRegistry
 import com.binge.designsystem.catalogapp.registry.components
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -35,7 +35,7 @@ import org.robolectric.annotation.Config
 @Config(qualifiers = "w411dp-h900dp-xxhdpi")
 class EverySampleOpensTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private var index by mutableIntStateOf(0)
 

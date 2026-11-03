@@ -10,7 +10,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -34,7 +34,7 @@ private const val LIST_TAG = "rows"
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w400dp-h800dp")
 class FilteredListScreenTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `a hoisted scroll behaviour is driven by the page's scroll`() {

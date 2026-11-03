@@ -31,7 +31,7 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.testing.LeanbackRule
 import com.binge.designsystem.tv.testing.settle
@@ -66,7 +66,7 @@ class TvImmersiveGridStateTest {
     val leanback = LeanbackRule()
 
     @get:Rule(order = 1)
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     private lateinit var focusManager: FocusManager
     private var content by mutableStateOf(cells(firstId = 0))

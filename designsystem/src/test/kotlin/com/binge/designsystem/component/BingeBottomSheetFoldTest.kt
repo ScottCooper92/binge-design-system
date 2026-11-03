@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -15,6 +14,7 @@ import androidx.window.layout.FoldingFeature
 import androidx.window.testing.layout.TestWindowLayoutInfo
 import androidx.window.testing.layout.WindowLayoutInfoPublisherRule
 import com.binge.designsystem.rememberFoldSafeBottomHeight
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -41,7 +41,7 @@ import androidx.window.testing.layout.FoldingFeature as posedFold
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w800dp-h1000dp-xhdpi")
 class BingeBottomSheetFoldTest {
     private val publisher = WindowLayoutInfoPublisherRule()
-    private val compose = createComposeRule()
+    private val compose = createTakeDownComposeRule()
 
     @get:Rule
     val rules: RuleChain = RuleChain.outerRule(publisher).around(compose)

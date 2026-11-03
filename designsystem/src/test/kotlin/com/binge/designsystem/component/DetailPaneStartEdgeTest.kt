@@ -11,13 +11,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.R
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,7 @@ private const val TOLERANCE = 1f
 @Config(sdk = [34], application = android.app.Application::class)
 class DetailPaneStartEdgeTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private var innerEdge by mutableStateOf<PaneEdge?>(null)
 

@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Dp
@@ -29,6 +28,7 @@ import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -55,7 +55,7 @@ private val Cutout = 32.dp
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeScreenScaffoldSideInsetsTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `a header's chip row does not add the side inset the scaffold already padded`() {

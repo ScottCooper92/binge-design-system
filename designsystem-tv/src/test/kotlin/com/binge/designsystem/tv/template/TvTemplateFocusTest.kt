@@ -25,7 +25,7 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.template.ScreenAction
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.focus.TV_FOCUS_SINK_TAG
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
@@ -55,7 +55,7 @@ private const val OVERFLOW_ROWS = 12
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvTemplateFocusTest {
     @get:Rule
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `an overlay page claims arrival on its entry target`() {

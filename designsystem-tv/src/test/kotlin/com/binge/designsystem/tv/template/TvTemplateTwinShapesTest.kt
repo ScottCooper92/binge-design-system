@@ -10,7 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.tv.material3.Text
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.template.ScreenAction
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -26,7 +26,7 @@ private val Copy = DecisionCopy(title = "Title", subtitle = "Subtitle")
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvTemplateTwinShapesTest {
     @get:Rule
-    val rule = createKeyboardComposeRule()
+    val rule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `a decision's answers are the phone's actions, modifier and callback included`() {

@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.getBoundsInRoot
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -13,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.R
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +31,7 @@ private val Cutout = 40.dp
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w800dp-h400dp")
 class BingeMediumTopBarSideInsetsTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `a side cutout moves the back button in by the cutout's width`() {

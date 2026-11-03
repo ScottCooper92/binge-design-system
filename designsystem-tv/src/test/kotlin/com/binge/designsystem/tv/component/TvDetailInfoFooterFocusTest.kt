@@ -17,7 +17,7 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.testing.createKeyboardComposeRule
+import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.template.TvDetailPage
 import com.binge.designsystem.tv.testing.LeanbackRule
@@ -49,7 +49,7 @@ class TvDetailInfoFooterFocusTest {
     val leanback = LeanbackRule()
 
     @get:Rule(order = 1)
-    val composeTestRule = createKeyboardComposeRule()
+    val composeTestRule = createTakeDownKeyboardComposeRule()
 
     @Test
     fun `down from the row above lands on the footer as one focus stop`() {

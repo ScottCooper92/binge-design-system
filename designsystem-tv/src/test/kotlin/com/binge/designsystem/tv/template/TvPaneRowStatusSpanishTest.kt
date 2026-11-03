@@ -2,7 +2,7 @@ package com.binge.designsystem.tv.template
 
 import android.app.Application
 import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -17,7 +17,7 @@ private const val KEY = "companions"
 @Config(sdk = [34], application = Application::class, qualifiers = "es-w960dp-h540dp-television-xhdpi")
 class TvPaneRowStatusSpanishTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createTakeDownComposeRule()
 
     @Test
     fun `a count of one takes the singular`() {

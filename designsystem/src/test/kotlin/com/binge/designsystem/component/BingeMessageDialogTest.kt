@@ -3,9 +3,9 @@ package com.binge.designsystem.component
 import androidx.activity.ComponentDialog
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.hasScrollAction
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -21,7 +21,7 @@ import org.robolectric.shadows.ShadowDialog
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeMessageDialogTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private var dismissed = 0
 

@@ -1,10 +1,10 @@
 package com.binge.designsystem
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -16,7 +16,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34], application = android.app.Application::class)
 class ResolvedContentPaddingVerticalTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     private fun padding(read: @androidx.compose.runtime.Composable () -> PaddingValues): PaddingValues {
         lateinit var result: PaddingValues
