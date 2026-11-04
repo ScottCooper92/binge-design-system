@@ -1,12 +1,16 @@
 package com.binge.designsystem.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -45,16 +49,14 @@ enum class BingeSheetKind { Task, Menu }
 /**
  * A [BingeAdaptiveSheet]'s handle: which [page] is showing, and how to open another over it or go back.
  *
- * Pages stack only where the sheet is a side sheet ([stacksPages]). Below the expanded width the sheet is the bottom
- * sheet it always was, and [push] does nothing: a caller there opens whatever it opened before, so a compact window does
- * not change. A caller that opens something from a task sheet therefore asks [stacksPages] first.
+ * Task sheets stack pages at every width ([stacksPages]). Menus stay a single page, so [push] does nothing for a menu.
  */
 @Stable
 class BingeSheetNav internal constructor(
     val page: String,
     /** How many pages are open, the root being one. */
     val depth: Int,
-    /** Whether [push] opens a page inside the sheet. False for a bottom sheet and for every menu. */
+    /** Whether [push] opens a page inside the sheet. False for every menu. */
     val stacksPages: Boolean,
     private val onPush: (page: String) -> Unit,
     private val onBack: () -> Unit,
@@ -76,7 +78,8 @@ class BingeSheetNav internal constructor(
  *   [BingeSheetNav.push] opens stacked inside it: a sheet opened from a task sheet is a page with a Back, never a second
  *   sheet. System Back goes back a page, and from the root closes the sheet. A tap on the scrim closes it outright.
  * - [BingeSheetKind.Task] below that width, and [BingeSheetKind.Menu] at every width, is [BingeBottomSheet], with the
- *   same capped width, insets and keyboard handling as before.
+ *   same capped width, insets and keyboard handling as before. A compact task sheet stacks pages too: Back closes the
+ *   keyboard first, then steps back a page, and closes the sheet from its root.
  *
  * [content] draws the page named by [BingeSheetNav.page]; what a page shows is the caller's to read from its own state,
  * and no page opens another of the same name. [skipPartiallyExpanded], [gesturesEnabled], [dismissOnClickOutside],
@@ -89,12 +92,13 @@ class BingeSheetNav internal constructor(
  * form has no Back bar, so a caller draws its own back row there.
  *
  * The page stack is saved and shared by both forms, so a rotation or a fold keeps the sheet on the page it was on. If the
- * window narrows with pages open, the bottom sheet shows the top one; it opens no more, a drag or system Back closes it
- * outright, and [BingeSheetNav.pop] steps back through the rest. A caller whose pages are backed by its own state (a view
+ * window narrows with pages open, the bottom sheet shows the top one and keeps the same navigation. A scrim tap or drag
+ * closes the whole bottom sheet, while system Back and [BingeSheetNav.pop] step back through its pages. A caller whose pages are backed by its own state (a view
  * model that holds the draft a page edits) hears every page left by Back, by the Back bar, by the system or by
  * [BingeSheetNav.pop], through [onPageBack], and can drop that page's state there. It is not called for the sheet closing,
  * which is [onDismissRequest]; the caller drops whatever pages remain then.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BingeAdaptiveSheet(
     kind: BingeSheetKind,
@@ -134,14 +138,12 @@ fun BingeAdaptiveSheet(
             content = hosted,
         )
     } else {
-        // A stack carried over from the side sheet (a fold, a rotation) keeps its top page here. The bottom sheet opens no
-        // more pages; a drag or system Back closes it outright, and only nav.pop() steps back through what is left.
         val nav =
             BingeSheetNav(
                 page = pages.last(),
                 depth = pages.size,
-                stacksPages = false,
-                onPush = {},
+                stacksPages = kind == BingeSheetKind.Task,
+                onPush = { page -> if (kind == BingeSheetKind.Task) pages.add(page) },
                 onBack = popPage,
             )
         BingeBottomSheet(
@@ -153,6 +155,9 @@ fun BingeAdaptiveSheet(
             dockable = dockable,
             edgeToEdge = edgeToEdge,
         ) {
+            val imeVisible = WindowInsets.isImeVisible
+            // This handler is inside the modal window. While the keyboard is up the bottom sheet's IME handler owns Back.
+            BackHandler(enabled = kind == BingeSheetKind.Task && pages.size > 1 && gesturesEnabled && !imeVisible) { popPage() }
             val wash = rememberBingeSheetWash()
             CompositionLocalProvider(LocalBingeSheetWash provides wash) {
                 Column(modifier = Modifier.fillMaxWidth().bingeSheetWashBehind(wash, overdrawTop = true)) { hosted(nav) }
