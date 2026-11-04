@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -33,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -58,6 +59,8 @@ class BingeSheetNav internal constructor(
     val depth: Int,
     /** Whether [push] opens a page inside the sheet. False for every menu. */
     val stacksPages: Boolean,
+    /** Whether the sheet is the side sheet, which has no drag handle. Not the same as [stacksPages]: a compact task sheet stacks pages too. */
+    internal val inSideSheet: Boolean,
     private val onPush: (page: String) -> Unit,
     private val onBack: () -> Unit,
 ) {
@@ -143,6 +146,7 @@ fun BingeAdaptiveSheet(
                 page = pages.last(),
                 depth = pages.size,
                 stacksPages = kind == BingeSheetKind.Task,
+                inSideSheet = false,
                 onPush = { page -> if (kind == BingeSheetKind.Task) pages.add(page) },
                 onBack = popPage,
             )
@@ -155,7 +159,8 @@ fun BingeAdaptiveSheet(
             dockable = dockable,
             edgeToEdge = edgeToEdge,
         ) {
-            val imeVisible = WindowInsets.isImeVisible
+            // The same reading as HideImeOnBack, so exactly one of the two handles Back.
+            val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
             // This handler is inside the modal window. While the keyboard is up the bottom sheet's IME handler owns Back.
             BackHandler(enabled = kind == BingeSheetKind.Task && pages.size > 1 && gesturesEnabled && !imeVisible) { popPage() }
             val wash = rememberBingeSheetWash()
@@ -262,6 +267,7 @@ fun BingeTaskSheetPanel(
                         page = pages.last(),
                         depth = pages.size,
                         stacksPages = true,
+                        inSideSheet = true,
                         onPush = onPush,
                         onBack = onBack,
                     )
