@@ -4,6 +4,7 @@
 
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.BingeScreenScaffold
 import com.binge.designsystem.template.ScreenBar
 
@@ -19,10 +21,12 @@ import com.binge.designsystem.template.ScreenBar
 @Composable
 fun TitleLongPressDemo() {
     var presses by rememberSaveable { mutableIntStateOf(0) }
-    BingeScreenScaffold(
-        title = "Long-press this title",
-        bar = ScreenBar.Small,
-        onTitleLongClick = { presses++ },
-        onTitleLongClickLabel = "Count a long press",
-    ) { padding -> Text("Long presses: $presses", Modifier.padding(padding)) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(
+            title = "Long-press this title",
+            bar = ScreenBar.Small,
+            onTitleLongClick = { presses++ },
+            onTitleLongClickLabel = "Count a long press",
+        ) { padding -> Text("Long presses: $presses", Modifier.padding(padding)) }
+    }
 }
