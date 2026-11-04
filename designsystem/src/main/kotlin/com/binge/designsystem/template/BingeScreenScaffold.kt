@@ -102,6 +102,9 @@ enum class ScreenBarChrome {
  *
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
  * floating navigation bar. Split it with [screenOuterPadding] and [screenInnerPadding], or use [ScreenBody].
+ *
+ * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
+ * Both default to absent, so existing titles keep their behaviour and appearance.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,6 +119,8 @@ fun BingeScreenScaffold(
     subtitle: String? = null,
     titleTrailing: (@Composable () -> Unit)? = null,
     header: (@Composable () -> Unit)? = null,
+    onTitleLongClick: (() -> Unit)? = null,
+    onTitleLongClickLabel: String? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     barChrome: ScreenBarChrome = ScreenBarChrome.Glass,
@@ -139,6 +144,8 @@ fun BingeScreenScaffold(
                 ScreenBar.Collapsing ->
                     BingePaneTopBar(
                         title = title,
+                        onTitleLongClick = onTitleLongClick,
+                        onTitleLongClickLabel = onTitleLongClickLabel,
                         onBack = back,
                         scrollBehavior = behavior,
                         containerColor = barColor,
@@ -149,6 +156,8 @@ fun BingeScreenScaffold(
                 ScreenBar.Small ->
                     BingeTopBar(
                         title = title,
+                        onTitleLongClick = onTitleLongClick,
+                        onTitleLongClickLabel = onTitleLongClickLabel,
                         onBack = back,
                         scrollBehavior = behavior,
                         containerColor = barColor,
@@ -159,6 +168,8 @@ fun BingeScreenScaffold(
                 ScreenBar.Large ->
                     BingeLargeTopBar(
                         title = title,
+                        onTitleLongClick = onTitleLongClick,
+                        onTitleLongClickLabel = onTitleLongClickLabel,
                         subtitle = subtitle,
                         onBack = back,
                         scrollBehavior = behavior,
