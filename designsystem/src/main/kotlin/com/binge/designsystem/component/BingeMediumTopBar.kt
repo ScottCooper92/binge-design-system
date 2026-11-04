@@ -90,6 +90,9 @@ import com.binge.designsystem.theme.BingeTheme
  * edge padding.
  *
  * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
+ *
+ * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
+ * Both default to absent, so existing titles keep their behaviour and appearance.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,6 +107,8 @@ fun BingeMediumTopBar(
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
     edgeInset: Dp = dimensionResource(R.dimen.medium_top_bar_edge_inset),
+    onTitleLongClick: (() -> Unit)? = null,
+    onTitleLongClickLabel: String? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     val transparent = containerColor == Color.Transparent
@@ -137,7 +142,11 @@ fun BingeMediumTopBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = titleColor,
-                    modifier = Modifier.padding(start = titleStartInset).semantics { heading() },
+                    modifier = Modifier
+                        .padding(
+                            start = titleStartInset,
+                        ).titleLongClick(onTitleLongClick, onTitleLongClickLabel)
+                        .semantics { heading() },
                 )
             },
             modifier = modifier.clearNavRail(),

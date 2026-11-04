@@ -63,6 +63,9 @@ fun rememberPaneTopBarScrollBehavior(): TopAppBarScrollBehavior = TopAppBarDefau
  * for an opaque bar on the app background.
  *
  * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
+ *
+ * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
+ * Both default to absent, so existing titles keep their behaviour and appearance.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +79,8 @@ fun BingePaneTopBar(
     foregroundScrimFraction: Float = scrimFraction,
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
+    onTitleLongClick: (() -> Unit)? = null,
+    onTitleLongClickLabel: String? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     if (!hasPaneBeside()) {
@@ -85,6 +90,8 @@ fun BingePaneTopBar(
         // BingeTopBar — keeps this form's seam-continuity guarantee the same as the two-row one.
         BingeMediumTopBar(
             title = title,
+            onTitleLongClick = onTitleLongClick,
+            onTitleLongClickLabel = onTitleLongClickLabel,
             modifier = modifier,
             onBack = onBack,
             scrollBehavior = scrollBehavior,
@@ -99,6 +106,8 @@ fun BingePaneTopBar(
     }
     TwoRowTopBar(
         title = title,
+        onTitleLongClick = onTitleLongClick,
+        onTitleLongClickLabel = onTitleLongClickLabel,
         modifier = modifier,
         onBack = onBack,
         scrollBehavior = scrollBehavior,
@@ -136,6 +145,8 @@ internal fun TwoRowTopBar(
     scrimColor: Color,
     scrimForegroundColor: Color,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit,
+    onTitleLongClick: (() -> Unit)? = null,
+    onTitleLongClickLabel: String? = null,
     expandedHeight: Dp = dimensionResource(R.dimen.pane_top_bar_expanded_height),
     subtitle: String? = null,
     titleTrailing: (@Composable () -> Unit)? = null,
@@ -175,7 +186,7 @@ internal fun TwoRowTopBar(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = titleColor,
-                        modifier = titleModifier,
+                        modifier = titleModifier.titleLongClick(onTitleLongClick, onTitleLongClickLabel),
                     )
                 } else {
                     // Padded rather than offset, so the control ends on the content's edge too: M3 already
@@ -195,7 +206,7 @@ internal fun TwoRowTopBar(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = titleColor,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).titleLongClick(onTitleLongClick, onTitleLongClickLabel),
                         )
                         trailing()
                     }

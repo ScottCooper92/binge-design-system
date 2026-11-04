@@ -19,6 +19,9 @@ import com.binge.designsystem.R
  * `containerColor = Color.Unspecified` for an opaque bar on the app background.
  *
  * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
+ *
+ * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
+ * Both default to absent, so existing titles keep their behaviour and appearance.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,10 +37,14 @@ fun BingeLargeTopBar(
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
     titleTrailing: (@Composable () -> Unit)? = null,
+    onTitleLongClick: (() -> Unit)? = null,
+    onTitleLongClickLabel: String? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     TwoRowTopBar(
         title = title,
+        onTitleLongClick = onTitleLongClick,
+        onTitleLongClickLabel = onTitleLongClickLabel,
         modifier = modifier,
         onBack = onBack,
         scrollBehavior = scrollBehavior,
