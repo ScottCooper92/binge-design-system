@@ -44,7 +44,7 @@ fun BingeAdaptiveSheetDemo() {
             BingeOutlinedButton(label = "Open a menu sheet", onClick = { kind = BingeSheetKind.Menu })
         }
         kind?.let { open ->
-            BingeAdaptiveSheet(kind = open, onDismissRequest = { kind = null }) { nav ->
+            BingeAdaptiveSheet(kind = open, onDismissRequest = { kind = null }, stackPagesWhenCompact = true) { nav ->
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.padding_m)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),

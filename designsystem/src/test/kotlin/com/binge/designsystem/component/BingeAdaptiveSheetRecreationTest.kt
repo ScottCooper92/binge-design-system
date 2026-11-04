@@ -146,7 +146,7 @@ class BingeAdaptiveSheetRecreationTest {
     fun `compact child and covered root page values both survive recreation`() {
         var navigation: BingeSheetNav? = null
         val sheet: @Composable (@Composable () -> Unit) -> Unit = { content ->
-            BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}) { nav ->
+            BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}, stackPagesWhenCompact = true) { nav ->
                 navigation = nav
                 if (nav.page == ROOT_PAGE) content() else SavedValue()
             }

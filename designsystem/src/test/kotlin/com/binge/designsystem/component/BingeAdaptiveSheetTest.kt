@@ -268,10 +268,15 @@ class BingeAdaptiveSheetCompactTest {
     private var stacks: Boolean? = null
     private var clearanceHeight: Int? = null
 
-    private fun show(kind: BingeSheetKind = BingeSheetKind.Task) {
+    private fun show(kind: BingeSheetKind = BingeSheetKind.Task, stackPagesWhenCompact: Boolean = true) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                BingeAdaptiveSheet(kind = kind, onDismissRequest = { dismissals++ }, onPageBack = { leftPages += it }) { nav ->
+                BingeAdaptiveSheet(
+                    kind = kind,
+                    onDismissRequest = { dismissals++ },
+                    onPageBack = { leftPages += it },
+                    stackPagesWhenCompact = stackPagesWhenCompact,
+                ) { nav ->
                     WithWindowInsets({
                         WindowInsetsCompat
                             .Builder()
@@ -343,6 +348,15 @@ class BingeAdaptiveSheetCompactTest {
     }
 
     @Test
+    fun `a compact task sheet does not stack pages unless it asks to`() {
+        show(stackPagesWhenCompact = false)
+        rule.onNodeWithText(OPEN).performClick()
+        rule.onNodeWithText(ROOT_TEXT).assertExists()
+        rule.onNodeWithText(DETAIL_TEXT).assertDoesNotExist()
+        assertEquals(false, stacks)
+    }
+
+    @Test
     fun `push still does nothing in a compact menu`() {
         show(BingeSheetKind.Menu)
         rule.onNodeWithText(OPEN).performClick()
@@ -375,7 +389,12 @@ class BingeAdaptiveSheetResizeTest {
                 }
             CompositionLocalProvider(LocalContext provides context, LocalConfiguration provides context.resources.configuration) {
                 BingeExpressiveTheme(dynamicColor = false) {
-                    BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}, onPageBack = { leftPages += it }) { nav ->
+                    BingeAdaptiveSheet(
+                        kind = BingeSheetKind.Task,
+                        onDismissRequest = {},
+                        onPageBack = { leftPages += it },
+                        stackPagesWhenCompact = true,
+                    ) { nav ->
                         stacks = nav.stacksPages
                         if (nav.page == "detail") {
                             Text(DETAIL_TEXT)

@@ -50,7 +50,8 @@ enum class BingeSheetKind { Task, Menu }
 /**
  * A [BingeAdaptiveSheet]'s handle: which [page] is showing, and how to open another over it or go back.
  *
- * Task sheets stack pages at every width ([stacksPages]). Menus stay a single page, so [push] does nothing for a menu.
+ * A task sheet stacks pages in the side sheet, and in the bottom sheet when it asks for it with `stackPagesWhenCompact`
+ * ([stacksPages]). Menus stay a single page, so [push] does nothing for a menu.
  */
 @Stable
 class BingeSheetNav internal constructor(
@@ -59,7 +60,7 @@ class BingeSheetNav internal constructor(
     val depth: Int,
     /** Whether [push] opens a page inside the sheet. False for every menu. */
     val stacksPages: Boolean,
-    /** Whether the sheet is the side sheet, which has no drag handle. Not the same as [stacksPages]: a compact task sheet stacks pages too. */
+    /** Whether the sheet is the side sheet, which has no drag handle. Not the same as [stacksPages]: a compact task sheet can stack pages too. */
     internal val inSideSheet: Boolean,
     private val onPush: (page: String) -> Unit,
     private val onBack: () -> Unit,
@@ -81,14 +82,19 @@ class BingeSheetNav internal constructor(
  *   [BingeSheetNav.push] opens stacked inside it: a sheet opened from a task sheet is a page with a Back, never a second
  *   sheet. System Back goes back a page, and from the root closes the sheet. A tap on the scrim closes it outright.
  * - [BingeSheetKind.Task] below that width, and [BingeSheetKind.Menu] at every width, is [BingeBottomSheet], with the
- *   same capped width, insets and keyboard handling as before. A compact task sheet stacks pages too: Back closes the
- *   keyboard first, then steps back a page, and closes the sheet from its root.
+ *   same capped width, insets and keyboard handling as before. It stacks pages only if [stackPagesWhenCompact] is true, so
+ *   a caller that opens its own sheet for a page at that width is not changed. When it does, Back closes the keyboard
+ *   first, then steps back a page, and closes the sheet from its root.
  *
  * [content] draws the page named by [BingeSheetNav.page]; what a page shows is the caller's to read from its own state,
  * and no page opens another of the same name. [skipPartiallyExpanded], [gesturesEnabled], [dismissOnClickOutside],
  * [dockable] and [edgeToEdge] are [BingeBottomSheet]'s and apply to its form; the side sheet has no drag, so they do not
  * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it, and [gesturesEnabled] false
  * locks it like the bottom sheet: system Back and the Back bar do nothing, so a write in flight is not walked away from.
+ *
+ * [stackPagesWhenCompact] makes a task sheet's bottom form stack pages like the side sheet. It is false by default: a caller
+ * that tests the width itself (`isExpandedLayout()`) to open a page as a second sheet would otherwise show the page twice.
+ * Turn it on only once the caller leaves that choice to the sheet. It has no effect on a menu or on the side sheet.
  *
  * [backLabel] names the page Back returns to, shown beside the arrow of a pushed page's Back bar. It is called with the page now
  * showing and returns the title of the page below it, or null for the icon-only bar. It reaches the side sheet only: the bottom
@@ -114,6 +120,7 @@ fun BingeAdaptiveSheet(
     dismissOnClickOutside: Boolean = gesturesEnabled,
     dockable: Boolean = false,
     edgeToEdge: Boolean = false,
+    stackPagesWhenCompact: Boolean = false,
     backLabel: (page: String) -> String? = { null },
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
@@ -141,13 +148,14 @@ fun BingeAdaptiveSheet(
             content = hosted,
         )
     } else {
+        val stacks = kind == BingeSheetKind.Task && stackPagesWhenCompact
         val nav =
             BingeSheetNav(
                 page = pages.last(),
                 depth = pages.size,
-                stacksPages = kind == BingeSheetKind.Task,
+                stacksPages = stacks,
                 inSideSheet = false,
-                onPush = { page -> if (kind == BingeSheetKind.Task) pages.add(page) },
+                onPush = { page -> if (stacks) pages.add(page) },
                 onBack = popPage,
             )
         BingeBottomSheet(
