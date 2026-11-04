@@ -407,4 +407,5 @@
     <dimen name="decision_landscape_points_top">48dp</dimen>
     <!-- How far a stop slider draws its first and last tick in from its edges: half its thumb. -->
     <dimen name="stop_slider_inset">10dp</dimen>
+    <dimen name="time_input_field_max_width">160dp</dimen>
 </resources>

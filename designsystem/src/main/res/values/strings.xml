@@ -156,4 +156,9 @@
     <string name="field_secret_hide">Hide the value</string>
     <string name="field_clear">Clear the value</string>
     <string name="field_required_label" translatable="false">%1$s *</string>
+    <string name="time_input_hour">Hour</string>
+    <string name="time_input_minute">Minute</string>
+    <string name="time_input_am">a.m.</string>
+    <string name="time_input_pm">p.m.</string>
+    <string name="time_input_invalid">Enter a valid time.</string>
 </resources>

@@ -139,4 +139,9 @@
     <string name="field_secret_show">Mostrar el valor</string>
     <string name="field_secret_hide">Ocultar el valor</string>
     <string name="field_clear">Borrar el valor</string>
+    <string name="time_input_hour">Hora</string>
+    <string name="time_input_minute">Minuto</string>
+    <string name="time_input_am">a. m.</string>
+    <string name="time_input_pm">p. m.</string>
+    <string name="time_input_invalid">Introduce una hora válida.</string>
 </resources>
