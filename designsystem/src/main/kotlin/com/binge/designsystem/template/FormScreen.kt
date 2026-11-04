@@ -33,6 +33,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -93,6 +94,9 @@ enum class FormActionPlacement {
  * fields scroll under, its scrim fading in as it collapses. Pass [ScreenBar.Small] for a single-line bar that slides
  * away as the form scrolls. [capWidth] holds the fields to a reading column
  * (`content_max_width`), centred, on a wide window.
+ *
+ * [positionKey] identifies an in-entry page: each key retains its own scroll, app-bar offsets and saved content.
+ * The form keeps its scroll above [notReady], so temporarily showing a loading or failure body does not discard it.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,65 +116,69 @@ fun FormScreen(
     extraActions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     notReady: (@Composable (padding: PaddingValues) -> Unit)? = null,
+    positionKey: String = "form",
     content: @Composable ColumnScope.(padding: PaddingValues) -> Unit,
 ) {
-    val showsFooter = placement == FormActionPlacement.Footer && primaryAction != null && notReady == null
-    if (saveStatus != null && notReady == null) FormSaveFailureSnackbar(saveStatus, snackbarHostState)
-    BingeScreenScaffold(
-        title = title,
-        modifier = modifier,
-        onBack = onBack,
-        bar = bar,
-        scrollBehavior = scrollBehavior,
-        snackbarHostState = snackbarHostState,
-        actions = {
-            if (saveStatus != null && notReady == null) FormSaveStatusText(saveStatus)
-            if (placement == FormActionPlacement.TopBar && primaryAction != null && notReady == null) {
-                BingeTextButton(
-                    label = primaryAction.label,
-                    onClick = primaryAction.onClick,
-                    enabled = primaryAction.enabled,
-                    loading = primaryAction.busy,
-                )
-            }
-            extraActions()
-        },
-        bottomBar = {
-            // The scaffold never lifts its bottomBar, so a footer rides the keyboard here; the body below
-            // consumes the taller bar, which leaves the fields' own imePadding nothing to add. Without a footer
-            // the bar stays unlifted, so the scaffold keeps clearing a floating nav overlay.
-            Column(if (showsFooter) Modifier.imePadding() else Modifier) {
-                bottomBar()
-                if (showsFooter) {
-                    FormFooter(primary = primaryAction, secondary = secondaryAction)
+    rememberSaveableStateHolder().SaveableStateProvider(positionKey) {
+        val contentScroll = rememberScrollState()
+        val showsFooter = placement == FormActionPlacement.Footer && primaryAction != null && notReady == null
+        if (saveStatus != null && notReady == null) FormSaveFailureSnackbar(saveStatus, snackbarHostState)
+        BingeScreenScaffold(
+            title = title,
+            modifier = modifier,
+            onBack = onBack,
+            bar = bar,
+            scrollBehavior = scrollBehavior,
+            snackbarHostState = snackbarHostState,
+            actions = {
+                if (saveStatus != null && notReady == null) FormSaveStatusText(saveStatus)
+                if (placement == FormActionPlacement.TopBar && primaryAction != null && notReady == null) {
+                    BingeTextButton(
+                        label = primaryAction.label,
+                        onClick = primaryAction.onClick,
+                        enabled = primaryAction.enabled,
+                        loading = primaryAction.busy,
+                    )
                 }
-            }
-        },
-    ) { padding ->
-        // The bars' insets are consumed first, so the navigation bar under the keyboard is not counted twice.
-        Box(modifier = Modifier.fillMaxSize().padding(padding.screenOuterPadding()).consumeWindowInsets(padding)) {
-            val inner = padding.screenInnerPadding()
-            if (notReady != null) {
-                notReady(inner)
-            } else {
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .imePadding()
-                            .then(if (scrolling) Modifier.verticalScroll(rememberScrollState()).padding(inner) else Modifier)
-                            .padding(resolvedContentInset()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+                extraActions()
+            },
+            bottomBar = {
+                // The scaffold never lifts its bottomBar, so a footer rides the keyboard here; the body below
+                // consumes the taller bar, which leaves the fields' own imePadding nothing to add. Without a footer
+                // the bar stays unlifted, so the scaffold keeps clearing a floating nav overlay.
+                Column(if (showsFooter) Modifier.imePadding() else Modifier) {
+                    bottomBar()
+                    if (showsFooter) {
+                        FormFooter(primary = primaryAction, secondary = secondaryAction)
+                    }
+                }
+            },
+        ) { padding ->
+            // The bars' insets are consumed first, so the navigation bar under the keyboard is not counted twice.
+            Box(modifier = Modifier.fillMaxSize().padding(padding.screenOuterPadding()).consumeWindowInsets(padding)) {
+                val inner = padding.screenInnerPadding()
+                if (notReady != null) {
+                    notReady(inner)
+                } else {
                     Column(
                         modifier =
                             Modifier
-                                .then(if (capWidth) Modifier.widthIn(max = dimensionResource(R.dimen.content_max_width)) else Modifier)
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+                                .fillMaxSize()
+                                .imePadding()
+                                .then(if (scrolling) Modifier.verticalScroll(contentScroll).padding(inner) else Modifier)
+                                .padding(resolvedContentInset()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        content(if (scrolling) PaddingValues() else inner)
+                        Column(
+                            modifier =
+                                Modifier
+                                    .then(if (capWidth) Modifier.widthIn(max = dimensionResource(R.dimen.content_max_width)) else Modifier)
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+                        ) {
+                            content(if (scrolling) PaddingValues() else inner)
+                        }
                     }
                 }
             }
