@@ -37,18 +37,26 @@ class BingeNumberSliderTest {
     val composeTestRule = createTakeDownComposeRule()
 
     private var value by mutableStateOf<Int?>(10)
+    private val commits = mutableListOf<Int?>()
 
-    private fun setSlider(initial: Int?, openEndLabel: String? = "Unlimited") {
+    private fun setSlider(
+        initial: Int?,
+        openEndLabel: String? = "Unlimited",
+        range: IntRange = 1..100,
+        step: Int = 1,
+    ) {
         value = initial
         composeTestRule.setContent {
             TestTheme {
                 BingeNumberSlider(
                     value = value,
                     onValueChange = { value = it },
-                    range = 1..100,
+                    range = range,
                     format = { "$it a week" },
                     description = "Movie requests",
                     openEndLabel = openEndLabel,
+                    onValueChangeFinished = { commits += value },
+                    step = step,
                 )
             }
         }
@@ -81,6 +89,45 @@ class BingeNumberSliderTest {
         composeTestRule.waitForIdle()
 
         assertTrue("a swipe towards the end must raise the value", (value ?: Int.MAX_VALUE) > 50)
+    }
+
+    @Test
+    fun `dragging reports draft values and commits once on release`() {
+        setSlider(10)
+        val slider = composeTestRule.onNodeWithContentDescription("Movie requests")
+        slider.performTouchInput {
+            down(center)
+            moveTo(centerRight)
+        }
+        assertTrue((value ?: 0) > 50)
+        assertTrue(commits.isEmpty())
+        slider.performTouchInput { up() }
+        assertEquals(listOf(value), commits)
+    }
+
+    @Test
+    fun `steppers and keyboard changes commit the value they picked`() {
+        setSlider(10)
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        val slider = composeTestRule.onNodeWithContentDescription("Movie requests")
+        slider.requestFocus()
+        slider.performKeyInput { pressKey(Key.DirectionRight) }
+        assertEquals(listOf(11, 10, 11), commits)
+    }
+
+    @Test
+    fun `stored values between steps or beyond the range survive until the user moves`() {
+        setSlider(7, openEndLabel = null, range = 0..120, step = 5)
+        composeTestRule.onNodeWithText("7 a week").assertExists()
+        assertTrue(commits.isEmpty())
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals(5, value)
+        composeTestRule.runOnIdle { value = 300 }
+        composeTestRule.onNodeWithText("300 a week").assertExists()
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals(115, value)
+        assertEquals(listOf(5, 115), commits)
     }
 
     @Test
