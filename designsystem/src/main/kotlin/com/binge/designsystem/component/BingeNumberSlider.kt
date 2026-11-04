@@ -45,7 +45,10 @@ import kotlin.math.roundToInt
  * [openEndLabel] gives the slider one stop past [range]'s last, which means "no limit" or "or more" and is [value]
  * `null`: drag to the end, or + from the top, and the readout says [openEndLabel], with ∞ marking that end of the track.
  * A consumer that stores "no limit" some other way (a 0, say) maps it to and from `null`. [onValueChange] fires on
- * every step, so a caller that saves as it changes should batch it.
+ * every step. [onValueChangeFinished] fires when a drag or keyboard change finishes, and after each stepper tap, so a
+ * caller can show a draft as it moves and save once when it lands. [step] sets the spacing between values and the
+ * steppers' increment; the range must divide into whole steps. A stored value outside the range or between steps still
+ * reads as stored until the user moves the control; the thumb sits at its nearest available position.
  */
 @Composable
 fun BingeNumberSlider(
@@ -57,13 +60,22 @@ fun BingeNumberSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     openEndLabel: String? = null,
+    onValueChangeFinished: () -> Unit = {},
+    step: Int = 1,
 ) {
+    require(step > 0 && (range.last - range.first) % step == 0) { "The range must contain whole positive steps" }
+    val finish = onValueChangeFinished
     val open = openEndLabel != null
     // The slider's own scale: the range, and with an open end, one more stop past its last.
-    val top = if (open) range.last + 1 else range.last
+    val top = if (open) range.last + step else range.last
     val position = if (value == null && open) top else (value ?: range.first).coerceIn(range)
-    val readout = if (position == top && open) openEndLabel.orEmpty() else format(position)
-    val pick = { at: Int -> onValueChange(if (open && at == top) null else at.coerceIn(range)) }
+    val readout = if (position == top && open) openEndLabel.orEmpty() else format(value ?: range.first)
+    val pick = { at: Int ->
+        val snapped = range.first + ((at - range.first).toFloat() / step).roundToInt() * step
+        onValueChange(if (open && at == top) null else snapped.coerceIn(range))
+    }
+    val next = range.first + ((position - range.first) / step + 1) * step
+    val previous = range.first + ((position - range.first + step - 1) / step - 1) * step
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
         Text(
             readout,
@@ -73,23 +85,29 @@ fun BingeNumberSlider(
             modifier = Modifier.fillMaxWidth(),
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { pick(position - 1) }, enabled = enabled && position > range.first) {
+            IconButton(onClick = {
+                pick(previous)
+                finish()
+            }, enabled = enabled && position > range.first) {
                 Icon(Icons.Filled.Remove, contentDescription = stringResource(R.string.number_slider_decrease, description))
             }
             // The state follows the position below, and every drag or key step is handed to the caller rather than kept,
             // as it was with the value-and-callback overload: the position stays the one truth.
             val sliderState =
-                remember(range.first, top) {
+                remember(range.first, top, step) {
                     SliderState(
                         position.toFloat(),
-                        (top - range.first - 1).coerceAtLeast(0),
+                        ((top - range.first) / step - 1).coerceAtLeast(0),
                         range.first.toFloat()..top.toFloat(),
                     )
                 }
             SideEffect { sliderState.value = position.toFloat() }
             Slider(
                 state = sliderState,
-                onValueChange = { picked -> picked.roundToInt().let { if (it != position) pick(it) } },
+                onValueChange = { picked ->
+                    picked.roundToInt().let { if (it != position || value != null && value !in range) pick(it) }
+                },
+                onValueChangeFinished = finish,
                 enabled = enabled,
                 // A hundred stops' tick marks blur into a dotted texture; the steppers are what land on one.
                 colors =
@@ -105,7 +123,10 @@ fun BingeNumberSlider(
                         stateDescription = readout
                     },
             )
-            IconButton(onClick = { pick(position + 1) }, enabled = enabled && position < top) {
+            IconButton(onClick = {
+                pick(next)
+                finish()
+            }, enabled = enabled && position < top) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.number_slider_increase, description))
             }
         }
@@ -171,7 +192,7 @@ fun bingeNumberItem(
     return ListItem(
         icon = icon,
         label = title,
-        detail = if (value == null && openEndLabel != null) openEndLabel else format((value ?: range.first).coerceIn(range)),
+        detail = if (value == null && openEndLabel != null) openEndLabel else format(value ?: range.first),
         enabled = enabled,
         onClick = { open = true },
     )
