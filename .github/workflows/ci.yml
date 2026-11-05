@@ -62,7 +62,7 @@ jobs:
       # JDK 17, matching Binge rather than binge-companions' 21. The extracted code
       # targets jvmTarget 17 and the AGP in libs.versions.toml is what Binge builds with, so the toolchain
       # here is the one the carve arrives expecting.
-      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
         with:
           distribution: temurin
           java-version: '17'
