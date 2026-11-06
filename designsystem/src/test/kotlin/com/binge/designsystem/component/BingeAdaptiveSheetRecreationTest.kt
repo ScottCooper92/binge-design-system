@@ -143,6 +143,32 @@ class BingeAdaptiveSheetRecreationTest {
     }
 
     @Test
+    fun `compact child and covered root page values both survive recreation`() {
+        var navigation: BingeSheetNav? = null
+        val sheet: @Composable (@Composable () -> Unit) -> Unit = { content ->
+            BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}, stackPagesWhenCompact = true) { nav ->
+                navigation = nav
+                if (nav.page == ROOT_PAGE) content() else SavedValue()
+            }
+        }
+        val controller = open(sheet)
+        write(7)
+        settle()
+        checkNotNull(navigation).push("detail")
+        settle()
+        write(9)
+        settle()
+        controller.recreate()
+        seen = -1
+        show(controller, sheet)
+        assertEquals("detail", checkNotNull(navigation).page)
+        assertEquals(9, seen)
+        checkNotNull(navigation).pop()
+        settle()
+        assertEquals(7, seen)
+    }
+
+    @Test
     fun `a sheet whose root changes does not bring the old stack's page state back`() {
         var root by mutableStateOf("a")
         val controller = Robolectric.buildActivity(ComponentActivity::class.java).setup()

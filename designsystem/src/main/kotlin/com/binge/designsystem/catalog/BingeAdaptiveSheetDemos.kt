@@ -29,13 +29,13 @@ private const val DETAIL_PAGE = "detail"
 /**
  * An adaptive sheet of each kind, opened for real: widen the window to 840dp or more (unfold a foldable, rotate a tablet)
  * and the task sheet becomes a side sheet whose "Open a page" row stacks a second page inside it under a Back, where a
- * narrow window keeps today's bottom sheet and opens the page as a second one. The menu is a bottom sheet at any width.
+ * narrow window stacks the same pages inside its bottom sheet. Back returns to the covered page at either width.
+ * The menu is a bottom sheet at any width.
  */
 @Composable
 fun BingeAdaptiveSheetDemo() {
     ScreenshotTheme {
         var kind by remember { mutableStateOf<BingeSheetKind?>(null) }
-        var secondSheet by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.padding_m)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
@@ -44,7 +44,7 @@ fun BingeAdaptiveSheetDemo() {
             BingeOutlinedButton(label = "Open a menu sheet", onClick = { kind = BingeSheetKind.Menu })
         }
         kind?.let { open ->
-            BingeAdaptiveSheet(kind = open, onDismissRequest = { kind = null }) { nav ->
+            BingeAdaptiveSheet(kind = open, onDismissRequest = { kind = null }, stackPagesWhenCompact = true) { nav ->
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.padding_m)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
@@ -56,20 +56,12 @@ fun BingeAdaptiveSheetDemo() {
                     if (open == BingeSheetKind.Task && nav.page != DETAIL_PAGE) {
                         BingeTextButton(
                             label = "Open a page",
-                            onClick = { if (nav.stacksPages) nav.push(DETAIL_PAGE) else secondSheet = true },
+                            onClick = { nav.push(DETAIL_PAGE) },
                         )
                     }
+                    if (nav.page == DETAIL_PAGE) BingeTextButton(label = "Back", onClick = nav::pop)
                     BingeTextButton(label = "Close", onClick = { kind = null })
                 }
-            }
-        }
-        if (secondSheet) {
-            BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = { secondSheet = false }) {
-                Text(
-                    text = "The second sheet a narrow window opens",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
-                )
             }
         }
     }

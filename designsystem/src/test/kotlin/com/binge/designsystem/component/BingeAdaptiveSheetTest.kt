@@ -4,27 +4,36 @@ import android.content.res.Configuration
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.performTouchInput
+import androidx.core.graphics.Insets
+import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.R
+import com.binge.designsystem.testing.WithWindowInsets
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -34,6 +43,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowDialog
 
 private const val ROOT_TEXT = "Root page"
 private const val DETAIL_TEXT = "Detail page"
@@ -245,36 +255,114 @@ class BingeAdaptiveSheetExpandedTest {
     }
 }
 
-/** Below the expanded width a task sheet is the bottom sheet it always was, and pages do not stack. */
+/** A compact task sheet keeps its pages and drafts, while a menu stays a single page. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w412dp-h900dp")
 class BingeAdaptiveSheetCompactTest {
     @get:Rule
     val rule = createTakeDownComposeRule()
 
+    private var keyboardUp by mutableStateOf(false)
+    private var dismissals = 0
+    private val leftPages = mutableListOf<String>()
     private var stacks: Boolean? = null
+    private var clearanceHeight: Int? = null
 
-    @Test
-    fun `a task sheet below the expanded width is a bottom sheet and does not stack`() {
+    private fun show(kind: BingeSheetKind = BingeSheetKind.Task, stackPagesWhenCompact: Boolean = true) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}) { nav ->
-                    stacks = nav.stacksPages
-                    Text(ROOT_TEXT)
-                    Text(OPEN, modifier = Modifier.clickable { nav.push("detail") })
+                BingeAdaptiveSheet(
+                    kind = kind,
+                    onDismissRequest = { dismissals++ },
+                    onPageBack = { leftPages += it },
+                    stackPagesWhenCompact = stackPagesWhenCompact,
+                ) { nav ->
+                    WithWindowInsets({
+                        WindowInsetsCompat
+                            .Builder()
+                            .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, if (keyboardUp) 300 else 0))
+                            .setVisible(WindowInsetsCompat.Type.ime(), keyboardUp)
+                            .build()
+                    }) {
+                        stacks = nav.stacksPages
+                        Box(Modifier.onSizeChanged { clearanceHeight = it.height }) { TaskSheetTopClearance(nav) }
+                        if (nav.page == "detail") {
+                            Text(DETAIL_TEXT)
+                        } else {
+                            var draft by rememberSaveable { mutableStateOf("") }
+                            Text(ROOT_TEXT)
+                            BasicTextField(draft, { draft = it })
+                            Text(OPEN, modifier = Modifier.clickable { nav.push("detail") })
+                        }
+                    }
                 }
             }
         }
-        rule.waitForIdle()
+    }
 
-        assertEquals(false, stacks)
+    @Test
+    fun `Back from a compact child page restores the underlying draft`() {
+        show()
+        rule.onNode(hasSetTextAction()).performTextReplacement("Half typed")
         rule.onNodeWithText(OPEN).performClick()
-        rule.waitForIdle()
+        rule.onNodeWithText(DETAIL_TEXT).assertExists()
+        assertEquals(true, stacks)
+        pressBack()
         rule.onNodeWithText(ROOT_TEXT).assertExists()
-        rule
-            .onAllNodes(
-                hasContentDescription(RuntimeEnvironment.getApplication().getString(R.string.cd_navigate_back)),
-            ).assertCountEquals(0)
+        rule.onNodeWithText("Half typed").assertExists()
+        assertEquals(listOf("detail"), leftPages)
+        assertEquals(0, dismissals)
+    }
+
+    private fun pressBack() {
+        val dialog = checkNotNull(ShadowDialog.getLatestDialog())
+        rule.runOnUiThread { dialog.onBackPressed() }
+        rule.waitForIdle()
+    }
+
+    @Test
+    fun `a compact child leaves Back to the keyboard before returning to its parent`() {
+        show()
+        rule.onNodeWithText(OPEN).performClick()
+        keyboardUp = true
+        rule.waitForIdle()
+        pressBack()
+        rule.onNodeWithText(DETAIL_TEXT).assertExists()
+        assertEquals(emptyList<String>(), leftPages)
+        keyboardUp = false
+        rule.waitForIdle()
+        pressBack()
+        rule.onNodeWithText(ROOT_TEXT).assertExists()
+        assertEquals(listOf("detail"), leftPages)
+        assertEquals(0, dismissals)
+        pressBack()
+        assertEquals(1, dismissals)
+    }
+
+    @Test
+    fun `a compact task sheet stacks pages and keeps no top clearance under its drag handle`() {
+        show()
+        rule.waitForIdle()
+        assertEquals(true, stacks)
+        assertEquals(0, clearanceHeight)
+    }
+
+    @Test
+    fun `a compact task sheet does not stack pages unless it asks to`() {
+        show(stackPagesWhenCompact = false)
+        rule.onNodeWithText(OPEN).performClick()
+        rule.onNodeWithText(ROOT_TEXT).assertExists()
+        rule.onNodeWithText(DETAIL_TEXT).assertDoesNotExist()
+        assertEquals(false, stacks)
+    }
+
+    @Test
+    fun `push still does nothing in a compact menu`() {
+        show(BingeSheetKind.Menu)
+        rule.onNodeWithText(OPEN).performClick()
+        rule.onNodeWithText(ROOT_TEXT).assertExists()
+        rule.onNodeWithText(DETAIL_TEXT).assertDoesNotExist()
+        assertEquals(false, stacks)
     }
 }
 
@@ -301,7 +389,12 @@ class BingeAdaptiveSheetResizeTest {
                 }
             CompositionLocalProvider(LocalContext provides context, LocalConfiguration provides context.resources.configuration) {
                 BingeExpressiveTheme(dynamicColor = false) {
-                    BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = {}, onPageBack = { leftPages += it }) { nav ->
+                    BingeAdaptiveSheet(
+                        kind = BingeSheetKind.Task,
+                        onDismissRequest = {},
+                        onPageBack = { leftPages += it },
+                        stackPagesWhenCompact = true,
+                    ) { nav ->
                         stacks = nav.stacksPages
                         if (nav.page == "detail") {
                             Text(DETAIL_TEXT)
@@ -319,7 +412,7 @@ class BingeAdaptiveSheetResizeTest {
         wide = false
         rule.waitForIdle()
 
-        assertEquals(false, stacks)
+        assertEquals(true, stacks)
         rule.onNodeWithText(DETAIL_TEXT).assertExists()
 
         wide = true

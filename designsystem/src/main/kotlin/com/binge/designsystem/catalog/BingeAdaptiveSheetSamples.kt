@@ -40,7 +40,8 @@ fun BingeAdaptiveTaskSheetSample() {
 
 /**
  * The task sheet after a row opened a second page. At the expanded width the page stacks inside the side sheet under a
- * Back; below it the page is the second bottom sheet an app opens there, since pages only stack in the side sheet.
+ * Back; below it the same page stacks inside the bottom sheet only when the sheet is given `stackPagesWhenCompact`, and
+ * then its system Back returns to the root.
  */
 @Composable
 fun BingeAdaptiveTaskSheetStackedSample() {

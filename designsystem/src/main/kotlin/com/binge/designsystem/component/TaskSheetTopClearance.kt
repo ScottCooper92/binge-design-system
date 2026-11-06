@@ -13,5 +13,5 @@ import com.binge.designsystem.R
  */
 @Composable
 fun TaskSheetTopClearance(nav: BingeSheetNav, modifier: Modifier = Modifier) {
-    if (nav.stacksPages) Spacer(modifier.height(dimensionResource(R.dimen.padding_m)))
+    if (nav.inSideSheet) Spacer(modifier.height(dimensionResource(R.dimen.padding_m)))
 }
