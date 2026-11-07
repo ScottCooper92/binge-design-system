@@ -56,24 +56,44 @@ fun Modifier.tvSideSheetWash(tint: Color): Modifier {
 
 /** Reports the panel's top, and draws [wash] behind everything the panel holds. */
 @Composable
-internal fun Modifier.tvSideSheetWashBehind(wash: TvSideSheetWash): Modifier {
+internal fun Modifier.tvSideSheetWashBehind(wash: TvSideSheetWash): Modifier =
+    onGloballyPositioned { wash.panelTop = it.positionInWindow().y }
+        .tvSideSheetWashBackdrop(tint = { wash.tint }, depth = { wash.depth() })
+
+/**
+ * The wash's gradient: [tint] at 60% from the top, 25% by 55% of the way down, and clear at [endY], in pixels. It is the one
+ * set of stops every sheet that washes its top uses, so a sheet drawn outside this module can take the same look.
+ */
+fun tvSideSheetWashBrush(
+    tint: Color,
+    endY: Float,
+): Brush =
+    Brush.verticalGradient(
+        colorStops =
+            arrayOf(
+                0f to tint.copy(alpha = WASH_TOP_ALPHA),
+                WASH_MID_STOP to tint.copy(alpha = WASH_MID_ALPHA),
+                1f to Color.Transparent,
+            ),
+        endY = endY,
+    )
+
+/**
+ * Draws the side-sheet wash behind this node: [tint] across its full width, from its top down [depth] pixels (how far the
+ * header reaches) and then a fade of `tv_side_sheet_wash_fade` into the panel below. Nothing is drawn while [tint] is null.
+ * Both are read as it draws, so a change redraws without recomposing. [TvSideSheet] draws its own panel this way, and a
+ * sheet of another kind can call it to match.
+ */
+@Composable
+fun Modifier.tvSideSheetWashBackdrop(
+    tint: () -> Color?,
+    depth: () -> Float,
+): Modifier {
     val fade = with(LocalDensity.current) { dimensionResource(TvR.dimen.tv_side_sheet_wash_fade).toPx() }
-    return onGloballyPositioned { wash.panelTop = it.positionInWindow().y }.drawBehind {
-        val tint = wash.tint ?: return@drawBehind
-        val bottom = wash.depth() + fade
-        drawRect(
-            brush =
-                Brush.verticalGradient(
-                    colorStops =
-                        arrayOf(
-                            0f to tint.copy(alpha = WASH_TOP_ALPHA),
-                            WASH_MID_STOP to tint.copy(alpha = WASH_MID_ALPHA),
-                            1f to Color.Transparent,
-                        ),
-                    endY = bottom,
-                ),
-            size = Size(size.width, bottom),
-        )
+    return drawBehind {
+        val color = tint() ?: return@drawBehind
+        val bottom = depth() + fade
+        drawRect(brush = tvSideSheetWashBrush(color, bottom), size = Size(size.width, bottom))
     }
 }
 
