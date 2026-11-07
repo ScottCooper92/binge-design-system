@@ -5,6 +5,8 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import androidx.compose.ui.test.requestFocus
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.R
 import com.binge.designsystem.tv.component.TvCompactButton
+import com.binge.designsystem.tv.component.TvCompactIconButton
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -66,6 +69,44 @@ class TvClickableEnabledToggleTest {
         }
 
         assertTogglingKeepsFocus()
+    }
+
+    @Test
+    fun `a focused TvCompactIconButton keeps focus when it is disabled, and ignores OK until re-enabled`() {
+        setControl {
+            TvCompactIconButton(
+                icon = Icons.Filled.Delete,
+                label = "Delete",
+                onClick = { clicks++ },
+                enabled = enabled,
+                modifier = Modifier.testTag(NODE),
+            )
+        }
+
+        assertTogglingKeepsFocus()
+    }
+
+    @Test
+    fun `a loading TvCompactIconButton keeps focus and ignores OK`() {
+        var loading by mutableStateOf(true)
+        setControl {
+            TvCompactIconButton(
+                icon = Icons.Filled.Delete,
+                label = "Delete",
+                onClick = { clicks++ },
+                loading = loading,
+                modifier = Modifier.testTag(NODE),
+            )
+        }
+
+        pressOk()
+        assertEquals(0, clicks)
+        rule.onNodeWithTag(NODE).assertIsFocused()
+
+        loading = false
+        rule.waitForIdle()
+        pressOk()
+        assertEquals(1, clicks)
     }
 
     private fun assertTogglingKeepsFocus() {

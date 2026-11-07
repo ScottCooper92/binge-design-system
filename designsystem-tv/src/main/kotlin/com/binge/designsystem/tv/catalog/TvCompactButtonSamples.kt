@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.runtime.Composable
@@ -46,7 +47,10 @@ fun TvCompactButtonSample() {
     }
 }
 
-/** The compact button while its action runs: a spinner in place of the label at the same width, at rest and focused. */
+/**
+ * The compact button while its action runs: a spinner in place of the label at the same width, at rest and focused. The
+ * icon-only companion beside it, in the destructive style, at rest, loading and disabled.
+ */
 @Composable
 fun TvCompactButtonLoadingSample() {
     Row(
@@ -57,6 +61,9 @@ fun TvCompactButtonLoadingSample() {
         TvCompactButton(label = "Try again", onClick = {}, style = TvButtonStyle.Primary)
         TvCompactButton(label = "Try again", onClick = {}, style = TvButtonStyle.Primary, loading = true)
         TvCompactButton(label = "Try again", onClick = {}, style = TvButtonStyle.Primary, loading = true, initiallyFocused = true)
+        TvCompactIconButton(icon = Icons.Filled.Delete, label = "Delete", onClick = {}, style = TvButtonStyle.Destructive)
+        TvCompactIconButton(icon = Icons.Filled.Delete, label = "Delete", onClick = {}, style = TvButtonStyle.Destructive, loading = true)
+        TvCompactIconButton(icon = Icons.Filled.Delete, label = "Delete", onClick = {}, style = TvButtonStyle.Destructive, enabled = false)
     }
 }
 
