@@ -27,8 +27,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.TextStyle
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
+import kotlin.math.roundToInt
 
 /**
  * The letters of a long alphabetical list down its edge: a tap or a drag over a letter calls [onLetter] with it, so the
@@ -47,7 +49,11 @@ fun BingeLetterRail(
     current: Char? = null,
 ) {
     if (letters.isEmpty()) return
-    val letterPx = with(LocalDensity.current) { dimensionResource(R.dimen.letter_rail_letter).roundToPx() }
+    // A letter's slot is its dimen, or the letter's scaled line height where a large font makes that taller, so the plan
+    // below fits fewer letters rather than drawing them taller than their slot.
+    val labelStyle = MaterialTheme.typography.labelSmall
+    val slotPx = dimensionResource(R.dimen.letter_rail_letter).let { with(LocalDensity.current) { it.roundToPx() } }
+    val letterPx = maxOf(slotPx, labelStyle.slotLineHeight().roundToInt())
     val dotPx = with(LocalDensity.current) { dimensionResource(R.dimen.letter_rail_dot).roundToPx() }
     // The plan comes from the constraints, not a measured size, so the first frame already draws the letters that fit.
     BoxWithConstraints(modifier.fillMaxHeight().width(dimensionResource(R.dimen.letter_rail_width))) {
@@ -67,6 +73,13 @@ private fun LetterRailColumn(
     onLetter: (Char) -> Unit,
     current: Char?,
 ) {
+    val letterHeight = with(LocalDensity.current) { letterPx.toDp() }
+    // A wide letter at a large font needs more than the slot's width too, up to the rail's own.
+    val letterWidth =
+        minOf(
+            maxOf(dimensionResource(R.dimen.letter_rail_letter), letterHeight),
+            dimensionResource(R.dimen.letter_rail_width),
+        )
     var touched by remember { mutableStateOf<Char?>(null) }
     // Set when a drag takes the gesture over from the press, so the cancelled press leaves the drag's dedupe alone.
     var dragging by remember { mutableStateOf(false) }
@@ -126,7 +139,7 @@ private fun LetterRailColumn(
             Box(
                 modifier =
                     Modifier
-                        .size(dimensionResource(R.dimen.letter_rail_letter))
+                        .size(letterWidth, letterHeight)
                         .background(if (lit) MaterialTheme.colorScheme.primary else Color.Transparent, BingeShapes.ElementExtraSmall),
                 contentAlignment = Alignment.Center,
             ) {
@@ -139,6 +152,19 @@ private fun LetterRailColumn(
         }
     }
 }
+
+/** The height one line of this style takes at the current font scale, in pixels; zero for a style with no size in sp. */
+@Composable
+private fun TextStyle.slotLineHeight(): Float =
+    with(LocalDensity.current) {
+        when {
+            lineHeight.isSp -> lineHeight.toPx()
+            fontSize.isSp -> (fontSize * LINE_HEIGHT_PER_FONT_SIZE).toPx()
+            else -> 0f
+        }
+    }
+
+private const val LINE_HEIGHT_PER_FONT_SIZE = 1.5f
 
 /** Which letters a rail draws at its height, and whether it puts a dot between them. */
 internal class LetterRailPlan(

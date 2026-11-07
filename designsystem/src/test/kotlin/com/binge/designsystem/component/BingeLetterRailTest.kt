@@ -2,19 +2,25 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -194,5 +200,39 @@ class BingeLetterRailTest {
         val plan = letterRailPlan(alphabet, heightPx = 5, letterPx = 20, dotPx = 10)
 
         assertEquals(listOf('A'), plan.shown)
+    }
+
+    /** #1088: at a large font a letter is no taller than its slot, so the rail draws fewer letters instead of cutting them. */
+    private fun assertLettersFitAt(scale: Float): List<Char> {
+        rule.setContent {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = scale)) {
+                Box(Modifier.height(400.dp)) { BingeLetterRail(letters = alphabet, onLetter = {}) }
+            }
+        }
+
+        val drawn = alphabet.filter { rule.onAllNodesWithText(it.toString()).fetchSemanticsNodes().isNotEmpty() }
+        assertEquals("at ${scale}x the rail draws letters", true, drawn.isNotEmpty())
+        drawn.forEach { letter ->
+            val node = rule.onNodeWithText(letter.toString()).fetchSemanticsNode()
+            val layouts = mutableListOf<TextLayoutResult>()
+            node.config[SemanticsActions.GetTextLayoutResult].action?.invoke(layouts)
+            val text = layouts.single()
+            assertEquals("$letter at ${scale}x is as tall as its slot", true, text.multiParagraph.height <= node.size.height)
+            assertEquals("$letter at ${scale}x is as wide as its slot", true, text.multiParagraph.maxIntrinsicWidth <= node.size.width)
+        }
+        return drawn
+    }
+
+    @Test
+    fun `at 1_3x font scale every drawn letter fits its slot, bounds against size`() {
+        assertLettersFitAt(1.3f)
+    }
+
+    @Test
+    fun `at 2x font scale every drawn letter fits its slot, and the rail thins its letters`() {
+        val drawn = assertLettersFitAt(2f)
+
+        assertEquals("the rail draws fewer letters than there are", true, drawn.size < alphabet.size)
     }
 }
