@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.theme.BingeTvShapes
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -186,9 +186,9 @@ private fun PairingCardSurface(modifier: Modifier, content: @Composable ColumnSc
         modifier =
             modifier
                 .width(IntrinsicSize.Max)
-                .clip(BingeShapes.AccountCard)
+                .clip(BingeTvShapes.Small)
                 .background(MaterialTheme.colorScheme.surface)
-                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeShapes.AccountCard)
+                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeTvShapes.Small)
                 .padding(dimensionResource(DesR.dimen.padding_l)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
