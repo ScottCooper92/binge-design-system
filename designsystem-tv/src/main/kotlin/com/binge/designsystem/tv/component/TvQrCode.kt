@@ -11,7 +11,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import com.binge.designsystem.tv.theme.BingeTvShapes
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import io.nayuki.qrcodegen.QrCode
 import kotlin.math.ceil
 
@@ -49,7 +49,7 @@ fun TvQrCode(
         // Square by construction: letting a parent stretch it is another common way to ship one that will not scan.
         modifier = modifier
             .aspectRatio(1f)
-            .clip(BingeTvShapes.Small)
+            .clip(BingeTvCorners.Small)
             .semantics { this.contentDescription = contentDescription },
     ) {
         val modules = qr.size + QUIET_ZONE_MODULES * 2
