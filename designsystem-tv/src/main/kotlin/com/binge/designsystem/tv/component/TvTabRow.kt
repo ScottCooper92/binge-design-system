@@ -42,6 +42,7 @@ import com.binge.designsystem.tv.focus.tvArrivalTarget
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvSelectionFocusGroup
 import com.binge.designsystem.tv.focus.tvSelectionTarget
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import kotlin.coroutines.cancellation.CancellationException
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -151,7 +152,8 @@ sealed interface TvTabCount {
 }
 
 /**
- * One tab's pill, coloured by [emphasis]. No border at any emphasis, so a tab cannot be mistaken for a filter chip.
+ * One tab's tile, coloured by [emphasis], with the small TV corner. No border at any emphasis, so a tab cannot be mistaken for a
+ * filter chip.
  * Both commit paths are guarded on [selected], so neither re-selects the current tab and re-runs what it shows.
  */
 @Composable
@@ -168,7 +170,7 @@ private fun TvTab(
         modifier =
             modifier
                 .height(dimensionResource(TvR.dimen.tv_button_height))
-                .clip(BingeShapes.Pill)
+                .clip(BingeTvCorners.Small)
                 .background(emphasis.containerColor(resting = Color.Transparent))
                 .tvClickable(
                     onFocusChanged = { gained -> if (gained && !selected) onSelect() },
