@@ -99,6 +99,9 @@ fun TvCompactButton(
  * The icon-only companion to [TvCompactButton]: a square of its height with the same corners and palette, named for a
  * screen reader by [label]. Unlike `TvIconButton` it does not expand into a labelled pill on focus: the v2 pages' icons
  * stay squares, and [label] is for accessibility only.
+ *
+ * [style], [enabled] and [loading] work as on [TvCompactButton]: a disabled button stays focusable and inert, and
+ * [loading] swaps the icon for a spinner at the same size and ignores presses while keeping focus.
  */
 @Composable
 fun TvCompactIconButton(
@@ -106,10 +109,13 @@ fun TvCompactIconButton(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    style: TvButtonStyle = TvButtonStyle.Secondary,
+    enabled: Boolean = true,
+    loading: Boolean = false,
     initiallyFocused: Boolean = false,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
-    val palette = tvCompactButtonColors(style = TvButtonStyle.Secondary, enabled = true, isFocused = focused)
+    val palette = tvCompactButtonColors(style = style, enabled = enabled, isFocused = focused)
     val shape = MaterialTheme.shapes.small
     Box(
         modifier = modifier
@@ -117,15 +123,25 @@ fun TvCompactIconButton(
             .clip(shape)
             .background(palette.container)
             .border(dimensionResource(TvR.dimen.tv_button_border_width), palette.border, shape)
-            .tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick)
-            .semantics { contentDescription = label },
+            .tvClickable(enabled = enabled, role = Role.Button, onFocusChanged = { focused = it }, onClick = { if (!loading) onClick() })
+            .semantics {
+                contentDescription = label
+                if (loading) progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
+            },
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = palette.content,
-            modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
+            modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)).then(if (loading) Modifier.alpha(0f) else Modifier),
         )
+        if (loading) {
+            TvSpinner(
+                color = palette.content,
+                diameter = dimensionResource(TvR.dimen.tv_button_icon),
+                stroke = dimensionResource(TvR.dimen.tv_button_spinner_stroke),
+            )
+        }
     }
 }
