@@ -36,11 +36,11 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.DecisionCopy
 import com.binge.designsystem.DecisionPoint
 import com.binge.designsystem.template.ScreenAction
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
 import com.binge.designsystem.tv.focus.tvFocusTarget
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.uppercaseLocalised
 import com.binge.designsystem.R as DesR
@@ -145,7 +145,7 @@ private fun DecisionCopyColumn(copy: DecisionCopy, noteContent: (@Composable Col
 
 @Composable
 private fun DecisionPointsCard(points: List<DecisionPoint>) {
-    Column(modifier = Modifier.fillMaxWidth().clip(BingeShapes.ListCard).background(MaterialTheme.colorScheme.surfaceVariant)) {
+    Column(modifier = Modifier.fillMaxWidth().clip(BingeTvCorners.Small).background(MaterialTheme.colorScheme.surfaceVariant)) {
         points.forEachIndexed { index, point ->
             DecisionPointRow(point)
             if (index < points.lastIndex) {
@@ -182,7 +182,7 @@ private fun DecisionPointRow(point: DecisionPoint) {
             modifier =
                 Modifier
                     .size(dimensionResource(TvR.dimen.tv_decision_point_badge))
-                    .clip(BingeShapes.Large)
+                    .clip(BingeTvCorners.Small)
                     .background(MaterialTheme.colorScheme.surface),
             contentAlignment = Alignment.Center,
         ) {

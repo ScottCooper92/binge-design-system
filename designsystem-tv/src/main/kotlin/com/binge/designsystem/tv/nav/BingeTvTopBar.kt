@@ -43,6 +43,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -58,8 +59,8 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
 
 /**
  * The bar over every page: [header] at the start (an item with a [TvNavItem.displayName] draws as a circular avatar, any
- * other as a pill), [items] as tabs centred, and [footer] at the end. A focused item is a light pill with dark text, and the
- * tab for [selectedKey] keeps a faint pill while focus is elsewhere. Only the centred tabs scale, from 0.8 at rest to full
+ * other as a small-cornered tile), [items] as tabs centred, and [footer] at the end. A focused item is a light tile with dark text, and the
+ * tab for [selectedKey] keeps a faint tile while focus is elsewhere. Only the centred tabs scale, from 0.8 at rest to full
  * size while the bar holds focus, so the two ends stay pinned.
  *
  * Focus never selects: OK on an item calls [onSelect] and nothing else does. Items named in
@@ -244,7 +245,7 @@ internal fun TvTopBarSurface(
 private enum class TvTopBarSlot { Start, Tabs, End }
 
 /**
- * One bar entry: an avatar for an item that carries a name, an icon for one in the icon-only set, a label pill otherwise.
+ * One bar entry: an avatar for an item that carries a name, an icon for one in the icon-only set, a label tile otherwise.
  * [selected] is null for an action, which is a button with no selection.
  */
 @Composable
@@ -307,7 +308,7 @@ private fun TvTopBarAvatar(
 }
 
 /**
- * A tab as a text pill, or, when [iconOnly], as its icon alone; named for a screen reader either way. A null [selected] makes
+ * A tab as a text tile, or, when [iconOnly], as its icon alone; named for a screen reader either way. A null [selected] makes
  * it an action's button.
  */
 @Composable
@@ -330,7 +331,7 @@ private fun TvTopBarPill(
     Row(
         modifier = modifier
             .heightIn(min = dimensionResource(TvR.dimen.tv_icon_button_diameter))
-            .clip(BingeShapes.Pill)
+            .clip(BingeTvCorners.Small)
             .background(container)
             .tvClickable(role = if (selected == null) Role.Button else Role.Tab, onFocusChanged = onFocusChanged, onClick = onClick)
             .clearAndSetSemantics {

@@ -61,6 +61,7 @@ import com.binge.designsystem.tv.component.TvVerticalDivider
 import com.binge.designsystem.tv.component.containerColor
 import com.binge.designsystem.tv.component.contentColor
 import com.binge.designsystem.tv.focus.tvFocusIndicator
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -131,7 +132,7 @@ fun TvButtonOnPanelSample() {
         modifier =
             Modifier
                 .padding(dimensionResource(TvR.dimen.tv_overscan_horizontal))
-                .background(MaterialTheme.colorScheme.surface, BingeShapes.AccountCard)
+                .background(MaterialTheme.colorScheme.surface, BingeTvCorners.Small)
                 .padding(dimensionResource(TvR.dimen.tv_overscan_horizontal)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
     ) {

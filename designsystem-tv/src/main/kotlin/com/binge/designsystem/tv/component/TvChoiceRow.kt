@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.component.WrappingRow
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.tvArrivalTarget
 import com.binge.designsystem.tv.focus.tvClickable
@@ -35,6 +34,7 @@ import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.focus.tvFocusFill
 import com.binge.designsystem.tv.focus.tvSelectionFocusGroup
 import com.binge.designsystem.tv.focus.tvSelectionTarget
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -44,7 +44,7 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The deliberate opposite of [TvTabRow], where focus is the commit. Use this where a switch is costly, such as one
  * that re-runs a query or drops what the user picked under the old value. Pressing the option already chosen is a
- * no-op, guarded here so no caller has to remember to. The pills sit side by side, so they carry no second line;
+ * no-op, guarded here so no caller has to remember to. The options sit side by side, so they carry no second line;
  * [TvOptionRow] is the stacked form that does. [initialFocusedKey] seeds one option as focused for a frame;
  * production passes null.
  *
@@ -63,8 +63,8 @@ fun TvChoiceRow(
 ) {
     val selectedEntry = remember { FocusRequester() }
     val aimed = entryFocusRequester != null || arrival != null
-    // Wraps onto a further line when the pills outgrow the row, as at a large font size. A plain row would squeeze the
-    // last pill to nothing. The box keeps what a row did for a parent that hands down a minimum size: the pills start
+    // Wraps onto a further line when the options outgrow the row, as at a large font size. A plain row would squeeze the
+    // last option to nothing. The box keeps what a row did for a parent that hands down a minimum size: the options start
     // at the start edge and sit in the middle of the height.
     Box(
         modifier =
@@ -107,7 +107,7 @@ data class TvChoiceUi(
 )
 
 /**
- * One option's pill. Focus fills it; being chosen adds the tick, and the two are independent. The tick takes the
+ * One option's tile, with the small TV corner. Focus fills it; being chosen adds the tick, and the two are independent. The tick takes the
  * label's colour, so it inverts with the fill rather than vanishing into it. Selection is announced as well as drawn.
  * An [icon] leads the label on its tinted plate.
  */
@@ -126,8 +126,8 @@ private fun TvChoice(
         modifier =
             modifier
                 .height(dimensionResource(TvR.dimen.tv_button_height))
-                .clip(BingeShapes.Pill)
-                .tvFocusFill(isFocused = focused, shape = BingeShapes.Pill)
+                .clip(BingeTvCorners.Small)
+                .tvFocusFill(isFocused = focused, shape = BingeTvCorners.Small)
                 .tvClickable(onFocusChanged = { focused = it }, onClick = onSelect)
                 .padding(horizontal = dimensionResource(TvR.dimen.tv_choice_padding_horizontal))
                 .semantics {
