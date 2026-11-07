@@ -10,9 +10,14 @@ import com.binge.designsystem.tv.theme.tvButtonColors
 /** The primary rests in a faint white pill; focus fills white, as in the top bar and tab strip. */
 private const val PRIMARY_REST_ALPHA = 0.2f
 
-/** The compact button's palette: [tvButtonColors] with the v2 white focus fill, and a white-tinted resting primary. */
+/**
+ * The compact button's palette: [tvButtonColors] with the v2 white focus fill, and a white-tinted resting primary.
+ * [TvCompactButton] and [TvCompactIconButton] draw from it, and a control that must look like them but is not one (a
+ * custom row action, say) can take the same colours here so the two never drift apart. Read it where the control reads
+ * its own focus, and pass that state as [isFocused].
+ */
 @Composable
-internal fun tvCompactButtonColors(
+fun tvCompactButtonColors(
     style: TvButtonStyle,
     enabled: Boolean,
     isFocused: Boolean,
