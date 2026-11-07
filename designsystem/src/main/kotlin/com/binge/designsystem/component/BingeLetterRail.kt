@@ -28,6 +28,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 import kotlin.math.roundToInt
@@ -55,11 +56,12 @@ fun BingeLetterRail(
     val slotPx = dimensionResource(R.dimen.letter_rail_letter).let { with(LocalDensity.current) { it.roundToPx() } }
     val letterPx = maxOf(slotPx, labelStyle.slotLineHeight().roundToInt())
     val dotPx = with(LocalDensity.current) { dimensionResource(R.dimen.letter_rail_dot).roundToPx() }
+    val textStyle = labelStyle.fittedTo(letterPx, slotPx)
     // The plan comes from the constraints, not a measured size, so the first frame already draws the letters that fit.
     BoxWithConstraints(modifier.fillMaxHeight().width(dimensionResource(R.dimen.letter_rail_width))) {
         val height = if (constraints.hasBoundedHeight) constraints.maxHeight else 0
         val plan = remember(letters, height, letterPx, dotPx) { letterRailPlan(letters, height, letterPx, dotPx) }
-        LetterRailColumn(letters, plan, height, letterPx, dotPx, onLetter, current)
+        LetterRailColumn(letters, plan, height, letterPx, dotPx, textStyle, onLetter, current)
     }
 }
 
@@ -70,6 +72,7 @@ private fun LetterRailColumn(
     height: Int,
     letterPx: Int,
     dotPx: Int,
+    textStyle: TextStyle,
     onLetter: (Char) -> Unit,
     current: Char?,
 ) {
@@ -145,7 +148,7 @@ private fun LetterRailColumn(
             ) {
                 Text(
                     letter.toString(),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = textStyle,
                     color = if (lit) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -163,6 +166,21 @@ private fun TextStyle.slotLineHeight(): Float =
             else -> 0f
         }
     }
+
+/**
+ * This style with its line exactly [letterPx] tall and the glyph centred in it, where a large font made the slot taller than
+ * its default [slotPx]. The drawn height is then the slot's by construction, rather than whatever the font's metrics give.
+ * At the default scale the style is left as it is, so the rail draws as it always did.
+ */
+@Composable
+private fun TextStyle.fittedTo(
+    letterPx: Int,
+    slotPx: Int,
+): TextStyle {
+    if (letterPx <= slotPx) return this
+    val lineHeightSp = with(LocalDensity.current) { letterPx.toSp() }
+    return copy(lineHeight = lineHeightSp, lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both))
+}
 
 private const val LINE_HEIGHT_PER_FONT_SIZE = 1.5f
 
