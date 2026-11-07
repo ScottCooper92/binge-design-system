@@ -21,9 +21,9 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.CARD_ASPECT_RATIO
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -48,8 +48,8 @@ fun TvSeeAllTile(
             modifier
                 .aspectRatio(aspectRatio)
                 // Ring before clip: it draws outside the bounds, so an earlier clip cuts it off.
-                .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
-                .clip(BingeShapes.MediaCard)
+                .tvFocusIndicator(isFocused = isFocused, shape = BingeTvCorners.Poster)
+                .clip(BingeTvCorners.Poster)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
                 .semantics { contentDescription = label }

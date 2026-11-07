@@ -27,7 +27,6 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.catalog.CatalogGroup
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.component.TvSeeAllTile
@@ -43,6 +42,7 @@ import com.binge.designsystem.tv.template.TvImmersiveGrid
 import com.binge.designsystem.tv.template.TvImmersiveGridContent
 import com.binge.designsystem.tv.template.TvImmersiveGridInPlace
 import com.binge.designsystem.tv.template.TvImmersiveHub
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -166,8 +166,8 @@ private fun SampleCard(
         modifier =
             modifier
                 .aspectRatio(CARD_ASPECT_RATIO)
-                .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
-                .clip(BingeShapes.MediaCard)
+                .tvFocusIndicator(isFocused = isFocused, shape = BingeTvCorners.Poster)
+                .clip(BingeTvCorners.Poster)
                 .background(sampleTone(title.id))
                 .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick),
     )
@@ -437,8 +437,8 @@ private fun SampleInPlaceCell(
         modifier =
             modifier
                 .aspectRatio(CARD_ASPECT_RATIO)
-                .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
-                .clip(BingeShapes.MediaCard)
+                .tvFocusIndicator(isFocused = isFocused, shape = BingeTvCorners.Poster)
+                .clip(BingeTvCorners.Poster)
                 .background(title?.let { sampleTone(it.id) } ?: MaterialTheme.colorScheme.surfaceVariant)
                 .tvClickable(onFocusChanged = onFocusChanged, onClick = onClick),
         contentAlignment = Alignment.Center,

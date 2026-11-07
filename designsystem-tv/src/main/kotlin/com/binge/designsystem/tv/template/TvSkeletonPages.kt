@@ -32,6 +32,7 @@ import com.binge.designsystem.tv.component.tvDetailHeroBand
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.tvContentGutterStart
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -156,7 +157,7 @@ private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
         ) {
             TvSkeletonBlock(
                 Modifier.width(dimensionResource(TvR.dimen.tv_detail_page_poster_width)).aspectRatio(CARD_ASPECT_RATIO),
-                shape = BingeShapes.MediaCard,
+                shape = BingeTvCorners.Poster,
             )
             Column(
                 modifier = Modifier.width(dimensionResource(TvR.dimen.tv_detail_page_copy_width)),
@@ -231,7 +232,7 @@ private fun DetailRowSkeleton(modifier: Modifier = Modifier) {
             items(count = DETAIL_CARDS) {
                 TvSkeletonBlock(
                     Modifier.width(dimensionResource(TvR.dimen.tv_skeleton_card_width)).aspectRatio(LANDSCAPE_RATIO),
-                    shape = BingeShapes.MediaCard,
+                    shape = BingeTvCorners.Poster,
                 )
             }
         }
@@ -267,7 +268,7 @@ internal fun PosterRowSkeleton(
             userScrollEnabled = false,
         ) {
             items(count = cards) {
-                TvSkeletonBlock(Modifier.width(cardWidth).aspectRatio(CARD_ASPECT_RATIO), shape = BingeShapes.MediaCard)
+                TvSkeletonBlock(Modifier.width(cardWidth).aspectRatio(CARD_ASPECT_RATIO), shape = BingeTvCorners.Poster)
             }
         }
     }
@@ -316,7 +317,7 @@ private fun SkeletonRows(
                             .aspectRatio(CARD_ASPECT_RATIO)
                             .then(if (row == 0 && column == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else Modifier)
                             .then(if (row * columns + column == seededIndex) Modifier.posterFocusRing() else Modifier),
-                        shape = BingeShapes.MediaCard,
+                        shape = BingeTvCorners.Poster,
                     )
                 }
             }

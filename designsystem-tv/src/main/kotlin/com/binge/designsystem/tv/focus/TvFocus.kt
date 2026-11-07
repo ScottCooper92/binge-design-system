@@ -28,6 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.tv.R as TvR
 
@@ -68,7 +69,7 @@ import com.binge.designsystem.tv.R as TvR
 @Composable
 fun Modifier.tvFocusIndicator(
     isFocused: Boolean,
-    shape: Shape = BingeShapes.MediaCard,
+    shape: Shape = BingeTvCorners.Poster,
     ringColor: Color = MaterialTheme.tvStyle.focusRing,
     restingColor: Color = Color.Unspecified,
 ): Modifier =

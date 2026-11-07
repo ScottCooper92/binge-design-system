@@ -34,9 +34,9 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.CARD_ASPECT_RATIO
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import kotlinx.coroutines.launch
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -146,7 +146,7 @@ fun TvPosterPlate(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(CARD_ASPECT_RATIO)
-            .clip(BingeShapes.MediaCard)
+            .clip(BingeTvCorners.Poster)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .then(interaction),
         content = content,
@@ -211,4 +211,4 @@ internal fun PosterFocusRing() {
 /** The poster ring as a modifier, for a node that cannot hold it as content. */
 @Composable
 internal fun Modifier.posterFocusRing(): Modifier =
-    border(dimensionResource(TvR.dimen.tv_focus_ring_width), MaterialTheme.colorScheme.onSurface, BingeShapes.MediaCard)
+    border(dimensionResource(TvR.dimen.tv_focus_ring_width), MaterialTheme.colorScheme.onSurface, BingeTvCorners.Poster)

@@ -13,4 +13,10 @@ import com.binge.designsystem.theme.BingeShapes
 object BingeTvCorners {
     /** Dialogs, cards, rows, tabs and QR plates: the same 8dp as [BingeShapes.TvListItem], so a row and the card holding it agree. */
     val Small: RoundedCornerShape = BingeShapes.TvListItem
+
+    /**
+     * A poster or media card, and the placeholder that stands in for one: the same 12dp as [BingeShapes.MoreCard], so the
+     * focus ring drawn around it matches.
+     */
+    val Poster: RoundedCornerShape = BingeShapes.MoreCard
 }

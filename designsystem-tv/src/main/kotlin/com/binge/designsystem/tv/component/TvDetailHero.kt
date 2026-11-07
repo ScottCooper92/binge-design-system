@@ -32,6 +32,7 @@ import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.tvContentGutterStart
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.uppercaseLocalised
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -150,7 +151,7 @@ fun TvDetailHero(
                         Modifier
                             .width(dimensionResource(TvR.dimen.tv_detail_page_poster_width))
                             .aspectRatio(CARD_ASPECT_RATIO)
-                            .clip(BingeShapes.MediaCard)
+                            .clip(BingeTvCorners.Poster)
                             .background(MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     poster()

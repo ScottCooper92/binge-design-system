@@ -61,6 +61,7 @@ import com.binge.designsystem.tv.component.TvVerticalDivider
 import com.binge.designsystem.tv.component.containerColor
 import com.binge.designsystem.tv.component.contentColor
 import com.binge.designsystem.tv.focus.tvFocusIndicator
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -335,7 +336,7 @@ private fun SamplePlate(
             modifier
                 .aspectRatio(CARD_ASPECT_RATIO)
                 .tvFocusIndicator(isFocused)
-                .clip(BingeShapes.MediaCard)
+                .clip(BingeTvCorners.Poster)
                 .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
     ) {
@@ -354,8 +355,8 @@ private fun FocusSampleTile(label: String, isFocused: Boolean) {
         modifier =
             Modifier
                 .size(width = dimensionResource(DesR.dimen.card_width), height = dimensionResource(DesR.dimen.card_height))
-                .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard),
-        shape = BingeShapes.MediaCard,
+                .tvFocusIndicator(isFocused = isFocused, shape = BingeTvCorners.Poster),
+        shape = BingeTvCorners.Poster,
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = label, style = MaterialTheme.typography.titleMedium)

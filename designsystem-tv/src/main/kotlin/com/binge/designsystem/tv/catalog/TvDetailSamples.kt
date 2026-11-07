@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.catalog.CatalogGroup
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCardRow
 import com.binge.designsystem.tv.component.TvDetailAction
 import com.binge.designsystem.tv.component.TvDetailActionRow
@@ -39,6 +38,7 @@ import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvHostedAsOverlay
 import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.template.TvDetailPage
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -142,8 +142,8 @@ private fun SampleCardRow(heading: String, onFocused: (Any) -> Unit) {
             modifier =
                 cellModifier
                     .aspectRatio(SAMPLE_CARD_RATIO)
-                    .tvFocusIndicator(isFocused = isFocused, shape = BingeShapes.MediaCard)
-                    .clip(BingeShapes.MediaCard)
+                    .tvFocusIndicator(isFocused = isFocused, shape = BingeTvCorners.Poster)
+                    .clip(BingeTvCorners.Poster)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .tvClickable(onFocusChanged = onFocusChanged, onClick = {}),
         )

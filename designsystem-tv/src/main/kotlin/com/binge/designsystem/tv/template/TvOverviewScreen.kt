@@ -35,12 +35,12 @@ import androidx.tv.material3.Text
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.BACKDROP_ASPECT_RATIO
 import com.binge.designsystem.CARD_ASPECT_RATIO
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
 import com.binge.designsystem.tv.focus.tvEndDirectionKey
 import com.binge.designsystem.tv.focus.tvFocusTarget
 import com.binge.designsystem.tv.focus.tvStartDirectionKey
 import com.binge.designsystem.tv.nav.LocalTvTopInset
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import kotlinx.coroutines.launch
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -182,7 +182,7 @@ private fun TvOverviewArtwork(posterUrl: String?, backdropUrl: String?) {
                     if (portrait) TvR.dimen.tv_overview_poster_width else TvR.dimen.tv_overview_backdrop_width,
                 ),
             ).aspectRatio(if (portrait) CARD_ASPECT_RATIO else BACKDROP_ASPECT_RATIO)
-            .clip(BingeShapes.MediaCard)
+            .clip(BingeTvCorners.Poster)
             .background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
         SubcomposeAsyncImage(
