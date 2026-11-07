@@ -173,10 +173,7 @@ private fun TextStyle.slotLineHeight(): Float =
  * At the default scale the style is left as it is, so the rail draws as it always did.
  */
 @Composable
-private fun TextStyle.fittedTo(
-    letterPx: Int,
-    slotPx: Int,
-): TextStyle {
+private fun TextStyle.fittedTo(letterPx: Int, slotPx: Int): TextStyle {
     if (letterPx <= slotPx) return this
     val lineHeightSp = with(LocalDensity.current) { letterPx.toSp() }
     return copy(lineHeight = lineHeightSp, lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both))
