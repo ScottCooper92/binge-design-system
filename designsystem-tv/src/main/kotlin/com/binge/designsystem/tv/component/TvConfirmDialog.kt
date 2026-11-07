@@ -22,8 +22,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvOverlayArrivalFocusEffect
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
@@ -119,9 +119,9 @@ internal fun TvDialogCard(modifier: Modifier = Modifier, content: @Composable Co
         modifier =
             modifier
                 .width(dimensionResource(TvR.dimen.tv_confirm_dialog_width))
-                .clip(BingeShapes.AccountCard)
+                .clip(BingeTvCorners.Small)
                 .background(MaterialTheme.tvStyle.panel)
-                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeShapes.AccountCard)
+                .border(dimensionResource(TvR.dimen.tv_button_border_width), MaterialTheme.colorScheme.border, BingeTvCorners.Small)
                 .padding(dimensionResource(DesR.dimen.padding_l)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
         content = content,
