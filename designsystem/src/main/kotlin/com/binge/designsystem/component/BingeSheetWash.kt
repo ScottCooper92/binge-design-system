@@ -1,5 +1,7 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
@@ -61,9 +63,11 @@ fun Modifier.bingeSheetWash(tint: Color): Modifier {
 internal fun Modifier.bingeSheetWashBehind(wash: BingeSheetWash, overdrawTop: Boolean = false): Modifier {
     val density = LocalDensity.current
     val fade = with(density) { dimensionResource(R.dimen.sheet_wash_fade).toPx() }
-    val overdraw = if (overdrawTop) with(density) { dimensionResource(R.dimen.sheet_wash_overdraw).toPx() } else 0f
+    val handleOverdraw = if (overdrawTop) with(density) { dimensionResource(R.dimen.sheet_wash_overdraw).toPx() } else 0f
+    val topInset = if (overdrawTop) WindowInsets.safeDrawing.getTop(density).toFloat() else 0f
     return onGloballyPositioned { wash.containerTop = it.positionInWindow().y }.drawBehind {
         val tint = wash.tint ?: return@drawBehind
+        val overdraw = sheetWashOverdraw(handleOverdraw, topInset, wash.containerTop)
         val bottom = wash.depth() + fade
         drawRect(
             topLeft = Offset(0f, -overdraw),
@@ -82,6 +86,17 @@ internal fun Modifier.bingeSheetWashBehind(wash: BingeSheetWash, overdrawTop: Bo
         )
     }
 }
+
+/**
+ * How far above its container the wash reaches: over the drag handle, and, expanded, up through the top inset too. An
+ * expanded sheet's content sits below that inset and the sheet's own colour would show above the wash. The inset's share
+ * is the part of it the sheet is up in, so a dragged sheet gives it back as the content comes away from the top.
+ */
+internal fun sheetWashOverdraw(
+    handle: Float,
+    topInset: Float,
+    containerTop: Float,
+): Float = handle + (topInset - (containerTop - topInset)).coerceIn(0f, topInset)
 
 private const val WASH_TOP_ALPHA = 0.6f
 private const val WASH_MID_ALPHA = 0.25f
