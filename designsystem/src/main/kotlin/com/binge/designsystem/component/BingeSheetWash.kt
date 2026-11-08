@@ -89,14 +89,16 @@ internal fun Modifier.bingeSheetWashBehind(wash: BingeSheetWash, overdrawTop: Bo
 
 /**
  * How far above its container the wash reaches: over the drag handle, and, expanded, up through the top inset too. An
- * expanded sheet's content sits below that inset and the sheet's own colour would show above the wash. The inset's share
- * is the part of it the sheet is up in, so a dragged sheet gives it back as the content comes away from the top.
+ * expanded sheet's content sits below the inset and the handle, and the sheet's own colour would show above the wash. The
+ * inset's share is the part of it the sheet is up in, measured from where the content rests when expanded (`topInset +
+ * handle`), so a dragged sheet gives it back as the content comes away from the top. A docking sheet has no handle above its
+ * content, so its content rests `handle` higher; the share then overshoots by up to a handle, which the sheet's shape clips.
  */
 internal fun sheetWashOverdraw(
     handle: Float,
     topInset: Float,
     containerTop: Float,
-): Float = handle + (topInset - (containerTop - topInset)).coerceIn(0f, topInset)
+): Float = handle + (topInset - (containerTop - topInset - handle)).coerceIn(0f, topInset)
 
 private const val WASH_TOP_ALPHA = 0.6f
 private const val WASH_MID_ALPHA = 0.25f
