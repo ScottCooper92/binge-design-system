@@ -136,7 +136,7 @@ fun TvDetailPageSkeleton(
     }
 }
 
-/** `TvDetailHero`'s band: its height, its content padding, the poster and copy on the weighted row, the pills at the foot. */
+/** `TvDetailHero`'s band: its height, its content padding, the poster and copy on the weighted row, the action buttons at the foot. */
 @Composable
 private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
     val band = tvDetailHeroBand()
