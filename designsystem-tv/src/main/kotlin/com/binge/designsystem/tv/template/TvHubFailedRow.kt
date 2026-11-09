@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.CARD_ASPECT_RATIO
-import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvSectionTitle
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
@@ -57,7 +57,7 @@ internal fun TvHubFailedRow(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                TvButton(
+                TvCompactButton(
                     label = failure.retryLabel,
                     onClick = failure.onRetry,
                     initiallyFocused = initiallyFocused,
