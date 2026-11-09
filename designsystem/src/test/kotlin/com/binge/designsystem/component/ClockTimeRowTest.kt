@@ -1,10 +1,10 @@
 package com.binge.designsystem.component
 
 import android.app.Application
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -17,7 +17,7 @@ import java.util.Locale
 @Config(sdk = [34], application = Application::class, qualifiers = "w320dp-h640dp")
 class ClockTimeRowTest {
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createTakeDownComposeRule()
 
     @Test
     fun `a 24-hour phone reads the time as hours and minutes`() {
