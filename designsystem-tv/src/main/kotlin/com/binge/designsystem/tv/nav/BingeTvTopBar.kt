@@ -44,6 +44,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.focus.tvFocusGroup
 import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -172,6 +173,8 @@ internal fun TvTopBarSurface(
     Layout(
         modifier = modifier
             .fillMaxWidth()
+            // With a trailing slot, focus arriving on the bar goes to the item last left, so leaving from an avatar returns to it.
+            .then(if (trailing != null) Modifier.tvFocusGroup() else Modifier)
             .alpha(if (visible) 1f else 0f)
             .then(
                 if (scrim) {
