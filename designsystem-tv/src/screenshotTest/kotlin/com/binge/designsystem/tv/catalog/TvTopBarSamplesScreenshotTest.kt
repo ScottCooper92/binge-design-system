@@ -43,6 +43,18 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun topBarLabelFooter() = Frame { TvTopBarLabelFooterSample() }
 
+    /** Content in the trailing slot: the tabs stay centred, and the ends are the caller's. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun topBarTrailing() = Frame { TvTopBarTrailingSample() }
+
+    /** No tabs and no start item: the avatar and the gear alone, at the end, with the bar keeping its height at 1.3x and 2x. */
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun topBarNoRail() = Frame { TvTopBarNoRailSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {

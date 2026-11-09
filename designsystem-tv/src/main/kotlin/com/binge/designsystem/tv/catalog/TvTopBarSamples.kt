@@ -24,12 +24,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
+import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
+import com.binge.designsystem.tv.component.TvIconButton
 import com.binge.designsystem.tv.nav.BingeTvTopBar
 import com.binge.designsystem.tv.nav.TvNavItem
 import com.binge.designsystem.tv.nav.TvTopBarSurface
+import com.binge.designsystem.tv.R as TvR
 
 private const val TOP_BAR_ART_FRACTION = 0.3f
 
@@ -131,4 +135,50 @@ fun TvTopBarLongLabelsSample() {
 @Composable
 fun TvTopBarLabelFooterSample() {
     TvTopBarSample(items = TopBarLongItems, iconOnlyFooter = false)
+}
+
+/** The top bar's trailing slot: an avatar and a gear at the end, with the tabs still centred between the ends. */
+@Composable
+fun TvTopBarTrailingSample() {
+    TvTopBarTrailingBar(items = TopBarSampleItems, header = TopBarHeader)
+}
+
+/** The same trailing slot with no tabs and no start item: only the avatar and the gear, pinned to the end. */
+@Composable
+fun TvTopBarNoRailSample() {
+    TvTopBarTrailingBar(items = emptyList(), header = null)
+}
+
+@Composable
+private fun TvTopBarTrailingBar(items: List<TvNavItem>, header: TvNavItem?) {
+    val down = remember { FocusRequester() }
+    var selected by rememberSaveable { mutableStateOf<Any>("movies") }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(TOP_BAR_ART_FRACTION)
+                .background(MaterialTheme.colorScheme.primary),
+        )
+        Text(
+            text = "Page content under the bar",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.align(Alignment.Center),
+        )
+        BingeTvTopBar(
+            header = header,
+            items = items,
+            footer = null,
+            selectedKey = selected,
+            onSelect = { selected = it },
+            itemFocusRequesters = emptyMap(),
+            down = down,
+            onFocusedChange = {},
+            trailing = {
+                BingeTvInitialsAvatar(name = "Alexander Hamilton", size = dimensionResource(TvR.dimen.tv_icon_button_diameter))
+                TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {})
+            },
+        )
+    }
 }

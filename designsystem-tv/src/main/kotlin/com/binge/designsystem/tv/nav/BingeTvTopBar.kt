@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -74,6 +75,10 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * Every item in [itemFocusRequesters] is attached to its requester, so the caller can send focus to a tab. Down from any item
  * lands on [down], the current page's own entry. [onFocusedChange] reports whether the bar holds focus.
  *
+ * [trailing] replaces [footer] with arbitrary content at the end (an avatar and a gear, say, with a menu hanging off the avatar).
+ * The caller owns that content's focus, but Down from it is the caller's too: give each focusable a `focusProperties { down = ... }`
+ * as the bar's own items get. With no [items] the bar draws no tabs and no rail, only its ends.
+ *
  * Until [visible] the bar is drawn clear and takes no focus, so it never shows a tab that is about to vanish. [scrim] fades
  * the bar's background from the theme's background at the top to clear, for a bar over page art; pass false to sit it on a
  * plain surface.
@@ -93,6 +98,7 @@ fun BingeTvTopBar(
     visible: Boolean = true,
     scrim: Boolean = true,
     actionKeys: Set<Any> = emptySet(),
+    trailing: (@Composable RowScope.() -> Unit)? = null,
 ) {
     var barFocused by remember { mutableStateOf(false) }
     var focusedKey by remember { mutableStateOf<Any?>(null) }
@@ -117,6 +123,7 @@ fun BingeTvTopBar(
         visible = visible,
         scrim = scrim,
         actionKeys = actionKeys,
+        trailing = trailing,
         modifier = modifier.onFocusChanged {
             barFocused = it.hasFocus
             onFocusedChange(it.hasFocus)
@@ -145,6 +152,7 @@ internal fun TvTopBarSurface(
     scrim: Boolean,
     modifier: Modifier = Modifier,
     actionKeys: Set<Any> = emptySet(),
+    trailing: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val background = MaterialTheme.colorScheme.background
     val scale by animateFloatAsState(
@@ -189,28 +197,37 @@ internal fun TvTopBarSurface(
                     modifier = itemModifier(header).layoutId(TvTopBarSlot.Start),
                 )
             }
-            Row(
-                modifier = Modifier.layoutId(TvTopBarSlot.Tabs).graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                },
-                horizontalArrangement = spacing,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                items.forEach { item ->
-                    TvTopBarEntry(
-                        item = item,
-                        selected = (item.key == selectedKey).takeUnless { item.key in actionKeys },
-                        focused = item.key == focusedKey,
-                        iconOnly = item.key in iconOnlyKeys,
-                        onFocusChanged = { onItemFocusChanged(item.key, it) },
-                        onClick = { onSelect(item.key) },
-                        // Tabs share what width there is, each up to its own: none is starved to nothing by the ones before it.
-                        modifier = itemModifier(item).weight(1f, fill = false),
-                    )
+            if (items.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.layoutId(TvTopBarSlot.Tabs).graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    },
+                    horizontalArrangement = spacing,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    items.forEach { item ->
+                        TvTopBarEntry(
+                            item = item,
+                            selected = (item.key == selectedKey).takeUnless { item.key in actionKeys },
+                            focused = item.key == focusedKey,
+                            iconOnly = item.key in iconOnlyKeys,
+                            onFocusChanged = { onItemFocusChanged(item.key, it) },
+                            onClick = { onSelect(item.key) },
+                            // Tabs share what width there is, each up to its own: none is starved to nothing by the ones before it.
+                            modifier = itemModifier(item).weight(1f, fill = false),
+                        )
+                    }
                 }
             }
-            if (footer != null) {
+            if (trailing != null) {
+                Row(
+                    modifier = Modifier.layoutId(TvTopBarSlot.End),
+                    horizontalArrangement = spacing,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = trailing,
+                )
+            } else if (footer != null) {
                 TvTopBarEntry(
                     item = footer,
                     selected = (footer.key == selectedKey).takeUnless { footer.key in actionKeys },
@@ -231,12 +248,12 @@ internal fun TvTopBarSurface(
         val clearance = if (start == null && end == null) 0 else endClearance.roundToPx()
         val reserved = maxOf(start?.width ?: 0, end?.width ?: 0) + clearance
         val tabs = measurables
-            .first { it.layoutId == TvTopBarSlot.Tabs }
-            .measure(loose.copy(maxWidth = (constraints.maxWidth - 2 * reserved).coerceAtLeast(0)))
-        val height = maxOf(start?.height ?: 0, tabs.height, end?.height ?: 0)
+            .firstOrNull { it.layoutId == TvTopBarSlot.Tabs }
+            ?.measure(loose.copy(maxWidth = (constraints.maxWidth - 2 * reserved).coerceAtLeast(0)))
+        val height = maxOf(start?.height ?: 0, tabs?.height ?: 0, end?.height ?: 0)
         layout(constraints.maxWidth, height) {
             start?.placeRelative(0, (height - start.height) / 2)
-            tabs.placeRelative((constraints.maxWidth - tabs.width) / 2, (height - tabs.height) / 2)
+            tabs?.placeRelative((constraints.maxWidth - tabs.width) / 2, (height - tabs.height) / 2)
             end?.placeRelative(constraints.maxWidth - end.width, (height - end.height) / 2)
         }
     }
