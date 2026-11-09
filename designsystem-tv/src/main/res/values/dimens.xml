@@ -115,7 +115,6 @@
     <dimen name="tv_skeleton_heading_width">160dp</dimen>
     <!-- A row heading's stand-in: TvSectionTitle's titleLarge line, so the rows under it sit where they will -->
     <dimen name="tv_skeleton_heading_height">28dp</dimen>
-    <dimen name="tv_skeleton_action_height">48dp</dimen>
     <dimen name="tv_skeleton_card_width">140dp</dimen>
     <!-- TvSwitch: the track, the outline it keeps unchecked, and the thumb inset within it -->
     <dimen name="tv_switch_track_width">44dp</dimen>
