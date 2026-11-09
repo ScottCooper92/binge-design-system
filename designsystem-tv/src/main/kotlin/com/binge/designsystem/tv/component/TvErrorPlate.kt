@@ -13,6 +13,8 @@ import com.binge.designsystem.R as DesR
 /**
  * A failure as a [TvMessagePlate]: the [kind]'s glyph and copy, and Try again when [onRetry] is set.
  *
+ * Try again is a [TvCompactButton], the same size as the [extraActions] beside it.
+ *
  * The plate is announced as a whole, as the phone's `ErrorScreen` is. A failure the caller cannot retry renders no
  * button, because a dead button is worse than none on a remote.
  * [retryInitiallyFocused] and [retryFocusRequester] take focus as parameters, so the focused state can be
@@ -44,7 +46,7 @@ fun TvErrorPlate(
             } else {
                 {
                     onRetry?.let { retry ->
-                        TvButton(
+                        TvCompactButton(
                             label = stringResource(DesR.string.error_kind_retry),
                             onClick = retry,
                             style = TvButtonStyle.Primary,
