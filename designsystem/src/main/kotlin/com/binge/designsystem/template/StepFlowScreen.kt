@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -162,6 +163,7 @@ internal class SplitMemory {
  * Whether the keyboard is up, for a split held while it is: visible, or its inset still animating away. On hide the
  * keyboard stops reporting itself visible while its inset is still shrinking a host's padded space.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun keyboardUp(): Boolean = WindowInsets.isImeVisible || WindowInsets.ime.getBottom(LocalDensity.current) > 0
 
