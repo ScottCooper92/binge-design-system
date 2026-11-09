@@ -207,7 +207,6 @@ internal fun downloadEtaHours(etaMinutes: Int): Int? =
 fun formatRuntime(minutes: Int): String = stringResource(R.string.hero_meta_runtime, minutes / MINUTES_PER_HOUR, minutes % MINUTES_PER_HOUR)
 
 private const val CLOCK_MINUTES_PER_DAY = 1440
-private const val CLOCK_MINUTES_PER_HOUR = 60
 
 /**
  * [minutes] since midnight in the phone's own clock format: `21:30` on a 24-hour phone, `9:30 PM` on a 12-hour one, each in
@@ -220,7 +219,7 @@ fun clockTimeText(
 ): String {
     val pattern = DateFormat.getBestDateTimePattern(locale, if (is24Hour) "Hm" else "hm")
     val ofDay = Math.floorMod(minutes, CLOCK_MINUTES_PER_DAY)
-    return LocalTime.of(ofDay / CLOCK_MINUTES_PER_HOUR, ofDay % CLOCK_MINUTES_PER_HOUR).format(DateTimeFormatter.ofPattern(pattern, locale))
+    return LocalTime.of(ofDay / MINUTES_PER_HOUR, ofDay % MINUTES_PER_HOUR).format(DateTimeFormatter.ofPattern(pattern, locale))
 }
 
 /** [clockTimeText] for an hour of the day that may carry minutes (8.5 is half past eight), as the server writes a schedule. */
@@ -228,4 +227,4 @@ fun clockHoursText(
     hour: Double,
     is24Hour: Boolean,
     locale: Locale,
-): String = clockTimeText(Math.round(hour * CLOCK_MINUTES_PER_HOUR).toInt(), is24Hour, locale)
+): String = clockTimeText(Math.round(hour * MINUTES_PER_HOUR).toInt(), is24Hour, locale)
