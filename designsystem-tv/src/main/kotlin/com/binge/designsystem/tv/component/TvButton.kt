@@ -30,6 +30,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.theme.TvButtonColors
 import com.binge.designsystem.tv.theme.TvButtonStyle
 import com.binge.designsystem.tv.theme.tvButtonColors
 import com.binge.designsystem.tv.R as TvR
@@ -105,7 +106,33 @@ fun TvButtonSurface(
     leadingIcon: ImageVector? = null,
     loading: Boolean = false,
 ) {
-    val palette = tvButtonColors(style = style, enabled = enabled, isFocused = isFocused)
+    TvButtonSurface(
+        label = label,
+        palette = tvButtonColors(style = style, enabled = enabled, isFocused = isFocused),
+        isFocused = isFocused,
+        modifier = modifier,
+        leadingIcon = leadingIcon,
+        loading = loading,
+    )
+}
+
+/**
+ * The same pill with a caller-supplied [palette], for a consumer whose button needs its own colours (a tone for one
+ * kind of request, a placeholder look) without re-rolling the chrome. [TvButtonSurface] with a `style` is this
+ * overload with the palette [tvButtonColors] resolves, so the two draw identically.
+ *
+ * [palette] is taken as given: it already encodes the enabled and focused state, so a caller resolves it per state.
+ * [isFocused] only mirrors the flag the caller owns; it changes nothing drawn here.
+ */
+@Composable
+fun TvButtonSurface(
+    label: String,
+    palette: TvButtonColors,
+    isFocused: Boolean,
+    modifier: Modifier = Modifier,
+    leadingIcon: ImageVector? = null,
+    loading: Boolean = false,
+) {
     Box(
         modifier = modifier
             .height(dimensionResource(TvR.dimen.tv_button_height))

@@ -34,28 +34,40 @@
       automerge: true,
     },
     {
-      // Compose, AGP, Kotlin and KSP must agree with the consumers' versions, and a rendering
+      // Compose, Kotlin and KSP must agree with the consumers' versions, and a rendering
       // shift needs a human to decide on the re-record. Never auto-merge, even on a patch.
       matchPackageNames: [
         "/^org\\.jetbrains\\.kotlin[.:]/",
         "/^com\\.google\\.devtools\\.ksp/",
-        "/^com\\.android\\.(tools\\.build|application|library)/",
         "/^androidx\\.compose\\./",
       ],
-      groupName: "compose + kotlin + android toolchain",
+      groupName: "compose + kotlin toolchain",
       automerge: false,
       prBodyNotes: [
-        "**Needs matching bumps in `Binge`, `binge-seerr`, `binge-archive` and `binge-jellyfin`.** The root `libs.versions.toml` is not a local decision: Compose, AGP, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
+        "**Needs matching bumps in `Binge`, `binge-seerr`, `binge-archive` and `binge-jellyfin`.** The root `libs.versions.toml` is not a local decision: Compose, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
+      ],
+    },
+    {
+      // AGP is its own PR. Gradle refuses two AGP versions in one build, so a bump here breaks every consumer's
+      // `consumer-check` until each one moves too, and it has to land in lockstep with all four of them. It must not
+      // wait behind, or be blocked by, a Compose bump that needs a decision of its own.
+      matchPackageNames: ["/^com\\.android\\.(tools\\.build|application|library)/"],
+      groupName: "android gradle plugin",
+      automerge: false,
+      prBodyNotes: [
+        "**Moves in lockstep with `Binge`, `binge-seerr`, `binge-archive` and `binge-jellyfin`.** Gradle rejects two AGP versions in one build, so the consumers' `consumer-check` stays red until each one bumps `agp` to the same version in its own catalog. Merge this together with those bumps, not before.",
       ],
     },
     {
       // material3 is pinned ahead of the BOM on an alpha, because the expressive theme reads APIs the BOM's stable line
-      // lacks. Its beta line is not taken until a Compose 1.13 BOM ships; alphas and the stable release still are.
+      // lacks. Its beta and rc lines are not taken until a Compose 1.13 BOM ships (#774); alphas and the stable release
+      // still are. The alpha line pulls the Compose UI line forward to 1.13, which the test fixtures rely on for
+      // `ComposeUiTestConfig`; an rc resolves back to the BOM's 1.12 and breaks them.
       matchPackageNames: [
         "androidx.compose.material3:material3",
         "androidx.compose.material3:material3-adaptive-navigation-suite",
       ],
-      allowedVersions: "!/-beta/",
+      allowedVersions: "!/-(beta|rc)/",
     },
   ],
 }

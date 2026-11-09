@@ -25,13 +25,14 @@ import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeModalSideSheet
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeSheetDockingHeader
+import com.binge.designsystem.component.BingeSheetStepHandle
 import com.binge.designsystem.component.BingeSheetTopBar
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.LocalBingeSheetDock
 import com.binge.designsystem.component.bingeSheetPinnedFooter
 import com.binge.designsystem.preview.ScreenshotTheme
 
-private enum class OpenSheet { Bottom, Docking, Side }
+private enum class OpenSheet { Bottom, Docking, DockingStep, Side }
 
 private const val DOCKING_ROWS = 30
 
@@ -56,6 +57,7 @@ fun SheetsDemo() {
         ) {
             BingeOutlinedButton(label = "Bottom sheet", onClick = { open = OpenSheet.Bottom })
             BingeOutlinedButton(label = "Docking bottom sheet", onClick = { open = OpenSheet.Docking })
+            BingeOutlinedButton(label = "Docking step, handle only", onClick = { open = OpenSheet.DockingStep })
             BingeOutlinedButton(label = "Side sheet", onClick = { open = OpenSheet.Side })
             Text(outcome)
         }
@@ -73,6 +75,17 @@ fun SheetsDemo() {
                     dockable = true,
                 ) {
                     DockingSheetBody { close("Dismissed by Done") }
+                }
+            OpenSheet.DockingStep ->
+                BingeBottomSheet(
+                    onDismissRequest = { close("Dismissed by gesture, scrim or back") },
+                    skipPartiallyExpanded = false,
+                    dockable = true,
+                ) {
+                    BingeSheetStepHandle(title = "Docked step")
+                    SheetBody("A step with no header of its own: it still has the handle. Pull up to dock, or", "Done") {
+                        close("Dismissed by Done")
+                    }
                 }
             OpenSheet.Side ->
                 BingeModalSideSheet(onDismissRequest = { close("Dismissed by back") }) {
