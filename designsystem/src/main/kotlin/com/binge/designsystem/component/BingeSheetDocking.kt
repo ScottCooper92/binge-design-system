@@ -301,6 +301,10 @@ fun Modifier.bingeSheetPinnedFooter(dock: BingeSheetDock?, backing: Color): Modi
  * outside a docking sheet.
  */
 @Composable
-fun BingeSheetStepHandle(title: String) {
-    BingeSheetDockingHeader(header = {}, dockedTopBar = { onClose -> BingeSheetTopBar(title = title, onClose = onClose) })
+fun BingeSheetStepHandle(title: String, modifier: Modifier = Modifier) {
+    BingeSheetDockingHeader(
+        header = {},
+        dockedTopBar = { onClose -> BingeSheetTopBar(title = title, onClose = onClose) },
+        modifier = modifier,
+    )
 }
