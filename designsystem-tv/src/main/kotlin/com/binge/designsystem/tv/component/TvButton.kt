@@ -36,7 +36,9 @@ import com.binge.designsystem.tv.theme.tvButtonColors
 import com.binge.designsystem.tv.R as TvR
 
 /**
- * The shared 10-foot text button: a pill coloured by [tvButtonColors], focus filling it with the accent. The
+ * The full-size 10-foot button: a pill coloured by [tvButtonColors], focus filling it with the accent. Reach for
+ * [TvCompactButton] first: retries, dialog answers and action rows all use it, and this pill is kept for poster-adjacent
+ * uses where the taller target belongs. The
  * text styles ([TvButtonStyle.Text], [TvButtonStyle.TextDestructive]) are the exception: a dialog's answers, a bare
  * label with no edge, since the panel is the shape. The
  * red styles keep their hue: [TvButtonStyle.DestructiveOutline] fills red on focus, and [TvButtonStyle.Destructive]

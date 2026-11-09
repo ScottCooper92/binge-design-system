@@ -148,7 +148,7 @@ fun TvPairingCardError(
                 )
             }
             PairingMessage(message, qrSize)
-            TvButton(label = retryLabel, onClick = onRetry, style = TvButtonStyle.Primary, initiallyFocused = retryInitiallyFocused)
+            TvCompactButton(label = retryLabel, onClick = onRetry, style = TvButtonStyle.Primary, initiallyFocused = retryInitiallyFocused)
         }
     }
 }
