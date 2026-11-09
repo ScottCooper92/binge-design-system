@@ -31,7 +31,7 @@ import com.binge.designsystem.tv.R as TvR
  * with a Retry button, or a refusal with its reason. Such a page has no Save button.
  *
  * [SaveStatus.Idle] draws nothing and takes no space, so place the line where its arrival moves nothing that
- * matters, such as under a top-aligned copy column. The other three states share one height, the button's, so
+ * matters, such as under a top-aligned copy column. The other three states share one height, the compact button's, so
  * the line does not jump between them. A failure keeps the change on screen and puts Retry, calling [onRetry],
  * in the line itself. This is the TV form of the phone's permanent Retry snackbar, since the TV module has no
  * snackbar. Retry is reachable on the D-pad but does not take focus, so a failure never pulls the user out of
@@ -52,7 +52,7 @@ fun TvSaveStatus(
     if (status == SaveStatus.Idle) return
     Row(
         modifier = modifier
-            .heightIn(min = dimensionResource(TvR.dimen.tv_button_height))
+            .heightIn(min = dimensionResource(TvR.dimen.tv_compact_button_height))
             .semantics { liveRegion = LiveRegionMode.Polite },
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_sm)),
         verticalAlignment = Alignment.CenterVertically,
@@ -77,7 +77,7 @@ fun TvSaveStatus(
                     Modifier.weight(1f, fill = false),
                 )
                 val focusManager = LocalFocusManager.current
-                TvButton(
+                TvCompactButton(
                     label = stringResource(DesR.string.save_status_retry),
                     onClick = {
                         // Retry leaves the line once the status moves on, and a focused node that leaves sends
