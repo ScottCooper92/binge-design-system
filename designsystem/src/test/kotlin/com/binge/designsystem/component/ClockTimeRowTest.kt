@@ -3,6 +3,8 @@ package com.binge.designsystem.component
 import android.app.Application
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.binge.designsystem.clockHoursText
+import com.binge.designsystem.clockTimeText
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -35,6 +37,11 @@ class ClockTimeRowTest {
     @Test
     fun `a whole day reads as midnight`() {
         assertEquals("00:00", clockTimeText(minutes = 1440, is24Hour = true, locale = Locale.US))
+    }
+
+    @Test
+    fun `a negative value wraps to the day before`() {
+        assertEquals("23:30", clockTimeText(minutes = -30, is24Hour = true, locale = Locale.US))
     }
 
     @Test

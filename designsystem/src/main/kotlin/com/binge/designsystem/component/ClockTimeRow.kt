@@ -1,6 +1,5 @@
 package com.binge.designsystem.component
 
-import android.text.format.DateFormat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.AlertDialog
@@ -18,8 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import com.binge.designsystem.clockTimeText
 import java.util.Locale
 import com.binge.designsystem.R as DesR
 
@@ -30,30 +28,10 @@ private const val MINUTES_PER_HOUR = 60
 private const val KEYBOARD_FONT_SCALE = 1.3f
 
 /**
- * [minutes] since midnight in the phone's own clock format: `21:30` on a 24-hour phone, `9:30 PM` on a 12-hour one, each in
- * the locale's own style. A whole day (24:00) reads as midnight.
- */
-fun clockTimeText(
-    minutes: Int,
-    is24Hour: Boolean,
-    locale: Locale,
-): String {
-    val pattern = DateFormat.getBestDateTimePattern(locale, if (is24Hour) "Hm" else "hm")
-    val ofDay = minutes % CLOCK_MINUTES_PER_DAY
-    return LocalTime.of(ofDay / MINUTES_PER_HOUR, ofDay % MINUTES_PER_HOUR).format(DateTimeFormatter.ofPattern(pattern, locale))
-}
-
-/** [clockTimeText] for an hour of the day that may carry minutes (8.5 is half past eight), as the server writes a schedule. */
-fun clockHoursText(
-    hour: Double,
-    is24Hour: Boolean,
-    locale: Locale,
-): String = clockTimeText(Math.round(hour * MINUTES_PER_HOUR).toInt(), is24Hour, locale)
-
-/**
  * A time of day as a row: [label], and the time in the phone's clock format as its detail. A tap opens Material's time
  * picker in a dialog, which handles a.m. and p.m. and the 12 or 24-hour dial itself; OK hands back the minutes since
- * midnight through [onPick]. At a large font the dialog takes the picker's keyboard entry, which still fits.
+ * midnight through [onPick]. Reach for it for a time in a settings row; for a time typed as a form field, use
+ * `BingeTimeInput`. At a large font the dialog takes the picker's keyboard entry, which still fits.
  */
 @Composable
 fun ClockTimeRow(
@@ -79,7 +57,7 @@ fun ClockTimeRow(
                 ),
             ),
     )
-    if (open) ClockTimeDialog(label, minutes % CLOCK_MINUTES_PER_DAY, is24Hour, onPick = onPick, onDismiss = { open = false })
+    if (open) ClockTimeDialog(label, Math.floorMod(minutes, CLOCK_MINUTES_PER_DAY), is24Hour, onPick = onPick, onDismiss = { open = false })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
