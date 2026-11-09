@@ -30,7 +30,6 @@ import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvMessagePlate
-import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvContentInset
@@ -249,30 +248,6 @@ fun TvImmersiveHubEmptyRowSample() {
         initialFocused = "approved" to 202,
         rows = listOf(TvHubRow<SampleTitle>(key = "pending", title = "Pending (0)", items = emptyList())) + SampleRows.drop(1),
     )
-}
-
-/** The tile that closes a row, at rest and focused, beside each other. */
-@Composable
-fun TvSeeAllTileSample() {
-    Row(
-        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
-    ) {
-        TvSeeAllTile(
-            label = "See all",
-            isFocused = false,
-            onFocusChanged = {},
-            onClick = {},
-            modifier = Modifier.width(dimensionResource(TvR.dimen.tv_immersive_card_width)),
-        )
-        TvSeeAllTile(
-            label = "See all",
-            isFocused = true,
-            onFocusChanged = {},
-            onClick = {},
-            modifier = Modifier.width(dimensionResource(TvR.dimen.tv_immersive_card_width)),
-        )
-    }
 }
 
 private const val GRID_ITEM_COUNT = 30

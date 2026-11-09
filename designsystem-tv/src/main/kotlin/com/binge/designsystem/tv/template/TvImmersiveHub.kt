@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -32,10 +33,11 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.component.TRAILING_KEY
 import com.binge.designsystem.tv.component.TvCardRow
-import com.binge.designsystem.tv.component.TvSeeAllTile
+import com.binge.designsystem.tv.component.TvSeeAllCard
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
@@ -304,12 +306,12 @@ fun <T : Any> TvImmersiveHub(
                         trailingContent =
                             row.onSeeAll?.takeIf { seeAllLabel != null }?.let { onSeeAll ->
                                 { isFocused, onFocusChanged, cellModifier ->
-                                    TvSeeAllTile(
+                                    TvSeeAllCard(
                                         label = seeAllLabel.orEmpty(),
                                         isFocused = isFocused,
                                         onFocusChanged = onFocusChanged,
                                         onClick = onSeeAll,
-                                        modifier = cellModifier.width(cardWidth).then(seeAllModifier(row.key)),
+                                        modifier = cellModifier.width(cardWidth).aspectRatio(CARD_ASPECT_RATIO).then(seeAllModifier(row.key)),
                                     )
                                 }
                             },
