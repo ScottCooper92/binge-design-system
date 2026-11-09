@@ -5,13 +5,15 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
-import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
@@ -45,17 +47,34 @@ class TvRowEntryContractTest {
     @get:Rule
     val composeTestRule = createTakeDownKeyboardComposeRule()
 
-    /** Saveable: the remembered cell rides `rememberSaveable`, so a saved-state restore keeps it (not a reset to 0). */
+    /**
+     * Saveable: the remembered cell rides `rememberSaveable`, so a saved-state restore keeps it (not a reset to 0).
+     *
+     * The save and the restore go through a [SaveableStateRegistry] directly, as an Activity's does, and not through
+     * `StateRestorationTester`. That tester round-trips the state through a `Bundle`, and Robolectric's pooled `Parcel`
+     * can come back already recycled by an earlier test in the same JVM ("Parcel recycled earlier than expected", #1069).
+     * An index needs no `Parcel`, so this case cannot be hit by that leak.
+     */
     @Test
     fun `the remembered cell survives state restoration`() {
-        val restorer = StateRestorationTester(composeTestRule)
+        val registry = mutableStateOf(SaveableStateRegistry(restoredValues = null, canBeSaved = { true }))
+        val showing = mutableStateOf(true)
         lateinit var entry: TvRowEntry
-        restorer.setContent {
-            BingeTvTheme { entry = rememberTvRowEntry(itemCount = 5) }
+        composeTestRule.setContent {
+            if (showing.value) {
+                CompositionLocalProvider(LocalSaveableStateRegistry provides registry.value) {
+                    BingeTvTheme { entry = rememberTvRowEntry(itemCount = 5) }
+                }
+            }
         }
         composeTestRule.runOnIdle { entry.rememberFocused(3) }
 
-        restorer.emulateSavedInstanceStateRestore()
+        val saved = composeTestRule.runOnIdle { registry.value.performSave() }
+        composeTestRule.runOnIdle { showing.value = false }
+        composeTestRule.runOnIdle {
+            registry.value = SaveableStateRegistry(restoredValues = saved, canBeSaved = { true })
+            showing.value = true
+        }
 
         composeTestRule.runOnIdle {
             assertEquals("The remembered index must survive a saved-state restore", 3, entry.entryIndex)

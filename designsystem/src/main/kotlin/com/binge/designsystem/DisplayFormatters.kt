@@ -1,6 +1,7 @@
 package com.binge.designsystem
 
 import android.icu.text.RelativeDateTimeFormatter
+import android.text.format.DateFormat
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
@@ -8,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Instant
+import java.time.LocalTime
 import java.time.Month
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -203,3 +205,26 @@ internal fun downloadEtaHours(etaMinutes: Int): Int? =
  */
 @Composable
 fun formatRuntime(minutes: Int): String = stringResource(R.string.hero_meta_runtime, minutes / MINUTES_PER_HOUR, minutes % MINUTES_PER_HOUR)
+
+private const val CLOCK_MINUTES_PER_DAY = 1440
+
+/**
+ * [minutes] since midnight in the phone's own clock format: `21:30` on a 24-hour phone, `9:30 PM` on a 12-hour one, each in
+ * the locale's own style. A whole day (24:00) reads as midnight, and a negative value wraps to the day before.
+ */
+fun clockTimeText(
+    minutes: Int,
+    is24Hour: Boolean,
+    locale: Locale,
+): String {
+    val pattern = DateFormat.getBestDateTimePattern(locale, if (is24Hour) "Hm" else "hm")
+    val ofDay = Math.floorMod(minutes, CLOCK_MINUTES_PER_DAY)
+    return LocalTime.of(ofDay / MINUTES_PER_HOUR, ofDay % MINUTES_PER_HOUR).format(DateTimeFormatter.ofPattern(pattern, locale))
+}
+
+/** [clockTimeText] for an hour of the day that may carry minutes (8.5 is half past eight), as the server writes a schedule. */
+fun clockHoursText(
+    hour: Double,
+    is24Hour: Boolean,
+    locale: Locale,
+): String = clockTimeText(Math.round(hour * MINUTES_PER_HOUR).toInt(), is24Hour, locale)

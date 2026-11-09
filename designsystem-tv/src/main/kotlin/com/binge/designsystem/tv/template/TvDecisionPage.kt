@@ -48,7 +48,7 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * The phone's decision screen on a television, on [TvTwoPanePage]: the [copy] beside a read-out card of
- * the [points], and the two answers pinned under it. Each point takes focus too, so ↑ from the answers walks a
+ * the [points], and the two answers, compact buttons, pinned under it. Each point takes focus too, so ↑ from the answers walks a
  * card taller than the panel into view a point at a time rather than leaving its end unreachable.
  *
  * [accept] is the primary and takes the page's entry focus. [decline] sits beside it, one press away. They are the
@@ -81,8 +81,8 @@ fun TvDecisionPage(
         entry = entry,
         divider = false,
         pinnedAction = {
-            TvActionButton(accept, TvButtonStyle.Primary, Modifier.focusRequester(entry), initiallyFocused = acceptInitiallyFocused)
-            TvActionButton(decline, TvButtonStyle.Secondary)
+            TvCompactActionButton(accept, TvButtonStyle.Primary, Modifier.focusRequester(entry), initiallyFocused = acceptInitiallyFocused)
+            TvCompactActionButton(decline, TvButtonStyle.Secondary)
         },
         copy = { DecisionCopyColumn(copy, noteContent) },
         action = { DecisionPointsCard(points) },

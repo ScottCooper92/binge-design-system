@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -108,7 +109,7 @@ fun TvImmersiveHubSkeleton(
 
 /**
  * The loading state of a detail page (`TvDetailPage`): the hero band at its loaded height, with the poster beside
- * the overline, title, facts and synopsis lines and the action pills at its foot, then one row of cards. Not
+ * the overline, title, facts and synopsis lines and the action buttons at its foot, then one row of cards. Not
  * focusable. Every block sits where the loaded page puts it, so nothing moves when the content arrives.
  *
  * The detail page pads the same in every [hosting], so the skeleton ignores it; it takes the parameter anyway so it
@@ -135,7 +136,7 @@ fun TvDetailPageSkeleton(
     }
 }
 
-/** `TvDetailHero`'s band: its height, its content padding, the poster and copy on the weighted row, the pills at the foot. */
+/** `TvDetailHero`'s band: its height, its content padding, the poster and copy on the weighted row, the action buttons at the foot. */
 @Composable
 private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
     val band = tvDetailHeroBand()
@@ -186,18 +187,20 @@ private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
                 }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s))) {
+        // The loaded row's compact buttons: 40dp, small corners, `padding_m` apart, centred in the row's width.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m), Alignment.CenterHorizontally),
+        ) {
             TvSkeletonBlock(
                 Modifier
                     .width(dimensionResource(TvR.dimen.tv_detail_page_action_primary_min_width))
-                    .height(dimensionResource(TvR.dimen.tv_skeleton_action_height)),
-                shape = BingeShapes.Pill,
+                    .height(dimensionResource(TvR.dimen.tv_compact_button_height)),
+                shape = MaterialTheme.shapes.small,
             )
             TvSkeletonBlock(
-                Modifier
-                    .width(dimensionResource(TvR.dimen.tv_skeleton_action_height))
-                    .height(dimensionResource(TvR.dimen.tv_skeleton_action_height)),
-                shape = BingeShapes.Pill,
+                Modifier.size(dimensionResource(TvR.dimen.tv_compact_button_height)),
+                shape = MaterialTheme.shapes.small,
             )
         }
     }
