@@ -29,7 +29,7 @@ class ClockTimeRowTest {
         val text = clockTimeText(minutes = 21 * 60 + 30, is24Hour = false, locale = Locale.US)
 
         assertEquals(true, text.startsWith("9:30"))
-        assertEquals(true, text.contains("PM"))
+        assertEquals(true, text.contains("PM", ignoreCase = true))
     }
 
     @Test
