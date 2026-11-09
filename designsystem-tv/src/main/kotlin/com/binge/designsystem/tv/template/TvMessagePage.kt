@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.focus.TvFocusSink
 import com.binge.designsystem.tv.theme.TvButtonStyle
@@ -27,6 +28,24 @@ internal fun TvActionButton(
     initiallyFocused: Boolean = false,
 ) {
     TvButton(
+        label = action.label,
+        onClick = action.onClick,
+        modifier = modifier.then(action.modifier),
+        style = style,
+        leadingIcon = action.leadingIcon,
+        initiallyFocused = initiallyFocused,
+    )
+}
+
+/** [TvActionButton] in the compact style, for the pages whose actions sit in a pinned footer. */
+@Composable
+internal fun TvCompactActionButton(
+    action: ScreenAction,
+    style: TvButtonStyle,
+    modifier: Modifier = Modifier,
+    initiallyFocused: Boolean = false,
+) {
+    TvCompactButton(
         label = action.label,
         onClick = action.onClick,
         modifier = modifier.then(action.modifier),
