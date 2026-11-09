@@ -19,7 +19,7 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * The detail action row, at the foot of the hero band and reused by any TV detail page. Each page supplies its
  * own [actions]; at most one is [TvDetailAction.isPrimary], and that one renders as the row's single labelled
- * [TvButton] with the wider min width — everything else is a circular [TvIconButton], unless it asks for a
+ * [TvCompactButton] with the wider min width — everything else is a square [TvCompactIconButton], unless it asks for a
  * label with [TvDetailAction.showLabel]. A row too long for the width it is given wraps onto a further line. Empty
  * [actions] renders nothing. [entryFocus] is where page entry lands.
  */
@@ -46,7 +46,7 @@ fun TvDetailActionRow(
             actions.forEach { action ->
                 val target = action.focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier
                 if (action.isPrimary) {
-                    TvButton(
+                    TvCompactButton(
                         label = action.label,
                         onClick = action.onClick,
                         style = TvButtonStyle.Primary,
@@ -55,7 +55,7 @@ fun TvDetailActionRow(
                         modifier = target.widthIn(min = dimensionResource(TvR.dimen.tv_detail_page_action_primary_min_width)),
                     )
                 } else if (action.showLabel) {
-                    TvButton(
+                    TvCompactButton(
                         label = action.label,
                         onClick = action.onClick,
                         style = action.style,
@@ -64,7 +64,7 @@ fun TvDetailActionRow(
                         modifier = target,
                     )
                 } else {
-                    TvIconButton(
+                    TvCompactIconButton(
                         icon = action.icon,
                         label = action.label,
                         onClick = action.onClick,
@@ -80,7 +80,7 @@ fun TvDetailActionRow(
 
 /**
  * One action in a [TvDetailActionRow]. [isPrimary] marks the row's one emphasised lead action — a filled, labelled
- * pill; every other action is an icon button with [label] as its accessible name, or a labelled button when
+ * compact button; every other action is an icon button with [label] as its accessible name, or a labelled button when
  * [showLabel] is set. [focusRequester] lets a caller hand
  * focus back to this action after a sheet it opened closes.
  */
