@@ -293,3 +293,18 @@ fun Modifier.bingeSheetPinnedFooter(dock: BingeSheetDock?, backing: Color): Modi
             translationY = if (naturalBottom.isNaN()) 0f else -pinnedFooterLift(naturalBottom, windowHeight, navigationBarHeight)
         }.drawBehind { drawRect(backing, size = Size(size.width, size.height + navigationBarHeight)) }
 }
+
+/**
+ * The drag handle for a step of a docking sheet that has no docking header of its own (a name, a typed path): the
+ * handle, which docks into a bar titled [title] if the sheet is pulled to full height. A docking sheet draws no handle
+ * itself, so without this such a step has none, and loses the handle's tap and screen-reader actions. It draws nothing
+ * outside a docking sheet.
+ */
+@Composable
+fun BingeSheetStepHandle(title: String, modifier: Modifier = Modifier) {
+    BingeSheetDockingHeader(
+        header = {},
+        dockedTopBar = { onClose -> BingeSheetTopBar(title = title, onClose = onClose) },
+        modifier = modifier,
+    )
+}
