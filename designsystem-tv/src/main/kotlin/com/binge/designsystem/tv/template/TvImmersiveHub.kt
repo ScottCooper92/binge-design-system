@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -311,7 +311,11 @@ fun <T : Any> TvImmersiveHub(
                                         isFocused = isFocused,
                                         onFocusChanged = onFocusChanged,
                                         onClick = onSeeAll,
-                                        modifier = cellModifier.width(cardWidth).aspectRatio(CARD_ASPECT_RATIO).then(seeAllModifier(row.key)),
+                                        modifier = cellModifier
+                                            .width(
+                                                cardWidth,
+                                            ).aspectRatio(CARD_ASPECT_RATIO)
+                                            .then(seeAllModifier(row.key)),
                                     )
                                 }
                             },

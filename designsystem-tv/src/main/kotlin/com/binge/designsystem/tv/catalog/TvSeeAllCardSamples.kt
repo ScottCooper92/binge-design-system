@@ -50,10 +50,7 @@ fun TvSeeAllCardGallerySample() {
 }
 
 @Composable
-private fun SeeAllCardPair(
-    aspectRatio: Float,
-    width: Dp,
-) {
+private fun SeeAllCardPair(aspectRatio: Float, width: Dp) {
     var focused by remember { mutableStateOf(true) }
     Row(
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
