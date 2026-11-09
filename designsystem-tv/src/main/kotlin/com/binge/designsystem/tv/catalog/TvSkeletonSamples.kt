@@ -20,7 +20,7 @@ fun TvImmersiveHubSkeletonOverlaySample() {
     TvImmersiveHubSkeleton(hosting = TvPageHosting.Overlay)
 }
 
-/** A detail page while it loads: the poster, the copy lines, the action pills and one row of cards. */
+/** A detail page while it loads: the poster, the copy lines, the action buttons and one row of cards. */
 @Composable
 fun TvDetailPageSkeletonSample() {
     TvDetailPageSkeleton()
