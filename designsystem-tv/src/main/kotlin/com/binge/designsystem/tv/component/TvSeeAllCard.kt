@@ -32,7 +32,8 @@ import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 private const val MAX_PEEK = 3
-private const val PEEK_TILT_DEGREES = 4f
+private const val PEEK_TILT_DEGREES = 5f
+private const val PEEK_SCALE = 0.84f
 private const val PEEK_SCRIM_ALPHA = 0.6f
 
 /**
@@ -74,6 +75,9 @@ fun TvSeeAllCard(
                     Modifier
                         .fillMaxSize()
                         .graphicsLayer {
+                            // Every slot fills the cell, so shrink them all: the deeper ones then show past the front one.
+                            scaleX = PEEK_SCALE
+                            scaleY = PEEK_SCALE
                             translationX = step * depth
                             rotationZ = PEEK_TILT_DEGREES * depth
                         }.clip(BingeShapes.MediaCard),
