@@ -3,7 +3,7 @@
 This library is licensed under the GNU General Public License, version 3 or (at your option) any
 later version. See [LICENSE](LICENSE).
 
-As a special exception, the copyright holders give you permission to link or combine this library
+As a special exception, the copyright holder gives you permission to link or combine this library
 with the Google Play services libraries and the Firebase libraries (or with modified versions of
 those libraries that are under the same licence), and to convey the resulting work. You must obey
 the GNU General Public License in all respects for all of the code used other than those libraries.

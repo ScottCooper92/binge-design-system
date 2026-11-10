@@ -233,8 +233,8 @@ a consumer keeps no wrappers of its own.
 
 ## Licence
 
-Copyright (c) Scott Cooper, and the Claude and bot identities that authored commits in this
-repository.
+Copyright (c) Scott Cooper. Commits in this repository authored by Claude and by bots were made on
+Scott Cooper's behalf, and the copyright in them is Scott Cooper's.
 
 This library is free software under the GNU General Public License, version 3 or (at your option)
 any later version. See [LICENSE](LICENSE).
@@ -242,7 +242,7 @@ any later version. See [LICENSE](LICENSE).
 [LICENSE-EXCEPTION.md](LICENSE-EXCEPTION.md) adds a permission under section 7 for the Google Play
 services and Firebase libraries that the apps which include this library link.
 
-The Binge app also uses this library. The copyright holder, being its sole holder, licenses it to
+The Binge app also uses this library. Scott Cooper, as the sole copyright holder, licenses it to
 the Binge app under separate terms. That grant is not under the GPL and gives nobody else any
 rights.
 

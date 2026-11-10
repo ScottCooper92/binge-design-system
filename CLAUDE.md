@@ -33,7 +33,8 @@ while they load. `TvImmersiveScroll.kt` there is the scroll the hub and
 grid share, not a template of its own. A template follows
 the one rule below like any component: it takes slots and callbacks, never a Binge type.
 
-This library is GPL-3.0-or-later (`LICENSE-EXCEPTION.md` adds the Google libraries' permission), and the Binge app uses it under a separate grant: new code and new dependencies must stay GPL-compatible.
+This library is GPL-3.0-or-later. `LICENSE-EXCEPTION.md` adds the Google libraries' permission.
+The Binge app uses it under a separate grant. New code and new dependencies must stay GPL-compatible.
 
 ## The one rule everything else serves
 
