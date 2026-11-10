@@ -91,6 +91,40 @@ fun TvSideSheetRowReservedLineSample() {
 }
 
 /**
+ * A row whose label is the whole point, such as a service's name, with [TvSideSheetRow]'s `labelMaxLines` raised so a long one wraps
+ * beside its switch instead of ending in an ellipsis. The icon and the switch keep their slot, and the short row beside it stays one line.
+ */
+@Composable
+fun TvSideSheetRowWrappedLabelSample() {
+    var first by remember { mutableStateOf(true) }
+    var second by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Rows on your hubs")
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Popular on Amazon Prime Video with Ads, including every channel add-on",
+                    icon = Icons.Filled.PlayCircle,
+                    labelMaxLines = 3,
+                    role = Role.Switch,
+                    onClick = { first = !first },
+                    trailing = { isFocused -> TvSwitch(checked = first, isFocused = isFocused) },
+                    initiallyFocused = true,
+                )
+                TvSideSheetRow(
+                    label = "Popular on Netflix",
+                    icon = Icons.Filled.PlayCircle,
+                    labelMaxLines = 3,
+                    role = Role.Switch,
+                    onClick = { second = !second },
+                    trailing = { isFocused -> TvSwitch(checked = second, isFocused = isFocused) },
+                )
+            }
+        }
+    }
+}
+
+/**
  * A page opened from a [com.binge.designsystem.tv.component.TvSideSheetStack]'s list: its own title and its own rows
  * on the same panel, the first focused. The stack's live behaviour, a page opening over another and focus returning to the
  * row that opened it, is [TvSideSheetStackDemo]'s.
