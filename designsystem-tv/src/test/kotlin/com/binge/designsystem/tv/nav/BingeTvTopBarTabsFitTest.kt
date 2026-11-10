@@ -14,6 +14,7 @@ import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
@@ -53,6 +54,8 @@ class BingeTvTopBarTabsFitTest {
         fontScale: Float,
         tabLabels: List<String> = labels,
         expandGear: Boolean = false,
+        withHeader: Boolean = true,
+        withTrailing: Boolean = true,
     ) {
         labels = tabLabels
         composeTestRule.setContent {
@@ -69,7 +72,7 @@ class BingeTvTopBarTabsFitTest {
                             label = "Profile",
                             icon = Icons.Filled.Person,
                             displayName = "Alexander Hamilton",
-                        ),
+                        ).takeIf { withHeader },
                         items = labels.map { TvNavItem(key = it, label = it, icon = Icons.Filled.Home) },
                         footer = null,
                         selectedKey = "home",
@@ -77,9 +80,13 @@ class BingeTvTopBarTabsFitTest {
                         itemFocusRequesters = emptyMap(),
                         down = remember { FocusRequester() },
                         onFocusedChange = {},
-                        trailing = {
-                            TvIconButton(icon = Icons.Filled.Person, label = "Account", onClick = {})
-                            TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = expandGear)
+                        trailing = if (withTrailing) {
+                            {
+                                TvIconButton(icon = Icons.Filled.Person, label = "Account", onClick = {})
+                                TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = expandGear)
+                            }
+                        } else {
+                            null
                         },
                     )
                 }
@@ -153,5 +160,50 @@ class BingeTvTopBarTabsFitTest {
     @Test
     fun `focusing the gear changes neither the tabs nor the avatar at 2x font`() {
         assertFocusingTheGearChangesNothing(fontScale = 2f)
+    }
+
+    private val fiveTabs = listOf("Home", "Movies", "TV shows", "Requests", "Search")
+
+    /** The private app's bar: the account avatar at the start and five tabs, nothing at the end. Fits at every font scale up to 2x. */
+    private fun assertHeaderAndFiveTabsAreWhole(fontScale: Float) {
+        setBar(fontScale = fontScale, tabLabels = fiveTabs, withTrailing = false)
+        assertNoTabIsCut()
+    }
+
+    @Test
+    fun `a start avatar and five tabs are whole at 1x font`() = assertHeaderAndFiveTabsAreWhole(1f)
+
+    @Test
+    fun `a start avatar and five tabs are whole at 1_3x font`() = assertHeaderAndFiveTabsAreWhole(1.3f)
+
+    @Test
+    fun `a start avatar and five tabs are whole at 2x font`() = assertHeaderAndFiveTabsAreWhole(2f)
+
+    /** binge-seerr's bar: an avatar and a gear at the end and no tabs. Both stay wholly inside the bar at every font scale. */
+    private fun assertTrailingOnlyIsInsideTheBar(fontScale: Float) {
+        setBar(fontScale = fontScale, tabLabels = emptyList(), withHeader = false)
+        val root = composeTestRule.onRoot().getUnclippedBoundsInRoot()
+        listOf("Account", "Settings").forEach { name ->
+            val bounds = composeTestRule.onNodeWithContentDescription(name).getUnclippedBoundsInRoot()
+            assertTrue("$name runs past the bar's right edge: ${bounds.right} of ${root.right}", bounds.right <= root.right)
+            assertTrue("$name starts left of the bar: ${bounds.left}", bounds.left >= root.left)
+        }
+    }
+
+    @Test
+    fun `a trailing avatar and gear with no tabs sit inside the bar at 1x font`() = assertTrailingOnlyIsInsideTheBar(1f)
+
+    @Test
+    fun `a trailing avatar and gear with no tabs sit inside the bar at 1_3x font`() = assertTrailingOnlyIsInsideTheBar(1.3f)
+
+    @Test
+    fun `a trailing avatar and gear with no tabs sit inside the bar at 2x font`() = assertTrailingOnlyIsInsideTheBar(2f)
+
+    /** The limit the bar's KDoc states: five tabs beside a start avatar and a trailing avatar and gear are whole up to 1.3x font. */
+    @Test
+    fun `five tabs beside a start avatar and a trailing avatar and gear are whole at 1_3x font`() {
+        setBar(fontScale = 1.3f, tabLabels = fiveTabs)
+        assertNoTabIsCut()
+        assertTabsClearOfTrailing()
     }
 }

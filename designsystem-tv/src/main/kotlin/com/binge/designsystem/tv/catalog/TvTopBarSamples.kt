@@ -88,6 +88,7 @@ internal fun TvTopBarSample(
     focusedKey: Any? = null,
     selectedKey: Any = "movies",
     iconOnlyFooter: Boolean = true,
+    showFooter: Boolean = true,
 ) {
     var selected by rememberSaveable { mutableStateOf(selectedKey) }
     val requesters = remember { (items + TopBarHeader + TopBarFooter).associate { it.key to FocusRequester() } }
@@ -110,7 +111,7 @@ internal fun TvTopBarSample(
             BingeTvTopBar(
                 header = TopBarHeader,
                 items = items,
-                footer = TopBarFooter,
+                footer = TopBarFooter.takeIf { showFooter },
                 selectedKey = selected,
                 onSelect = { selected = it },
                 itemFocusRequesters = requesters,
@@ -122,7 +123,7 @@ internal fun TvTopBarSample(
             TvTopBarSurface(
                 header = TopBarHeader,
                 items = items,
-                footer = TopBarFooter,
+                footer = TopBarFooter.takeIf { showFooter },
                 selectedKey = selected,
                 barFocused = true,
                 focusedKey = focusedKey,
@@ -136,6 +137,15 @@ internal fun TvTopBarSample(
             )
         }
     }
+}
+
+/**
+ * The bar as the private app draws it: the account avatar at the start and five tabs, with nothing at the end. At 2x font the five
+ * tabs still fit, the avatar leaving them 796 dp of a 960 dp screen for the 756 they need.
+ */
+@Composable
+fun TvTopBarHeaderTabsSample() {
+    TvTopBarSample(items = TopBarSampleItems, showFooter = false)
 }
 
 /** The top bar with labels long enough to crowd it: for the 1.3x and 2x font frames, where each stays on one line. */

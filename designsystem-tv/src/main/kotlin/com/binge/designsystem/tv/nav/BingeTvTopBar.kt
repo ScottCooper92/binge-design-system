@@ -87,6 +87,10 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * the page resumes there, on a tab or on the avatar, instead of on the nearest one. With no [items] the bar draws no tabs and no rail,
  * only its ends.
  *
+ * The room is finite. On a 960 dp screen five tabs (546 dp at 1x font, 613 at 1.3x, 756 at 2x) fit beside a start avatar and a trailing
+ * avatar and gear, which leave 668 dp, up to 1.3x font; at 2x they fit beside a start avatar alone, which leaves 796. Past that the
+ * widest tabs shrink to a common width and ellipsize.
+ *
  * A tab keeps its own width, so its label is never cut while the bar has room for it: the tabs sit centred when they fit clear of the
  * wider end on both sides, else between the two ends. Only when even that is too narrow do the widest tabs shrink, to a common width.
  *
