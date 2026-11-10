@@ -85,6 +85,18 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun accountMenuStart() = Frame { TvAccountMenuStartSample() }
 
+    /** The avatar as the bar's current destination: its ring is drawn faintly. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuSelected() = Frame { TvAccountMenuSelectedSample() }
+
+    /** The current destination with the menu open over it. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuSelectedOpen() = Frame { TvAccountMenuSelectedOpenSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {

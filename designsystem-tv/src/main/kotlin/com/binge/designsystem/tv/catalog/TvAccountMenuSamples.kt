@@ -67,6 +67,18 @@ fun TvAccountMenuStartSample() {
     }
 }
 
+/** The avatar as the bar's current destination, closed: the Account page is showing, so the avatar's ring is drawn faintly. */
+@Composable
+fun TvAccountMenuSelectedSample() {
+    AccountMenuBar(initiallyOpen = false, selected = true)
+}
+
+/** The same current destination with the menu open over it. */
+@Composable
+fun TvAccountMenuSelectedOpenSample() {
+    AccountMenuBar(initiallyOpen = true, selected = true)
+}
+
 /**
  * The real menu on a live bar. Focus the avatar to open it, Down to enter its rows, Up to return. BACK closes it onto the
  * avatar and it stays closed until focus leaves and comes back. Sign out asks first, then closes the menu.
@@ -77,7 +89,7 @@ fun TvAccountMenuDemo() {
 }
 
 @Composable
-private fun AccountMenuBar(initiallyOpen: Boolean) {
+private fun AccountMenuBar(initiallyOpen: Boolean, selected: Boolean = false) {
     val down = remember { FocusRequester() }
     var lastAction by remember { mutableStateOf("") }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -103,7 +115,7 @@ private fun AccountMenuBar(initiallyOpen: Boolean) {
             down = down,
             onFocusedChange = {},
             trailing = {
-                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End) { lastAction = it }
+                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End, selected = selected) { lastAction = it }
                 // Stays a circle on focus: the bar lays the tabs out around the trailing slot, so nothing in it may change size.
                 TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = false)
             },
@@ -117,6 +129,7 @@ private fun AccountMenu(
     initiallyOpen: Boolean,
     anchor: TvAccountMenuAnchor,
     modifier: Modifier = Modifier,
+    selected: Boolean = false,
     onAction: (String) -> Unit,
 ) {
     TvAccountMenu(
@@ -126,6 +139,7 @@ private fun AccountMenu(
         detail = "Administrator",
         down = down,
         initiallyOpen = initiallyOpen,
+        selected = selected,
         anchor = anchor,
         extraContent = {
             Text(

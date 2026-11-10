@@ -35,6 +35,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
@@ -94,6 +95,10 @@ enum class TvAccountMenuAnchor { Start, End }
  * [initiallyOpen] draws the menu open until focus first reaches it, for a frame, which fires no focus events; production passes
  * false.
  *
+ * [selected] marks the avatar as the bar's current destination, for a host whose Account page is the one showing: the avatar's
+ * ring is drawn faintly while focus is elsewhere (and on the header's avatar while the menu is open), where a selected tab in [BingeTvTopBar] keeps a faint tile, and a screen
+ * reader reads it as selected. The focused ring is the same either way. The default draws and reads as it did before the parameter.
+ *
  * [avatarFocusRequester], when set, is the requester the avatar uses in place of its own, so a host that routes entry focus
  * through a requester per bar item can land focus on the avatar. [onOpenChange] is called with the menu's new state each time
  * it opens or closes, so a host can hold its bar at full size meanwhile. The menu counts as open while its confirm dialog is up,
@@ -113,6 +118,7 @@ fun TvAccountMenu(
     initiallyOpen: Boolean = false,
     avatarFocusRequester: FocusRequester? = null,
     onOpenChange: (Boolean) -> Unit = {},
+    selected: Boolean = false,
 ) {
     var avatarFocused by remember { mutableStateOf(false) }
     var menuFocused by remember { mutableStateOf(false) }
@@ -164,6 +170,7 @@ fun TvAccountMenu(
                 name = name,
                 avatarUrl = avatarUrl,
                 focused = avatarFocused,
+                selected = selected,
                 onFocusChanged = { avatarFocused = it },
                 onClick = { if (open) firstRow?.tryRequestFocus() },
                 modifier = Modifier
@@ -177,6 +184,7 @@ fun TvAccountMenu(
                     avatarUrl = avatarUrl,
                     detail = detail,
                     anchor = anchor,
+                    selected = selected,
                     rows = ordered,
                     requesterFor = { key -> rowRequesters.getOrPut(key) { FocusRequester() } },
                     avatarRequester = avatarRequester,
@@ -232,26 +240,39 @@ fun TvAccountMenu(
 
 private enum class AccountSlot { Anchor, Panel }
 
+/** The selected avatar's ring: the bar's faint tile alpha would not read on a ring this thin, so it is stronger. */
+private const val SELECTED_RING_ALPHA = 0.5f
+
 @Composable
 private fun AccountAvatar(
     label: String,
     name: String,
     avatarUrl: String?,
     focused: Boolean,
+    selected: Boolean,
     onFocusChanged: (Boolean) -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val diameter = dimensionResource(TvR.dimen.tv_icon_button_diameter)
     val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val ringColor = when {
+        focused -> onSurface
+        selected -> onSurface.copy(alpha = SELECTED_RING_ALPHA)
+        else -> Color.Transparent
+    }
     Box(
         modifier = modifier
             .size(diameter)
             .clip(BingeShapes.Pill)
-            .border(ring, if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent, BingeShapes.Pill)
+            .border(ring, ringColor, BingeShapes.Pill)
             .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
-            .clearAndSetSemantics { contentDescription = label }
-            .padding(ring),
+            .clearAndSetSemantics {
+                contentDescription = label
+                // Only a selected avatar says so, so one that is never selected reads as it always has.
+                if (selected) this.selected = true
+            }.padding(ring),
         contentAlignment = Alignment.Center,
     ) {
         BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = avatarUrl)
@@ -264,6 +285,7 @@ private fun AccountPanel(
     avatarUrl: String?,
     detail: String?,
     anchor: TvAccountMenuAnchor,
+    selected: Boolean,
     rows: List<TvAccountMenuRow>,
     requesterFor: (Any) -> FocusRequester,
     avatarRequester: FocusRequester,
@@ -281,7 +303,14 @@ private fun AccountPanel(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_xs)),
     ) {
         val avatar = @Composable {
-            Box(Modifier.size(diameter).padding(ring)) {
+            // The open menu keeps the selected avatar's ring, so the bar's current destination does not vanish under it.
+            val selectedRing =
+                if (selected) {
+                    Modifier.border(ring, MaterialTheme.colorScheme.onSurface.copy(alpha = SELECTED_RING_ALPHA), BingeShapes.Pill)
+                } else {
+                    Modifier
+                }
+            Box(Modifier.size(diameter).then(selectedRing).padding(ring)) {
                 BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = avatarUrl)
             }
         }
