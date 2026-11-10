@@ -114,7 +114,9 @@ fun TvAccountMenu(
     val avatarRequester = remember { FocusRequester() }
     val rowRequesters = remember { mutableMapOf<Any, FocusRequester>() }
     val ordered = remember(rows) { rows.filter { it.confirm == null } + rows.filter { it.confirm != null } }
-    val firstRow = ordered.firstOrNull()?.let { rowRequesters.getOrPut(it.key) { FocusRequester() } }
+    val firstRow = remember(ordered) {
+        ordered.firstOrNull()?.let { rowRequesters.getOrPut(it.key) { FocusRequester() } }
+    }
     val panelWidthDp = dimensionResource(TvR.dimen.tv_account_menu_width)
     val panelPadDp = dimensionResource(DesR.dimen.padding_m)
     val open = !heldClosed && (avatarFocused || menuFocused || confirming != null || seededOpen)
