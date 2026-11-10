@@ -2,12 +2,15 @@
 
 package com.binge.designsystem.catalog
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.BingeConfirmDialogContent
+import com.binge.designsystem.component.ListRow
 import com.binge.designsystem.component.SwitchRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -87,6 +90,51 @@ private fun SwitchDialogFrame(initiallyOn: Boolean, longLabels: Boolean = false)
                     checked = deleteFiles,
                     onCheckedChange = { deleteFiles = it },
                 )
+            },
+        )
+    }
+}
+
+/**
+ * A choice the confirm applies to, with nothing preselected: the confirm stays greyed out until one is picked, and then the
+ * dialog is the plain two-action row. For a destructive action that must name what it acts on, where a default would be a guess.
+ */
+@Composable
+fun BingeConfirmDialogChoiceRequiredSample() {
+    ChoiceRequiredFrame(initiallyPicked = null)
+}
+
+/** The same dialog once an option is picked: the confirm is live. */
+@Composable
+fun BingeConfirmDialogChoicePickedSample() {
+    ChoiceRequiredFrame(initiallyPicked = "4K")
+}
+
+@Composable
+private fun ChoiceRequiredFrame(initiallyPicked: String?) {
+    var picked by remember { mutableStateOf(initiallyPicked) }
+    ScreenshotTheme {
+        BingeConfirmDialogContent(
+            title = "Delete files?",
+            message = "Choose which version's files to delete from the server. This cannot be undone.",
+            confirmLabel = "Delete",
+            onConfirm = {},
+            onDismissRequest = {},
+            destructive = true,
+            confirmEnabled = picked != null,
+            extraContent = {
+                listOf("Standard", "4K").forEach { option ->
+                    ListRow(
+                        onClick = { picked = option },
+                        selected = picked == option,
+                        containerColor =
+                            if (picked == option) {
+                                MaterialTheme.colorScheme.secondaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.surfaceContainer
+                            },
+                    ) { modifier -> Text(text = option, style = MaterialTheme.typography.bodyLarge, modifier = modifier) }
+                }
             },
         )
     }

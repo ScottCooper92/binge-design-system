@@ -112,6 +112,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun confirmDialogChoiceRequired() = Frame { TvConfirmDialogChoiceRequiredSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun messageDialog() = Frame { TvMessageDialogSample() }
 
     @PreviewTest
