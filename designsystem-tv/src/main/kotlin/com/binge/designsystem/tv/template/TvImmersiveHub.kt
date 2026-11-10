@@ -4,9 +4,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,10 +34,11 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.component.TRAILING_KEY
 import com.binge.designsystem.tv.component.TvCardRow
-import com.binge.designsystem.tv.component.TvSeeAllTile
+import com.binge.designsystem.tv.component.TvSeeAllCard
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
@@ -66,6 +69,11 @@ data class TvHubRow<T>(
      * it to the hub, which wraps a row only once it is long enough.
      */
     val loops: Boolean = true,
+    /**
+     * Up to three image slots the row's See-all card fans behind its label, so the end of the row hints at what lies behind it. The hub
+     * loads no images, so the caller fills them (its own poster loader); empty leaves the card a plain fill.
+     */
+    val seeAllPeek: List<@Composable BoxScope.() -> Unit> = emptyList(),
 )
 
 /** What a failed [TvHubRow] says, and the retry it offers. The caller owns the copy, as it does the row's title. */
@@ -196,6 +204,9 @@ fun <T : Any> TvImmersiveHub(
         rememberAnchorKeeper(
             scrollTarget,
             focusedItem?.let(itemId),
+            // See-all takes focus without changing the focused item, but it can still draw a bring-into-view scroll from the column when
+            // the row sits partly below the viewport, so its focus must re-assert the anchor as a title's does.
+            seeAllRowKey,
             alsoReport = { bodyHasFocus = it.hasFocus },
             shouldScroll = {
                 scrollTarget != listState.firstVisibleItemIndex || scrollOffset != listState.firstVisibleItemScrollOffset
@@ -304,12 +315,17 @@ fun <T : Any> TvImmersiveHub(
                         trailingContent =
                             row.onSeeAll?.takeIf { seeAllLabel != null }?.let { onSeeAll ->
                                 { isFocused, onFocusChanged, cellModifier ->
-                                    TvSeeAllTile(
+                                    TvSeeAllCard(
                                         label = seeAllLabel.orEmpty(),
                                         isFocused = isFocused,
                                         onFocusChanged = onFocusChanged,
                                         onClick = onSeeAll,
-                                        modifier = cellModifier.width(cardWidth).then(seeAllModifier(row.key)),
+                                        peek = row.seeAllPeek,
+                                        modifier = cellModifier
+                                            .width(
+                                                cardWidth,
+                                            ).aspectRatio(CARD_ASPECT_RATIO)
+                                            .then(seeAllModifier(row.key)),
                                     )
                                 }
                             },

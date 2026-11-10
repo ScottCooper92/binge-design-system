@@ -62,10 +62,10 @@ class TvControlSemanticsTest {
     }
 
     @Test
-    fun `a TvSeeAllTile announces as a button`() {
+    fun `a TvSeeAllCard announces as a button`() {
         rule.setContent {
             BingeTvTheme {
-                TvSeeAllTile(label = "See all", isFocused = false, onFocusChanged = {}, onClick = {}, modifier = Modifier.testTag(NODE))
+                TvSeeAllCard(label = "See all", isFocused = false, onFocusChanged = {}, onClick = {}, modifier = Modifier.testTag(NODE))
             }
         }
 
