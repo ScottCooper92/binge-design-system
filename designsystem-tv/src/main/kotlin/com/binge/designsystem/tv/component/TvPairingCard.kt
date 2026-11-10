@@ -147,7 +147,7 @@ private fun PairingCardSurface(modifier: Modifier, content: @Composable ColumnSc
     )
 }
 
-/** Wraps at [width], the code's, so a long message does not widen the card past the code. */
+/** Wraps at [width], the code's, so a long failure does not widen the card past the loading state's. */
 @Composable
 private fun PairingMessage(text: String, width: Dp) {
     Text(
