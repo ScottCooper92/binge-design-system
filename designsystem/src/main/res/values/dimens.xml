@@ -101,6 +101,7 @@
     <!-- Bounds the catalog sample for BingeFilterChipPager, which is otherwise fillMaxSize. -->
     <dimen name="catalog_filter_chip_pager_height">240dp</dimen>
     <dimen name="catalog_tabbed_pager_height">240dp</dimen>
+    <dimen name="catalog_tab_row_flush_padding">0dp</dimen>
     <!-- The width the WrappingRow catalog sample pins its row to, narrow enough that the tags wrap. -->
     <dimen name="wrapping_row_sample_width">200dp</dimen>
     <!-- Filled / tonal buttons (detail action row, CTAs) -->
