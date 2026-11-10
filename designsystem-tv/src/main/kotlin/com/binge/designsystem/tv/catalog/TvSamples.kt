@@ -44,7 +44,6 @@ import com.binge.designsystem.tv.component.TvExcludedMark
 import com.binge.designsystem.tv.component.TvIconButtonSurface
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.component.TvPairingCard
-import com.binge.designsystem.tv.component.TvPairingCardError
 import com.binge.designsystem.tv.component.TvPairingCardLoading
 import com.binge.designsystem.tv.component.TvQrCode
 import com.binge.designsystem.tv.component.TvRowEmphasis
@@ -534,40 +533,8 @@ fun TvPairingCardLoadingSample() {
     }
 }
 
-/** Asking for a code failed: the same chrome, the failure, and Try again focused. */
-@Composable
-fun TvPairingCardErrorSample() {
-    Box(modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l))) {
-        TvPairingCardError(
-            message = "Couldn't get a code. Check the connection.",
-            retryLabel = "Try again",
-            onRetry = {},
-            retryInitiallyFocused = true,
-        )
-    }
-}
-
 /** A share of the pane's short side, as a host sizes the code. */
 private const val PAIRING_QR_SHARE = 0.6f
-
-/**
- * A long failure in a pane that is the limit: the code is sized from the pane's height, as a host does, and the message
- * runs to four lines. The glyph's box gives up height, so the message and Try again stay inside the card.
- */
-@Composable
-fun TvPairingCardErrorLongMessageSample() {
-    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        TvPairingCardError(
-            message =
-                "This TV isn't on a Wi-Fi or wired home network, so a phone can't reach it. " +
-                    "Type the address instead, or connect this TV to your home network and try again.",
-            retryLabel = "Try again",
-            onRetry = {},
-            retryInitiallyFocused = true,
-            qrSize = minOf(maxWidth, maxHeight) * PAIRING_QR_SHARE,
-        )
-    }
-}
 
 /**
  * The full card in a pane too short for it at the size the caller asked for. The code gives up size and the instruction,

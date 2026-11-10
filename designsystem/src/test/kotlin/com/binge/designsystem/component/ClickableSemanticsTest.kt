@@ -14,9 +14,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
-import androidx.paging.LoadState
 import com.binge.designsystem.R
-import com.binge.designsystem.template.PagedAppendFooter
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -91,13 +89,6 @@ class ClickableSemanticsTest {
         rule.onNode(toggle).performClick()
         rule.onNode(toggle).assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, string(R.string.cd_group_expanded)))
         rule.onNode(hasText(string(R.string.rating_card_reviews_subtitle_no_average), substring = true) and button).assertExists()
-    }
-
-    @Test
-    fun `the paged retry line is a button`() {
-        show { PagedAppendFooter(state = LoadState.Error(RuntimeException()), retryLabel = "Retry", onRetry = {}) }
-
-        rule.onNode(hasText("Retry") and button).assertExists()
     }
 
     @Test
