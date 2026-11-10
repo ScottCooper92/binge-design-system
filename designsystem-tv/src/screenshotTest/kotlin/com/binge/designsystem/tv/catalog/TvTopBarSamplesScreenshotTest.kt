@@ -61,6 +61,30 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun topBarNoRail() = Frame { TvTopBarNoRailSample() }
 
+    /** The account menu closed in the trailing slot: the avatar and the gear. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuClosed() = Frame { TvAccountMenuSample() }
+
+    /** The menu open over the avatar: the header, the quota line and the rows, Sign out last. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuOpen() = Frame { TvAccountMenuOpenSample() }
+
+    /** The open menu at 1.3x and 2x font: the rows stay on one line and nothing is clipped. */
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun accountMenuOpenLargeFont() = Frame { TvAccountMenuOpenSample() }
+
+    /** The menu anchored at the start: the avatar leads the header and the panel grows toward the end. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuStart() = Frame { TvAccountMenuStartSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
