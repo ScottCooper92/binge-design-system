@@ -13,11 +13,11 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasScrollAction
-import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -36,7 +36,7 @@ class FormScreenPositionTest {
     @Test fun `loading child pages and saved state restore the content and bar as one position`() {
         var page by mutableStateOf("main")
         var loading by mutableStateOf(false)
-        val restoration = StateRestorationTester(rule)
+        val restoration = InMemoryStateRestorationTester(rule)
         restoration.setContent {
             val waiting: (@Composable (PaddingValues) -> Unit)? = if (loading) ({ Text("Loading") }) else null
             TestTheme {

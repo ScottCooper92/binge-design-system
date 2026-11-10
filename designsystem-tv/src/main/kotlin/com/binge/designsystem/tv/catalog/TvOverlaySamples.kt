@@ -36,8 +36,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCheckboxRow
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvInfoCard
 import com.binge.designsystem.tv.component.TvMessageDialogContent
@@ -308,7 +308,7 @@ fun TvMessageDialogKeyWithCopySample() {
             initiallyFocused = true,
             extraContent = {
                 Text(text = TV_SHOWN_ONCE_KEY, style = MaterialTheme.typography.bodyLarge, fontFamily = FontFamily.Monospace)
-                TvButton(label = if (copied) "Copied" else "Copy", onClick = { copied = true }, style = TvButtonStyle.Secondary)
+                TvCompactButton(label = if (copied) "Copied" else "Copy", onClick = { copied = true }, style = TvButtonStyle.Secondary)
             },
         )
     }
