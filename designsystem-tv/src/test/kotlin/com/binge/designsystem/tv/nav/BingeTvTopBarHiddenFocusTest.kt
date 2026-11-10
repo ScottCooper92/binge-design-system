@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
@@ -40,7 +43,10 @@ class BingeTvTopBarHiddenFocusTest {
 
     private lateinit var focusManager: FocusManager
 
+    private var barVisible by mutableStateOf(true)
+
     private fun setBar(visible: Boolean, grouped: Boolean = false) {
+        barVisible = visible
         composeTestRule.setContent {
             BingeTvTheme {
                 focusManager = LocalFocusManager.current
@@ -54,7 +60,7 @@ class BingeTvTopBarHiddenFocusTest {
                         itemFocusRequesters = emptyMap(),
                         down = remember { FocusRequester() },
                         onFocusedChange = {},
-                        visible = visible,
+                        visible = barVisible,
                         trailing = {
                             val gear = @Composable {
                                 TvIconButton(
@@ -100,6 +106,24 @@ class BingeTvTopBarHiddenFocusTest {
     fun `Up from the page does not reach an item the caller put in its own focus group while the bar is hidden`() {
         setBar(visible = false, grouped = true)
         moveUp()
+        composeTestRule.onNodeWithContentDescription("Settings").assertIsNotFocused()
+    }
+
+    @Test
+    fun `a bar that hides after focus left a nested trailing item does not restore focus to it`() {
+        setBar(visible = true, grouped = true)
+        composeTestRule.onNodeWithContentDescription("Settings").requestFocus()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Settings").assertIsFocused()
+        // Focus leaves down to the page, so the bar's restorer has the nested item saved; then the bar hides.
+        composeTestRule.runOnIdle { focusManager.moveFocus(FocusDirection.Down) }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("content").assertIsFocused()
+        barVisible = false
+        composeTestRule.waitForIdle()
+
+        moveUp()
+
         composeTestRule.onNodeWithContentDescription("Settings").assertIsNotFocused()
     }
 }
