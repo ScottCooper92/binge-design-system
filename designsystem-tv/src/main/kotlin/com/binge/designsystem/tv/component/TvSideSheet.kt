@@ -245,7 +245,7 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * ending in a [TvSwitch], whose on or off state the row then announces with it. A [selected] row carries a tick, for a sheet that is a choice. [enabled] false dims a control that cannot
  * be used yet and keeps it out of the focus order; a fact the sheet shows is a [TvSideSheetReadout]. [initiallyFocused] draws the focused state, for a frame.
  *
- * The [label] holds to one line with an ellipsis, as every TV row's does. [supportingText] is a second line under it, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
+ * The [label] holds to one line with an ellipsis, as every TV row's does, unless the caller raises [labelMaxLines]: for a row whose label is the whole point, such as a service's name, which an ellipsis would hide at a large font scale. The switch, icon and trailing value keep their slot and the label wraps in the space left. [supportingText] is a second line under it, held to one line with an ellipsis: what the row does. [leading] replaces [icon] with a visual of the caller's, such
  * as a poster thumbnail for a sheet about one title; size it with `tv_side_sheet_thumbnail_width` and `_height`.
  * An [icon] sits on its tinted plate, in the error colour for a [destructive] row and dimmed for a disabled one.
  * [reserveSupportingLine] keeps that line's height when [supportingText] is null, so a row with nothing to say there
@@ -269,6 +269,7 @@ fun TvSideSheetRow(
     supportingText: String? = null,
     leading: (@Composable () -> Unit)? = null,
     reserveSupportingLine: Boolean = false,
+    labelMaxLines: Int = 1,
     role: Role = Role.Button,
     opensPage: Boolean = false,
     saving: Boolean = false,
@@ -328,6 +329,7 @@ fun TvSideSheetRow(
         selected = selected,
         supportingText = supportingText,
         leading = leading,
+        labelMaxLines = labelMaxLines,
         reserveSupportingLine = reserveSupportingLine,
         trailing = trailing?.let { slot -> { slot(focused) } },
         chevronTint = if (opensPage) supporting else null,
@@ -395,6 +397,7 @@ private fun SideSheetRowLayout(
     supportingText: String?,
     leading: (@Composable () -> Unit)?,
     reserveSupportingLine: Boolean,
+    labelMaxLines: Int = 1,
     trailing: (@Composable () -> Unit)? = null,
     focusedIconTint: Color = MaterialTheme.tvStyle.onFocusContainer,
     chevronTint: Color? = null,
@@ -433,7 +436,7 @@ private fun SideSheetRowLayout(
                     text = label,
                     style = MaterialTheme.typography.titleMedium,
                     color = content,
-                    maxLines = 1,
+                    maxLines = labelMaxLines,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.align(Alignment.CenterStart),
                 )
@@ -444,7 +447,7 @@ private fun SideSheetRowLayout(
                     text = label,
                     style = MaterialTheme.typography.titleMedium,
                     color = content,
-                    maxLines = 1,
+                    maxLines = labelMaxLines,
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (supportingText != null) {
