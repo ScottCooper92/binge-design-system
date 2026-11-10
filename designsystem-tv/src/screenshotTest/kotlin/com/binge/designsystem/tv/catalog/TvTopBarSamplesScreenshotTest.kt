@@ -37,6 +37,12 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun topBarLongLabels() = Frame { TvTopBarLongLabelsSample() }
 
+    /** The start avatar and five tabs at 1.3x and 2x font: every label stays whole, as the bar has the room for them. */
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun topBarHeaderTabs() = Frame { TvTopBarHeaderTabsSample() }
+
     /** The footer as a label pill, which is wider than the gear: the tabs must not run under it. */
     @PreviewTest
     @TvWorstCaseFontPreviews
