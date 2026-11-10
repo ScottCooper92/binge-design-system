@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -47,6 +48,8 @@ import com.binge.designsystem.tv.R as TvR
 
 private const val ROW_ITEM_COUNT = 8
 private const val TONE_COUNT = 7
+private const val SHORT_ROW_ITEM_COUNT = 3
+private const val SEE_ALL_COUNT = 24
 
 private data class SampleTitle(
     val id: Int,
@@ -60,11 +63,12 @@ private fun sampleRow(
     title: String,
     firstId: Int,
     seeAll: Boolean = false,
+    itemCount: Int = ROW_ITEM_COUNT,
 ) = TvHubRow(
     key = key,
     title = title,
     items =
-        List(ROW_ITEM_COUNT) { index ->
+        List(itemCount) { index ->
             SampleTitle(
                 id = firstId + index,
                 title = "A title in $title ${index + 1}",
@@ -75,6 +79,19 @@ private fun sampleRow(
     onSeeAll = if (seeAll) ({}) else null,
     seeAllPeek = if (seeAll) HubPeek else emptyList(),
 )
+
+/** A short row whose See-all tile says its own count, "All 24", from the row's `seeAllLabel`, where the hub's is "See all". */
+@Composable
+fun TvImmersiveHubSeeAllLabelsSample() {
+    val allCount = stringResource(TvR.string.tv_see_all_count, SEE_ALL_COUNT)
+    SampleHub(
+        rows =
+            listOf(
+                sampleRow("approved", "Approved ($SEE_ALL_COUNT)", firstId = 200, seeAll = true, itemCount = SHORT_ROW_ITEM_COUNT)
+                    .copy(seeAllLabel = allCount),
+            ),
+    )
+}
 
 /** Three stand-in posters, in the hub's own tones, for the See-all card to fan. */
 private val HubPeek: List<@Composable BoxScope.() -> Unit> =

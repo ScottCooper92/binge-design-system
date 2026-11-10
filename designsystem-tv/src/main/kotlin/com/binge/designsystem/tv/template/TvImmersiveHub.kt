@@ -52,7 +52,10 @@ data class TvHubRow<T>(
     val key: String,
     val title: String,
     val items: List<T>,
-    /** The row's end tile, opening the whole set behind it; null means the row has none. Shown only when the hub is given a `seeAllLabel`. */
+    /**
+     * The row's end tile, opening the whole set behind it; null means the row has none. Shown only when the row has a See-all label:
+     * its own [seeAllLabel], else the hub's `seeAllLabel`.
+     */
     val onSeeAll: (() -> Unit)? = null,
     /**
      * Whether the row's items are still on their way. An empty loading row holds its slot with the hub's
@@ -74,6 +77,11 @@ data class TvHubRow<T>(
      * loads no images, so the caller fills them (its own poster loader); empty leaves the card a plain fill.
      */
     val seeAllPeek: List<@Composable BoxScope.() -> Unit> = emptyList(),
+    /**
+     * What this row's See-all tile says, "All 24" with the row's own count, in place of the hub's `seeAllLabel`, which a row without
+     * one falls back to. A row has a tile only when [onSeeAll] is set and it has a label from one of the two.
+     */
+    val seeAllLabel: String? = null,
 )
 
 /** What a failed [TvHubRow] says, and the retry it offers. The caller owns the copy, as it does the row's title. */
@@ -104,7 +112,8 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
  * above the rows at rest and gives way to the backdrop once a card takes focus; without one the first row's
  * first item is the resting backdrop. An empty row is skipped, unless it is [TvHubRow.isLoading]: then [pendingRow]
  * holds its place, unfocusable, until its items arrive. An empty row with a [TvHubRow.failure] keeps its slot too, and says
- * why in place of its cards, with a retry that is the row's one focus stop.
+ * why in place of its cards, with a retry that is the row's one focus stop. A row's See-all tile says the row's own
+ * [TvHubRow.seeAllLabel], else [seeAllLabel], and a row with neither has no tile.
  *
  * A page template, like [TvBoard]: [hosting] decides who places first focus on it — in a shell destination the
  * shell offers focus and the hub only routes it to the hero or first row, as an overlay it claims focus itself
@@ -286,6 +295,7 @@ fun <T : Any> TvImmersiveHub(
                         pendingRow(rowAnchor)
                         return@itemsIndexed
                     }
+                    val rowSeeAllLabel = row.seeAllLabel ?: seeAllLabel
                     TvCardRow(
                         items = row.items,
                         key = itemId,
@@ -295,7 +305,7 @@ fun <T : Any> TvImmersiveHub(
                         entryFocusRequester = hubEntry.takeIf { row.key == effectiveEntryKey },
                         initiallyFocusedKey = initialFocused?.takeIf { it.first == row.key }?.second,
                         overrideIndex =
-                            if (seeAllRowKey == row.key && row.onSeeAll != null && seeAllLabel != null) {
+                            if (seeAllRowKey == row.key && row.onSeeAll != null && rowSeeAllLabel != null) {
                                 row.items.size
                             } else {
                                 rowMemory[row.key]?.let { id -> row.items.indexOfFirst { itemId(it) == id }.takeIf { it >= 0 } }
@@ -313,10 +323,10 @@ fun <T : Any> TvImmersiveHub(
                             }
                         },
                         trailingContent =
-                            row.onSeeAll?.takeIf { seeAllLabel != null }?.let { onSeeAll ->
+                            row.onSeeAll?.takeIf { rowSeeAllLabel != null }?.let { onSeeAll ->
                                 { isFocused, onFocusChanged, cellModifier ->
                                     TvSeeAllCard(
-                                        label = seeAllLabel.orEmpty(),
+                                        label = rowSeeAllLabel.orEmpty(),
                                         isFocused = isFocused,
                                         onFocusChanged = onFocusChanged,
                                         onClick = onSeeAll,
