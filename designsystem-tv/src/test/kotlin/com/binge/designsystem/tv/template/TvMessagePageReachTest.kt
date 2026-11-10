@@ -6,11 +6,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.catalog.TvMessagePageWorstCaseSample
@@ -76,7 +84,35 @@ class TvMessagePageReachTest {
         rule.onNodeWithText("Headline").assertIsDisplayed()
     }
 
+    @Test
+    fun `at 2x a remote can scroll the whole body into view above the actions`() {
+        show(2f) { TvMessagePageWorstCaseSample() }
+        val actionsTop = rule.onNodeWithText("Update").getUnclippedBoundsInRoot().top
+        val body = rule.onNode(hasText(LONG_MESSAGE_START, substring = true))
+        assertTrue("the body is not cut off at the start", body.getUnclippedBoundsInRoot().bottom.value > actionsTop.value)
+        rule.onNodeWithText("Update").requestFocus()
+        rule.onNodeWithText("Update").performKeyInput { pressKey(Key.DirectionUp) }
+        rule.waitForIdle()
+        rule.onNode(hasScrollAction()).assertIsFocused()
+        repeat(MAX_PRESSES) {
+            rule.onNode(hasScrollAction()).performKeyInput { pressKey(Key.DirectionDown) }
+            rule.mainClock.advanceTimeBy(SCROLL_SETTLE_MS)
+            rule.waitForIdle()
+        }
+        val end = body.getUnclippedBoundsInRoot().bottom
+        assertTrue("the body ends at $end, still under the actions at $actionsTop", end.value <= actionsTop.value + TOLERANCE)
+    }
+
+    @Test
+    fun `a plate whose copy fits takes no focus for it`() {
+        show(1f) { TvMessagePlate(headline = "Headline", body = "Short.") { } }
+        rule.onNode(hasScrollAction() and isFocusable()).assertDoesNotExist()
+    }
+
     private companion object {
+        const val LONG_MESSAGE_START = "This version of the app"
+        const val MAX_PRESSES = 12
+        const val SCROLL_SETTLE_MS = 500L
         const val TOLERANCE = 0.5f
     }
 }
