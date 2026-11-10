@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Settings
@@ -20,17 +19,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.component.TvIconButton
 import com.binge.designsystem.tv.nav.BingeTvTopBar
 import com.binge.designsystem.tv.nav.TvAccountMenu
-import com.binge.designsystem.tv.nav.TvAccountMenuAnchor
 import com.binge.designsystem.tv.nav.TvAccountMenuConfirm
 import com.binge.designsystem.tv.nav.TvAccountMenuRow
-import com.binge.designsystem.tv.R as TvR
 
 private const val ART_FRACTION = 0.3f
 
@@ -44,35 +40,6 @@ fun TvAccountMenuSample() {
 @Composable
 fun TvAccountMenuOpenSample() {
     AccountMenuBar(initiallyOpen = true)
-}
-
-/** The menu anchored at the start, open: it grows toward the end from a leading avatar, which sits before the name. */
-@Composable
-fun TvAccountMenuStartSample() {
-    val down = remember { FocusRequester() }
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(ART_FRACTION)
-                .background(MaterialTheme.colorScheme.primary),
-        )
-        TvAccountMenu(
-            avatarLabel = "Account",
-            name = "Alexander Hamilton",
-            detail = "Administrator",
-            down = down,
-            anchor = TvAccountMenuAnchor.Start,
-            initiallyOpen = true,
-            rows = listOf(
-                TvAccountMenuRow("switch", "Switch profile", Icons.Filled.SwapHoriz, {}),
-                TvAccountMenuRow("settings", "Settings", Icons.Filled.Settings, {}),
-            ),
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(dimensionResource(TvR.dimen.tv_account_menu_start_inset)),
-        )
-    }
 }
 
 /**
