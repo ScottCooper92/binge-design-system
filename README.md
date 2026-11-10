@@ -233,4 +233,25 @@ a consumer keeps no wrappers of its own.
 
 ## Licence
 
-See [LICENSE](LICENSE).
+Copyright (c) Scott Cooper, and the Claude and bot identities that authored commits in this
+repository.
+
+This library is free software under the GNU General Public License, version 3 or (at your option)
+any later version. See [LICENSE](LICENSE).
+
+[LICENSE-EXCEPTION.md](LICENSE-EXCEPTION.md) adds a permission under section 7 for the Google Play
+services and Firebase libraries that the apps which include this library link.
+
+The Binge app also uses this library. The copyright holder, being its sole holder, licenses it to
+the Binge app under separate terms. That grant is not under the GPL and gives nobody else any
+rights.
+
+This repository reserves no artwork and no name: the GPL covers all of it, apart from the files
+below.
+
+The Outfit font in `designsystem/src/main/assets/fonts/` and `designsystem/src/main/res/font/` is
+under the SIL Open Font License 1.1, and its licence file travels with it. The Gradle wrapper
+scripts and the dependencies keep their own licences.
+
+The contracts and SDK in `binge-companions` stay under Apache 2.0, so anyone can write a companion
+without taking on the GPL.
