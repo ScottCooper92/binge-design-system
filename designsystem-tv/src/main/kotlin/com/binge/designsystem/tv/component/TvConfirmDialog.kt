@@ -96,14 +96,14 @@ fun TvConfirmDialogContent(
             modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(DesR.dimen.padding_s)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m), Alignment.End),
         ) {
-            TvButton(
+            TvCompactButton(
                 label = dismissLabel,
                 onClick = onDismissRequest,
                 style = TvButtonStyle.Text,
                 initiallyFocused = initiallyDismissFocused,
                 modifier = Modifier.focusRequester(dismissFocus),
             )
-            TvButton(
+            TvCompactButton(
                 label = confirmLabel,
                 onClick = onConfirm,
                 style = if (destructive) TvButtonStyle.TextDestructive else TvButtonStyle.Text,
