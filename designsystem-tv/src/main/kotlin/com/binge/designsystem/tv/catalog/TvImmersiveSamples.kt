@@ -73,7 +73,12 @@ private fun sampleRow(
             )
         },
     onSeeAll = if (seeAll) ({}) else null,
+    seeAllPeek = if (seeAll) HubPeek else emptyList(),
 )
+
+/** Three stand-in posters, in the hub's own tones, for the See-all card to fan. */
+private val HubPeek: List<@Composable BoxScope.() -> Unit> =
+    (0 until 3).map { id -> { Box(Modifier.fillMaxSize().background(sampleTone(id))) } }
 
 private val SampleRows =
     listOf(

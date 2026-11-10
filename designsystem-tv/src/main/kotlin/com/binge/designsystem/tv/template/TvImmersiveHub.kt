@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -68,6 +69,11 @@ data class TvHubRow<T>(
      * it to the hub, which wraps a row only once it is long enough.
      */
     val loops: Boolean = true,
+    /**
+     * Up to three image slots the row's See-all card fans behind its label, so the end of the row hints at what lies behind it. The hub
+     * loads no images, so the caller fills them (its own poster loader); empty leaves the card a plain fill.
+     */
+    val seeAllPeek: List<@Composable BoxScope.() -> Unit> = emptyList(),
 )
 
 /** What a failed [TvHubRow] says, and the retry it offers. The caller owns the copy, as it does the row's title. */
@@ -311,6 +317,7 @@ fun <T : Any> TvImmersiveHub(
                                         isFocused = isFocused,
                                         onFocusChanged = onFocusChanged,
                                         onClick = onSeeAll,
+                                        peek = row.seeAllPeek,
                                         modifier = cellModifier
                                             .width(
                                                 cardWidth,

@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -32,8 +31,11 @@ import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 private const val MAX_PEEK = 3
-private const val PEEK_TILT_DEGREES = 5f
-private const val PEEK_SCALE = 0.84f
+private const val PEEK_TILT_DEGREES = 3f
+private const val PEEK_SCALE = 0.8f
+
+/** How far each layer sits from the middle one, as a share of the cell's own width and height. */
+private const val PEEK_SPREAD = 0.04f
 private const val PEEK_SCRIM_ALPHA = 0.6f
 
 /**
@@ -44,7 +46,7 @@ private const val PEEK_SCRIM_ALPHA = 0.6f
  * "See all" when it has none; the arrow sits beside it on the front layer.
  *
  * [peek] is up to [MAX_PEEK] image slots the caller fills (extra ones are ignored, and this module loads no images).
- * They fan out behind the front layer, the first slot nearest the front, under a scrim that keeps the label legible.
+ * They fan out behind the label, the first slot nearest the front, wholly inside the cell, under a scrim that keeps the label legible.
  * With none, the card is a plain fill. Focus is the cell's own ring and the same press handling as any cell.
  */
 @Composable
@@ -57,7 +59,6 @@ fun TvSeeAllCard(
     peek: List<@Composable BoxScope.() -> Unit> = emptyList(),
 ) {
     val slots = peek.take(MAX_PEEK)
-    val step = with(LocalDensity.current) { dimensionResource(TvR.dimen.tv_see_all_peek_step).toPx() }
     Box(
         modifier =
             modifier
@@ -68,18 +69,20 @@ fun TvSeeAllCard(
                 .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
                 .semantics { contentDescription = label },
     ) {
-        // Drawn back to front: the last slot is furthest back, tilted and shifted most.
+        // Drawn back to front: the last slot is furthest back. The layers are scaled to PEEK_SCALE and then fanned about the middle
+        // one, by an offset and a tilt small enough that the corners stay inside the cell, so the clip never cuts the fan flat.
         slots.indices.reversed().forEach { depth ->
+            val from = depth - (slots.size - 1) / 2f
             Box(
                 modifier =
                     Modifier
                         .fillMaxSize()
                         .graphicsLayer {
-                            // Every slot fills the cell, so shrink them all: the deeper ones then show past the front one.
                             scaleX = PEEK_SCALE
                             scaleY = PEEK_SCALE
-                            translationX = step * depth
-                            rotationZ = PEEK_TILT_DEGREES * depth
+                            translationX = size.width * PEEK_SPREAD * from
+                            translationY = -size.height * PEEK_SPREAD * from
+                            rotationZ = PEEK_TILT_DEGREES * from
                         }.clip(BingeShapes.MediaCard),
             ) { slots[depth](this) }
         }

@@ -51,6 +51,7 @@ fun TvSeeAllCardGallerySample() {
 
 @Composable
 private fun SeeAllCardPair(aspectRatio: Float, width: Dp) {
+    var restFocused by remember { mutableStateOf(false) }
     var focused by remember { mutableStateOf(true) }
     Row(
         modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
@@ -58,8 +59,8 @@ private fun SeeAllCardPair(aspectRatio: Float, width: Dp) {
     ) {
         TvSeeAllCard(
             label = stringResource(TvR.string.tv_see_all_count, SAMPLE_COUNT),
-            isFocused = false,
-            onFocusChanged = {},
+            isFocused = restFocused,
+            onFocusChanged = { restFocused = it },
             onClick = {},
             peek = SamplePeek,
             modifier = Modifier.width(width).aspectRatio(aspectRatio),
