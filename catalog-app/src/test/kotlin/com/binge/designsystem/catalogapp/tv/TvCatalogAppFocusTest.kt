@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.assertIsFocused
-import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
@@ -101,7 +101,7 @@ class TvCatalogAppFocusTest {
             val name = "Row %02d".format(index)
             CatalogEntry(id = name, group = "Group", name = name, description = "") { Box(Modifier.size(10.dp)) }
         }
-        val tester = StateRestorationTester(rule)
+        val tester = InMemoryStateRestorationTester(rule)
         tester.setContent { BingeTvTheme { TvCatalogApp(tall) } }
         rule.waitForIdle()
         rule.onNodeWithText("Row %02d".format(DEEP_ROW)).assertDoesNotExist()
