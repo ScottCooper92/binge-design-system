@@ -10,7 +10,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -18,6 +20,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.component.TvIconButton
@@ -160,6 +163,13 @@ class BingeTvTopBarTabsFitTest {
     @Test
     fun `focusing the gear changes neither the tabs nor the avatar at 2x font`() {
         assertFocusingTheGearChangesNothing(fontScale = 2f)
+    }
+
+    @Test
+    fun `the bar's avatar is 36dp and the bar is as tall as its tabs`() {
+        setBar(fontScale = 1f)
+        composeTestRule.onNodeWithContentDescription("Profile").assertWidthIsEqualTo(36.dp).assertHeightIsEqualTo(36.dp)
+        composeTestRule.onNodeWithContentDescription("Home").assertHeightIsEqualTo(52.dp)
     }
 
     private val fiveTabs = listOf("Home", "Movies", "TV shows", "Requests", "Search")
