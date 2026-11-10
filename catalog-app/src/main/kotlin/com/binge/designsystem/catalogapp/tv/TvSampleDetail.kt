@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -49,19 +50,26 @@ fun TvSampleDetail(
     closer.ReportDisposal()
     val firstControl = remember { FocusRequester() }
     TvOverlayArrivalFocusEffect(target = firstControl, key = entry.id)
+    // The overscan pads the catalog's own controls only. The sample below fills the screen as a real page does, and takes its own
+    // overscan: padding it here too would render it narrower than any shell page, and a bar would run out of room sooner.
+    val overscan = PaddingValues(
+        horizontal = dimensionResource(TvR.dimen.tv_overscan_horizontal),
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .tvExitFocusGroup { closer.trapping }
-            .padding(
-                horizontal = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                vertical = dimensionResource(TvR.dimen.tv_overscan_vertical),
-            ),
+            .padding(top = dimensionResource(TvR.dimen.tv_overscan_vertical)),
     ) {
-        Text(text = entry.name, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            text = entry.name,
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(overscan),
+        )
         Row(
-            modifier = Modifier.padding(vertical = dimensionResource(R.dimen.catalog_padding)),
+            modifier = Modifier.padding(overscan).padding(vertical = dimensionResource(R.dimen.catalog_padding)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.catalog_controls_gap)),
             verticalAlignment = Alignment.CenterVertically,
         ) {

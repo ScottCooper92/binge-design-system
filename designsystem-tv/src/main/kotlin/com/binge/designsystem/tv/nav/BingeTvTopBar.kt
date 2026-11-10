@@ -5,9 +5,11 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -36,6 +38,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -43,6 +47,7 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.focus.tvFocusGroup
 import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -74,7 +79,24 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * Every item in [itemFocusRequesters] is attached to its requester, so the caller can send focus to a tab. Down from any item
  * lands on [down], the current page's own entry. [onFocusedChange] reports whether the bar holds focus.
  *
- * Until [visible] the bar is drawn clear and takes no focus, so it never shows a tab that is about to vanish. [scrim] fades
+ * [trailing] replaces [footer] with arbitrary content at the end (an avatar and a gear, say, with a menu hanging off the avatar).
+ * The caller owns that content's focus, but Down from it is the caller's too: give each focusable a `focusProperties { down = ... }`
+ * as the bar's own items get. The bar lays the tabs out around the slot's width at rest, so an item in it must keep its size on
+ * focus: a `TvIconButton` there passes `expandOnFocus = false`, or its labelled pill would push the avatar and squeeze the tabs.
+ * With a [trailing] slot the whole bar is a focus group that restores the item last left, so Up from
+ * the page resumes there, on a tab or on the avatar, instead of on the nearest one. With no [items] the bar draws no tabs and no rail,
+ * only its ends.
+ *
+ * The room is finite. On a 960 dp screen five tabs (546 dp at 1x font, 613 at 1.3x, 756 at 2x) fit beside a start avatar and a trailing
+ * avatar and gear, which leave 668 dp, up to 1.3x font; at 2x they fit beside a start avatar alone, which leaves 796. Past that the
+ * widest tabs shrink to a common width and ellipsize.
+ *
+ * A tab keeps its own width, so its label is never cut while the bar has room for it: the tabs sit centred when they fit clear of the
+ * wider end on both sides, else between the two ends. Only when even that is too narrow do the widest tabs shrink, to a common width.
+ *
+ * Until [visible] the bar is drawn clear and takes no focus, so it never shows a tab that is about to vanish. The [trailing] slot refuses
+ * directional entry while hidden, however its content nests focus groups; a focus request made straight at an item inside such a nested
+ * group is the caller's to withhold. [scrim] fades
  * the bar's background from the theme's background at the top to clear, for a bar over page art; pass false to sit it on a
  * plain surface.
  */
@@ -93,6 +115,7 @@ fun BingeTvTopBar(
     visible: Boolean = true,
     scrim: Boolean = true,
     actionKeys: Set<Any> = emptySet(),
+    trailing: (@Composable RowScope.() -> Unit)? = null,
 ) {
     var barFocused by remember { mutableStateOf(false) }
     var focusedKey by remember { mutableStateOf<Any?>(null) }
@@ -117,6 +140,7 @@ fun BingeTvTopBar(
         visible = visible,
         scrim = scrim,
         actionKeys = actionKeys,
+        trailing = trailing,
         modifier = modifier.onFocusChanged {
             barFocused = it.hasFocus
             onFocusedChange(it.hasFocus)
@@ -145,6 +169,7 @@ internal fun TvTopBarSurface(
     scrim: Boolean,
     modifier: Modifier = Modifier,
     actionKeys: Set<Any> = emptySet(),
+    trailing: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val background = MaterialTheme.colorScheme.background
     val scale by animateFloatAsState(
@@ -159,11 +184,14 @@ internal fun TvTopBarSurface(
             this.down = down
         }
     }
-    val spacing = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s))
+    val gap = dimensionResource(DesR.dimen.padding_s)
+    val spacing = Arrangement.spacedBy(gap)
     val endClearance = dimensionResource(DesR.dimen.padding_m)
     Layout(
         modifier = modifier
             .fillMaxWidth()
+            // With a trailing slot, focus arriving on the bar goes to the item last left, so leaving from an avatar returns to it.
+            .then(if (trailing != null) Modifier.tvFocusGroup() else Modifier)
             .alpha(if (visible) 1f else 0f)
             .then(
                 if (scrim) {
@@ -189,28 +217,41 @@ internal fun TvTopBarSurface(
                     modifier = itemModifier(header).layoutId(TvTopBarSlot.Start),
                 )
             }
-            Row(
-                modifier = Modifier.layoutId(TvTopBarSlot.Tabs).graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                },
-                horizontalArrangement = spacing,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                items.forEach { item ->
-                    TvTopBarEntry(
-                        item = item,
-                        selected = (item.key == selectedKey).takeUnless { item.key in actionKeys },
-                        focused = item.key == focusedKey,
-                        iconOnly = item.key in iconOnlyKeys,
-                        onFocusChanged = { onItemFocusChanged(item.key, it) },
-                        onClick = { onSelect(item.key) },
-                        // Tabs share what width there is, each up to its own: none is starved to nothing by the ones before it.
-                        modifier = itemModifier(item).weight(1f, fill = false),
-                    )
+            if (items.isNotEmpty()) {
+                TvTopBarTabs(
+                    spacing = gap,
+                    modifier = Modifier.layoutId(TvTopBarSlot.Tabs).graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    },
+                ) {
+                    items.forEach { item ->
+                        TvTopBarEntry(
+                            item = item,
+                            selected = (item.key == selectedKey).takeUnless { item.key in actionKeys },
+                            focused = item.key == focusedKey,
+                            iconOnly = item.key in iconOnlyKeys,
+                            onFocusChanged = { onItemFocusChanged(item.key, it) },
+                            onClick = { onSelect(item.key) },
+                            modifier = itemModifier(item),
+                        )
+                    }
                 }
             }
-            if (footer != null) {
+            if (trailing != null) {
+                Row(
+                    // Hidden, the slot takes no focus, as the items above do. The group refuses directional entry, which holds however the
+                    // caller nests its own focus groups inside; canFocus covers a focus request made at an item directly in the slot.
+                    modifier = Modifier
+                        .layoutId(TvTopBarSlot.End)
+                        .focusProperties { onEnter = { if (!visible) cancelFocusChange() } }
+                        .focusGroup()
+                        .focusProperties { canFocus = visible },
+                    horizontalArrangement = spacing,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = trailing,
+                )
+            } else if (footer != null) {
                 TvTopBarEntry(
                     item = footer,
                     selected = (footer.key == selectedKey).takeUnless { footer.key in actionKeys },
@@ -223,21 +264,74 @@ internal fun TvTopBarSurface(
             }
         },
     ) { measurables, constraints ->
-        // The ends are measured as they are, a 52dp avatar or a pill as wide as its label, and the tabs get what is left on
-        // both sides of the wider one so they stay centred. A crowded bar then shortens its tabs instead of running under an end.
+        // The ends are measured as they are, a 52dp avatar or a pill as wide as its label. The tabs keep their own width wherever it
+        // fits: centred between the bar's edges when it fits clear of the wider end on both sides, else between the two ends, shifted off
+        // centre. Only when even that is too narrow do the tabs shrink, the widest first (see TvTopBarTabs), so a label is never
+        // cut while there is room for it.
         val loose = constraints.copy(minWidth = 0, minHeight = 0)
         val start = measurables.firstOrNull { it.layoutId == TvTopBarSlot.Start }?.measure(loose)
         val end = measurables.firstOrNull { it.layoutId == TvTopBarSlot.End }?.measure(loose)
-        val clearance = if (start == null && end == null) 0 else endClearance.roundToPx()
-        val reserved = maxOf(start?.width ?: 0, end?.width ?: 0) + clearance
-        val tabs = measurables
-            .first { it.layoutId == TvTopBarSlot.Tabs }
-            .measure(loose.copy(maxWidth = (constraints.maxWidth - 2 * reserved).coerceAtLeast(0)))
-        val height = maxOf(start?.height ?: 0, tabs.height, end?.height ?: 0)
+        val clearance = endClearance.roundToPx()
+        val startEdge = if (start != null) start.width + clearance else 0
+        val endEdge = constraints.maxWidth - if (end != null) end.width + clearance else 0
+        val reserved = maxOf(start?.width ?: 0, end?.width ?: 0) + if (start == null && end == null) 0 else clearance
+        val symmetricMax = (constraints.maxWidth - 2 * reserved).coerceAtLeast(0)
+        val betweenMax = (endEdge - startEdge).coerceAtLeast(0)
+        val tabsMeasurable = measurables.firstOrNull { it.layoutId == TvTopBarSlot.Tabs }
+        val fitsCentred = tabsMeasurable == null || tabsMeasurable.maxIntrinsicWidth(loose.maxHeight) <= symmetricMax
+        val tabs = tabsMeasurable?.measure(loose.copy(maxWidth = if (fitsCentred) symmetricMax else betweenMax))
+        val height = maxOf(start?.height ?: 0, tabs?.height ?: 0, end?.height ?: 0)
         layout(constraints.maxWidth, height) {
             start?.placeRelative(0, (height - start.height) / 2)
-            tabs.placeRelative((constraints.maxWidth - tabs.width) / 2, (height - tabs.height) / 2)
+            if (tabs != null) {
+                val centred = (constraints.maxWidth - tabs.width) / 2
+                val x = if (fitsCentred) centred else centred.coerceIn(startEdge, (endEdge - tabs.width).coerceAtLeast(startEdge))
+                tabs.placeRelative(x, (height - tabs.height) / 2)
+            }
             end?.placeRelative(constraints.maxWidth - end.width, (height - end.height) / 2)
+        }
+    }
+}
+
+/**
+ * The tabs in a row, [spacing] apart. Each keeps its own width while the row has room for all of them. When it has not, the
+ * widest are cut back to a common cap, the largest that fits, so a short label is left whole and no tab is starved to nothing
+ * by the ones before it.
+ */
+@Composable
+private fun TvTopBarTabs(
+    spacing: Dp,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
+        val gap = spacing.roundToPx()
+        val gaps = gap * (measurables.size - 1).coerceAtLeast(0)
+        // A Measurable is measured once, so the natural widths come from the intrinsics and each tab is measured at the width it gets.
+        val natural = measurables.map { it.maxIntrinsicWidth(constraints.maxHeight) }
+        val total = natural.sum() + gaps
+        val cap = if (total <= constraints.maxWidth) {
+            Constraints.Infinity
+        } else {
+            val budget = (constraints.maxWidth - gaps).coerceAtLeast(0)
+            var low = 0
+            var high = natural.max()
+            while (low < high) {
+                val mid = (low + high + 1) / 2
+                if (natural.sumOf { minOf(it, mid) } <= budget) low = mid else high = mid - 1
+            }
+            low
+        }
+        val placeables = measurables.mapIndexed { index, measurable ->
+            measurable.measure(constraints.copy(minWidth = 0, maxWidth = minOf(natural[index], cap)))
+        }
+        val height = placeables.maxOfOrNull { it.height } ?: 0
+        layout(placeables.sumOf { it.width } + gaps, height) {
+            var x = 0
+            placeables.forEach { placeable ->
+                placeable.placeRelative(x, (height - placeable.height) / 2)
+                x += placeable.width + gap
+            }
         }
     }
 }
