@@ -29,6 +29,7 @@ import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
@@ -389,7 +390,7 @@ fun TvImmersiveGridMessageSample() {
             TvMessagePlate(
                 body = "Nothing matches these filters.",
                 alignment = Alignment.Center,
-                actions = { TvButton(label = "Clear filters", onClick = {}, style = TvButtonStyle.Primary) },
+                actions = { TvCompactButton(label = "Clear filters", onClick = {}, style = TvButtonStyle.Primary) },
             )
         },
     )
