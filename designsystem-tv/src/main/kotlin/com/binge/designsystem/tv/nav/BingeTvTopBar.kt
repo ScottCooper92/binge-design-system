@@ -177,7 +177,8 @@ internal fun TvTopBarSurface(
             this.down = down
         }
     }
-    val spacing = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s))
+    val gap = dimensionResource(DesR.dimen.padding_s)
+    val spacing = Arrangement.spacedBy(gap)
     val endClearance = dimensionResource(DesR.dimen.padding_m)
     Layout(
         modifier = modifier
@@ -211,7 +212,7 @@ internal fun TvTopBarSurface(
             }
             if (items.isNotEmpty()) {
                 TvTopBarTabs(
-                    spacing = dimensionResource(DesR.dimen.padding_s),
+                    spacing = gap,
                     modifier = Modifier.layoutId(TvTopBarSlot.Tabs).graphicsLayer {
                         scaleX = scale
                         scaleY = scale
@@ -232,7 +233,8 @@ internal fun TvTopBarSurface(
             }
             if (trailing != null) {
                 Row(
-                    modifier = Modifier.layoutId(TvTopBarSlot.End),
+                    // Hidden, the slot takes no focus, as the items above do: the gate reaches every focusable the caller puts in it.
+                    modifier = Modifier.layoutId(TvTopBarSlot.End).focusProperties { canFocus = visible },
                     horizontalArrangement = spacing,
                     verticalAlignment = Alignment.CenterVertically,
                     content = trailing,
