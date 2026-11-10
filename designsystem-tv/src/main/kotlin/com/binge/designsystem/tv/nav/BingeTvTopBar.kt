@@ -37,6 +37,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -78,7 +80,12 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  *
  * [trailing] replaces [footer] with arbitrary content at the end (an avatar and a gear, say, with a menu hanging off the avatar).
  * The caller owns that content's focus, but Down from it is the caller's too: give each focusable a `focusProperties { down = ... }`
- * as the bar's own items get. With no [items] the bar draws no tabs and no rail, only its ends.
+ * as the bar's own items get. With a [trailing] slot the whole bar is a focus group that restores the item last left, so Up from
+ * the page resumes there, on a tab or on the avatar, instead of on the nearest one. With no [items] the bar draws no tabs and no rail,
+ * only its ends.
+ *
+ * A tab keeps its own width, so its label is never cut while the bar has room for it: the tabs sit centred when they fit clear of the
+ * wider end on both sides, else between the two ends. Only when even that is too narrow do the widest tabs shrink, to a common width.
  *
  * Until [visible] the bar is drawn clear and takes no focus, so it never shows a tab that is about to vanish. [scrim] fades
  * the bar's background from the theme's background at the top to clear, for a bar over page art; pass false to sit it on a
@@ -201,13 +208,12 @@ internal fun TvTopBarSurface(
                 )
             }
             if (items.isNotEmpty()) {
-                Row(
+                TvTopBarTabs(
+                    spacing = dimensionResource(DesR.dimen.padding_s),
                     modifier = Modifier.layoutId(TvTopBarSlot.Tabs).graphicsLayer {
                         scaleX = scale
                         scaleY = scale
                     },
-                    horizontalArrangement = spacing,
-                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     items.forEach { item ->
                         TvTopBarEntry(
@@ -217,8 +223,7 @@ internal fun TvTopBarSurface(
                             iconOnly = item.key in iconOnlyKeys,
                             onFocusChanged = { onItemFocusChanged(item.key, it) },
                             onClick = { onSelect(item.key) },
-                            // Tabs share what width there is, each up to its own: none is starved to nothing by the ones before it.
-                            modifier = itemModifier(item).weight(1f, fill = false),
+                            modifier = itemModifier(item),
                         )
                     }
                 }
@@ -243,21 +248,74 @@ internal fun TvTopBarSurface(
             }
         },
     ) { measurables, constraints ->
-        // The ends are measured as they are, a 52dp avatar or a pill as wide as its label, and the tabs get what is left on
-        // both sides of the wider one so they stay centred. A crowded bar then shortens its tabs instead of running under an end.
+        // The ends are measured as they are, a 52dp avatar or a pill as wide as its label. The tabs keep their own width wherever it
+        // fits: centred between the bar's edges when it fits clear of the wider end on both sides, else between the two ends, shifted off
+        // centre. Only when even that is too narrow do the tabs shrink, the widest first (see TvTopBarTabs), so a label is never
+        // cut while there is room for it.
         val loose = constraints.copy(minWidth = 0, minHeight = 0)
         val start = measurables.firstOrNull { it.layoutId == TvTopBarSlot.Start }?.measure(loose)
         val end = measurables.firstOrNull { it.layoutId == TvTopBarSlot.End }?.measure(loose)
-        val clearance = if (start == null && end == null) 0 else endClearance.roundToPx()
-        val reserved = maxOf(start?.width ?: 0, end?.width ?: 0) + clearance
-        val tabs = measurables
-            .firstOrNull { it.layoutId == TvTopBarSlot.Tabs }
-            ?.measure(loose.copy(maxWidth = (constraints.maxWidth - 2 * reserved).coerceAtLeast(0)))
+        val clearance = endClearance.roundToPx()
+        val startEdge = if (start != null) start.width + clearance else 0
+        val endEdge = constraints.maxWidth - if (end != null) end.width + clearance else 0
+        val reserved = maxOf(start?.width ?: 0, end?.width ?: 0) + if (start == null && end == null) 0 else clearance
+        val symmetricMax = (constraints.maxWidth - 2 * reserved).coerceAtLeast(0)
+        val betweenMax = (endEdge - startEdge).coerceAtLeast(0)
+        val tabsMeasurable = measurables.firstOrNull { it.layoutId == TvTopBarSlot.Tabs }
+        val fitsCentred = tabsMeasurable == null || tabsMeasurable.maxIntrinsicWidth(loose.maxHeight) <= symmetricMax
+        val tabs = tabsMeasurable?.measure(loose.copy(maxWidth = if (fitsCentred) symmetricMax else betweenMax))
         val height = maxOf(start?.height ?: 0, tabs?.height ?: 0, end?.height ?: 0)
         layout(constraints.maxWidth, height) {
             start?.placeRelative(0, (height - start.height) / 2)
-            tabs?.placeRelative((constraints.maxWidth - tabs.width) / 2, (height - tabs.height) / 2)
+            if (tabs != null) {
+                val centred = (constraints.maxWidth - tabs.width) / 2
+                val x = if (fitsCentred) centred else centred.coerceIn(startEdge, (endEdge - tabs.width).coerceAtLeast(startEdge))
+                tabs.placeRelative(x, (height - tabs.height) / 2)
+            }
             end?.placeRelative(constraints.maxWidth - end.width, (height - end.height) / 2)
+        }
+    }
+}
+
+/**
+ * The tabs in a row, [spacing] apart. Each keeps its own width while the row has room for all of them. When it has not, the
+ * widest are cut back to a common cap, the largest that fits, so a short label is left whole and no tab is starved to nothing
+ * by the ones before it.
+ */
+@Composable
+private fun TvTopBarTabs(
+    spacing: Dp,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
+        val gap = spacing.roundToPx()
+        val gaps = gap * (measurables.size - 1).coerceAtLeast(0)
+        // A Measurable is measured once, so the natural widths come from the intrinsics and each tab is measured at the width it gets.
+        val natural = measurables.map { it.maxIntrinsicWidth(constraints.maxHeight) }
+        val total = natural.sum() + gaps
+        val cap = if (total <= constraints.maxWidth) {
+            Constraints.Infinity
+        } else {
+            val budget = (constraints.maxWidth - gaps).coerceAtLeast(0)
+            var low = 0
+            var high = natural.max()
+            while (low < high) {
+                val mid = (low + high + 1) / 2
+                if (natural.sumOf { minOf(it, mid) } <= budget) low = mid else high = mid - 1
+            }
+            low
+        }
+        val placeables = measurables.mapIndexed { index, measurable ->
+            measurable.measure(constraints.copy(minWidth = 0, maxWidth = minOf(natural[index], cap)))
+        }
+        val height = placeables.maxOfOrNull { it.height } ?: 0
+        layout(placeables.sumOf { it.width } + gaps, height) {
+            var x = 0
+            placeables.forEach { placeable ->
+                placeable.placeRelative(x, (height - placeable.height) / 2)
+                x += placeable.width + gap
+            }
         }
     }
 }
