@@ -5,6 +5,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -89,7 +90,9 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * A tab keeps its own width, so its label is never cut while the bar has room for it: the tabs sit centred when they fit clear of the
  * wider end on both sides, else between the two ends. Only when even that is too narrow do the widest tabs shrink, to a common width.
  *
- * Until [visible] the bar is drawn clear and takes no focus, so it never shows a tab that is about to vanish. [scrim] fades
+ * Until [visible] the bar is drawn clear and takes no focus, so it never shows a tab that is about to vanish. The [trailing] slot refuses
+ * directional entry while hidden, however its content nests focus groups; a focus request made straight at an item inside such a nested
+ * group is the caller's to withhold. [scrim] fades
  * the bar's background from the theme's background at the top to clear, for a bar over page art; pass false to sit it on a
  * plain surface.
  */
@@ -233,8 +236,13 @@ internal fun TvTopBarSurface(
             }
             if (trailing != null) {
                 Row(
-                    // Hidden, the slot takes no focus, as the items above do: the gate reaches every focusable the caller puts in it.
-                    modifier = Modifier.layoutId(TvTopBarSlot.End).focusProperties { canFocus = visible },
+                    // Hidden, the slot takes no focus, as the items above do. The group refuses directional entry, which holds however the
+                    // caller nests its own focus groups inside; canFocus covers a focus request made at an item directly in the slot.
+                    modifier = Modifier
+                        .layoutId(TvTopBarSlot.End)
+                        .focusProperties { onEnter = { if (!visible) cancelFocusChange() } }
+                        .focusGroup()
+                        .focusProperties { canFocus = visible },
                     horizontalArrangement = spacing,
                     verticalAlignment = Alignment.CenterVertically,
                     content = trailing,

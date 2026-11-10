@@ -1,12 +1,14 @@
 package com.binge.designsystem.tv.nav
 
 import android.app.Application
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -38,7 +40,7 @@ class BingeTvTopBarHiddenFocusTest {
 
     private lateinit var focusManager: FocusManager
 
-    private fun setBar(visible: Boolean) {
+    private fun setBar(visible: Boolean, grouped: Boolean = false) {
         composeTestRule.setContent {
             BingeTvTheme {
                 focusManager = LocalFocusManager.current
@@ -53,7 +55,18 @@ class BingeTvTopBarHiddenFocusTest {
                         down = remember { FocusRequester() },
                         onFocusedChange = {},
                         visible = visible,
-                        trailing = { TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = false) },
+                        trailing = {
+                            val gear = @Composable {
+                                TvIconButton(
+                                    icon = Icons.Filled.Settings,
+                                    label = "Settings",
+                                    onClick = {},
+                                    expandOnFocus = false,
+                                )
+                            }
+                            // A caller's own focus group inside the slot: the gate must reach what is inside it as well.
+                            if (grouped) Box(Modifier.focusGroup()) { gear() } else gear()
+                        },
                     )
                     Box(Modifier.size(48.dp).testTag("content").focusable())
                 }
@@ -79,6 +92,13 @@ class BingeTvTopBarHiddenFocusTest {
     @Test
     fun `Up from the page does not reach the trailing item while the bar is hidden`() {
         setBar(visible = false)
+        moveUp()
+        composeTestRule.onNodeWithContentDescription("Settings").assertIsNotFocused()
+    }
+
+    @Test
+    fun `Up from the page does not reach an item the caller put in its own focus group while the bar is hidden`() {
+        setBar(visible = false, grouped = true)
         moveUp()
         composeTestRule.onNodeWithContentDescription("Settings").assertIsNotFocused()
     }
