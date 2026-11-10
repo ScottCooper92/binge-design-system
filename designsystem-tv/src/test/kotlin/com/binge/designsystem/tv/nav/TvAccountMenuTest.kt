@@ -18,10 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -61,6 +65,7 @@ class TvAccountMenuTest {
         name: String = "Alexander Hamilton",
         avatarRequester: FocusRequester? = null,
         reportChanges: Boolean = false,
+        selected: Boolean = false,
     ) {
         composeTestRule.setContent {
             BingeTvTheme {
@@ -76,6 +81,7 @@ class TvAccountMenuTest {
                             detail = "Administrator",
                             down = content,
                             avatarFocusRequester = avatarRequester,
+                            selected = selected,
                             onOpenChange = { if (reportChanges) openChanges += it },
                             rows = listOf(
                                 TvAccountMenuRow("switch", "Switch profile", Icons.Filled.Settings, { switched++ }),
@@ -272,5 +278,27 @@ class TvAccountMenuTest {
         focusAvatar()
         pressBack()
         assertEquals(listOf(true, false), openChanges)
+    }
+
+    @Test
+    fun `a selected avatar reads as selected`() {
+        setMenu(selected = true)
+        composeTestRule.onNodeWithContentDescription("Account").assertIsSelected()
+    }
+
+    @Test
+    fun `an avatar that is not selected says nothing about selection, as it did before the parameter`() {
+        setMenu()
+        composeTestRule
+            .onNodeWithContentDescription("Account")
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Selected))
+    }
+
+    @Test
+    fun `a selected avatar still opens the menu and keeps its selection while it is open`() {
+        setMenu(selected = true)
+        focusAvatar()
+        assertTrue(menuIsOpen())
+        composeTestRule.onNodeWithContentDescription("Account").assertIsSelected()
     }
 }
