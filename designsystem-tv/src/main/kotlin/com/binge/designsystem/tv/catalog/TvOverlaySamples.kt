@@ -37,6 +37,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCheckboxRow
+import com.binge.designsystem.tv.component.TvChoiceRow
+import com.binge.designsystem.tv.component.TvChoiceUi
 import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvInfoCard
@@ -376,6 +378,35 @@ fun TvConfirmDialogSwitchSample() {
                 TvSideSheetRow(label = "Also delete the files", onClick = { deleteFiles = !deleteFiles }, role = Role.Switch) { isFocused ->
                     TvSwitch(checked = deleteFiles, isFocused = isFocused)
                 }
+            },
+        )
+    }
+}
+
+/**
+ * A choice the confirm applies to, with nothing preselected: the confirm is greyed out until one is picked, and focus still
+ * arrives on Cancel. For a destructive action that must name what it acts on.
+ */
+@Composable
+fun TvConfirmDialogChoiceRequiredSample() {
+    var picked by remember { mutableStateOf<String?>(null) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvConfirmDialogContent(
+            title = "Delete files?",
+            message = "Choose which version's files to delete from the server. This cannot be undone.",
+            confirmLabel = "Delete",
+            dismissLabel = "Cancel",
+            destructive = true,
+            onConfirm = {},
+            onDismissRequest = {},
+            confirmEnabled = picked != null,
+            initiallyDismissFocused = true,
+            extraContent = {
+                TvChoiceRow(
+                    choices = listOf(TvChoiceUi("standard", "Standard"), TvChoiceUi("4k", "4K")),
+                    selectedKey = picked.orEmpty(),
+                    onSelect = { picked = it },
+                )
             },
         )
     }
