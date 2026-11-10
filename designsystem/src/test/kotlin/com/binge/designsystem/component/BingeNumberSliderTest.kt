@@ -211,4 +211,83 @@ class BingeNumberSliderTest {
         composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
         assertEquals(100, value)
     }
+
+    private val landed = mutableListOf<Int?>()
+
+    private fun setItem() {
+        value = 10
+        composeTestRule.setContent {
+            TestTheme {
+                ItemGroup(
+                    title = null,
+                    rows =
+                        listOf(
+                            bingeNumberItem(
+                                icon = Icons.Filled.Movie,
+                                title = "Movie requests",
+                                value = value,
+                                range = 1..100,
+                                format = { "$it a week" },
+                                onChange = { value = it },
+                                openEndLabel = "Unlimited",
+                                onValueChangeFinished = { landed += it },
+                            ),
+                        ),
+                )
+            }
+        }
+        composeTestRule.onNodeWithText("10 a week").performClick()
+    }
+
+    @Test
+    fun `the row's sheet reports the landed value once for a stepper tap`() {
+        setItem()
+
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+
+        assertEquals(listOf<Int?>(11), landed)
+        assertEquals(11, value)
+    }
+
+    @Test
+    fun `the row's sheet reports nothing while a drag moves and the landed value on release`() {
+        setItem()
+        val slider = composeTestRule.onNodeWithContentDescription("Movie requests")
+        slider.performTouchInput {
+            down(center)
+            moveTo(centerRight)
+        }
+        assertTrue((value ?: 0) > 50)
+        assertTrue("reported before the drag ended: $landed", landed.isEmpty())
+
+        slider.performTouchInput { up() }
+
+        assertEquals(listOf(value), landed)
+    }
+
+    @Test
+    fun `a row given no callback still changes its value as before`() {
+        value = 10
+        composeTestRule.setContent {
+            TestTheme {
+                ItemGroup(
+                    title = null,
+                    rows =
+                        listOf(
+                            bingeNumberItem(
+                                icon = Icons.Filled.Movie,
+                                title = "Movie requests",
+                                value = value,
+                                range = 1..100,
+                                format = { "$it a week" },
+                                onChange = { value = it },
+                            ),
+                        ),
+                )
+            }
+        }
+        composeTestRule.onNodeWithText("10 a week").performClick()
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(11, value)
+    }
 }
