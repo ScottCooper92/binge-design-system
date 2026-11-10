@@ -10,14 +10,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.component.TvIconButton
 import com.binge.designsystem.tv.theme.BingeTvTheme
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -45,7 +49,11 @@ class BingeTvTopBarTabsFitTest {
     private val labelWidths = mutableMapOf<String, Int>()
     private var paddingPx = 0f
 
-    private fun setBar(fontScale: Float, tabLabels: List<String> = labels) {
+    private fun setBar(
+        fontScale: Float,
+        tabLabels: List<String> = labels,
+        expandGear: Boolean = false,
+    ) {
         labels = tabLabels
         composeTestRule.setContent {
             val base = LocalDensity.current
@@ -71,7 +79,7 @@ class BingeTvTopBarTabsFitTest {
                         onFocusedChange = {},
                         trailing = {
                             TvIconButton(icon = Icons.Filled.Person, label = "Account", onClick = {})
-                            TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {})
+                            TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = expandGear)
                         },
                     )
                 }
@@ -109,5 +117,41 @@ class BingeTvTopBarTabsFitTest {
         setBar(fontScale = 2f)
         assertNoTabIsCut()
         assertTabsClearOfTrailing()
+    }
+
+    private fun layoutWidths(): List<Int> =
+        labels.map {
+            composeTestRule
+                .onNodeWithContentDescription(it)
+                .fetchSemanticsNode()
+                .layoutInfo.width
+        }
+
+    private fun avatarLeft() = composeTestRule.onNodeWithContentDescription("Account").getUnclippedBoundsInRoot().left
+
+    private fun assertFocusingTheGearChangesNothing(fontScale: Float, expandGear: Boolean = false) {
+        setBar(fontScale = fontScale, expandGear = expandGear)
+        val widthsAtRest = layoutWidths()
+        val avatarAtRest = avatarLeft()
+
+        composeTestRule.onNodeWithContentDescription("Settings").requestFocus()
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(1_000)
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Settings").assertIsFocused()
+
+        assertEquals("The tabs changed width when the gear took focus", widthsAtRest, layoutWidths())
+        assertEquals("The avatar moved when the gear took focus", avatarAtRest.value, avatarLeft().value, 0.5f)
+        assertNoTabIsCut()
+    }
+
+    @Test
+    fun `focusing the gear changes neither the tabs nor the avatar at 1x font`() {
+        assertFocusingTheGearChangesNothing(fontScale = 1f)
+    }
+
+    @Test
+    fun `focusing the gear changes neither the tabs nor the avatar at 2x font`() {
+        assertFocusingTheGearChangesNothing(fontScale = 2f)
     }
 }

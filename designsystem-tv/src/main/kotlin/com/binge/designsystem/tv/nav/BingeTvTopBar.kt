@@ -80,7 +80,9 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  *
  * [trailing] replaces [footer] with arbitrary content at the end (an avatar and a gear, say, with a menu hanging off the avatar).
  * The caller owns that content's focus, but Down from it is the caller's too: give each focusable a `focusProperties { down = ... }`
- * as the bar's own items get. With a [trailing] slot the whole bar is a focus group that restores the item last left, so Up from
+ * as the bar's own items get. The bar lays the tabs out around the slot's width at rest, so an item in it must keep its size on
+ * focus: a `TvIconButton` there passes `expandOnFocus = false`, or its labelled pill would push the avatar and squeeze the tabs.
+ * With a [trailing] slot the whole bar is a focus group that restores the item last left, so Up from
  * the page resumes there, on a tab or on the avatar, instead of on the nearest one. With no [items] the bar draws no tabs and no rail,
  * only its ends.
  *

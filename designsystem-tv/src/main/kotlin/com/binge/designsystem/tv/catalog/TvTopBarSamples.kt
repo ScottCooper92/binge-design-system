@@ -195,6 +195,8 @@ private fun TvTopBarTrailingBar(items: List<TvNavItem>, header: TvNavItem?) {
                     label = "Settings",
                     onClick = {},
                     modifier = Modifier.focusProperties { this.down = down },
+                    // Stays a circle on focus: the bar lays the tabs out around this slot, so it must not change size.
+                    expandOnFocus = false,
                 )
             },
         )
