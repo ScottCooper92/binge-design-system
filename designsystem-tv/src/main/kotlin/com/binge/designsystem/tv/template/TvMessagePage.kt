@@ -13,31 +13,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.template.ScreenAction
-import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvMessagePlate
 import com.binge.designsystem.tv.focus.TvFocusSink
 import com.binge.designsystem.tv.theme.TvButtonStyle
 
-/** An [action] as a TV button: its label, icon and modifier, with [modifier] added for the page's own focus wiring. */
-@Composable
-internal fun TvActionButton(
-    action: ScreenAction,
-    style: TvButtonStyle,
-    modifier: Modifier = Modifier,
-    initiallyFocused: Boolean = false,
-) {
-    TvButton(
-        label = action.label,
-        onClick = action.onClick,
-        modifier = modifier.then(action.modifier),
-        style = style,
-        leadingIcon = action.leadingIcon,
-        initiallyFocused = initiallyFocused,
-    )
-}
-
-/** [TvActionButton] in the compact style, for the pages whose actions sit in a pinned footer. */
+/** An [action] as a compact TV button: its label, icon and modifier, with [modifier] added for the page's own focus wiring. */
 @Composable
 internal fun TvCompactActionButton(
     action: ScreenAction,
@@ -71,7 +52,7 @@ internal fun TvCompactActionButton(
  *
  * Two shapes differ from the phone's `MessageScreen` on purpose. [loading] is a flag here, not a separate page,
  * because the page must keep holding focus while it loads. And there is no free `actions` slot: focus has to land
- * on a known [primary], so a TV message offers at most the two.
+ * on a known [primary], so a TV message offers at most the two. Both are compact buttons, as every action row is.
  */
 @Composable
 fun TvMessagePage(
@@ -113,8 +94,8 @@ fun TvMessagePage(
             actions =
                 if (hasAction) {
                     {
-                        TvActionButton(primary, TvButtonStyle.Primary, Modifier.focusRequester(entry))
-                        secondary?.let { TvActionButton(it, TvButtonStyle.Secondary) }
+                        TvCompactActionButton(primary, TvButtonStyle.Primary, Modifier.focusRequester(entry))
+                        secondary?.let { TvCompactActionButton(it, TvButtonStyle.Secondary) }
                     }
                 } else {
                     null
