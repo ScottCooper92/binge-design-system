@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,6 +93,11 @@ enum class TvAccountMenuAnchor { Start, End }
  *
  * [initiallyOpen] draws the menu open until focus first reaches it, for a frame, which fires no focus events; production passes
  * false.
+ *
+ * [avatarFocusRequester], when set, is the requester the avatar uses in place of its own, so a host that routes entry focus
+ * through a requester per bar item can land focus on the avatar. [onOpenChange] is called with the menu's new state each time
+ * it opens or closes, so a host can hold its bar at full size meanwhile. The menu counts as open while its confirm dialog is up,
+ * and a menu that leaves the composition while open reports closed. Both default to the behaviour without them.
  */
 @Composable
 fun TvAccountMenu(
@@ -104,6 +111,8 @@ fun TvAccountMenu(
     anchor: TvAccountMenuAnchor = TvAccountMenuAnchor.End,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
     initiallyOpen: Boolean = false,
+    avatarFocusRequester: FocusRequester? = null,
+    onOpenChange: (Boolean) -> Unit = {},
 ) {
     var avatarFocused by remember { mutableStateOf(false) }
     var menuFocused by remember { mutableStateOf(false) }
@@ -111,7 +120,8 @@ fun TvAccountMenu(
     var refocusRow by remember { mutableStateOf<Any?>(null) }
     var heldClosed by remember { mutableStateOf(false) }
     var seededOpen by remember { mutableStateOf(initiallyOpen) }
-    val avatarRequester = remember { FocusRequester() }
+    val ownAvatarRequester = remember { FocusRequester() }
+    val avatarRequester = avatarFocusRequester ?: ownAvatarRequester
     val rowRequesters = remember { mutableMapOf<Any, FocusRequester>() }
     val ordered = remember(rows) { rows.filter { it.confirm == null } + rows.filter { it.confirm != null } }
     val firstRow = remember(ordered) {
@@ -120,6 +130,16 @@ fun TvAccountMenu(
     val panelWidthDp = dimensionResource(TvR.dimen.tv_account_menu_width)
     val panelPadDp = dimensionResource(DesR.dimen.padding_m)
     val open = !heldClosed && (avatarFocused || menuFocused || confirming != null || seededOpen)
+
+    val reportOpenChange by rememberUpdatedState(onOpenChange)
+    var reportedOpen by remember { mutableStateOf(open) }
+    LaunchedEffect(open) {
+        if (open != reportedOpen) {
+            reportedOpen = open
+            reportOpenChange(open)
+        }
+    }
+    DisposableEffect(Unit) { onDispose { if (reportedOpen) reportOpenChange(false) } }
 
     // The hold lifts once focus has left the avatar and the menu, and when the header changes: a signed-out account has gone.
     LaunchedEffect(avatarFocused, menuFocused, confirming) {
