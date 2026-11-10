@@ -23,9 +23,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -300,5 +302,11 @@ class TvAccountMenuTest {
         focusAvatar()
         assertTrue(menuIsOpen())
         composeTestRule.onNodeWithContentDescription("Account").assertIsSelected()
+    }
+
+    @Test
+    fun `the avatar in the bar is 36dp, not a button's 52dp`() {
+        setMenu()
+        composeTestRule.onNodeWithContentDescription("Account").assertWidthIsEqualTo(36.dp).assertHeightIsEqualTo(36.dp)
     }
 }

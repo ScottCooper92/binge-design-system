@@ -385,19 +385,23 @@ private fun TvTopBarAvatar(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val diameter = dimensionResource(TvR.dimen.tv_icon_button_diameter)
+    val slot = dimensionResource(TvR.dimen.tv_icon_button_diameter)
+    val diameter = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
     val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
-    Box(
-        modifier = modifier
-            .size(diameter)
-            .clip(BingeShapes.Pill)
-            .border(ring, if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent, BingeShapes.Pill)
-            .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
-            .clearAndSetSemantics { contentDescription = item.label }
-            .padding(ring),
-        contentAlignment = Alignment.Center,
-    ) {
-        BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = item.avatarUrl)
+    // Smaller than a button, in a button-sized slot: the bar's height and the tabs' places stay where they were.
+    Box(modifier = modifier.size(slot), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .size(diameter)
+                .clip(BingeShapes.Pill)
+                .border(ring, if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent, BingeShapes.Pill)
+                .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
+                .clearAndSetSemantics { contentDescription = item.label }
+                .padding(ring),
+            contentAlignment = Alignment.Center,
+        ) {
+            BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = item.avatarUrl)
+        }
     }
 }
 

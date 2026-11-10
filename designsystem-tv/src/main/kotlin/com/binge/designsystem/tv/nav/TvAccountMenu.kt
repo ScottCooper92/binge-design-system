@@ -254,7 +254,8 @@ private fun AccountAvatar(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val diameter = dimensionResource(TvR.dimen.tv_icon_button_diameter)
+    val slot = dimensionResource(TvR.dimen.tv_icon_button_diameter)
+    val diameter = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
     val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
     val onSurface = MaterialTheme.colorScheme.onSurface
     val ringColor = when {
@@ -262,20 +263,24 @@ private fun AccountAvatar(
         selected -> onSurface.copy(alpha = SELECTED_RING_ALPHA)
         else -> Color.Transparent
     }
-    Box(
-        modifier = modifier
-            .size(diameter)
-            .clip(BingeShapes.Pill)
-            .border(ring, ringColor, BingeShapes.Pill)
-            .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
-            .clearAndSetSemantics {
-                contentDescription = label
-                // Only a selected avatar says so, so one that is never selected reads as it always has.
-                if (selected) this.selected = true
-            }.padding(ring),
-        contentAlignment = Alignment.Center,
-    ) {
-        BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = avatarUrl)
+    // The avatar is smaller than a button but sits in a button-sized slot, so the bar's height and the open panel's avatar
+    // (which is drawn over this slot) keep their places.
+    Box(modifier = modifier.size(slot), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .size(diameter)
+                .clip(BingeShapes.Pill)
+                .border(ring, ringColor, BingeShapes.Pill)
+                .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
+                .clearAndSetSemantics {
+                    contentDescription = label
+                    // Only a selected avatar says so, so one that is never selected reads as it always has.
+                    if (selected) this.selected = true
+                }.padding(ring),
+            contentAlignment = Alignment.Center,
+        ) {
+            BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = avatarUrl)
+        }
     }
 }
 

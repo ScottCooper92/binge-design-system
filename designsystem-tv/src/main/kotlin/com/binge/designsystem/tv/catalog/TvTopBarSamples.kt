@@ -217,18 +217,21 @@ private fun TvTopBarTrailingBar(items: List<TvNavItem>, header: TvNavItem?) {
 @Composable
 private fun SampleAvatarButton(modifier: Modifier = Modifier) {
     var focused by remember { mutableStateOf(false) }
-    val diameter = dimensionResource(TvR.dimen.tv_icon_button_diameter)
+    val slot = dimensionResource(TvR.dimen.tv_icon_button_diameter)
+    val diameter = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
     val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
-    Box(
-        modifier = modifier
-            .size(diameter)
-            .clip(BingeShapes.Pill)
-            .border(ring, if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent, BingeShapes.Pill)
-            .tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = {})
-            .clearAndSetSemantics { contentDescription = "Account" }
-            .padding(ring),
-        contentAlignment = Alignment.Center,
-    ) {
-        BingeTvInitialsAvatar(name = "Alexander Hamilton", size = diameter - ring * 2)
+    Box(modifier = modifier.size(slot), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .size(diameter)
+                .clip(BingeShapes.Pill)
+                .border(ring, if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent, BingeShapes.Pill)
+                .tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = {})
+                .clearAndSetSemantics { contentDescription = "Account" }
+                .padding(ring),
+            contentAlignment = Alignment.Center,
+        ) {
+            BingeTvInitialsAvatar(name = "Alexander Hamilton", size = diameter - ring * 2)
+        }
     }
 }
