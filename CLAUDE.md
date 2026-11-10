@@ -92,7 +92,8 @@ stays disabled until something changes. A single toggle or choice applies at onc
 verb, never an icon alone; a destructive action sits in an overflow menu or behind a confirm.
 
 **Chips and tabs.** Chips narrow the same list: every chip shows a part of one set of things (`BingeFilterChipRow`,
-`BingeFilterChipPager`). Tabs switch between different content: each tab is its own view. Never use both on one page.
+`BingeFilterChipPager`). Tabs switch between different content: each tab is its own view (`BingeTabRow`,
+`BingeTabbedPager`). Never use both on one page.
 
 ## Gates
 
