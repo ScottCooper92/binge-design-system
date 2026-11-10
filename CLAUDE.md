@@ -91,6 +91,9 @@ with no button. A top-bar text "Save" (`FormActionPlacement.TopBar`) is only for
 stays disabled until something changes. A single toggle or choice applies at once. One primary per screen; a top-bar action is a
 verb, never an icon alone; a destructive action sits in an overflow menu or behind a confirm.
 
+**Chips and tabs.** Chips narrow the same list: every chip shows a part of one set of things (`BingeFilterChipRow`,
+`BingeFilterChipPager`). Tabs switch between different content: each tab is its own view. Never use both on one page.
+
 ## Gates
 
 CI runs `./gradlew build validateDebugScreenshotTest`. `build` is the Kotlin compile, the unit
