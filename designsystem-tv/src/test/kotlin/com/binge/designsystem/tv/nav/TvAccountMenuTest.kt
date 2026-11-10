@@ -55,7 +55,13 @@ class TvAccountMenuTest {
     private var switched = 0
     private var signedOut = 0
 
-    private fun setMenu(name: String = "Alexander Hamilton") {
+    private val openChanges = mutableListOf<Boolean>()
+
+    private fun setMenu(
+        name: String = "Alexander Hamilton",
+        avatarRequester: FocusRequester? = null,
+        reportChanges: Boolean = false,
+    ) {
         composeTestRule.setContent {
             BingeTvTheme {
                 // The shell's own handler, registered before the menu's, so the menu's wins while it is open.
@@ -69,6 +75,8 @@ class TvAccountMenuTest {
                             name = name,
                             detail = "Administrator",
                             down = content,
+                            avatarFocusRequester = avatarRequester,
+                            onOpenChange = { if (reportChanges) openChanges += it },
                             rows = listOf(
                                 TvAccountMenuRow("switch", "Switch profile", Icons.Filled.Settings, { switched++ }),
                                 TvAccountMenuRow(
@@ -224,5 +232,45 @@ class TvAccountMenuTest {
         key(Key.DirectionLeft)
         assertTrue("The menu stayed open after focus left it", !menuIsOpen())
         composeTestRule.onNodeWithContentDescription("Account").assertIsNotFocused()
+    }
+
+    @Test
+    fun `a supplied requester focuses the avatar`() {
+        val requester = FocusRequester()
+        setMenu(avatarRequester = requester)
+        composeTestRule.onNodeWithContentDescription("Account").assertIsNotFocused()
+        composeTestRule.runOnIdle { requester.requestFocus() }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Account").assertIsFocused()
+        assertTrue("The avatar did not open the menu", menuIsOpen())
+        key(Key.DirectionDown)
+        composeTestRule.onNodeWithText("Switch profile").assertIsFocused()
+    }
+
+    @Test
+    fun `onOpenChange is true on open, stays true under the confirm, and is false on close`() {
+        setMenu(reportChanges = true)
+        assertEquals("Nothing is reported before the menu changes", emptyList<Boolean>(), openChanges)
+        focusAvatar()
+        assertEquals(listOf(true), openChanges)
+        key(Key.DirectionDown)
+        key(Key.DirectionDown)
+        key(Key.DirectionCenter)
+        composeTestRule.onNodeWithText("Sign out?").assertExists()
+        assertEquals("The confirm dialog counts as open", listOf(true), openChanges)
+        composeTestRule.onNodeWithText("Cancel").performKeyInput { pressKey(Key.DirectionCenter) }
+        composeTestRule.waitForIdle()
+        assertEquals(listOf(true), openChanges)
+        composeTestRule.onNodeWithContentDescription("Page").requestFocus()
+        composeTestRule.waitForIdle()
+        assertEquals(listOf(true, false), openChanges)
+    }
+
+    @Test
+    fun `onOpenChange is false when Back closes the menu`() {
+        setMenu(reportChanges = true)
+        focusAvatar()
+        pressBack()
+        assertEquals(listOf(true, false), openChanges)
     }
 }
