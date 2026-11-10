@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -89,8 +90,9 @@ fun TvSideSheetDemo() {
 /**
  * The real stacked sheet: Settings opens a list whose rows each open their own page. BACK, or the key pointing away from
  * the panel, goes back one page with focus on the row that opened the one just left, and from the list closes the sheet and returns
- * focus to the button. "Reopen where I was" opens it on the page it was closed on, with focus on the row that last had it,
- * from the path the stack's state kept.
+ * focus to the button. Each page under the list has a "Close sheet" row, so the sheet can be closed from any depth. "Reopen
+ * where I was" opens it on the page it was closed on, with focus on the row that last had it (the Close row, when that is how
+ * it was closed), from the path the stack's state kept.
  */
 @Composable
 fun TvSideSheetStackDemo() {
@@ -138,11 +140,15 @@ fun TvSideSheetStackDemo() {
                     TvSideSheetRows {
                         TvSideSheetRow("New requests", onClick = {}, supportingText = "On", modifier = nav.row("new"))
                         TvSideSheetRow("Issues", onClick = {}, supportingText = "Off", modifier = nav.row("issues"))
+                        TvSideSheetRow("Close sheet", onClick = closer::close, icon = Icons.Filled.Close, modifier = nav.row("close"))
                     }
                 }
                 else -> {
                     TvSideSheetTitle("Quality")
-                    TvSideSheetRows { DemoQualities.forEach { label -> TvSideSheetRow(label, onClick = {}, modifier = nav.row(label)) } }
+                    TvSideSheetRows {
+                        DemoQualities.forEach { label -> TvSideSheetRow(label, onClick = {}, modifier = nav.row(label)) }
+                        TvSideSheetRow("Close sheet", onClick = closer::close, icon = Icons.Filled.Close, modifier = nav.row("close"))
+                    }
                 }
             }
         }
