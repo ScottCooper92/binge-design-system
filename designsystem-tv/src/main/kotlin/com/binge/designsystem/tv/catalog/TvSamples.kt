@@ -39,6 +39,7 @@ import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvButtonSurface
 import com.binge.designsystem.tv.component.TvCardRow
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvErrorPlate
 import com.binge.designsystem.tv.component.TvExcludedMark
 import com.binge.designsystem.tv.component.TvIconButtonSurface
@@ -256,7 +257,7 @@ fun TvMessagePlateSample() {
         body = "Check the spelling, or try a shorter search.",
         icon = Icons.Filled.SearchOff,
         alignment = Alignment.Center,
-        actions = { TvButton(label = "Clear search", onClick = {}, style = TvButtonStyle.Primary) },
+        actions = { TvCompactButton(label = "Clear search", onClick = {}, style = TvButtonStyle.Primary) },
     )
 }
 
