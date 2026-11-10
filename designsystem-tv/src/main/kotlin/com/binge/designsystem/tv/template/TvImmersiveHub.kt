@@ -204,6 +204,9 @@ fun <T : Any> TvImmersiveHub(
         rememberAnchorKeeper(
             scrollTarget,
             focusedItem?.let(itemId),
+            // See-all takes focus without changing the focused item, but it can still draw a bring-into-view scroll from the column when
+            // the row sits partly below the viewport, so its focus must re-assert the anchor as a title's does.
+            seeAllRowKey,
             alsoReport = { bodyHasFocus = it.hasFocus },
             shouldScroll = {
                 scrollTarget != listState.firstVisibleItemIndex || scrollOffset != listState.firstVisibleItemScrollOffset
