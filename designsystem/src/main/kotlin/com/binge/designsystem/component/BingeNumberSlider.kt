@@ -152,7 +152,9 @@ internal fun SliderBound(text: String, modifier: Modifier = Modifier) =
 /**
  * A number setting as a [ListItem] for an [ItemGroup]: its [title], and its value ([format] of it, or [openEndLabel]) as
  * the detail. A tap opens a sheet holding a [BingeNumberSlider] under the title; each change is handed to [onChange]
- * as it happens. A row that is not [enabled] dims, and closes its sheet if open.
+ * as it happens. [onValueChangeFinished] is called once with the value the control landed on, when a drag or keyboard change
+ * finishes and after each stepper tap, so a setting that saves as it is made can save there, not on every step of a drag.
+ * The default does nothing. A row that is not [enabled] dims, and closes its sheet if open.
  */
 @Composable
 fun bingeNumberItem(
@@ -164,8 +166,12 @@ fun bingeNumberItem(
     onChange: (Int?) -> Unit,
     enabled: Boolean = true,
     openEndLabel: String? = null,
+    onValueChangeFinished: (Int?) -> Unit = {},
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
+    // The last value the control picked, which a stepper tap finishes on before the caller's own value has recomposed.
+    var landed by remember { mutableStateOf(value) }
+    SideEffect { landed = value }
     LaunchedEffect(enabled) { if (!enabled) open = false }
     if (open) {
         BingeBottomSheet(onDismissRequest = { open = false }) {
@@ -180,11 +186,15 @@ fun bingeNumberItem(
                 Text(title, style = MaterialTheme.typography.titleMedium)
                 BingeNumberSlider(
                     value = value,
-                    onValueChange = onChange,
+                    onValueChange = {
+                        landed = it
+                        onChange(it)
+                    },
                     range = range,
                     format = format,
                     description = title,
                     openEndLabel = openEndLabel,
+                    onValueChangeFinished = { onValueChangeFinished(landed) },
                 )
             }
         }
