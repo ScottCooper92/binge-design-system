@@ -79,6 +79,12 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun accountMenuOpenLargeFont() = Frame { TvAccountMenuOpenSample() }
 
+    /** The menu anchored at the start: the panel grows toward the end and the avatar leads the name. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuStart() = Frame { TvAccountMenuStartSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
