@@ -48,7 +48,9 @@ import kotlin.math.roundToInt
  * every step. [onValueChangeFinished] fires when a drag or keyboard change finishes, and after each stepper tap, so a
  * caller can show a draft as it moves and save once when it lands. [step] sets the spacing between values and the
  * steppers' increment; the range must divide into whole steps. A stored value outside the range or between steps still
- * reads as stored until the user moves the control; the thumb sits at its nearest available position.
+ * reads as stored until the user moves the control; the thumb sits at its nearest available position. The first step from such a
+ * value lands on the nearest stop in the direction of travel: from between two stops, the stop on that side; from above the
+ * range, down to the range's last stop; from below it, up to the range's first.
  */
 @Composable
 fun BingeNumberSlider(
@@ -74,8 +76,13 @@ fun BingeNumberSlider(
         val snapped = range.first + ((at - range.first).toFloat() / step).roundToInt() * step
         onValueChange(if (open && at == top) null else snapped.coerceIn(range))
     }
-    val next = range.first + ((position - range.first) / step + 1) * step
-    val previous = range.first + ((position - range.first + step - 1) / step - 1) * step
+    // The first step from a stored value off the scale lands on the nearest stop in the direction of travel, which for a value
+    // beyond an end of the range is that end: the thumb sits there, so a step down from above the range goes to its last stop,
+    // not to the one below it.
+    val aboveRange = value != null && value > range.last
+    val belowRange = value != null && value < range.first
+    val next = if (belowRange) range.first else range.first + ((position - range.first) / step + 1) * step
+    val previous = if (aboveRange) range.last else range.first + ((position - range.first + step - 1) / step - 1) * step
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
         Text(
             readout,

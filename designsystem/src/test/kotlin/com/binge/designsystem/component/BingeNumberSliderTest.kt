@@ -126,8 +126,44 @@ class BingeNumberSliderTest {
         composeTestRule.runOnIdle { value = 300 }
         composeTestRule.onNodeWithText("300 a week").assertExists()
         composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals("the first step down from above the range lands on its last stop", 120, value)
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
         assertEquals(115, value)
-        assertEquals(listOf(5, 115), commits)
+        assertEquals(listOf(5, 120, 115), commits)
+    }
+
+    @Test
+    fun `the first step up from below the range lands on its first stop`() {
+        setSlider(0, openEndLabel = null, range = 1..90)
+        composeTestRule.onNodeWithText("0 a week").assertExists()
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").assertIsNotEnabled()
+
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(1, value)
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(2, value)
+    }
+
+    @Test
+    fun `from above the range, plus steps onto the open end and minus onto the range's last stop`() {
+        setSlider(120, openEndLabel = "Unlimited", range = 1..90)
+        composeTestRule.onNodeWithText("120 a week").assertExists()
+
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals(90, value)
+        composeTestRule.runOnIdle { value = 120 }
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertNull(value)
+    }
+
+    @Test
+    fun `from between two stops a step lands on the stop on that side`() {
+        setSlider(7, openEndLabel = null, range = 0..120, step = 5)
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(10, value)
+        composeTestRule.runOnIdle { value = 7 }
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals(5, value)
     }
 
     @Test
