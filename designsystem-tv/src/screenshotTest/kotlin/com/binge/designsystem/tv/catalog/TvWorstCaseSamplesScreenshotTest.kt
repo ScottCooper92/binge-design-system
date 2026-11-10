@@ -67,6 +67,11 @@ class TvWorstCaseSamplesScreenshotTest {
     @Composable
     fun sideSheetRowSaving() = Frame { TvSideSheetRowSavingWorstCaseSample() }
 
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun messagePage() = Frame { TvMessagePageWorstCaseSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
