@@ -103,6 +103,26 @@ class TvMessagePageReachTest {
         assertTrue("the body ends at $end, still under the actions at $actionsTop", end.value <= actionsTop.value + TOLERANCE)
     }
 
+    private fun assertDownFromTheBodyReturnsTo(action: String) {
+        show(2f) { TvMessagePageWorstCaseSample() }
+        rule.onNodeWithText(action).requestFocus()
+        rule.onNodeWithText(action).performKeyInput { pressKey(Key.DirectionUp) }
+        rule.waitForIdle()
+        rule.onNode(hasScrollAction()).assertIsFocused()
+        repeat(MAX_PRESSES) {
+            rule.onRoot().performKeyInput { pressKey(Key.DirectionDown) }
+            rule.mainClock.advanceTimeBy(SCROLL_SETTLE_MS)
+            rule.waitForIdle()
+        }
+        rule.onNodeWithText(action).assertIsFocused()
+    }
+
+    @Test
+    fun `down from the end of the body returns to the primary action it came up from`() = assertDownFromTheBodyReturnsTo("Update")
+
+    @Test
+    fun `down from the end of the body returns to the secondary action it came up from`() = assertDownFromTheBodyReturnsTo("Not now")
+
     @Test
     fun `a plate whose copy fits takes no focus for it`() {
         show(1f) { TvMessagePlate(headline = "Headline", body = "Short.") { } }

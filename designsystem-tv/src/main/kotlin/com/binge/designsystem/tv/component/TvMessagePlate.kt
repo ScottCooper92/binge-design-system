@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.tv.focus.tvFocusGroup
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.focus.tvFocusTarget
 import kotlinx.coroutines.launch
@@ -57,7 +58,7 @@ import com.binge.designsystem.tv.R as TvR
  * scrolled and the plate is laid out as before.
  *
  * When the copy does overflow it takes focus, so a remote can read it: Up from the actions moves into it, Down and Up scroll it
- * under a focus ring, and a press at either end moves on out of it. A plate whose copy fits has no extra focus stop.
+ * under a focus ring, and a press at either end moves on out of it. Down from the end returns to the action focus came up from. A plate whose copy fits has no extra focus stop.
  *
  * [announce] makes the whole plate a polite live region, merged, as `MessageScreen`'s is on the phone: for a failure
  * that replaced what the user was reading, so a screen reader says the headline and body and not only the focused button.
@@ -166,6 +167,8 @@ private fun PlateContent(
         }
         actions?.let {
             Row(
+                // A focus group that restores, so focus coming back from the copy lands on the action it left, not the nearest one.
+                modifier = Modifier.tvFocusGroup(),
                 horizontalArrangement =
                     Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_sm)),
             ) {
