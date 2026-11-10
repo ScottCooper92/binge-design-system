@@ -92,10 +92,12 @@ fun TvSideSheetRowReservedLineSample() {
 
 /**
  * A row whose label is the whole point, such as a service's name, with [TvSideSheetRow]'s `labelMaxLines` raised so a long one wraps
- * under its switch instead of ending in an ellipsis. The icon and the switch keep their slot, and the short row beside it stays one line.
+ * beside its switch instead of ending in an ellipsis. The icon and the switch keep their slot, and the short row beside it stays one line.
  */
 @Composable
 fun TvSideSheetRowWrappedLabelSample() {
+    var first by remember { mutableStateOf(true) }
+    var second by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
         TvSideSheetPanel {
             TvSideSheetTitle("Rows on your hubs")
@@ -105,8 +107,8 @@ fun TvSideSheetRowWrappedLabelSample() {
                     icon = Icons.Filled.PlayCircle,
                     labelMaxLines = 3,
                     role = Role.Switch,
-                    onClick = {},
-                    trailing = { isFocused -> TvSwitch(checked = true, isFocused = isFocused) },
+                    onClick = { first = !first },
+                    trailing = { isFocused -> TvSwitch(checked = first, isFocused = isFocused) },
                     initiallyFocused = true,
                 )
                 TvSideSheetRow(
@@ -114,8 +116,8 @@ fun TvSideSheetRowWrappedLabelSample() {
                     icon = Icons.Filled.PlayCircle,
                     labelMaxLines = 3,
                     role = Role.Switch,
-                    onClick = {},
-                    trailing = { isFocused -> TvSwitch(checked = false, isFocused = isFocused) },
+                    onClick = { second = !second },
+                    trailing = { isFocused -> TvSwitch(checked = second, isFocused = isFocused) },
                 )
             }
         }
