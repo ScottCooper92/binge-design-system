@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Settings
@@ -19,14 +20,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.component.TvIconButton
 import com.binge.designsystem.tv.nav.BingeTvTopBar
 import com.binge.designsystem.tv.nav.TvAccountMenu
+import com.binge.designsystem.tv.nav.TvAccountMenuAnchor
 import com.binge.designsystem.tv.nav.TvAccountMenuConfirm
 import com.binge.designsystem.tv.nav.TvAccountMenuRow
+import com.binge.designsystem.R as DesR
 
 private const val ART_FRACTION = 0.3f
 
@@ -40,6 +44,27 @@ fun TvAccountMenuSample() {
 @Composable
 fun TvAccountMenuOpenSample() {
     AccountMenuBar(initiallyOpen = true)
+}
+
+/** The menu anchored at the start of a leading corner instead of a bar's end: the avatar leads the header and the panel grows toward the end. */
+@Composable
+fun TvAccountMenuStartSample() {
+    val down = remember { FocusRequester() }
+    var lastAction by remember { mutableStateOf("") }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = lastAction.ifEmpty { "Page content beside the menu" },
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(dimensionResource(DesR.dimen.padding_l)),
+        )
+        AccountMenu(
+            down = down,
+            initiallyOpen = true,
+            anchor = TvAccountMenuAnchor.Start,
+            modifier = Modifier.align(Alignment.TopStart).padding(dimensionResource(DesR.dimen.padding_l)),
+        ) { lastAction = it }
+    }
 }
 
 /**
@@ -78,34 +103,47 @@ private fun AccountMenuBar(initiallyOpen: Boolean) {
             down = down,
             onFocusedChange = {},
             trailing = {
-                TvAccountMenu(
-                    avatarLabel = "Account",
-                    name = "Alexander Hamilton",
-                    detail = "Administrator",
-                    down = down,
-                    initiallyOpen = initiallyOpen,
-                    extraContent = {
-                        Text(
-                            text = "12 of 20 requests used",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    rows = listOf(
-                        TvAccountMenuRow("switch", "Switch profile", Icons.Filled.SwapHoriz, { lastAction = "Switch profile" }),
-                        TvAccountMenuRow(
-                            key = "signout",
-                            label = "Sign out",
-                            icon = Icons.AutoMirrored.Filled.ExitToApp,
-                            onClick = { lastAction = "Signed out" },
-                            confirm = TvAccountMenuConfirm("Sign out?", "You will need to sign in again.", "Sign out"),
-                        ),
-                        TvAccountMenuRow("settings", "Settings", Icons.Filled.Settings, { lastAction = "Settings" }),
-                    ),
-                )
+                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End) { lastAction = it }
                 // Stays a circle on focus: the bar lays the tabs out around the trailing slot, so nothing in it may change size.
                 TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = false)
             },
         )
     }
+}
+
+@Composable
+private fun AccountMenu(
+    down: FocusRequester,
+    initiallyOpen: Boolean,
+    anchor: TvAccountMenuAnchor,
+    modifier: Modifier = Modifier,
+    onAction: (String) -> Unit,
+) {
+    TvAccountMenu(
+        modifier = modifier,
+        avatarLabel = "Account",
+        name = "Alexander Hamilton",
+        detail = "Administrator",
+        down = down,
+        initiallyOpen = initiallyOpen,
+        anchor = anchor,
+        extraContent = {
+            Text(
+                text = "12 of 20 requests used",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        rows = listOf(
+            TvAccountMenuRow("switch", "Switch profile", Icons.Filled.SwapHoriz, { onAction("Switch profile") }),
+            TvAccountMenuRow(
+                key = "signout",
+                label = "Sign out",
+                icon = Icons.AutoMirrored.Filled.ExitToApp,
+                onClick = { onAction("Signed out") },
+                confirm = TvAccountMenuConfirm("Sign out?", "You will need to sign in again.", "Sign out"),
+            ),
+            TvAccountMenuRow("settings", "Settings", Icons.Filled.Settings, { onAction("Settings") }),
+        ),
+    )
 }
