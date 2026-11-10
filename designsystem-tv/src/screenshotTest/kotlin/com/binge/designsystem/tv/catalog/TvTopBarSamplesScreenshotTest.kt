@@ -37,11 +37,29 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun topBarLongLabels() = Frame { TvTopBarLongLabelsSample() }
 
+    /** The start avatar and five tabs at 1.3x and 2x font: every label stays whole, as the bar has the room for them. */
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun topBarHeaderTabs() = Frame { TvTopBarHeaderTabsSample() }
+
     /** The footer as a label pill, which is wider than the gear: the tabs must not run under it. */
     @PreviewTest
     @TvWorstCaseFontPreviews
     @Composable
     fun topBarLabelFooter() = Frame { TvTopBarLabelFooterSample() }
+
+    /** Content in the trailing slot: the tabs stay centred, and the ends are the caller's. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun topBarTrailing() = Frame { TvTopBarTrailingSample() }
+
+    /** No tabs and no start item: the avatar and the gear alone, at the end, with the bar keeping its height at 1.3x and 2x. */
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun topBarNoRail() = Frame { TvTopBarNoRailSample() }
 
     @Composable
     private fun Frame(content: @Composable () -> Unit) {

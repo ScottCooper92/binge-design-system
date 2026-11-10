@@ -55,6 +55,9 @@ import com.binge.designsystem.tv.R as TvR
  * independent of [enabled]: the button keeps its colours and focus, so the remote does not lose its place, and the
  * focused reveal still shows [label] beside the spinner.
  *
+ * [expandOnFocus] false keeps the control a circle when focused: only its colours change. Pass it where a neighbour must not move
+ * when this one takes focus, such as an item in a top bar's trailing slot, which the bar lays the tabs out around.
+ *
  * [initiallyFocused] seeds the focus flag so a screenshot can show the revealed frame (a baseline runs no
  * coroutines, so no real focus event lands); production leaves it false.
  */
@@ -68,6 +71,7 @@ fun TvIconButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     initiallyFocused: Boolean = false,
+    expandOnFocus: Boolean = true,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     TvIconButtonSurface(
@@ -77,6 +81,7 @@ fun TvIconButton(
         enabled = enabled,
         isFocused = focused,
         loading = loading,
+        expandOnFocus = expandOnFocus,
         modifier = modifier
             .tvClickable(
                 enabled = enabled,
@@ -111,6 +116,7 @@ internal fun TvIconButtonSurface(
     isFocused: Boolean,
     modifier: Modifier = Modifier,
     loading: Boolean = false,
+    expandOnFocus: Boolean = true,
 ) {
     val palette = tvButtonColors(style = style, enabled = enabled, isFocused = isFocused)
     val diameter = dimensionResource(TvR.dimen.tv_icon_button_diameter)
@@ -148,7 +154,7 @@ internal fun TvIconButtonSurface(
                     modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
                 )
             }
-            if (isFocused) {
+            if (isFocused && expandOnFocus) {
                 Text(
                     text = label,
                     style = MaterialTheme.typography.titleMedium,

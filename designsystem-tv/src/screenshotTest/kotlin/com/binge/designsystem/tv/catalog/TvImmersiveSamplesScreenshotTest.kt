@@ -97,7 +97,12 @@ class TvImmersiveSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
-    fun seeAllTile() = Frame { TvSeeAllTileSample() }
+    fun seeAllCardPoster() = Frame { TvSeeAllCardPosterSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun seeAllCardGallery() = Frame { TvSeeAllCardGallerySample() }
 
     @Composable
     private fun Frame(content: @Composable () -> Unit) {

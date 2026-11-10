@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -30,7 +29,6 @@ import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvMessagePlate
-import com.binge.designsystem.tv.component.TvSeeAllTile
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.nav.LocalTvContentInset
@@ -75,7 +73,12 @@ private fun sampleRow(
             )
         },
     onSeeAll = if (seeAll) ({}) else null,
+    seeAllPeek = if (seeAll) HubPeek else emptyList(),
 )
+
+/** Three stand-in posters, in the hub's own tones, for the See-all card to fan. */
+private val HubPeek: List<@Composable BoxScope.() -> Unit> =
+    (0 until 3).map { id -> { Box(Modifier.fillMaxSize().background(sampleTone(id))) } }
 
 private val SampleRows =
     listOf(
@@ -249,30 +252,6 @@ fun TvImmersiveHubEmptyRowSample() {
         initialFocused = "approved" to 202,
         rows = listOf(TvHubRow<SampleTitle>(key = "pending", title = "Pending (0)", items = emptyList())) + SampleRows.drop(1),
     )
-}
-
-/** The tile that closes a row, at rest and focused, beside each other. */
-@Composable
-fun TvSeeAllTileSample() {
-    Row(
-        modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_l)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_l)),
-    ) {
-        TvSeeAllTile(
-            label = "See all",
-            isFocused = false,
-            onFocusChanged = {},
-            onClick = {},
-            modifier = Modifier.width(dimensionResource(TvR.dimen.tv_immersive_card_width)),
-        )
-        TvSeeAllTile(
-            label = "See all",
-            isFocused = true,
-            onFocusChanged = {},
-            onClick = {},
-            modifier = Modifier.width(dimensionResource(TvR.dimen.tv_immersive_card_width)),
-        )
-    }
 }
 
 private const val GRID_ITEM_COUNT = 30
