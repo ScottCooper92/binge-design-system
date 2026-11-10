@@ -103,7 +103,8 @@ private fun AccountMenuBar(initiallyOpen: Boolean) {
                         TvAccountMenuRow("settings", "Settings", Icons.Filled.Settings, { lastAction = "Settings" }),
                     ),
                 )
-                TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {})
+                // Stays a circle on focus: the bar lays the tabs out around the trailing slot, so nothing in it may change size.
+                TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = false)
             },
         )
     }
