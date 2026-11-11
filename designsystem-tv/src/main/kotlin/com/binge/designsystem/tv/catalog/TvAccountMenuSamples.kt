@@ -131,14 +131,9 @@ private fun AccountMenuBar(
             down = down,
             onFocusedChange = {},
             trailing = {
-                AccountMenu(
-                    down = down,
-                    initiallyOpen = initiallyOpen,
-                    anchor = TvAccountMenuAnchor.End,
-                    selected = selected,
-                    focusedRowKey = focusedRowKey,
-                    onAction = { lastAction = it },
-                )
+                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End, selected = selected, focusedRowKey = focusedRowKey) { action ->
+                    lastAction = action
+                }
                 // Stays a circle on focus: the bar lays the tabs out around the trailing slot, so nothing in it may change size.
                 TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = false)
             },
