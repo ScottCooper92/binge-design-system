@@ -34,6 +34,9 @@ import com.binge.designsystem.tv.R as TvR
  * on dismiss, so a stray OK does nothing. Both answers are text buttons, and [destructive] draws the confirm one in the
  * error colour.
  *
+ * [confirmEnabled] false greys the confirm out until the user has chosen what it applies to, so a stray OK cannot commit a choice
+ * never made.
+ *
  * [extraContent] sits between the message and the buttons, as on the phone's confirm dialog: an option the confirm
  * applies, say. Focus still arrives on dismiss, whatever the slot holds.
  *
@@ -49,6 +52,7 @@ fun TvConfirmDialog(
     modifier: Modifier = Modifier,
     dismissLabel: String = stringResource(DesR.string.action_cancel),
     destructive: Boolean = false,
+    confirmEnabled: Boolean = true,
     extraContent: (@Composable () -> Unit)? = null,
 ) {
     Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -58,6 +62,7 @@ fun TvConfirmDialog(
             confirmLabel = confirmLabel,
             dismissLabel = dismissLabel,
             destructive = destructive,
+            confirmEnabled = confirmEnabled,
             onConfirm = onConfirm,
             onDismissRequest = onDismissRequest,
             modifier = modifier,
@@ -83,6 +88,7 @@ fun TvConfirmDialogContent(
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    confirmEnabled: Boolean = true,
     initiallyDismissFocused: Boolean = false,
     extraContent: (@Composable () -> Unit)? = null,
 ) {
@@ -96,16 +102,17 @@ fun TvConfirmDialogContent(
             modifier = Modifier.fillMaxWidth().padding(top = dimensionResource(DesR.dimen.padding_s)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m), Alignment.End),
         ) {
-            TvButton(
+            TvCompactButton(
                 label = dismissLabel,
                 onClick = onDismissRequest,
                 style = TvButtonStyle.Text,
                 initiallyFocused = initiallyDismissFocused,
                 modifier = Modifier.focusRequester(dismissFocus),
             )
-            TvButton(
+            TvCompactButton(
                 label = confirmLabel,
                 onClick = onConfirm,
+                enabled = confirmEnabled,
                 style = if (destructive) TvButtonStyle.TextDestructive else TvButtonStyle.Text,
             )
         }

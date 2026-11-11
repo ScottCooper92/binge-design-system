@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
@@ -20,6 +21,11 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * The row is transparent by default, so it takes the colour of the page behind it. Material's own default is the
  * theme's `surface`, which in a dark scheme is not the scaffold's `background`, and read as a band across the page.
  * Pass [containerColor] for a row that sits on a surface of its own.
+ *
+ * [edgePadding] is the room before the first tab and after the last. It defaults to the screen's content inset, so a row
+ * at the top of a page lines its tabs up with the page's content. Inside a column that already has that inset, the row
+ * would indent twice: pass zero there, and the first tab's cell starts at the column's content edge. A tab's own text
+ * padding still sits inside its cell, so its label is set in from that edge.
  */
 @Composable
 fun BingeTabRow(
@@ -28,12 +34,13 @@ fun BingeTabRow(
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
     containerColor: Color = Color.Transparent,
+    edgePadding: Dp = resolvedContentInset(),
 ) {
     PrimaryScrollableTabRow(
         selectedTabIndex = selectedIndex.coerceIn(0, (tabs.size - 1).coerceAtLeast(0)),
         modifier = modifier,
         containerColor = containerColor,
-        edgePadding = resolvedContentInset(),
+        edgePadding = edgePadding,
     ) {
         tabs.forEachIndexed { index, title ->
             Tab(

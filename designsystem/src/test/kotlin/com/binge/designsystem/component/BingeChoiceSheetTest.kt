@@ -16,13 +16,13 @@ import androidx.compose.ui.test.hasScrollToNodeAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isToggleable
-import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -264,7 +264,7 @@ class BingeChoiceSheetTest {
     /** The restored sheet state was saved under the decision it opened with, so a recreation keeps it (#441). */
     @Test
     fun `the part-way decision survives a recreation after the list changes length`() {
-        val restoration = StateRestorationTester(rule)
+        val restoration = InMemoryStateRestorationTester(rule)
         var choices: BingeChoiceList<Int> by mutableStateOf(BingeChoiceList.Ready(listOf(BingeChoice(1, "One"))))
         var partWay: Boolean? = null
         restoration.setContent { partWay = rememberOpensPartWay(choices) }
@@ -280,7 +280,7 @@ class BingeChoiceSheetTest {
 
     @Test
     fun a_row_restored_open_runs_onOpen_again() {
-        val restoration = StateRestorationTester(rule)
+        val restoration = InMemoryStateRestorationTester(rule)
         var opened = 0
         restoration.setContent {
             ItemGroup(
@@ -309,7 +309,7 @@ class BingeChoiceSheetTest {
     }
 
     private fun ticksAcrossRestore(draftSaver: Saver<Set<String>, out Any>?): Set<String>? {
-        val restoration = StateRestorationTester(rule)
+        val restoration = InMemoryStateRestorationTester(rule)
         var done: Set<String>? = null
         val choices = BingeChoiceList.Ready(listOf(BingeChoice("a", "Alpha"), BingeChoice("b", "Bravo")))
         restoration.setContent {

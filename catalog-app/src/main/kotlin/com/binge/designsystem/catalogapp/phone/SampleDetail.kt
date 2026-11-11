@@ -32,11 +32,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.catalog.LocalDemoBack
 import com.binge.designsystem.catalogapp.R
-import com.binge.designsystem.catalogapp.overrides.FontScalePresets
 import com.binge.designsystem.catalogapp.overrides.SampleLocale
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.overrides.WithOverrides
@@ -73,7 +73,7 @@ fun SampleDetail(
     onBack: (() -> Unit)?,
 ) {
     var showTweaks by rememberSaveable { mutableStateOf(false) }
-    val tweaked = overrides != SampleOverrides(dark = isSystemInDarkTheme(), fontScale = FontScalePresets.first(), rtl = false)
+    val tweaked = overrides != SampleOverrides(dark = isSystemInDarkTheme(), fontScale = LocalDensity.current.fontScale, rtl = false)
     val component = CatalogComponent(entry.group, entry.groupName, variants)
     val onePerScreen = component.onePerScreen
     if (component.fullScreen) {

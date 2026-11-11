@@ -28,14 +28,4 @@ class PagedPhaseSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun rows() = PagedPhaseRowsSample()
-
-    @PreviewTest
-    @ScreenStatePreview
-    @Composable
-    fun appendFooterLoading() = PagedAppendFooterLoadingSample()
-
-    @PreviewTest
-    @ScreenStatePreview
-    @Composable
-    fun appendFooterRetry() = PagedAppendFooterRetrySample()
 }

@@ -126,8 +126,44 @@ class BingeNumberSliderTest {
         composeTestRule.runOnIdle { value = 300 }
         composeTestRule.onNodeWithText("300 a week").assertExists()
         composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals("the first step down from above the range lands on its last stop", 120, value)
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
         assertEquals(115, value)
-        assertEquals(listOf(5, 115), commits)
+        assertEquals(listOf(5, 120, 115), commits)
+    }
+
+    @Test
+    fun `the first step up from below the range lands on its first stop`() {
+        setSlider(0, openEndLabel = null, range = 1..90)
+        composeTestRule.onNodeWithText("0 a week").assertExists()
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").assertIsNotEnabled()
+
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(1, value)
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(2, value)
+    }
+
+    @Test
+    fun `from above the range, plus steps onto the open end and minus onto the range's last stop`() {
+        setSlider(120, openEndLabel = "Unlimited", range = 1..90)
+        composeTestRule.onNodeWithText("120 a week").assertExists()
+
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals(90, value)
+        composeTestRule.runOnIdle { value = 120 }
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertNull(value)
+    }
+
+    @Test
+    fun `from between two stops a step lands on the stop on that side`() {
+        setSlider(7, openEndLabel = null, range = 0..120, step = 5)
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(10, value)
+        composeTestRule.runOnIdle { value = 7 }
+        composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
+        assertEquals(5, value)
     }
 
     @Test
@@ -210,5 +246,84 @@ class BingeNumberSliderTest {
 
         composeTestRule.onNodeWithContentDescription("Decrease Movie requests").performClick()
         assertEquals(100, value)
+    }
+
+    private val landed = mutableListOf<Int?>()
+
+    private fun setItem() {
+        value = 10
+        composeTestRule.setContent {
+            TestTheme {
+                ItemGroup(
+                    title = null,
+                    rows =
+                        listOf(
+                            bingeNumberItem(
+                                icon = Icons.Filled.Movie,
+                                title = "Movie requests",
+                                value = value,
+                                range = 1..100,
+                                format = { "$it a week" },
+                                onChange = { value = it },
+                                openEndLabel = "Unlimited",
+                                onValueChangeFinished = { landed += it },
+                            ),
+                        ),
+                )
+            }
+        }
+        composeTestRule.onNodeWithText("10 a week").performClick()
+    }
+
+    @Test
+    fun `the row's sheet reports the landed value once for a stepper tap`() {
+        setItem()
+
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+
+        assertEquals(listOf<Int?>(11), landed)
+        assertEquals(11, value)
+    }
+
+    @Test
+    fun `the row's sheet reports nothing while a drag moves and the landed value on release`() {
+        setItem()
+        val slider = composeTestRule.onNodeWithContentDescription("Movie requests")
+        slider.performTouchInput {
+            down(center)
+            moveTo(centerRight)
+        }
+        assertTrue((value ?: 0) > 50)
+        assertTrue("reported before the drag ended: $landed", landed.isEmpty())
+
+        slider.performTouchInput { up() }
+
+        assertEquals(listOf(value), landed)
+    }
+
+    @Test
+    fun `a row given no callback still changes its value as before`() {
+        value = 10
+        composeTestRule.setContent {
+            TestTheme {
+                ItemGroup(
+                    title = null,
+                    rows =
+                        listOf(
+                            bingeNumberItem(
+                                icon = Icons.Filled.Movie,
+                                title = "Movie requests",
+                                value = value,
+                                range = 1..100,
+                                format = { "$it a week" },
+                                onChange = { value = it },
+                            ),
+                        ),
+                )
+            }
+        }
+        composeTestRule.onNodeWithText("10 a week").performClick()
+        composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
+        assertEquals(11, value)
     }
 }
