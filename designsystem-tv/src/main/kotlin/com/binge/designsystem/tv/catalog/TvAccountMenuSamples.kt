@@ -26,9 +26,9 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.component.TvIconButton
 import com.binge.designsystem.tv.nav.BingeTvTopBar
-import com.binge.designsystem.tv.nav.TvAccountMenu
 import com.binge.designsystem.tv.nav.TvAccountMenuAnchor
 import com.binge.designsystem.tv.nav.TvAccountMenuConfirm
+import com.binge.designsystem.tv.nav.TvAccountMenuContent
 import com.binge.designsystem.tv.nav.TvAccountMenuRow
 import com.binge.designsystem.R as DesR
 
@@ -40,13 +40,13 @@ fun TvAccountMenuSample() {
     AccountMenuBar(initiallyOpen = false)
 }
 
-/** The same bar with the menu open over the avatar: the header, a quota line, then the rows, with Sign out last. */
+/** The same bar with the menu open below the avatar: the header, a quota line, then the rows, with Sign out last. */
 @Composable
 fun TvAccountMenuOpenSample() {
     AccountMenuBar(initiallyOpen = true)
 }
 
-/** The menu anchored at the start of a leading corner instead of a bar's end: the avatar leads the header and the panel grows toward the end. */
+/** The menu anchored at the start of a leading corner instead of a bar's end: the panel is level with the avatar's start and grows toward the end. */
 @Composable
 fun TvAccountMenuStartSample() {
     val down = remember { FocusRequester() }
@@ -79,6 +79,18 @@ fun TvAccountMenuSelectedOpenSample() {
     AccountMenuBar(initiallyOpen = true, selected = true)
 }
 
+/** The open menu with a row focused: the full-width white pill with dark icon and text. */
+@Composable
+fun TvAccountMenuFocusedRowSample() {
+    AccountMenuBar(initiallyOpen = true, focusedRowKey = "switch")
+}
+
+/** The open menu with Sign out focused: the pill is the destructive fill, as on every other destructive control. */
+@Composable
+fun TvAccountMenuFocusedDestructiveSample() {
+    AccountMenuBar(initiallyOpen = true, focusedRowKey = "signout")
+}
+
 /**
  * The real menu on a live bar. Focus the avatar to open it, Down to enter its rows, Up to return. BACK closes it onto the
  * avatar and it stays closed until focus leaves and comes back. Sign out asks first, then closes the menu.
@@ -89,7 +101,11 @@ fun TvAccountMenuDemo() {
 }
 
 @Composable
-private fun AccountMenuBar(initiallyOpen: Boolean, selected: Boolean = false) {
+private fun AccountMenuBar(
+    initiallyOpen: Boolean,
+    selected: Boolean = false,
+    focusedRowKey: Any? = null,
+) {
     val down = remember { FocusRequester() }
     var lastAction by remember { mutableStateOf("") }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -115,7 +131,9 @@ private fun AccountMenuBar(initiallyOpen: Boolean, selected: Boolean = false) {
             down = down,
             onFocusedChange = {},
             trailing = {
-                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End, selected = selected) { lastAction = it }
+                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End, selected = selected, focusedRowKey = focusedRowKey) { action ->
+                    lastAction = action
+                }
                 // Stays a circle on focus: the bar lays the tabs out around the trailing slot, so nothing in it may change size.
                 TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = false)
             },
@@ -130,9 +148,10 @@ private fun AccountMenu(
     anchor: TvAccountMenuAnchor,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
+    focusedRowKey: Any? = null,
     onAction: (String) -> Unit,
 ) {
-    TvAccountMenu(
+    TvAccountMenuContent(
         modifier = modifier,
         avatarLabel = "Account",
         name = "Alexander Hamilton",
@@ -140,6 +159,7 @@ private fun AccountMenu(
         down = down,
         initiallyOpen = initiallyOpen,
         selected = selected,
+        focusedRowKey = focusedRowKey,
         anchor = anchor,
         extraContent = {
             Text(

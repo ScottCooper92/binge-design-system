@@ -1,6 +1,7 @@
 package com.binge.designsystem.tv.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.theme.BingeShapes
 
 /**
@@ -13,4 +14,7 @@ import com.binge.designsystem.theme.BingeShapes
 object BingeTvCorners {
     /** Dialogs, cards, rows, tabs and QR plates: the same 8dp as [BingeShapes.TvListItem], so a row and the card holding it agree. */
     val Small: RoundedCornerShape = BingeShapes.TvListItem
+
+    /** The account dropdown's floating panel: rounder than a row, so it reads as a surface of its own. */
+    val Menu: RoundedCornerShape = RoundedCornerShape(24.dp)
 }

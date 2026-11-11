@@ -67,7 +67,7 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun accountMenuClosed() = Frame { TvAccountMenuSample() }
 
-    /** The menu open over the avatar: the header, the quota line and the rows, Sign out last. */
+    /** The menu open below the avatar: the header, the quota line and the rows, Sign out last. */
     @PreviewTest
     @TvPreviews
     @Composable
@@ -79,7 +79,25 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun accountMenuOpenLargeFont() = Frame { TvAccountMenuOpenSample() }
 
-    /** The menu anchored at the start: the avatar leads the header and the panel grows toward the end. */
+    /** A row focused: the full-width white pill with dark icon and text. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuRowFocused() = Frame { TvAccountMenuFocusedRowSample() }
+
+    /** The focused row at 1.3x and 2x font. */
+    @PreviewTest
+    @TvWorstCaseFontPreviews
+    @Composable
+    fun accountMenuRowFocusedLargeFont() = Frame { TvAccountMenuFocusedRowSample() }
+
+    /** Sign out focused: the destructive fill, not a white pill. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun accountMenuDestructiveFocused() = Frame { TvAccountMenuFocusedDestructiveSample() }
+
+    /** The menu anchored at the start: the panel is level with the avatar's start and grows toward the end. */
     @PreviewTest
     @TvPreviews
     @Composable
@@ -91,7 +109,7 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun accountMenuSelected() = Frame { TvAccountMenuSelectedSample() }
 
-    /** The current destination with the menu open over it. */
+    /** The current destination with the menu open below it. */
     @PreviewTest
     @TvPreviews
     @Composable
