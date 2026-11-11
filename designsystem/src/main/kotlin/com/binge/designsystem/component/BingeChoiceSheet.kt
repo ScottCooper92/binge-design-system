@@ -150,6 +150,9 @@ internal fun rememberOpensPartWay(choices: BingeChoiceList<*>): Boolean = rememb
  *
  * For a pick that needs context, [subtitle] sits under the title (which copy is being marked, say) and [caption] across
  * the header below it (what the change reaches). Docked, the bar keeps the title alone.
+ *
+ * Pass [filterPlaceholder] for a list long enough to search, as [BingeMultiChoiceSheet] does: a filter field then sits
+ * above the rows and narrows them by label. While it has text the list is flat, not sectioned.
  */
 @Composable
 fun <T> BingeChoiceSheet(
@@ -163,6 +166,7 @@ fun <T> BingeChoiceSheet(
     pinned: List<T> = emptyList(),
     subtitle: String? = null,
     caption: String? = null,
+    filterPlaceholder: String? = null,
 ) {
     val partWay = rememberOpensPartWay(choices)
     BingeBottomSheet(
@@ -180,6 +184,7 @@ fun <T> BingeChoiceSheet(
             suggested = suggested,
             pinned = pinned,
             underNavigationBar = partWay,
+            filterPlaceholder = filterPlaceholder,
         ) { value ->
             onSelect(value)
             onDismissRequest()
@@ -399,10 +404,18 @@ fun <T> BingeChoiceSheetContent(
     dragHandle: Boolean = true,
     subtitle: String? = null,
     caption: String? = null,
+    filterPlaceholder: String? = null,
 ) {
     Column(modifier) {
         RestingSheetTop(dragHandle) { BingeSheetHeader(title, subtitle = subtitle, caption = caption) }
-        SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
+        SingleChoiceList(
+            choices = choices,
+            selected = selected,
+            suggested = suggested,
+            pinned = pinned,
+            filterPlaceholder = filterPlaceholder,
+            onSelect = onSelect,
+        )
     }
 }
 
@@ -522,7 +535,9 @@ fun BingeSheetHeader(
  * with no header. Use it where the screen or pane already names the choice in its own top bar, so the title is not
  * drawn twice. A long list is sectioned and lettered as the sheet's is, with [suggested] and [pinned] as there. It
  * scrolls itself. [underNavigationBar] pads its end clear of the navigation bar, for a list that runs to the window's foot.
+ * With a [filterPlaceholder], a filter field above the rows narrows them by label, as [BingeMultiChoiceSheet]'s does.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun <T> SingleChoiceList(
     choices: BingeChoiceList<T>,
@@ -531,23 +546,69 @@ fun <T> SingleChoiceList(
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
     underNavigationBar: Boolean = false,
+    filterPlaceholder: String? = null,
+    imeVisible: Boolean = WindowInsets.isImeVisible,
     onSelect: (T) -> Unit,
 ) {
     val markSlot = choices is BingeChoiceList.Ready && choices.choices.any { it.isMarked() }
-    if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size)) {
-        SectionedChoiceList(
-            choices = choices.choices,
-            current = listOfNotNull(selected),
-            currentLabel = stringResource(R.string.choice_section_current),
-            suggested = suggested,
-            pinned = pinned,
-            underNavigationBar = underNavigationBar,
-            modifier = modifier.selectableGroup(),
-        ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
+    if (filterPlaceholder == null) {
+        if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size)) {
+            SectionedChoiceList(
+                choices = choices.choices,
+                current = listOfNotNull(selected),
+                currentLabel = stringResource(R.string.choice_section_current),
+                suggested = suggested,
+                pinned = pinned,
+                underNavigationBar = underNavigationBar,
+                modifier = modifier.selectableGroup(),
+            ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
+            return
+        }
+        ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
+            for (choice in ready.pinnedFirst(pinned)) RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
+        }
         return
     }
-    ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
-        for (choice in ready.pinnedFirst(pinned)) RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
+    var query by rememberSaveable { mutableStateOf("") }
+    // As the multi-choice list: open the sheet fully while the keyboard is up so the field is not under it.
+    val dock = LocalBingeSheetDock.current
+    val needsRoom = imeVisible && dock?.canExpand == true
+    LaunchedEffect(needsRoom) { if (needsRoom) dock.expand() }
+    Column(modifier) {
+        if (choices is BingeChoiceList.Ready) {
+            BingeSearchField(
+                query = query,
+                onQueryChange = { query = it },
+                onClear = { query = "" },
+                placeholder = filterPlaceholder,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                modifier =
+                    Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.padding_m),
+                        vertical = dimensionResource(R.dimen.padding_s),
+                    ),
+            )
+        }
+        if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size) && query.isBlank()) {
+            SectionedChoiceList(
+                choices = choices.choices,
+                current = listOfNotNull(selected),
+                currentLabel = stringResource(R.string.choice_section_current),
+                suggested = suggested,
+                pinned = pinned,
+                underNavigationBar = underNavigationBar,
+                modifier = Modifier.selectableGroup(),
+            ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
+            return@Column
+        }
+        ChoiceListBody(choices, Modifier.selectableGroup(), underNavigationBar) { ready ->
+            val matching = ready.filter { query.isBlank() || it.label.contains(query.trim(), ignoreCase = true) }
+            for (choice in matching.pinnedFirst(
+                pinned,
+            )) {
+                RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
+            }
+        }
     }
 }
 

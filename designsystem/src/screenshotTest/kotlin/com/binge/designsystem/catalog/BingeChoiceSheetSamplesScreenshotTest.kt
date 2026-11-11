@@ -29,6 +29,13 @@ class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun SingleChoiceFiltered() {
+        BingeChoiceSheetFilteredSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun MultiChoiceFiltered() {
         BingeMultiChoiceSheetSample()
     }
