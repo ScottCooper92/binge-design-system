@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -39,15 +42,15 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvConfirmDialog
-import com.binge.designsystem.tv.component.TvSideSheetRow
 import com.binge.designsystem.tv.focus.tryRequestFocus
 import com.binge.designsystem.tv.focus.tvClickable
-import com.binge.designsystem.tv.theme.BingeTvCorners
+import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
@@ -76,9 +79,11 @@ enum class TvAccountMenuAnchor { Start, End }
 /**
  * The account avatar and the menu that opens from it, for a bar's trailing (or leading) slot.
  *
- * The menu is open while the avatar is focused or focus is inside it. It is laid over the avatar's own place, its header's
- * avatar on the anchor's, and it does not change the size the avatar reports, so the bar does not move. The header is the
- * [name] and [detail] beside the avatar; [extraContent] sits under it, for a line such as a quota. The [rows] follow.
+ * The menu is open while the avatar is focused or focus is inside it. It drops down below the avatar, level with its end (or its
+ * start, for [TvAccountMenuAnchor.Start]), over the page and not over the bar, and it does not change the size the avatar
+ * reports, so the bar does not move. The panel has round corners, a thin outline and a soft shadow. Its header is the
+ * avatar and the [name], with the [detail] under it; [extraContent] sits under the header, for a line such as a quota. The [rows]
+ * follow: a plain icon and a label, with a white pill for the focused one and the error colour for a destructive one (its focused pill is the destructive fill).
  *
  * Keys. Down from the avatar enters the first row while the menu is open; while it is closed Down goes to [down], the
  * page below. Up from the first row returns to the avatar. Left and Right are not trapped: leaving the menu sideways closes it
@@ -120,6 +125,44 @@ fun TvAccountMenu(
     onOpenChange: (Boolean) -> Unit = {},
     selected: Boolean = false,
 ) {
+    TvAccountMenuContent(
+        avatarLabel = avatarLabel,
+        name = name,
+        rows = rows,
+        down = down,
+        modifier = modifier,
+        avatarUrl = avatarUrl,
+        detail = detail,
+        anchor = anchor,
+        extraContent = extraContent,
+        initiallyOpen = initiallyOpen,
+        avatarFocusRequester = avatarFocusRequester,
+        onOpenChange = onOpenChange,
+        selected = selected,
+    )
+}
+
+/**
+ * [TvAccountMenu]'s body. [focusedRowKey], for a frame, draws the row with that key focused without a focus request: a frame
+ * fires no focus events, so it could not show a focused row otherwise. Production passes null.
+ */
+@Composable
+internal fun TvAccountMenuContent(
+    avatarLabel: String,
+    name: String,
+    rows: List<TvAccountMenuRow>,
+    down: FocusRequester,
+    modifier: Modifier = Modifier,
+    avatarUrl: String? = null,
+    detail: String? = null,
+    anchor: TvAccountMenuAnchor = TvAccountMenuAnchor.End,
+    extraContent: (@Composable ColumnScope.() -> Unit)? = null,
+    initiallyOpen: Boolean = false,
+    avatarFocusRequester: FocusRequester? = null,
+    onOpenChange: (Boolean) -> Unit = {},
+    selected: Boolean = false,
+    focusedRowKey: Any? = null,
+) {
     var avatarFocused by remember { mutableStateOf(false) }
     var menuFocused by remember { mutableStateOf(false) }
     var confirming by remember { mutableStateOf<TvAccountMenuRow?>(null) }
@@ -134,7 +177,7 @@ fun TvAccountMenu(
         ordered.firstOrNull()?.let { rowRequesters.getOrPut(it.key) { FocusRequester() } }
     }
     val panelWidthDp = dimensionResource(TvR.dimen.tv_account_menu_width)
-    val panelPadDp = dimensionResource(DesR.dimen.padding_m)
+    val panelGapDp = dimensionResource(DesR.dimen.padding_s)
     val open = !heldClosed && (avatarFocused || menuFocused || confirming != null || seededOpen)
 
     val reportOpenChange by rememberUpdatedState(onOpenChange)
@@ -183,11 +226,11 @@ fun TvAccountMenu(
                     name = name,
                     avatarUrl = avatarUrl,
                     detail = detail,
-                    anchor = anchor,
                     selected = selected,
                     rows = ordered,
                     requesterFor = { key -> rowRequesters.getOrPut(key) { FocusRequester() } },
                     avatarRequester = avatarRequester,
+                    focusedRowKey = focusedRowKey,
                     extraContent = extraContent,
                     onRow = { row ->
                         if (row.confirm != null) confirming = row else row.onClick()
@@ -202,17 +245,17 @@ fun TvAccountMenu(
         val loose = constraints.copy(minWidth = 0, minHeight = 0)
         val anchorPlaceable = measurables.first { it.layoutId == AccountSlot.Anchor }.measure(loose)
         val panelWidth = panelWidthDp.roundToPx()
-        val panelPad = panelPadDp.roundToPx()
+        val panelGap = panelGapDp.roundToPx()
         val panel = measurables
             .firstOrNull { it.layoutId == AccountSlot.Panel }
             ?.measure(Constraints(minWidth = panelWidth, maxWidth = panelWidth, maxHeight = Constraints.Infinity))
         layout(anchorPlaceable.width, anchorPlaceable.height) {
             anchorPlaceable.placeRelative(0, 0)
-            // The panel's own padding is what the header's avatar sits inside, so the panel starts that far outside the anchor:
-            // its avatar then lies exactly on this one.
+            // Below the anchor, with a small gap, level with its end (or its start): the menu drops down over the page and leaves
+            // the bar as it was.
             panel?.placeRelative(
-                x = if (anchor == TvAccountMenuAnchor.End) anchorPlaceable.width - panel.width + panelPad else -panelPad,
-                y = -panelPad,
+                x = if (anchor == TvAccountMenuAnchor.End) anchorPlaceable.width - panel.width else 0,
+                y = anchorPlaceable.height + panelGap,
             )
         }
     }
@@ -289,25 +332,32 @@ private fun AccountPanel(
     name: String,
     avatarUrl: String?,
     detail: String?,
-    anchor: TvAccountMenuAnchor,
     selected: Boolean,
     rows: List<TvAccountMenuRow>,
     requesterFor: (Any) -> FocusRequester,
     avatarRequester: FocusRequester,
+    focusedRowKey: Any?,
     extraContent: (@Composable ColumnScope.() -> Unit)?,
     onRow: (TvAccountMenuRow) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val diameter = dimensionResource(TvR.dimen.tv_icon_button_diameter)
+    val avatarSize = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
     val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
+    val shape = RoundedCornerShape(dimensionResource(TvR.dimen.tv_account_menu_corner))
     Column(
         modifier = modifier
-            .clip(BingeTvCorners.Small)
+            .shadow(dimensionResource(TvR.dimen.tv_account_menu_shadow), shape)
+            .clip(shape)
             .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(dimensionResource(TvR.dimen.tv_account_menu_outline), MaterialTheme.colorScheme.borderVariant, shape)
             .padding(dimensionResource(DesR.dimen.padding_m)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_xs)),
     ) {
-        val avatar = @Composable {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(DesR.dimen.padding_s)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             // The open menu keeps the selected avatar's ring, so the bar's current destination does not vanish under it.
             val selectedRing =
                 if (selected) {
@@ -315,36 +365,77 @@ private fun AccountPanel(
                 } else {
                     Modifier
                 }
-            Box(Modifier.size(diameter).then(selectedRing).padding(ring)) {
-                BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = avatarUrl)
+            Box(Modifier.size(avatarSize).then(selectedRing).padding(ring)) {
+                BingeTvInitialsAvatar(name = name, size = avatarSize - ring * 2, avatarUrl = avatarUrl)
             }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(DesR.dimen.padding_s)),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
-            // Top, not centre: at a large font the words grow, and the avatar must stay on the anchor's own place.
-            verticalAlignment = Alignment.Top,
-        ) {
-            if (anchor == TvAccountMenuAnchor.End) {
-                AccountWords(name, detail)
-                avatar()
-            } else {
-                avatar()
-                AccountWords(name, detail)
-            }
+            AccountWords(name, detail)
         }
         extraContent?.invoke(this)
         rows.forEachIndexed { index, row ->
-            TvSideSheetRow(
-                label = row.label,
-                icon = row.icon,
-                destructive = row.confirm != null,
+            AccountRow(
+                row = row,
+                initiallyFocused = row.key == focusedRowKey,
                 onClick = { onRow(row) },
                 modifier = Modifier
                     .focusRequester(requesterFor(row.key))
                     .then(if (index == 0) Modifier.focusProperties { up = avatarRequester } else Modifier),
             )
         }
+    }
+}
+
+/**
+ * A menu row: a plain icon and the label, no tile behind the icon. Focus is a full-width white pill with dark icon and text. A
+ * destructive row is in the error colour, and its focused pill is the style's destructive fill, as elsewhere.
+ */
+@Composable
+private fun AccountRow(
+    row: TvAccountMenuRow,
+    initiallyFocused: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var focused by remember { mutableStateOf(initiallyFocused) }
+    val scheme = MaterialTheme.colorScheme
+    val destructive = row.confirm != null
+    val style = MaterialTheme.tvStyle
+    // A destructive row keeps its colour when focused, as every destructive control does: the pill is the style's destructive
+    // fill, because the error colour is too pale to read on a white one.
+    val content = when {
+        destructive && focused -> style.onDestructiveFocusContainer
+        destructive -> scheme.error
+        focused -> scheme.surface
+        else -> scheme.onSurface
+    }
+    val fill = when {
+        destructive && focused -> style.destructiveFocusContainer
+        focused -> scheme.onSurface
+        else -> Color.Transparent
+    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = dimensionResource(TvR.dimen.tv_icon_button_diameter))
+            .clip(BingeShapes.Pill)
+            .background(fill)
+            .tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = onClick)
+            .padding(horizontal = dimensionResource(DesR.dimen.padding_m), vertical = dimensionResource(DesR.dimen.padding_s)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = row.icon,
+            contentDescription = null,
+            tint = content,
+            modifier = Modifier.size(dimensionResource(TvR.dimen.tv_account_menu_icon_size)),
+        )
+        Text(
+            text = row.label,
+            style = MaterialTheme.typography.titleMedium,
+            color = content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
