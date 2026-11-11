@@ -46,7 +46,7 @@ fun TvAccountMenuOpenSample() {
     AccountMenuBar(initiallyOpen = true)
 }
 
-/** The menu anchored at the start of a leading corner instead of a bar's end: the avatar leads the header and the panel grows toward the end. */
+/** The menu anchored at the start of a leading corner instead of a bar's end: the panel is level with the avatar's start and grows toward the end. */
 @Composable
 fun TvAccountMenuStartSample() {
     val down = remember { FocusRequester() }
@@ -131,9 +131,8 @@ private fun AccountMenuBar(
             down = down,
             onFocusedChange = {},
             trailing = {
-                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End, selected = selected, focusedRowKey = focusedRowKey) {
-                    lastAction =
-                        it
+                AccountMenu(down, initiallyOpen, TvAccountMenuAnchor.End, selected = selected, focusedRowKey = focusedRowKey) { action ->
+                    lastAction = action
                 }
                 // Stays a circle on focus: the bar lays the tabs out around the trailing slot, so nothing in it may change size.
                 TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}, expandOnFocus = false)

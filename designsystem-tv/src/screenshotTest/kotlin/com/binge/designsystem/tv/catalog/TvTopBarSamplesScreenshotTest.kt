@@ -97,7 +97,7 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun accountMenuDestructiveFocused() = Frame { TvAccountMenuFocusedDestructiveSample() }
 
-    /** The menu anchored at the start: the avatar leads the header and the panel grows toward the end. */
+    /** The menu anchored at the start: the panel is level with the avatar's start and grows toward the end. */
     @PreviewTest
     @TvPreviews
     @Composable
