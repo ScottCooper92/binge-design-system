@@ -191,6 +191,21 @@ fun BingeChoiceSheetDockedSample() {
     }
 }
 
+/** A long single-choice list with its filter above the rows: the field, then the sectioned list as it reads with nothing typed. */
+@Composable
+fun BingeChoiceSheetFilteredSample() {
+    ScreenshotTheme {
+        SheetFrame(docked = true, title = REGION_TITLE) {
+            SingleChoiceList(
+                choices = BingeChoiceList.Ready(SampleRegions),
+                selected = "Japan",
+                filterPlaceholder = FILTER,
+                onSelect = {},
+            )
+        }
+    }
+}
+
 /**
  * A multi-choice sheet with its filter in use: Clear and Done in the header, the rows narrowed to those matching "an",
  * and what was already chosen first.

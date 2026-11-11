@@ -141,6 +141,25 @@ class BingeChoiceSheetTest {
     }
 
     @Test
+    fun `a single choice list's filter narrows a long list by label and a match picks`() {
+        var picked: Int? = null
+        rule.setContent { SingleChoiceList(choices = many, selected = 1, filterPlaceholder = "Filter") { picked = it } }
+
+        rule.onNode(hasSetTextAction()).performTextInput("Choice 77")
+
+        assertEquals(0, rule.onAllNodesWithText("Choice 12").fetchSemanticsNodes().size)
+        rule.onNode(hasText("Choice 77") and !hasSetTextAction()).assertIsDisplayed().performClick()
+        assertEquals(77, picked)
+    }
+
+    @Test
+    fun `a single choice list without a filter placeholder has no filter field`() {
+        rule.setContent { SingleChoiceList(choices = many, selected = 1) { } }
+
+        assertEquals(0, rule.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().size)
+    }
+
+    @Test
     fun `the filter narrows the rows by label`() {
         rule.setContent {
             MultiChoiceList(
