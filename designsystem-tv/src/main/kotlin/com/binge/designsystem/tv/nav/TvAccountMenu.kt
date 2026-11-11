@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +49,7 @@ import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvConfirmDialog
 import com.binge.designsystem.tv.focus.tryRequestFocus
 import com.binge.designsystem.tv.focus.tvClickable
+import com.binge.designsystem.tv.theme.BingeTvCorners
 import com.binge.designsystem.tv.theme.tvStyle
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
@@ -343,7 +343,7 @@ private fun AccountPanel(
 ) {
     val avatarSize = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
     val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
-    val shape = RoundedCornerShape(dimensionResource(TvR.dimen.tv_account_menu_corner))
+    val shape = BingeTvCorners.Menu
     Column(
         modifier = modifier
             .shadow(dimensionResource(TvR.dimen.tv_account_menu_shadow), shape)
