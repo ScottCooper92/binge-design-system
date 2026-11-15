@@ -45,6 +45,7 @@ import com.binge.designsystem.component.ListItem
 import com.binge.designsystem.component.ListItemConnector
 import com.binge.designsystem.component.ListItemDestination
 import com.binge.designsystem.component.ListItemNote
+import com.binge.designsystem.component.ProvideRowFocus
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
 import com.binge.designsystem.theme.BingeShapes
@@ -643,5 +644,25 @@ fun ItemGroupWrappingRowsSample() {
                 ),
             ),
         )
+    }
+}
+
+/**
+ * A screen that opened on one of its rows, as a search result does: [ProvideRowFocus] has scrolled to the row with the key and
+ * washed it. Drawn at the wash's peak. The catalog's live version is [ItemGroupRowFocusDemo].
+ */
+@Composable
+fun ItemGroupRowFocusSample() {
+    ScreenshotTheme {
+        ProvideRowFocus(key = "https", showAtPeak = true) {
+            ItemGroup(
+                title = "Networking",
+                rows = listOf(
+                    ListItem(icon = Icons.Filled.Dns, label = "HTTP port", detail = "8096", key = "http"),
+                    ListItem(icon = Icons.Filled.Dns, label = "HTTPS port", detail = "8920", key = "https"),
+                    ListItem(icon = Icons.Filled.Verified, label = "Enable HTTPS", toggled = true, key = "enable"),
+                ),
+            )
+        }
     }
 }
