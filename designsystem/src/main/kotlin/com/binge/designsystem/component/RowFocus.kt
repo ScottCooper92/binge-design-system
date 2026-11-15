@@ -23,9 +23,13 @@ import androidx.compose.ui.draw.drawBehind
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.theme.tonalContainer
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 
 /** How long the row stays washed once it is in view. */
 private const val FLASH_HOLD_MILLIS = 900L
+
+/** How long a row is waited for, as a screen loads what its rows show, before the key is given up on. */
+private const val FIND_TIMEOUT_MILLIS = 4_000L
 
 /** The wash fading in and out, in milliseconds. Under reduce motion it snaps instead. */
 private const val FLASH_FADE_MILLIS = 300
@@ -49,8 +53,8 @@ internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
  * A screen that scrolls a plain column (a form, say) composes every row at once, so the row is scrolled to as soon as it reports
  * itself. A screen built on a lazy list passes that list's own [listState]: the row may belong to a group that is not composed yet,
  * because a lazy list only composes what is near the screen, so the list is stepped from the top, one item at a time, until the row
- * reports itself, and then the row is scrolled to. A row that never appears (the screen does not have it, or the user may not see
- * it) leaves the list where it began. The wash is a tonal fade in and out over
+ * reports itself, and then the row is scrolled to. A row that does not appear within a few seconds (the screen does not have it, or the user may not see
+ * it) leaves the list where it began. A screen that loads what its rows show is waited for. The wash is a tonal fade in and out over
  * about a second; under reduce motion it appears and goes without the fade. [showAtPeak] draws the wash on its row from the first
  * frame and never scrolls, for a screenshot of the state.
  */
@@ -66,18 +70,29 @@ fun ProvideRowFocus(
     if (showAtPeak) focus.flashing = key
     LaunchedEffect(key, showAtPeak) {
         if (key == null || showAtPeak) return@LaunchedEffect
-        // A row's registration lands with the composition that follows this one.
-        withFrameNanos { }
         val startIndex = listState?.firstVisibleItemIndex ?: 0
         val startOffset = listState?.firstVisibleItemScrollOffset ?: 0
-        var index = 0
-        while (listState != null && focus.targets[key] == null && index < listState.layoutInfo.totalItemsCount) {
-            listState.scrollToItem(index++)
-            // Composition of the item the scroll brought near, and the row's registration, take a frame or two.
-            withFrameNanos { }
-            withFrameNanos { }
-        }
-        val requester = focus.targets[key]
+        // The screen may still be loading what its rows show, and a lazy list composes only what is near the screen: so wait for the
+        // row to report itself, stepping a lazy list from the top meanwhile (and again if its items change as the screen loads).
+        val requester =
+            withTimeoutOrNull(FIND_TIMEOUT_MILLIS) {
+                var scanned = 0
+                var total = -1
+                var found = focus.targets[key]
+                while (found == null) {
+                    val count = listState?.layoutInfo?.totalItemsCount ?: 0
+                    if (count != total) {
+                        total = count
+                        scanned = 0
+                    }
+                    if (listState != null && scanned < count) listState.scrollToItem(scanned++)
+                    // Composition of what the scroll brought near, and the row's registration, take a frame or two.
+                    withFrameNanos { }
+                    withFrameNanos { }
+                    found = focus.targets[key]
+                }
+                found
+            }
         if (requester == null) {
             listState?.scrollToItem(startIndex, startOffset)
             return@LaunchedEffect

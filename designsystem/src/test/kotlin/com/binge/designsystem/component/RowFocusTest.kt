@@ -98,6 +98,35 @@ class RowFocusTest {
         rule.onNodeWithText("Row 30.1").assertIsDisplayed()
     }
 
+    @Test
+    fun `a row that appears after the screen loads is still scrolled to`() {
+        // The wait for the row runs on the test clock: hold it, load the screen a moment in, then let it run.
+        rule.mainClock.autoAdvance = false
+        var loaded by mutableStateOf(false)
+        rule.setContent {
+            ProvideRowFocus(key = "r-30-1") {
+                Column(modifier = Modifier.fillMaxWidth().height(300.dp).verticalScroll(rememberScrollState())) {
+                    if (loaded) {
+                        repeat(GROUPS) { group ->
+                            ItemGroup(
+                                title = "Group $group",
+                                rows = List(
+                                    ROWS,
+                                ) { row -> ListItem(icon = Icons.Filled.Settings, label = "Row $group.$row", key = "r-$group-$row") },
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        rule.mainClock.advanceTimeBy(200)
+        loaded = true
+        rule.mainClock.advanceTimeBy(500)
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+        rule.onNodeWithText("Row 30.1").assertIsDisplayed()
+    }
+
     private companion object {
         const val GROUPS = 40
         const val ROWS = 3
