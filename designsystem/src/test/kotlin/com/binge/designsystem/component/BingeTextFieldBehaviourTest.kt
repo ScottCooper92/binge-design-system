@@ -16,6 +16,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.requestFocus
 import com.binge.designsystem.R
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
@@ -41,8 +42,12 @@ class BingeTextFieldBehaviourTest {
     private fun caret(index: Int = 0): Int = field(index).fetchSemanticsNode().config[SemanticsProperties.TextSelectionRange].start
 
     @Test
-    fun `a field that opens with a value has its caret at the end of it`() {
+    fun `a pre-filled field shows its start until it is focused, then has its caret at the end`() {
         rule.setContent { TestTheme { BingeTextField(value = "192.168.1.20", label = "Address", onValueChange = {}) } }
+        rule.waitForIdle()
+        assertEquals(0, caret())
+
+        field().requestFocus()
         rule.waitForIdle()
         assertEquals("192.168.1.20".length, caret())
     }
@@ -109,8 +114,9 @@ class BingeTextFieldBehaviourTest {
     }
 
     @Test
-    fun `a secret field that opens with a value has its caret at the end of it`() {
+    fun `a secret field has its caret at the end of its value once focused`() {
         rule.setContent { TestTheme { BingeTextField(value = "s3cret-key", label = "Key", secret = true, onValueChange = {}) } }
+        field().requestFocus()
         rule.waitForIdle()
         assertEquals("s3cret-key".length, caret())
     }

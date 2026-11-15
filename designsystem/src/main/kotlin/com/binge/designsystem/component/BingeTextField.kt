@@ -101,10 +101,17 @@ fun BingeTextField(
             else -> null
         }
     // The String overload of OutlinedTextField starts its selection at 0, so a pre-filled field that takes focus without a tap (Next,
-    // a focus requester) would put the caret before its text. Own the selection: it starts at the end, follows the user once they move
-    // it, and goes back to the end when the value is changed from outside (the clear button, a restore).
-    var field by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
-    val fieldValue = if (field.text == value) field else TextFieldValue(value, TextRange(value.length))
+    // a focus requester) would put the caret before its text. Own the selection: it goes to the end when the field gains focus (a tap
+    // that follows still places it where the user touched), follows the user from there, and goes back to the end when the value is
+    // changed from outside while focused. An unfocused field keeps the selection at 0, because a text field scrolls to its caret, and a
+    // long saved value (a URL) should show its start while nobody is editing it.
+    var field by remember { mutableStateOf(TextFieldValue(value)) }
+    val fieldValue =
+        when {
+            !focused -> TextFieldValue(value)
+            field.text == value -> field
+            else -> TextFieldValue(value, TextRange(value.length))
+        }
     val submit = {
         focusManager.clearFocus()
         onDone?.invoke()
@@ -153,8 +160,10 @@ fun BingeTextField(
         modifier =
             modifier
                 .fillMaxWidth()
-                .onFocusChanged { focused = it.isFocused }
-                .then(contentType?.let { type -> Modifier.semantics { this.contentType = type } } ?: Modifier),
+                .onFocusChanged {
+                    focused = it.isFocused
+                    if (it.isFocused) field = TextFieldValue(value, TextRange(value.length))
+                }.then(contentType?.let { type -> Modifier.semantics { this.contentType = type } } ?: Modifier),
     )
 }
 
