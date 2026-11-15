@@ -35,7 +35,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextOverflow
@@ -297,34 +296,25 @@ private fun AccountAvatar(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val slot = dimensionResource(TvR.dimen.tv_icon_button_diameter)
-    val diameter = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
-    val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
     val onSurface = MaterialTheme.colorScheme.onSurface
     val ringColor = when {
         focused -> onSurface
         selected -> onSurface.copy(alpha = SELECTED_RING_ALPHA)
         else -> Color.Transparent
     }
-    // The avatar is smaller than a button but sits in a button-sized slot, so the bar's height and the open panel's avatar
-    // (which is drawn over this slot) keep their places.
-    Box(modifier = modifier.size(slot), contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .size(diameter)
-                .clip(BingeShapes.Pill)
-                .border(ring, ringColor, BingeShapes.Pill)
-                .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
-                .clearAndSetSemantics {
-                    contentDescription = label
-                    // Only a selected avatar says so, so one that is never selected reads as it always has.
-                    if (selected) this.selected = true
-                }.padding(ring),
-            contentAlignment = Alignment.Center,
-        ) {
-            BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = avatarUrl)
-        }
-    }
+    TvAvatarButton(
+        name = name,
+        avatarUrl = avatarUrl,
+        ringColor = ringColor,
+        onFocusChanged = onFocusChanged,
+        onClick = onClick,
+        semantics = {
+            contentDescription = label
+            // Only a selected avatar says so, so one that is never selected reads as it always has.
+            if (selected) this.selected = true
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable
