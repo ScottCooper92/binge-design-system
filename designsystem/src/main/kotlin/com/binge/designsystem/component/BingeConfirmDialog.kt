@@ -26,6 +26,7 @@ import com.binge.designsystem.R
  * dialog could do a milder or a more severe thing, the choice is a [SwitchRow] in [extraContent], off by default: the caller owns
  * its state and passes [confirmLabel] and [destructive] from it, and the body says what the switch adds. The visible body
  * is delegated to [BingeConfirmDialogContent] so screenshot tests can render it (the [AlertDialog] window does not capture).
+ * [confirmEnabled] false greys the confirm out until the user has chosen what it applies to, as a choice in [extraContent] with nothing preselected.
  */
 @Composable
 fun BingeConfirmDialog(
@@ -37,6 +38,7 @@ fun BingeConfirmDialog(
     modifier: Modifier = Modifier,
     dismissLabel: String = stringResource(R.string.action_cancel),
     destructive: Boolean = false,
+    confirmEnabled: Boolean = true,
     extraContent: @Composable (() -> Unit)? = null,
 ) {
     AlertDialog(
@@ -58,6 +60,7 @@ fun BingeConfirmDialog(
                 confirmLabel = confirmLabel,
                 dismissLabel = dismissLabel,
                 destructive = destructive,
+                confirmEnabled = confirmEnabled,
                 onConfirm = onConfirm,
                 onDismissRequest = onDismissRequest,
             )
@@ -79,6 +82,7 @@ fun BingeConfirmDialogContent(
     modifier: Modifier = Modifier,
     dismissLabel: String = stringResource(R.string.action_cancel),
     destructive: Boolean = false,
+    confirmEnabled: Boolean = true,
     extraContent: @Composable (() -> Unit)? = null,
 ) {
     Column(
@@ -98,6 +102,7 @@ fun BingeConfirmDialogContent(
             confirmLabel = confirmLabel,
             dismissLabel = dismissLabel,
             destructive = destructive,
+            confirmEnabled = confirmEnabled,
             onConfirm = onConfirm,
             onDismissRequest = onDismissRequest,
         )
@@ -109,6 +114,7 @@ private fun ConfirmActions(
     confirmLabel: String,
     dismissLabel: String,
     destructive: Boolean,
+    confirmEnabled: Boolean,
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -116,7 +122,7 @@ private fun ConfirmActions(
         gap = dimensionResource(R.dimen.padding_s),
         modifier = Modifier.fillMaxWidth(),
         first = { BingeTextButton(label = dismissLabel, onClick = onDismissRequest) },
-        second = { BingeTextButton(label = confirmLabel, onClick = onConfirm, destructive = destructive) },
+        second = { BingeTextButton(label = confirmLabel, onClick = onConfirm, enabled = confirmEnabled, destructive = destructive) },
     )
 }
 

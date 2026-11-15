@@ -137,7 +137,7 @@ private fun entryModifier(entry: FocusRequester, isEntry: Boolean): Modifier = i
  * resolved cell passes its art as [content] and its focus handling as [interaction]; the plate passes neither.
  */
 @Composable
-fun TvPosterPlate(
+internal fun TvPosterPlate(
     modifier: Modifier = Modifier,
     interaction: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit = {},

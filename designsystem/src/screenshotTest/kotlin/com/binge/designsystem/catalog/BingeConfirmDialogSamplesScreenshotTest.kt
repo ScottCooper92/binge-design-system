@@ -54,4 +54,18 @@ class BingeConfirmDialogSamplesScreenshotTest {
     fun ShortActionsWorstCase() {
         BingeConfirmDialogShortActionsWorstCaseSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ChoiceRequired() {
+        BingeConfirmDialogChoiceRequiredSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ChoicePicked() {
+        BingeConfirmDialogChoicePickedSample()
+    }
 }

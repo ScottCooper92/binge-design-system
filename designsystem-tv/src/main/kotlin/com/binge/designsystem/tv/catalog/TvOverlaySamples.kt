@@ -36,8 +36,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCheckboxRow
+import com.binge.designsystem.tv.component.TvChoiceRow
+import com.binge.designsystem.tv.component.TvChoiceUi
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvConfirmDialogContent
 import com.binge.designsystem.tv.component.TvInfoCard
 import com.binge.designsystem.tv.component.TvMessageDialogContent
@@ -84,6 +86,40 @@ fun TvSideSheetRowReservedLineSample() {
                     onClick = { selected = "All" },
                     selected = selected == "All",
                     reserveSupportingLine = true,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * A row whose label is the whole point, such as a service's name, with [TvSideSheetRow]'s `labelMaxLines` raised so a long one wraps
+ * beside its switch instead of ending in an ellipsis. The icon and the switch keep their slot, and the short row beside it stays one line.
+ */
+@Composable
+fun TvSideSheetRowWrappedLabelSample() {
+    var first by remember { mutableStateOf(true) }
+    var second by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TvSideSheetPanel {
+            TvSideSheetTitle("Rows on your hubs")
+            TvSideSheetRows {
+                TvSideSheetRow(
+                    label = "Popular on Amazon Prime Video with Ads, including every channel add-on",
+                    icon = Icons.Filled.PlayCircle,
+                    labelMaxLines = 3,
+                    role = Role.Switch,
+                    onClick = { first = !first },
+                    trailing = { isFocused -> TvSwitch(checked = first, isFocused = isFocused) },
+                    initiallyFocused = true,
+                )
+                TvSideSheetRow(
+                    label = "Popular on Netflix",
+                    icon = Icons.Filled.PlayCircle,
+                    labelMaxLines = 3,
+                    role = Role.Switch,
+                    onClick = { second = !second },
+                    trailing = { isFocused -> TvSwitch(checked = second, isFocused = isFocused) },
                 )
             }
         }
@@ -308,7 +344,7 @@ fun TvMessageDialogKeyWithCopySample() {
             initiallyFocused = true,
             extraContent = {
                 Text(text = TV_SHOWN_ONCE_KEY, style = MaterialTheme.typography.bodyLarge, fontFamily = FontFamily.Monospace)
-                TvButton(label = if (copied) "Copied" else "Copy", onClick = { copied = true }, style = TvButtonStyle.Secondary)
+                TvCompactButton(label = if (copied) "Copied" else "Copy", onClick = { copied = true }, style = TvButtonStyle.Secondary)
             },
         )
     }
@@ -342,6 +378,35 @@ fun TvConfirmDialogSwitchSample() {
                 TvSideSheetRow(label = "Also delete the files", onClick = { deleteFiles = !deleteFiles }, role = Role.Switch) { isFocused ->
                     TvSwitch(checked = deleteFiles, isFocused = isFocused)
                 }
+            },
+        )
+    }
+}
+
+/**
+ * A choice the confirm applies to, with nothing preselected: the confirm is greyed out until one is picked, and focus still
+ * arrives on Cancel. For a destructive action that must name what it acts on.
+ */
+@Composable
+fun TvConfirmDialogChoiceRequiredSample() {
+    var picked by remember { mutableStateOf<String?>(null) }
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        TvConfirmDialogContent(
+            title = "Delete files?",
+            message = "Choose which version's files to delete from the server. This cannot be undone.",
+            confirmLabel = "Delete",
+            dismissLabel = "Cancel",
+            destructive = true,
+            onConfirm = {},
+            onDismissRequest = {},
+            confirmEnabled = picked != null,
+            initiallyDismissFocused = true,
+            extraContent = {
+                TvChoiceRow(
+                    choices = listOf(TvChoiceUi("standard", "Standard"), TvChoiceUi("4k", "4K")),
+                    selectedKey = picked.orEmpty(),
+                    onSelect = { picked = it },
+                )
             },
         )
     }

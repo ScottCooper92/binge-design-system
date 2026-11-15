@@ -8,6 +8,12 @@
     <dimen name="tv_content_gutter_start">24dp</dimen>
     <!-- Top navigation bar -->
     <dimen name="tv_top_bar_avatar_ring">2dp</dimen>
+    <!-- The bar's avatar, ring included. Drawn in a tv_icon_button_diameter slot, so the bar's height and its neighbours do not move. -->
+    <dimen name="tv_top_bar_avatar_size">36dp</dimen>
+    <dimen name="tv_account_menu_width">360dp</dimen>
+    <dimen name="tv_account_menu_outline">1dp</dimen>
+    <dimen name="tv_account_menu_shadow">12dp</dimen>
+    <dimen name="tv_account_menu_icon_size">24dp</dimen>
     <dimen name="tv_top_bar_item_padding_horizontal">23dp</dimen>
     <!-- Focus ring -->
     <dimen name="tv_focus_ring_width">3dp</dimen>
@@ -47,8 +53,6 @@
     <!-- Message plate and illustration -->
     <dimen name="tv_message_plate_max_width">520dp</dimen>
     <dimen name="tv_pairing_qr_size">200dp</dimen>
-    <!-- The failure glyph a pairing card draws in place of its code when asking for one failed. -->
-    <dimen name="tv_pairing_error_icon_size">48dp</dimen>
     <!-- Text and search fields: a form's field width, and the frame the remote lands on. -->
     <dimen name="tv_text_field_width">520dp</dimen>
     <dimen name="tv_text_field_height">56dp</dimen>

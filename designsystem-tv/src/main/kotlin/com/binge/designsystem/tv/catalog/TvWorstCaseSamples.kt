@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.ReportProblem
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.SaveStatus
 import com.binge.designsystem.catalog.ScreenshotOnly
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.tv.component.TvCheckboxRow
 import com.binge.designsystem.tv.component.TvChoiceRow
 import com.binge.designsystem.tv.component.TvChoiceUi
@@ -40,6 +42,8 @@ import com.binge.designsystem.tv.focus.tvFocusContentColor
 import com.binge.designsystem.tv.template.TvHubFailedRow
 import com.binge.designsystem.tv.template.TvHubRowFailure
 import com.binge.designsystem.tv.template.TvListPaneBoard
+import com.binge.designsystem.tv.template.TvMessagePage
+import com.binge.designsystem.tv.template.TvPageHosting
 import com.binge.designsystem.tv.template.TvPaneAction
 import com.binge.designsystem.tv.template.TvPaneGroup
 import com.binge.designsystem.tv.template.TvPaneOption
@@ -320,4 +324,22 @@ fun TvSideSheetRowSavingWorstCaseSample() {
         }
         TvSideSheetRow(label = LONG_LABEL, onClick = {}, icon = Icons.Filled.Folder, supportingText = LONG_SUPPORT, saving = true)
     }
+}
+
+private const val LONG_MESSAGE =
+    "This version of the app can no longer reach the server it was set up with. The server was updated and now needs a newer " +
+        "version of this app, so nothing on this screen can load until you update. Update from the Play Store, then open the app " +
+        "again; your sign-in and your settings are kept. If you cannot update, ask whoever runs the server to allow older apps."
+
+/** A message page with art, a headline, a long body and two actions: at a large font the actions must stay on screen. */
+@Composable
+fun TvMessagePageWorstCaseSample() {
+    TvMessagePage(
+        headline = "Update required to carry on",
+        body = LONG_MESSAGE,
+        icon = Icons.Filled.SystemUpdate,
+        hosting = TvPageHosting.Overlay,
+        primary = ScreenAction("Update", {}),
+        secondary = ScreenAction("Not now", {}),
+    )
 }

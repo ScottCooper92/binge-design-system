@@ -12,8 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.tv.material3.MaterialTheme
-import com.binge.designsystem.catalogapp.overrides.FontScalePresets
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
 import com.binge.designsystem.catalogapp.registry.TvCatalogRegistry
@@ -29,7 +29,9 @@ import com.binge.designsystem.tv.focus.rememberTvOverlayCloser
 @Composable
 fun TvCatalogApp(entries: List<CatalogEntry> = TvCatalogRegistry) {
     var selectedId by rememberSaveable { mutableStateOf<String?>(null) }
-    var fontScale by rememberSaveable { mutableFloatStateOf(FontScalePresets.first()) }
+    // No preset is chosen at first: the samples follow the device's own font scale until one is.
+    val deviceFontScale = LocalDensity.current.fontScale
+    var fontScale by rememberSaveable { mutableFloatStateOf(deviceFontScale) }
     var rtl by rememberSaveable { mutableStateOf(false) }
     val rowRequesters = remember { TvRowRequesters() }
     val arrival = rememberTvArrivalFocus()

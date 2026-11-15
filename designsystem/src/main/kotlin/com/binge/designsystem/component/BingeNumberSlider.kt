@@ -48,7 +48,9 @@ import kotlin.math.roundToInt
  * every step. [onValueChangeFinished] fires when a drag or keyboard change finishes, and after each stepper tap, so a
  * caller can show a draft as it moves and save once when it lands. [step] sets the spacing between values and the
  * steppers' increment; the range must divide into whole steps. A stored value outside the range or between steps still
- * reads as stored until the user moves the control; the thumb sits at its nearest available position.
+ * reads as stored until the user moves the control; the thumb sits at its nearest available position. The first step from such a
+ * value lands on the nearest stop in the direction of travel: from between two stops, the stop on that side; from above the
+ * range, down to the range's last stop; from below it, up to the range's first.
  */
 @Composable
 fun BingeNumberSlider(
@@ -74,8 +76,13 @@ fun BingeNumberSlider(
         val snapped = range.first + ((at - range.first).toFloat() / step).roundToInt() * step
         onValueChange(if (open && at == top) null else snapped.coerceIn(range))
     }
-    val next = range.first + ((position - range.first) / step + 1) * step
-    val previous = range.first + ((position - range.first + step - 1) / step - 1) * step
+    // The first step from a stored value off the scale lands on the nearest stop in the direction of travel, which for a value
+    // beyond an end of the range is that end: the thumb sits there, so a step down from above the range goes to its last stop,
+    // not to the one below it.
+    val aboveRange = value != null && value > range.last
+    val belowRange = value != null && value < range.first
+    val next = if (belowRange) range.first else range.first + ((position - range.first) / step + 1) * step
+    val previous = if (aboveRange) range.last else range.first + ((position - range.first + step - 1) / step - 1) * step
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
         Text(
             readout,
@@ -152,7 +159,9 @@ internal fun SliderBound(text: String, modifier: Modifier = Modifier) =
 /**
  * A number setting as a [ListItem] for an [ItemGroup]: its [title], and its value ([format] of it, or [openEndLabel]) as
  * the detail. A tap opens a sheet holding a [BingeNumberSlider] under the title; each change is handed to [onChange]
- * as it happens. A row that is not [enabled] dims, and closes its sheet if open.
+ * as it happens. [onValueChangeFinished] is called once with the value the control landed on, when a drag or keyboard change
+ * finishes and after each stepper tap, so a setting that saves as it is made can save there, not on every step of a drag.
+ * The default does nothing. A row that is not [enabled] dims, and closes its sheet if open.
  */
 @Composable
 fun bingeNumberItem(
@@ -164,8 +173,12 @@ fun bingeNumberItem(
     onChange: (Int?) -> Unit,
     enabled: Boolean = true,
     openEndLabel: String? = null,
+    onValueChangeFinished: (Int?) -> Unit = {},
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
+    // The last value the control picked, which a stepper tap finishes on before the caller's own value has recomposed.
+    var landed by remember { mutableStateOf(value) }
+    SideEffect { landed = value }
     LaunchedEffect(enabled) { if (!enabled) open = false }
     if (open) {
         BingeBottomSheet(onDismissRequest = { open = false }) {
@@ -180,11 +193,15 @@ fun bingeNumberItem(
                 Text(title, style = MaterialTheme.typography.titleMedium)
                 BingeNumberSlider(
                     value = value,
-                    onValueChange = onChange,
+                    onValueChange = {
+                        landed = it
+                        onChange(it)
+                    },
                     range = range,
                     format = format,
                     description = title,
                     openEndLabel = openEndLabel,
+                    onValueChangeFinished = { onValueChangeFinished(landed) },
                 )
             }
         }

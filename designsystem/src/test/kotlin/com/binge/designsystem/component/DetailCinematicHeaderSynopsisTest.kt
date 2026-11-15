@@ -1,9 +1,9 @@
 package com.binge.designsystem.component
 
-import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -24,7 +24,7 @@ class DetailCinematicHeaderSynopsisTest {
 
     @Test
     fun `the full synopsis sheet survives a recreation`() {
-        val restoration = StateRestorationTester(rule)
+        val restoration = InMemoryStateRestorationTester(rule)
         restoration.setContent {
             TestTheme {
                 // The synopsis on its own: the header's backdrop draws a mesh Robolectric cannot build.

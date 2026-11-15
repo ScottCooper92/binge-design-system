@@ -33,6 +33,9 @@ while they load. `TvImmersiveScroll.kt` there is the scroll the hub and
 grid share, not a template of its own. A template follows
 the one rule below like any component: it takes slots and callbacks, never a Binge type.
 
+This library is GPL-3.0-or-later. `LICENSE-EXCEPTION.md` adds the Google libraries' permission.
+The Binge app uses it under a separate grant. New code and new dependencies must stay GPL-compatible.
+
 ## The one rule everything else serves
 
 **A component here may not know what Binge's data looks like.**
@@ -90,6 +93,10 @@ navigation pill (`BingeNavPresentation.FloatingBar`): the pill covers a pinned f
 with no button. A top-bar text "Save" (`FormActionPlacement.TopBar`) is only for a multi-field edit that must apply together, and
 stays disabled until something changes. A single toggle or choice applies at once. One primary per screen; a top-bar action is a
 verb, never an icon alone; a destructive action sits in an overflow menu or behind a confirm.
+
+**Chips and tabs.** Chips narrow the same list: every chip shows a part of one set of things (`BingeFilterChipRow`,
+`BingeFilterChipPager`). Tabs switch between different content: each tab is its own view (`BingeTabRow`,
+`BingeTabbedPager`). Never use both on one page.
 
 ## Gates
 

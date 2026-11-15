@@ -22,6 +22,11 @@ class TvOverlaySamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun sideSheetRowWrappedLabel() = Frame { TvSideSheetRowWrappedLabelSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun sideSheetStackPage() = Frame { TvSideSheetStackPageSample() }
 
     @PreviewTest
@@ -103,6 +108,11 @@ class TvOverlaySamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun confirmDialogSwitch() = Frame { TvConfirmDialogSwitchSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun confirmDialogChoiceRequired() = Frame { TvConfirmDialogChoiceRequiredSample() }
 
     @PreviewTest
     @TvPreviews

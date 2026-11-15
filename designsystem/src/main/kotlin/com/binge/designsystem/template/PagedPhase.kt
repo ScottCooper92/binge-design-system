@@ -1,23 +1,10 @@
 package com.binge.designsystem.template
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import com.binge.designsystem.R
-import com.binge.designsystem.component.BingeLoadingIndicator
 
 /** What a paged list shows. Phone and TV both read it from [pagedPhase], so they agree. */
 @Immutable
@@ -197,32 +184,5 @@ fun PagedPhaseContent(
         PagedPhase.Empty -> empty()
         is PagedPhase.Failed -> failed(phase.error)
         is PagedPhase.Rows -> rows(phase.refreshing, phase.refreshError)
-    }
-}
-
-/**
- * The footer under a list that is still showing: a spinner while the next page loads, or a tappable line
- * when it failed. The caller owns [retryLabel] and what [onRetry] does, a reconnect for a rejected session.
- */
-@Composable
-fun PagedAppendFooter(
-    state: LoadState,
-    retryLabel: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val padding = Modifier.fillMaxWidth().padding(vertical = dimensionResource(R.dimen.padding_m))
-    when (state) {
-        is LoadState.Loading ->
-            Box(modifier = modifier.then(padding), contentAlignment = Alignment.Center) { BingeLoadingIndicator() }
-        is LoadState.Error ->
-            Text(
-                text = retryLabel,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-                modifier = modifier.clickable(role = Role.Button, onClick = onRetry).then(padding),
-            )
-        is LoadState.NotLoading -> Unit
     }
 }

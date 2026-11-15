@@ -23,13 +23,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.LocalIsSinglePaneNav
 import com.binge.designsystem.PaneContent
 import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.catalogapp.R
-import com.binge.designsystem.catalogapp.overrides.FontScalePresets
 import com.binge.designsystem.catalogapp.overrides.SampleLocale
 import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
@@ -53,7 +53,9 @@ fun CatalogApp() {
     var query by rememberSaveable { mutableStateOf("") }
     val systemDark = isSystemInDarkTheme()
     var dark by rememberSaveable { mutableStateOf(systemDark) }
-    var fontScale by rememberSaveable { mutableFloatStateOf(FontScalePresets.first()) }
+    // No preset is chosen at first: the samples follow the device's own font scale until one is.
+    val deviceFontScale = LocalDensity.current.fontScale
+    var fontScale by rememberSaveable { mutableFloatStateOf(deviceFontScale) }
     var rtl by rememberSaveable { mutableStateOf(false) }
     var locale by rememberSaveable { mutableStateOf(SampleLocale.System) }
     val gridState = rememberLazyGridState()

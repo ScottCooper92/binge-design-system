@@ -7,7 +7,7 @@ import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.test.junit4.StateRestorationTester
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -32,8 +32,8 @@ class ScrollDepthCarryTest {
     private var shown by mutableStateOf(true)
     private var changing = false
 
-    private fun show(): StateRestorationTester {
-        val restoration = StateRestorationTester(rule)
+    private fun show(): InMemoryStateRestorationTester {
+        val restoration = InMemoryStateRestorationTester(rule)
         restoration.setContent {
             if (shown) ScrollDepthEffect({ reported += it }, { lastVisible }) { changing }
         }

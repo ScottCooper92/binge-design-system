@@ -24,6 +24,7 @@ import com.binge.designsystem.catalog.CatalogGroup
 import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCheckboxRow
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvSaveStatus
 import com.binge.designsystem.tv.template.TvMessagePage
 import com.binge.designsystem.tv.template.TvPageHosting
@@ -60,7 +61,7 @@ fun TvStepFlowDemo() {
         onBack = if (step > 0) ({ step-- }) else null,
         footerHint = "BACK returns to the step before.",
         footerActions = {
-            TvButton(
+            TvCompactButton(
                 label = if (step < DEMO_STEP_COUNT - 1) "Continue" else "Start again",
                 onClick = { step = (step + 1) % DEMO_STEP_COUNT },
                 style = TvButtonStyle.Primary,
@@ -106,7 +107,7 @@ fun TvTwoPanePagePinnedActionDemo() {
     TvTwoPanePage(
         split = TvTwoPaneSplit.Balanced,
         hosting = TvPageHosting.Overlay,
-        pinnedAction = { TvButton(label = "Add server", onClick = {}, style = TvButtonStyle.Primary) },
+        pinnedAction = { TvCompactButton(label = "Add server", onClick = {}, style = TvButtonStyle.Primary) },
         copy = {
             TvTwoPaneCopy(
                 headline = "Add a server",

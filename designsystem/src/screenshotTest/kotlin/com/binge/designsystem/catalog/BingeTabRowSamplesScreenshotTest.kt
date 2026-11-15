@@ -11,4 +11,11 @@ class BingeTabRowSamplesScreenshotTest {
     fun TabRow() {
         BingeTabRowSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun TabRowFlush() {
+        BingeTabRowFlushSample()
+    }
 }

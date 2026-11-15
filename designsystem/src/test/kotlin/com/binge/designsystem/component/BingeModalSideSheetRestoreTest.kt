@@ -2,7 +2,7 @@ package com.binge.designsystem.component
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.test.junit4.StateRestorationTester
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -23,7 +23,7 @@ class BingeModalSideSheetRestoreTest {
 
     @Test
     fun `a restored sheet is already shown on its first composition`() {
-        val restoration = StateRestorationTester(rule)
+        val restoration = InMemoryStateRestorationTester(rule)
         val firstValues = mutableListOf<Boolean>()
         restoration.setContent {
             val shown = rememberSideSheetShown()

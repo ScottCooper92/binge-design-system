@@ -172,16 +172,6 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
-    fun pairingCardError() = Frame { TvPairingCardErrorSample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun pairingCardErrorLongMessage() = Frame { TvPairingCardErrorLongMessageSample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
     fun initialsAvatar() = Frame { TvInitialsAvatarSample() }
 
     @Composable

@@ -32,8 +32,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.SaveStatus
-import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvCheckboxRow
+import com.binge.designsystem.tv.component.TvCompactButton
 import com.binge.designsystem.tv.component.TvIllustration
 import com.binge.designsystem.tv.component.TvOptionRow
 import com.binge.designsystem.tv.component.TvSaveStatus
@@ -169,7 +169,7 @@ internal fun TvListPane(
                     }
                     row.clear?.let { action ->
                         item(key = "clear") {
-                            TvButton(
+                            TvCompactButton(
                                 label = action.label,
                                 onClick = action.onClick,
                                 enabled = action.enabled,

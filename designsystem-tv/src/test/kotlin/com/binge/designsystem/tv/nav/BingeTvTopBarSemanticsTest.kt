@@ -11,10 +11,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithContentDescription
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
+import com.binge.designsystem.tv.component.TvIconButton
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Rule
 import org.junit.Test
@@ -61,6 +63,29 @@ class BingeTvTopBarSemanticsTest {
             .onNodeWithContentDescription("Settings")
             .assert(role(Role.Button))
             .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Selected))
+    }
+
+    @Test
+    fun `a bar with no tabs draws its trailing content and nothing in the middle`() {
+        composeTestRule.setContent {
+            BingeTvTheme {
+                BingeTvTopBar(
+                    header = null,
+                    items = emptyList(),
+                    footer = null,
+                    selectedKey = "none",
+                    onSelect = {},
+                    itemFocusRequesters = emptyMap(),
+                    down = remember { FocusRequester() },
+                    onFocusedChange = {},
+                    trailing = { TvIconButton(icon = Icons.Filled.Settings, label = "Settings", onClick = {}) },
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithContentDescription("Settings").assertExists()
+        composeTestRule.onAllNodes(role(Role.Tab)).assertCountEquals(0)
     }
 
     private fun role(role: Role) = SemanticsMatcher.expectValue(SemanticsProperties.Role, role)

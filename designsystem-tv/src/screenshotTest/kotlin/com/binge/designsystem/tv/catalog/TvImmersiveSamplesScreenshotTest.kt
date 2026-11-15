@@ -97,7 +97,23 @@ class TvImmersiveSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
-    fun seeAllTile() = Frame { TvSeeAllTileSample() }
+    fun seeAllCardPoster() = Frame { TvSeeAllCardPosterSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun seeAllCardGallery() = Frame { TvSeeAllCardGallerySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun seeAllCardPortrait() = Frame { TvSeeAllCardPortraitSample() }
+
+    /** A row's See-all tile says the row's own label, "All 24", in place of the hub's "See all". */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun hubSeeAllLabels() = Frame { TvImmersiveHubSeeAllLabelsSample() }
 
     @Composable
     private fun Frame(content: @Composable () -> Unit) {

@@ -84,7 +84,7 @@ fun TvMessageDialogContent(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TvButton(
+            TvCompactButton(
                 label = confirmLabel,
                 onClick = onDismiss,
                 style = TvButtonStyle.Text,

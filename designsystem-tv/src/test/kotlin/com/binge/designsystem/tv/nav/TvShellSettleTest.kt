@@ -1,7 +1,7 @@
 package com.binge.designsystem.tv.nav
 
 import android.app.Application
-import androidx.compose.ui.test.junit4.StateRestorationTester
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -40,7 +40,7 @@ class TvShellSettleTest {
 
     @Test
     fun `the settled key survives recreation`() {
-        val restoration = StateRestorationTester(rule)
+        val restoration = InMemoryStateRestorationTester(rule)
         lateinit var settle: TvShellSettle
         restoration.setContent { settle = rememberTvShellSettle(HOME) }
         settle.jumpTo(SEARCH)
