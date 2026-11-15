@@ -31,6 +31,10 @@ private const val FLASH_HOLD_MILLIS = 900L
 /** How long a row is waited for, as a screen loads what its rows show, before the key is given up on. */
 private const val FIND_TIMEOUT_MILLIS = 4_000L
 
+/** Frames, and then milliseconds, a screen that has just loaded is given to settle its sizes before and after the row is scrolled to. */
+private const val SETTLE_FRAMES = 3
+private const val SETTLE_MILLIS = 120L
+
 /** The wash fading in and out, in milliseconds. Under reduce motion it snaps instead. */
 private const val FLASH_FADE_MILLIS = 300
 
@@ -97,6 +101,11 @@ fun ProvideRowFocus(
             listState?.scrollToItem(startIndex, startOffset)
             return@LaunchedEffect
         }
+        // A screen that has just loaded is still settling its sizes, so the scroll range may not reach the row yet: let a few frames
+        // pass, scroll, and scroll once more when the layout has had a moment to finish.
+        repeat(SETTLE_FRAMES) { withFrameNanos { } }
+        requester.bringIntoView()
+        delay(SETTLE_MILLIS)
         requester.bringIntoView()
         focus.flashing = key
         delay(FLASH_HOLD_MILLIS)
