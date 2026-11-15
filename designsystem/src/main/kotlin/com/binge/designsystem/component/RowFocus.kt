@@ -46,7 +46,7 @@ private const val FLASH_FADE_MILLIS = 220
 private const val PULSE_HALF_MILLIS = 220L
 private const val PULSES = 2
 
-/** The wash at a pulse's peak: strong enough to find the row by, soft enough to read through. */
+/** The wash at a pulse's peak. It is the tonal container colour at full strength; the softness comes from that colour, not from this alpha. */
 private const val PEAK_ALPHA = 1f
 
 /** The wash the row keeps once it has pulsed, until the screen is left or another row is asked for. */
@@ -82,12 +82,14 @@ internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
  * it) leaves the list where it began. A screen that loads what its rows show is waited for. The wash is a tonal one that pulses twice and then settles to a
  * steady highlight, which stays until the screen is left or another row is asked for, as Android's Settings does; under reduce motion
  * it changes level without the fade. [showAtPeak] draws the wash on its row from the first
- * frame and never scrolls, for a screenshot of the state.
+ * frame and never scrolls, for a screenshot of the state; it is not for an app's own screens.
+ *
+ * A row is looked for again only when [key] changes. To show the same row again, set the key to null, let a frame pass (composition has to
+ * see the null), and then set it back.
  */
 @Composable
 fun ProvideRowFocus(
     key: String?,
-    modifier: Modifier = Modifier,
     listState: LazyListState? = null,
     showAtPeak: Boolean = false,
     content: @Composable () -> Unit,
