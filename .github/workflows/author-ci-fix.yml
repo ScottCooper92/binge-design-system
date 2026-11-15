@@ -51,7 +51,7 @@ jobs:
       # TMDB key this build has no use for, and tunes Gradle for a container this job
       # does not run in. The Android SDK is preinstalled on the hosted runner image.
       toolchain: jvm
-      java_version: '17'
+      java_version: '21'
       verify_guidance: >
         Scope Gradle to the module rather than running the whole tree when you
         are checking one thing — `./gradlew :designsystem:test`, or
