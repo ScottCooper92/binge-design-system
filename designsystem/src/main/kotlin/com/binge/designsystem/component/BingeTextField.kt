@@ -27,10 +27,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import com.binge.designsystem.R
 
@@ -98,13 +100,21 @@ fun BingeTextField(
             }
             else -> null
         }
+    // The String overload of OutlinedTextField starts its selection at 0, so a pre-filled field that takes focus without a tap (Next,
+    // a focus requester) would put the caret before its text. Own the selection: it starts at the end, follows the user once they move
+    // it, and goes back to the end when the value is changed from outside (the clear button, a restore).
+    var field by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+    val fieldValue = if (field.text == value) field else TextFieldValue(value, TextRange(value.length))
     val submit = {
         focusManager.clearFocus()
         onDone?.invoke()
     }
     OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
+        value = fieldValue,
+        onValueChange = {
+            field = it
+            if (it.text != value) onValueChange(it.text)
+        },
         label = { Text(if (required) stringResource(R.string.field_required_label, label) else label) },
         placeholder = placeholder?.let { { Text(it) } },
         enabled = enabled,
