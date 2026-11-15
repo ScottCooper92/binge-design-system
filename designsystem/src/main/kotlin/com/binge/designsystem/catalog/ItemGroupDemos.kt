@@ -25,7 +25,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
  * A long screen of keyed groups: each button opens it on a row that is not on screen, and [ProvideRowFocus] steps the list to it,
- * scrolls it into view and washes it once. A row is shown again only after the key has changed, so clear it first.
+ * scrolls it into view, pulses it and leaves it highlighted. A row is shown again only after the key has changed, so clear it first.
  */
 @Composable
 fun ItemGroupRowFocusDemo() {

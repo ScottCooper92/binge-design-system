@@ -177,7 +177,7 @@ private fun ListItemView(
                     }
                 }
             }
-            // Found by a key and washed once when a screen opens on this row; nothing without a key.
+            // Found by a key and highlighted when a screen opens on this row; nothing without a key.
             .rowFocusTarget(row.key)
             // The wash sits outside the click, so the ripple draws over it rather than under it.
             .background(if (row.selected) MaterialTheme.colorScheme.primary.tonalContainer() else Color.Transparent)

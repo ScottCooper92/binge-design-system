@@ -29,9 +29,6 @@ import com.binge.designsystem.theme.tonalContainer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 
-/** How long the row stays washed once it is in view. */
-private const val FLASH_HOLD_MILLIS = 900L
-
 /** How long a row is waited for, as a screen loads what its rows show, before the key is given up on. */
 private const val FIND_TIMEOUT_MILLIS = 4_000L
 
@@ -42,17 +39,27 @@ private const val SETTLE_MILLIS = 120L
 /** How much of the screen's height is asked for under the row, so the row ends up near the middle. */
 private const val ROOM_BELOW_SHARE = 0.45f
 
-/** The wash fading in and out, in milliseconds. Under reduce motion it snaps instead. */
-private const val FLASH_FADE_MILLIS = 300
+/** The wash fading between levels, in milliseconds. Under reduce motion it snaps instead. */
+private const val FLASH_FADE_MILLIS = 220
 
-/** A wash strong enough to find the row by, soft enough to read through. */
-private const val FLASH_PEAK_ALPHA = 0.9f
+/** One pulse is this long up and this long down; the row pulses [PULSES] times and then stays at [STEADY_ALPHA]. */
+private const val PULSE_HALF_MILLIS = 220L
+private const val PULSES = 2
+
+/** The wash at a pulse's peak: strong enough to find the row by, soft enough to read through. */
+private const val PEAK_ALPHA = 0.9f
+
+/** The wash the row keeps once it has pulsed, until the screen is left or another row is asked for. */
+private const val STEADY_ALPHA = 0.55f
 
 /** What a screen's [ListItem]s with a [ListItem.key] report to, so one of them can be found and shown. */
 @Stable
 internal class RowFocus {
     val targets = mutableMapOf<String, RowTarget>()
-    var flashing by mutableStateOf<String?>(null)
+
+    /** The row washed now, and how strongly. */
+    var shown by mutableStateOf<String?>(null)
+    var level by mutableStateOf(0f)
 }
 
 /** A keyed row: what scrolls to it, and its size, which is how much room it asks for. */
@@ -65,15 +72,16 @@ internal class RowTarget(
 internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
 
 /**
- * Brings the row whose [ListItem.key] is [key] into view and washes it once, for a screen that opens on a particular setting (a
+ * Brings the row whose [ListItem.key] is [key] into view and pulses it twice, then leaves it highlighted, for a screen that opens on a particular setting (a
  * search result, say). Wrap the screen in it; with a null [key] it does nothing.
  *
  * A screen that scrolls a plain column (a form, say) composes every row at once, so the row is scrolled to as soon as it reports
  * itself. A screen built on a lazy list passes that list's own [listState]: the row may belong to a group that is not composed yet,
  * because a lazy list only composes what is near the screen, so the list is stepped from the top, one item at a time, until the row
  * reports itself, and then the row is scrolled to. A row that does not appear within a few seconds (the screen does not have it, or the user may not see
- * it) leaves the list where it began. A screen that loads what its rows show is waited for. The wash is a tonal fade in and out over
- * about a second; under reduce motion it appears and goes without the fade. [showAtPeak] draws the wash on its row from the first
+ * it) leaves the list where it began. A screen that loads what its rows show is waited for. The wash is a tonal one that pulses twice and then settles to a
+ * steady highlight, which stays until the screen is left or another row is asked for, as Android's Settings does; under reduce motion
+ * it changes level without the fade. [showAtPeak] draws the wash on its row from the first
  * frame and never scrolls, for a screenshot of the state.
  */
 @Composable
@@ -86,9 +94,15 @@ fun ProvideRowFocus(
 ) {
     val focus = remember { RowFocus() }
     val containerHeight = LocalWindowInfo.current.containerSize.height
-    if (showAtPeak) focus.flashing = key
+    if (showAtPeak) {
+        focus.shown = key
+        focus.level = PEAK_ALPHA
+    }
     LaunchedEffect(key, showAtPeak) {
-        if (key == null || showAtPeak) return@LaunchedEffect
+        if (showAtPeak) return@LaunchedEffect
+        // A row washed for an earlier key lets go as the next is looked for.
+        focus.shown = null
+        if (key == null) return@LaunchedEffect
         val startIndex = listState?.firstVisibleItemIndex ?: 0
         val startOffset = listState?.firstVisibleItemScrollOffset ?: 0
         // The screen may still be loading what its rows show, and a lazy list composes only what is near the screen: so wait for the
@@ -122,9 +136,13 @@ fun ProvideRowFocus(
         target.showWithRoomBelow(containerHeight)
         delay(SETTLE_MILLIS)
         target.showWithRoomBelow(containerHeight)
-        focus.flashing = key
-        delay(FLASH_HOLD_MILLIS)
-        focus.flashing = null
+        focus.shown = key
+        repeat(PULSES) {
+            focus.level = PEAK_ALPHA
+            delay(PULSE_HALF_MILLIS)
+            focus.level = STEADY_ALPHA
+            delay(PULSE_HALF_MILLIS)
+        }
     }
     CompositionLocalProvider(LocalRowFocus provides focus) { content() }
 }
@@ -154,7 +172,7 @@ internal fun Modifier.rowFocusTarget(key: String?): Modifier {
         onDispose { if (focus.targets[key] === target) focus.targets.remove(key) }
     }
     val alpha by animateFloatAsState(
-        targetValue = if (focus.flashing == key) FLASH_PEAK_ALPHA else 0f,
+        targetValue = if (focus.shown == key) focus.level else 0f,
         animationSpec = if (LocalReduceMotion.current) snap() else tween(FLASH_FADE_MILLIS),
         label = "rowFocusWash",
     )

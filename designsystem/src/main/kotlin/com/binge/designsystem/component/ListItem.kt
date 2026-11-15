@@ -129,7 +129,7 @@ data class ListItem(
     val checked: Boolean? = null,
     /**
      * A stable name for this row, for a screen that opens on a particular setting: [ProvideRowFocus] scrolls to the row that has
-     * it and washes it once. Rows without one are unaffected. Unique within the screen.
+     * it, pulses it and leaves it highlighted. Rows without one are unaffected. Unique within the screen.
      */
     val key: String? = null,
 )
