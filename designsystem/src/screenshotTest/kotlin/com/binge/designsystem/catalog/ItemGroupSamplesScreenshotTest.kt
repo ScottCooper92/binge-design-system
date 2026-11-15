@@ -181,4 +181,11 @@ class ItemGroupSamplesScreenshotTest {
     fun wrappingRows() {
         ItemGroupWrappingRowsSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun rowFocus() {
+        ItemGroupRowFocusSample()
+    }
 }
