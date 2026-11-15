@@ -47,10 +47,10 @@ private const val PULSE_HALF_MILLIS = 220L
 private const val PULSES = 2
 
 /** The wash at a pulse's peak: strong enough to find the row by, soft enough to read through. */
-private const val PEAK_ALPHA = 0.9f
+private const val PEAK_ALPHA = 1f
 
 /** The wash the row keeps once it has pulsed, until the screen is left or another row is asked for. */
-private const val STEADY_ALPHA = 0.55f
+private const val STEADY_ALPHA = 0.8f
 
 /** What a screen's [ListItem]s with a [ListItem.key] report to, so one of them can be found and shown. */
 @Stable
