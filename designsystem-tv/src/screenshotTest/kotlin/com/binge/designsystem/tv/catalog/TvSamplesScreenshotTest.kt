@@ -37,6 +37,11 @@ class TvSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun buttonLeadingContent() = Frame { TvButtonLeadingContentSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun buttonOnPanel() = Frame { TvButtonOnPanelSample() }
 
     @PreviewTest
