@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.click
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.input.ImeAction
 import com.binge.designsystem.R
@@ -122,5 +124,41 @@ class BingeSearchFieldBehaviourTest {
         rule.waitForIdle()
 
         rule.onNode(hasSetTextAction()).assertIsFocused()
+    }
+
+    private fun caret(): Int =
+        rule
+            .onNode(hasSetTextAction())
+            .fetchSemanticsNode()
+            .config[SemanticsProperties.TextSelectionRange]
+            .start
+
+    @Test
+    fun `a field that opens with a query has its caret at the end of it`() {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeSearchField(query = "hardware", onQueryChange = {}, onClear = {}, placeholder = PLACEHOLDER)
+            }
+        }
+        rule.waitForIdle()
+        assertEquals("hardware".length, caret())
+    }
+
+    @Test
+    fun `typing goes on from the caret, and a query set from outside puts the caret at its end`() {
+        var query by mutableStateOf("gpu")
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                BingeSearchField(query = query, onQueryChange = { query = it }, onClear = { query = "" }, placeholder = PLACEHOLDER)
+            }
+        }
+        rule.onNode(hasSetTextAction()).performTextInput("s")
+        rule.waitForIdle()
+        assertEquals("gpus", query)
+        assertEquals(4, caret())
+
+        query = "transcoding"
+        rule.waitForIdle()
+        assertEquals("transcoding".length, caret())
     }
 }
