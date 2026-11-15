@@ -1,10 +1,13 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.getValue
@@ -73,6 +76,26 @@ class RowFocusTest {
         show(null)
         rule.waitForIdle()
         rule.onNodeWithText("Row 0.0").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a row far down a plain scrolling column is scrolled to and shown`() {
+        rule.setContent {
+            ProvideRowFocus(key = "r-30-1") {
+                Column(modifier = Modifier.fillMaxWidth().height(300.dp).verticalScroll(rememberScrollState())) {
+                    repeat(GROUPS) { group ->
+                        ItemGroup(
+                            title = "Group $group",
+                            rows = List(
+                                ROWS,
+                            ) { row -> ListItem(icon = Icons.Filled.Settings, label = "Row $group.$row", key = "r-$group-$row") },
+                        )
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        rule.onNodeWithText("Row 30.1").assertIsDisplayed()
     }
 
     private companion object {

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Bookmark
@@ -655,7 +654,7 @@ fun ItemGroupWrappingRowsSample() {
 @Composable
 fun ItemGroupRowFocusSample() {
     ScreenshotTheme {
-        ProvideRowFocus(key = "https", listState = rememberLazyListState(), showAtPeak = true) {
+        ProvideRowFocus(key = "https", showAtPeak = true) {
             ItemGroup(
                 title = "Networking",
                 rows = listOf(

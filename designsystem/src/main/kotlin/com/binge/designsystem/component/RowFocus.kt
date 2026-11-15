@@ -44,19 +44,21 @@ internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
 
 /**
  * Brings the row whose [ListItem.key] is [key] into view and washes it once, for a screen that opens on a particular setting (a
- * search result, say). Wrap the screen's list in it and give [listState] the list's own state; with a null [key] it does nothing.
+ * search result, say). Wrap the screen in it; with a null [key] it does nothing.
  *
- * The row may belong to a group that is not composed yet, because a lazy list only composes what is near the screen. So the list is
- * stepped from the top, one item at a time, until the row reports itself, and then the row is scrolled to. A row that never appears
- * (the page does not have it, or the user may not see it) leaves the list where it began. The wash is a tonal fade in and out over
+ * A screen that scrolls a plain column (a form, say) composes every row at once, so the row is scrolled to as soon as it reports
+ * itself. A screen built on a lazy list passes that list's own [listState]: the row may belong to a group that is not composed yet,
+ * because a lazy list only composes what is near the screen, so the list is stepped from the top, one item at a time, until the row
+ * reports itself, and then the row is scrolled to. A row that never appears (the screen does not have it, or the user may not see
+ * it) leaves the list where it began. The wash is a tonal fade in and out over
  * about a second; under reduce motion it appears and goes without the fade. [showAtPeak] draws the wash on its row from the first
  * frame and never scrolls, for a screenshot of the state.
  */
 @Composable
 fun ProvideRowFocus(
     key: String?,
-    listState: LazyListState,
     modifier: Modifier = Modifier,
+    listState: LazyListState? = null,
     showAtPeak: Boolean = false,
     content: @Composable () -> Unit,
 ) {
@@ -64,10 +66,12 @@ fun ProvideRowFocus(
     if (showAtPeak) focus.flashing = key
     LaunchedEffect(key, showAtPeak) {
         if (key == null || showAtPeak) return@LaunchedEffect
-        val startIndex = listState.firstVisibleItemIndex
-        val startOffset = listState.firstVisibleItemScrollOffset
+        // A row's registration lands with the composition that follows this one.
+        withFrameNanos { }
+        val startIndex = listState?.firstVisibleItemIndex ?: 0
+        val startOffset = listState?.firstVisibleItemScrollOffset ?: 0
         var index = 0
-        while (focus.targets[key] == null && index < listState.layoutInfo.totalItemsCount) {
+        while (listState != null && focus.targets[key] == null && index < listState.layoutInfo.totalItemsCount) {
             listState.scrollToItem(index++)
             // Composition of the item the scroll brought near, and the row's registration, take a frame or two.
             withFrameNanos { }
@@ -75,7 +79,7 @@ fun ProvideRowFocus(
         }
         val requester = focus.targets[key]
         if (requester == null) {
-            listState.scrollToItem(startIndex, startOffset)
+            listState?.scrollToItem(startIndex, startOffset)
             return@LaunchedEffect
         }
         requester.bringIntoView()
