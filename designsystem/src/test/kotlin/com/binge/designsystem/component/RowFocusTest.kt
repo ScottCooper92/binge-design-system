@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.template.FormScreen
 import com.binge.designsystem.testing.createTakeDownComposeRule
+import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -123,6 +125,28 @@ class RowFocusTest {
         loaded = true
         rule.mainClock.advanceTimeBy(500)
         rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+        rule.onNodeWithText("Row 30.1").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a row far down a form screen with a collapsing bar is scrolled to and shown`() {
+        rule.setContent {
+            BingeExpressiveTheme {
+                ProvideRowFocus(key = "r-30-1") {
+                    FormScreen(title = "Form", onBack = {}) {
+                        repeat(GROUPS) { group ->
+                            ItemGroup(
+                                title = "Group $group",
+                                rows = List(
+                                    ROWS,
+                                ) { row -> ListItem(icon = Icons.Filled.Settings, label = "Row $group.$row", key = "r-$group-$row") },
+                            )
+                        }
+                    }
+                }
+            }
+        }
         rule.waitForIdle()
         rule.onNodeWithText("Row 30.1").assertIsDisplayed()
     }

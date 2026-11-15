@@ -20,6 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.unit.IntSize
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.theme.tonalContainer
 import kotlinx.coroutines.delay
@@ -35,6 +39,9 @@ private const val FIND_TIMEOUT_MILLIS = 4_000L
 private const val SETTLE_FRAMES = 3
 private const val SETTLE_MILLIS = 120L
 
+/** How much of the screen's height is asked for under the row, so the row ends up near the middle. */
+private const val ROOM_BELOW_SHARE = 0.45f
+
 /** The wash fading in and out, in milliseconds. Under reduce motion it snaps instead. */
 private const val FLASH_FADE_MILLIS = 300
 
@@ -44,8 +51,15 @@ private const val FLASH_PEAK_ALPHA = 0.9f
 /** What a screen's [ListItem]s with a [ListItem.key] report to, so one of them can be found and shown. */
 @Stable
 internal class RowFocus {
-    val targets = mutableMapOf<String, BringIntoViewRequester>()
+    val targets = mutableMapOf<String, RowTarget>()
     var flashing by mutableStateOf<String?>(null)
+}
+
+/** A keyed row: what scrolls to it, and its size, which is how much room it asks for. */
+internal class RowTarget(
+    val requester: BringIntoViewRequester,
+) {
+    var size: IntSize = IntSize.Zero
 }
 
 internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
@@ -71,6 +85,7 @@ fun ProvideRowFocus(
     content: @Composable () -> Unit,
 ) {
     val focus = remember { RowFocus() }
+    val containerHeight = LocalWindowInfo.current.containerSize.height
     if (showAtPeak) focus.flashing = key
     LaunchedEffect(key, showAtPeak) {
         if (key == null || showAtPeak) return@LaunchedEffect
@@ -78,7 +93,7 @@ fun ProvideRowFocus(
         val startOffset = listState?.firstVisibleItemScrollOffset ?: 0
         // The screen may still be loading what its rows show, and a lazy list composes only what is near the screen: so wait for the
         // row to report itself, stepping a lazy list from the top meanwhile (and again if its items change as the screen loads).
-        val requester =
+        val target =
             withTimeoutOrNull(FIND_TIMEOUT_MILLIS) {
                 var scanned = 0
                 var total = -1
@@ -97,21 +112,32 @@ fun ProvideRowFocus(
                 }
                 found
             }
-        if (requester == null) {
+        if (target == null) {
             listState?.scrollToItem(startIndex, startOffset)
             return@LaunchedEffect
         }
         // A screen that has just loaded is still settling its sizes, so the scroll range may not reach the row yet: let a few frames
         // pass, scroll, and scroll once more when the layout has had a moment to finish.
         repeat(SETTLE_FRAMES) { withFrameNanos { } }
-        requester.bringIntoView()
+        target.showWithRoomBelow(containerHeight)
         delay(SETTLE_MILLIS)
-        requester.bringIntoView()
+        target.showWithRoomBelow(containerHeight)
         focus.flashing = key
         delay(FLASH_HOLD_MILLIS)
         focus.flashing = null
     }
     CompositionLocalProvider(LocalRowFocus provides focus) { content() }
+}
+
+/**
+ * Scrolls to the row with some room below it. A plain "make it visible" scroll does the least it can, which leaves the row against the
+ * edge of the screen where a pinned footer can cover it; asking for the row and a share of the screen under it puts the row in the
+ * middle. A row near the end of a screen cannot go further than the end allows.
+ */
+private suspend fun RowTarget.showWithRoomBelow(containerHeight: Int) {
+    val width = size.width.toFloat()
+    val below = (containerHeight * ROOM_BELOW_SHARE).coerceAtLeast(size.height.toFloat())
+    requester.bringIntoView(Rect(0f, 0f, width, size.height + below))
 }
 
 /**
@@ -122,10 +148,10 @@ fun ProvideRowFocus(
 internal fun Modifier.rowFocusTarget(key: String?): Modifier {
     val focus = LocalRowFocus.current
     if (focus == null || key == null) return this
-    val requester = remember { BringIntoViewRequester() }
-    DisposableEffect(focus, key, requester) {
-        focus.targets[key] = requester
-        onDispose { if (focus.targets[key] === requester) focus.targets.remove(key) }
+    val target = remember { RowTarget(BringIntoViewRequester()) }
+    DisposableEffect(focus, key, target) {
+        focus.targets[key] = target
+        onDispose { if (focus.targets[key] === target) focus.targets.remove(key) }
     }
     val alpha by animateFloatAsState(
         targetValue = if (focus.flashing == key) FLASH_PEAK_ALPHA else 0f,
@@ -134,6 +160,7 @@ internal fun Modifier.rowFocusTarget(key: String?): Modifier {
     )
     val wash = MaterialTheme.colorScheme.primary.tonalContainer()
     return this
-        .bringIntoViewRequester(requester)
+        .bringIntoViewRequester(target.requester)
+        .onSizeChanged { target.size = it }
         .drawBehind { if (alpha > 0f) drawRect(wash, alpha = alpha) }
 }
