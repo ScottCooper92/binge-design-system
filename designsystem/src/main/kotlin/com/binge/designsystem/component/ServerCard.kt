@@ -1,6 +1,12 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -16,26 +22,43 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeSentiment
+import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.theme.accent
 
 /** The font scale from which the health pill drops under the address instead of sitting beside the name. */
 private const val SERVER_CARD_STACK_FONT_SCALE = 1.5f
 
-/** A status pill on a [ServerCard]: [label] names the state and [sentiment] colours it. */
+/**
+ * A status pill on a [ServerCard]: [label] names the state and [sentiment] colours it.
+ *
+ * With an [onClick] the pill is a button: it takes the button role, shows a ring in its accent when focused, and has a touch
+ * target of at least `min_touch_target`. It is drawn at its own size, so only its place in the card grows, and a row that
+ * holds one is taller than a row of plain pills. [onClickLabel] names what the tap does for a screen reader ("Open updates");
+ * the [label] stays the pill's name. Without an [onClick] the pill is drawn, and read, as it always was.
+ */
 data class ServerCardChip(
     val label: String,
     val sentiment: BingeSentiment,
+    val onClick: (() -> Unit)? = null,
+    val onClickLabel: String? = null,
 )
 
 /**
@@ -116,18 +139,18 @@ fun ServerCard(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
                 itemVerticalAlignment = Alignment.CenterVertically,
             ) {
-                chips.forEach { StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true) }
+                chips.forEach { ServerCardChipView(it) }
             }
         }
         if (stacked) {
             ServerCardText(title, subtitle, address)
-            statusChip?.let { StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true) }
+            statusChip?.let { ServerCardChipView(it) }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ServerCardText(title, subtitle, address, Modifier.weight(1f))
                 statusChip?.let {
                     Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
-                    StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true)
+                    ServerCardChipView(it)
                 }
             }
         }
@@ -138,6 +161,37 @@ fun ServerCard(
                 contentPadding = PaddingValues(),
             )
         }
+    }
+}
+
+/** A chip as the card draws it: the pill alone, or, with an [ServerCardChip.onClick], the pill as a button. */
+@Composable
+private fun ServerCardChipView(chip: ServerCardChip) {
+    val onClick = chip.onClick
+    if (onClick == null) {
+        StatusChip(label = chip.label, sentiment = chip.sentiment, singleLine = true)
+        return
+    }
+    val interactions = remember { MutableInteractionSource() }
+    val focused by interactions.collectIsFocusedAsState()
+    Box(
+        modifier = Modifier
+            .minimumInteractiveComponentSize()
+            .clip(BingeShapes.Pill)
+            .border(
+                width = dimensionResource(R.dimen.server_card_chip_focus_ring),
+                color = if (focused) chip.sentiment.accent() else Color.Transparent,
+                shape = BingeShapes.Pill,
+            ).clickable(
+                interactionSource = interactions,
+                indication = LocalIndication.current,
+                role = Role.Button,
+                onClickLabel = chip.onClickLabel,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        StatusChip(label = chip.label, sentiment = chip.sentiment, singleLine = true)
     }
 }
 

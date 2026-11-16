@@ -204,6 +204,8 @@
     <dimen name="status_chip_dot_size">7dp</dimen>
     <dimen name="status_chip_dot_halo_size">13dp</dimen>
     <dimen name="status_chip_dot_spacing">6dp</dimen>
+    <!-- The ring a tappable server-card chip shows while focused, so a keyboard or D-pad user sees where they are -->
+    <dimen name="server_card_chip_focus_ring">2dp</dimen>
     <!-- BingeSnackbar — the floating pill (horizontal inset reuses padding_m) -->
     <dimen name="snackbar_elevation">6dp</dimen>
     <!-- M3's snackbar height: 48dp at one line, 68dp at two. The min holds the first, and the text's

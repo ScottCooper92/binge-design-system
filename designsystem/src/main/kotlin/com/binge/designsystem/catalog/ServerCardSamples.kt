@@ -45,6 +45,22 @@ fun ServerCardAllChipsSample() {
     }
 }
 
+/** A server card whose "Update available" pill is a button: drawn at the pill's own size, with the touch target around it. */
+@Composable
+fun ServerCardTappableChipSample() {
+    ScreenshotTheme {
+        ServerCard(
+            title = "Home server",
+            logo = logo(),
+            subtitle = "Jellyseerr 2.5.2",
+            address = "https://requests.example.com",
+            chips = listOf(ServerCardChip("Update available", BingeSentiment.Caution, onClick = {}, onClickLabel = "Open updates")),
+            statusChip = health,
+            stats = threeStats,
+        )
+    }
+}
+
 /** A server card with no pill beside the logo and three totals: the health pill alone. */
 @Composable
 fun ServerCardPlainSample() {
