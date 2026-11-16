@@ -228,6 +228,38 @@ fun BingeMultiChoiceSheetSample() {
 }
 
 /**
+ * A filter that matches nothing, in the single-choice list and the multi-choice list: a search-off glyph over one line where
+ * the rows were. The first says the design system's own "No matches"; the second says the words its caller gave.
+ */
+@Composable
+fun BingeChoiceSheetNoMatchSample() {
+    ScreenshotTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l))) {
+            SheetFrame(docked = false, title = REGION_TITLE) {
+                SingleChoiceList(
+                    choices = BingeChoiceList.Ready(SampleRegions),
+                    selected = "Japan",
+                    filterPlaceholder = FILTER,
+                    initialQuery = "zzz",
+                    onSelect = {},
+                )
+            }
+            SheetFrame(docked = false, title = LANGUAGES_TITLE, actions = true) {
+                MultiChoiceList(
+                    choices = BingeChoiceList.Ready(SampleLanguages),
+                    chosen = setOf("ja"),
+                    leading = setOf("ja"),
+                    filterPlaceholder = FILTER,
+                    noMatchLabel = "No languages match",
+                    onCheckedChange = { _, _ -> },
+                    initialQuery = "zzz",
+                )
+            }
+        }
+    }
+}
+
+/**
  * A multi-choice sheet that applies each tick as it is made, for a setting saved as it changes: Clear in the header and
  * no Done, since there is nothing left to confirm.
  */
