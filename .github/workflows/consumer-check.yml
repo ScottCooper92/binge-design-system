@@ -1,6 +1,6 @@
 name: Consumer check
 
-# Informational. Compiles binge-seerr, binge-archive and binge-jellyfin, the public consumers of this repository,
+# Informational. Compiles binge-seerr, binge-archive and ephyra, the public consumers of this repository,
 # against this PR's head commit, because a green build here says nothing about a consumer: a changed
 # public signature is otherwise noticed only by the bump PR that arrives after it merged. Each job is
 # binge-ci's consumer-check workflow; this file owns the triggers and says what to compile.
@@ -71,5 +71,5 @@ jobs:
   jellyfin:
     uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0645bdd0319cbada073d6ca2585a17440d37f8f6 # v1
     with:
-      consumer: ScottCooper92/binge-jellyfin
+      consumer: ScottCooper92/ephyra
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'

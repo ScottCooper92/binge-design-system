@@ -44,7 +44,7 @@
       groupName: "compose + kotlin toolchain",
       automerge: false,
       prBodyNotes: [
-        "**Needs matching bumps in `Binge`, `binge-seerr`, `binge-archive` and `binge-jellyfin`.** The root `libs.versions.toml` is not a local decision: Compose, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
+        "**Needs matching bumps in `Binge`, `binge-seerr`, `binge-archive` and `ephyra`.** The root `libs.versions.toml` is not a local decision: Compose, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
       ],
     },
     {
@@ -55,7 +55,7 @@
       groupName: "android gradle plugin",
       automerge: false,
       prBodyNotes: [
-        "**Moves in lockstep with `Binge`, `binge-seerr`, `binge-archive` and `binge-jellyfin`.** Gradle rejects two AGP versions in one build, so the consumers' `consumer-check` stays red until each one bumps `agp` to the same version in its own catalog. Merge this together with those bumps, not before.",
+        "**Moves in lockstep with `Binge`, `binge-seerr`, `binge-archive` and `ephyra`.** Gradle rejects two AGP versions in one build, so the consumers' `consumer-check` stays red until each one bumps `agp` to the same version in its own catalog. Merge this together with those bumps, not before.",
       ],
     },
     {
