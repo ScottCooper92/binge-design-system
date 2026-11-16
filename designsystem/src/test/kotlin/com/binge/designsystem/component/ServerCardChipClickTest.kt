@@ -8,7 +8,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
@@ -35,9 +35,16 @@ class ServerCardChipClickTest {
     private val isButton = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button)
     private val hasClick = SemanticsMatcher.keyIsDefined(SemanticsActions.OnClick)
 
-    private fun show(chip: ServerCardChip) {
+    private fun show(chip: ServerCardChip, statusChip: ServerCardChip? = null) {
         rule.setContent {
-            TestTheme { ServerCard(title = "Home", logo = rememberVectorPainter(Icons.Filled.Tv), chips = listOf(chip)) }
+            TestTheme {
+                ServerCard(
+                    title = "Home",
+                    logo = rememberVectorPainter(Icons.Filled.Tv),
+                    chips = listOf(chip),
+                    statusChip = statusChip,
+                )
+            }
         }
     }
 
@@ -52,19 +59,35 @@ class ServerCardChipClickTest {
     }
 
     @Test
-    fun `the click label names the action and the label stays the chip's name`() {
-        show(ServerCardChip("Update available", BingeSentiment.Caution, onClick = {}, onClickLabel = "Open updates"))
+    fun `a content description replaces the spoken label of a tappable chip`() {
+        show(ServerCardChip("Update available", BingeSentiment.Caution, onClick = {}, contentDescription = "Release notes"))
 
-        val node = rule.onNodeWithText("Update available").fetchSemanticsNode()
-        assertEquals("Open updates", node.config[SemanticsActions.OnClick].label)
-        rule.onNode(hasText("Update available")).assert(isButton)
+        rule.onNodeWithContentDescription("Release notes").assert(isButton)
+        rule.onNodeWithText("Update available").assertDoesNotExist()
+    }
+
+    @Test
+    fun `a tappable chip with no content description reads its label`() {
+        show(ServerCardChip("Update available", BingeSentiment.Caution, onClick = {}))
+
+        rule.onNodeWithText("Update available").assert(isButton)
     }
 
     @Test
     fun `a chip with no onClick is not a button and has no click action`() {
-        show(ServerCardChip("Update available", BingeSentiment.Caution))
+        show(ServerCardChip("Update available", BingeSentiment.Caution, contentDescription = "Release notes"))
 
         rule.onNodeWithText("Update available").assert(!isButton).assert(!hasClick)
+    }
+
+    @Test
+    fun `the status chip stays a label even when it carries an onClick`() {
+        show(
+            ServerCardChip("Demo", BingeSentiment.Caution),
+            statusChip = ServerCardChip("Connected", BingeSentiment.Positive, onClick = {}),
+        )
+
+        rule.onNodeWithText("Connected").assert(!isButton).assert(!hasClick)
     }
 
     @Test

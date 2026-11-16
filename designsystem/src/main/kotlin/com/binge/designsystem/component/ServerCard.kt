@@ -36,6 +36,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.resolvedContentPadding
@@ -49,16 +52,17 @@ private const val SERVER_CARD_STACK_FONT_SCALE = 1.5f
 /**
  * A status pill on a [ServerCard]: [label] names the state and [sentiment] colours it.
  *
- * With an [onClick] the pill is a button: it takes the button role, shows a ring in its accent when focused, and has a touch
- * target of at least `min_touch_target`. It is drawn at its own size, so only its place in the card grows, and a row that
- * holds one is taller than a row of plain pills. [onClickLabel] names what the tap does for a screen reader ("Open updates");
- * the [label] stays the pill's name. Without an [onClick] the pill is drawn, and read, as it always was.
+ * In [ServerCard]'s `chips`, an [onClick] makes the pill a button: it takes the button role, shows a ring in its accent when
+ * focused, and has a touch target of at least `min_touch_target`. It is drawn at its own size, so only its place in the card
+ * grows, and a row that holds one is taller than a row of plain pills. [contentDescription] is what a screen reader says for
+ * such a pill ("Release notes"); null reads the [label]. The `statusChip` stays a label whatever it carries: only `chips` take
+ * a click. Without an [onClick] the pill is drawn, and read, as it always was, and [contentDescription] is not used.
  */
 data class ServerCardChip(
     val label: String,
     val sentiment: BingeSentiment,
     val onClick: (() -> Unit)? = null,
-    val onClickLabel: String? = null,
+    val contentDescription: String? = null,
 )
 
 /**
@@ -144,13 +148,13 @@ fun ServerCard(
         }
         if (stacked) {
             ServerCardText(title, subtitle, address)
-            statusChip?.let { ServerCardChipView(it) }
+            statusChip?.let { StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true) }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 ServerCardText(title, subtitle, address, Modifier.weight(1f))
                 statusChip?.let {
                     Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
-                    ServerCardChipView(it)
+                    StatusChip(label = it.label, sentiment = it.sentiment, singleLine = true)
                 }
             }
         }
@@ -174,6 +178,7 @@ private fun ServerCardChipView(chip: ServerCardChip) {
     }
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
+    val description = chip.contentDescription
     Box(
         modifier = Modifier
             .minimumInteractiveComponentSize()
@@ -182,16 +187,17 @@ private fun ServerCardChipView(chip: ServerCardChip) {
                 width = dimensionResource(R.dimen.server_card_chip_focus_ring),
                 color = if (focused) chip.sentiment.accent() else Color.Transparent,
                 shape = BingeShapes.Pill,
-            ).clickable(
-                interactionSource = interactions,
-                indication = LocalIndication.current,
-                role = Role.Button,
-                onClickLabel = chip.onClickLabel,
-                onClick = onClick,
-            ),
+            ).clickable(interactionSource = interactions, indication = LocalIndication.current, role = Role.Button, onClick = onClick)
+            .then(if (description != null) Modifier.semantics { contentDescription = description } else Modifier),
         contentAlignment = Alignment.Center,
     ) {
-        StatusChip(label = chip.label, sentiment = chip.sentiment, singleLine = true)
+        // With a description of its own, the pill's text is not read a second time beside it.
+        StatusChip(
+            label = chip.label,
+            sentiment = chip.sentiment,
+            singleLine = true,
+            modifier = if (description != null) Modifier.clearAndSetSemantics {} else Modifier,
+        )
     }
 }
 
