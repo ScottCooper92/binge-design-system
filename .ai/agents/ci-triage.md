@@ -22,7 +22,7 @@ than one failure — fix them all, or say which you did not.
 
 **A green build here does not mean a green build in the consumers.**
 
-`consumer-check` compiles binge-seerr, binge-archive and binge-jellyfin informationally, and Binge is
+`consumer-check` compiles binge-seerr, binge-archive and ephyra informationally, and Binge is
 private and is not compiled. If a repair changes a public signature — a parameter, a return type, a
 component's name — it is a change in four other codebases that will not notice until their next sync.
 
