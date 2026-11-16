@@ -20,6 +20,15 @@ class ServerCardSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @WorstCaseFontPreviews
+    @FontScalePreviews
+    @Composable
+    fun TappableChip() {
+        ServerCardTappableChipSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
     @Composable
     fun Plain() {
         ServerCardPlainSample()
