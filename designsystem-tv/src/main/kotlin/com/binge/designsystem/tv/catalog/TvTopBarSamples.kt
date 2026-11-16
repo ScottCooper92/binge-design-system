@@ -3,13 +3,10 @@
 package com.binge.designsystem.tv.catalog
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
@@ -26,27 +23,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
-import com.binge.designsystem.theme.BingeShapes
-import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.component.TvButton
 import com.binge.designsystem.tv.component.TvIconButton
-import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.nav.BingeTvTopBar
+import com.binge.designsystem.tv.nav.TvAvatarButton
 import com.binge.designsystem.tv.nav.TvNavItem
 import com.binge.designsystem.tv.nav.TvTopBarSurface
-import com.binge.designsystem.tv.R as TvR
 
 private const val TOP_BAR_ART_FRACTION = 0.3f
 
@@ -217,21 +207,13 @@ private fun TvTopBarTrailingBar(items: List<TvNavItem>, header: TvNavItem?) {
 @Composable
 private fun SampleAvatarButton(modifier: Modifier = Modifier) {
     var focused by remember { mutableStateOf(false) }
-    val slot = dimensionResource(TvR.dimen.tv_icon_button_diameter)
-    val diameter = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
-    val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
-    Box(modifier = modifier.size(slot), contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .size(diameter)
-                .clip(BingeShapes.Pill)
-                .border(ring, if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent, BingeShapes.Pill)
-                .tvClickable(role = Role.Button, onFocusChanged = { focused = it }, onClick = {})
-                .clearAndSetSemantics { contentDescription = "Account" }
-                .padding(ring),
-            contentAlignment = Alignment.Center,
-        ) {
-            BingeTvInitialsAvatar(name = "Alexander Hamilton", size = diameter - ring * 2)
-        }
-    }
+    TvAvatarButton(
+        name = "Alexander Hamilton",
+        avatarUrl = null,
+        ringColor = if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+        onFocusChanged = { focused = it },
+        onClick = {},
+        semantics = { contentDescription = "Account" },
+        modifier = modifier,
+    )
 }
