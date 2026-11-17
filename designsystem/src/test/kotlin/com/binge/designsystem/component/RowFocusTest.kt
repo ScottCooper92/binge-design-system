@@ -11,6 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -209,6 +212,53 @@ class RowFocusTest {
 
         rule.onNodeWithText("Row 30.1").assertIsDisplayed()
         assertEquals(before, backButtonBounds())
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun `a sliding top bar stays shown and scrimmed over a row scrolled to`() {
+        // The bar stays put, but it must still know the body has moved under it: its scrim fades in with how far the content has
+        // passed, so a bar that never heard of the scroll would sit transparent over the rows.
+        var key by mutableStateOf<String?>(null)
+        lateinit var behavior: TopAppBarScrollBehavior
+        rule.setContent {
+            BingeExpressiveTheme {
+                behavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+                ProvideRowFocus(key = key) {
+                    FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Small, scrollBehavior = behavior) { rows() }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        key = "r-30-1"
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Row 30.1").assertIsDisplayed()
+        assertEquals(0f, behavior.state.heightOffset, 0f)
+        assertEquals(1f, behavior.state.overlappedFraction, 0f)
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun `a collapsing top bar still collapses over a row scrolled to`() {
+        // Only the sliding bar was hidden by the scroll; the collapsing one arrives collapsed and scrimmed, as it should.
+        var key by mutableStateOf<String?>(null)
+        lateinit var behavior: TopAppBarScrollBehavior
+        rule.setContent {
+            BingeExpressiveTheme {
+                behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+                ProvideRowFocus(key = key) {
+                    FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Collapsing, scrollBehavior = behavior) { rows() }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        key = "r-30-1"
+        rule.waitForIdle()
+
+        assertEquals(1f, behavior.state.collapsedFraction, 0f)
     }
 
     @Test

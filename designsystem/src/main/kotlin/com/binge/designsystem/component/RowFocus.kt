@@ -6,7 +6,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -65,16 +67,20 @@ internal class RowFocus {
     var shown by mutableStateOf<String?>(null)
     var level by mutableStateOf(0f)
 
-    /** True while [ProvideRowFocus] is scrolling to a row, as opposed to the user scrolling. A top bar does not follow that scroll. */
+    /** True while [ProvideRowFocus] is scrolling to a row, as opposed to the user scrolling. A sliding top bar does not move for it. */
     var scrolling by mutableStateOf(false)
 }
 
 /**
- * This connection, except that it takes no part in a scroll that [focus] is making to bring a row into view. A top bar's scroll behaviour reads the
- * body's scroll to collapse or hide the bar, and that is right for the user's own scroll; a screen that opens on a row scrolls on its own, and the bar
- * must still be there when it arrives. A null [focus] changes nothing.
+ * This connection, except that a scroll [focus] is making to bring a row into view does not move the bar's height. A sliding bar's scroll
+ * behaviour reads the body's scroll as the user scrolling down and hides the bar; that is right for the user's own scroll, but a screen that
+ * opens on a row scrolls on its own, and the bar must still be there when it arrives.
+ *
+ * The bar still hears of the scroll after the fact: its scrim fades in with how far the content has passed under it, which it tracks from the
+ * same callback that moves its height. So the delegate is still called, and only the height it moved is put back. A null [focus] changes nothing.
  */
-internal fun NestedScrollConnection.ignoringRowFocusScroll(focus: RowFocus?): NestedScrollConnection {
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun NestedScrollConnection.keepingBarHeightDuringRowFocus(focus: RowFocus?, barState: TopAppBarState): NestedScrollConnection {
     if (focus == null) return this
     val delegate = this
     return object : NestedScrollConnection {
@@ -85,7 +91,13 @@ internal fun NestedScrollConnection.ignoringRowFocusScroll(focus: RowFocus?): Ne
             consumed: Offset,
             available: Offset,
             source: NestedScrollSource,
-        ): Offset = if (focus.scrolling) Offset.Zero else delegate.onPostScroll(consumed, available, source)
+        ): Offset {
+            if (!focus.scrolling) return delegate.onPostScroll(consumed, available, source)
+            val height = barState.heightOffset
+            val result = delegate.onPostScroll(consumed, available, source)
+            barState.heightOffset = height
+            return result
+        }
 
         override suspend fun onPreFling(available: Velocity): Velocity = delegate.onPreFling(available)
 
@@ -115,7 +127,7 @@ internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
  * it changes level without the fade. [showAtPeak] draws the wash on its row from the first
  * frame and never scrolls, for a screenshot of the state; it is not for an app's own screens.
  *
- * The screen's top bar does not follow this scroll: only the user's own scroll collapses or hides it. For that, wrap the scaffold in it, as the lazy and
+ * A sliding top bar (`ScreenBar.Small`) does not slide away for this scroll: only the user's own scroll hides it. For that, wrap the scaffold in it, as the lazy and
  * plain screens here do, so the scaffold can see it.
  *
  * A row is looked for again only when [key] changes. To show the same row again, set the key to null, let a frame pass (composition has to
