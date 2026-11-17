@@ -265,7 +265,9 @@ class RowFocusTest {
     fun `the user's own scroll still hides a sliding top bar`() {
         rule.setContent {
             BingeExpressiveTheme {
-                FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Small) { rows() }
+                ProvideRowFocus(key = null) {
+                    FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Small) { rows() }
+                }
             }
         }
         rule.waitForIdle()
