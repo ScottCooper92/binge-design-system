@@ -1,14 +1,9 @@
 package com.binge.designsystem.component
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
@@ -25,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
@@ -40,7 +34,6 @@ import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
-import com.binge.designsystem.theme.LocalReduceMotion
 
 /**
  * A landscape (16:9) tile with a backdrop image behind a text scrim and the category's [title] on it,
@@ -158,7 +151,7 @@ fun categoryTileHeight(): Dp = dimensionResource(R.dimen.category_tile_width) / 
 
 /**
  * The frame both tiles share: the landscape size, the [BingeShapes.MediaCard] corner, the press scale
- * (off under reduced motion, as [MediaCard]'s is) and a single click target that announces [label] as
+ * ([pressScale], shared with [MediaCard]) and a single click target that announces [label] as
  * one item. The children's own text and images are merged away so the tile reads once.
  */
 @Composable
@@ -169,25 +162,12 @@ private fun CategoryTileFrame(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val reduceMotion = LocalReduceMotion.current
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed && !reduceMotion) PRESSED_SCALE else 1f,
-        animationSpec = if (reduceMotion) {
-            snap()
-        } else {
-            spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium)
-        },
-        label = "category-tile-press-scale",
-    )
     Box(
         modifier = modifier
             .width(dimensionResource(R.dimen.category_tile_width))
             .aspectRatio(TILE_ASPECT_RATIO)
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }.clip(BingeShapes.MediaCard)
+            .pressScale(interactionSource)
+            .clip(BingeShapes.MediaCard)
             .clickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
@@ -202,7 +182,6 @@ private fun CategoryTileFrame(
 }
 
 private const val TILE_ASPECT_RATIO = 16f / 9f
-private const val PRESSED_SCALE = 0.95f
 private const val SCRIM_START = 0.35f
 private const val SCRIM_TOP_ALPHA = 0.1f
 private const val SCRIM_BOTTOM_ALPHA = 0.75f
