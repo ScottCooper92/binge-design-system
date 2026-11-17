@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -80,7 +81,8 @@ private const val STEP_SLIDE_MILLIS = 280
  * slides the whole step across, and the outgoing one must keep drawing itself while it leaves. A step whose
  * content scrolls itself, a lazy grid, returns false from [contentScrolls] and gets the remaining height instead.
  * [scrollBehavior] is [BingeScreenScaffold]'s, for a caller that owns the bar's state; an untitled flow's bar is
- * pinned by default. [barChrome] is [BingeScreenScaffold]'s, the plain bar for a flow with nothing under it. Beside a list pane the first step's Back is dropped, as the scaffold does, but a step back always shows. The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
+ * pinned by default. [barChrome] is [BingeScreenScaffold]'s, the plain bar for a flow with nothing under it. [actions] are
+ * [BingeScreenScaffold]'s too: what sits at the end of the bar on every step, such as an overflow menu a user needs before they can reach any settings. Beside a list pane the first step's Back is dropped, as the scaffold does, but a step back always shows. The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,6 +100,7 @@ fun StepFlowScreen(
     onExit: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     barChrome: ScreenBarChrome = ScreenBarChrome.Glass,
+    actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     content: @Composable ColumnScope.(step: Int) -> Unit,
 ) {
     val back = if (currentStep > 0) onBack else onExit
@@ -121,6 +124,7 @@ fun StepFlowScreen(
             scrollBehavior = scrollBehavior ?: ownBehavior,
             header = if (stepCount > 1) ({ StepReadOut(stepCount, currentStep) }) else null,
             barChrome = barChrome,
+            actions = actions,
         ) { padding ->
             ScreenBody(padding) { inner ->
                 val expandedWidth = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
