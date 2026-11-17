@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,9 +27,12 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -703,8 +707,16 @@ fun StepFlowScreenPlainChromeSample() {
     SampleStepFlow(ScreenBarChrome.Plain)
 }
 
+/** The same step with an action at the end of its bar, the three-dot menu a first-run flow offers before any settings are in reach. */
 @Composable
-private fun SampleStepFlow(barChrome: ScreenBarChrome) {
+fun StepFlowScreenActionsSample() {
+    SampleStepFlow(ScreenBarChrome.Plain) {
+        IconButton(onClick = {}) { Icon(Icons.Filled.MoreVert, contentDescription = "More options") }
+    }
+}
+
+@Composable
+private fun SampleStepFlow(barChrome: ScreenBarChrome, actions: @Composable RowScope.() -> Unit = {}) {
     var step by remember { mutableIntStateOf(1) }
     val leave = LocalDemoBack.current
     val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
@@ -714,6 +726,7 @@ private fun SampleStepFlow(barChrome: ScreenBarChrome) {
             currentStep = step,
             onBack = { if (step > 0) step-- else leave() },
             barChrome = barChrome,
+            actions = { actions() },
             aside = {
                 Box(
                     modifier =

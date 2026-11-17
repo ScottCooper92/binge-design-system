@@ -295,6 +295,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun stepFlowPlainChrome() = StepFlowScreenPlainChromeSample()
 
+    /** The plain bar with an action at its end: the overflow menu a flow offers before any settings are in reach. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowActions() = StepFlowScreenActionsSample()
+
     @PreviewTest
     @ScreenStatePreview
     @Composable
