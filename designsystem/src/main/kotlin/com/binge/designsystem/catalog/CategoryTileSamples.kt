@@ -33,7 +33,7 @@ private const val LOGO_HEIGHT_PX = 160
  * stretch a fixed-width tile to the frame; a row or column in an app never does.
  */
 @Composable
-private fun LooseFrame(content: @Composable () -> Unit) {
+internal fun LooseFrame(content: @Composable () -> Unit) {
     Box(Modifier.wrapContentSize(Alignment.TopStart)) { content() }
 }
 
