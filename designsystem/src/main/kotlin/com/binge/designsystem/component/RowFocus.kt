@@ -20,10 +20,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.Velocity
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.theme.tonalContainer
 import kotlinx.coroutines.delay
@@ -60,6 +64,33 @@ internal class RowFocus {
     /** The row washed now, and how strongly. */
     var shown by mutableStateOf<String?>(null)
     var level by mutableStateOf(0f)
+
+    /** True while [ProvideRowFocus] is scrolling to a row, as opposed to the user scrolling. A top bar does not follow that scroll. */
+    var scrolling by mutableStateOf(false)
+}
+
+/**
+ * This connection, except that it takes no part in a scroll that [focus] is making to bring a row into view. A top bar's scroll behaviour reads the
+ * body's scroll to collapse or hide the bar, and that is right for the user's own scroll; a screen that opens on a row scrolls on its own, and the bar
+ * must still be there when it arrives. A null [focus] changes nothing.
+ */
+internal fun NestedScrollConnection.ignoringRowFocusScroll(focus: RowFocus?): NestedScrollConnection {
+    if (focus == null) return this
+    val delegate = this
+    return object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset =
+            if (focus.scrolling) Offset.Zero else delegate.onPreScroll(available, source)
+
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource,
+        ): Offset = if (focus.scrolling) Offset.Zero else delegate.onPostScroll(consumed, available, source)
+
+        override suspend fun onPreFling(available: Velocity): Velocity = delegate.onPreFling(available)
+
+        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity = delegate.onPostFling(consumed, available)
+    }
 }
 
 /** A keyed row: what scrolls to it, and its size, which is how much room it asks for. */
@@ -83,6 +114,9 @@ internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
  * steady highlight, which stays until the screen is left or another row is asked for, as Android's Settings does; under reduce motion
  * it changes level without the fade. [showAtPeak] draws the wash on its row from the first
  * frame and never scrolls, for a screenshot of the state; it is not for an app's own screens.
+ *
+ * The screen's top bar does not follow this scroll: only the user's own scroll collapses or hides it. For that, wrap the scaffold in it, as the lazy and
+ * plain screens here do, so the scaffold can see it.
  *
  * A row is looked for again only when [key] changes. To show the same row again, set the key to null, let a frame pass (composition has to
  * see the null), and then set it back.
@@ -135,9 +169,9 @@ fun ProvideRowFocus(
         // A screen that has just loaded is still settling its sizes, so the scroll range may not reach the row yet: let a few frames
         // pass, scroll, and scroll once more when the layout has had a moment to finish.
         repeat(SETTLE_FRAMES) { withFrameNanos { } }
-        target.showWithRoomBelow(containerHeight)
+        focus.scrollTo(target, containerHeight)
         delay(SETTLE_MILLIS)
-        target.showWithRoomBelow(containerHeight)
+        focus.scrollTo(target, containerHeight)
         focus.shown = key
         repeat(PULSES) {
             focus.level = PEAK_ALPHA
@@ -147,6 +181,16 @@ fun ProvideRowFocus(
         }
     }
     CompositionLocalProvider(LocalRowFocus provides focus) { content() }
+}
+
+/** Scrolls to [target] while marking it as this focus's own scroll, which a top bar's scroll behaviour ignores. */
+private suspend fun RowFocus.scrollTo(target: RowTarget, containerHeight: Int) {
+    scrolling = true
+    try {
+        target.showWithRoomBelow(containerHeight)
+    } finally {
+        scrolling = false
+    }
 }
 
 /**

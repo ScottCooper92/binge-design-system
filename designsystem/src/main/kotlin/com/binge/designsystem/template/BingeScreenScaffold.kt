@@ -44,7 +44,9 @@ import com.binge.designsystem.component.BingeLargeTopBar
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.BingeTopBar
+import com.binge.designsystem.component.LocalRowFocus
 import com.binge.designsystem.component.OverlaidHeaderContent
+import com.binge.designsystem.component.ignoringRowFocusScroll
 import com.binge.designsystem.paneBackOrNull
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentInset
@@ -130,12 +132,13 @@ fun BingeScreenScaffold(
     val ownBehavior = rememberScreenBarScrollBehavior(bar)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
     val scrim = screenBarScrim(bar, behavior)
+    val rowFocus = LocalRowFocus.current
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
     // What an ancestor already reserved, such as the custom rail's start inset, is not reserved again (#372).
     var consumed by remember { mutableStateOf(WindowInsets(0, 0, 0, 0)) }
     Scaffold(
-        modifier = (behavior?.let { modifier.nestedScroll(it.nestedScrollConnection) } ?: modifier)
+        modifier = (behavior?.let { modifier.nestedScroll(it.nestedScrollConnection.ignoringRowFocusScroll(rowFocus)) } ?: modifier)
             .onConsumedWindowInsetsChanged { consumed = it },
         contentWindowInsets = WindowInsets(0),
         topBar = {
