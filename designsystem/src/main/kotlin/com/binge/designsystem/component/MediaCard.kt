@@ -283,12 +283,17 @@ private fun MediaCardOverlays(
     }
 }
 
-/** The chip's wash is translucent, so it sits on a solid surface rather than straight on the artwork. */
+/**
+ * The chip's wash is translucent, so it sits on a solid surface rather than straight on the artwork. It is one line, cut with an
+ * ellipsis where the label does not fit: wrapped inside a poster's width, a larger font scale breaks a word across lines and
+ * stacks the chip down the artwork.
+ */
 @Composable
 private fun MediaCardStatusChip(status: MediaCardStatus) {
     StatusChip(
         label = status.label,
         sentiment = status.sentiment,
+        singleLine = true,
         modifier = Modifier
             .clip(BingeShapes.Pill)
             .background(MaterialTheme.colorScheme.surface),
