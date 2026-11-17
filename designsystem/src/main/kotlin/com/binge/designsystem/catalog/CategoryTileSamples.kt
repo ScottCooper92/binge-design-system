@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import com.binge.designsystem.component.BackdropTile
 import com.binge.designsystem.component.LogoTile
 import com.binge.designsystem.component.MediaCarousel
+import com.binge.designsystem.component.categoryTileHeight
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.preview.WithPreviewImage
 
@@ -107,10 +108,22 @@ fun CategoryTileRowSample() {
     ScreenshotTheme {
         WithPreviewImage(BACKDROP_WIDTH_PX, BACKDROP_HEIGHT_PX) {
             Column {
-                MediaCarousel(title = "Genres", items = genres, itemKey = { it }, onMoreClick = {}) { _, genre ->
+                MediaCarousel(
+                    title = "Genres",
+                    items = genres,
+                    itemKey = { it },
+                    onMoreClick = {},
+                    endTileHeight = categoryTileHeight(),
+                ) { _, genre ->
                     BackdropTile(title = genre, imageUrl = BACKDROP_URL, onClick = {})
                 }
-                MediaCarousel(title = "Studios", items = studios, itemKey = { it }, onMoreClick = {}) { _, studio ->
+                MediaCarousel(
+                    title = "Studios",
+                    items = studios,
+                    itemKey = { it },
+                    onMoreClick = {},
+                    endTileHeight = categoryTileHeight(),
+                ) { _, studio ->
                     LogoTile(name = studio, logoUrl = null, onClick = {})
                 }
             }

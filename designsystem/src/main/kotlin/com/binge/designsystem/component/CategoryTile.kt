@@ -35,6 +35,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
@@ -150,6 +151,10 @@ private fun LogoTileName(name: String) {
         )
     }
 }
+
+/** The height of a [BackdropTile] or [LogoTile]: [R.dimen.category_tile_width] at 16:9. Pass it to [MediaCarousel]'s `endTileHeight` for a row of them. */
+@Composable
+fun categoryTileHeight(): Dp = dimensionResource(R.dimen.category_tile_width) / TILE_ASPECT_RATIO
 
 /**
  * The frame both tiles share: the landscape size, the [BingeShapes.MediaCard] corner, the press scale
