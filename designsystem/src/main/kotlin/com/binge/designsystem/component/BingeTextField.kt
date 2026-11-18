@@ -103,25 +103,18 @@ fun BingeTextField(
     // The String overload of OutlinedTextField starts its selection at 0, so a pre-filled field that takes focus without a tap (Next,
     // a focus requester) would put the caret before its text. Own the selection: it goes to the end when the field gains focus (a tap
     // that follows still places it where the user touched), follows the user from there, and goes back to the end when the value is
-    // changed from outside while focused. An unfocused field keeps the selection at 0, because a text field scrolls to its caret, and a
-    // long saved value (a URL) should show its start while nobody is editing it.
-    var field by remember { mutableStateOf(TextFieldValue(value)) }
-    val fieldValue =
-        when {
-            !focused -> TextFieldValue(value)
-            field.text == value -> field
-            else -> TextFieldValue(value, TextRange(value.length))
-        }
+    // changed from outside while focused. A value the caller rewrites from what was typed (a filter) keeps the caret where it was, moved
+    // by what was removed, rather than counting as a change from outside (#1158). An unfocused field keeps the selection at 0, because a
+    // text field scrolls to its caret, and a long saved value (a URL) should show its start while nobody is editing it.
+    val caret = rememberFieldCaret(value, TextFieldValue(value))
+    val fieldValue = if (focused) caret.shown(value) else TextFieldValue(value)
     val submit = {
         focusManager.clearFocus()
         onDone?.invoke()
     }
     OutlinedTextField(
         value = fieldValue,
-        onValueChange = {
-            field = it
-            if (it.text != value) onValueChange(it.text)
-        },
+        onValueChange = { if (caret.edit(it, value)) onValueChange(it.text) },
         label = { Text(if (required) stringResource(R.string.field_required_label, label) else label) },
         placeholder = placeholder?.let { { Text(it) } },
         enabled = enabled,
@@ -162,7 +155,7 @@ fun BingeTextField(
                 .fillMaxWidth()
                 .onFocusChanged {
                     focused = it.isFocused
-                    if (it.isFocused) field = TextFieldValue(value, TextRange(value.length))
+                    if (it.isFocused) caret.reset(TextFieldValue(value, TextRange(value.length)))
                 }.then(contentType?.let { type -> Modifier.semantics { this.contentType = type } } ?: Modifier),
     )
 }

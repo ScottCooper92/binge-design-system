@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -72,9 +71,10 @@ fun BingeSearchField(
     val interactionSource = remember { MutableInteractionSource() }
     // The String overload of BasicTextField starts its selection at 0, so a field that opens with a query (a screen restored on Back)
     // would put the caret before it. Own the selection: it starts at the end, follows the user once they move it, and goes back to the
-    // end when the query is changed from outside (a clear, a restore).
-    var field by remember { mutableStateOf(TextFieldValue(query, TextRange(query.length))) }
-    val shown = if (field.text == query) field else TextFieldValue(query, TextRange(query.length))
+    // end when the query is changed from outside (a clear, a restore). A query the caller rewrites from what was typed keeps the caret
+    // where it was (#1158).
+    val caret = rememberFieldCaret(query, TextFieldValue(query, TextRange(query.length)))
+    val shown = caret.shown(query)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -104,10 +104,7 @@ fun BingeSearchField(
         Box(modifier = Modifier.weight(1f)) {
             BasicTextField(
                 value = shown,
-                onValueChange = {
-                    field = it
-                    if (it.text != query) onQueryChange(it.text)
-                },
+                onValueChange = { if (caret.edit(it, query)) onQueryChange(it.text) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()

@@ -16,7 +16,9 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.test.requestFocus
+import androidx.compose.ui.text.TextRange
 import com.binge.designsystem.R
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
@@ -119,5 +121,48 @@ class BingeTextFieldBehaviourTest {
         field().requestFocus()
         rule.waitForIdle()
         assertEquals("s3cret-key".length, caret())
+    }
+
+    @Test
+    fun `a filter that rewrites what was typed leaves the caret where it was`() {
+        var value by mutableStateOf("8096")
+        rule.setContent {
+            TestTheme {
+                BingeTextField(
+                    value = value,
+                    label = "Port",
+                    onValueChange = { value = it.filter(Char::isDigit) },
+                )
+            }
+        }
+        field().requestFocus()
+        field().performTextInputSelection(TextRange(2))
+
+        field().performTextInput("x")
+        rule.waitForIdle()
+
+        assertEquals("8096", value)
+        assertEquals(2, caret())
+    }
+
+    @Test
+    fun `a value that arrives after the edit keeps the caret where the user typed`() {
+        var value by mutableStateOf("8096")
+        var received = value
+        rule.setContent { TestTheme { BingeTextField(value = value, label = "Port", onValueChange = { received = it }) } }
+        field().requestFocus()
+        field().performTextInputSelection(TextRange(2))
+
+        field().performTextInput("7")
+        rule.waitForIdle()
+        // The caller's state has not caught up, so the field still shows the old text, with the caret where the user left it.
+        assertEquals("8096", value)
+        assertEquals(2, caret())
+
+        value = received
+        rule.waitForIdle()
+
+        assertEquals("80796", value)
+        assertEquals(3, caret())
     }
 }
