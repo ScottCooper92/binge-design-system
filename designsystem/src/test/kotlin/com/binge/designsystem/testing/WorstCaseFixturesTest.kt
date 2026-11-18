@@ -15,6 +15,7 @@ import com.binge.designsystem.catalog.BingeConfirmDialogWorstCaseSample
 import com.binge.designsystem.catalog.BingeMessageDialogWorstCaseSample
 import com.binge.designsystem.catalog.BingeStopSliderWorstCaseSample
 import com.binge.designsystem.catalog.CheckboxRowWorstCaseSample
+import com.binge.designsystem.catalog.DateBoundFieldsLongLabelsSample
 import com.binge.designsystem.catalog.ItemGroupWideTrailingWorstCaseSample
 import com.binge.designsystem.catalog.ItemGroupWorstCaseSample
 import com.binge.designsystem.catalog.ListRowWorstCaseSample
@@ -52,6 +53,10 @@ class WorstCaseFixturesTest {
         // A pass that checked nothing is no pass: scrolling content is skipped, and these rows must not hide in it.
         assertTrue("only $checked text nodes were checked", checked >= MIN_CHECKED)
     }
+
+    @Test fun `date bound fields at 1_3`() = check(FONT_13) { DateBoundFieldsLongLabelsSample() }
+
+    @Test fun `date bound fields at 2_0`() = check(FONT_20) { DateBoundFieldsLongLabelsSample() }
 
     @Test fun `a person card at 1_3`() = check(FONT_13) { PersonCardWorstCaseSample() }
 
