@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,9 @@ private const val FILTER_CHIP_COUNT_SCRIM_ALPHA = 0.22f
  *
  * A chip that is not [enabled] takes no taps and dims, which is what a form saving asks for: a
  * chip that silently swallows a tap looks the same as one that took it.
+ *
+ * A [contentDescription] is what a screen reader announces for the chip instead of the [label] (and [count]), for a
+ * label that needs more to be understood by ear. Null leaves the chip to be read as its label.
  */
 @Composable
 fun BingeFilterChip(
@@ -53,6 +57,7 @@ fun BingeFilterChip(
     leadingPainter: Painter? = null,
     count: Int? = null,
     enabled: Boolean = true,
+    contentDescription: String? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
     // A selected chip is a big amber fill, so it takes the fixed amber, as BingeFilledButton does.
@@ -70,8 +75,11 @@ fun BingeFilterChip(
                     Modifier.border(dimensionResource(R.dimen.hairline_thickness), scheme.outlineVariant, BingeShapes.Pill)
                 },
             ).clickable(enabled = enabled, onClick = onClick, role = Role.Button)
-            .semantics { this.selected = isSelected }
-            .padding(
+            .semantics {
+                this.selected = isSelected
+                // The chip is one merged node, so this stands in for the label and count a screen reader would read.
+                if (contentDescription != null) this.contentDescription = contentDescription
+            }.padding(
                 horizontal = dimensionResource(R.dimen.chip_padding_h),
                 vertical = dimensionResource(R.dimen.chip_padding_v),
             ),

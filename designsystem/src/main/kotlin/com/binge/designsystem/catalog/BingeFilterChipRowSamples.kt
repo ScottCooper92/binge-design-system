@@ -62,7 +62,7 @@ fun BingeFilterChipRowMidSelectionSample() {
                 FilterChipItem("Pending", 3),
                 FilterChipItem("Processing", 5),
                 FilterChipItem("Available", 28),
-                FilterChipItem("Failed"),
+                FilterChipItem("Failed", contentDescription = "Failed requests"),
             ),
             selectedIndex = selected,
             onSelect = { selected = it },
