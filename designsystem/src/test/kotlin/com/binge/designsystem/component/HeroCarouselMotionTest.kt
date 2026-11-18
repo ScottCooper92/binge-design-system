@@ -157,6 +157,13 @@ class HeroCarouselMotionTest {
         Snapshot.sendApplyNotifications()
     }
 
+    private fun setServices(vararg feedbackTypes: Int) {
+        accessibility.setEnabledAccessibilityServiceList(
+            feedbackTypes.map { type -> AccessibilityServiceInfo().apply { feedbackType = type } },
+        )
+        Snapshot.sendApplyNotifications()
+    }
+
     private fun turnOnService(feedbackType: Int) {
         accessibility.setEnabled(true)
         accessibility.setEnabledAccessibilityServiceList(listOf(AccessibilityServiceInfo().apply { this.feedbackType = feedbackType }))
@@ -215,6 +222,25 @@ class HeroCarouselMotionTest {
         assertSlide("Beta")
 
         turnOffTouchExploration()
+        rule.mainClock.advanceTimeByFrame()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Gamma")
+    }
+
+    @Test
+    fun `a switch-access style service turned on beside a service that only draws stops autoplay, and turning it off resumes it`() {
+        // Neither the accessibility state nor touch exploration changes here: only the set of enabled services does.
+        turnOnService(AccessibilityServiceInfo.FEEDBACK_VISUAL)
+        show()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Beta")
+
+        setServices(AccessibilityServiceInfo.FEEDBACK_VISUAL, AccessibilityServiceInfo.FEEDBACK_GENERIC)
+        rule.mainClock.advanceTimeByFrame()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Beta")
+
+        setServices(AccessibilityServiceInfo.FEEDBACK_VISUAL)
         rule.mainClock.advanceTimeByFrame()
         advance(AUTOPLAY_MS + SLACK_MS)
         assertSlide("Gamma")

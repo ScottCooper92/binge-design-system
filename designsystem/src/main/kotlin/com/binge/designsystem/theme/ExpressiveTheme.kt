@@ -155,8 +155,12 @@ fun systemReduceMotion(): Boolean {
  * or acts generically, as a switch-access service does. A service that only draws, such as a magnifier or a colour filter, does not count,
  * because it does not read the page to the user.
  *
- * Observed, because a user turns a service on and off from system Settings while the app stays alive. Public beside [systemReduceMotion] for
- * the same reason: a theme outside this module, such as the TV one, reads it too.
+ * Observed, because a user turns a service on and off from system Settings while the app stays alive. Touch exploration and the
+ * accessibility state each have a listener, but neither fires when one service is turned on or off while another is already on; from
+ * Android 13 a third listener covers that. Below it, a second service is picked up the next time this leaves and re-enters the composition.
+ *
+ * Public so that an app that builds its own theme, rather than using [BingeExpressiveTheme], can provide [LocalAssistiveTechnology] with the
+ * same answer.
  */
 @Composable
 fun systemAssistiveTechnology(): Boolean {
@@ -168,11 +172,25 @@ fun systemAssistiveTechnology(): Boolean {
         if (manager == null) return@DisposableEffect onDispose { }
         val onTouchExploration = AccessibilityManager.TouchExplorationStateChangeListener { active = manager.readAssistiveTechnology() }
         val onState = AccessibilityManager.AccessibilityStateChangeListener { active = manager.readAssistiveTechnology() }
+        // Fires when the set of enabled services changes while the accessibility state itself does not: a switch-access service turned on
+        // beside a magnifier that was already on flips neither of the listeners above.
+        val onServices =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                AccessibilityManager.AccessibilityServicesStateChangeListener { active = manager.readAssistiveTechnology() }
+            } else {
+                null
+            }
         manager.addTouchExplorationStateChangeListener(onTouchExploration)
         manager.addAccessibilityStateChangeListener(onState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && onServices != null) {
+            manager.addAccessibilityServicesStateChangeListener(onServices)
+        }
         onDispose {
             manager.removeTouchExplorationStateChangeListener(onTouchExploration)
             manager.removeAccessibilityStateChangeListener(onState)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && onServices != null) {
+                manager.removeAccessibilityServicesStateChangeListener(onServices)
+            }
         }
     }
 
