@@ -59,6 +59,15 @@
       ],
     },
     {
+      // The screenshot library and plugin read one `screenshot` version in libs.versions.toml, and the plugin trails the library:
+      // alpha17 of the library shipped with no alpha17 of the plugin (#1107), and main could not resolve the plugin. Renovate
+      // already groups dependencies that share a version variable, so a group rule cannot stop a library-only release from moving
+      // it. Leaving the library out does: the plugin is then the only one that proposes a version, so the shared version only
+      // moves to one both have. Bump the library by hand if it ever needs to run ahead.
+      matchPackageNames: ["com.android.tools.screenshot:screenshot-validation-api"],
+      enabled: false,
+    },
+    {
       // material3 is pinned ahead of the BOM on an alpha, because the expressive theme reads APIs the BOM's stable line
       // lacks. Its beta and rc lines are not taken until a Compose 1.13 BOM ships (#774); alphas and the stable release
       // still are. The alpha line pulls the Compose UI line forward to 1.13, which the test fixtures rely on for
