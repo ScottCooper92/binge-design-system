@@ -17,7 +17,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-/** A long section title at a large font wraps inside what the "More" action leaves, instead of squeezing it away. */
+/** A long section title at a large font ellipsizes inside what the "More" action leaves, instead of squeezing it away. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w412dp-h8000dp")
 // Native graphics, because legacy graphics measures text at a pixel a character and nothing would wrap.
