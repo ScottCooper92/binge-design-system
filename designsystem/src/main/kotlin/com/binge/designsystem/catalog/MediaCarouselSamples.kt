@@ -34,3 +34,28 @@ fun MediaCarouselSample() {
         }
     }
 }
+
+/**
+ * A poster card with a two-line caption and the row's see-all tile, to show where the default tile stands against the card: it lines up with the
+ * posters, not with the captions under them, and at 1.3x and 2x only the captions grow. The row passes no `endTileHeight`. A row that wants
+ * the tile to span the captions as well passes `Dp.Unspecified`.
+ */
+@Composable
+fun MediaCarouselPosterAlignedEndTileSample() {
+    ScreenshotTheme {
+        MediaCarousel(
+            title = "Trending movies",
+            items = listOf("The Lord of the Rings: The Return of the King"),
+            itemKey = { it },
+            onMoreClick = {},
+        ) { _, title ->
+            MediaCard(
+                posterUrl = null,
+                title = title,
+                rating = 8.5f,
+                onClick = {},
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+        }
+    }
+}
