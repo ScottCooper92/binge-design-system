@@ -23,6 +23,8 @@ data class SampleDeclaration(
 data class ScanResult(
     val samples: List<SampleDeclaration>,
     val problems: List<String>,
+    /** Every sample the file declares, including those of a `@file:ScreenshotOnly` file, which lists none in [samples]. */
+    val declared: List<SampleDeclaration> = samples,
 )
 
 /**
@@ -94,7 +96,7 @@ object SampleScanner {
             }
         }
         // A screenshot-only file is still checked, so a bad sample fails the build, but lists nothing.
-        return ScanResult(if (screenshotOnly) emptyList() else samples, problems)
+        return ScanResult(if (screenshotOnly) emptyList() else samples, problems, declared = samples)
     }
 
     /** `BingeConfirmDialogSamples.kt` → `BingeConfirmDialog`; a `…Demos.kt` file groups the same way. */

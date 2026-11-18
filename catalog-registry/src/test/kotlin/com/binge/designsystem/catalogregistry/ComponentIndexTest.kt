@@ -123,4 +123,24 @@ class ComponentIndexTest {
         )
         assertEquals(first, ComponentIndex.render(sources.reversed(), catalog))
     }
+
+    @Test
+    fun `a sample in a screenshot-only file is still the sample to copy`() {
+        val sources = listOf("A.kt" to tagged.trimIndent())
+        val catalog = listOf(
+            "BingeChoiceSheetSamples.kt" to
+                "@file:ScreenshotOnly\n\npackage x\n\n/** The sheet. */\n@Composable\nfun BingeChoiceSheetSample() {}",
+        )
+
+        assertTrue("`BingeChoiceSheetSample`" in ComponentIndex.render(sources, catalog))
+        assertTrue(ComponentIndex.problems(sources, catalog).isEmpty())
+    }
+
+    @Test
+    fun `a composable annotated on the same line is checked too`() {
+        val result = scan("@Composable fun Thing() {}\n@Composable internal fun Quiet() {}")
+
+        assertEquals(1, result.problems.size)
+        assertTrue("public Thing has no @need" in result.problems.single())
+    }
 }

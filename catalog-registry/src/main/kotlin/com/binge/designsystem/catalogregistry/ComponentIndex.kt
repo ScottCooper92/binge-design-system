@@ -53,8 +53,8 @@ data class IndexScan(
  */
 object ComponentIndex {
     private val declaration =
-        Regex("""^(public\s+)?(inline\s+)?fun\s+(?:<[^>]*>\s*)?(?:[\w<>?]+\.)?([A-Z]\w*)\s*\(""")
-    private val hidden = Regex("""^(internal|private|protected)\s+""")
+        Regex("""^((?:@\w+(?:\([^)]*\))?\s+)*)(public\s+)?(inline\s+)?fun\s+(?:<[^>]*>\s*)?(?:[\w<>?]+\.)?([A-Z]\w*)\s*\(""")
+    private val hidden = Regex("""^(?:@\w+(?:\([^)]*\))?\s+)*(internal|private|protected)\s+""")
     private val tag = Regex("""^@(need|group|replaces|sample)\s+(\S.*)$""")
     private val excludedSuffixes = listOf("Preview", "Sample", "Demo")
 
@@ -65,10 +65,10 @@ object ComponentIndex {
         for ((index, line) in lines.withIndex()) {
             if (hidden.containsMatchIn(line)) continue
             val match = declaration.find(line) ?: continue
-            val name = match.groupValues[3]
+            val name = match.groupValues[4]
             if (excludedSuffixes.any { name.endsWith(it) }) continue
             val above = SampleScanner.annotationsAbove(lines, index)
-            if (above.none { it.startsWith("@Composable") }) continue
+            if (above.none { it.startsWith("@Composable") } && "@Composable" !in match.groupValues[1]) continue
             val where = "$fileName:${index + 1}"
             val kdoc = SampleScanner.kdocAbove(lines, index - above.size)
             val tags = kdoc.mapNotNull { tag.find(it) }.associate { it.groupValues[1] to it.groupValues[2].trim() }
@@ -146,7 +146,7 @@ object ComponentIndex {
 
     private fun sampleNames(catalogSources: List<Pair<String, String>>): Set<String> =
         catalogSources
-            .flatMap { (path, text) -> SampleScanner.scan(path, text).samples }
+            .flatMap { (path, text) -> SampleScanner.scan(path, text).declared }
             .filter { it.kind == EntryKind.Sample }
             .map { it.function }
             .toSet()
