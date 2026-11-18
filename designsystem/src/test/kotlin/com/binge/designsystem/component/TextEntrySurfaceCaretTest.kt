@@ -6,7 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.test.requestFocus
+import androidx.compose.ui.text.TextRange
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -98,5 +100,80 @@ class TextEntrySurfaceCaretTest {
         rule.waitForIdle()
 
         assertEquals("s3cret-key".length, caret())
+    }
+
+    @Test
+    fun `a filter that rewrites what was typed leaves the caret where it was`() {
+        value = "8096"
+        rule.setContent {
+            TestTheme {
+                TextEntrySurface(
+                    title = "Port",
+                    value = value,
+                    onValueChange = { value = it.filter(Char::isDigit) },
+                    onSubmit = {},
+                    onCancel = {},
+                    submitLabel = "Save",
+                    singleLine = true,
+                )
+            }
+        }
+        rule.onNode(hasSetTextAction()).requestFocus()
+        rule.onNode(hasSetTextAction()).performTextInputSelection(TextRange(2))
+
+        rule.onNode(hasSetTextAction()).performTextInput("x")
+        rule.waitForIdle()
+
+        assertEquals("8096", value)
+        assertEquals(2, caret())
+    }
+
+    @Test
+    fun `a value that arrives after the edit keeps the caret where the user typed`() {
+        var received = ""
+        value = "8096"
+        rule.setContent {
+            TestTheme {
+                TextEntrySurface(
+                    title = "Port",
+                    value = value,
+                    onValueChange = { received = it },
+                    onSubmit = {},
+                    onCancel = {},
+                    submitLabel = "Save",
+                    singleLine = true,
+                )
+            }
+        }
+        rule.onNode(hasSetTextAction()).requestFocus()
+        rule.onNode(hasSetTextAction()).performTextInputSelection(TextRange(2))
+
+        rule.onNode(hasSetTextAction()).performTextInput("7")
+        rule.waitForIdle()
+        // The caller's state has not caught up, so the field still shows the old text, with the caret where the user left it.
+        assertEquals("8096", value)
+        assertEquals(2, caret())
+
+        value = received
+        rule.waitForIdle()
+
+        assertEquals("80796", value)
+        assertEquals(3, caret())
+    }
+
+    @Test
+    fun `an edit dropped for the cap is not left pending, so a value set from outside still puts the caret at its end`() {
+        show("abc", maxLength = 5)
+        rule.onNode(hasSetTextAction()).requestFocus()
+        rule.onNode(hasSetTextAction()).performTextInputSelection(TextRange(1))
+
+        rule.onNode(hasSetTextAction()).performTextInput("defg")
+        rule.waitForIdle()
+        assertEquals("abc", value)
+
+        value = "transcoding"
+        rule.waitForIdle()
+
+        assertEquals("transcoding".length, caret())
     }
 }
