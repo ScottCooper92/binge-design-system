@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -79,16 +80,16 @@ private fun StatCell(
         Icon(
             imageVector = stat.icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = stat.accent.takeOrElse { MaterialTheme.colorScheme.primary },
             modifier = Modifier.size(dimensionResource(R.dimen.detail_stat_icon_size)),
         )
         Text(
             text = stat.value,
             style = MaterialTheme.typography.titleSmall,
-            color = valueColor,
+            color = stat.accent.takeOrElse { valueColor },
             textAlign = TextAlign.Center,
         )
-        Text(text = stat.label, style = MaterialTheme.typography.labelSmall, color = labelColor)
+        Text(text = stat.label, style = MaterialTheme.typography.labelSmall, color = stat.accent.takeOrElse { labelColor })
     }
 }
 

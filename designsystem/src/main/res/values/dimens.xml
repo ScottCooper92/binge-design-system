@@ -300,6 +300,8 @@
     <!-- ServerCard -->
     <dimen name="server_card_logo">40dp</dimen>
     <dimen name="server_card_section_spacing">14dp</dimen>
+    <!-- ServerCard: the arrow at the start of the update row -->
+    <dimen name="server_card_update_icon">18dp</dimen>
     <!-- DetailStatRow -->
     <dimen name="detail_stat_icon_size">20dp</dimen>
     <dimen name="detail_stat_divider_height">40dp</dimen>
