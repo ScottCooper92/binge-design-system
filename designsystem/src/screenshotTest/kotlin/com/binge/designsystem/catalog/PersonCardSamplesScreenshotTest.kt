@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 /** Screenshot coverage for the person-card catalog samples: the tile, its long-text and missing-content variants, the row that hosts it, and its skeleton. */
 class PersonCardSamplesScreenshotTest {
@@ -46,6 +47,14 @@ class PersonCardSamplesScreenshotTest {
     @Composable
     fun Row() {
         PersonCardRowSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun RowEndTile() {
+        PersonCardRowEndTileSample()
     }
 
     @PreviewTest
