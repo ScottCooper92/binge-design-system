@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Month
 import java.time.ZoneId
@@ -151,6 +152,10 @@ private fun relativeFuture(now: Long, distance: Long): String {
 
 /** A month's short name in [locale] ("Jan", "ene"), in the standalone form a picker cell shows. */
 internal fun shortMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.SHORT_STANDALONE, locale)
+
+/** A date's month and year in [locale], in that locale's own order and abbreviation: "Mar 2018", "mars 2018", "2018年3月". */
+internal fun LocalDate.formatMonthYear(locale: Locale = Locale.getDefault()): String =
+    DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "yMMM"), locale).format(this)
 
 /** A month's full name in [locale] ("March", "marzo"), in the standalone form a picker headline shows. */
 internal fun fullMonthName(month: Month, locale: Locale): String = month.getDisplayName(TextStyle.FULL_STANDALONE, locale)
