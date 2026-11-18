@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.BACKDROP_ASPECT_RATIO
 import com.binge.designsystem.R
+import com.binge.designsystem.formatRuntimeMinutes
 
 /**
  * One episode of a season as a flat row: a still with its rating chip on it, then an eyebrow ("E7 · 73 min"),
@@ -93,7 +94,7 @@ private fun EpisodeBrowseStill(episode: EpisodeBrowseUi) {
 @Composable
 private fun EpisodeBrowseMetadata(episode: EpisodeBrowseUi, modifier: Modifier = Modifier) {
     val number = stringResource(R.string.detail_episode_label, episode.number)
-    val detail = episode.runtimeMinutes?.let { stringResource(R.string.detail_runtime_minutes, it) }
+    val detail = episode.runtimeMinutes?.let { formatRuntimeMinutes(it) }
         ?: episode.airDate?.takeIf { it.isNotBlank() }
     Column(
         modifier = modifier,

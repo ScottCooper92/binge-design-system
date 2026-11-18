@@ -7,7 +7,7 @@ import androidx.compose.runtime.Immutable
  * formatted for the reader, and the consumer decides what an absent [rating] or [runtimeMinutes] means.
  *
  * A [rating] of null or 0 draws no chip. The eyebrow is "E[number]", then [runtimeMinutes] when there is
- * one, else [airDate] when there is one.
+ * one, else [airDate] when there is one. [number] is unique within a season: the list keys its rows by it.
  */
 @Immutable
 data class EpisodeBrowseUi(

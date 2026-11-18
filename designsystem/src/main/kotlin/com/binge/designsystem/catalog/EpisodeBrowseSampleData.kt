@@ -2,8 +2,6 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.EpisodeBrowseUi
 import com.binge.designsystem.component.SeasonSectionState
 import com.binge.designsystem.component.SeasonSectionUi
