@@ -108,6 +108,8 @@ fun DetailCinematicHeader(
     // Replaces the text title, for a header that shows a title logo. The caller owns loading and tinting,
     // and gives it a fixed height so text and logo swap without moving the layout.
     titleContent: (@Composable () -> Unit)? = null,
+    // Review scores after the genres, each an icon and its value, on the same line.
+    externalScores: List<ExternalScore> = emptyList(),
 ) {
     val eyebrow = genres.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     var headerOrigin by remember { mutableStateOf(Offset.Zero) }
@@ -149,6 +151,7 @@ fun DetailCinematicHeader(
             synopsisInitiallyOverflowing = synopsisInitiallyOverflowing,
             copyBounds = copyBounds,
             titleContent = titleContent,
+            externalScores = externalScores,
             modifier = Modifier.align(Alignment.BottomStart),
         )
     }
@@ -165,6 +168,7 @@ private fun CinematicCopyRow(
     synopsisInitiallyOverflowing: Boolean,
     copyBounds: CinematicCopyBounds,
     titleContent: (@Composable () -> Unit)?,
+    externalScores: List<ExternalScore>,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -218,15 +222,14 @@ private fun CinematicCopyRow(
                     autoSize = DetailHeroDefaults.cinematicTitleAutoSize(),
                 )
             }
-            if (!eyebrow.isNullOrBlank()) {
+            if (!eyebrow.isNullOrBlank() || externalScores.isNotEmpty()) {
                 Spacer(Modifier.height(lineGap))
-                Text(
-                    text = eyebrow,
+                // Genres in the theme's accent, as on DetailHero and the TV hero; the scores follow them.
+                GenreScoreLine(
+                    genres = eyebrow,
+                    scores = externalScores,
+                    scoreColor = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
                     modifier = reportsLineEnd(copyBounds, CopyLine.Genres),
-                    style = MaterialTheme.typography.labelLarge,
-                    // Matches DetailHero and the TV hero, both of which key genres off the theme's
-                    // accent.
-                    color = MaterialTheme.colorScheme.primary,
                 )
             }
             if (!tagline.isNullOrBlank()) {

@@ -219,28 +219,24 @@ private fun HeroMetaRow(item: HeroItem) {
             add(HeroMetaPart(item.genres.take(MAX_META_GENRES).joinToString(" · "), isGenre = true))
         }
     }
-    if (item.rating == null && parts.isEmpty()) return
-    Row(
-        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.hero_meta_gap)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        item.rating?.let { HeroRating(it) }
-        parts.forEachIndexed { i, part ->
-            if (i > 0 || item.rating != null) HeroMetaDot()
-            Text(
-                text = part.text,
-                style = MaterialTheme.typography.labelLarge,
-                color = if (part.isGenre) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
-                },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+    if (item.rating == null && parts.isEmpty() && item.externalScores.isEmpty()) return
+    val ink = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
+    val entries = buildList<@Composable () -> Unit> {
+        item.rating?.let { add { HeroRating(it) } }
+        parts.forEach { part ->
+            add {
+                Text(
+                    text = part.text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
+        item.externalScores.forEach { score -> add { ExternalScoreItem(score, color = ink) } }
     }
+    MetaFlow(entries = entries, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s)))
 }
 
 @Composable
@@ -274,7 +270,7 @@ private fun HeroRating(rating: Float) {
 }
 
 @Composable
-private fun HeroMetaDot() {
+internal fun HeroMetaDot() {
     Box(
         modifier = Modifier
             .size(dimensionResource(R.dimen.hero_meta_dot_size))
