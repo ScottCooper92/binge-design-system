@@ -22,6 +22,10 @@ import com.binge.designsystem.tv.R as TvR
  * [TvCompactButton] with the wider min width — everything else is a square [TvCompactIconButton], unless it asks for a
  * label with [TvDetailAction.showLabel]. A row too long for the width it is given wraps onto a further line. Empty
  * [actions] renders nothing. [entryFocus] is where page entry lands.
+ *
+ * @need lay out the actions at the foot of a TV detail hero
+ * @group tv
+ * @replaces a hand-built row of TV buttons
  */
 @Composable
 fun TvDetailActionRow(

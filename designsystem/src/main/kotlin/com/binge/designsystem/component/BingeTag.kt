@@ -30,6 +30,10 @@ import com.binge.designsystem.uppercaseLocalised
  * for [tint], and its `fill()` for [fill]); a null [tint] is neutral — a `surfaceContainerHigh`
  * wash with `onSurfaceVariant` text. [uppercase] (default) matches the design's type tags (MOVIE,
  * VIDEO…); pass `false` for cased labels such as roles (Owner / Admin).
+ *
+ * @need label an item with a short classification
+ * @group cards
+ * @replaces a hand-built tinted Box holding an icon and text
  */
 @Composable
 fun BingeTag(

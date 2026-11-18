@@ -67,6 +67,10 @@ internal const val RATING_CARD_SECONDARY_ALPHA = 0.74f
  * non-interactive and the prompt swaps to [notYetRateableQuestion]/[notYetRateableHint]. A
  * caller decides rateability from its own data (a release date, an air date); this component
  * has no opinion on what makes a title unrateable, only on how to show it.
+ *
+ * @need let the user rate an item with stars
+ * @group cards
+ * @replaces a hand-built star picker card
  */
 @Composable
 fun RatingCard(

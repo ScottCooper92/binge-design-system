@@ -39,6 +39,10 @@ private const val STATUS_CHIP_DOT_HALO_ALPHA = 0.30f
  * every app.
  *
  * The wash is lighter in a light theme, where the accents are darker for contrast, so every label stays clear of WCAG AA.
+ *
+ * @need show the state of a request, issue or job as a coloured pill
+ * @group cards
+ * @replaces a hand-built coloured label with a dot
  */
 @Composable
 fun StatusChip(

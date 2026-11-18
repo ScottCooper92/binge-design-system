@@ -79,6 +79,10 @@ import com.binge.designsystem.uppercaseLocalised
  * rows are its main content — passes its own. [titleSpacing] is the gap between the title and the
  * first row. [belowRows] draws inside the same surface after the last row, for a caller whose row
  * expands into more content; it owns its own divider.
+ *
+ * @need group related settings or list items under a title on one surface
+ * @group rows
+ * @replaces a hand-built titled Column of rows with dividers
  */
 @Composable
 fun ItemGroup(
@@ -114,7 +118,13 @@ fun ItemGroup(
     }
 }
 
-/** The rows of a [ItemGroup] with their dividers and no surface, for a card that supplies its own. */
+/**
+ * The rows of an [ItemGroup] with their dividers and no surface, for a card that supplies its own.
+ *
+ * @need show list items with dividers on a surface of your own
+ * @group rows
+ * @replaces a hand-built Column of rows with dividers
+ */
 @Composable
 fun ItemRows(
     rows: List<ListItem>,

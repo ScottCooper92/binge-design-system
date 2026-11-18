@@ -37,6 +37,10 @@ import com.binge.designsystem.tv.R as TvR
  * inert, as [TvButton]'s does); shorter, tighter, and small-radius corners. [loading] hides the label and shows a spinner in
  * its place, keeping the width, and ignores presses while keeping focus. The primary and secondary styles fill white on
  * focus; the destructive and text styles keep [TvButton]'s palette. [initiallyFocused] seeds the focused look for frames.
+ *
+ * @need add a compact button to a TV screen
+ * @group tv
+ * @replaces a hand-built small focusable button
  */
 @Composable
 fun TvCompactButton(
@@ -102,6 +106,10 @@ fun TvCompactButton(
  *
  * [style], [enabled] and [loading] work as on [TvCompactButton]: a disabled button stays focusable and inert, and
  * [loading] swaps the icon for a spinner at the same size and ignores presses while keeping focus.
+ *
+ * @need add an icon-only button to a TV action row
+ * @group tv
+ * @replaces a hand-built square focusable icon button
  */
 @Composable
 fun TvCompactIconButton(

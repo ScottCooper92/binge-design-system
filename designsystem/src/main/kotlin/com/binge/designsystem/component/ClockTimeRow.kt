@@ -32,6 +32,10 @@ private const val KEYBOARD_FONT_SCALE = 1.3f
  * picker in a dialog, which handles a.m. and p.m. and the 12 or 24-hour dial itself; OK hands back the minutes since
  * midnight through [onPick]. Reach for it for a time in a settings row; for a time typed as a form field, use
  * `BingeTimeInput`. At a large font the dialog takes the picker's keyboard entry, which still fits.
+ *
+ * @need pick a time of day
+ * @group inputs
+ * @replaces a hand-built row that opens a time picker dialog
  */
 @Composable
 fun ClockTimeRow(

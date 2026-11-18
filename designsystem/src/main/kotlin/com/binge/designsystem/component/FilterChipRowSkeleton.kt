@@ -37,6 +37,9 @@ private const val SKELETON_CHIP_COUNT = 3
  * own padding and label, not a line of text; the geometry checks on both screens are what keep it honest.
  *
  * [description] names the loading state for a screen reader; without one it stays silent.
+ *
+ * @need reserve space for a filter chip row while loading
+ * @group feedback
  */
 @Composable
 fun FilterChipRowSkeleton(modifier: Modifier = Modifier, description: String? = null) {

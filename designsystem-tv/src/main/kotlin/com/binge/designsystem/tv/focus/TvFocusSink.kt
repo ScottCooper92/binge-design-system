@@ -42,6 +42,9 @@ const val TV_FOCUS_SINK_TAG = "tv-focus-sink"
  * 1dp and fully transparent rather than zero-size: some Compose versions drop zero-size nodes from directional
  * search, so this stays a real laid-out node. No `Modifier` parameter — the geometry, alpha and semantics here
  * are the whole contract, not something a call site should be able to override.
+ *
+ * @need give an empty pane something to hold focus
+ * @group tv
  */
 @Composable
 fun TvFocusSink(startEntry: FocusRequester? = null) {

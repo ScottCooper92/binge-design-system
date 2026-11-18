@@ -95,6 +95,9 @@ fun Modifier.tvSwapTarget(swap: TvSwapFocus): Modifier {
  * Claims focus for the replacement, once, when its [tvSwapTarget] is attached while [swap] is armed, then disarms. One
  * request, no retry: the arm outlives the press by [SWAP_WINDOW_MS], so a replacement that composes a little later
  * still gets it, and a swap that never produces a target lets go instead of pulling focus on a later, unrelated change.
+ *
+ * @need move focus to the control that replaces a pressed one
+ * @group tv
  */
 @Composable
 fun TvSwapFocusEffect(swap: TvSwapFocus) {

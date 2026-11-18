@@ -69,6 +69,10 @@ import com.binge.designsystem.paneSideInsets
  * [isRefreshing] showing the spinner under the bar, or in it with [pullIndicator] for a page with no image there; `null`, the default, adds no pull. [onBack] is dropped in a pane whose list already offers it.
  * The hero runs full-bleed; [content] centres at [contentMaxWidth] on a wide window. A page whose rails bleed to the
  * edge passes `Dp.Infinity`: [content] then fills the width, and pads each section by [LocalHeroReadingMargin].
+ *
+ * @need build a detail page under a full-bleed hero
+ * @group screens
+ * @replaces a hand-built scaffold with a hero and fading bar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -162,6 +166,10 @@ private fun ProvideHeroReadingMargin(modifier: Modifier, content: @Composable ()
  * [contentPadding] are the list's own, and apply to the hero item too: a spacing between every row, rows
  * capped and centred on a wide window, a gap under the last one. Its items read [LocalHeroReadingMargin] as an
  * eager page's sections do, measured inside the page.
+ *
+ * @need build a long lazy detail page under a hero
+ * @group screens
+ * @replaces a hand-built LazyColumn page with a hero item and fading bar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -216,6 +224,10 @@ fun HeroDetailLazyScreen(
  * same back control at rest, so back works whether or not the load does. [content] draws from the top of the
  * window, as the hero would, and the status bar follows the theme, since no artwork sits under it yet. Pass the
  * page's [snackbarHostState] so a message raised while it loads survives the swap to the loaded page.
+ *
+ * @need show the loading or failed state of a hero detail page
+ * @group feedback
+ * @replaces a hand-built loading or error frame with a back control
  */
 @Composable
 fun HeroDetailStateScreen(

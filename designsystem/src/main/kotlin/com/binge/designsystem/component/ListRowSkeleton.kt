@@ -27,6 +27,9 @@ private const val DEFAULT_LIST_ROW_SKELETON_COUNT = 8
  * corner. [height] defaults to a poster-leading row so the loading→content swap doesn't reflow;
  * pass a shorter one for a row shape that resolves shorter, such as an avatar-leading row.
  * [description] names the loading state for a screen reader; without one it stays silent.
+ *
+ * @need show a loading placeholder for a list row
+ * @group feedback
  */
 @Composable
 fun ListRowSkeleton(
@@ -56,6 +59,10 @@ fun ListRowSkeleton(
  * this column's content padding would otherwise be applied on the wrong side of it.
  *
  * [description] names the loading state for a screen reader, once for the column rather than per row.
+ *
+ * @need show loading placeholders for a whole list of rows
+ * @group feedback
+ * @replaces a hand-built Column of shimmer boxes
  */
 @Composable
 fun ListRowSkeletonColumn(

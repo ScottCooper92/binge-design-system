@@ -41,6 +41,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * The trailing **Tile** that ends a carousel, grid, or image strip and links to a "see all" /
  * "Discover more" screen: a chevron in a circle inside a dashed outline, with [label] underneath.
  * The caller sizes it via [modifier] to match the surrounding cells.
+ *
+ * @need end a carousel with a see-all link
+ * @group cards
+ * @replaces a hand-built dashed tile with a chevron
  */
 @Composable
 fun SeeAllTile(

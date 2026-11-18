@@ -60,6 +60,10 @@ import com.binge.designsystem.theme.BingeShapes
  * A non-null [selected] makes the row one choice of a single-select list: it takes `Role.RadioButton` and the selected
  * state, so a screen reader hears "Label, radio button, selected", and paints nothing itself (tint the row with
  * [containerColor], or show a tick, as the caller likes).
+ *
+ * @need show a full-width list row with a leading visual and text
+ * @group rows
+ * @replaces a hand-built clickable Row on a tonal surface
  */
 @Composable
 fun ListRow(
@@ -121,6 +125,10 @@ fun ListRow(
  * beside it — a status badge or action. Top-aligned so the trailing content stays put when the title wraps to
  * a second line, and the title takes the remaining width. This is the single home for a row title's
  * style, so every adopting row reads the same; drop it at the top of a [ListRow] content column.
+ *
+ * @need show a row title with a trailing badge or action
+ * @group rows
+ * @replaces a hand-built Row of title and trailing content
  */
 @Composable
 fun ListRowHeader(
@@ -150,6 +158,10 @@ fun ListRowHeader(
  * a wider ratio for backdrop-style stills. Pass [onClick] to make the poster tappable on its own
  * (e.g. opening the title while the row body opens an actions sheet) — the ripple stays clipped to
  * the poster's rounded corners.
+ *
+ * @need lead a list row with a poster image
+ * @group rows
+ * @replaces a hand-built clipped image beside row text
  */
 @Composable
 fun ListRowPoster(

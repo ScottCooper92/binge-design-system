@@ -170,6 +170,10 @@ data class TvPaneGroup(
  * fires no focus events; production passes neither. The first row carries [TvLayoutAnchors.LIST_PANE_FIRST_ROW],
  * which [TvListPaneBoardSkeleton] reserves. [clearAll] adds a button under the last row that acts on the board as a
  * whole; it takes focus without changing the described row.
+ *
+ * @need build a tv settings page of rows with a pane of options
+ * @group tv
+ * @replaces a hand-built list beside a detail pane
  */
 @Composable
 fun TvListPaneBoard(

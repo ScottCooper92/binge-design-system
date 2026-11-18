@@ -42,6 +42,10 @@ import com.binge.designsystem.tv.R as TvR
  * A [SaveStatus.Refused] change was put back by the page, and asking again would be refused again, so the line is the
  * reason in the error tone with no Retry. The TV has no snackbar and no timed message, so the reason stays in place until
  * the page moves the status on, which is when the row is next changed or the page is left. The reason wraps in a narrow panel.
+ *
+ * @need show saving, saved and failed status on a page that saves as you go
+ * @group tv
+ * @replaces a hand-built Row of status text and retry button
  */
 @Composable
 fun TvSaveStatus(

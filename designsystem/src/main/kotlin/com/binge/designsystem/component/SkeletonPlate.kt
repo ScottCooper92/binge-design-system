@@ -11,6 +11,10 @@ import com.binge.designsystem.theme.BingeShapes
  * One shimmering rounded block, sized by its caller: the plate a hand-built loading skeleton is made of, standing in
  * for a line of text, a poster or a chip. [shape] clips it, defaulting to the small element radius. A skeleton that
  * mirrors real content renders that content with `Modifier.skeleton` instead; this is for one built from plates.
+ *
+ * @need show a shimmering block while content loads
+ * @group feedback
+ * @replaces a hand-built shimmering box for a loading skeleton
  */
 @Composable
 fun SkeletonPlate(modifier: Modifier = Modifier, shape: Shape = BingeShapes.ElementSmall) {

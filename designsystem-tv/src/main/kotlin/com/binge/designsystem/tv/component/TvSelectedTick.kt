@@ -34,6 +34,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The glyph is decoration and says nothing to a screen reader. Mark the row that holds it with
  * [Modifier.tvSelected], so the state is announced where the tick is drawn.
+ *
+ * @need mark a value as chosen
+ * @group tv
+ * @replaces a hand-built check icon
  */
 @Composable
 fun TvSelectedTick(tint: Color, modifier: Modifier = Modifier) {
@@ -54,6 +58,10 @@ fun TvSelectedTick(tint: Color, modifier: Modifier = Modifier) {
  *
  * Deliberately not tinted with the error colour. Exclusion is a choice, not a fault, and a red glyph would
  * say something is wrong with this row.
+ *
+ * @need mark a value as ruled out
+ * @group tv
+ * @replaces a hand-built cross icon
  */
 @Composable
 fun TvExcludedMark(tint: Color, modifier: Modifier = Modifier) {
@@ -75,6 +83,10 @@ fun TvExcludedMark(tint: Color, modifier: Modifier = Modifier) {
  *
  * [size] is [TvSelectedTickBadgeSize.Standard] for a tile in a grid. Use [TvSelectedTickBadgeSize.Large] on a
  * large card that is read from across the room.
+ *
+ * @need mark an image as chosen
+ * @group tv
+ * @replaces a hand-built Box of tick on a coloured disc over an image
  */
 @Composable
 fun TvSelectedTickBadge(modifier: Modifier = Modifier, size: TvSelectedTickBadgeSize = TvSelectedTickBadgeSize.Standard) {

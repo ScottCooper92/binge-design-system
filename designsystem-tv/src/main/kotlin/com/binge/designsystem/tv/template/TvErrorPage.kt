@@ -16,6 +16,9 @@ import com.binge.designsystem.R as DesR
  * button, because a dead button is worse than none on a remote. [title] and [message] override the kind's copy, for a
  * failure only the caller can name (a missing API key is not "Not allowed"). [secondary] sits beside Try again, and is
  * shown only with it, as a [TvMessagePage] shows its second action.
+ *
+ * @need show a failure as a whole tv page with a retry
+ * @group tv
  */
 @Composable
 fun TvErrorPage(

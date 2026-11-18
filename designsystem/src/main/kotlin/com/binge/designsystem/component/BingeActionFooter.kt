@@ -70,6 +70,10 @@ import com.binge.designsystem.theme.BingeShapes
  * elsewhere — a caller whose action promotes to this footer only once it is the sheet's sole primary
  * CTA (dropping out of a tiered pool of two-or-more) should pass the same icon, so the action doesn't
  * lose its icon purely because of how many peers it currently has.
+ *
+ * @need pin a primary action to the bottom of a screen or sheet
+ * @group bars
+ * @replaces a hand-built bottom Surface holding a full-width button
  */
 @Composable
 fun BingeActionFooter(

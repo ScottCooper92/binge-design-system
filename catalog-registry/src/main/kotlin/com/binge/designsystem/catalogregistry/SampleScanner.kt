@@ -23,6 +23,8 @@ data class SampleDeclaration(
 data class ScanResult(
     val samples: List<SampleDeclaration>,
     val problems: List<String>,
+    /** Every sample the file declares, including those of a `@file:ScreenshotOnly` file, which lists none in [samples]. */
+    val declared: List<SampleDeclaration> = samples,
 )
 
 /**
@@ -94,7 +96,7 @@ object SampleScanner {
             }
         }
         // A screenshot-only file is still checked, so a bad sample fails the build, but lists nothing.
-        return ScanResult(if (screenshotOnly) emptyList() else samples, problems)
+        return ScanResult(if (screenshotOnly) emptyList() else samples, problems, declared = samples)
     }
 
     /** `BingeConfirmDialogSamples.kt` → `BingeConfirmDialog`; a `…Demos.kt` file groups the same way. */
@@ -114,7 +116,7 @@ object SampleScanner {
 
     private val wordBoundary = Regex("""(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])""")
 
-    private fun annotationsAbove(lines: List<String>, declarationIndex: Int): List<String> {
+    internal fun annotationsAbove(lines: List<String>, declarationIndex: Int): List<String> {
         val found = ArrayDeque<String>()
         var i = declarationIndex - 1
         while (i >= 0 && lines[i].trimStart().startsWith("@")) {
@@ -159,7 +161,7 @@ object SampleScanner {
         return text.substring(open + 1).trim()
     }
 
-    private fun kdocAbove(lines: List<String>, firstAnnotationIndex: Int): List<String> {
+    internal fun kdocAbove(lines: List<String>, firstAnnotationIndex: Int): List<String> {
         var end = firstAnnotationIndex - 1
         while (end >= 0 && lines[end].isBlank()) end--
         if (end < 0 || !lines[end].trim().endsWith("*/")) return emptyList()
@@ -177,7 +179,7 @@ object SampleScanner {
         }
     }
 
-    private fun firstSentence(kdoc: List<String>): String {
+    internal fun firstSentence(kdoc: List<String>): String {
         val prose = kdoc.dropWhile { it.isEmpty() }.takeWhile { it.isNotEmpty() && !it.startsWith("@") }.joinToString(" ")
         val cleaned = kdocLink
             .replace(prose, "$1")

@@ -30,6 +30,10 @@ import com.binge.designsystem.tv.R as TvR
  * [entry] is where focus lands when it enters the page; whether the page also claims it is [hosting]'s call
  * (see [TvPageHosting]), and [arrivalEnabled] holds the claim back until the target exists. [trailingContent] sits in
  * the heading band, so it is not shown when [title] is null.
+ *
+ * @need frame a tv page with a heading and safe insets
+ * @group tv
+ * @replaces a hand-built Box with overscan padding
  */
 @Composable
 fun TvBoard(
@@ -58,6 +62,9 @@ fun TvBoard(
 /**
  * A page's title, in a band of the same height on every page so titles share a line. [trailingContent] sits
  * at the band's end, unweighted, so an action there is never squeezed out by a long title.
+ *
+ * @need add a title line to a tv page
+ * @group tv
  */
 @Composable
 fun TvScreenHeading(

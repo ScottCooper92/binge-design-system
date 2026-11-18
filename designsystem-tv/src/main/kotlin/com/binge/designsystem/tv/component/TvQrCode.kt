@@ -35,6 +35,10 @@ private const val QUIET_ZONE_MODULES = 4
  *
  * [contentDescription] is required rather than defaulted: a matrix of squares is opaque to a screen reader,
  * so the caller must say what scanning it does.
+ *
+ * @need show a qr code for a phone to scan
+ * @group tv
+ * @replaces a hand-drawn QR code on a Canvas
  */
 @Composable
 fun TvQrCode(

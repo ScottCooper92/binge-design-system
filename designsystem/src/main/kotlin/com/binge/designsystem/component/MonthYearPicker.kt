@@ -55,6 +55,10 @@ import java.util.Locale
  *
  * The visible body is [MonthYearPickerContent], stateless so screenshot tests can render it: the
  * modal [Dialog] window does not capture in previews.
+ *
+ * @need pick a month and year
+ * @group sheets
+ * @replaces a hand-built dialog with month and year lists
  */
 @Composable
 fun MonthYearPickerDialog(

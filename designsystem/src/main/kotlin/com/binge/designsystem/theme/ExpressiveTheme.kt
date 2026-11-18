@@ -64,6 +64,12 @@ class BingeBrand(
     }
 }
 
+/**
+ * The app theme: the colour, type, shape and motion settings every component here reads, around [content].
+ *
+ * @need apply the app theme to a tree of content
+ * @group screens
+ */
 @Composable
 fun BingeExpressiveTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

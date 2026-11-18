@@ -36,6 +36,10 @@ import com.binge.designsystem.tv.R as TvR
  * is sized by the caller. A screen reader reads the title and lines together, as one item. Under [TvStyle.Monochrome] the card's
  * fill matches the sheet's panel, so at rest it carries a faint outline; the accent styles draw none. [initiallyFocused] draws the
  * focused state, for a frame.
+ *
+ * @need show a titled group of facts as a tile on a TV
+ * @group tv
+ * @replaces a hand-built focusable tile of text lines
  */
 @Composable
 fun TvInfoCard(

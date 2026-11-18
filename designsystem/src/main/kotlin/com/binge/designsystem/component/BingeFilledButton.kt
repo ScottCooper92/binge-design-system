@@ -31,6 +31,11 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * The fill is the fixed amber, the same in both themes. Light `primary` is a darker amber tuned for
  * text, and as a large fill it reads muddy.
+ *
+ * @need offer the primary action on a screen
+ * @group inputs
+ * @sample FilledButtonSample
+ * @replaces a raw Button with colours and loading state set by hand
  */
 @Composable
 fun BingeFilledButton(

@@ -30,6 +30,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  *
  * The visible body is delegated to [CreateListDialogContent] so it can be rendered directly in
  * screenshot tests, since the modal [AlertDialog] window itself does not capture in previews.
+ *
+ * @need ask for a name to create a new list
+ * @group sheets
+ * @replaces a hand-built AlertDialog with a text field
  */
 @Composable
 fun CreateListDialog(

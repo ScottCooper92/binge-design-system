@@ -97,6 +97,10 @@ internal fun seeAllFanVisibleShares(count: Int): List<Float> {
  * They fan out behind the label, the first slot nearest the front, wholly inside the cell: the front layer in the middle under a
  * scrim that keeps the label legible, and each further layer beside it, showing about a quarter of the cell's width of its own image
  * under a lighter scrim, so a portrait or a face still reads as one. With none, the card is a plain fill. Focus is the cell's own ring and the same press handling as any cell.
+ *
+ * @need add a see-all card at the end of a row of cards
+ * @group tv
+ * @replaces a hand-built card at the end of a carousel
  */
 @Composable
 fun TvSeeAllCard(

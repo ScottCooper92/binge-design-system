@@ -97,6 +97,10 @@ enum class FormActionPlacement {
  *
  * [positionKey] identifies an in-entry page: each key retains its own scroll, app-bar offsets and saved content.
  * The form keeps its scroll above [notReady], so temporarily showing a loading or failure body does not discard it.
+ *
+ * @need build a form or editor screen with its commit action
+ * @group screens
+ * @replaces a hand-built scaffold with a scrolling form and save button
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -189,6 +193,10 @@ fun FormScreen(
 /**
  * One titled group of a form's fields, laid out like `ItemGroup`: the title above the surface, the fields on
  * it. The title is a heading, so a screen reader can jump group to group.
+ *
+ * @need group the fields of a form under a titled surface
+ * @group rows
+ * @replaces a hand-built titled card of fields
  */
 @Composable
 fun FormSection(

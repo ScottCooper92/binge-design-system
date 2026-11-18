@@ -231,6 +231,10 @@ class TvSideSheetNav internal constructor(
  * state. [content] draws the page named by [TvSideSheetNav.page], and gives every row [TvSideSheetNav.row]. Pass the
  * [closer] the caller closes it with, so it lets focus go as the sheet closes and returns it once the sheet is gone. To reopen
  * where the user was, use the overload that takes a [TvSideSheetStackState].
+ *
+ * @need open pages one over another in a side sheet
+ * @group tv
+ * @replaces a hand-built stack of side sheets
  */
 @Composable
 fun TvSideSheetStack(
@@ -263,6 +267,10 @@ fun TvSideSheetStack(
  * remembered row into view.
  *
  * The root-only overload is this one with a state it makes for itself.
+ *
+ * @need open pages one over another in a side sheet
+ * @group tv
+ * @replaces a hand-built stack of side sheets
  */
 @Composable
 fun TvSideSheetStack(

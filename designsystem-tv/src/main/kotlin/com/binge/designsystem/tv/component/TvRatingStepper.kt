@@ -51,6 +51,10 @@ import com.binge.designsystem.tv.R as TvR
  * OK does not commit anything: the control only reports [onValueChange], and the screen puts its own explicit
  * action beside it. [valueLabel] is the number as the screen words it ("7 / 10"), shown beside the stars and
  * announced as the control's state. [initiallyFocused] seeds the lit state for a frame; production passes false.
+ *
+ * @need set a star rating with the d-pad
+ * @group tv
+ * @replaces a hand-built Row of star buttons
  */
 @Composable
 fun TvRatingStepper(

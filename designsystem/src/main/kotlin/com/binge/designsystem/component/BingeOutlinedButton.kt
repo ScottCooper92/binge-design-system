@@ -34,6 +34,11 @@ import com.binge.designsystem.theme.BingeShapes
  * [showLabel] collapses the button to icon-only, keeping the same pill shape and tap target. It
  * requires a [leadingIcon]: once the label's [Text] isn't there, the icon is what carries the
  * accessible name via `contentDescription`.
+ *
+ * @need offer a secondary action next to a primary one
+ * @group inputs
+ * @sample OutlinedButtonSample
+ * @replaces a raw OutlinedButton with loading state set by hand
  */
 @Composable
 fun BingeOutlinedButton(

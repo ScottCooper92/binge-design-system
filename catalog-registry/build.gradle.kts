@@ -27,3 +27,38 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
+
+/**
+ * The need-keyed component index, `docs/components.md`, built from the `@need`, `@group` and `@replaces` tags
+ * in the public composables' KDoc. `generateComponentIndex` writes it; `checkComponentIndex` (part of `check`)
+ * fails when the file is stale or a public composable is untagged. Read by relative path, as the catalog
+ * registry is, so this module needs no dependency on the Android modules.
+ */
+val indexSources = listOf(
+    "src=${rootProject.file("designsystem/src/main/kotlin")}",
+    "src=${rootProject.file("designsystem-tv/src/main/kotlin")}",
+    "catalog=${rootProject.file("designsystem/src/main/kotlin/com/binge/designsystem/catalog")}",
+    "catalog=${rootProject.file("designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/catalog")}",
+)
+val indexFile = rootProject.file("docs/components.md")
+
+fun indexTask(
+    name: String,
+    mode: String,
+    text: String,
+) = tasks.register<JavaExec>(name) {
+    group = "documentation"
+    description = text
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.binge.designsystem.catalogregistry.ComponentIndexGenerator")
+    args(listOf(mode, indexFile.absolutePath) + indexSources)
+    inputs.files(
+        fileTree(rootProject.file("designsystem/src/main/kotlin")),
+        fileTree(rootProject.file("designsystem-tv/src/main/kotlin")),
+    )
+}
+
+indexTask("generateComponentIndex", "write", "Writes docs/components.md from the KDoc tags.")
+val checkComponentIndex =
+    indexTask("checkComponentIndex", "check", "Fails if docs/components.md is stale or a public composable is untagged.")
+tasks.named("check") { dependsOn(checkComponentIndex) }

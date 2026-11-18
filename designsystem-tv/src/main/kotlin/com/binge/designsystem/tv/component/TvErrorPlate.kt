@@ -20,6 +20,10 @@ import com.binge.designsystem.R as DesR
  * [retryInitiallyFocused] and [retryFocusRequester] take focus as parameters, so the focused state can be
  * screenshotted. [title] and [message] override the kind's copy, for a failure only the caller can name (a missing
  * API key is not "Not allowed"), and [extraActions] follow Try again in the same row.
+ *
+ * @need show a failure with Try again on a TV screen
+ * @group tv
+ * @replaces a hand-built TV error message with a retry button
  */
 @Composable
 fun TvErrorPlate(

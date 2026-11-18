@@ -13,6 +13,10 @@ import com.binge.designsystem.R
 /**
  * Media type as a neutral [BingeTag] — Movie / TV / Episode with the matching glyph, for surfaces that
  * mix those rows.
+ *
+ * @need label a row as a movie, TV show or episode
+ * @group cards
+ * @replaces a hand-built tag with an icon and text
  */
 @Composable
 fun MediaTypeTag(type: MediaTypeTagType, modifier: Modifier = Modifier) {

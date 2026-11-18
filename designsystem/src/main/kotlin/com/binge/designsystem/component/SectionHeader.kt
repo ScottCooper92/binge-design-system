@@ -38,6 +38,10 @@ import com.binge.designsystem.theme.BingeShapes
  * the app's only section-title primitive, so marking it here is what gives every carousel, detail
  * section and search group a landmark. The "see all" button describes itself with the section name,
  * since a hub carries one per carousel and they would otherwise all announce identically.
+ *
+ * @need title a section with an optional see-more action
+ * @group rows
+ * @replaces a hand-built Row of a title and a text button
  */
 @Composable
 fun SectionHeader(

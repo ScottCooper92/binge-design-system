@@ -60,6 +60,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [initiallyFocused] seeds the focus flag so a screenshot can show the revealed frame (a baseline runs no
  * coroutines, so no real focus event lands); production leaves it false.
+ *
+ * @need add an icon control that expands to a label on TV focus
+ * @group tv
+ * @replaces a hand-built icon button that grows on focus
  */
 @Composable
 fun TvIconButton(

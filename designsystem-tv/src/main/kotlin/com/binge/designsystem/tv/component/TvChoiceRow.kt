@@ -50,6 +50,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [entryFocusRequester] and [arrival] let a page aim focus at the row, as [TvTabRow]'s do: the request lands on the
  * chosen option, and so does focus entering the row from outside. Without either, entry is the ordinary search.
+ *
+ * @need pick one of a few options on a TV, committing on OK
+ * @group tv
+ * @replaces a hand-built row of focusable options
  */
 @Composable
 fun TvChoiceRow(

@@ -56,6 +56,10 @@ private const val LANDSCAPE_CONTENT_WEIGHT = 3f
  * flow takes the flow's bar instead, as [StepFlowScreen] draws it.
  *
  * [noteContent] replaces `copy.note` in both layouts, as [DecisionHeading] says.
+ *
+ * @need ask one yes-or-no question on a whole screen
+ * @group screens
+ * @replaces a hand-built consent or opt-in screen
  */
 @Composable
 fun DecisionScreen(
@@ -90,6 +94,10 @@ fun DecisionScreen(
  * It has no background, insets, scroll or pinned answers, so it can be a page inside a step flow that supplies its
  * own chrome and footer. [DecisionScreen] lays out the same pieces around it. [noteContent] replaces `copy.note`, as
  * [DecisionHeading] says.
+ *
+ * @need show the content of a decision as one page of a flow
+ * @group screens
+ * @replaces a hand-built hero, copy and points column
  */
 @Composable
 fun DecisionBody(
@@ -176,6 +184,10 @@ private fun DecisionLandscape(
  * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour (#673). It sits
  * where the note does, and its paragraphs are spaced as the heading's lines are. A bare `Text` in it reads as the note
  * would: the slot provides the note's style and colour, so only a paragraph that differs names its own.
+ *
+ * @need show the heading block of a decision step
+ * @group screens
+ * @replaces a hand-built kicker, title and subtitle stack
  */
 @Composable
 fun DecisionHeading(

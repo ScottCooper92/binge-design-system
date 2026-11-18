@@ -46,6 +46,10 @@ private const val CHECK_POP_INITIAL_SCALE = 0.7f
  * [provider] supplies id/name/logo metadata. Toggle semantics use [Role.Checkbox], and [onCheckedChange] is told the state the tap asks for.
  * Reduce-motion safe: the check badge fades rather than scales and the selection
  * lift snaps instead of springing under [LocalReduceMotion].
+ *
+ * @need show one selectable logo tile in a picker grid
+ * @group inputs
+ * @replaces a hand-built selectable square with a logo and check
  */
 @Composable
 fun WatchProviderTile(
