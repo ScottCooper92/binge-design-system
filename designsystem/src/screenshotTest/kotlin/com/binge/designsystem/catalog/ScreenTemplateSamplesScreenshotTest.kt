@@ -10,6 +10,7 @@ import com.binge.designsystem.preview.PreviewSystemBarInsets
 import com.binge.designsystem.preview.SOURCE_LOCALE
 import com.binge.designsystem.preview.ScreenPreviews
 import com.binge.designsystem.preview.ScreenStatePreview
+import com.binge.designsystem.preview.ScreenWidthPreviews
 
 /** [com.binge.designsystem.preview.ScreenPreviews]' `phone-land` cell, for a frame that adds side insets to it. */
 private const val PHONE_LANDSCAPE = "spec:width=411dp,height=891dp,orientation=landscape"
@@ -23,7 +24,7 @@ private const val TABLET = "spec:width=800dp,height=1280dp,orientation=landscape
  */
 class ScreenTemplateSamplesScreenshotTest {
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun screenScaffold() = BingeScreenScaffoldSample()
 
@@ -69,7 +70,7 @@ class ScreenTemplateSamplesScreenshotTest {
     fun screenScaffoldSmallNoBack() = BingeScreenScaffoldSmallBarNoBackSample()
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun message() = MessageScreenSample()
 
@@ -119,7 +120,7 @@ class ScreenTemplateSamplesScreenshotTest {
     fun emptyAction() = EmptyScreenActionSample()
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun decision() = DecisionScreenSample()
 
@@ -153,7 +154,7 @@ class ScreenTemplateSamplesScreenshotTest {
     fun decisionInPane() = DecisionScreenInPaneSample()
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun filteredList() = FilteredListScreenSample()
 
@@ -219,7 +220,7 @@ class ScreenTemplateSamplesScreenshotTest {
     fun heroDetailBleed() = HeroDetailScreenBleedSample()
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun heroDetailLazy() = HeroDetailLazyScreenSample()
 
@@ -259,7 +260,7 @@ class ScreenTemplateSamplesScreenshotTest {
     fun screenFooter() = ScreenFooterSample()
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun formFooter() = FormScreenFooterSample()
 
@@ -270,7 +271,7 @@ class ScreenTemplateSamplesScreenshotTest {
     fun formFooterUnderSystemBars() = PreviewSystemBarInsets { FormScreenFooterSample() }
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun formTopBar() = FormScreenTopBarSample()
 
@@ -280,7 +281,7 @@ class ScreenTemplateSamplesScreenshotTest {
     fun formTopBarUnchanged() = FormScreenTopBarUnchangedSample()
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun formCapped() = FormScreenCappedSample()
 
@@ -349,7 +350,7 @@ class ScreenTemplateSamplesScreenshotTest {
         }
 
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun screenScaffoldLargeBar() = BingeScreenScaffoldLargeBarSample()
 }

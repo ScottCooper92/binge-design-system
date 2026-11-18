@@ -3,7 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
-import com.binge.designsystem.preview.ScreenPreviews
+import com.binge.designsystem.preview.ScreenWidthPreviews
 
 /**
  * Screenshot coverage for the [ListRowSkeletonColumn] catalog samples — renders the shared
@@ -13,7 +13,7 @@ import com.binge.designsystem.preview.ScreenPreviews
  */
 class ListRowSkeletonSamplesScreenshotTest {
     @PreviewTest
-    @ScreenPreviews
+    @ScreenWidthPreviews
     @Composable
     fun Loading() {
         ListRowSkeletonSample()

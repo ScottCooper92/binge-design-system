@@ -155,6 +155,18 @@ annotation class RtlPreview
 annotation class ScreenPreviews
 
 /**
+ * [ScreenPreviews] without its `phone-land` and `foldable` cells: phone, `phone-light` and `tablet`, for a screen whose layout does
+ * not change between a phone and the foldable or landscape windows beyond what the tablet cell already shows. Keep
+ * [ScreenPreviews] where it does: a split that opens at the foldable's width, or an inset a landscape window adds. The three cells
+ * are [ScreenPreviews]' own, spec for spec, so a frame that moves between the two keeps the baselines it still has.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "phone", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "phone-light", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
+@Preview(name = "tablet", device = TABLET_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+annotation class ScreenWidthPreviews
+
+/**
  * [ScreenPreviews] without its `tablet` cell, for a screen whose layouts have no breakpoint above the foldable's: the
  * tablet cell would only re-render the foldable's layout wider. The four cells are [ScreenPreviews]' own, spec for
  * spec, so a frame that moves between the two keeps its baselines. [TabletScreenPreview] is the cell this leaves out.
