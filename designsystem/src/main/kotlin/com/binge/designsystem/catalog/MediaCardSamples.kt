@@ -16,6 +16,7 @@ import com.binge.designsystem.component.MediaCardSkeleton
 import com.binge.designsystem.component.MediaCardStatus
 import com.binge.designsystem.component.MediaTypeTagType
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.preview.WithPreviewImage
 import com.binge.designsystem.theme.BingeSentiment
 
 /**
@@ -101,8 +102,8 @@ fun MediaCardUnratedSample() {
 }
 
 /**
- * A poster carrying a status chip top-start, the way a grid marks where a request for the title stands.
- * The type badge sits above it on a surface that mixes kinds, so the sample shows both.
+ * A poster carrying a status as a dot top-end, the way a grid marks where a request for the title stands. The type badge sits top-start
+ * on a surface that mixes kinds, so the sample shows both. The label is not drawn: it is in the card's semantics.
  */
 @Composable
 fun MediaCardStatusSample() {
@@ -119,26 +120,45 @@ fun MediaCardStatusSample() {
     }
 }
 
-/**
- * A status label too long for the poster's width: the chip stays on one line and is cut with an ellipsis, so at a large font scale
- * it does not break a word or run down the artwork. See [MediaCardStatusSample] for one that fits.
- */
+/** The status dot on a near-white poster, where the dot's ring is what keeps it visible. */
 @Composable
-fun MediaCardStatusLongLabelSample() {
+fun MediaCardStatusLightPosterSample() {
     ScreenshotTheme {
-        // In a Column, so the theme's Surface does not stretch the card past its own width.
-        Column {
-            MediaCard(
-                posterUrl = null,
-                title = "Arrival",
-                rating = 7.9f,
-                onClick = {},
-                status = MediaCardStatus(label = "Partly available", sentiment = BingeSentiment.Caution),
-                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
-            )
+        WithPreviewImage(widthPx = LIGHT_POSTER_WIDTH_PX, heightPx = LIGHT_POSTER_HEIGHT_PX, color = LIGHT_POSTER_COLOR) {
+            // In a Column, so the theme's Surface does not stretch the card past its own width.
+            Column {
+                MediaCard(
+                    posterUrl = "light-poster",
+                    title = "Arrival",
+                    rating = null,
+                    onClick = {},
+                    status = MediaCardStatus(label = "Processing", sentiment = BingeSentiment.Caution),
+                    modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+                )
+            }
         }
     }
 }
+
+/** A status and a top-end action on one poster: the dot sits to the start of the action button, so neither covers the other. */
+@Composable
+fun MediaCardStatusWithActionSample() {
+    ScreenshotTheme {
+        MediaCard(
+            posterUrl = null,
+            title = "Arrival",
+            rating = 7.9f,
+            onClick = {},
+            status = MediaCardStatus(label = "Requested", sentiment = BingeSentiment.Info),
+            topEndAction = MediaCardAction(icon = Icons.Filled.Close, contentDescription = "Remove", onClick = {}),
+            modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+        )
+    }
+}
+
+private const val LIGHT_POSTER_WIDTH_PX = 300
+private const val LIGHT_POSTER_HEIGHT_PX = 450
+private const val LIGHT_POSTER_COLOR = 0xFFF4F1EA.toInt()
 
 /** A title the user is part-way through: the bar along the poster's bottom edge says how far, here 40%. */
 @Composable
