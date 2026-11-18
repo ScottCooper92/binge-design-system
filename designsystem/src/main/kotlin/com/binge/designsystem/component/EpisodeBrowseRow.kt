@@ -30,7 +30,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.formatRuntimeMinutes
 
 /**
- * One episode of a season as a flat row: a still with its rating chip on it, then an eyebrow ("E7 · 73 min"),
+ * One episode of a season as a flat row: a still with its rating chip on it, then an eyebrow ("E7" and "73 min"),
  * the name over two lines and the synopsis over three.
  *
  * The eyebrow is the number and then the runtime when there is one, else the air date when there is one, as two
