@@ -65,6 +65,9 @@
          column here too (the rails start-align to it but bleed past); Search caps its field/results here.
          Wider screens centre the column with gutters; a no-op on phones. -->
     <dimen name="content_max_width">640dp</dimen>
+    <!-- The width the search results are held to, which goes with search_result_columns: the column count and this cap are the two halves of
+         how a results page lays out, so they live together. 640dp below 600dp; values-w600dp widens it so two or three columns of rows fit. -->
+    <dimen name="search_content_max_width">640dp</dimen>
     <!-- Watch-provider tile grid, for a provider-picking screen -->
     <dimen name="provider_grid_spacing">12dp</dimen>
     <dimen name="provider_tile_border">2.5dp</dimen>
