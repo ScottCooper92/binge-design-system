@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
@@ -232,7 +233,11 @@ private fun ServerCardUpdateRow(update: ServerCardUpdate) {
     val accent = BingeSentiment.Caution.accent()
     Surface(
         onClick = update.onClick,
-        modifier = Modifier.fillMaxWidth().heightIn(min = dimensionResource(R.dimen.min_touch_target)),
+        // A clickable `Surface` is not announced as a button on its own; the row is one, so it says so.
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = dimensionResource(R.dimen.min_touch_target))
+            .semantics { role = Role.Button },
         shape = MaterialTheme.shapes.medium,
         color = accent.tonalContainer(),
         contentColor = accent,
