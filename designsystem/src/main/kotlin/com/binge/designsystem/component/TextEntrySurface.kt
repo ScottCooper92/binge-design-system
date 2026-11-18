@@ -105,15 +105,11 @@ fun TextEntrySurface(
     var focused by remember { mutableStateOf(false) }
     // The String overload of OutlinedTextField starts its selection at 0, so a field opened on an existing value would put the caret
     // before it. Own the selection as BingeTextField does: it goes to the end when the field gains focus (a tap that follows still places
-    // it), follows the user, and goes back to the end when the value is changed from outside while focused. Unfocused it stays at 0, so a
-    // long value shows its start while nobody is editing it.
-    var field by remember { mutableStateOf(TextFieldValue(value)) }
-    val fieldValue =
-        when {
-            !focused -> TextFieldValue(value)
-            field.text == value -> field
-            else -> TextFieldValue(value, TextRange(value.length))
-        }
+    // it), follows the user, and goes back to the end when the value is changed from outside while focused. A value the caller rewrites from
+    // what was typed keeps the caret where it was (#1201, as #1158 did for BingeTextField). Unfocused it stays at 0, so a long value shows
+    // its start while nobody is editing it.
+    val caret = rememberFieldCaret(value, TextFieldValue(value))
+    val fieldValue = if (focused) caret.shown(value) else TextFieldValue(value)
     val expanded = expanded && !singleLine
     val submit = submitEnabled && !isSubmitting
     val fieldMaxLines = when {
@@ -140,16 +136,16 @@ fun TextEntrySurface(
             // A change over maxLength is dropped whole, so the field keeps what it showed. A caret move leaves the text as it was and always
             // goes through, even where the caller's own value is already over the cap.
             onValueChange = { updated ->
-                if (updated.text == value || maxLength == null || updated.text.length <= maxLength) {
-                    field = updated
-                    if (updated.text != value) onValueChange(updated.text)
+                // A dropped edit never reaches the caret, so it is not left pending as an edit the caller has yet to answer.
+                if ((updated.text == value || maxLength == null || updated.text.length <= maxLength) && caret.edit(updated, value)) {
+                    onValueChange(updated.text)
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged {
                     focused = it.isFocused
-                    if (it.isFocused) field = TextFieldValue(value, TextRange(value.length))
+                    if (it.isFocused) caret.reset(TextFieldValue(value, TextRange(value.length)))
                 }
                 // Expanded has a bounded column height to weight against, so the field fills the
                 // space and scrolls internally; collapsed it wraps to its capped line count.
