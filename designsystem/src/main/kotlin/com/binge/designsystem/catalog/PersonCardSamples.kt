@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.component.MediaCarousel
 import com.binge.designsystem.component.PersonCard
 import com.binge.designsystem.component.PersonCardSkeleton
@@ -109,6 +110,27 @@ fun PersonCardRowSample() {
                     photoUrl = if (hasPhoto) PHOTO_URL else null,
                     onClick = {},
                 )
+            }
+        }
+    }
+}
+
+/**
+ * A short row of people with its see-all tile. The tile is as tall as the cards, which `endTileHeight = Dp.Unspecified` takes from the
+ * tallest card the row has composed, so it follows the font scale; see the worst-case frames at 1.3x and 2x.
+ */
+@Composable
+fun PersonCardRowEndTileSample() {
+    ScreenshotTheme {
+        WithPreviewImage(PHOTO_SIZE_PX, PHOTO_SIZE_PX) {
+            MediaCarousel(
+                title = "Cast",
+                items = cast.take(2),
+                itemKey = { it.first },
+                onMoreClick = {},
+                endTileHeight = Dp.Unspecified,
+            ) { _, (name, subtitle, hasPhoto) ->
+                PersonCard(name = name, subtitle = subtitle, photoUrl = if (hasPhoto) PHOTO_URL else null, onClick = {})
             }
         }
     }
