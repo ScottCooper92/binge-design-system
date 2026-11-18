@@ -61,7 +61,7 @@ fun PersonCard(
     description: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val label = description ?: listOfNotNull(name, subtitle).joinToString(", ")
+    val label = description ?: listOf(name, subtitle).filterNot { it.isNullOrBlank() }.joinToString(", ")
     Column(
         modifier = modifier
             .width(dimensionResource(R.dimen.person_card_width))
