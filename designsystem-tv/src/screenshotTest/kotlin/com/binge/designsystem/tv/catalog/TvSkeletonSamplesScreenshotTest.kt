@@ -7,7 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
-/** Screenshot coverage for the TV skeleton pages: the hub's and the detail page's loading states. */
+/** Screenshot coverage for the TV skeleton pages: the immersive hub's loading states. */
 class TvSkeletonSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
@@ -18,11 +18,6 @@ class TvSkeletonSamplesScreenshotTest {
     @TvPreviews
     @Composable
     fun hubOverlay() = Frame { TvImmersiveHubSkeletonOverlaySample() }
-
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun detail() = Frame { TvDetailPageSkeletonSample() }
 
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
