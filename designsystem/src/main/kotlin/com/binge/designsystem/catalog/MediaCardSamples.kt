@@ -1,6 +1,7 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -115,6 +116,27 @@ fun MediaCardStatusSample() {
             status = MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive),
             modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
         )
+    }
+}
+
+/**
+ * A status label too long for the poster's width: the chip stays on one line and is cut with an ellipsis, so at a large font scale
+ * it does not break a word or run down the artwork. See [MediaCardStatusSample] for one that fits.
+ */
+@Composable
+fun MediaCardStatusLongLabelSample() {
+    ScreenshotTheme {
+        // In a Column, so the theme's Surface does not stretch the card past its own width.
+        Column {
+            MediaCard(
+                posterUrl = null,
+                title = "Arrival",
+                rating = 7.9f,
+                onClick = {},
+                status = MediaCardStatus(label = "Partly available", sentiment = BingeSentiment.Caution),
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+        }
     }
 }
 

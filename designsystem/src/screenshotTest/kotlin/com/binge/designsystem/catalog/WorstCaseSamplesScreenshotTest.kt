@@ -2,6 +2,7 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.LocalePreviews
 import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 /**
@@ -49,6 +50,14 @@ class WorstCaseSamplesScreenshotTest {
     @Composable
     fun MediaCard() {
         MediaCardWorstCaseSample()
+    }
+
+    @PreviewTest
+    @WorstCaseFontPreviews
+    @LocalePreviews
+    @Composable
+    fun PersonCard() {
+        PersonCardWorstCaseSample()
     }
 
     @PreviewTest

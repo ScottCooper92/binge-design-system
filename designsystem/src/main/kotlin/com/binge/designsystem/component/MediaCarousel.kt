@@ -24,6 +24,9 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 /**
  * A titled horizontal row of media items, with an optional trailing "see all" tile.
  *
+ * The trailing tile is [endTileHeight] tall, which defaults to a poster card with its caption. A row of shorter items, such as the
+ * category tiles ([categoryTileHeight]), passes their height so the tile does not stand taller than the row.
+ *
  * [itemContent] receives each item's position in [items] as well as the item, so a caller reporting
  * which position was tapped reads it from the slot rather than searching the list for it.
  */
@@ -36,6 +39,7 @@ fun <T> MediaCarousel(
     onMoreClick: (() -> Unit)? = null,
     onEndTileClick: (() -> Unit)? = onMoreClick,
     endTileLabel: String = stringResource(R.string.gallery_see_all),
+    endTileHeight: Dp = dimensionResource(R.dimen.card_height),
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
     // The row is full-bleed under an overlaying rail; its first column clears it instead (navOverlayStart).
     // A caller whose own parent already applied the overlay inset (e.g. a grid's navOverlayPadding)
@@ -64,7 +68,7 @@ fun <T> MediaCarousel(
                         onClick = onEndTileClick,
                         modifier = Modifier
                             .width(dimensionResource(R.dimen.see_all_tile_width))
-                            .height(dimensionResource(R.dimen.card_height)),
+                            .height(endTileHeight),
                     )
                 }
             }

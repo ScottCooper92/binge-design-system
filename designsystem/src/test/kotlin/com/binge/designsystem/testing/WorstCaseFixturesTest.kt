@@ -19,6 +19,7 @@ import com.binge.designsystem.catalog.ItemGroupWideTrailingWorstCaseSample
 import com.binge.designsystem.catalog.ItemGroupWorstCaseSample
 import com.binge.designsystem.catalog.ListRowWorstCaseSample
 import com.binge.designsystem.catalog.MediaCardWorstCaseSample
+import com.binge.designsystem.catalog.PersonCardWorstCaseSample
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -51,6 +52,10 @@ class WorstCaseFixturesTest {
         // A pass that checked nothing is no pass: scrolling content is skipped, and these rows must not hide in it.
         assertTrue("only $checked text nodes were checked", checked >= MIN_CHECKED)
     }
+
+    @Test fun `a person card at 1_3`() = check(FONT_13) { PersonCardWorstCaseSample() }
+
+    @Test fun `a person card at 2_0`() = check(FONT_20) { PersonCardWorstCaseSample() }
 
     @Test fun `a list row at 1_3`() = check(FONT_13) { ListRowWorstCaseSample() }
 
