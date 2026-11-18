@@ -14,4 +14,6 @@
          A search result is a ListRow, not a poster, so it wants a wider cell than media_grid_columns
          gives: one column on a phone, widening only where a row would otherwise run the full window. -->
     <integer name="search_result_columns">1</integer>
+    <!-- How many lines an episode browse row gives its synopsis before it ellipsizes. -->
+    <integer name="episode_browse_row_overview_max_lines">3</integer>
 </resources>

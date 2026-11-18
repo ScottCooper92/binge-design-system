@@ -1,0 +1,130 @@
+package com.binge.designsystem.component
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.BACKDROP_ASPECT_RATIO
+import com.binge.designsystem.R
+import com.binge.designsystem.modifier.skeleton
+import com.binge.designsystem.theme.BingeShapes
+
+private const val SKELETON_TITLE_WIDTH_FRACTION = 0.7f
+private const val SKELETON_META_WIDTH_FRACTION = 0.35f
+
+/**
+ * A season's heading: [title] at `headlineSmall` on the screen background, with [subtitle] (an episode
+ * count, say) under it. It reads as the same kind of section heading the rest of an app uses rather than a
+ * banded divider.
+ */
+@Composable
+fun SeasonHeader(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = dimensionResource(R.dimen.screen_content_inset),
+                vertical = dimensionResource(R.dimen.padding_m),
+            ),
+    ) {
+        Text(text = title, style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/** A row-shaped placeholder for an episode of a season still loading, laid out like [EpisodeBrowseRow]. */
+@Composable
+fun EpisodeBrowseRowSkeleton(modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = dimensionResource(R.dimen.screen_content_inset),
+                    vertical = dimensionResource(R.dimen.detail_meta_spacing),
+                ),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(dimensionResource(R.dimen.episode_browse_row_still_width))
+                    .aspectRatio(BACKDROP_ASPECT_RATIO)
+                    .skeleton(visible = true, shape = MaterialTheme.shapes.small),
+            )
+            Spacer(Modifier.width(dimensionResource(R.dimen.padding_m)))
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)),
+            ) {
+                Text(
+                    text = " ",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier
+                        .fillMaxWidth(SKELETON_META_WIDTH_FRACTION)
+                        .skeleton(visible = true, shape = BingeShapes.Tag),
+                )
+                Text(
+                    text = " ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .fillMaxWidth(SKELETON_TITLE_WIDTH_FRACTION)
+                        .skeleton(visible = true, shape = BingeShapes.Tag),
+                )
+            }
+        }
+        Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
+    }
+}
+
+/**
+ * A season whose episodes failed to load: its own [message] and, when [onRetry] is set, a text button
+ * labelled [retryLabel], under its header and leaving the other seasons untouched.
+ */
+@Composable
+fun SeasonFailedRow(
+    message: String,
+    retryLabel: String,
+    modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = dimensionResource(R.dimen.screen_content_inset),
+                vertical = dimensionResource(R.dimen.detail_meta_spacing),
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        if (onRetry != null) {
+            TextButton(onClick = onRetry) { Text(retryLabel) }
+        }
+    }
+}

@@ -145,4 +145,6 @@
     <string name="time_input_am">a. m.</string>
     <string name="time_input_pm">p. m.</string>
     <string name="time_input_invalid">Introduce una hora válida.</string>
+    <string name="detail_episode_label">E%1$d</string>
+    <string name="detail_runtime_minutes">%1$d min</string>
 </resources>
