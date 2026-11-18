@@ -52,6 +52,9 @@ jobs:
       # does not run in. The Android SDK is preinstalled on the hosted runner image.
       toolchain: jvm
       java_version: '21'
+      # Scott, 2026-11-18: the bot may re-record frames of components its own PR changed, with
+      # before/after posted for review (binge-ci #376).
+      rerecord_screenshots: true
       verify_guidance: >
         Scope Gradle to the module rather than running the whole tree when you
         are checking one thing — `./gradlew :designsystem:test`, or
@@ -67,15 +70,18 @@ jobs:
         NEVER silence a gate instead of fixing it. Do not add a ktlint
         baseline, do not add `ktlint-disable` comments to make a file pass,
         do not add a lint-baseline.xml, do not set `abortOnError = false`,
-        and do not exclude a source set from `check`. Do not touch any
-        screenshot baseline PNG under `src/screenshotTestDebug/reference/`,
-        and never run `updateDebugScreenshotTest`.
+        and do not exclude a source set from `check`.
 
-        A failing screenshot test means the rendering changed. Re-recording
-        the baseline makes CI green while accepting whatever was rendered,
-        which is how a real visual regression gets merged, and here it lands
-        in four other codebases that never agreed to it. A baseline is a
-        deliberate human decision, not a repair.
+        Screenshot baselines follow the re-record gate this workflow turns
+        on (rerecord_screenshots): re-record a frame only when every differing
+        frame renders a component this PR's own diff changed, run the update
+        task scoped to those classes, and commit only those PNGs. The workflow
+        then posts each frame's before and after on the PR for the review bot
+        to judge against the PR's stated intent. A differing frame for a
+        component the PR did not touch is a regression or a stale base: stop
+        and say so, because that change lands in four other codebases that
+        never agreed to it. A render error or an out-of-memory failure is not
+        a diff: never re-record on one. Never delete a baseline to get green.
 
         Formatting failures are the cheapest class of failure to fix
         properly. A lint baseline is worse than it looks: it silences the
@@ -83,15 +89,9 @@ jobs:
         is to be included by other builds. A baseline here is a finding
         suppressed in four codebases that never agreed to it.
 
-        If the only way to green is through one of those, that is a stop:
-        make no changes and say so.
-
-        This is deliberately stricter than the review-feedback bot, which may
-        re-record a baseline its own requested change moved. Do not
-        "harmonise" the two. That bot knows why the pixels changed because
-        it just changed them; you arrive at a red build you did not cause
-        and cannot tell an intended shift from a regression. Stopping is
-        the right answer for you and the wrong one for it.
+        If the only way to green is through one of the suppressions above,
+        or through a frame the PR did not change, that is a stop: make no
+        changes and say so.
     secrets:
       AUTHOR_APP_ID: ${{ secrets.AUTHOR_APP_ID }}
       AUTHOR_APP_PRIVATE_KEY: ${{ secrets.AUTHOR_APP_PRIVATE_KEY }}
