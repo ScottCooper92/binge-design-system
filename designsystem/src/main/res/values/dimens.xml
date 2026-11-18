@@ -230,6 +230,9 @@
     <dimen name="card_action_icon_size">20dp</dimen>
     <dimen name="card_action_inset">6dp</dimen>
     <dimen name="card_badge_inset">6dp</dimen>
+    <!-- The poster status dot: its fill, and the ring around it that keeps it visible on a light poster. -->
+    <dimen name="media_card_status_dot_size">12dp</dimen>
+    <dimen name="media_card_status_dot_ring">1.5dp</dimen>
     <!-- Portrait-phone / tall-window hero height (unchanged). values-sw600dp lifts it to the
          taller cinematic value on tablets; the landscape-phone cap is computed off the window
          height in code (min(60% window, hero_height_compact_cap)) so the first rail always peeks. -->

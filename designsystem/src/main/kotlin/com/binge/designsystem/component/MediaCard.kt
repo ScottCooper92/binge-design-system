@@ -7,6 +7,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +35,7 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import coil3.compose.SubcomposeAsyncImage
@@ -46,6 +49,7 @@ import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
+import com.binge.designsystem.theme.fill
 
 /**
  * A poster tile for a grid or carousel: the image with a title, rating and optional badges and progress.
@@ -82,7 +86,9 @@ fun MediaCard(
                 indication = LocalIndication.current,
                 role = Role.Button,
                 onClick = onClick,
-            ),
+            )
+            // A dot alone cannot carry the status, so its words join the card's own announcement ("Arrival, Available").
+            .semantics { if (status != null) stateDescription = status.label },
     ) {
         Card(
             shape = BingeShapes.MediaCard,
@@ -271,44 +277,55 @@ private fun MediaCardOverlays(
                     .padding(dimensionResource(R.dimen.card_rating_padding)),
             )
         }
-        if (typeBadge != null || status != null) {
-            Column(
+        if (typeBadge != null) {
+            MediaTypeTag(
+                type = typeBadge,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(badgeInset),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
-            ) {
-                if (typeBadge != null) MediaTypeTag(type = typeBadge)
-                if (status != null) MediaCardStatusChip(status)
-            }
+            )
         }
-        if (topEndAction != null) {
-            MediaCardActionButton(
-                action = topEndAction,
+        if (status != null || topEndAction != null) {
+            // The status dot and the action share the top-end corner: the dot sits to the start of the action, never under it.
+            Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(dimensionResource(R.dimen.card_action_inset)),
-            )
+                    .padding(
+                        dimensionResource(
+                            if (topEndAction != null) R.dimen.card_action_inset else R.dimen.card_rating_padding,
+                        ),
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (status != null) MediaCardStatusDot(status)
+                if (topEndAction != null) MediaCardActionButton(action = topEndAction)
+            }
         }
     }
 }
 
 /**
- * The chip's wash is translucent, so it sits on a solid surface rather than straight on the artwork. It is one line, cut with an
- * ellipsis where the label does not fit: wrapped inside a poster's width, a larger font scale breaks a word across lines and
- * stacks the chip down the artwork.
+ * The status as a dot in the sentiment's fill, the colour a [StatusChip]'s dot uses, so it reads as the same status everywhere. A ring in the
+ * card's scrim colour keeps it visible on a light poster. It has no words of its own: the label is in the card's semantics.
  */
 @Composable
-private fun MediaCardStatusChip(status: MediaCardStatus) {
-    StatusChip(
-        label = status.label,
-        sentiment = status.sentiment,
-        singleLine = true,
+private fun MediaCardStatusDot(status: MediaCardStatus) {
+    val ring = dimensionResource(R.dimen.media_card_status_dot_ring)
+    Box(
         modifier = Modifier
-            .clip(BingeShapes.Pill)
-            .background(MaterialTheme.colorScheme.surface),
-    )
+            .background(BingeTheme.colors.scrim.copy(alpha = STATUS_DOT_RING_ALPHA), CircleShape)
+            .padding(ring),
+    ) {
+        Spacer(
+            Modifier
+                .size(dimensionResource(R.dimen.media_card_status_dot_size))
+                .background(status.sentiment.fill(), CircleShape),
+        )
+    }
 }
+
+private const val STATUS_DOT_RING_ALPHA = 0.7f
 
 @Composable
 private fun MediaCardActionButton(action: MediaCardAction, modifier: Modifier = Modifier) {

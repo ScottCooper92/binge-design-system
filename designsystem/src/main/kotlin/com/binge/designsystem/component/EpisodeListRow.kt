@@ -35,6 +35,8 @@ import com.binge.designsystem.theme.BingeTheme
  * A null [onClick] makes the row display-only: the layout is the same, but it is not a button, so it has no click
  * semantics, no ripple and no focus target. For an app that lists episodes to be read, not opened.
  *
+ * The still has no content description: it sits beside the episode's name, so a screen reader would say the name twice.
+ *
  * @need show an episode in a list with its still and details
  * @group rows
  * @replaces a hand-built row with an image and a text column
@@ -52,7 +54,7 @@ fun EpisodeListRow(
     ListRow(
         modifier = modifier,
         onClick = onClick,
-        leading = { EpisodeStill(stillUrl = stillUrl, contentDescription = name) },
+        leading = { EpisodeStill(stillUrl = stillUrl) },
     ) { contentModifier ->
         EpisodeRowMeta(
             episodeNumber = episodeNumber,
@@ -64,11 +66,12 @@ fun EpisodeListRow(
     }
 }
 
+/** The still is decorative beside the episode's name, which the row's text already carries, so it has no description of its own. */
 @Composable
-private fun EpisodeStill(stillUrl: String?, contentDescription: String?) {
+private fun EpisodeStill(stillUrl: String?) {
     ListRowPoster(
         imageUrl = stillUrl,
-        contentDescription = contentDescription,
+        contentDescription = null,
         width = dimensionResource(R.dimen.episode_row_still_width),
         aspectRatio = BACKDROP_ASPECT_RATIO,
     )
@@ -152,7 +155,7 @@ private fun EpisodeRowSubtitle(rating: Float, airDate: String?) {
 fun EpisodeListRowSkeleton(modifier: Modifier = Modifier, description: String? = null) {
     ListRow(
         modifier = modifier.describedAs(description),
-        leading = { EpisodeStill(stillUrl = null, contentDescription = null) },
+        leading = { EpisodeStill(stillUrl = null) },
     ) { contentModifier ->
         Column(modifier = contentModifier) {
             Text(text = " ", style = MaterialTheme.typography.labelSmall)

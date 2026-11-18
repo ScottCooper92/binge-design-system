@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
@@ -39,6 +40,9 @@ import com.binge.designsystem.theme.BingeShapes
  * section and search group a landmark. The "see all" button describes itself with the section name,
  * since a hub carries one per carousel and they would otherwise all announce identically.
  *
+ * [horizontalPadding] defaults to the screen's content inset, which widens with the window (16, 24, then 32dp), so the title lines up with
+ * the rest of the page on a tablet or a foldable.
+ *
  * @need title a section with an optional see-more action
  * @group rows
  * @replaces a hand-built Row of a title and a text button
@@ -49,7 +53,7 @@ fun SectionHeader(
     modifier: Modifier = Modifier,
     onMoreClick: (() -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
-    horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
+    horizontalPadding: Dp = resolvedContentInset(),
     startPadding: Dp = horizontalPadding + navOverlayStart(),
     endPadding: Dp = horizontalPadding + navOverlayEnd(),
 ) {
