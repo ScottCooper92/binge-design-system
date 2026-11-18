@@ -330,6 +330,8 @@
     <dimen name="episode_browse_row_still_width">144dp</dimen>
     <!-- Clear space under the last row of a season-grouped episode list. -->
     <dimen name="detail_bottom_spacing">32dp</dimen>
+    <!-- The catalog sample for the shared navigation motion: the fixed height of its two-screen stage. -->
+    <dimen name="nav_motion_sample_height">180dp</dimen>
     <dimen name="icon_size_m">18dp</dimen>
     <dimen name="chip_padding_h">18dp</dimen>
     <dimen name="chip_padding_v">12dp</dimen>
