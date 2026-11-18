@@ -60,4 +60,12 @@ class ExternalScoreSamplesScreenshotTest {
     fun CarouselPhone() {
         HeroCarouselScoresSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun CarouselStatus() {
+        HeroCarouselStatusSample()
+    }
 }

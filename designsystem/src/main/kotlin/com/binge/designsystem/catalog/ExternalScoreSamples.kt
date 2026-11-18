@@ -17,7 +17,9 @@ import com.binge.designsystem.component.ExternalScoreKind
 import com.binge.designsystem.component.ExternalScoreLine
 import com.binge.designsystem.component.HeroCarousel
 import com.binge.designsystem.component.HeroItem
+import com.binge.designsystem.component.MediaCardStatus
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeSentiment
 
 private val EnglishScores = listOf(
     ExternalScore(ExternalScoreKind.CriticsFresh, "97%", "Critics 97 percent"),
@@ -108,7 +110,7 @@ fun DetailCinematicHeaderScoresSample() {
     }
 }
 
-/** [HeroCarousel] whose first slide carries the scores after the genres on its meta row. */
+/** [HeroCarousel] whose slide carries the scores after the genres and, last, an Available status. */
 @Composable
 fun HeroCarouselScoresSample() {
     ScreenshotTheme {
@@ -124,6 +126,27 @@ fun HeroCarouselScoresSample() {
                     runtimeMinutes = 152,
                     rank = 1,
                     externalScores = EnglishScores,
+                    status = MediaCardStatus("Available", BingeSentiment.Positive),
+                ),
+            ),
+            onItemClick = {},
+        )
+    }
+}
+
+/** [HeroCarousel] with a status and no scores: the status follows the rating and the genres. */
+@Composable
+fun HeroCarouselStatusSample() {
+    ScreenshotTheme {
+        HeroCarousel(
+            items = listOf(
+                HeroItem(
+                    id = 1,
+                    imageUrl = null,
+                    title = "Dune",
+                    rating = 7.6f,
+                    genres = listOf("Science Fiction", "Action"),
+                    status = MediaCardStatus("Requested", BingeSentiment.Caution),
                 ),
             ),
             onItemClick = {},
