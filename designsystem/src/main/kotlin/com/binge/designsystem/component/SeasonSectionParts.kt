@@ -17,12 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import com.binge.designsystem.BACKDROP_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeShapes
 
-private const val SKELETON_TITLE_WIDTH_FRACTION = 0.7f
 private const val SKELETON_META_WIDTH_FRACTION = 0.35f
 
 /**
@@ -53,7 +55,8 @@ fun SeasonHeader(
     }
 }
 
-/** A row-shaped placeholder for an episode of a season still loading, laid out like [EpisodeBrowseRow]. */
+/** A row-shaped placeholder for an episode of a season still loading. It reserves the height of a full
+ * [EpisodeBrowseRow] (the eyebrow, a two-line name and a full synopsis), so the list does not jump as a season loads. */
 @Composable
 fun EpisodeBrowseRowSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
@@ -77,19 +80,20 @@ fun EpisodeBrowseRowSkeleton(modifier: Modifier = Modifier) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)),
             ) {
-                Text(
-                    text = " ",
+                SkeletonLine(
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier
-                        .fillMaxWidth(SKELETON_META_WIDTH_FRACTION)
-                        .skeleton(visible = true, shape = BingeShapes.Tag),
+                    widthFraction = SKELETON_META_WIDTH_FRACTION,
+                    lines = 1,
                 )
-                Text(
-                    text = " ",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .fillMaxWidth(SKELETON_TITLE_WIDTH_FRACTION)
-                        .skeleton(visible = true, shape = BingeShapes.Tag),
+                SkeletonLine(
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                    widthFraction = 1f,
+                    lines = 2,
+                )
+                SkeletonLine(
+                    style = MaterialTheme.typography.bodySmall,
+                    widthFraction = 1f,
+                    lines = integerResource(R.integer.episode_browse_row_overview_max_lines),
                 )
             }
         }
@@ -127,4 +131,22 @@ fun SeasonFailedRow(
             TextButton(onClick = onRetry) { Text(retryLabel) }
         }
     }
+}
+
+/** A plate as tall as [lines] lines of [style], so a loading row reserves the loaded row's text block. */
+@Composable
+private fun SkeletonLine(
+    style: TextStyle,
+    widthFraction: Float,
+    lines: Int,
+) {
+    Text(
+        text = " ",
+        style = style,
+        minLines = lines,
+        maxLines = lines,
+        modifier = Modifier
+            .fillMaxWidth(widthFraction)
+            .skeleton(visible = true, shape = BingeShapes.Tag),
+    )
 }

@@ -35,7 +35,7 @@ fun EpisodeBrowseRowAirDateSample() {
                 number = 8,
                 name = "Garden of Bones",
                 overview = "A short synopsis.",
-                airDate = "Mar 12, 2023",
+                airDate = "12 Mar 2023",
             ),
         )
     }
@@ -54,7 +54,7 @@ fun EpisodeBrowseRowSkeletonSample() {
 fun SeasonSectionsListSample() {
     SeasonList(
         listOf(
-            loadedSeason(1, "Season 1", "3 episodes"),
+            loadedSeason(1, "Season 1", "3 episodes", airDate = "5 Mar 2023"),
             SeasonSectionUi("2", "Season 2", "10 episodes", SeasonSectionState.Loading(rowCount = 4)),
         ),
     )
@@ -71,16 +71,15 @@ fun SeasonSectionsListLoadingSample() {
     )
 }
 
-/** Season 2 failed: its message and a Retry button under its header, season 1 untouched. Retry sends it back to loading. */
+/** Season 1 failed: its message and a Retry button under its header, season 2 untouched. Retry sends it back to loading. */
 @Composable
 fun SeasonSectionsListFailedSample() {
     var failed by remember { mutableStateOf(true) }
     SeasonList(
         listOf(
-            loadedSeason(1, "Season 1", "3 episodes"),
             SeasonSectionUi(
-                key = "2",
-                title = "Season 2",
+                key = "1",
+                title = "Season 1",
                 subtitle = "10 episodes",
                 state = if (failed) {
                     SeasonSectionState.Failed(
@@ -92,16 +91,17 @@ fun SeasonSectionsListFailedSample() {
                     SeasonSectionState.Loading(rowCount = 4)
                 },
             ),
+            loadedSeason(2, "Season 2", "3 episodes", airDate = "5 Mar 2023"),
         ),
     )
 }
 
-/** The loaded list in Spanish: the copy is the consumer's, the "E7" and "min" come from the design system. */
+/** The loaded list in Spanish: the copy and the formatted date are the consumer's, the "E1" and "min" come from the design system. */
 @Composable
 fun SeasonSectionsListSpanishSample() {
     SeasonList(
         listOf(
-            loadedSeason(1, "Temporada 1", "3 episodios"),
+            loadedSeason(1, "Temporada 1", "3 episodios", airDate = "5 mar 2023"),
             SeasonSectionUi(
                 key = "2",
                 title = "Temporada 2",
@@ -133,6 +133,7 @@ private fun loadedSeason(
     number: Int,
     title: String,
     subtitle: String,
+    airDate: String,
 ) = SeasonSectionUi(
     key = number.toString(),
     title = title,
@@ -140,7 +141,7 @@ private fun loadedSeason(
     state = SeasonSectionState.Loaded(
         listOf(
             sampleEpisode(1),
-            sampleEpisode(2).copy(runtimeMinutes = null, airDate = "Mar 5, 2023", rating = null),
+            sampleEpisode(2).copy(runtimeMinutes = null, airDate = airDate, rating = null),
             sampleEpisode(3).copy(overview = null, stillUrl = null),
         ),
     ),

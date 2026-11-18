@@ -32,7 +32,9 @@ import com.binge.designsystem.R
  * One episode of a season as a flat row: a still with its rating chip on it, then an eyebrow ("E7 · 73 min"),
  * the name over two lines and the synopsis over three.
  *
- * The eyebrow is the number and the runtime when there is one, else the air date when there is one.
+ * The eyebrow is the number and then the runtime when there is one, else the air date when there is one, as two
+ * labels with a gap between them and no separator. [EpisodeBrowseUi.airDate] is shown as given: the consumer formats it
+ * for the reader's locale.
  * A null [onClick] makes the row display-only: the same layout, with no click semantics and no ripple.
  */
 @Composable
@@ -93,20 +95,17 @@ private fun EpisodeBrowseMetadata(episode: EpisodeBrowseUi, modifier: Modifier =
     val number = stringResource(R.string.detail_episode_label, episode.number)
     val detail = episode.runtimeMinutes?.let { stringResource(R.string.detail_runtime_minutes, it) }
         ?: episode.airDate?.takeIf { it.isNotBlank() }
-    val eyebrow = if (detail != null) {
-        "$number ${stringResource(R.string.list_row_meta_separator)} $detail"
-    } else {
-        number
-    }
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)),
     ) {
-        Text(
-            text = eyebrow,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            EpisodeBrowseEyebrowText(number)
+            detail?.let { EpisodeBrowseEyebrowText(it) }
+        }
         Text(
             text = episode.name,
             style = MaterialTheme.typography.bodyMedium,
@@ -125,4 +124,13 @@ private fun EpisodeBrowseMetadata(episode: EpisodeBrowseUi, modifier: Modifier =
             )
         }
     }
+}
+
+@Composable
+private fun EpisodeBrowseEyebrowText(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
