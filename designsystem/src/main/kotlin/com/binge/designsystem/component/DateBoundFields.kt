@@ -64,6 +64,7 @@ private const val PICKABLE_YEARS_AHEAD = 5
  * @group inputs
  * @sample DateBoundFieldsEmptySample
  * @replaces two hand-built fields that each open a date picker
+ * @sample DateBoundFieldsEmptySample
  */
 @Composable
 fun BingeDateBoundFields(

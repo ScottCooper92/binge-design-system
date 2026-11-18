@@ -36,6 +36,7 @@ import com.binge.designsystem.theme.BingeShapes
  * @group inputs
  * @sample FilledButtonSample
  * @replaces a raw Button with colours and loading state set by hand
+ * @sample FilledButtonSample
  */
 @Composable
 fun BingeFilledButton(

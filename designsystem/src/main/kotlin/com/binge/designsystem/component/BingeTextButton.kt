@@ -43,6 +43,7 @@ import com.binge.designsystem.theme.BingeShapes
  * @group inputs
  * @sample TextButtonSample
  * @replaces a raw TextButton with loading state set by hand
+ * @sample TextButtonSample
  */
 @Composable
 fun BingeTextButton(

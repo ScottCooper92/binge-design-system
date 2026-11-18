@@ -100,6 +100,7 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * @group tv
  * @sample TvTopBarSample
  * @replaces a hand-built Row of header, tabs and footer
+ * @sample TvTopBarSample
  */
 @Composable
 fun BingeTvTopBar(
