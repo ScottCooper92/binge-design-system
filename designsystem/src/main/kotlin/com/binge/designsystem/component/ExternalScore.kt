@@ -138,7 +138,7 @@ internal fun MetaFlow(entries: List<@Composable () -> Unit>, modifier: Modifier 
  * between scores when they do not fit, and a screen reader reads each as its [ExternalScore.contentDescription].
  * [color] is the values' ink.
  *
- * @need Show review scores from other sources (critics, audience, IMDb) next to a title, each with its icon.
+ * @need show review scores from other sources (critics, audience, IMDb) next to a title, each with its icon
  * @group rows
  * @sample ExternalScoreLineSample
  */
