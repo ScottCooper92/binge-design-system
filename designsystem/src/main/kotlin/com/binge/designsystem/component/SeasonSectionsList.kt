@@ -34,6 +34,11 @@ import com.binge.designsystem.R
  * [contentPadding] carries a transparent bar's height, so rows travel under it: only its top and bottom are used, and the rows keep
  * the standard screen inset at the sides. A null [onEpisodeClick] makes
  * the rows display-only; otherwise it receives the section key and the episode number.
+ *
+ * @need list every episode of a show grouped by season, loading seasons as they scroll into view
+ * @group rows
+ * @replaces a hand-built LazyColumn of season headers, episode rows and skeletons
+ * @sample SeasonSectionsListSample
  */
 @Composable
 fun SeasonSectionsList(

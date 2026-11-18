@@ -37,6 +37,11 @@ import com.binge.designsystem.formatRuntimeMinutes
  * labels with a gap between them and no separator. [EpisodeBrowseUi.airDate] is shown as given: the consumer formats it
  * for the reader's locale.
  * A null [onClick] makes the row display-only: the same layout, with no click semantics and no ripple.
+ *
+ * @need show one episode of a season as a row with its still, rating and synopsis
+ * @group rows
+ * @replaces a hand-built Row of a thumbnail, rating chip and text lines
+ * @sample EpisodeBrowseRowSample
  */
 @Composable
 fun EpisodeBrowseRow(

@@ -31,6 +31,11 @@ private const val SKELETON_META_WIDTH_FRACTION = 0.35f
  * A season's heading: [title] at `headlineSmall` on the screen background, with [subtitle] (an episode
  * count, say) under it. It reads as the same kind of section heading the rest of an app uses rather than a
  * banded divider.
+ *
+ * @need head a season in a list of episodes
+ * @group rows
+ * @replaces a hand-built Column of a title and a count
+ * @sample SeasonSectionsListSample
  */
 @Composable
 fun SeasonHeader(
@@ -56,7 +61,12 @@ fun SeasonHeader(
 }
 
 /** A row-shaped placeholder for an episode of a season still loading. It reserves the height of a full
- * [EpisodeBrowseRow] (the eyebrow, a two-line name and a full synopsis), so the list does not jump as a season loads. */
+ * [EpisodeBrowseRow] (the eyebrow, a two-line name and a full synopsis), so the list does not jump as a season loads. *
+ * @need hold a loading season's place with episode-shaped placeholders
+ * @group feedback
+ * @replaces a hand-built shimmer plate for an episode row
+ * @sample EpisodeBrowseRowSkeletonSample
+ */
 @Composable
 fun EpisodeBrowseRowSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
@@ -104,6 +114,11 @@ fun EpisodeBrowseRowSkeleton(modifier: Modifier = Modifier) {
 /**
  * A season whose episodes failed to load: its own [message] and, when [onRetry] is set, a text button
  * labelled [retryLabel], under its header and leaving the other seasons untouched.
+ *
+ * @need show that one season failed to load, with its own retry
+ * @group feedback
+ * @replaces a hand-built message and retry button under a season header
+ * @sample SeasonSectionsListFailedSample
  */
 @Composable
 fun SeasonFailedRow(
