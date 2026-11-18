@@ -1,8 +1,6 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.EpisodeBrowseRow
 import com.binge.designsystem.component.EpisodeBrowseRowSkeleton
 import com.binge.designsystem.component.EpisodeBrowseUi

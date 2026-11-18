@@ -34,3 +34,14 @@ internal fun List<SeasonSectionUi>.sectionsNeeded(headerIndices: List<Int>, visi
     val withNext = visible.lastOrNull()?.let { visible + (it + 1) } ?: visible
     return withNext.mapNotNull { getOrNull(it)?.key }
 }
+
+/**
+ * The key of the row at [index] in a season's [this] list: its section and episode number, which is unique within a season. A data
+ * source that repeats a number would make a lazy list throw on the duplicate key, so a repeated number takes its index too.
+ */
+internal fun List<EpisodeBrowseUi>.rowKey(
+    sectionKey: String,
+    index: Int,
+    episode: EpisodeBrowseUi,
+): String =
+    if (count { it.number == episode.number } > 1) "ep_${sectionKey}_${episode.number}_$index" else "ep_${sectionKey}_${episode.number}"

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +31,8 @@ import com.binge.designsystem.R
  * The first time headers are known the list scrolls once to the section whose key is [openAt] (the first
  * section when null or unknown), and never again, across recomposition and rotation.
  *
- * [contentPadding] carries a transparent bar's height, so rows travel under it. A null [onEpisodeClick] makes
+ * [contentPadding] carries a transparent bar's height, so rows travel under it: only its top and bottom are used, and the rows keep
+ * the standard screen inset at the sides. A null [onEpisodeClick] makes
  * the rows display-only; otherwise it receives the section key and the episode number.
  */
 @Composable
@@ -78,7 +80,10 @@ fun SeasonSectionsList(
                 }
                 when (val state = section.state) {
                     is SeasonSectionState.Loaded ->
-                        items(state.episodes, key = { "ep_${section.key}_${it.number}" }) { episode ->
+                        itemsIndexed(
+                            state.episodes,
+                            key = { index, episode -> state.episodes.rowKey(section.key, index, episode) },
+                        ) { _, episode ->
                             EpisodeBrowseRow(
                                 episode = episode,
                                 onClick = onEpisodeClick?.let { click -> { click(section.key, episode.number) } },

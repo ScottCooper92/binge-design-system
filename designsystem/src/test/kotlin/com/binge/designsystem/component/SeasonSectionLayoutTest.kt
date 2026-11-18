@@ -33,4 +33,14 @@ class SeasonSectionLayoutTest {
         assertEquals(listOf("4"), sections.sectionsNeeded(headers, listOf(37)))
         assertEquals(emptyList<String>(), sections.sectionsNeeded(headers, emptyList()))
     }
+
+    @Test
+    fun rowKeysAreUniqueEvenWhenASourceRepeatsAnEpisodeNumber() {
+        val repeated = listOf(ep, ep, ep.copy(number = 2))
+
+        val keys = repeated.mapIndexed { index, episode -> repeated.rowKey("1", index, episode) }
+
+        assertEquals(keys.size, keys.toSet().size)
+        assertEquals("ep_1_2", keys.last())
+    }
 }
