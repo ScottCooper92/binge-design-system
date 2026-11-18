@@ -60,8 +60,10 @@ fun SeasonHeader(
     }
 }
 
-/** A row-shaped placeholder for an episode of a season still loading. It reserves the height of a full
- * [EpisodeBrowseRow] (the eyebrow, a two-line name and a full synopsis), so the list does not jump as a season loads. *
+/**
+ * A row-shaped placeholder for an episode of a season still loading. It reserves the height of a full
+ * [EpisodeBrowseRow] (the eyebrow, a two-line name and a full synopsis), so the list does not jump as a season loads.
+ *
  * @need hold a loading season's place with episode-shaped placeholders
  * @group feedback
  * @replaces a hand-built shimmer plate for an episode row
