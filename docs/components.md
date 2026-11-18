@@ -96,6 +96,7 @@ sample to copy and what it replaces. If a need is not here, check `catalog/` bef
 | show an episode in a list with its still and details | `EpisodeListRow` | A TV episode as a full-width ListRow: a backdrop still leading an eyebrow-led meta column | `EpisodeListRowSample` | a hand-built row with an image and a text column |
 | show list items with dividers on a surface of your own | `ItemRows` | The rows of an ItemGroup with their dividers and no surface, for a card that supplies its own | `ItemRowsNoSurfaceSample` | a hand-built Column of rows with dividers |
 | show long body text that collapses with a toggle | `ExpandableOverview` | Body copy that collapses to OVERVIEW_COLLAPSED_LINES and offers a toggle once it has more to show | `ExpandableOverviewSample` | a hand-built Text with a show-more toggle |
+| Show review scores from other sources (critics, audience, IMDb) next to a title, each with its icon. | `ExternalScoreLine` | A row of scores, each a glyph and its value, separated by the meta dot, for a screen's own meta line | `ExternalScoreLineSample` | — |
 | summarise the services a person has picked under a picker grid | `ServicesSummary` | Fixed-height summary of the user's selected streaming services | `ServicesSummaryEmptySample` | a hand-built row of selected logos with an empty hint |
 | title a section with an optional see-more action | `SectionHeader` | A section title with an optional "more" affordance | `SectionHeaderLongTitleSample` | a hand-built Row of a title and a text button |
 
