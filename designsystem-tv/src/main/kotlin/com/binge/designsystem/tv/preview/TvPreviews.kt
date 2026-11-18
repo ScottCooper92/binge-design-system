@@ -120,6 +120,9 @@ annotation class TvPreviewsOnBlack
  * frames want this readable canvas; a **screen-root** frame should use the other one.
  *
  * [style] is the TV style the frame draws in, inherited like `BingeTvTheme`'s, so a frame for another style passes it.
+ *
+ * @need wrap a tv preview or screenshot test in the theme
+ * @group tv
  */
 @Composable
 fun TvScreenshotTheme(
@@ -142,6 +145,9 @@ fun TvScreenshotTheme(
  * Using this, a screen that paints its base renders **identically** — the fill covers the canvas either
  * way — so adopting it is safe, and any baseline that *does* move is a screen that was relying on the
  * harness. That is the whole test: it cannot be asserted, only rendered.
+ *
+ * @need render a full-screen tv frame on the window colour
+ * @group tv
  */
 @Composable
 fun TvScreenshotThemeOnBlack(

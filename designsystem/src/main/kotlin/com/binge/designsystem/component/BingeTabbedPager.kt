@@ -26,6 +26,10 @@ import androidx.compose.ui.graphics.Color
  *
  * [beyondViewportPageCount] is how many pages either side of the visible one stay composed; see
  * [BingeFilterChipPager] for what raising it costs.
+ *
+ * @need switch between different views by tab or swipe
+ * @group bars
+ * @replaces a hand-built tab row wired to a HorizontalPager
  */
 @Composable
 fun BingeTabbedPager(

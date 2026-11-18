@@ -42,6 +42,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The footer is a row of [footerActions] at the end of the band, where the phone stacks its footer full width
  * under the step: a remote moves across a row, a thumb reaches down a column.
+ *
+ * @need build a multi-step setup or sign-in flow on tv
+ * @group tv
+ * @replaces a hand-built pager with a footer of buttons
  */
 @Composable
 fun TvStepFlow(
@@ -104,6 +108,9 @@ fun TvStepFlow(
 /**
  * The kicker, title and subtitle a step opens with. None of it is focusable: a heading holds nothing to press,
  * so ↑ from the content below is absorbed rather than parking the ring on inert text.
+ *
+ * @need open a flow step with a kicker, title and subtitle
+ * @group tv
  */
 @Composable
 fun TvStepHeading(

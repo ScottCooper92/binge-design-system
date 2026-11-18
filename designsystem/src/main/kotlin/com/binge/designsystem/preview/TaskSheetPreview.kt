@@ -41,6 +41,9 @@ annotation class TaskSheetPreviews
  * A task sheet's resting chrome as the window shows it, without the modal window around it, which does not capture: the
  * side sheet's panel at the expanded width, with the clearance a page keeps there, and a bottom sheet's top below it.
  * A [page] other than the root is drawn as a pushed page, under its Back bar.
+ *
+ * @need preview a task sheet without its modal window
+ * @group sheets
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

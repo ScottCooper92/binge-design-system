@@ -56,6 +56,10 @@ private const val SIDE_SHEET_ANIMATION_MS = 250
  * Built on [Dialog] (`usePlatformDefaultWidth = false`) so it owns the whole window for the scrim
  * and gets back-press handling for free. The slide is driven by an [AnimatedVisibility] toggled on
  * first composition, so opening animates in rather than snapping, and only once: a recreation restores it open.
+ *
+ * @need show a modal panel on the end edge of a wide window
+ * @group sheets
+ * @replaces a hand-built end-aligned panel over a scrim
  */
 @Composable
 fun BingeModalSideSheet(

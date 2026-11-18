@@ -25,6 +25,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  *
  * String keys only: a row keyed on anything else is skipped rather than reported as something a
  * caller cannot match on.
+ *
+ * @need report which list rows reached the viewport
+ * @group rows
+ * @replaces a hand-built snapshotFlow on the list state
  */
 @Composable
 fun RowImpressionEffect(listState: LazyListState, onRowVisible: (key: String) -> Unit) {

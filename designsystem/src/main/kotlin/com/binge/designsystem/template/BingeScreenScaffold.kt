@@ -109,6 +109,10 @@ enum class ScreenBarChrome {
  *
  * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
  * Both default to absent, so existing titles keep their behaviour and appearance.
+ *
+ * @need frame a screen with a top bar, scrolling body and snackbar host
+ * @group screens
+ * @replaces a hand-built Scaffold with a transparent scrolling top bar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -224,6 +228,10 @@ fun BingeScreenScaffold(
 /**
  * The common body of a [BingeScreenScaffold]: a full-size box placed by [screenOuterPadding], handing
  * [content] the [screenInnerPadding] that belongs inside its scroll, or around a state that does not scroll.
+ *
+ * @need place a scaffold body with the standard screen padding
+ * @group screens
+ * @replaces hand-computed screen padding around a body
  */
 @Composable
 fun ScreenBody(

@@ -44,6 +44,9 @@ import com.binge.designsystem.tv.R as TvR
  * [hosting] is the loaded hub's: an overlay or a pre-shell page lands focus on the first row at once, and the hub
  * anchors that row at the foot of the copy band rather than a row gap below it, so the skeleton's rows sit there too.
  * It stands in for a hub with no hero only: a hero hub lands focus on the hero, so a hero hub shows its own loading state.
+ *
+ * @need show a loading placeholder for a home hub of poster rows
+ * @group tv
  */
 @Composable
 fun TvImmersiveHubSkeleton(

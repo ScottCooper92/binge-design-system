@@ -21,6 +21,9 @@ import com.binge.designsystem.tv.R as TvR
  * A page's way back as a top app bar draws it: an arrow and the name of the page Back returns to. Nothing on the root page.
  * It is no control and takes no focus; the remote's Back is the action. [TvSideSheetTitle] draws it above its own text, and a
  * page with no title of its own (a header leads it) calls it directly.
+ *
+ * @need show which page back returns to in a side sheet
+ * @group tv
  */
 @Composable
 fun TvSideSheetBack(modifier: Modifier = Modifier) {

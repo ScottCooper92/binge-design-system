@@ -27,6 +27,10 @@ import com.binge.designsystem.R as DesR
  * choice is a [TvConfirmDialog]. With [dismissible] false, only the button closes it: Back and a press outside do nothing,
  * for a message the user must not lose by a stray press, such as a secret shown once. [extraContent] sits between the message
  * and the button, as on [TvConfirmDialog]; focus still arrives on the button, whatever the slot holds.
+ *
+ * @need tell a TV viewer something with one acknowledge button
+ * @group tv
+ * @replaces a hand-built TV dialog with one button
  */
 @Composable
 fun TvMessageDialog(
@@ -62,6 +66,9 @@ fun TvMessageDialog(
  * The dialog's visible card, apart from the modal window, so a screenshot can render it. [initiallyFocused] draws the button
  * focused, the frame the user sees first: a static preview runs no arrival effect. Rendered inline, it pulls focus to the
  * button when it mounts.
+ *
+ * @need preview the card of a TV message dialog without its window
+ * @group tv
  */
 @Composable
 fun TvMessageDialogContent(

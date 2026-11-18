@@ -16,6 +16,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The inset is the row family's pair — start gutter, end overscan — so a title sits above the first card of
  * the [TvCardRow] it heads rather than nudged out of line.
+ *
+ * @need add a section heading above a row of content on tv
+ * @group tv
+ * @replaces a hand-built Text with ad hoc title styling
  */
 @Composable
 fun TvSectionTitle(text: String, modifier: Modifier = Modifier) {

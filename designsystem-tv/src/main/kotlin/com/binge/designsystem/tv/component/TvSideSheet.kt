@@ -75,6 +75,10 @@ import com.binge.designsystem.tv.R as TvR
  * there with [TvSideSheetStepFocus]. The caller owns the visibility flag, and returns focus to what opened
  * the sheet, with `rememberTvOverlayCloser`; pass the closer as [closer] so the sheet lets focus go as it closes and traps again once it is gone.
  * [toBottomEdge] is the panel's: see [TvSideSheetPanel].
+ *
+ * @need open a side sheet of actions or choices on tv
+ * @group tv
+ * @replaces a hand-built Dialog panel on the end edge
  */
 @Composable
 fun TvSideSheet(
@@ -125,6 +129,9 @@ internal fun TvSideSheetHost(
  * Pulls the sheet's entry focus to the step that has just come into composition: the rows when the sheet
  * opens, and again when Cancel on a confirm step brings them back. It runs from the step, not the sheet,
  * because swapping a step recomposes the rows without the sheet itself re-entering.
+ *
+ * @need move focus to a side sheet step that just appeared
+ * @group tv
  */
 @Composable
 fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
@@ -138,6 +145,10 @@ fun TvSideSheetStepFocus(entryFocus: FocusRequester) {
  * the overscan margin from them. [toBottomEdge] drops the bottom margin, for content that scrolls: it runs to the screen's
  * edge, and [TvSideSheetRows] carries the bottom overscan inside its scroll, so its last row can still scroll clear of the edge.
  * Given the [closer] that closes it, the panel stops trapping focus as the close starts and traps again once it is disposed.
+ *
+ * @need draw a side sheet panel without a scrim, for a preview
+ * @group tv
+ * @replaces a hand-built panel Column on the end edge
  */
 @Composable
 fun TvSideSheetPanel(
@@ -196,6 +207,9 @@ internal fun TvSideSheetPanelHost(
 /**
  * The sheet's heading: what its rows act on. On a page opened over another in a [TvSideSheetStack] it carries [TvSideSheetBack]
  * above its text, which names the page Back returns to.
+ *
+ * @need add a heading to a side sheet
+ * @group tv
  */
 @Composable
 fun TvSideSheetTitle(text: String, modifier: Modifier = Modifier) {
@@ -225,7 +239,12 @@ internal class TvSideSheetPage(
 
 internal val LocalTvSideSheetPage = staticCompositionLocalOf<TvSideSheetPage?> { null }
 
-/** A line under the title, such as what a confirm step is about to do. */
+/**
+ * A line under the title, such as what a confirm step is about to do.
+ *
+ * @need add a line of explanation under a side sheet title
+ * @group tv
+ */
 @Composable
 fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -237,8 +256,8 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
 }
 
 /**
- * One row. Focus is the fill. A [destructive] row rests in the error colour, so it reads as one before it is
- * reached, and fills with it when focused, as a destructive button does. [trailing] ends the row, such as a switch or a short
+ * One row of a side sheet, pressed with the remote. Focus is the fill. A [destructive] row rests in the error colour, so it reads
+ * as one before it is reached, and fills with it when focused, as a destructive button does. [trailing] ends the row, such as a switch or a short
  * value, and is told whether the row is focused so it can match the fill. It is held to `tv_side_sheet_trailing_max_width`, so
  * at a large font a value cannot take the label's room: give a text value one line and an ellipsis. A row that [opensPage],
  * one that pushes a page on a [TvSideSheetStack], ends in a chevron, after the trailing value and the tick. [role] is what a screen reader calls the row: `Role.Switch` for a row
@@ -255,6 +274,10 @@ fun TvSideSheetBody(text: String, modifier: Modifier = Modifier) {
  * While [saving], a spinner holds the tick's place, in the tick's box, after the trailing value and before the chevron, and
  * the row announces that it is in progress: for a press that applies at once but takes a moment to land. The caller decides
  * what a press does meanwhile.
+ *
+ * @need add a pressable row to a side sheet
+ * @group tv
+ * @replaces a hand-built focusable Row of label, value and chevron
  */
 @Composable
 fun TvSideSheetRow(
@@ -355,6 +378,10 @@ data class TvSideSheetNote(
  * A read-out in a side sheet: a fact the sheet shows, such as a server's address or version, rather than a control. It stays out
  * of the focus order, as a disabled [TvSideSheetRow] does, but draws at full contrast, since the value is what the row is for.
  * A screen reader reads the [label] and [supportingText] together, as one item.
+ *
+ * @need show a fact in a side sheet that is not a control
+ * @group tv
+ * @replaces a hand-built Row of label and value
  */
 @Composable
 fun TvSideSheetReadout(
@@ -522,6 +549,10 @@ private fun RowNote(note: TvSideSheetNote, color: Color) {
  *
  * @param entryFocus the request [TvSideSheet] hands its content. Null only on a [TvSideSheetStack] page: anywhere else
  * a null leaves the step taking no focus.
+ *
+ * @need ask to confirm a destructive action in a side sheet
+ * @group tv
+ * @replaces a hand-built confirm step with two buttons
  */
 @Composable
 fun ColumnScope.TvSideSheetConfirm(

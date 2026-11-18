@@ -104,6 +104,9 @@ class TvUserMoves {
  * The one wrapper a shell puts at its root to switch the user-move guard on: it provides one [TvUserMoves] for its lifetime
  * through [LocalTvUserMoves] and notes each direction press on its way down, without consuming it. A host that already owns the
  * key handler that sees every press can provide [LocalTvUserMoves] and call [TvUserMoves.note] itself instead.
+ *
+ * @need guard focus against moves the user did not make
+ * @group tv
  */
 @Composable
 fun TvUserMovesHost(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
@@ -136,6 +139,9 @@ val LocalTvUserMoves = staticCompositionLocalOf { TvUserMoves() }
  *
  * One request, no retry: the target must be attached from the first frame (a plate that becomes the real control in
  * place), which is what lets it work through a push while the outgoing screen still holds focus.
+ *
+ * @need put first focus on a page's target when it appears
+ * @group tv
  */
 @Composable
 fun TvArrivalFocusEffect(
@@ -166,6 +172,10 @@ private val UNSEEN = Any()
  * The target must be attached from the first frame, which is what lets one request land, including on a node mounted
  * mid-transition. Named for "first focus" rather than "restore" so arrival and focus-*return* call sites grep apart. [key]
  * re-places the focus when the overlay's identity changes (a settings pane re-shown for a different link).
+ *
+ * @need put first focus on an overlay when it opens
+ * @group tv
+ * @replaces a hand-built LaunchedEffect that requests focus
  */
 @Composable
 fun TvOverlayArrivalFocusEffect(target: FocusRequester, key: Any? = Unit) {

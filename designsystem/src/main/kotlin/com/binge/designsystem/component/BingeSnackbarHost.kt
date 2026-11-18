@@ -99,6 +99,10 @@ internal fun BingeSnackbar(
  * [LocalNavOverlayInsets]'s bottom inset on top of the fixed gap, so it clears a floating nav bar the
  * same way a scrollable does via `navOverlayPadding()`; composed outside a nav shell, that local
  * defaults to zero and the offset is unchanged.
+ *
+ * @need show snackbar messages above a floating navigation bar
+ * @group feedback
+ * @replaces a raw SnackbarHost with the bottom offset worked out by hand
  */
 @Composable
 fun BingeSnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {

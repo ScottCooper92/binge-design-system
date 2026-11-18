@@ -56,6 +56,10 @@ import com.binge.designsystem.tv.R as TvR
  * [initialFocusedLabel] seeds one row as focused for a frame; production passes null. [arrival] makes the first row
  * the one the page lands on. [choiceIcon] gives a choice the icon its row leads with, on its tinted plate: the
  * choice's own where each has one, otherwise the setting's. Null draws no icon.
+ *
+ * @need pick one option from a short list on tv
+ * @group tv
+ * @replaces a hand-built Column of selectable rows under a title
  */
 @Composable
 fun <T> TvOptionGroup(
@@ -103,6 +107,10 @@ fun <T> TvOptionGroup(
  * that has to be read in full, such as an address the user is about to trust; the row grows with it. While [saving], the tick's place holds a spinner instead, in
  * the tick's box so nothing moves, and the row announces that it is in progress: for a choice that applies at once but takes
  * a moment to land. The caller decides what a press does meanwhile.
+ *
+ * @need show one selectable option as a tv list row
+ * @group tv
+ * @replaces a hand-built ListItem with a tick
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -168,6 +176,10 @@ fun TvOptionRow(
  * [excluded] makes it a third state, ruled out rather than chosen: the box carries the excluded mark in place of the
  * tick, and the row announces as indeterminate and excluded. [leading] replaces [icon] with a mark of the caller's own,
  * such as a logo, in the same place.
+ *
+ * @need toggle a yes-or-no setting with a remote
+ * @group tv
+ * @replaces a hand-built Row of checkbox and label
  */
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable

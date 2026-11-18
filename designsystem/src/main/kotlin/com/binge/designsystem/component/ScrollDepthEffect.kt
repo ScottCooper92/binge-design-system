@@ -67,6 +67,10 @@ private fun deepestIndexSaver(): Saver<DeepestIndex, ArrayList<Int>> =
  * and a visit that went deeper before a rotation and then scrolled back up still reports how deep it went. That holds
  * when the change reaches an activity that is already stopped, because a live visit is saved at the stop. A visit that
  * has reported carries nothing, such as the one the back stack saves when the surface is left.
+ *
+ * @need report how far down a list a visit scrolled
+ * @group rows
+ * @replaces a hand-built snapshotFlow on the list state
  */
 @Composable
 fun ScrollDepthEffect(listState: LazyListState, onVisitEnded: (deepestIndex: Int?) -> Unit) {
@@ -77,7 +81,13 @@ fun ScrollDepthEffect(listState: LazyListState, onVisitEnded: (deepestIndex: Int
     }
 }
 
-/** The grid form of [ScrollDepthEffect]. Same contract; `LazyGridState` shares no supertype with the list. */
+/**
+ * Reports how far down a lazy grid a visit got, once on leave; the grid form of the list effect.
+ *
+ * @need report how far down a grid a visit scrolled
+ * @group rows
+ * @replaces a hand-built snapshotFlow on the grid state
+ */
 @Composable
 fun ScrollDepthEffect(gridState: LazyGridState, onVisitEnded: (deepestIndex: Int?) -> Unit) {
     ScrollDepthEffect(onVisitEnded) {

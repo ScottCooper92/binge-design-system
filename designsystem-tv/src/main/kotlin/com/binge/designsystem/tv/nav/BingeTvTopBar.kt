@@ -95,6 +95,11 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  * group is the caller's to withhold. [scrim] fades
  * the bar's background from the theme's background at the top to clear, for a bar over page art; pass false to sit it on a
  * plain surface.
+ *
+ * @need add a top bar with tabs and an account slot on tv
+ * @group tv
+ * @sample TvTopBarSample
+ * @replaces a hand-built Row of header, tabs and footer
  */
 @Composable
 fun BingeTvTopBar(

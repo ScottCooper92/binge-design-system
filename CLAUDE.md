@@ -65,6 +65,10 @@ agree with the consumers'.
 
 ## Compose conventions
 
+Before building a component in an app, look it up by need in `docs/components.md`. Every public composable carries `@need` and
+`@group` in its KDoc (and `@replaces` where it saves a hand-built version); `./gradlew generateComponentIndex` rebuilds the file,
+and `check` fails if it is stale or a public composable is untagged.
+
 - Every `Dp` comes from a dimension resource, never an inline `.dp` in a composable.
 - Reach for a shape token rather than re-deriving a `RoundedCornerShape`.
 - User-visible text is a string resource in this module. A component that takes its copy as a

@@ -46,6 +46,10 @@ import com.binge.designsystem.theme.BingeTheme
  *
  * The tile is one click target and one accessibility item announcing [description], or [title] when
  * [description] is null. Pass [description] only when the spoken label should differ from the title.
+ *
+ * @need show a category as a wide image tile with a title
+ * @group cards
+ * @replaces a hand-built Box with an image and a gradient scrim
  */
 @Composable
 fun BackdropTile(
@@ -104,6 +108,10 @@ fun BackdropTile(
  * tile shows [name] as text, so it is never blank.
  *
  * The tile is one click target and one accessibility item announcing [name].
+ *
+ * @need show a studio or network as a logo on a neutral tile
+ * @group cards
+ * @replaces a hand-built Box centring a logo on a surface
  */
 @Composable
 fun LogoTile(

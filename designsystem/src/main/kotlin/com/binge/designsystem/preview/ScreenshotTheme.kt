@@ -26,6 +26,9 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  *   paints it by default), so a screen frame shows its page as the app does. A Material 3 [Surface]
  *   defaults to `surface`, which differs in dark theme, so the colour is set here. TvScreenshotTheme
  *   paints the same canvas.
+ *
+ * @need wrap a preview or screenshot frame in the theme
+ * @group screens
  */
 @Composable
 fun ScreenshotTheme(

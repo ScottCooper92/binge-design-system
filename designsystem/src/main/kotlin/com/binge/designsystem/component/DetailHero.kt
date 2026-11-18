@@ -59,6 +59,10 @@ private const val HERO_META_ALPHA = 0.80f
  * the window to leave. A transition between two screens that both call this composes them together,
  * and the outgoing one disposes after the incoming one has set light icons; restoring then would put
  * dark icons over the incoming hero.
+ *
+ * @need keep status bar icons light over a full-bleed image
+ * @group media
+ * @replaces hand-written status bar appearance code
  */
 @Composable
 fun DarkStatusBarEffect() {
@@ -85,6 +89,13 @@ fun DarkStatusBarEffect() {
  */
 internal val darkStatusBarHolds = StatusBarHolds<Window>()
 
+/**
+ * A full-bleed hero for a detail page: a backdrop image with the title and tagline over it.
+ *
+ * @need show a detail page hero with a backdrop, title and tagline
+ * @group media
+ * @replaces a hand-built backdrop with title text over it
+ */
 @Composable
 fun DetailHero(
     title: String,
@@ -181,6 +192,10 @@ fun DetailHero(
  *
  * Public so a hero speaking a different vocabulary — `CollectionHero`, which has no tagline, genres
  * or single-title meta line — can reuse the imagery without inheriting [DetailHero]'s slots.
+ *
+ * @need draw the image layer a hero sits on
+ * @group media
+ * @replaces a hand-built backdrop image with a scrim
  */
 @Composable
 fun HeroBackdrop(

@@ -85,6 +85,10 @@ private const val CINEMATIC_SYNOPSIS_MAX_LINES = 4
  * title leaves the far side of the art raw. A second, stronger band runs the full width behind the
  * facts row, which spans it. Both are placed from the copy's measured bounds, so they follow a title
  * that wraps or a tagline that is missing.
+ *
+ * @need show an immersive detail header with a backdrop, poster and copy
+ * @group media
+ * @replaces a hand-built backdrop and poster header
  */
 @Composable
 fun DetailCinematicHeader(

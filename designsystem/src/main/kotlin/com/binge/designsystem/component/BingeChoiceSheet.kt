@@ -160,6 +160,10 @@ internal fun rememberOpensPartWay(choices: BingeChoiceList<*>): Boolean = rememb
  * above the rows and narrows them by label. While it has text the list is flat, not sectioned. When the text matches nothing
  * the sheet says so under a search-off glyph: [noMatchLabel] is the words ("No tuner channels match"), and null uses the design
  * system's own "No matches".
+ *
+ * @need pick one value from a long list
+ * @group sheets
+ * @replaces a hand-built LazyColumn of radio rows in a sheet
  */
 @Composable
 fun <T> BingeChoiceSheet(
@@ -221,6 +225,10 @@ fun <T> BingeChoiceSheet(
  * has no saver of its own, so without one the sheet reopens with the ticks reset to [selected]. For `String` values,
  * `Saver(save = { ArrayList(it) }, restore = { it.toSet() })` is enough. With [applyAsPicked] there is no draft to keep.
  * [subtitle] and [caption] add context to the header, as on [BingeChoiceSheet].
+ *
+ * @need pick several values from a list and apply them together
+ * @group sheets
+ * @replaces a hand-built LazyColumn of checkbox rows in a sheet
  */
 @Composable
 fun <T> BingeMultiChoiceSheet(
@@ -404,6 +412,9 @@ fun <T> bingeMultiChoiceItem(
  * so it takes the colour of whatever holds it, and its header does not dock. Pass `dragHandle = false` when the
  * sheet holding it draws its own handle, as [BingeBottomSheet] does. It does not clear the navigation bar; a caller
  * in an edge-to-edge sheet does that itself. [subtitle] and [caption] are the sheet's.
+ *
+ * @need frame a single-choice sheet body in a preview or inside your own sheet
+ * @group sheets
  */
 @Composable
 fun <T> BingeChoiceSheetContent(
@@ -442,6 +453,9 @@ fun <T> BingeChoiceSheetContent(
  * caller passes the selection the content opened with, so a row does not jump when ticked. Like
  * [BingeChoiceSheetContent], it draws no surface, its header does not dock, and `dragHandle = false` drops the handle
  * for a sheet that draws its own. [subtitle] and [caption] are the sheet's.
+ *
+ * @need frame a multi-choice sheet body in a preview or inside your own sheet
+ * @group sheets
  */
 @Composable
 fun <T> BingeMultiChoiceSheetContent(
@@ -515,6 +529,10 @@ internal fun ChoiceSheetTop(
  * It is the part that scrolls away. Pair it with a `BingeSheetTopBar` through `BingeSheetDockingHeader`, which swaps
  * this block for the bar as the sheet docks. The subtitle says what the sheet is for, and the caption what acting on
  * it will change.
+ *
+ * @need give a docking sheet a title with subtitle, actions and caption
+ * @group sheets
+ * @replaces a hand-built Row of title text and action buttons at the top of a sheet
  */
 @Composable
 fun BingeSheetHeader(
@@ -554,6 +572,10 @@ fun BingeSheetHeader(
  * scrolls itself. [underNavigationBar] pads its end clear of the navigation bar, for a list that runs to the window's foot.
  * With a [filterPlaceholder], a filter field above the rows narrows them by label, as [BingeMultiChoiceSheet]'s does, and says
  * [noMatchLabel] when it matches nothing. [initialQuery] opens the filter with that text in it.
+ *
+ * @need show a single-choice list in a pane that already has its own title
+ * @group rows
+ * @replaces a hand-built LazyColumn of radio rows
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

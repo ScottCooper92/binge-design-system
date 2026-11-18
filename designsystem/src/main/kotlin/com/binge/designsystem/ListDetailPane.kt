@@ -9,6 +9,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 
 /**
+ * Measures the pane it sits in and tells [content] its real width and which edge it shares with a neighbouring pane.
+ *
  * Provides [LocalPaneWidth] as the width [content] is actually measured at, rather than one derived
  * from a scene strategy's own preferred-width arithmetic — the list pane and the detail pane get
  * different real widths from the same directive, so only measuring what the host's `NavDisplay`
@@ -18,6 +20,10 @@ import androidx.compose.ui.Modifier
  * it, [PaneEdge.End] for a list pane, [PaneEdge.Start] for its detail and [PaneEdge.Both] for a middle pane — but only while
  * [LocalIsSinglePaneNav] says both are on screen. Below the breakpoint the same entry fills the
  * window alone and has no inner edge, so the caller passes its role once and never checks.
+ *
+ * @need measure the width of a pane in a list-detail layout
+ * @group screens
+ * @replaces a hand-built BoxWithConstraints that publishes its width
  */
 @Composable
 fun PaneContent(

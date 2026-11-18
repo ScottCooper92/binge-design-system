@@ -57,6 +57,10 @@ data class ScreenAction(
  * Both apps render their loading, empty and error arms through this, so they read alike; each maps its own
  * error model onto the copy. [announce] makes the whole message a polite live region, for a failure that
  * replaced content the user was reading. It centres clear of a floating navigation bar.
+ *
+ * @need show one message with an icon, text and up to two actions
+ * @group feedback
+ * @replaces a hand-built centred icon, headline, body and buttons
  */
 @Composable
 fun MessageScreen(
@@ -127,7 +131,13 @@ fun MessageScreen(
     }
 }
 
-/** The frame while a screen loads: the indicator alone, centred where a [MessageScreen] would sit. */
+/**
+ * The frame while a screen loads: the indicator alone, centred where a [MessageScreen] would sit.
+ *
+ * @need show a full-screen loading indicator
+ * @group feedback
+ * @replaces a hand-built centred progress indicator
+ */
 @Composable
 fun LoadingMessageScreen(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize().padding(navOverlayPadding()), contentAlignment = Alignment.Center) {

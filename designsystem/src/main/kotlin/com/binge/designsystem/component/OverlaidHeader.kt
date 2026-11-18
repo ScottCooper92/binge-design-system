@@ -51,6 +51,10 @@ private enum class OverlaidHeaderSlot { Header, Content }
  * [BingeTopBar]/[BingeMediumTopBar] — every current caller overlays a plain, predictable surface.
  * Override to [BingeTheme.colors.scrim] only for a header floating over genuinely unpredictable
  * content, the way [DetailOverlayTopBar] does over a hero.
+ *
+ * @need pin a header over content that scrolls beneath it
+ * @group bars
+ * @replaces a hand-built Box with a scrim under a pinned header
  */
 @Composable
 fun OverlaidHeaderContent(

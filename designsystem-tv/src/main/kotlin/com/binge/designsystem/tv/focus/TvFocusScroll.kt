@@ -29,6 +29,9 @@ private val LocalInheritedBringIntoViewSpec = compositionLocalOf<BringIntoViewSp
  * The scope reaches **every** scrollable inside [content], including a row nested in the wrapped list. A row that
  * wants the ambient feel back for its own scrolling calls [TvInheritedFocusScroll] — [TvCardRow] already does, so the horizontal card
  * runs keep the default parking while the column they sit in holds still.
+ *
+ * @need stop a scrollable jumping when focus moves between visible items
+ * @group tv
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -48,6 +51,9 @@ fun TvStableFocusScroll(content: @Composable () -> Unit) {
  * This is the half of the contract an immersive hub needs: the vertical list must not re-pivot as focus
  * crosses its rows, but each row's own horizontal scroll should still park a focused card the way every other
  * carousel does. Baked into [TvCardRow] so a screen gets both halves by drawing an ordinary row.
+ *
+ * @need restore normal focus scrolling inside a stable-scroll container
+ * @group tv
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

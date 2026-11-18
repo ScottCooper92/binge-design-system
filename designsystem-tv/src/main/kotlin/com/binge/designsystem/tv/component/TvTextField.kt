@@ -80,6 +80,10 @@ private const val SECRET_MASK = '•'
  * [imeAction] hands focus back to the frame before [onImeAction] runs. [placeholder] shows while the field is empty.
  * A disabled field is dimmed by [DISABLED_ALPHA], label and frame alike.
  * [fillWidth] takes the parent's width rather than a form's. [initiallyFocused] seeds the ring for a frame.
+ *
+ * @need type text with a remote
+ * @group tv
+ * @replaces a hand-built BasicTextField with a focus ring
  */
 @Composable
 fun TvTextField(
@@ -131,6 +135,10 @@ fun TvTextField(
  * makes it. [label] is what a screen reader calls it, "Search" say, and [placeholder] what to type. The keyboard's
  * action is Search, and runs [onSearch] once focus is back on the frame. The frame, the ring, select to edit and the
  * vertical leave are the text field's.
+ *
+ * @need add a search bar on tv
+ * @group tv
+ * @replaces a hand-built pill-shaped text field with a search icon
  */
 @Composable
 fun TvSearchField(

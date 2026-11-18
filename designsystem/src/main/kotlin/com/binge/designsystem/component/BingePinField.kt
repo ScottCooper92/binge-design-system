@@ -43,6 +43,10 @@ import com.binge.designsystem.theme.BingeShapes
  * anything past [length]. [onComplete] fires once the last box fills; a caller that wants a fresh try after a wrong
  * code clears [value]. [label] is what assistive technology reads for the field. [error] marks every box and is
  * announced with the field.
+ *
+ * @need enter a short numeric code one digit to a box
+ * @group inputs
+ * @replaces a hand-built row of single-digit text boxes
  */
 @Composable
 fun BingePinField(

@@ -50,6 +50,10 @@ import com.binge.designsystem.toInitials
  *
  * The tile is one click target and one accessibility item announcing [description], or the [name] and [subtitle] when [description] is
  * null. The caller owns all the words.
+ *
+ * @need show a person with a round photo in a carousel
+ * @group cards
+ * @replaces a hand-built Column of a round image and text
  */
 @Composable
 fun PersonCard(
@@ -86,6 +90,9 @@ fun PersonCard(
 /**
  * The loading stand-in for a [PersonCard]: a round plate where the photo goes and a caption that takes the card's own room, so a row does not
  * move when its people arrive. [description] names the loading state for a screen reader; without one it stays silent.
+ *
+ * @need show a loading placeholder for a person card row
+ * @group feedback
  */
 @Composable
 fun PersonCardSkeleton(modifier: Modifier = Modifier, description: String? = null) {
