@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,7 +62,28 @@ fun BingeFilterChipRowMidSelectionSample() {
                 FilterChipItem("Pending", 3),
                 FilterChipItem("Processing", 5),
                 FilterChipItem("Available", 28),
-                FilterChipItem("Failed"),
+                FilterChipItem("Failed", contentDescription = "Failed requests"),
+            ),
+            selectedIndex = selected,
+            onSelect = { selected = it },
+        )
+    }
+}
+
+/**
+ * A row whose chips carry a leading icon, one without, and a count on the first — the icon sits before
+ * the label and the row stays a single scrolling line.
+ */
+@Composable
+fun BingeFilterChipRowIconsSample() {
+    var selected by remember { mutableIntStateOf(0) }
+    ScreenshotTheme {
+        BingeFilterChipRow(
+            items = listOf(
+                FilterChipItem(label = "Movies", count = 88, icon = Icons.Filled.Movie),
+                FilterChipItem(label = "Favourites", icon = Icons.Filled.Star),
+                FilterChipItem(label = "Refine", icon = Icons.Filled.Tune),
+                FilterChipItem(label = "Watchlist"),
             ),
             selectedIndex = selected,
             onSelect = { selected = it },

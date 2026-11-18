@@ -1,6 +1,6 @@
 name: Consumer check
 
-# Informational. Compiles binge-seerr, binge-archive and binge-jellyfin, the public consumers of this repository,
+# Informational. Compiles binge-seerr, binge-archive and ephyra, the consumers of this repository that CI can reach,
 # against this PR's head commit, because a green build here says nothing about a consumer: a changed
 # public signature is otherwise noticed only by the bump PR that arrives after it merged. Each job is
 # binge-ci's consumer-check workflow; this file owns the triggers and says what to compile.
@@ -16,7 +16,11 @@ name: Consumer check
 # the merge of an approved PR and names this check. That includes an intentional signature
 # change. A maintainer then merges by hand, or re-runs CI once all three jobs are green.
 #
-# Binge is the fourth consumer and is private, so it needs a token and is not covered here.
+# Binge is the fourth consumer and is deliberately not compiled here.
+#
+# A job whose consumer is a private repository sets `private_consumer` and passes the reviewer app's
+# credentials, so the workflow can check the consumer out, submodules included. Without them that checkout
+# fails before any Gradle task runs.
 #
 # The three jobs run side by side: binge-ci's concurrency group includes the consumer.
 #
@@ -57,19 +61,27 @@ permissions:
 
 jobs:
   seerr:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0645bdd0319cbada073d6ca2585a17440d37f8f6 # v1
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0e23ad4311757677213da647bd150eca33d256f0 # v1.0.49
     with:
       consumer: ScottCooper92/binge-seerr
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
+      private_consumer: true
+    secrets:
+      REVIEWER_APP_ID: ${{ secrets.REVIEWER_APP_ID }}
+      REVIEWER_APP_PRIVATE_KEY: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
 
   archive:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0645bdd0319cbada073d6ca2585a17440d37f8f6 # v1
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0e23ad4311757677213da647bd150eca33d256f0 # v1.0.49
     with:
       consumer: ScottCooper92/binge-archive
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
 
   jellyfin:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0645bdd0319cbada073d6ca2585a17440d37f8f6 # v1
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@0e23ad4311757677213da647bd150eca33d256f0 # v1.0.49
     with:
-      consumer: ScottCooper92/binge-jellyfin
+      consumer: ScottCooper92/ephyra
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
+      private_consumer: true
+    secrets:
+      REVIEWER_APP_ID: ${{ secrets.REVIEWER_APP_ID }}
+      REVIEWER_APP_PRIVATE_KEY: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}

@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -40,6 +42,15 @@ import com.binge.designsystem.theme.BingeShapes
  * its own rather than the page's background continuing under the button.
  *
  * [destructive] gives the button the error tone, for a sheet whose one action removes or declines something.
+ *
+ * [failed] is the other use of that tone, and a different meaning: the sheet's primary send did not go through. The caller
+ * passes the reason as [label] for as long as it wants it shown, and the reason is a few words ("Quota reached", "No permission",
+ * "Couldn't request"): the full cause belongs in the dialog that [onClick], which stays the caller's, usually opens with a way
+ * to retry (`docs/messages.md`). A longer reason wraps and the button grows rather than clip it, but a few words is what the
+ * button is for. Beside the colour, a failed footer sets the `error` semantics with
+ * the label, so a screen reader announces the reason as an error, which [destructive] does not do. A footer that is both gets the
+ * same colours. It is for a failed send from a sheet's pinned primary; a page's footer reports a failure another way. Pass
+ * [loading] or [failed], not both: a loading footer shows its spinner whatever [failed] says.
  *
  * [bottomPadding] is spacing, not a safe area. A sheet's own `contentWindowInsets` already applies
  * `safeDrawing` around its content — `BottomSheet` calls `windowInsetsPadding` with it — so this
@@ -76,6 +87,7 @@ fun BingeActionFooter(
     clearsNavigationBar: Boolean = false,
     sidePadding: PaddingValues = PaddingValues(horizontal = horizontalPadding),
     destructive: Boolean = false,
+    failed: Boolean = false,
 ) {
     val direction = LocalLayoutDirection.current
     Surface(
@@ -90,10 +102,11 @@ fun BingeActionFooter(
             leadingIcon = leadingIcon,
             enabled = enabled,
             loading = loading,
-            destructive = destructive,
+            destructive = destructive || failed,
             modifier =
                 Modifier
                     .fillMaxWidth()
+                    .then(if (failed) Modifier.semantics { error(label) } else Modifier)
                     .then(if (clearsNavigationBar) Modifier.windowInsetsPadding(bottomBarInsets()) else Modifier)
                     .padding(start = sidePadding.calculateStartPadding(direction), end = sidePadding.calculateEndPadding(direction))
                     .padding(top = dimensionResource(R.dimen.padding_sm), bottom = bottomPadding),

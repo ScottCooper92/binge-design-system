@@ -44,7 +44,7 @@
       groupName: "compose + kotlin toolchain",
       automerge: false,
       prBodyNotes: [
-        "**Needs matching bumps in `Binge`, `binge-seerr`, `binge-archive` and `binge-jellyfin`.** The root `libs.versions.toml` is not a local decision: Compose, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
+        "**Needs matching bumps in `Binge`, `binge-seerr`, `binge-archive` and `ephyra`.** The root `libs.versions.toml` is not a local decision: Compose, Kotlin and KSP versions have to agree with the consumers'. A rendering shift fails `validateDebugScreenshotTest`; the re-record is a human decision.",
       ],
     },
     {
@@ -55,8 +55,17 @@
       groupName: "android gradle plugin",
       automerge: false,
       prBodyNotes: [
-        "**Moves in lockstep with `Binge`, `binge-seerr`, `binge-archive` and `binge-jellyfin`.** Gradle rejects two AGP versions in one build, so the consumers' `consumer-check` stays red until each one bumps `agp` to the same version in its own catalog. Merge this together with those bumps, not before.",
+        "**Moves in lockstep with `Binge`, `binge-seerr`, `binge-archive` and `ephyra`.** Gradle rejects two AGP versions in one build, so the consumers' `consumer-check` stays red until each one bumps `agp` to the same version in its own catalog. Merge this together with those bumps, not before.",
       ],
+    },
+    {
+      // The screenshot library and plugin read one `screenshot` version in libs.versions.toml, and the plugin trails the library:
+      // alpha17 of the library shipped with no alpha17 of the plugin (#1107), and main could not resolve the plugin. Renovate
+      // already groups dependencies that share a version variable, so a group rule cannot stop a library-only release from moving
+      // it. Leaving the library out does: the plugin is then the only one that proposes a version, so the shared version only
+      // moves to one both have. Bump the library by hand if it ever needs to run ahead.
+      matchPackageNames: ["com.android.tools.screenshot:screenshot-validation-api"],
+      enabled: false,
     },
     {
       // material3 is pinned ahead of the BOM on an alpha, because the expressive theme reads APIs the BOM's stable line

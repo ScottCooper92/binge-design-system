@@ -29,6 +29,8 @@
     <dimen name="tv_button_padding_horizontal">28dp</dimen>
     <dimen name="tv_button_icon">22dp</dimen>
     <dimen name="tv_button_icon_gap">10dp</dimen>
+    <!-- A picture in the button's leading slot: it fits inside the pill with the border and a little air above and below -->
+    <dimen name="tv_button_avatar">32dp</dimen>
     <dimen name="tv_button_border_width">1dp</dimen>
     <!-- Compact button: the v2 shape, shorter and tighter than the pill -->
     <dimen name="tv_compact_button_height">40dp</dimen>
@@ -119,7 +121,6 @@
     <dimen name="tv_skeleton_heading_width">160dp</dimen>
     <!-- A row heading's stand-in: TvSectionTitle's titleLarge line, so the rows under it sit where they will -->
     <dimen name="tv_skeleton_heading_height">28dp</dimen>
-    <dimen name="tv_skeleton_card_width">140dp</dimen>
     <!-- TvSwitch: the track, the outline it keeps unchecked, and the thumb inset within it -->
     <dimen name="tv_switch_track_width">44dp</dimen>
     <dimen name="tv_switch_track_height">24dp</dimen>

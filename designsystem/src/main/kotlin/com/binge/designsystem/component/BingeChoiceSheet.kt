@@ -30,6 +30,8 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,8 +56,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -150,6 +155,11 @@ internal fun rememberOpensPartWay(choices: BingeChoiceList<*>): Boolean = rememb
  *
  * For a pick that needs context, [subtitle] sits under the title (which copy is being marked, say) and [caption] across
  * the header below it (what the change reaches). Docked, the bar keeps the title alone.
+ *
+ * Pass [filterPlaceholder] for a list long enough to search, as [BingeMultiChoiceSheet] does: a filter field then sits
+ * above the rows and narrows them by label. While it has text the list is flat, not sectioned. When the text matches nothing
+ * the sheet says so under a search-off glyph: [noMatchLabel] is the words ("No tuner channels match"), and null uses the design
+ * system's own "No matches".
  */
 @Composable
 fun <T> BingeChoiceSheet(
@@ -163,6 +173,8 @@ fun <T> BingeChoiceSheet(
     pinned: List<T> = emptyList(),
     subtitle: String? = null,
     caption: String? = null,
+    filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
 ) {
     val partWay = rememberOpensPartWay(choices)
     BingeBottomSheet(
@@ -180,6 +192,8 @@ fun <T> BingeChoiceSheet(
             suggested = suggested,
             pinned = pinned,
             underNavigationBar = partWay,
+            filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
         ) { value ->
             onSelect(value)
             onDismissRequest()
@@ -200,8 +214,8 @@ fun <T> BingeChoiceSheet(
  * lead at any length, as on [BingeChoiceSheet]. A choice's mark shows on its row whatever the list's length.
  *
  * Pass [filterPlaceholder] for a list long enough to search, a hundred entries or more, say: a filter field then sits
- * under the header and narrows the rows by label. [actions] adds buttons to the header, before Clear and Done. The
- * sheet opens and docks as [BingeChoiceSheet] does.
+ * under the header and narrows the rows by label; a filter that matches nothing says [noMatchLabel], as [BingeChoiceSheet]
+ * does. [actions] adds buttons to the header, before Clear and Done. The sheet opens and docks as [BingeChoiceSheet] does.
  *
  * Pass [draftSaver] to keep the ticks across a rotation or process death, as a sheet restored open should. A generic [T]
  * has no saver of its own, so without one the sheet reopens with the ticks reset to [selected]. For `String` values,
@@ -219,6 +233,7 @@ fun <T> BingeMultiChoiceSheet(
     clearLabel: String,
     modifier: Modifier = Modifier,
     filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
     actions: @Composable RowScope.() -> Unit = {},
@@ -266,6 +281,7 @@ fun <T> BingeMultiChoiceSheet(
             chosen = draft,
             leading = openedWith,
             filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
             onCheckedChange = { value, on -> pick(if (on) draft + value else draft - value) },
             underNavigationBar = partWay,
             suggested = suggested,
@@ -339,6 +355,7 @@ fun <T> bingeMultiChoiceItem(
     onDone: (Set<T>) -> Unit,
     enabled: Boolean = true,
     filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
     onOpen: () -> Unit = {},
     selectedLabel: String? = null,
     draftSaver: Saver<Set<T>, out Any>? = null,
@@ -358,6 +375,7 @@ fun <T> bingeMultiChoiceItem(
             doneLabel = doneLabel,
             clearLabel = clearLabel,
             filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
             draftSaver = draftSaver,
             applyAsPicked = applyAsPicked,
         )
@@ -399,10 +417,20 @@ fun <T> BingeChoiceSheetContent(
     dragHandle: Boolean = true,
     subtitle: String? = null,
     caption: String? = null,
+    filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
 ) {
     Column(modifier) {
         RestingSheetTop(dragHandle) { BingeSheetHeader(title, subtitle = subtitle, caption = caption) }
-        SingleChoiceList(choices = choices, selected = selected, suggested = suggested, pinned = pinned, onSelect = onSelect)
+        SingleChoiceList(
+            choices = choices,
+            selected = selected,
+            suggested = suggested,
+            pinned = pinned,
+            filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
+            onSelect = onSelect,
+        )
     }
 }
 
@@ -427,6 +455,7 @@ fun <T> BingeMultiChoiceSheetContent(
     doneLabel: String? = null,
     onDone: () -> Unit = {},
     filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
     leading: Set<T> = chosen,
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
@@ -448,6 +477,7 @@ fun <T> BingeMultiChoiceSheetContent(
             chosen = chosen,
             leading = leading,
             filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
             onCheckedChange = onCheckedChange,
             suggested = suggested,
             pinned = pinned,
@@ -522,7 +552,10 @@ fun BingeSheetHeader(
  * with no header. Use it where the screen or pane already names the choice in its own top bar, so the title is not
  * drawn twice. A long list is sectioned and lettered as the sheet's is, with [suggested] and [pinned] as there. It
  * scrolls itself. [underNavigationBar] pads its end clear of the navigation bar, for a list that runs to the window's foot.
+ * With a [filterPlaceholder], a filter field above the rows narrows them by label, as [BingeMultiChoiceSheet]'s does, and says
+ * [noMatchLabel] when it matches nothing. [initialQuery] opens the filter with that text in it.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun <T> SingleChoiceList(
     choices: BingeChoiceList<T>,
@@ -531,23 +564,72 @@ fun <T> SingleChoiceList(
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
     underNavigationBar: Boolean = false,
+    filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
+    imeVisible: Boolean = WindowInsets.isImeVisible,
+    initialQuery: String = "",
     onSelect: (T) -> Unit,
 ) {
     val markSlot = choices is BingeChoiceList.Ready && choices.choices.any { it.isMarked() }
-    if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size)) {
-        SectionedChoiceList(
-            choices = choices.choices,
-            current = listOfNotNull(selected),
-            currentLabel = stringResource(R.string.choice_section_current),
-            suggested = suggested,
-            pinned = pinned,
-            underNavigationBar = underNavigationBar,
-            modifier = modifier.selectableGroup(),
-        ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
+    if (filterPlaceholder == null) {
+        if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size)) {
+            SectionedChoiceList(
+                choices = choices.choices,
+                current = listOfNotNull(selected),
+                currentLabel = stringResource(R.string.choice_section_current),
+                suggested = suggested,
+                pinned = pinned,
+                underNavigationBar = underNavigationBar,
+                modifier = modifier.selectableGroup(),
+            ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
+            return
+        }
+        ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
+            for (choice in ready.pinnedFirst(pinned)) RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
+        }
         return
     }
-    ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
-        for (choice in ready.pinnedFirst(pinned)) RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
+    var query by rememberSaveable { mutableStateOf(initialQuery) }
+    // As the multi-choice list: open the sheet fully while the keyboard is up so the field is not under it.
+    val dock = LocalBingeSheetDock.current
+    val needsRoom = imeVisible && dock?.canExpand == true
+    LaunchedEffect(needsRoom) { if (needsRoom) dock.expand() }
+    Column(modifier) {
+        if (choices is BingeChoiceList.Ready) {
+            BingeSearchField(
+                query = query,
+                onQueryChange = { query = it },
+                onClear = { query = "" },
+                placeholder = filterPlaceholder,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                modifier =
+                    Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.padding_m),
+                        vertical = dimensionResource(R.dimen.padding_s),
+                    ),
+            )
+        }
+        if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size) && query.isBlank()) {
+            SectionedChoiceList(
+                choices = choices.choices,
+                current = listOfNotNull(selected),
+                currentLabel = stringResource(R.string.choice_section_current),
+                suggested = suggested,
+                pinned = pinned,
+                underNavigationBar = underNavigationBar,
+                modifier = Modifier.selectableGroup(),
+            ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
+            return@Column
+        }
+        ChoiceListBody(choices, Modifier.selectableGroup(), underNavigationBar) { ready ->
+            val matching = ready.filter { query.isBlank() || it.label.contains(query.trim(), ignoreCase = true) }
+            for (choice in matching.pinnedFirst(
+                pinned,
+            )) {
+                RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
+            }
+            if (matching.isEmpty() && query.isNotBlank()) ChoiceNoMatch(noMatchLabel)
+        }
     }
 }
 
@@ -564,6 +646,7 @@ internal fun <T> MultiChoiceList(
     chosen: Set<T>,
     leading: Set<T>,
     filterPlaceholder: String?,
+    noMatchLabel: String? = null,
     onCheckedChange: (T, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     initialQuery: String = "",
@@ -639,7 +722,38 @@ internal fun <T> MultiChoiceList(
                     )
                 }
             }
+            if (matching.isEmpty() && query.isNotBlank()) ChoiceNoMatch(noMatchLabel)
         }
+    }
+}
+
+/**
+ * What a filter that matches nothing leaves where the rows were, said as an empty screen says it: a search-off glyph over one
+ * centred line. The line is [label], or the design system's own "No matches" when it is null, and it is a polite live region,
+ * so a screen reader says it when the last typed letter empties the list. There is no action: the filter field clears itself.
+ */
+@Composable
+private fun ChoiceNoMatch(label: String?) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(dimensionResource(R.dimen.padding_l))
+            .semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.SearchOff,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(dimensionResource(R.dimen.message_screen_icon_size)),
+        )
+        Text(
+            text = label ?: stringResource(R.string.choice_no_match),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 

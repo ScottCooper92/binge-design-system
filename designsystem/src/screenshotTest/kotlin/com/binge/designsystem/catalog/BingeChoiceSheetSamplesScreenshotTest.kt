@@ -3,6 +3,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
@@ -29,8 +30,23 @@ class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun SingleChoiceFiltered() {
+        BingeChoiceSheetFilteredSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun MultiChoiceFiltered() {
         BingeMultiChoiceSheetSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun NoMatch() {
+        BingeChoiceSheetNoMatchSample()
     }
 
     @PreviewTest

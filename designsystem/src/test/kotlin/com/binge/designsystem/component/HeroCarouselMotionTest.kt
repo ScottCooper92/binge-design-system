@@ -1,5 +1,9 @@
 package com.binge.designsystem.component
 
+import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Context
+import android.view.accessibility.AccessibilityManager
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -14,6 +18,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -133,6 +139,123 @@ class HeroCarouselMotionTest {
         rule.onRoot().performTouchInput { swipeLeft() }
         rule.waitForIdle()
         assertSlide("Alpha")
+    }
+
+    private val accessibility =
+        shadowOf(RuntimeEnvironment.getApplication().getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager)
+
+    // The state a listener writes reaches the composition when the snapshot is applied, which a test holding the clock must do itself.
+    private fun turnOnTouchExploration() {
+        accessibility.setEnabled(true)
+        accessibility.setTouchExplorationEnabled(true)
+        Snapshot.sendApplyNotifications()
+    }
+
+    private fun turnOffTouchExploration() {
+        accessibility.setEnabled(false)
+        accessibility.setTouchExplorationEnabled(false)
+        Snapshot.sendApplyNotifications()
+    }
+
+    private fun setServices(vararg feedbackTypes: Int) {
+        accessibility.setEnabledAccessibilityServiceList(
+            feedbackTypes.map { type -> AccessibilityServiceInfo().apply { feedbackType = type } },
+        )
+        Snapshot.sendApplyNotifications()
+    }
+
+    private fun turnOnService(feedbackType: Int) {
+        accessibility.setEnabled(true)
+        accessibility.setEnabledAccessibilityServiceList(listOf(AccessibilityServiceInfo().apply { this.feedbackType = feedbackType }))
+    }
+
+    @Test
+    fun `autoplay holds on the current slide while touch exploration is on`() {
+        turnOnTouchExploration()
+        show()
+
+        advance(3 * AUTOPLAY_MS)
+
+        assertSlide("Alpha")
+    }
+
+    @Test
+    fun `autoplay holds while a switch-access style service is on`() {
+        turnOnService(AccessibilityServiceInfo.FEEDBACK_GENERIC)
+        show()
+
+        advance(3 * AUTOPLAY_MS)
+
+        assertSlide("Alpha")
+    }
+
+    @Test
+    fun `autoplay holds while a screen reader that speaks is on without touch exploration`() {
+        turnOnService(AccessibilityServiceInfo.FEEDBACK_SPOKEN)
+        show()
+
+        advance(3 * AUTOPLAY_MS)
+
+        assertSlide("Alpha")
+    }
+
+    @Test
+    fun `a service that only draws does not stop autoplay`() {
+        turnOnService(AccessibilityServiceInfo.FEEDBACK_VISUAL)
+        show()
+
+        advance(AUTOPLAY_MS + SLACK_MS)
+
+        assertSlide("Beta")
+    }
+
+    @Test
+    fun `turning a screen reader on while the carousel shows stops autoplay, and turning it off lets it resume`() {
+        show()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Beta")
+
+        turnOnTouchExploration()
+        rule.mainClock.advanceTimeByFrame()
+        // One interval, not three: three steps round three slides and land on the same one, which would pass with autoplay running.
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Beta")
+
+        turnOffTouchExploration()
+        rule.mainClock.advanceTimeByFrame()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Gamma")
+    }
+
+    @Test
+    fun `a switch-access style service turned on beside a service that only draws stops autoplay, and turning it off resumes it`() {
+        // Neither the accessibility state nor touch exploration changes here: only the set of enabled services does.
+        turnOnService(AccessibilityServiceInfo.FEEDBACK_VISUAL)
+        show()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Beta")
+
+        setServices(AccessibilityServiceInfo.FEEDBACK_VISUAL, AccessibilityServiceInfo.FEEDBACK_GENERIC)
+        rule.mainClock.advanceTimeByFrame()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Beta")
+
+        setServices(AccessibilityServiceInfo.FEEDBACK_VISUAL)
+        rule.mainClock.advanceTimeByFrame()
+        advance(AUTOPLAY_MS + SLACK_MS)
+        assertSlide("Gamma")
+    }
+
+    @Test
+    fun `swiping still pages the carousel while a screen reader is on`() {
+        turnOnTouchExploration()
+        rule.mainClock.autoAdvance = true
+        show()
+
+        rule.onRoot().performTouchInput { swipeLeft() }
+        rule.waitForIdle()
+
+        assertSlide("Beta")
     }
 
     private companion object {

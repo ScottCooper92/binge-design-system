@@ -2,4 +2,6 @@
 <resources>
     <!-- Medium width (>=600dp): a touch more hub inset so content clears the bezel. See values/dimens.xml. -->
     <dimen name="screen_content_inset">24dp</dimen>
+    <!-- Wide enough for the two or three columns search_result_columns gives from here. See values/dimens.xml. -->
+    <dimen name="search_content_max_width">1100dp</dimen>
 </resources>

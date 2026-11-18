@@ -23,7 +23,9 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,8 +37,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -65,6 +69,12 @@ fun BingeSearchField(
     val internalFocusRequester = remember { FocusRequester() }
     val fieldFocus = focusRequester ?: internalFocusRequester
     val interactionSource = remember { MutableInteractionSource() }
+    // The String overload of BasicTextField starts its selection at 0, so a field that opens with a query (a screen restored on Back)
+    // would put the caret before it. Own the selection: it starts at the end, follows the user once they move it, and goes back to the
+    // end when the query is changed from outside (a clear, a restore). A query the caller rewrites from what was typed keeps the caret
+    // where it was (#1158).
+    val caret = rememberFieldCaret(query, TextFieldValue(query, TextRange(query.length)))
+    val shown = caret.shown(query)
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -93,8 +103,8 @@ fun BingeSearchField(
         Spacer(Modifier.width(dimensionResource(R.dimen.search_bar_icon_spacing)))
         Box(modifier = Modifier.weight(1f)) {
             BasicTextField(
-                value = query,
-                onValueChange = onQueryChange,
+                value = shown,
+                onValueChange = { if (caret.edit(it, query)) onQueryChange(it.text) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()

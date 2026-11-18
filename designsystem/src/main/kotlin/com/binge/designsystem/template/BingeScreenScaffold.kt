@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -44,7 +45,10 @@ import com.binge.designsystem.component.BingeLargeTopBar
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.BingeTopBar
+import com.binge.designsystem.component.LocalRowFocus
 import com.binge.designsystem.component.OverlaidHeaderContent
+import com.binge.designsystem.component.RowFocus
+import com.binge.designsystem.component.keepingBarHeightDuringRowFocus
 import com.binge.designsystem.paneBackOrNull
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentInset
@@ -130,12 +134,13 @@ fun BingeScreenScaffold(
     val ownBehavior = rememberScreenBarScrollBehavior(bar)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
     val scrim = screenBarScrim(bar, behavior)
+    val rowFocus = LocalRowFocus.current
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
     // What an ancestor already reserved, such as the custom rail's start inset, is not reserved again (#372).
     var consumed by remember { mutableStateOf(WindowInsets(0, 0, 0, 0)) }
     Scaffold(
-        modifier = (behavior?.let { modifier.nestedScroll(it.nestedScrollConnection) } ?: modifier)
+        modifier = (behavior?.let { modifier.nestedScroll(barConnection(bar, it, rowFocus)) } ?: modifier)
             .onConsumedWindowInsetsChanged { consumed = it },
         contentWindowInsets = WindowInsets(0),
         topBar = {
@@ -261,6 +266,26 @@ fun PaddingValues.screenListPadding(): PaddingValues {
         bottom = resolvedContentInset() + calculateBottomPadding(),
     )
 }
+
+/**
+ * The connection a [bar]'s [behavior] listens to the body through. A sliding bar leaves its height alone for the scroll a row focus makes to
+ * bring a row into view, so a screen opened on a row still has its bar. The collapsing and large bars are left as they were: a collapsing bar
+ * arrives collapsed and scrimmed over the rows scrolled under it, which is how it should look.
+ */
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun barConnection(
+    bar: ScreenBar,
+    behavior: TopAppBarScrollBehavior,
+    rowFocus: RowFocus?,
+): NestedScrollConnection =
+    remember(bar, behavior, rowFocus) {
+        if (bar == ScreenBar.Small) {
+            behavior.nestedScrollConnection.keepingBarHeightDuringRowFocus(rowFocus, behavior.state)
+        } else {
+            behavior.nestedScrollConnection
+        }
+    }
 
 /**
  * How far a [bar]'s scrim has faded in under [behavior]: with the body's collapse for the collapsing and large bars,

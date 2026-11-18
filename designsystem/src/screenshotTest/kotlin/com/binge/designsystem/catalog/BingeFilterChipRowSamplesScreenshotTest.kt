@@ -6,7 +6,7 @@ import com.binge.designsystem.preview.ComponentPreviews
 
 /**
  * Screenshot coverage for the filter-chip-row catalog samples — renders the shared
- * [BingeFilterChipRowSample] and [BingeFilterChipPagerSample], and their mid-selection and scrimmed variants.
+ * [BingeFilterChipRowSample] and [BingeFilterChipPagerSample], and their mid-selection, icon and scrimmed variants.
  */
 class BingeFilterChipRowSamplesScreenshotTest {
     @PreviewTest
@@ -28,6 +28,13 @@ class BingeFilterChipRowSamplesScreenshotTest {
     @Composable
     fun FilterChips() {
         BingeFilterChipRowMidSelectionSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun IconChips() {
+        BingeFilterChipRowIconsSample()
     }
 
     @PreviewTest

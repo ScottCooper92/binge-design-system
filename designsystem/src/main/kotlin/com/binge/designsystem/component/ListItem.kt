@@ -127,6 +127,11 @@ data class ListItem(
      * [toggleState] take precedence, and a checked row has no long-press.
      */
     val checked: Boolean? = null,
+    /**
+     * A stable name for this row, for a screen that opens on a particular setting: [ProvideRowFocus] scrolls to the row that has
+     * it, pulses it and leaves it highlighted. Rows without one are unaffected. Unique within the screen.
+     */
+    val key: String? = null,
 )
 
 /**

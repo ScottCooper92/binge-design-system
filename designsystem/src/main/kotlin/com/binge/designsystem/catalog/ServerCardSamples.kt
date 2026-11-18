@@ -14,6 +14,7 @@ import com.binge.designsystem.component.HubCard
 import com.binge.designsystem.component.ServerCard
 import com.binge.designsystem.component.ServerCardChip
 import com.binge.designsystem.component.ServerCardStat
+import com.binge.designsystem.component.ServerCardUpdate
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
 
@@ -29,7 +30,7 @@ private val threeStats =
         ServerCardStat(Icons.Filled.HourglassEmpty, "7", "Pending"),
     )
 
-/** A server card with every pill: the flags beside the logo and the health pill beside the title, and four totals. */
+/** A server card with every pill: the flags and the health pill in the header's top row, and four totals. */
 @Composable
 fun ServerCardAllChipsSample() {
     ScreenshotTheme {
@@ -41,6 +42,51 @@ fun ServerCardAllChipsSample() {
             chips = listOf(ServerCardChip("Demo", BingeSentiment.Caution), ServerCardChip("Update available", BingeSentiment.Caution)),
             statusChip = health,
             stats = threeStats + ServerCardStat(Icons.Filled.People, "9", "Users"),
+        )
+    }
+}
+
+/** A server card whose "Update available" pill is a button beside a plain "Demo" pill: both are the same size, and the button has the touch target around it. */
+@Composable
+fun ServerCardTappableChipSample() {
+    ScreenshotTheme {
+        ServerCard(
+            title = "Home server",
+            logo = logo(),
+            subtitle = "Jellyseerr 2.5.2",
+            address = "https://requests.example.com",
+            chips = listOf(
+                ServerCardChip("Demo", BingeSentiment.Caution),
+                ServerCardChip("Update available", BingeSentiment.Caution, onClick = {}, contentDescription = "Release notes"),
+            ),
+            statusChip = health,
+            stats = threeStats,
+        )
+    }
+}
+
+/**
+ * A server with an update and requests waiting: the full-width update row under the header, and the pending total in the
+ * caution accent while the other totals stay plain.
+ */
+@Composable
+fun ServerCardUpdateSample() {
+    ScreenshotTheme {
+        ServerCard(
+            title = "Home server",
+            logo = logo(),
+            subtitle = "Jellyseerr 2.5.2",
+            address = "https://requests.example.com",
+            chips = listOf(ServerCardChip("Demo", BingeSentiment.Caution)),
+            statusChip = health,
+            update = ServerCardUpdate(label = "Update available: 2.6.0", actionLabel = "Release notes", onClick = {}),
+            stats =
+                listOf(
+                    ServerCardStat(Icons.Filled.Movie, "128", "Movies"),
+                    ServerCardStat(Icons.Filled.Tv, "42", "TV"),
+                    ServerCardStat(Icons.Filled.People, "9", "Users"),
+                    ServerCardStat(Icons.Filled.HourglassEmpty, "7", "Pending", BingeSentiment.Caution),
+                ),
         )
     }
 }

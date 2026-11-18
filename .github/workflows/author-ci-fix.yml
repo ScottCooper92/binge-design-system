@@ -43,7 +43,7 @@ jobs:
       (github.event.workflow_run.event != 'schedule') &&
       (!github.event.pull_request || github.event.pull_request.head.repo.full_name == github.repository) &&
       (!github.event.workflow_run || github.event.workflow_run.head_repository.full_name == github.repository)
-    uses: ScottCooper92/binge-ci/.github/workflows/author-ci-fix.yml@0c5177c6b9f591bf2d4c87a2d0d48d2680b4c398 # v1
+    uses: ScottCooper92/binge-ci/.github/workflows/author-ci-fix.yml@0e23ad4311757677213da647bd150eca33d256f0 # v1.0.49
     with:
       author_bot_id: ${{ vars.AUTHOR_BOT_ID }}
       # jvm, not android: this repo's ci.yml is setup-java + setup-gradle and nothing
@@ -51,7 +51,7 @@ jobs:
       # TMDB key this build has no use for, and tunes Gradle for a container this job
       # does not run in. The Android SDK is preinstalled on the hosted runner image.
       toolchain: jvm
-      java_version: '17'
+      java_version: '21'
       verify_guidance: >
         Scope Gradle to the module rather than running the whole tree when you
         are checking one thing — `./gradlew :designsystem:test`, or
@@ -59,8 +59,8 @@ jobs:
         when you push.
 
         You cannot compile the consumers from here. This build is included by Binge,
-        binge-seerr, binge-archive and binge-jellyfin, so a change that is green here can still break
-        theirs. CI compiles binge-seerr, binge-archive and binge-jellyfin informationally; Binge is
+        binge-seerr, binge-archive and ephyra, so a change that is green here can still break
+        theirs. CI compiles binge-seerr, binge-archive and ephyra informationally; Binge is
         not compiled. If a fix
         changes a public signature, say so rather than assuming green means safe.
       gate_rules: |

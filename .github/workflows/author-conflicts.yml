@@ -34,7 +34,7 @@ jobs:
       (github.event_name == 'workflow_dispatch' ||
        (github.event.workflow_run.event == 'push' &&
         github.event.workflow_run.head_branch == github.event.repository.default_branch))
-    uses: ScottCooper92/binge-ci/.github/workflows/author-conflicts.yml@0c5177c6b9f591bf2d4c87a2d0d48d2680b4c398 # v1
+    uses: ScottCooper92/binge-ci/.github/workflows/author-conflicts.yml@0e23ad4311757677213da647bd150eca33d256f0 # v1.0.49
     with:
       dispatched: ${{ github.event_name == 'workflow_dispatch' }}
       author_bot_id: ${{ vars.AUTHOR_BOT_ID }}
@@ -51,8 +51,8 @@ jobs:
 
         A conflict over a public signature of a component must be handed
         back. This build is included by Binge, binge-seerr, binge-archive and
-        binge-jellyfin, you cannot compile any of them from here, and CI compiles only
-        binge-seerr, binge-archive and binge-jellyfin, so
+        ephyra, you cannot compile any of them from here, and CI compiles only
+        binge-seerr, binge-archive and ephyra, so
         you cannot tell whether a resolution that compiles in this repository
         breaks a consumer. Leave
         it unresolved and say so in note.md.

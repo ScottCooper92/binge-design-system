@@ -4,10 +4,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,9 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.LocalReduceMotion
-import com.binge.designsystem.tv.component.BingeTvInitialsAvatar
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvFocusGroup
 import com.binge.designsystem.tv.theme.BingeTvCorners
@@ -385,24 +381,15 @@ private fun TvTopBarAvatar(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val slot = dimensionResource(TvR.dimen.tv_icon_button_diameter)
-    val diameter = dimensionResource(TvR.dimen.tv_top_bar_avatar_size)
-    val ring = dimensionResource(TvR.dimen.tv_top_bar_avatar_ring)
-    // Smaller than a button, in a button-sized slot: the bar's height and the tabs' places stay where they were.
-    Box(modifier = modifier.size(slot), contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .size(diameter)
-                .clip(BingeShapes.Pill)
-                .border(ring, if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent, BingeShapes.Pill)
-                .tvClickable(role = Role.Button, onFocusChanged = onFocusChanged, onClick = onClick)
-                .clearAndSetSemantics { contentDescription = item.label }
-                .padding(ring),
-            contentAlignment = Alignment.Center,
-        ) {
-            BingeTvInitialsAvatar(name = name, size = diameter - ring * 2, avatarUrl = item.avatarUrl)
-        }
-    }
+    TvAvatarButton(
+        name = name,
+        avatarUrl = item.avatarUrl,
+        ringColor = if (focused) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+        onFocusChanged = onFocusChanged,
+        onClick = onClick,
+        semantics = { contentDescription = item.label },
+        modifier = modifier,
+    )
 }
 
 /**

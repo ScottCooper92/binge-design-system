@@ -1,11 +1,13 @@
 package com.binge.designsystem.theme
 
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.database.ContentObserver
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.view.accessibility.AccessibilityManager
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +25,13 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 
 val LocalReduceMotion = staticCompositionLocalOf { false }
+
+/**
+ * Whether an assistive technology, such as a screen reader or a switch-access service, is on. A component that moves content on its own, such
+ * as an autoplaying carousel, holds still while this is true, so a page stays put under a user who is still reading it. Read it next to
+ * [LocalReduceMotion]; [BingeExpressiveTheme] provides both. False where nothing provides it.
+ */
+val LocalAssistiveTechnology = staticCompositionLocalOf { false }
 
 /**
  * An app's own pair of Material colour schemes, light and dark.
@@ -63,6 +72,7 @@ fun BingeExpressiveTheme(
     dynamicColor: Boolean = false,
     reduceMotion: Boolean = systemReduceMotion(),
     brand: BingeBrand = BingeBrand.Binge,
+    assistiveTechnology: Boolean = systemAssistiveTechnology(),
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
@@ -79,6 +89,7 @@ fun BingeExpressiveTheme(
 
     CompositionLocalProvider(
         LocalReduceMotion provides reduceMotion,
+        LocalAssistiveTechnology provides assistiveTechnology,
         LocalBingeColors provides bingeColors,
         LocalBingeDarkTheme provides darkTheme,
     ) {
@@ -137,6 +148,60 @@ fun systemReduceMotion(): Boolean {
     }
 
     return reduceMotion
+}
+
+/**
+ * Whether an assistive technology is on: touch exploration (TalkBack's mode), or an enabled accessibility service that speaks, gives braille
+ * or acts generically, as a switch-access service does. A service that only draws, such as a magnifier or a colour filter, does not count,
+ * because it does not read the page to the user.
+ *
+ * Observed, because a user turns a service on and off from system Settings while the app stays alive. From API 33 a change to the set of
+ * enabled services is observed too. Below that, only the first service switching on or off and touch exploration are, so a second service
+ * is picked up on the next composition. Public beside [systemReduceMotion] so that a consumer that builds its own theme can provide
+ * [LocalAssistiveTechnology] from it.
+ */
+@Composable
+fun systemAssistiveTechnology(): Boolean {
+    val context = LocalContext.current
+    val manager = remember(context) { context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager }
+    var active by remember(manager) { mutableStateOf(manager.readAssistiveTechnology()) }
+
+    DisposableEffect(manager) {
+        if (manager == null) return@DisposableEffect onDispose { }
+        val onTouchExploration = AccessibilityManager.TouchExplorationStateChangeListener { active = manager.readAssistiveTechnology() }
+        val onState = AccessibilityManager.AccessibilityStateChangeListener { active = manager.readAssistiveTechnology() }
+        manager.addTouchExplorationStateChangeListener(onTouchExploration)
+        manager.addAccessibilityStateChangeListener(onState)
+        val onServices =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                AccessibilityManager.AccessibilityServicesStateChangeListener { active = manager.readAssistiveTechnology() }
+            } else {
+                null
+            }
+        if (onServices != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            manager.addAccessibilityServicesStateChangeListener(onServices)
+        }
+        onDispose {
+            if (onServices != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                manager.removeAccessibilityServicesStateChangeListener(onServices)
+            }
+            manager.removeTouchExplorationStateChangeListener(onTouchExploration)
+            manager.removeAccessibilityStateChangeListener(onState)
+        }
+    }
+
+    return active
+}
+
+private const val ASSISTIVE_FEEDBACK =
+    AccessibilityServiceInfo.FEEDBACK_SPOKEN or AccessibilityServiceInfo.FEEDBACK_BRAILLE or AccessibilityServiceInfo.FEEDBACK_GENERIC
+
+private fun AccessibilityManager?.readAssistiveTechnology(): Boolean {
+    if (this == null || !isEnabled) return false
+    if (isTouchExplorationEnabled) return true
+    return getEnabledAccessibilityServiceList(
+        AccessibilityServiceInfo.FEEDBACK_ALL_MASK,
+    ).any { it.feedbackType and ASSISTIVE_FEEDBACK != 0 }
 }
 
 private fun Context.readSystemReduceMotion(): Boolean {

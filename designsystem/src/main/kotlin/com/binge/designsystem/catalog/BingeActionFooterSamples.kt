@@ -110,3 +110,23 @@ fun BingeActionFooterDestructiveSample() {
         BingeActionFooter(label = "Decline request", onClick = {}, destructive = true)
     }
 }
+
+/**
+ * A failed send from a sheet's pinned primary: the button in the error tone with the short reason as its label, which the caller shows
+ * for a few seconds. A tap is the caller's, usually opening a dialog with the full cause and Retry. Not [BingeActionFooterDestructiveSample]:
+ * that is a sheet whose action removes or declines something, and the failure is a send that did not go through.
+ */
+@Composable
+fun BingeActionFooterFailedSample() {
+    ScreenshotTheme {
+        BingeActionFooter(label = "Couldn't reach your server", onClick = {}, failed = true)
+    }
+}
+
+/** The same failure in Spanish, whose reason runs longer: at a large font it wraps and the button grows rather than clip it. */
+@Composable
+fun BingeActionFooterFailedSpanishSample() {
+    ScreenshotTheme {
+        BingeActionFooter(label = "No se pudo conectar con tu servidor", onClick = {}, failed = true)
+    }
+}

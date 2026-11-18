@@ -48,6 +48,7 @@ import com.binge.designsystem.component.MediaCardAction
 import com.binge.designsystem.component.MediaCardStatus
 import com.binge.designsystem.component.MediaTypeTag
 import com.binge.designsystem.component.MediaTypeTagType
+import com.binge.designsystem.component.PersonCard
 import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.FormAction
@@ -251,6 +252,21 @@ fun MediaCardWorstCaseSample() {
             status = MediaCardStatus(label = "Partly available", sentiment = BingeSentiment.Positive),
             modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
         )
+    }
+}
+
+/** A [PersonCard] with a long name, a long subtitle and no photo, so the initials stand in, the caption is full and nothing may clip. */
+@Composable
+fun PersonCardWorstCaseSample() {
+    ScreenshotTheme {
+        LooseFrame {
+            PersonCard(
+                name = "Maria Fernanda de los Angeles Rodriguez Hernandez",
+                subtitle = "Supervising sound editor and re-recording mixer",
+                photoUrl = null,
+                onClick = {},
+            )
+        }
     }
 }
 

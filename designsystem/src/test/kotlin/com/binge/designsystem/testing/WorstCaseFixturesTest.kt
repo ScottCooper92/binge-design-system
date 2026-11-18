@@ -15,10 +15,13 @@ import com.binge.designsystem.catalog.BingeConfirmDialogWorstCaseSample
 import com.binge.designsystem.catalog.BingeMessageDialogWorstCaseSample
 import com.binge.designsystem.catalog.BingeStopSliderWorstCaseSample
 import com.binge.designsystem.catalog.CheckboxRowWorstCaseSample
+import com.binge.designsystem.catalog.DateBoundFieldsLongLabelsSample
 import com.binge.designsystem.catalog.ItemGroupWideTrailingWorstCaseSample
 import com.binge.designsystem.catalog.ItemGroupWorstCaseSample
+import com.binge.designsystem.catalog.LabelledIconButtonSpanishRowSample
 import com.binge.designsystem.catalog.ListRowWorstCaseSample
 import com.binge.designsystem.catalog.MediaCardWorstCaseSample
+import com.binge.designsystem.catalog.PersonCardWorstCaseSample
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -51,6 +54,18 @@ class WorstCaseFixturesTest {
         // A pass that checked nothing is no pass: scrolling content is skipped, and these rows must not hide in it.
         assertTrue("only $checked text nodes were checked", checked >= MIN_CHECKED)
     }
+
+    @Test fun `date bound fields at 1_3`() = check(FONT_13) { DateBoundFieldsLongLabelsSample() }
+
+    @Test fun `date bound fields at 2_0`() = check(FONT_20) { DateBoundFieldsLongLabelsSample() }
+
+    @Test fun `labelled icon buttons at 1_3`() = check(FONT_13) { LabelledIconButtonSpanishRowSample() }
+
+    @Test fun `labelled icon buttons at 2_0`() = check(FONT_20) { LabelledIconButtonSpanishRowSample() }
+
+    @Test fun `a person card at 1_3`() = check(FONT_13) { PersonCardWorstCaseSample() }
+
+    @Test fun `a person card at 2_0`() = check(FONT_20) { PersonCardWorstCaseSample() }
 
     @Test fun `a list row at 1_3`() = check(FONT_13) { ListRowWorstCaseSample() }
 

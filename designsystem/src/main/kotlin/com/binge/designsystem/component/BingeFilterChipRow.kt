@@ -39,7 +39,7 @@ import com.binge.designsystem.resolvedContentPadding
 
 /**
  * A horizontally-scrolling row of [BingeFilterChip]s — the selected one filled in the primary accent,
- * the rest outlined, each carrying an optional count. Stateless: the caller owns [selectedIndex] and
+ * the rest outlined, each carrying an optional leading icon and count ([FilterChipItem]). Stateless: the caller owns [selectedIndex] and
  * reacts to [onSelect]. The chip counterpart to [BingeTabRow], for filters that narrow a list (rather
  * than switch screens); pair it via [BingeFilterChipPager] for swipe-between-filters.
  */
@@ -76,6 +76,8 @@ fun BingeFilterChipRow(
                 selected = index == selectedIndex,
                 onClick = { onSelect(index) },
                 count = item.count,
+                leadingIcon = item.icon,
+                contentDescription = item.contentDescription,
             )
         }
     }

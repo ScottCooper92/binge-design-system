@@ -51,6 +51,7 @@ import com.binge.designsystem.component.HeroBackdrop
 import com.binge.designsystem.component.ImagePlaceholder
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
+import com.binge.designsystem.theme.LocalAssistiveTechnology
 import com.binge.designsystem.theme.LocalReduceMotion
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
@@ -81,7 +82,7 @@ data class HeroItem(
 
 /**
  * The hub featured carousel: a full-bleed cinematic hero — one backdrop at a time, crossfading
- * between titles, autoplaying every [AUTO_ADVANCE_MS] (paused while the user drags), with
+ * between titles, autoplaying every [AUTO_ADVANCE_MS] (paused while the user drags, and held still under reduced motion or an assistive technology), with
  * left-anchored copy and a dot rail.
  *
  * Crossfade, not a `HorizontalPager`: the mock fades opacity between full-bleed backdrops, which a
@@ -123,13 +124,15 @@ fun HeroCarousel(
     var dragging by remember { mutableStateOf(false) }
     val current = index.coerceIn(0, count - 1)
 
-    // Autoplay is a motion effect, so reduce-motion holds on the current slide (manual paging only).
+    // Autoplay is a motion effect, so reduce-motion holds on the current slide (manual paging only). So does an assistive technology, which
+    // is reading the page to a user who has not moved it: it changes under them, and with it the description they are on.
     val reduceMotion = LocalReduceMotion.current
+    val assistiveTechnology = LocalAssistiveTechnology.current
 
     // Keyed on `current` so every index change — swipe, dot tap, or auto-advance — restarts the delay,
     // giving each visible slide a full AUTO_ADVANCE_MS. Paused (returns early) while dragging.
-    LaunchedEffect(count, dragging, current, reduceMotion) {
-        if (count <= 1 || dragging || reduceMotion) return@LaunchedEffect
+    LaunchedEffect(count, dragging, current, reduceMotion, assistiveTechnology) {
+        if (count <= 1 || dragging || reduceMotion || assistiveTechnology) return@LaunchedEffect
         delay(AUTO_ADVANCE_MS)
         index = (index + 1) % count
     }

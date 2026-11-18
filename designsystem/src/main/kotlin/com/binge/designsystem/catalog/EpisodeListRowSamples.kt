@@ -23,6 +23,21 @@ fun EpisodeListRowSample() {
     }
 }
 
+/** A display-only row, with no `onClick`: the same layout, but not a button, so no ripple or focus target. */
+@Composable
+fun EpisodeListRowDisplayOnlySample() {
+    ScreenshotTheme {
+        EpisodeListRow(
+            episodeNumber = 4,
+            name = "Garden of Bones",
+            stillUrl = null,
+            rating = 8.1f,
+            airDate = "Mar 12, 2023",
+            onClick = null,
+        )
+    }
+}
+
 /** The episode row's loading placeholder — shimmering still, number, and meta lines. */
 @Composable
 fun EpisodeListRowSkeletonSample() {

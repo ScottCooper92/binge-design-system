@@ -21,7 +21,7 @@ run-name: >-
 # here cannot see every consumer, so a change that compiles fine in this repository can
 # still break a consuming app at its next sync. auto_merge was off until the review had a
 # track record here. It is on now. The `Consumer check` workflow, kept apart from `CI`,
-# compiles binge-seerr, binge-archive and binge-jellyfin against a change that touches what they compile, and a red or pending
+# compiles binge-seerr, binge-archive and ephyra against a change that touches what they compile, and a red or pending
 # run there holds auto-merge at UNSTABLE. A consumer break that gets through surfaces at that
 # consumer's own submodule bump.
 on:
@@ -75,11 +75,13 @@ jobs:
     #
     # A fork PR never reaches the bot. binge-ci refuses one too, and this keeps the guard in sight
     # here (#407). It checks the events that name a head repository and lets the others through.
+    # Skip coordinator status notes (`<!-- to-coordinator`) so they start no empty run.
     if: >-
+      !startsWith(github.event.comment.body, '<!-- to-coordinator') &&
       (github.event_name != 'workflow_run' || github.event.workflow_run.event != 'schedule') &&
       (!github.event.pull_request || github.event.pull_request.head.repo.full_name == github.repository) &&
       (!github.event.workflow_run || github.event.workflow_run.head_repository.full_name == github.repository)
-    uses: ScottCooper92/binge-ci/.github/workflows/bot-review.yml@0c5177c6b9f591bf2d4c87a2d0d48d2680b4c398 # v1
+    uses: ScottCooper92/binge-ci/.github/workflows/bot-review.yml@0e23ad4311757677213da647bd150eca33d256f0 # v1.0.49
     with:
       dispatch_pr: ${{ inputs.pr }}
       auto_merge: true

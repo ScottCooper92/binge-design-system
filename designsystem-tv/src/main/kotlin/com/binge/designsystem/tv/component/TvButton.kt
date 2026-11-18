@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.Icon
+import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
@@ -53,6 +55,11 @@ import com.binge.designsystem.tv.R as TvR
  * be sent twice. It is independent of [enabled]: the button keeps its colours, its size and focus, so the remote does
  * not lose its place, and [label] stays its accessible name.
  *
+ * [leadingContent] is a composable slot before the label, for what an icon can't be (an account's picture). The caller sizes it,
+ * keeping it inside the pill's height ([TvR.dimen.tv_button_icon] is the icon's size), and `LocalContentColor` is the button's
+ * content colour, so a glyph drawn with it inverts on focus as [leadingIcon] does. When both are given the content is drawn and
+ * the icon is not. A slot that is only decoration adds nothing for a screen reader: [label] stays the button's name.
+ *
  * [initiallyFocused] seeds the focus flag so a screenshot can show the focused state (a baseline runs no
  * coroutines, so no real focus event lands); production leaves it false. Reach for [TvButtonSurface] when
  * the caller owns the flag outright.
@@ -67,6 +74,7 @@ fun TvButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     initiallyFocused: Boolean = false,
+    leadingContent: (@Composable () -> Unit)? = null,
 ) {
     var focused by remember { mutableStateOf(initiallyFocused) }
     TvButtonSurface(
@@ -76,6 +84,7 @@ fun TvButton(
         isFocused = focused,
         leadingIcon = leadingIcon,
         loading = loading,
+        leadingContent = leadingContent,
         modifier = modifier
             .tvClickable(
                 enabled = enabled,
@@ -91,7 +100,7 @@ fun TvButton(
  * screenshot can render the focused frame without a real focus request landing by capture time.
  *
  * An optional [leadingIcon] sits before the label at the button's content colour, so it inverts with the
- * label when focus fills the pill.
+ * label when focus fills the pill. [leadingContent] takes its place when a caller needs more than an icon; see [TvButton].
  *
  * [loading] hides the icon and label, keeping their room, and centres a spinner in their place, so the pill does not
  * change width. The hidden label still names the control to a screen reader, and the surface says it is busy.
@@ -105,6 +114,7 @@ fun TvButtonSurface(
     modifier: Modifier = Modifier,
     leadingIcon: ImageVector? = null,
     loading: Boolean = false,
+    leadingContent: (@Composable () -> Unit)? = null,
 ) {
     TvButtonSurface(
         label = label,
@@ -113,6 +123,7 @@ fun TvButtonSurface(
         modifier = modifier,
         leadingIcon = leadingIcon,
         loading = loading,
+        leadingContent = leadingContent,
     )
 }
 
@@ -132,6 +143,7 @@ fun TvButtonSurface(
     modifier: Modifier = Modifier,
     leadingIcon: ImageVector? = null,
     loading: Boolean = false,
+    leadingContent: (@Composable () -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
@@ -148,13 +160,17 @@ fun TvButtonSurface(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_button_icon_gap)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            leadingIcon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null,
-                    tint = palette.content,
-                    modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
-                )
+            if (leadingContent != null) {
+                CompositionLocalProvider(LocalContentColor provides palette.content, content = leadingContent)
+            } else {
+                leadingIcon?.let {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null,
+                        tint = palette.content,
+                        modifier = Modifier.size(dimensionResource(TvR.dimen.tv_button_icon)),
+                    )
+                }
             }
             Text(
                 text = label,
