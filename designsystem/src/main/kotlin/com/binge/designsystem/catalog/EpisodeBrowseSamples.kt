@@ -1,3 +1,5 @@
+@file:OnePerScreen
+
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
