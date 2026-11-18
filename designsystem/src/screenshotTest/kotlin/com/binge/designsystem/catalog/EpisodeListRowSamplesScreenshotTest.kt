@@ -16,6 +16,13 @@ class EpisodeListRowSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun displayOnly() {
+        EpisodeListRowDisplayOnlySample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun skeleton() {
         EpisodeListRowSkeletonSample()
     }

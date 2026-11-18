@@ -31,13 +31,16 @@ import com.binge.designsystem.theme.BingeTheme
  * Episodes are a distinct, denser row archetype than the poster-leading rows — the "EP NN" overline
  * plus a tight [titleSmall] title is deliberate — so it keeps its own header rather than the shared
  * [ListRowHeader], while still reusing `ListRow`'s surface/leading/content chrome.
+ *
+ * A null [onClick] makes the row display-only: the layout is the same, but it is not a button, so it has no click
+ * semantics, no ripple and no focus target. For an app that lists episodes to be read, not opened.
  */
 @Composable
 fun EpisodeListRow(
     episodeNumber: Int,
     name: String,
     stillUrl: String?,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     rating: Float = 0f,
     airDate: String? = null,
