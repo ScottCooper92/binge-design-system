@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -29,15 +28,10 @@ import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvSkeletonBlock
 import com.binge.designsystem.tv.component.posterFocusRing
-import com.binge.designsystem.tv.component.tvDetailHeroBand
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.tvContentGutterStart
-import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
-
-private const val LANDSCAPE_RATIO = 4f / 3f
-private const val SYNOPSIS_LINES = 3
 
 /**
  * The loading state of an immersive hub (`TvImmersiveHub`): the text band over where the backdrop will be, then rows of
@@ -106,143 +100,6 @@ fun TvImmersiveHubSkeleton(
         }
     }
 }
-
-/**
- * The loading state of a detail page (`TvDetailPage`): the hero band at its loaded height, with the poster beside
- * the overline, title, facts and synopsis lines and the action buttons at its foot, then one row of cards. Not
- * focusable. Every block sits where the loaded page puts it, so nothing moves when the content arrives.
- *
- * The detail page pads the same in every [hosting], so the skeleton ignores it; it takes the parameter anyway so it
- * has the same parameters as the page it stands in for, and swapping one for the other is a one-line change.
- * [firstSectionKey] is the key of the page's first section, so the row stands in for it as a layout anchor.
- */
-@Composable
-fun TvDetailPageSkeleton(
-    modifier: Modifier = Modifier,
-    @Suppress("UNUSED_PARAMETER") hosting: TvPageHosting = currentTvPageHosting(),
-    description: String? = null,
-    firstSectionKey: String? = null,
-) {
-    Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .describedAs(description),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_page_section_gap)),
-    ) {
-        DetailHeroSkeleton(Modifier.tvLayoutAnchor(TvLayoutAnchors.entry(TvLayoutAnchors.HERO_KEY)))
-        DetailRowSkeleton(firstSectionKey?.let { Modifier.tvLayoutAnchor(TvLayoutAnchors.entry(it)) } ?: Modifier)
-    }
-}
-
-/** `TvDetailHero`'s band: its height, its content padding, the poster and copy on the weighted row, the action buttons at the foot. */
-@Composable
-private fun DetailHeroSkeleton(modifier: Modifier = Modifier) {
-    val band = tvDetailHeroBand()
-    Column(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .height(band.height)
-                .padding(
-                    start = tvContentGutterStart(),
-                    end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                    top = band.contentTop,
-                ),
-    ) {
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_page_hero_gap)),
-        ) {
-            TvSkeletonBlock(
-                Modifier.width(dimensionResource(TvR.dimen.tv_detail_page_poster_width)).aspectRatio(CARD_ASPECT_RATIO),
-                shape = BingeShapes.MediaCard,
-            )
-            Column(
-                modifier = Modifier.width(dimensionResource(TvR.dimen.tv_detail_page_copy_width)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_page_copy_gap)),
-            ) {
-                TvSkeletonBlock(
-                    Modifier
-                        .width(dimensionResource(TvR.dimen.tv_skeleton_overline_width))
-                        .height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
-                )
-                TvSkeletonBlock(
-                    Modifier
-                        .width(dimensionResource(TvR.dimen.tv_skeleton_title_width))
-                        .height(dimensionResource(TvR.dimen.tv_skeleton_title_height)),
-                )
-                TvSkeletonBlock(
-                    Modifier
-                        .width(dimensionResource(TvR.dimen.tv_skeleton_meta_width))
-                        .height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
-                )
-                repeat(SYNOPSIS_LINES) { line ->
-                    TvSkeletonBlock(
-                        Modifier
-                            .fillMaxWidth(if (line == SYNOPSIS_LINES - 1) LAST_LINE_FRACTION else 1f)
-                            .height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
-                    )
-                }
-            }
-        }
-        // The loaded row's compact buttons: 40dp, small corners, `padding_m` apart, centred in the row's width.
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_m), Alignment.CenterHorizontally),
-        ) {
-            TvSkeletonBlock(
-                Modifier
-                    .width(dimensionResource(TvR.dimen.tv_detail_page_action_primary_min_width))
-                    .height(dimensionResource(TvR.dimen.tv_compact_button_height)),
-                shape = MaterialTheme.shapes.small,
-            )
-            TvSkeletonBlock(
-                Modifier.size(dimensionResource(TvR.dimen.tv_compact_button_height)),
-                shape = MaterialTheme.shapes.small,
-            )
-        }
-    }
-}
-
-/**
- * A detail section's card row, at the start gutter `TvCardRow` uses. Unbounded below, as the loaded page's row runs
- * off the panel's foot, so a short panel does not squeeze the cards up over the heading.
- */
-@Composable
-private fun DetailRowSkeleton(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.fillMaxWidth().wrapContentHeight(align = Alignment.Top, unbounded = true),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_header_gap)),
-    ) {
-        TvSkeletonBlock(
-            Modifier
-                .padding(start = tvContentGutterStart())
-                .width(dimensionResource(TvR.dimen.tv_skeleton_heading_width))
-                .height(dimensionResource(TvR.dimen.tv_skeleton_heading_height)),
-        )
-        LazyRow(
-            contentPadding =
-                PaddingValues(
-                    start = tvContentGutterStart(),
-                    end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
-                ),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_media_row_card_gap)),
-            userScrollEnabled = false,
-        ) {
-            items(count = DETAIL_CARDS) {
-                TvSkeletonBlock(
-                    Modifier.width(dimensionResource(TvR.dimen.tv_skeleton_card_width)).aspectRatio(LANDSCAPE_RATIO),
-                    shape = BingeShapes.MediaCard,
-                )
-            }
-        }
-    }
-}
-
-private const val LAST_LINE_FRACTION = 0.6f
-private const val DETAIL_CARDS = 6
 
 @Composable
 internal fun PosterRowSkeleton(
