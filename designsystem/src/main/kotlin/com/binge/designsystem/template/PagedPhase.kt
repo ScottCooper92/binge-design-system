@@ -175,6 +175,7 @@ fun rememberMergedPagedPhase(
  *
  * @need show skeleton, empty, failed or rows for a paged list
  * @group feedback
+ * @sample PagedPhaseSkeletonSample
  * @replaces a hand-built when over the phases of a paged list
  */
 @Composable

@@ -51,6 +51,7 @@ private const val GLASS_BACKGROUND_ALPHA = 0.4f
  *
  * @need tap an icon-only action, even over imagery
  * @group inputs
+ * @sample IconButtonToneSample
  * @replaces a hand-built IconButton with a circular backing
  */
 @Composable

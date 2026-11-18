@@ -41,6 +41,7 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * @need offer a low-emphasis action such as cancel
  * @group inputs
+ * @sample TextButtonSample
  * @replaces a raw TextButton with loading state set by hand
  */
 @Composable

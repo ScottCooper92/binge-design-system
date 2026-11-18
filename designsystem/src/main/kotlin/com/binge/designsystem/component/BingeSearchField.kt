@@ -56,6 +56,7 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  *
  * @need type a search query with a clear button
  * @group inputs
+ * @sample SearchFieldEmptySample
  * @replaces a hand-built pill TextField with a magnifier and clear icon
  */
 @Composable

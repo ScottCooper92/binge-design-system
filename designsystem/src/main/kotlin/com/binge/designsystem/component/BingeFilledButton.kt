@@ -34,6 +34,7 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * @need offer the primary action on a screen
  * @group inputs
+ * @sample FilledButtonSample
  * @replaces a raw Button with colours and loading state set by hand
  */
 @Composable

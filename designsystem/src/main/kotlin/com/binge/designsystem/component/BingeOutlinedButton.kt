@@ -37,6 +37,7 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * @need offer a secondary action next to a primary one
  * @group inputs
+ * @sample OutlinedButtonSample
  * @replaces a raw OutlinedButton with loading state set by hand
  */
 @Composable

@@ -21,6 +21,7 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  *
  * @need show an indeterminate loading spinner
  * @group feedback
+ * @sample LoadingIndicatorSample
  * @replaces a raw CircularProgressIndicator
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

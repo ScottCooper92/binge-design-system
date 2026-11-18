@@ -98,6 +98,7 @@ private const val BAR_SCRIM_TOP_ALPHA = 0.9f
  *
  * @need add a top bar with tabs and an account slot on tv
  * @group tv
+ * @sample TvTopBarSample
  * @replaces a hand-built Row of header, tabs and footer
  */
 @Composable

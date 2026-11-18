@@ -62,6 +62,7 @@ private const val PICKABLE_YEARS_AHEAD = 5
  *
  * @need pick a from and to month for a date range
  * @group inputs
+ * @sample DateBoundFieldsEmptySample
  * @replaces two hand-built fields that each open a date picker
  */
 @Composable
