@@ -58,7 +58,6 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * @group inputs
  * @sample SearchFieldEmptySample
  * @replaces a hand-built pill TextField with a magnifier and clear icon
- * @sample SearchFieldEmptySample
  */
 @Composable
 fun BingeSearchField(

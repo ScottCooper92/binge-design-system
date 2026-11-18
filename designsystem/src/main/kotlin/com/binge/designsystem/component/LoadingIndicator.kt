@@ -23,7 +23,6 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * @group feedback
  * @sample LoadingIndicatorSample
  * @replaces a raw CircularProgressIndicator
- * @sample LoadingIndicatorSample
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

@@ -39,7 +39,6 @@ import com.binge.designsystem.theme.BingeShapes
  * @group inputs
  * @sample OutlinedButtonSample
  * @replaces a raw OutlinedButton with loading state set by hand
- * @sample OutlinedButtonSample
  */
 @Composable
 fun BingeOutlinedButton(

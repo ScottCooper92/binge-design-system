@@ -53,7 +53,6 @@ private const val GLASS_BACKGROUND_ALPHA = 0.4f
  * @group inputs
  * @sample IconButtonToneSample
  * @replaces a hand-built IconButton with a circular backing
- * @sample IconButtonToneSample
  */
 @Composable
 fun ExpressiveIconButton(

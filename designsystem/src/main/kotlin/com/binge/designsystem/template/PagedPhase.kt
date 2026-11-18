@@ -177,7 +177,6 @@ fun rememberMergedPagedPhase(
  * @group feedback
  * @sample PagedPhaseSkeletonSample
  * @replaces a hand-built when over the phases of a paged list
- * @sample PagedPhaseSkeletonSample
  */
 @Composable
 fun PagedPhaseContent(
