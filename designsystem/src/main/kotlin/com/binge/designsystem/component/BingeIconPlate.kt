@@ -22,6 +22,10 @@ import com.binge.designsystem.theme.tonalContainer
  * The tinted plate a row leads with: [content] drawn over a wash of [tint], which is `primary` unless the row
  * names its own. Settings rows and choice rows share it, so an icon reads the same wherever it leads. [content] is
  * handed the accent, for a glyph that should match the wash; anything else, such as a flag emoji, can ignore it.
+ *
+ * @need lead a row with an icon on a tinted plate
+ * @group cards
+ * @replaces a hand-built Box with a tinted background and an icon
  */
 @Composable
 fun BingeIconPlate(
@@ -41,7 +45,13 @@ fun BingeIconPlate(
     }
 }
 
-/** [BingeIconPlate] around a single glyph. */
+/**
+ * [BingeIconPlate] around a single glyph.
+ *
+ * @need lead a row with an icon on a tinted plate
+ * @group cards
+ * @replaces a hand-built Box with a tinted background and an icon
+ */
 @Composable
 fun BingeIconPlate(
     painter: Painter,
@@ -58,7 +68,13 @@ fun BingeIconPlate(
     }
 }
 
-/** [BingeIconPlate] around a single vector glyph. */
+/**
+ * [BingeIconPlate] around a single vector glyph.
+ *
+ * @need lead a row with an icon on a tinted plate
+ * @group cards
+ * @replaces a hand-built Box with a tinted background and an icon
+ */
 @Composable
 fun BingeIconPlate(
     icon: ImageVector,

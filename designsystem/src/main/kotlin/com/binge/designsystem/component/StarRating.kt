@@ -45,6 +45,10 @@ private const val MAX_STARS = 5
  * Each interactive star is a button naming the value it sets, with its half a long-press away, so every
  * value on the scale is reachable without the gesture — the whole rating control published a label and
  * no action at all until this, leaving a primary action of the app impossible with a screen reader.
+ *
+ * @need show a rating as five stars
+ * @group cards
+ * @replaces a hand-built row of star icons
  */
 @Composable
 fun StarRating(

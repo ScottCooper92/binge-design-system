@@ -58,6 +58,10 @@ data class BingeStop(
  * names the slider for a screen reader, which hears the shown stop's [BingeStop.contentDescription], else its label, as its state. Needs at least two [stops]. Keep a
  * stop's name to a short word or two: it wraps inside the room its stop owns, and at the largest font a single long word breaks
  * across lines there rather than clipping.
+ *
+ * @need choose one of a few ordered levels with labelled stops
+ * @group inputs
+ * @replaces a raw stepped Slider with hand-placed labels
  */
 @Composable
 fun BingeStopSlider(

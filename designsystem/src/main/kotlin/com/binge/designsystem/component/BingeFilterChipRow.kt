@@ -42,6 +42,10 @@ import com.binge.designsystem.resolvedContentPadding
  * the rest outlined, each carrying an optional leading icon and count ([FilterChipItem]). Stateless: the caller owns [selectedIndex] and
  * reacts to [onSelect]. The chip counterpart to [BingeTabRow], for filters that narrow a list (rather
  * than switch screens); pair it via [BingeFilterChipPager] for swipe-between-filters.
+ *
+ * @need narrow a list with a row of filter chips
+ * @group cards
+ * @replaces a hand-built LazyRow of filter chips
  */
 @Composable
 fun BingeFilterChipRow(
@@ -182,6 +186,10 @@ fun rememberFilterPagerState(
  * before the user swipes to them rather than showing a placeholder on arrival. The cost is that every
  * composed neighbour does its work: a page that fetches from the network fetches for a filter the
  * user may never open.
+ *
+ * @need narrow a list with filter chips and swipeable pages
+ * @group cards
+ * @replaces a hand-built chip row wired to a HorizontalPager
  */
 @Composable
 fun BingeFilterChipPager(

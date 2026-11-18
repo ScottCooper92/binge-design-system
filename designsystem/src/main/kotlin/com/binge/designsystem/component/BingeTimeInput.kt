@@ -60,6 +60,10 @@ fun timeOfDayMinutes(
  * when a field takes focus its caret starts after the existing digits. [hour] and [minute] stay with the caller, including
  * incomplete input, so a form can hold them above its modal window and disable submission while [timeOfDayMinutes] is null.
  * In 12-hour mode supply [afternoon] and [onAfternoon] as well. A 24-hour value runs from 00:00 to 23:59.
+ *
+ * @need enter a time of day
+ * @group inputs
+ * @replaces a hand-built pair of number fields with am/pm chips
  */
 @Composable
 fun BingeTimeInput(

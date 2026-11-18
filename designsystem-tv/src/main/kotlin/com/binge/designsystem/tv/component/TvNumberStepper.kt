@@ -45,6 +45,10 @@ import com.binge.designsystem.tv.R as TvR
  * "Unlimited") and which is announced as the control's state. Like [TvRatingStepper], a press past either end is
  * consumed and does nothing, direction follows the layout, OK commits nothing, and the control only reports
  * [onValueChange]. [step] must be positive. [initiallyFocused] seeds the lit state for a frame; production passes false.
+ *
+ * @need set a whole number with the d-pad
+ * @group tv
+ * @replaces a hand-built Row of two arrow buttons around a number
  */
 @Composable
 fun TvNumberStepper(

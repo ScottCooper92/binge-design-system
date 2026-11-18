@@ -37,6 +37,9 @@ import com.binge.designsystem.theme.systemReduceMotion
  * where no call site passed anything so `LocalReduceMotion` was permanently `false` on a TV and every gate
  * against it was dead code that read as working. Reading the setting here keeps a call site from having to
  * remember; a screenshot theme still overrides it to pin the reduced branch.
+ *
+ * @need theme a tv app
+ * @group tv
  */
 @Composable
 fun BingeTvTheme(

@@ -14,6 +14,10 @@ import com.binge.designsystem.R as DesR
  * A hairline vertical divider between two side-by-side TV panes.
  *
  * Fills the height it is given; the caller insets it — to the overscan-safe area, say — through [modifier].
+ *
+ * @need separate two side-by-side panes
+ * @group tv
+ * @replaces a hand-built thin Box
  */
 @Composable
 fun TvVerticalDivider(modifier: Modifier = Modifier) {

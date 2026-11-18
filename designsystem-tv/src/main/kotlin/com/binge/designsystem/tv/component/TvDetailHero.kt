@@ -107,6 +107,10 @@ internal fun tvDetailHeroBand(): TvDetailHeroBand {
  *
  * [artwork] and [poster] are slots so the design system needs no image loader and a screenshot with no network
  * is not stuck baking a fallback plate.
+ *
+ * @need open a TV detail page with backdrop, poster and actions
+ * @group tv
+ * @replaces a hand-built backdrop band with poster and copy
  */
 @Composable
 fun TvDetailHero(

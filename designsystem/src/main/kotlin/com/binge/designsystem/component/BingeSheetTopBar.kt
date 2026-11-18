@@ -26,6 +26,10 @@ import com.binge.designsystem.R
  *
  * It takes [onClose], not `onBack`, on purpose: the control at its start is an X that dismisses the sheet, not a way back
  * through a stack, so the screen bars' optional `onBack` does not apply and the callback is required.
+ *
+ * @need show a top bar on a sheet that fills the screen
+ * @group bars
+ * @replaces a hand-built Row of close button, title and actions
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

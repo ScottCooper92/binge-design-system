@@ -46,6 +46,10 @@ private const val FILTER_CHIP_COUNT_SCRIM_ALPHA = 0.22f
  *
  * A [contentDescription] is what a screen reader announces for the chip instead of the [label] (and [count]), for a
  * label that needs more to be understood by ear. Null leaves the chip to be read as its label.
+ *
+ * @need toggle one filter option on a list
+ * @group cards
+ * @replaces a raw FilterChip with its colours set by hand
  */
 @Composable
 fun BingeFilterChip(

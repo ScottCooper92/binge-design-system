@@ -65,6 +65,9 @@ class TvImmersiveCopyLayout(
  * heading. The copy is bottom-anchored, so without it a tall block would overflow up into the heading. [copyStart] is
  * where the copy starts: the content gutter by default, or a page's own start edge ([tvPagePadding]) for one that pads its
  * heading and cards by that. [layout] sets the copy's width and the scrim that beds it.
+ *
+ * @need show artwork behind rows with text above them
+ * @group tv
  */
 @Composable
 fun <T : Any> TvImmersiveBackdrop(

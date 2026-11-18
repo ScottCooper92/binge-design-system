@@ -30,6 +30,10 @@ import com.binge.designsystem.tv.R as TvR
  * Match the row it sits in. A switch in a row that is not [enabled] dims with the row. One in a destructive row is
  * [destructive]: focused, the row fills with the error colour, and the switch inverts against that instead of the focus
  * fill; unfocused, a checked switch has the error colour for its track. The other colours are the style's: see `TvStyle`.
+ *
+ * @need show an on or off switch at the end of a tv row
+ * @group tv
+ * @replaces a hand-built track and thumb
  */
 @Composable
 fun TvSwitch(

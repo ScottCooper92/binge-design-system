@@ -61,6 +61,10 @@ import com.binge.designsystem.tv.R as TvR
  * where the note does, under the heading with the copy's gap, and its paragraphs are spaced as the heading's lines are.
  * A bare `Text` in it reads as the note would: the slot provides the note's style and colour, so only a paragraph that
  * differs names its own.
+ *
+ * @need ask a yes-or-no question on a full tv page
+ * @group tv
+ * @replaces a hand-built two-pane page with two buttons
  */
 @Composable
 fun TvDecisionPage(
@@ -94,6 +98,9 @@ fun TvDecisionPage(
  * for a decision that is one step of a [TvStepFlow]. The flow supplies the chrome, the hosting and the footer that
  * carries the answers. The points scroll on their own side, and each takes focus, so ↑ from the footer walks a card
  * taller than the space into view. [noteContent] replaces `copy.note`, as [TvDecisionPage] says.
+ *
+ * @need ask a yes-or-no question as one step of a flow
+ * @group tv
  */
 @Composable
 fun TvDecisionBody(

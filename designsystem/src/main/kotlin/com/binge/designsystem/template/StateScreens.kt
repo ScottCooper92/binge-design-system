@@ -17,6 +17,10 @@ import com.binge.designsystem.R
  * a message the server sent. The whole message is announced, not just the headline, because it replaced what
  * the user was reading. [secondary] is a second way out beside Try again, such as Settings for a failure the
  * user fixes there, as the TV's error plate offers its extra actions.
+ *
+ * @need show a failed load with a Try again action
+ * @group feedback
+ * @replaces a hand-built error message with a retry button
  */
 @Composable
 fun ErrorScreen(
@@ -38,7 +42,13 @@ fun ErrorScreen(
     )
 }
 
-/** Nothing here yet, said once under its [icon], with an [action] where there is something to do about it. */
+/**
+ * Nothing here yet, said once under its [icon], with an [action] where there is something to do about it.
+ *
+ * @need show that a list or screen has nothing in it yet
+ * @group feedback
+ * @replaces a hand-built empty state with icon and text
+ */
 @Composable
 fun EmptyScreen(
     message: String,

@@ -41,6 +41,10 @@ import com.binge.designsystem.tv.R as TvR
  * applies, say. Focus still arrives on dismiss, whatever the slot holds.
  *
  * For an action already inside a [TvSideSheet], its own confirm step reads better: see `TvSideSheetConfirm`.
+ *
+ * @need ask a TV viewer to confirm or cancel an action
+ * @group tv
+ * @replaces a hand-built TV dialog with two buttons
  */
 @Composable
 fun TvConfirmDialog(
@@ -77,6 +81,9 @@ fun TvConfirmDialog(
  *
  * The content runs the arrival effect itself, so rendered inline, outside a dialog window, it pulls focus to dismiss
  * when it mounts.
+ *
+ * @need preview the card of a TV confirm dialog without its window
+ * @group tv
  */
 @Composable
 fun TvConfirmDialogContent(

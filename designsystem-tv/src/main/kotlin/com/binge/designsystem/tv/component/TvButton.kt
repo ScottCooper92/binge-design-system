@@ -63,6 +63,10 @@ import com.binge.designsystem.tv.R as TvR
  * [initiallyFocused] seeds the focus flag so a screenshot can show the focused state (a baseline runs no
  * coroutines, so no real focus event lands); production leaves it false. Reach for [TvButtonSurface] when
  * the caller owns the flag outright.
+ *
+ * @need add a full-size button to a TV screen
+ * @group tv
+ * @replaces a hand-built focusable pill button
  */
 @Composable
 fun TvButton(
@@ -104,6 +108,10 @@ fun TvButton(
  *
  * [loading] hides the icon and label, keeping their room, and centres a spinner in their place, so the pill does not
  * change width. The hidden label still names the control to a screen reader, and the surface says it is busy.
+ *
+ * @need draw a TV button face with custom or fixed focus state
+ * @group tv
+ * @replaces a hand-built pill with focus colours
  */
 @Composable
 fun TvButtonSurface(
@@ -134,6 +142,10 @@ fun TvButtonSurface(
  *
  * [palette] is taken as given: it already encodes the enabled and focused state, so a caller resolves it per state.
  * [isFocused] only mirrors the flag the caller owns; it changes nothing drawn here.
+ *
+ * @need draw a TV button face with custom or fixed focus state
+ * @group tv
+ * @replaces a hand-built pill with focus colours
  */
 @Composable
 fun TvButtonSurface(

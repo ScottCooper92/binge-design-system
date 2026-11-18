@@ -69,6 +69,10 @@ internal const val TAB_COUNT_SCRIM_ALPHA = 0.18f
  * Put the row on the page's `background` tone. A resting tab is transparent, and a count's sub-pill is tinted towards its
  * own text, so on a lighter ground such as `surface` the count drops below WCAG AA (about 3.95:1 against 5.40:1 on
  * `background`). `TvTabCountContrastTest` pins both numbers.
+ *
+ * @need switch between slices of a collection on tv
+ * @group tv
+ * @replaces a hand-built Row of focusable tabs
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

@@ -39,6 +39,10 @@ import com.binge.designsystem.theme.BingeShapes
  * With [onClick] the whole card is one control: its rounded surface takes the press, the ripple stays inside the
  * corners, and the trailing chevron is decoration. Without it the card is a plain header. [tag] is drawn beside the
  * name in a row card and under it in a column card, for a role such as Admin; pass a [BingeTag] to match elsewhere.
+ *
+ * @need show a signed-in person with avatar, name and a secondary line
+ * @group cards
+ * @replaces a hand-built Row of avatar and two text lines
  */
 @Composable
 fun AccountProfileCard(

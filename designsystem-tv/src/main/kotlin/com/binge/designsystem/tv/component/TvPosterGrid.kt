@@ -63,6 +63,10 @@ class TvPosterCell(
  * This is the bare grid: it owns its scroll state, draws the poster and its focus ring itself, and has a keyed mode a screen
  * that re-orders its results can use. A grid inside the immersive hub's template, whose parent owns the scroll and the focus
  * and whose cell is the caller's own, is `TvImmersiveGridInPlace` instead. Both share the cell-count rule in `TvPlateGrid.kt`.
+ *
+ * @need show a grid of posters on tv
+ * @group tv
+ * @replaces a hand-built LazyVerticalGrid of poster cards
  */
 @Composable
 fun TvPosterGrid(

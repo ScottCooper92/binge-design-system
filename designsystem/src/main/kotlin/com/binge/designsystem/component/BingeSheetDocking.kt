@@ -182,6 +182,10 @@ internal data class DockingSheetShape(
  * as it docks under the status bar. The region's height follows the crossfade, so the content below moves into the
  * space the header gives back. Outside a docking sheet (a side sheet, say) it is [header] alone. [dockedTopBar] is
  * handed the sheet's close.
+ *
+ * @need show a sheet header that becomes a top bar when the sheet fills the screen
+ * @group sheets
+ * @replaces a hand-built crossfade between a handle and a top bar
  */
 @Composable
 fun BingeSheetDockingHeader(
@@ -299,6 +303,9 @@ fun Modifier.bingeSheetPinnedFooter(dock: BingeSheetDock?, backing: Color): Modi
  * handle, which docks into a bar titled [title] if the sheet is pulled to full height. A docking sheet draws no handle
  * itself, so without this such a step has none, and loses the handle's tap and screen-reader actions. It draws nothing
  * outside a docking sheet.
+ *
+ * @need keep a drag handle on a sheet step that has no header
+ * @group sheets
  */
 @Composable
 fun BingeSheetStepHandle(title: String, modifier: Modifier = Modifier) {

@@ -64,6 +64,10 @@ import kotlinx.coroutines.launch
  * top would double-inset. A field that jumps the sheet on focus needs a scrollable ancestor in its
  * own content instead, so the `bringIntoView` request has somewhere local to land — see
  * [TextEntrySurface], whose own KDoc names this sheet as its intended host.
+ *
+ * @need show content in a modal bottom sheet
+ * @group sheets
+ * @replaces a raw ModalBottomSheet with its colours and shape set by hand
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

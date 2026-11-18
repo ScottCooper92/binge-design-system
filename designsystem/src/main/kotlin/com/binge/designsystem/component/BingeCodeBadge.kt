@@ -18,6 +18,10 @@ import com.binge.designsystem.theme.labelSmallEmphasis
 /**
  * Small bordered badge for short codes — ISO language/country codes, certifications, etc.
  * The label is rendered as-is (callers uppercase when appropriate).
+ *
+ * @need label something with a short code such as a language or country
+ * @group cards
+ * @replaces a hand-built bordered Text for a short code
  */
 @Composable
 fun BingeCodeBadge(label: String, modifier: Modifier = Modifier) {

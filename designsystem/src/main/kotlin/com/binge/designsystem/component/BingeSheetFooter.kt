@@ -25,12 +25,18 @@ import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
 
 /**
+ * A slot for a sheet page's primary action, pinned in the side sheet and drawn in place elsewhere.
+ *
  * Where a page's primary action goes. In the side sheet the footer is pinned to the foot of the sheet and the page scrolls
  * above it, so the action is in the same place on every page and in every state. Anywhere else, the bottom sheet included,
  * it is drawn in place, where the page put it.
  *
  * Call it from the page's content with the action, `BingeActionFooter` usually. At most one footer is pinned per page; the
  * last one composed wins.
+ *
+ * @need place a sheet page primary action so it pins in a side sheet
+ * @group sheets
+ * @replaces a hand-built pinned footer in a side sheet
  */
 @Composable
 fun BingeSheetFooter(content: @Composable () -> Unit) {

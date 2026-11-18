@@ -53,6 +53,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * Pass [focusRequester] to focus the field from outside — a caller cannot add its own
  * `Modifier.focusRequester` for this, because two of them on one node do not both bind and the
  * caller's is the one dropped. Omit it and the field keeps a private one for its own tap handling.
+ *
+ * @need type a search query with a clear button
+ * @group inputs
+ * @replaces a hand-built pill TextField with a magnifier and clear icon
  */
 @Composable
 fun BingeSearchField(

@@ -24,6 +24,10 @@ import com.binge.designsystem.R
  *
  * @param horizontalSpacing the gap between children on a line.
  * @param verticalSpacing the gap between lines.
+ *
+ * @need lay out chips or tags that wrap onto more lines
+ * @group cards
+ * @replaces FlowRow inside a card sized from intrinsic height
  */
 @Composable
 fun WrappingRow(

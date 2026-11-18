@@ -59,6 +59,10 @@ internal const val TRAILING_KEY = "tv-card-row-trailing"
  * Every cell must be focusable: the row's horizontal scroll is driven entirely by cell focus, so inert cells
  * would strand anything past the panel edge. A read-out of non-focusable tiles wants a wrapping layout
  * instead.
+ *
+ * @need show a heading over a row of cards on a TV page
+ * @group tv
+ * @replaces a hand-built LazyRow with focus routing
  */
 @Composable
 fun <T> TvCardRow(

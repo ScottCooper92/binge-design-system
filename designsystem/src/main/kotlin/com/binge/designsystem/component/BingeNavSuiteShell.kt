@@ -95,7 +95,9 @@ enum class BingeNavPresentation {
 }
 
 /**
- * The Binge app shell. Presentation is chosen by one qualifier-resolved bool resource
+ * The app shell that frames screens with a bottom bar or a side rail of top-level destinations.
+ *
+ * Presentation is chosen by one qualifier-resolved bool resource
  * (`binge_nav_rail_expanded`), not imperative width/orientation code. The bespoke side rail is for a
  * landscape tablet only: a window at least 1000dp wide with a smallest width of at least 600dp
  * (`values-sw600dp-w1000dp`). Every other bucket gets the floating bar: portrait phone, landscape
@@ -116,6 +118,10 @@ enum class BingeNavPresentation {
  * Stateless — the caller supplies [items], [selectedKey], and [onSelect], and renders routed UI in
  * [content]. The nav is always shown: full-screen details live on a root back stack *above* this
  * shell, so there's no `showNavigation` flag and no `movableContentOf`.
+ *
+ * @need frame the app with a bottom bar or side rail for top-level destinations
+ * @group bars
+ * @replaces a hand-built Scaffold with a navigation bar or rail
  */
 @Composable
 fun BingeNavSuiteShell(

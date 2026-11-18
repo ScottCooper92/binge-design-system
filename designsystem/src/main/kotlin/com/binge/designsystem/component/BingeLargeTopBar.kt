@@ -22,6 +22,10 @@ import com.binge.designsystem.R
  *
  * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
  * Both default to absent, so existing titles keep their behaviour and appearance.
+ *
+ * @need give a screen a large collapsing top bar with a subtitle
+ * @group bars
+ * @replaces a raw LargeTopAppBar with a subtitle added by hand
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

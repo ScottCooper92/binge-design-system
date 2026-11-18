@@ -5,6 +5,9 @@ import androidx.compose.runtime.Composable
 /**
  * [WithPreviewImage] at avatar size and colour: a square teal stand-in for a profile photo. Use a null or
  * blank URL inside it to exercise the initials/placeholder branch instead.
+ *
+ * @need preview an avatar without a network
+ * @group feedback
  */
 @Composable
 fun WithPreviewAvatarImage(content: @Composable () -> Unit) {

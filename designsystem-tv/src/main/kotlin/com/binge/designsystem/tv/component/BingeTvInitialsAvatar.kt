@@ -31,6 +31,10 @@ private const val INITIALS_TEXT_FRACTION = 0.4f
  *
  * The tv-material twin of the phone `BingeInitialsAvatar`: the two `MaterialTheme` trees don't cross, so the
  * initials read tv-material typography while both surfaces share the same `BingeColors` palette tokens.
+ *
+ * @need show a person avatar on a TV screen
+ * @group tv
+ * @replaces a hand-built circle with initials
  */
 @Composable
 fun BingeTvInitialsAvatar(

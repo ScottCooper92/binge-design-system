@@ -38,6 +38,10 @@ import com.binge.designsystem.theme.BingeShapes
  * [trailingIcon] follows the label at the same size and spacing as [leadingIcon], such as an
  * open-in-new glyph for a destination outside the app. It is decorative: the label carries the name,
  * so it is not drawn when [showLabel] is false or while [loading].
+ *
+ * @need offer a low-emphasis action such as cancel
+ * @group inputs
+ * @replaces a raw TextButton with loading state set by hand
  */
 @Composable
 fun BingeTextButton(

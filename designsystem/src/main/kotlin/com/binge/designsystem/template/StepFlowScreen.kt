@@ -83,6 +83,10 @@ private const val STEP_SLIDE_MILLIS = 280
  * [scrollBehavior] is [BingeScreenScaffold]'s, for a caller that owns the bar's state; an untitled flow's bar is
  * pinned by default. [barChrome] is [BingeScreenScaffold]'s, the plain bar for a flow with nothing under it. [actions] are
  * [BingeScreenScaffold]'s too: what sits at the end of the bar on every step, such as an overflow menu a user needs before they can reach any settings. Beside a list pane the first step's Back is dropped, as the scaffold does, but a step back always shows. The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
+ *
+ * @need build a multi-step setup or onboarding screen
+ * @group screens
+ * @replaces a hand-built stepper with a pinned footer
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,7 +180,13 @@ internal fun heldWhileIme(
     held: Boolean?,
 ): Boolean = if (imeVisible && held != null) held else measured
 
-/** The kicker, title and subtitle a step opens with. */
+/**
+ * The kicker, title and subtitle a step opens with.
+ *
+ * @need show the title block that opens a flow step
+ * @group screens
+ * @replaces a hand-built kicker, title and subtitle stack
+ */
 @Composable
 fun StepHeading(
     title: String,

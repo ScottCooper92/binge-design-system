@@ -26,6 +26,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * at the top of a page lines its tabs up with the page's content. Inside a column that already has that inset, the row
  * would indent twice: pass zero there, and the first tab's cell starts at the column's content edge. A tab's own text
  * padding still sits inside its cell, so its label is set in from that edge.
+ *
+ * @need switch between different views with a tab strip
+ * @group bars
+ * @replaces a raw ScrollableTabRow
  */
 @Composable
 fun BingeTabRow(

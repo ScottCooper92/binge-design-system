@@ -51,6 +51,10 @@ import kotlin.math.roundToInt
  * reads as stored until the user moves the control; the thumb sits at its nearest available position. The first step from such a
  * value lands on the nearest stop in the direction of travel: from between two stops, the stop on that side; from above the
  * range, down to the range's last stop; from below it, up to the range's first.
+ *
+ * @need pick a whole number from a range
+ * @group inputs
+ * @replaces a raw Slider with a value label and step buttons
  */
 @Composable
 fun BingeNumberSlider(

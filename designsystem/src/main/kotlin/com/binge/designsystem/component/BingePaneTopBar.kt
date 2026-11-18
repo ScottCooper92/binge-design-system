@@ -66,6 +66,10 @@ fun rememberPaneTopBarScrollBehavior(): TopAppBarScrollBehavior = TopAppBarDefau
  *
  * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
  * Both default to absent, so existing titles keep their behaviour and appearance.
+ *
+ * @need give a pane a top bar that adapts to sharing the window
+ * @group bars
+ * @replaces a hand-built top bar that changes when a second pane is shown
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

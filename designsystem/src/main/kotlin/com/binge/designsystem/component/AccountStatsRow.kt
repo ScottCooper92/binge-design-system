@@ -22,6 +22,13 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.uppercaseLocalised
 
+/**
+ * A row of equal-width stat tiles, each a value over a caption.
+ *
+ * @need show a few headline numbers side by side
+ * @group cards
+ * @replaces a hand-built Row of value-over-caption columns
+ */
 @Composable
 fun AccountStatsRow(stats: List<AccountStat>, modifier: Modifier = Modifier) {
     Row(

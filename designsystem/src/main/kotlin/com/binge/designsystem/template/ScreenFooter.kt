@@ -22,6 +22,10 @@ import com.binge.designsystem.theme.BingeShapes
  * pinned bar sits the same over what scrolls under it.
  *
  * It does not lift itself above the keyboard; a caller whose bar holds a field adds `imePadding` around it.
+ *
+ * @need pin a footer bar of buttons or a summary under a screen
+ * @group bars
+ * @replaces a hand-built bottom bar with insets
  */
 @Composable
 fun ScreenFooter(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {

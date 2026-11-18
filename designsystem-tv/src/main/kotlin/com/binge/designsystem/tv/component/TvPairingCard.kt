@@ -40,6 +40,10 @@ import com.binge.designsystem.tv.R as TvR
  * [qrSize] is the code's side where there is room for it. In a card whose height or width is bounded, the code
  * gives up size first and the lines around it keep theirs, so a card in a short pane fits it; measured with unbounded
  * room, as in a scrolling pane, it keeps the full [qrSize].
+ *
+ * @need hand a sign-in over to a phone with a qr code and a code
+ * @group tv
+ * @replaces a hand-built Card of QR code, instruction and code
  */
 @Composable
 fun TvPairingCard(
@@ -91,6 +95,9 @@ fun TvPairingCard(
  * [message] such as "Getting a code". A sign-in panel keeps the card in place while it asks for one. The block is
  * [qrSize] square where there is room and gives up size first where there is not, as the code does in [TvPairingCard];
  * the message wraps at [qrSize], so a long one is as tall as it is on the card that follows.
+ *
+ * @need show a placeholder while a pairing code loads
+ * @group tv
  */
 @Composable
 fun TvPairingCardLoading(

@@ -67,6 +67,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * [announce] makes the whole plate a polite live region, merged, as `MessageScreen`'s is on the phone: for a failure
  * that replaced what the user was reading, so a screen reader says the headline and body and not only the focused button.
+ *
+ * @need say something went wrong or nothing is here on tv
+ * @group tv
+ * @replaces a hand-built Column of headline, body and buttons
  */
 @Composable
 fun TvMessagePlate(

@@ -86,6 +86,10 @@ enum class TvTwoPaneStyle {
  * take no pinned Save: they save as made, and a [TvSaveStatus] in the copy says how it went. [actionFirst]
  * mirrors the panes for a page whose choices lead (a grid of services, then why). [style] picks the form or
  * the board shape. Focus entry lands on [entry]; see [TvBoard] for [hosting].
+ *
+ * @need lay out a tv page as copy beside an action pane
+ * @group tv
+ * @replaces a hand-built Row of two panes
  */
 @Composable
 fun TvTwoPanePage(
@@ -142,6 +146,9 @@ fun TvTwoPanePage(
  * The copy a [TvTwoPanePage] usually opens with: an optional illustration, a headline, a body and a note,
  * aligned with the pane. A page whose copy is anything else (a QR panel's pitch with a button in it) builds
  * its own column in the slot instead.
+ *
+ * @need write the copy pane of a two-pane tv page
+ * @group tv
  */
 @Composable
 fun TvTwoPaneCopy(

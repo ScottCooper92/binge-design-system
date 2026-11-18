@@ -53,6 +53,10 @@ internal fun TvCompactActionButton(
  * Two shapes differ from the phone's `MessageScreen` on purpose. [loading] is a flag here, not a separate page,
  * because the page must keep holding focus while it loads. And there is no free `actions` slot: focus has to land
  * on a known [primary], so a TV message offers at most the two. Both are compact buttons, as every action row is.
+ *
+ * @need show a gate, blocker or failure as a whole tv page
+ * @group tv
+ * @replaces a hand-built centred Column of message and buttons
  */
 @Composable
 fun TvMessagePage(
