@@ -77,6 +77,7 @@ fun BingeFilterChipRow(
                 onClick = { onSelect(index) },
                 count = item.count,
                 leadingIcon = item.icon,
+                contentDescription = item.contentDescription,
             )
         }
     }
