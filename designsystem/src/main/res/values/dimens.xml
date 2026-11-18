@@ -415,4 +415,7 @@
     <!-- Category tiles (BackdropTile, LogoTile): a 16:9 landscape tile, a row sibling of the poster card -->
     <dimen name="category_tile_width">192dp</dimen>
     <dimen name="category_tile_logo_padding">24dp</dimen>
+    <!-- Person card (PersonCard): a round photo over the name and a subtitle, a row sibling of the poster card -->
+    <dimen name="person_card_width">104dp</dimen>
+    <dimen name="person_card_photo_size">88dp</dimen>
 </resources>
