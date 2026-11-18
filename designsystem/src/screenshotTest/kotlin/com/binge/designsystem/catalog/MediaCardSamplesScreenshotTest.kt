@@ -5,8 +5,6 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
-import com.binge.designsystem.preview.ComponentPreviews
-import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 /**
  * Screenshot coverage for the poster-card catalog samples, on the colour axis only. The samples bound their own card
@@ -58,11 +56,19 @@ class MediaCardSamplesScreenshotTest {
     }
 
     @PreviewTest
-    @ComponentPreviews
-    @WorstCaseFontPreviews
+    @Preview(name = "light-poster", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "light-poster-dark", uiMode = UI_MODE_NIGHT_YES)
     @Composable
-    fun StatusLongLabel() {
-        MediaCardStatusLongLabelSample()
+    fun StatusLightPoster() {
+        MediaCardStatusLightPosterSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "status-action", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "status-action-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun StatusWithAction() {
+        MediaCardStatusWithActionSample()
     }
 
     @PreviewTest
