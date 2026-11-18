@@ -38,4 +38,24 @@ class DetailOverlayTopBarSamplesScreenshotTest {
     fun ScrolledLight() {
         DetailOverlayTopBarScrolledSample()
     }
+
+    @PreviewTest
+    @Preview(name = "content-light", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "content-dark", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "content-light2x", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_NO, fontScale = 2.0f)
+    @Preview(name = "content-dark2x", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_YES, fontScale = 2.0f)
+    @Composable
+    fun OverContent() {
+        DetailOverlayTopBarOverContentSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "half-light", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "half-dark", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "half-light2x", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_NO, fontScale = 2.0f)
+    @Preview(name = "half-dark2x", device = OVERLAY_BAR_DEVICE, uiMode = UI_MODE_NIGHT_YES, fontScale = 2.0f)
+    @Composable
+    fun OverContentHalf() {
+        DetailOverlayTopBarOverContentHalfSample()
+    }
 }
