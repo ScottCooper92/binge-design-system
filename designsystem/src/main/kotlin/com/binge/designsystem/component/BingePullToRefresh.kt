@@ -33,6 +33,10 @@ import com.binge.designsystem.R
  *
  * [indicatorTopInset] is how far down the spinner rests. Under a transparent top bar that the list scrolls beneath, as in
  * `BingeScreenScaffold`, pass the scaffold's top padding so the spinner shows below the bar rather than behind it.
+ *
+ * @need refresh a screen of server data by pulling down
+ * @group feedback
+ * @replaces a raw PullToRefreshBox with its indicator set by hand
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -27,6 +27,10 @@ import com.binge.designsystem.R
  * its state and passes [confirmLabel] and [destructive] from it, and the body says what the switch adds. The visible body
  * is delegated to [BingeConfirmDialogContent] so screenshot tests can render it (the [AlertDialog] window does not capture).
  * [confirmEnabled] false greys the confirm out until the user has chosen what it applies to, as a choice in [extraContent] with nothing preselected.
+ *
+ * @need ask the user to confirm or cancel an action
+ * @group sheets
+ * @replaces a raw AlertDialog with a cancel and a confirm button
  */
 @Composable
 fun BingeConfirmDialog(
@@ -71,6 +75,9 @@ fun BingeConfirmDialog(
 /**
  * Stateless body of [BingeConfirmDialog], split out so screenshot tests can render the dialog's
  * visible content directly — the modal [AlertDialog] window itself does not capture in previews.
+ *
+ * @need render a confirm dialog body in a screenshot frame
+ * @group sheets
  */
 @Composable
 fun BingeConfirmDialogContent(

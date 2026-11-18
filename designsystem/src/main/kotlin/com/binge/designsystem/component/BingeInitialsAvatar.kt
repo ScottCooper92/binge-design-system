@@ -32,6 +32,10 @@ import com.binge.designsystem.toInitials
  * loading / on error) falls back to up to two initials of [name] on a deterministic tone from the
  * theme's pastel avatar palette (same person always maps to the same colour). The initials autosize
  * to a fixed fraction of the circle, so they scale with [size].
+ *
+ * @need show a person as a round avatar with initials fallback
+ * @group media
+ * @replaces a hand-built circle with an image or initials
  */
 @Composable
 fun BingeInitialsAvatar(

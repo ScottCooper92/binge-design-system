@@ -29,6 +29,10 @@ private const val STATUS_BAR_SCRIM_MID_STOP = 0.60f
  * reads at full strength.
  *
  * Call it as the last child of the [Box] that hosts the scrolling content, so it draws on top.
+ *
+ * @need keep status bar icons legible over scrolling content
+ * @group bars
+ * @replaces a hand-built gradient box under the status bar
  */
 @Composable
 fun BoxScope.StatusBarScrim(modifier: Modifier = Modifier) {

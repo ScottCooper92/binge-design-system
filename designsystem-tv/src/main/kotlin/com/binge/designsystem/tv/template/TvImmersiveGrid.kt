@@ -80,6 +80,10 @@ private const val DEFAULT_COLUMNS = 6
  * @param inPlace opts into one grid for loading and cells, drawing plates in the cells loading uses, so focus on a plate
  * stays on the cell the item arrives in. [loading], [pendingCell] and [cell] are unused then. A message is not drawn in place: [message]
  * takes the pane, and the entry plate leaves with the grid.
+ *
+ * @need show a paged grid of posters over a backdrop on tv
+ * @group tv
+ * @replaces a hand-built LazyVerticalGrid over an image
  */
 @Composable
 fun <T : Any> TvImmersiveGrid(
@@ -341,6 +345,10 @@ fun <T : Any> TvImmersiveGrid(
 /**
  * The grid over a source that is always cells, for a caller with nothing to say while loading or when empty.
  * [itemAt] returns null for a cell not loaded yet, which draws nothing.
+ *
+ * @need show a paged grid of posters over a backdrop on tv
+ * @group tv
+ * @replaces a hand-built LazyVerticalGrid over an image
  */
 @Composable
 fun <T : Any> TvImmersiveGrid(

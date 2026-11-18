@@ -29,6 +29,10 @@ import com.binge.designsystem.R
  * a hand-rolled row is the 32dp the switch draws. The row has no horizontal padding: it takes the edges of the container it
  * sits in, so it lines up with the text above it; pad it with [modifier] where it stands alone. A [supportingText] is
  * [supportingMaxLines] lines, one by default: say what the switch does.
+ *
+ * @need show a single on/off setting with a label
+ * @group inputs
+ * @replaces a hand-built Row of text and a Switch
  */
 @Composable
 fun SwitchRow(

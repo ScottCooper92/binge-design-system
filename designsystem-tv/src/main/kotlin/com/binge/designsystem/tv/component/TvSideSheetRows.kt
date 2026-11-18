@@ -31,6 +31,10 @@ internal val LocalTvSideSheetToBottomEdge = staticCompositionLocalOf { false }
  * rows sit that far inside the scroll: the first row's ring shows at the top, and the last row's once scrolled to the end.
  * The rows rest where they would without it. On a panel to the bottom edge the overscan inside the scroll already clears the
  * last ring, and the viewport stops at the screen's edge.
+ *
+ * @need lay out the rows of a side sheet in a scrolling column
+ * @group tv
+ * @replaces a hand-built scrolling Column of rows
  */
 @Composable
 fun ColumnScope.TvSideSheetRows(

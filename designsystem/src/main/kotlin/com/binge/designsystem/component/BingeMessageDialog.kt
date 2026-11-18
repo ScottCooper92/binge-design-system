@@ -32,6 +32,10 @@ import com.binge.designsystem.R
  *
  * Use it for any message the user must read to act, however short. A result that needs no action is a snackbar: see
  * `docs/messages.md`. The visible body is [BingeMessageDialogContent], so screenshot tests can render it.
+ *
+ * @need tell the user why something failed with one acknowledge button
+ * @group sheets
+ * @replaces a raw AlertDialog with a single button
  */
 @Composable
 fun BingeMessageDialog(
@@ -53,7 +57,12 @@ fun BingeMessageDialog(
     )
 }
 
-/** Stateless body of [BingeMessageDialog], apart from the modal window, so a screenshot can render it. */
+/**
+ * Stateless body of [BingeMessageDialog], apart from the modal window, so a screenshot can render it.
+ *
+ * @need render a message dialog body in a screenshot frame
+ * @group sheets
+ */
 @Composable
 fun BingeMessageDialogContent(
     title: String,

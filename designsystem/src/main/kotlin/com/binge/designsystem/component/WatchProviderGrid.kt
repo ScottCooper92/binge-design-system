@@ -39,6 +39,10 @@ private const val SKELETON_ROW_COUNT = 3
  *
  * [columns] must match whatever [WatchProviderGridSkeleton] was given for the same surface, or the
  * skeleton reserves tiles a different size from the ones that arrive — see [DEFAULT_GRID_COLUMNS].
+ *
+ * @need pick several items from a grid of logo tiles
+ * @group inputs
+ * @replaces a hand-built grid of logo tiles
  */
 @Composable
 fun WatchProviderGrid(
@@ -76,6 +80,10 @@ fun WatchProviderGrid(
  * [isFirstRow] puts the anchor `WatchProviderGridSkeleton`'s first plate carries on this row's first tile —
  * see [LayoutAnchors]. The grid is sized by its content, so anchoring the container would not say where the
  * tiles land.
+ *
+ * @need lay out one row of logo tiles inside a lazy list
+ * @group rows
+ * @replaces a hand-built Row of equal-width tiles
  */
 @Composable
 fun WatchProviderGridRow(
@@ -116,6 +124,10 @@ fun WatchProviderGridRow(
  * its six or eight.
  *
  * [description] names the loading state for a screen reader; without one it stays silent.
+ *
+ * @need show a loading placeholder for a grid of logo tiles
+ * @group feedback
+ * @replaces a hand-built grid of placeholder blocks
  */
 @Composable
 fun WatchProviderGridSkeleton(

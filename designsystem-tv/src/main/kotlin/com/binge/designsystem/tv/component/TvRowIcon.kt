@@ -27,6 +27,10 @@ private const val FOCUSED_PLATE_ALPHA = 0.2f
  * Focus is a parameter, as for the rows that host it. On the focus fill the plate becomes a wash of [focusedTint] and
  * the glyph takes it, so the icon inverts with the row instead of fighting its container. It defaults to the style's
  * content on focus, the ink on the focus fill; a row that fills with another colour, such as a destructive row's `error`, passes that fill's ink.
+ *
+ * @need show a tinted icon at the start of a tv row
+ * @group tv
+ * @replaces a hand-built Box of icon on a coloured plate
  */
 @Composable
 fun TvRowIcon(

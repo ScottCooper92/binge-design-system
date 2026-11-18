@@ -67,6 +67,10 @@ enum class TvInfoFooterHeaderStyle {
  *
  * The block is one focus target that draws a ring, not a fill: content scrolls by focus stop, so a
  * non-focusable block below the last row could be unreachable. Blank groups drop out.
+ *
+ * @need show label and value details at the end of a TV detail page
+ * @group tv
+ * @replaces a hand-built grid of label and value groups
  */
 @Composable
 fun TvDetailInfoFooter(
@@ -146,6 +150,10 @@ fun TvDetailPageScope.detailsSection(
  * doesn't hand-roll the focus wiring. Reach for [detailsSection] rather than this to put it on a
  * [com.binge.designsystem.tv.template.TvDetailPage]. [initialFocused] seeds the ring for a screenshot and is
  * `false` in production.
+ *
+ * @need place a focusable details block on a TV detail page
+ * @group tv
+ * @replaces hand-wired focus around a details footer
  */
 @Composable
 fun TvDetailInfoFooterSection(

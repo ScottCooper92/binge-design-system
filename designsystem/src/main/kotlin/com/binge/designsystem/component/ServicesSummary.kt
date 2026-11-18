@@ -41,6 +41,10 @@ private const val MAX_VISIBLE_LOGOS = 5
  *
  * A selection past [MAX_VISIBLE_LOGOS] stops rendering every logo — unbounded, that row overflows
  * its container — and folds the rest into a trailing "+N" badge instead.
+ *
+ * @need summarise the services a person has picked under a picker grid
+ * @group rows
+ * @replaces a hand-built row of selected logos with an empty hint
  */
 @Composable
 fun ServicesSummary(

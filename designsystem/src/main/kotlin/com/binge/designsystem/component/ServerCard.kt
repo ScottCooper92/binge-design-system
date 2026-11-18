@@ -96,6 +96,10 @@ data class ServerCardUpdate(
 /**
  * A dashboard block: a tonal surface with the pane's [sides] around it and the medium spacing inside. Phone and
  * tablet only: nothing in it takes focus, so a TV page builds its own.
+ *
+ * @need group dashboard content on a tonal card
+ * @group cards
+ * @replaces a hand-built Surface with a padded Column
  */
 @Composable
 fun HubCard(
@@ -133,6 +137,10 @@ fun HubCard(
  *   click whatever it carries. The name and address below it keep the header's whole width at every font scale.
  * @param update the full-width row under the header when the server has an update; null hides it.
  * @param stats up to four totals, shown as the design system's [DetailStatRow]; empty hides the strip.
+ *
+ * @need show a connected server status and stats on a home card
+ * @group cards
+ * @replaces a hand-built header card with status pills and stats
  */
 @Composable
 fun ServerCard(

@@ -74,6 +74,10 @@ private const val TEXT_ENTRY_MAX_LINES = 6
  * @param supportingText a line under the title for the unit or the format ("In milliseconds").
  * @param secret masks the value, asks for a password keyboard and gives the field a reveal toggle, so a pasted key can be checked
  *   before it is saved. Replaces [visualTransformation] and [keyboardOptions]' keyboard type while on.
+ *
+ * @need collect a block of text with cancel and submit buttons
+ * @group inputs
+ * @replaces a hand-built dialog with a multi-line field and two buttons
  */
 @Composable
 fun TextEntrySurface(

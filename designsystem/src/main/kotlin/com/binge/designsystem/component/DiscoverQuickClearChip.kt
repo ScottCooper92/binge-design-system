@@ -28,6 +28,13 @@ import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
+/**
+ * A pill that names an applied filter and clears it on tap, tinted for include or exclude.
+ *
+ * @need clear an applied filter with one tap
+ * @group cards
+ * @replaces a hand-built pill with a close icon
+ */
 @Composable
 fun DiscoverQuickClearChip(
     label: String,

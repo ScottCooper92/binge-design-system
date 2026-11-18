@@ -132,6 +132,10 @@ internal val LocalRowFocus = compositionLocalOf<RowFocus?> { null }
  *
  * A row is looked for again only when [key] changes. To show the same row again, set the key to null, let a frame pass (composition has to
  * see the null), and then set it back.
+ *
+ * @need scroll to and highlight a particular settings row
+ * @group rows
+ * @replaces hand-written scroll and highlight code for a row
  */
 @Composable
 fun ProvideRowFocus(

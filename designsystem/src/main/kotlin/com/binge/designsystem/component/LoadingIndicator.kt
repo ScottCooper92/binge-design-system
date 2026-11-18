@@ -18,6 +18,11 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * @param color Tint for the indicator. Defaults to the theme's primary colour; a caller drawing
  * against a non-default background (e.g. a filled button's own foreground colour) can override it
  * so the spinner stays legible there instead of silently taking primary regardless of context.
+ *
+ * @need show an indeterminate loading spinner
+ * @group feedback
+ * @sample LoadingIndicatorSample
+ * @replaces a raw CircularProgressIndicator
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

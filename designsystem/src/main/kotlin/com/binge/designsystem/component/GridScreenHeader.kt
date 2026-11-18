@@ -22,6 +22,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 /**
  * A grid screen's header: a back button above a large [title]. A null [onBack] drops the back button, for a grid in a pane
  * beside the list that already offers the way back, as on the top bars.
+ *
+ * @need head a grid screen with a back button and large title
+ * @group bars
+ * @replaces a hand-built Column of a back icon and a title
  */
 @Composable
 fun GridScreenHeader(

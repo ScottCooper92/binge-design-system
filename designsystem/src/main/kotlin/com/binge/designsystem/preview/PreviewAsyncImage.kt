@@ -21,6 +21,9 @@ import coil3.compose.LocalAsyncImagePreviewHandler
  *
  * The preview-handler API is `@ExperimentalCoilApi` (Coil 3.5.0) with no stable equivalent; the opt-in is
  * accepted for preview-only tooling.
+ *
+ * @need preview images without a network
+ * @group feedback
  */
 @OptIn(ExperimentalCoilApi::class)
 @Composable

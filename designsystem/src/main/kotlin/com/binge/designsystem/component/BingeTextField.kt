@@ -56,6 +56,10 @@ private const val DISABLED_ICON_ALPHA = 0.38f
  * @param imeAction [ImeAction.Next] moves focus on, so the last field of a form passes [ImeAction.Done]. Done, and Go for a
  *   field that connects or signs in, drop the keyboard and then run [onDone]. A multi-line field keeps the keyboard's Enter,
  *   whatever this says.
+ *
+ * @need enter a line of text in a settings form
+ * @group inputs
+ * @replaces a raw OutlinedTextField with error and clear handling
  */
 @Composable
 fun BingeTextField(

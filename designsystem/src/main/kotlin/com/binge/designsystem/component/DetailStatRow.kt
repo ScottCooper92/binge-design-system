@@ -28,6 +28,13 @@ import com.binge.designsystem.R
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
+/**
+ * A row of headline stats, each a value over a short label.
+ *
+ * @need show a row of headline stats on a detail page
+ * @group rows
+ * @replaces a hand-built Row of value and label pairs
+ */
 @Composable
 fun DetailStatRow(
     stats: List<DetailStat>,

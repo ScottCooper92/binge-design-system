@@ -28,6 +28,10 @@ private const val SKELETON_CARD_COUNT = 6
  * plates on the loaded row's insets.
  *
  * [description] names the loading state for a screen reader; without one it stays silent.
+ *
+ * @need show a loading placeholder for a poster row
+ * @group feedback
+ * @replaces a hand-built row of grey placeholder boxes under a heading
  */
 @Composable
 fun CarouselSkeleton(

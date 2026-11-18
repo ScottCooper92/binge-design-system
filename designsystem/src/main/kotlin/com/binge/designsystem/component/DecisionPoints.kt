@@ -24,7 +24,13 @@ import com.binge.designsystem.DecisionPoint
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 
-/** The [points] a decision rests on, one row each in a card, hairlines between. */
+/**
+ * The points a decision rests on, one row each in a card with hairlines between.
+ *
+ * @need list the points a decision rests on
+ * @group cards
+ * @replaces a hand-built Column of rows with dividers
+ */
 @Composable
 fun DecisionPointsCard(points: List<DecisionPoint>, modifier: Modifier = Modifier) {
     Column(
@@ -74,6 +80,9 @@ private fun DecisionPointRow(point: DecisionPoint) {
  * The decorative plate that heads a decision: [icon] in a hero-shaped plate, with [badge] on its corner. Public so a
  * decision that is one step of a `StepFlowScreen` can put it in the flow's aside, where a split step keeps it beside
  * the heading rather than in the content's scroll (#638).
+ *
+ * @need head a decision screen with an icon and a badge
+ * @group media
  */
 @Composable
 fun DecisionHero(

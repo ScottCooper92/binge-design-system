@@ -77,6 +77,9 @@ data class PreviewCutout(
  * It is opt-in rather than applied by the shared multipreview annotations in this file's own package:
  * nearly every `@ScreenPreviews`/`@ScreenStatePreview` frame has a top bar reading the status-bar
  * inset, so defaulting it on would re-record every one of them at once.
+ *
+ * @need preview a screen under real-sized system bars
+ * @group screens
  */
 @Composable
 fun PreviewSystemBarInsets(

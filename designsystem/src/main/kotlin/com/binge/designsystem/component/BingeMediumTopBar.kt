@@ -93,6 +93,10 @@ import com.binge.designsystem.theme.BingeTheme
  *
  * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
  * Both default to absent, so existing titles keep their behaviour and appearance.
+ *
+ * @need give a scrolling screen a collapsing medium top bar
+ * @group bars
+ * @replaces a raw MediumTopAppBar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

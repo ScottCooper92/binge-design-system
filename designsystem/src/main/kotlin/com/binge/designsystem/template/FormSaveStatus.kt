@@ -66,6 +66,10 @@ fun formSaveStatus(
 /**
  * The inline "Saving…" or "Saved", for a bar's trailing slot. A failure has no inline text: [FormSaveFailureSnackbar]
  * says so. [FormScreen] draws this itself; a page built on another scaffold places it in the bar's actions.
+ *
+ * @need show Saving or Saved in a form bar
+ * @group feedback
+ * @replaces a hand-built inline save status label
  */
 @Composable
 fun RowScope.FormSaveStatusText(status: FormSaveStatus, modifier: Modifier = Modifier) {
@@ -93,6 +97,10 @@ fun RowScope.FormSaveStatusText(status: FormSaveStatus, modifier: Modifier = Mod
  * It is shown again whenever it goes without being answered, since another message on the host dismisses the one
  * showing, and after a Retry that fails at once, which leaves the status Failed and this effect unrestarted. Retry
  * calls the latest `onRetry`, not the one the effect started with.
+ *
+ * @need keep a save-failed snackbar up with Retry
+ * @group feedback
+ * @replaces a hand-built snackbar effect for failed saves
  */
 @Composable
 fun FormSaveFailureSnackbar(status: FormSaveStatus, snackbarHostState: SnackbarHostState) {

@@ -48,6 +48,10 @@ import com.binge.designsystem.theme.BingeShapes
  * announcing [contentDescription], or the [label] when that is null, so the label is not a focus stop of its own. Pressing scales the
  * column as the carousel tiles do and ripples the circle. A button that is not [enabled] takes no taps, and its circle and label dim by
  * [DISABLED_ALPHA].
+ *
+ * @need offer a secondary action as a round icon with a caption
+ * @group inputs
+ * @replaces a hand-built Column of an icon button and a label
  */
 @Composable
 fun LabelledIconButton(

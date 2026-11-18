@@ -71,6 +71,10 @@ import com.binge.designsystem.tv.R as TvR
  * [initialFocusedSectionKey] seeds both the anchor and the list position, which is what makes the
  * anchored (off-rest) states screenshot-testable: a static frame runs no coroutines, so a baseline
  * relying on the keeper's effect would quietly capture an unscrolled list.
+ *
+ * @need build a tv detail page with a hero band and sections
+ * @group tv
+ * @replaces a hand-built LazyColumn with a hero first
  */
 @Composable
 fun TvDetailPage(

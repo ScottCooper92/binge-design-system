@@ -64,6 +64,10 @@ fun searchResultColumns(): Int = integerResource(R.integer.search_result_columns
  *
  * The cap is applied to the [Modifier] handed to [content] so it lands on the scrolling child; the
  * centring comes from a parent `Box` because a `wrapContentWidth` cap misbehaves around a `LazyColumn`.
+ *
+ * @need keep a full-width screen to a readable column on tablets
+ * @group screens
+ * @replaces a hand-built Box with a max-width and centred alignment
  */
 @Composable
 fun CenteredContent(

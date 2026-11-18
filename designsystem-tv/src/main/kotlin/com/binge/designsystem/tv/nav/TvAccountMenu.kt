@@ -107,6 +107,9 @@ enum class TvAccountMenuAnchor { Start, End }
  * through a requester per bar item can land focus on the avatar. [onOpenChange] is called with the menu's new state each time
  * it opens or closes, so a host can hold its bar at full size meanwhile. The menu counts as open while its confirm dialog is up,
  * and a menu that leaves the composition while open reports closed. Both default to the behaviour without them.
+ *
+ * @need show an avatar that opens an account menu on tv
+ * @group tv
  */
 @Composable
 fun TvAccountMenu(

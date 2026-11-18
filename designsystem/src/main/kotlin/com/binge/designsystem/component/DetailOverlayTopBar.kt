@@ -77,6 +77,10 @@ import com.binge.designsystem.theme.BingeTheme
  * The fade starts [heroHeight] down the page, so it must be the hero's laid-out height, not its floor: a hero that
  * grows at a large font scale fades the bar early on the default. Measure it with [rememberMeasuredHeroHeight] and
  * [measuredHeroHeight], as the hero detail templates do.
+ *
+ * @need float a back button and actions over a hero
+ * @group bars
+ * @replaces a hand-built transparent top bar over an image
  */
 @Composable
 fun BoxScope.DetailOverlayTopBar(
@@ -100,11 +104,17 @@ fun BoxScope.DetailOverlayTopBar(
 }
 
 /**
+ * A transparent top bar floating over a hero at the head of a lazy list.
+ *
  * The same bar driven by a raw scrolled distance rather than a [ScrollState], for a screen whose
  * header is the first item of a `LazyColumn` — `CollectionScreen`, which keeps its list lazy and so
  * has a `LazyListState` instead. [scrollOffsetPx] is how far the top of the header has travelled
  * above the viewport; read it as a lambda so the fade recomposes on scroll without the caller
  * hoisting a state object this component would only read one number from.
+ *
+ * @need float a back button and actions over a hero in a lazy list
+ * @group bars
+ * @replaces a hand-built transparent top bar over an image
  */
 @Composable
 fun BoxScope.DetailOverlayTopBar(

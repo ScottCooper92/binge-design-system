@@ -35,6 +35,10 @@ import com.binge.designsystem.component.FilterChipItem
  * them, and one scrim over both that fades in as the bar collapses ([scrimFraction] null follows the bar; pass a
  * fraction to drive it yourself). Pass an opaque [headerBackground] and a [scrimFraction] of zero for a header
  * that is a solid ground, and [ScreenBar.Small] for a single-line bar.
+ *
+ * @need show a list split by filter chips, one page per filter
+ * @group screens
+ * @replaces a hand-built scaffold with chips over a pager
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

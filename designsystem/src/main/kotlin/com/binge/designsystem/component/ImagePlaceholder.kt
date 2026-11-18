@@ -15,6 +15,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
+/**
+ * A tonal plate with a centred icon, standing in for an image that is missing or still loading.
+ *
+ * @need fill an image slot that has no image
+ * @group media
+ * @replaces a hand-built Box with a tinted icon
+ */
 @Composable
 fun ImagePlaceholder(modifier: Modifier = Modifier, iconAlignment: Alignment = Alignment.Center) {
     Box(

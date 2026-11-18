@@ -66,6 +66,10 @@ private const val OVERVIEW_SCROLL_STEP = 240f
  * no image source. [posterUrl] is the left still when the caller has one, [backdropUrl] otherwise.
  * Supplying [onPrevious] or [onNext] turns it into a reader over a list and claims both horizontal keys, so
  * only BACK dismisses; [footer] is where the key hint goes.
+ *
+ * @need read long text full screen with the d-pad
+ * @group tv
+ * @replaces a hand-built scrolling text overlay
  */
 @Composable
 fun TvOverviewScreen(

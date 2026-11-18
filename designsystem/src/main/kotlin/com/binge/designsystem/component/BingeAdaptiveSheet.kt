@@ -106,6 +106,10 @@ class BingeSheetNav internal constructor(
  * model that holds the draft a page edits) hears every page left by Back, by the Back bar, by the system or by
  * [BingeSheetNav.pop], through [onPageBack], and can drop that page's state there. It is not called for the sheet closing,
  * which is [onDismissRequest]; the caller drops whatever pages remain then.
+ *
+ * @need open a sheet that is a bottom sheet on phones and a side sheet on wide windows
+ * @group sheets
+ * @replaces choosing between a bottom sheet and a side sheet by hand
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -255,6 +259,9 @@ private val PageStackSaver =
  * side sheet's chrome and clear of the system bars and the keyboard. It is the panel without the modal window around it,
  * which a screenshot does not capture, so a frame or a test can render a sheet's page as the side sheet draws it. A sheet in
  * use is [BingeAdaptiveSheet], which owns the stack; this takes it as [pages] and reports [onPush] and [onBack].
+ *
+ * @need draw a task sheet page as the side sheet shows it, for a frame or test
+ * @group sheets
  */
 @Composable
 fun BingeTaskSheetPanel(

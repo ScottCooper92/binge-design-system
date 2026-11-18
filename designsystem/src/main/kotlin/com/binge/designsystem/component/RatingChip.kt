@@ -35,6 +35,13 @@ enum class RatingChipTone {
     Accent,
 }
 
+/**
+ * A small chip showing a score to one decimal beside a star, in a glass, surface or accent tone.
+ *
+ * @need show a score as a small star chip
+ * @group cards
+ * @replaces a hand-built Row of a star icon and score text
+ */
 @Composable
 fun RatingChip(
     rating: Float,

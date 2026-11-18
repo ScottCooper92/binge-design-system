@@ -42,6 +42,9 @@ private const val PANE_TITLE_WIDTH_FRACTION = 0.6f
  * [TvPaneGroup.note]: the note pushes the first row down, so a skeleton without it would move the rows when it resolves.
  * [rowIcon] reserves each row's leading icon, for a board whose rows carry a [TvPaneRow.icon]: the icon takes the row's
  * start and a little height, so the label bars would otherwise sit left of where the labels land.
+ *
+ * @need show a loading placeholder for a settings page of rows and options
+ * @group tv
  */
 @Composable
 fun TvListPaneBoardSkeleton(

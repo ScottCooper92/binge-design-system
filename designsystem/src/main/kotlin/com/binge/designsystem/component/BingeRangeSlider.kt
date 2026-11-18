@@ -43,6 +43,10 @@ import kotlin.math.abs
  * A value the grid does not contain (a stored 6.3 on a half-point track) is kept when the other thumb is
  * dragged: Material 3 snaps the untouched thumb to the nearest step, so a thumb that moved by less than half
  * a step is reported at its old value.
+ *
+ * @need pick a from and to value on a slider
+ * @group inputs
+ * @replaces a raw RangeSlider with a value label
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

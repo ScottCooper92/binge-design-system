@@ -127,6 +127,10 @@ private val RowMemorySaver: Saver<SnapshotStateMap<String, Any>, Any> =
  * The visit hooks report what focus did, for impressions: [onHeroVisible] and [onRowVisible] as focus arrives in
  * the hero or a row, [onItemTapped] with a click's row and position, and [onVisitEnded] once as the hub leaves, with
  * the deepest place focus reached. That place counts the hero as 0 and each row by its position in [rows] after it.
+ *
+ * @need build a home hub of poster rows over a backdrop
+ * @group tv
+ * @replaces a hand-built LazyColumn of carousels over an image
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

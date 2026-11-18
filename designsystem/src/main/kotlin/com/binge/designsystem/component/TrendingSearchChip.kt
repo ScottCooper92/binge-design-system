@@ -29,6 +29,10 @@ import com.binge.designsystem.theme.BingeShapes
  * The two share a slot and are mutually exclusive, [rank] winning. That is what lets one row mix a
  * trending chart with the user's own history and stay readable — a numbered pill is trending, a glyphed
  * one is theirs — without a second chip type or a legend.
+ *
+ * @need suggest a search term, ranked or from history
+ * @group cards
+ * @replaces a hand-built clickable pill with a number or icon
  */
 @Composable
 fun TrendingSearchChip(

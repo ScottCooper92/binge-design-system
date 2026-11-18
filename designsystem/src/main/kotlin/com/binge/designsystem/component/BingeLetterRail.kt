@@ -41,6 +41,10 @@ import kotlin.math.roundToInt
  * When the rail is too short for every letter, it shows every second letter, or third, with a dot between them for the
  * ones left out, as a contact list does. A tap or a drag then picks one of the letters drawn: the nearest to the finger,
  * so a touch on a dot picks its neighbour. [current] is lit only when it is drawn.
+ *
+ * @need jump through a long alphabetical list by letter
+ * @group bars
+ * @replaces a hand-built column of letters with touch handling
  */
 @Composable
 fun BingeLetterRail(

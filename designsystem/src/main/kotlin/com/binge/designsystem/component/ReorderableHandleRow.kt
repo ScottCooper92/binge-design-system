@@ -31,6 +31,10 @@ import com.binge.designsystem.R
  * extension on `ReorderableCollectionItemScope`, only callable from inside that scope's lambda, so it
  * can't be built in here — this component takes no dependency on the reorderable library itself, so a
  * companion app can reuse the same row shell against its own list.
+ *
+ * @need let the user drag rows to reorder a list
+ * @group rows
+ * @replaces a hand-built row with a drag handle
  */
 @Composable
 fun ReorderableHandleRow(

@@ -42,6 +42,10 @@ import com.binge.designsystem.theme.titleMediumEmphasis
  * [startPadding] and [endPadding] are the nav-overlay insets and sit **outside** the row's clip, so they stay a
  * caller concern — a caller whose own parent already applied them (e.g. a grid's `navOverlayPadding`) passes
  * its own value to avoid adding them twice. See `SectionHeader`'s `startPadding` and `endPadding`.
+ *
+ * @need offer a browse-everything entry at the end of a list
+ * @group rows
+ * @replaces a hand-built clickable row with an icon and chevron
  */
 @Composable
 fun DiscoverEntryRow(

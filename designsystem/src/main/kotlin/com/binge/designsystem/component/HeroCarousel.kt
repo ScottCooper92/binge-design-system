@@ -100,6 +100,10 @@ data class HeroItem(
  * [onItemClick] rather than widening it, for the reason `PosterCarousel.onItemTapped` gives: routing
  * wants the id and reporting wants the position. The paged index lives in here and nowhere else, so
  * a caller could not derive it. Defaults to a no-op so previews compose unchanged.
+ *
+ * @need feature a few titles in an autoplaying full-bleed carousel
+ * @group media
+ * @replaces a hand-built HorizontalPager of backdrops
  */
 @Composable
 fun HeroCarousel(
