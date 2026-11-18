@@ -36,6 +36,8 @@ import com.binge.designsystem.formatRuntimeMinutes
  * The eyebrow is the number and then the runtime when there is one, else the air date when there is one, as two
  * labels with a gap between them and no separator. [EpisodeBrowseUi.airDate] is shown as given: the consumer formats it
  * for the reader's locale.
+ * The still has no content description: it sits beside the episode's name, so a screen reader would say the name twice.
+ *
  * A null [onClick] makes the row display-only: the same layout, with no click semantics and no ripple.
  *
  * @need show one episode of a season as a row with its still, rating and synopsis
@@ -78,7 +80,7 @@ private fun EpisodeBrowseStill(episode: EpisodeBrowseUi) {
     ) {
         SubcomposeAsyncImage(
             model = episode.stillUrl,
-            contentDescription = episode.name,
+            contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
             loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
