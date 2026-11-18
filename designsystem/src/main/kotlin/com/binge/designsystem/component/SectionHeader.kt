@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -27,7 +28,8 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
 /**
- * A section title with an optional "more" affordance. [startPadding] defaults to [horizontalPadding]
+ * A section title with an optional "more" affordance. The title is one line and ellipsizes when it does not fit beside the
+ * trailing action; a screen reader still reads it whole. [startPadding] defaults to [horizontalPadding]
  * plus the nav overlay's start inset, so a header under an overlaying rail clears it without the
  * caller thinking about it; a caller that has already added the inset (a carousel padding its row to
  * match) passes its own value.
@@ -67,7 +69,11 @@ fun SectionHeader(
             text = title,
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
-            // Weighted, not fill: a long title at a large font wraps inside what the trailing action leaves, where an
+            // One line, ellipsized: a header is a row's label, not a paragraph, and a title that wraps makes the rows around it
+            // uneven. A screen reader still hears the whole title, because the semantics text is the string and not what is drawn.
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            // Weighted, not fill: a long title at a large font ellipsizes inside what the trailing action leaves, where an
             // unweighted one took the whole row and squeezed "More" to a few pixels wide.
             modifier = Modifier.weight(1f, fill = false).semantics { heading() },
         )
