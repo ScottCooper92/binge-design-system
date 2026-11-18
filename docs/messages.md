@@ -30,10 +30,10 @@ The TV has no snackbars. It shows a result in place, and an acknowledgement that
 
 This is for one case: a sheet whose pinned primary button sends something (connect, send, request, report), and the send did not go through. It is not for a page's footer, and not for a load that failed.
 
-- The button turns to the error colour and its label becomes a short reason, for example "Couldn't reach your server". This is the `failed` state of `BingeActionFooter`. The caller passes the reason as the label and decides how long it shows, a few seconds.
+- The button turns to the error colour and its label becomes a short reason of a few words, for example "Quota reached". This is the `failed` state of `BingeActionFooter`. The caller passes the reason as the label and decides how long it shows, a few seconds.
 - A tap on it is the caller's. It opens a dialog with the full cause and Retry. A dialog with Retry and a way out is a `BingeConfirmDialog`, which has two actions. A `BingeMessageDialog` has exactly one, so it is not the right one.
 - A screen reader hears the reason as an error, because a failed footer sets the `error` semantics with the label.
-- The reason is one short phrase, and the full cause belongs in the dialog. A longer reason wraps and the button grows rather than clip it, as the Spanish frame at 2x font shows.
+- The reason is a few words, such as "Quota reached", "No permission" or "Couldn't request". The full cause belongs in the dialog. A longer reason wraps and the button grows rather than clip it, as the Spanish frame at 2x font shows, but a few words is what the button is for.
 - `destructive` is not this. It is for a sheet whose one action removes or declines something, and it carries no error semantics. A footer that is both gets the same colours.
 
 ## Worked example: a failed backup

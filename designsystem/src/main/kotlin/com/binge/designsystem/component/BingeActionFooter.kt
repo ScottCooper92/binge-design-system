@@ -44,8 +44,10 @@ import com.binge.designsystem.theme.BingeShapes
  * [destructive] gives the button the error tone, for a sheet whose one action removes or declines something.
  *
  * [failed] is the other use of that tone, and a different meaning: the sheet's primary send did not go through. The caller
- * passes the short reason as [label] for as long as it wants it shown, and [onClick] stays its own, usually to open a dialog
- * with the full cause and a way to retry (`docs/messages.md`). Beside the colour, a failed footer sets the `error` semantics with
+ * passes the reason as [label] for as long as it wants it shown, and the reason is a few words ("Quota reached", "No permission",
+ * "Couldn't request"): the full cause belongs in the dialog that [onClick], which stays the caller's, usually opens with a way
+ * to retry (`docs/messages.md`). A longer reason wraps and the button grows rather than clip it, but a few words is what the
+ * button is for. Beside the colour, a failed footer sets the `error` semantics with
  * the label, so a screen reader announces the reason as an error, which [destructive] does not do. A footer that is both gets the
  * same colours. It is for a failed send from a sheet's pinned primary; a page's footer reports a failure another way. Pass
  * [loading] or [failed], not both: a loading footer shows its spinner whatever [failed] says.
