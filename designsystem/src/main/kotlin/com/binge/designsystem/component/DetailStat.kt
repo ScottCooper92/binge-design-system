@@ -1,16 +1,22 @@
 package com.binge.designsystem.component
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
 import com.binge.designsystem.formatVoteCount
 
+/**
+ * One cell of a [DetailStatRow]. [accent], when specified, colours the cell's icon, value and label, so one stat can carry a
+ * sentiment, such as a count waiting on someone. Unspecified, the cell takes the row's colours.
+ */
 data class DetailStat(
     val icon: ImageVector,
     val value: String,
     val label: String,
+    val accent: Color = Color.Unspecified,
 )
 
 /**
