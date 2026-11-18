@@ -16,7 +16,7 @@ name: Consumer check
 # the merge of an approved PR and names this check. That includes an intentional signature
 # change. A maintainer then merges by hand, or re-runs CI once all three jobs are green.
 #
-# Binge is the fourth consumer and is private, so it needs a token and is not covered here.
+# Binge is the fourth consumer and is deliberately not compiled here.
 #
 # A job whose consumer is a private repository sets `private_consumer` and passes the reviewer app's
 # credentials, so the workflow can check the consumer out, submodules included. Without them that checkout
