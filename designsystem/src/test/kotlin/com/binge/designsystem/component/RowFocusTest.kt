@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,17 +11,30 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.template.BingeScreenScaffold
 import com.binge.designsystem.template.FormScreen
+import com.binge.designsystem.template.ScreenBar
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -149,6 +163,130 @@ class RowFocusTest {
         }
         rule.waitForIdle()
         rule.onNodeWithText("Row 30.1").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a form screen opened on a far row keeps its sliding top bar`() {
+        // The scroll to the row must not hide the bar: only the user's own scroll does. The back button sits where it does on a screen
+        // opened with no row.
+        var key by mutableStateOf<String?>(null)
+        rule.setContent {
+            BingeExpressiveTheme {
+                ProvideRowFocus(key = key) {
+                    FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Small) { rows() }
+                }
+            }
+        }
+        rule.waitForIdle()
+        val before = backButtonBounds()
+        assertTrue("the back button should be laid out", before.width > 0f && before.height > 0f)
+
+        key = "r-30-1"
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Row 30.1").assertIsDisplayed()
+        assertEquals(before, backButtonBounds())
+    }
+
+    @Test
+    fun `a lazy screen opened on a far row keeps its sliding top bar`() {
+        var key by mutableStateOf<String?>(null)
+        rule.setContent {
+            BingeExpressiveTheme {
+                val state = rememberLazyListState()
+                ProvideRowFocus(key = key, listState = state) {
+                    BingeScreenScaffold(title = "Lazy", onBack = {}, bar = ScreenBar.Small) { padding ->
+                        LazyColumn(state = state, modifier = Modifier.fillMaxWidth(), contentPadding = padding) {
+                            items((0 until GROUPS).toList()) { group -> ItemGroup(title = "Group $group", rows = rowsOf(group)) }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        val before = backButtonBounds()
+        assertTrue("the back button should be laid out", before.width > 0f && before.height > 0f)
+
+        key = "r-30-1"
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Row 30.1").assertIsDisplayed()
+        assertEquals(before, backButtonBounds())
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun `a sliding top bar stays shown and scrimmed over a row scrolled to`() {
+        // The bar stays put, but it must still know the body has moved under it: its scrim fades in with how far the content has
+        // passed, so a bar that never heard of the scroll would sit transparent over the rows.
+        var key by mutableStateOf<String?>(null)
+        lateinit var behavior: TopAppBarScrollBehavior
+        rule.setContent {
+            BingeExpressiveTheme {
+                behavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+                ProvideRowFocus(key = key) {
+                    FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Small, scrollBehavior = behavior) { rows() }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        key = "r-30-1"
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Row 30.1").assertIsDisplayed()
+        assertEquals(0f, behavior.state.heightOffset, 0f)
+        assertEquals(1f, behavior.state.overlappedFraction, 0f)
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun `a collapsing top bar still collapses over a row scrolled to`() {
+        // Only the sliding bar was hidden by the scroll; the collapsing one arrives collapsed and scrimmed, as it should.
+        var key by mutableStateOf<String?>(null)
+        lateinit var behavior: TopAppBarScrollBehavior
+        rule.setContent {
+            BingeExpressiveTheme {
+                behavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+                ProvideRowFocus(key = key) {
+                    FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Collapsing, scrollBehavior = behavior) { rows() }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        key = "r-30-1"
+        rule.waitForIdle()
+
+        assertEquals(1f, behavior.state.collapsedFraction, 0f)
+    }
+
+    @Test
+    fun `the user's own scroll still hides a sliding top bar`() {
+        rule.setContent {
+            BingeExpressiveTheme {
+                ProvideRowFocus(key = null) {
+                    FormScreen(title = "Form", onBack = {}, bar = ScreenBar.Small) { rows() }
+                }
+            }
+        }
+        rule.waitForIdle()
+        val before = backButtonBounds()
+
+        rule.onRoot().performTouchInput { swipeUp() }
+        rule.waitForIdle()
+
+        assertNotEquals(before, backButtonBounds())
+    }
+
+    private fun backButtonBounds() = rule.onNodeWithContentDescription("Back").fetchSemanticsNode().boundsInRoot
+
+    private fun rowsOf(group: Int) =
+        List(ROWS) { row -> ListItem(icon = Icons.Filled.Settings, label = "Row $group.$row", key = "r-$group-$row") }
+
+    @Composable
+    private fun ColumnScope.rows() {
+        repeat(GROUPS) { group -> ItemGroup(title = "Group $group", rows = rowsOf(group)) }
     }
 
     private companion object {
