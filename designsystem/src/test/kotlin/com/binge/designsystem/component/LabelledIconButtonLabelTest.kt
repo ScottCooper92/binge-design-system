@@ -61,7 +61,7 @@ class LabelledIconButtonLabelTest {
         val layout = layoutOf(label)
         assertEquals("$label wrapped at $fontScale", 1, layout.lineCount)
         assertFalse("$label was cut at $fontScale", layout.isLineEllipsized(0))
-        assertTrue("fewer than two text nodes were checked", rule.assertNoTextClipped() >= 1)
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
     }
 
     @Test fun `Trailer reads in full at 1_3`() = assertReadsInFull("Trailer", 1.3f)
