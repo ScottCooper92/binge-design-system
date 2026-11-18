@@ -16,6 +16,7 @@ class BingeNavMotionTest {
         assertEquals(0.9f, NAV_POP_SCALE, 0f)
         assertEquals(0.9f, NAV_PREDICTIVE_POP_ALPHA, 0f)
         assertEquals(0.96f, NAV_TAB_PREDICTIVE_POP_SCALE, 0f)
+        assertEquals(0.96f, NAV_TAB_PREDICTIVE_POP_ALPHA, 0f)
     }
 
     @Test

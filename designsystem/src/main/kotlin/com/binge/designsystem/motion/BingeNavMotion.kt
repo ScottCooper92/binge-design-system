@@ -13,6 +13,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.theme.LocalReduceMotion
 
@@ -34,8 +36,11 @@ const val NAV_POP_SCALE = 0.9f
 /** The alpha a screen being dragged away by a predictive back gesture fades towards: low enough to read as leaving, high enough to peek. */
 const val NAV_PREDICTIVE_POP_ALPHA = 0.9f
 
-/** The scale and alpha of the lighter predictive pop for a drill-down inside a tab, where the screen under is the same page. */
+/** The scale of the lighter predictive pop for a drill-down inside a tab, where the screen under is the same page. */
 const val NAV_TAB_PREDICTIVE_POP_SCALE = 0.96f
+
+/** The alpha a drill-down inside a tab fades towards under a predictive back gesture. */
+const val NAV_TAB_PREDICTIVE_POP_ALPHA = 0.96f
 
 /**
  * The four screen transitions apps built on this design system share, so a push, a pop and a predictive back gesture look the same in
@@ -47,10 +52,10 @@ const val NAV_TAB_PREDICTIVE_POP_SCALE = 0.96f
  * - **Pop** has no enter: the screen under is already there. The popped screen *scales down and fades* rather than slides, because a
  *   directional slide fights the inward edge drag of the back gesture, and its fade is short ([NAV_POP_DURATION_MS]).
  * - **Predictive pop** is the same motion with a fade target of [NAV_PREDICTIVE_POP_ALPHA], so the preview under the finger is a subtle peek.
- * - **Tab predictive pop** is the same at a lighter [NAV_TAB_PREDICTIVE_POP_SCALE] scale and alpha, for a drill-down inside a tab, which does not
+ * - **Tab predictive pop** is the same at a lighter [NAV_TAB_PREDICTIVE_POP_SCALE] scale and [NAV_TAB_PREDICTIVE_POP_ALPHA] alpha, for a drill-down inside a tab, which does not
  *   cover the window.
  *
- * Under reduce motion every transition is a plain crossfade over the same duration, with no slide and no scale. Use [rememberBingeNavMotion] from
+ * Under reduce motion nothing slides or scales: the forward transition is a crossfade, and each pop is a fade-out of the popped screen over the same duration. Use [rememberBingeNavMotion] from
  * composition, or the builders directly with the flag a caller already holds.
  */
 @Immutable
@@ -63,7 +68,7 @@ class BingeNavMotion internal constructor(
 
 /** The shared transitions for [LocalReduceMotion] and the current layout direction, remembered so a recomposition keeps the same instances. */
 @Composable
-fun rememberBingeNavMotion(layoutDirection: LayoutDirection = LayoutDirection.Ltr): BingeNavMotion {
+fun rememberBingeNavMotion(layoutDirection: LayoutDirection = LocalLayoutDirection.current): BingeNavMotion {
     val reduceMotion = LocalReduceMotion.current
     return remember(reduceMotion, layoutDirection) {
         BingeNavMotion(
@@ -83,7 +88,7 @@ fun bingeDetailForward(reduceMotion: Boolean, layoutDirection: LayoutDirection =
     val spec = tween<Float>(NAV_FORWARD_DURATION_MS, easing = FastOutSlowInEasing)
     if (reduceMotion) return ContentTransform(fadeIn(spec), fadeOut(spec))
     val direction = if (layoutDirection == LayoutDirection.Rtl) -1 else 1
-    val slide = tween<androidx.compose.ui.unit.IntOffset>(NAV_FORWARD_DURATION_MS, easing = FastOutSlowInEasing)
+    val slide = tween<IntOffset>(NAV_FORWARD_DURATION_MS, easing = FastOutSlowInEasing)
     return ContentTransform(
         targetContentEnter = slideInHorizontally(slide) { direction * it / NAV_FORWARD_ENTER_OFFSET_FRACTION } + fadeIn(spec),
         initialContentExit = slideOutHorizontally(slide) { -direction * it / NAV_FORWARD_EXIT_OFFSET_FRACTION } + fadeOut(spec),
@@ -97,9 +102,9 @@ fun bingeDetailPop(reduceMotion: Boolean): ContentTransform = pop(reduceMotion, 
 fun bingeDetailPredictivePop(reduceMotion: Boolean): ContentTransform =
     pop(reduceMotion, scale = NAV_POP_SCALE, alpha = NAV_PREDICTIVE_POP_ALPHA)
 
-/** A drill-down inside a tab being dragged away: the lighter [NAV_TAB_PREDICTIVE_POP_SCALE] scale and alpha. */
+/** A drill-down inside a tab being dragged away: the lighter [NAV_TAB_PREDICTIVE_POP_SCALE] scale and [NAV_TAB_PREDICTIVE_POP_ALPHA] alpha. */
 fun bingeTabPredictivePop(reduceMotion: Boolean): ContentTransform =
-    pop(reduceMotion, scale = NAV_TAB_PREDICTIVE_POP_SCALE, alpha = NAV_TAB_PREDICTIVE_POP_SCALE)
+    pop(reduceMotion, scale = NAV_TAB_PREDICTIVE_POP_SCALE, alpha = NAV_TAB_PREDICTIVE_POP_ALPHA)
 
 private fun pop(
     reduceMotion: Boolean,
