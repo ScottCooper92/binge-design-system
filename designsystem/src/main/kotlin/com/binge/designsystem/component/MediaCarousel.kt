@@ -27,6 +27,7 @@ import com.binge.designsystem.component.SectionHeader
 import com.binge.designsystem.component.SeeAllTile
 import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
 /**
@@ -44,6 +45,9 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * [itemContent] receives each item's position in [items] as well as the item, so a caller reporting
  * which position was tapped reads it from the slot rather than searching the list for it.
  *
+ * The row's side inset ([horizontalPadding]) is the screen's content inset, which widens with the window (16, 24, then 32dp), so its first
+ * card lines up with the headers and chip rows around it on a tablet or a foldable; a caller may pass its own.
+ *
  * @need show a titled row of posters with a see-all tile
  * @group media
  * @replaces a hand-built LazyRow with a section title
@@ -58,7 +62,7 @@ fun <T> MediaCarousel(
     onEndTileClick: (() -> Unit)? = onMoreClick,
     endTileLabel: String = stringResource(R.string.gallery_see_all),
     endTileHeight: Dp = dimensionResource(R.dimen.card_height),
-    horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
+    horizontalPadding: Dp = resolvedContentInset(),
     // The row is full-bleed under an overlaying rail; its first column clears it instead (navOverlayStart).
     // A caller whose own parent already applied the overlay inset (e.g. a grid's navOverlayPadding)
     // passes its own value to avoid adding it twice.
