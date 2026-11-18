@@ -61,7 +61,7 @@ permissions:
 
 jobs:
   seerr:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@9aa87438d8de8738851b9761619dd14290523dc4 # v1.0.46
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@37267fa7e22a43babb58aecf4577ce3cd0253b41 # v1.0.47
     with:
       consumer: ScottCooper92/binge-seerr
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
@@ -71,13 +71,13 @@ jobs:
       REVIEWER_APP_PRIVATE_KEY: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
 
   archive:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@9aa87438d8de8738851b9761619dd14290523dc4 # v1.0.46
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@37267fa7e22a43babb58aecf4577ce3cd0253b41 # v1.0.47
     with:
       consumer: ScottCooper92/binge-archive
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
 
   jellyfin:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@9aa87438d8de8738851b9761619dd14290523dc4 # v1.0.46
+    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@37267fa7e22a43babb58aecf4577ce3cd0253b41 # v1.0.47
     with:
       consumer: ScottCooper92/ephyra
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
