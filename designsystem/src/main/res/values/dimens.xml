@@ -326,6 +326,8 @@
     <dimen name="hero_pull_in_bar_lift">28dp</dimen>
     <!-- Episode list row: the backdrop still's width (the rest of the chrome comes from ListRow). -->
     <dimen name="episode_row_still_width">132dp</dimen>
+    <!-- The catalog sample for the shared navigation motion: the fixed height of its two-screen stage. -->
+    <dimen name="nav_motion_sample_height">180dp</dimen>
     <dimen name="icon_size_m">18dp</dimen>
     <dimen name="chip_padding_h">18dp</dimen>
     <dimen name="chip_padding_v">12dp</dimen>
