@@ -52,7 +52,8 @@ fun mediaGridColumns(): Int {
 /**
  * Number of columns for the search results grid at the current window width: 1 (compact), 2 (>=600dp),
  * 3 (>=1240dp). Lower than [mediaGridColumns] at every tier because a result is a full `ListRow`
- * (poster + title + meta), not a poster — it needs roughly twice a poster cell's width to stay legible.
+ * (poster + title + meta), not a poster — it needs roughly twice a poster cell's width to stay legible. The width the results are
+ * held to is `R.dimen.search_content_max_width`, which goes with these counts: 640dp, and 1100dp from 600dp.
  */
 @Composable
 fun searchResultColumns(): Int = integerResource(R.integer.search_result_columns)
