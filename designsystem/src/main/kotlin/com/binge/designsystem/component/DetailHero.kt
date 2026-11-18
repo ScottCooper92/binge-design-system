@@ -176,7 +176,7 @@ fun DetailHero(
 /**
  * The imagery layer a hero sits on: the backdrop (with its loading/error plate) under the black
  * status-bar band. [richBackdrop] adds the MeshGradientPainter tonal wash between the two, which the
- * title heroes opt into. The copy brings its own backing: put [heroCopyFade] on the column that
+ * title heroes opt into; with it and no [backdropUrl], the wash stands alone and no placeholder is drawn. The copy brings its own backing: put [heroCopyFade] on the column that
  * holds it.
  *
  * Public so a hero speaking a different vocabulary — `CollectionHero`, which has no tagline, genres
@@ -190,14 +190,17 @@ fun HeroBackdrop(
     richBackdrop: Boolean = false,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        SubcomposeAsyncImage(
-            model = backdropUrl,
-            contentDescription = contentDescription,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-            loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
-            error = { ImagePlaceholder(Modifier.fillMaxSize()) },
-        )
+        // A hero with the wash and no backdrop leaves the wash alone: a placeholder icon would read as an image that failed to load.
+        if (!(richBackdrop && backdropUrl.isNullOrBlank())) {
+            SubcomposeAsyncImage(
+                model = backdropUrl,
+                contentDescription = contentDescription,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+                loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
+                error = { ImagePlaceholder(Modifier.fillMaxSize()) },
+            )
+        }
         if (richBackdrop) {
             // The fixed amber, not primary: the wash sits on raw art in both themes, and light primary
             // is a burnt amber tuned for text on a white page, which turns muddy there.
