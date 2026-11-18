@@ -16,6 +16,10 @@ import com.binge.designsystem.R
  * It is page context and not a heading, so it carries no heading semantics: a screen reader reads it where it sits, straight
  * after the title, and heading navigation skips it. Keep it to a sentence; a line that wraps to one orphan word wants shorter
  * copy, not smaller type.
+ *
+ * @need explain what a page is for under its title
+ * @group screens
+ * @replaces a hand-built body Text under a page title
  */
 @Composable
 fun PageIntro(text: String, modifier: Modifier = Modifier) {

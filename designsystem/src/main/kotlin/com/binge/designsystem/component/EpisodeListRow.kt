@@ -34,6 +34,10 @@ import com.binge.designsystem.theme.BingeTheme
  *
  * A null [onClick] makes the row display-only: the layout is the same, but it is not a button, so it has no click
  * semantics, no ripple and no focus target. For an app that lists episodes to be read, not opened.
+ *
+ * @need show an episode in a list with its still and details
+ * @group rows
+ * @replaces a hand-built row with an image and a text column
  */
 @Composable
 fun EpisodeListRow(
@@ -140,6 +144,9 @@ private fun EpisodeRowSubtitle(rating: Float, airDate: String?) {
 /**
  * Loading placeholder for an [EpisodeListRow]: the still plate and the row's two text lines, blank.
  * [description] names the loading state for a screen reader; without one it stays silent.
+ *
+ * @need show a loading placeholder for an episode row
+ * @group feedback
  */
 @Composable
 fun EpisodeListRowSkeleton(modifier: Modifier = Modifier, description: String? = null) {

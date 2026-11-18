@@ -37,6 +37,10 @@ import com.binge.designsystem.theme.tonalContainer
  * Pass [actionLabel] and [onAction] to add a centred text button beneath the text, for guidance that
  * asks the user to go somewhere. [actionIcon] trails the label, such as an open-in-new glyph for a
  * destination outside the app.
+ *
+ * @need show standing guidance or help on a screen
+ * @group cards
+ * @replaces a hand-built tinted Row of icon and text
  */
 @Composable
 fun HintCard(

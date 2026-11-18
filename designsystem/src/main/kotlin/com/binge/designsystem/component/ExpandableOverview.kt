@@ -32,6 +32,10 @@ private const val OVERVIEW_COLLAPSED_LINES = 3
  * makes TV focus screenshot-testable. Preview and test use only: at runtime the layout pass reports
  * the truth, and passing `true` for copy that does not overflow would draw a toggle that expands
  * nothing.
+ *
+ * @need show long body text that collapses with a toggle
+ * @group rows
+ * @replaces a hand-built Text with a show-more toggle
  */
 @Composable
 fun ExpandableOverview(

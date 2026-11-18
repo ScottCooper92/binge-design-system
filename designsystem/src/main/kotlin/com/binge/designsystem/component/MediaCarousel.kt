@@ -43,6 +43,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  *
  * [itemContent] receives each item's position in [items] as well as the item, so a caller reporting
  * which position was tapped reads it from the slot rather than searching the list for it.
+ *
+ * @need show a titled row of posters with a see-all tile
+ * @group media
+ * @replaces a hand-built LazyRow with a section title
  */
 @Composable
 fun <T> MediaCarousel(

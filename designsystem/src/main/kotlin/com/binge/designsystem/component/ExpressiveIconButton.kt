@@ -28,6 +28,8 @@ import com.binge.designsystem.theme.BingeTheme
 private const val GLASS_BACKGROUND_ALPHA = 0.4f
 
 /**
+ * A round icon button in a choice of tones, with a glass tone for floating over imagery.
+ *
  * [IconButtonTone.Glass] stays the always-black/white pair ([BingeTheme.colors.scrim]) rather than
  * following the theme: it exists specifically for an icon floating over *unpredictable* imagery — a
  * hero backdrop that could be any colour — where only a guaranteed-dark backing keeps the icon
@@ -46,6 +48,10 @@ private const val GLASS_BACKGROUND_ALPHA = 0.4f
  *
  * [tint] is read at the call site, outside [IconButton], so the button's own disabled content colour
  * never reaches the glyph; a disabled button dims [tint] itself by [DISABLED_ALPHA].
+ *
+ * @need tap an icon-only action, even over imagery
+ * @group inputs
+ * @replaces a hand-built IconButton with a circular backing
  */
 @Composable
 fun ExpressiveIconButton(

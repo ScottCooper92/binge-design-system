@@ -31,6 +31,13 @@ import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 
+/**
+ * A filter chip with three states: neutral, include and exclude. A tap and a long press move between them.
+ *
+ * @need filter by including or excluding a value
+ * @group cards
+ * @replaces a hand-built three-state filter chip
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun IncludeExcludeChip(

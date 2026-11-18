@@ -59,6 +59,10 @@ private const val PICKABLE_YEARS_AHEAD = 5
  *
  * The consumer owns the words: [fromLabel] and [toLabel] name the fields and title their pickers, and
  * [fromClearDescription] and [toClearDescription] are what a screen reader hears on each clear button.
+ *
+ * @need pick a from and to month for a date range
+ * @group inputs
+ * @replaces two hand-built fields that each open a date picker
  */
 @Composable
 fun BingeDateBoundFields(

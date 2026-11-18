@@ -68,6 +68,10 @@ private fun InfoValue.isBlank(): Boolean =
  * Key-value row for detail screens: label (fixed-width, SemiBold, muted) on the left,
  * value (Medium) on the right. The value is plain text, a single link, or a row of link
  * tokens. Skips rendering when the value is blank.
+ *
+ * @need show a label and value pair on a detail screen
+ * @group rows
+ * @replaces a hand-built Row of label and value text
  */
 @Composable
 fun InfoRow(
@@ -95,7 +99,13 @@ fun InfoRow(
     }
 }
 
-/** Plain-text convenience overload — skips rendering when [value] is null/blank. */
+/**
+ * A key-value row for plain text, skipped when the value is blank.
+ *
+ * @need show a label and plain text value on a detail screen
+ * @group rows
+ * @replaces a hand-built Row of label and value text
+ */
 @Composable
 fun InfoRow(
     label: String,
@@ -141,7 +151,13 @@ private fun InfoRowLinks(links: List<InfoLink>) {
     }
 }
 
-/** Stacked [InfoRow]s with consistent horizontal padding. Blank values are filtered. */
+/**
+ * A stack of key-value rows with consistent horizontal padding; blank values are filtered out.
+ *
+ * @need show a stack of label and value pairs
+ * @group rows
+ * @replaces a hand-built Column of key-value rows
+ */
 @Composable
 fun InfoRowList(entries: List<InfoRowEntry>, modifier: Modifier = Modifier) {
     val visible = entries.filterNot { it.value.isBlank() }

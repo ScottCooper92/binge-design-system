@@ -83,6 +83,7 @@ catalog-app/        the debug-only catalog app, with a phone activity and a TV o
 catalog-registry/   the generator that lists the catalog's samples and demos for that app
 
 docs/
+├── components.md        every public component by the need it meets, generated from its KDoc tags
 ├── messages.md          a snackbar for a result, a dialog for a cause and a next step
 ├── pull-to-refresh.md   where to use BingePullToRefresh, and how a view model reports the reload
 └── tv-foundation.md     why focus is a parameter, and the accent model the TV components share
@@ -96,6 +97,14 @@ user-visible string is in `values/strings.xml` with its Spanish translation alon
 components take their copy as parameters, so `designsystem-tv` holds only a few strings of its own,
 such as a badge's count and a hidden field's announcement. The baselines are the ones Binge
 recorded; each slice validated byte-identical against them before it landed.
+
+## The component index
+
+`docs/components.md` lists every public composable by what it is for, with the catalog sample to copy and what it replaces. It is
+generated: each public composable's KDoc carries `@need` (the need, in the reader's words), `@group` (one of `screens`, `bars`,
+`sheets`, `rows`, `cards`, `media`, `inputs`, `feedback`, `tv`) and optionally `@replaces` and `@sample`. The first KDoc sentence
+is the description. `./gradlew generateComponentIndex` writes the file; `checkComponentIndex` runs in `check` and fails when the
+file is stale or a public composable has no tag.
 
 ## The catalog app
 

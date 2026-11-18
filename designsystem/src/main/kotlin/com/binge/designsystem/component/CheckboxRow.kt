@@ -45,6 +45,10 @@ import com.binge.designsystem.R
  * The row owns the toggle semantics ([Role.Checkbox] via [Modifier.toggleable]) itself, which is
  * why the child [Checkbox]'s own `onCheckedChange` is `null` below — exactly one node should
  * announce state to a screen reader, not two.
+ *
+ * @need pick several items from a long checklist
+ * @group inputs
+ * @replaces a hand-built Row of a checkbox and text
  */
 @Composable
 fun CheckboxRow(

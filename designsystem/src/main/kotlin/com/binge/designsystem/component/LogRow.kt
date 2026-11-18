@@ -75,6 +75,10 @@ data class LogRowEntry(
  * copies the line either way ([onCopy] decides what goes on the clipboard).
  *
  * @param initiallyExpanded starts the row open; its open state is kept per [LogRowEntry.id] across recomposition and rotation.
+ *
+ * @need show a log entry with its severity
+ * @group rows
+ * @replaces a hand-built card with a severity stripe and text
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

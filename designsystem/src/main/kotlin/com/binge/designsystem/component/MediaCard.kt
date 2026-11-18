@@ -47,6 +47,13 @@ import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
 
+/**
+ * A poster tile for a grid or carousel: the image with a title, rating and optional badges and progress.
+ *
+ * @need show a poster tile with a title and rating
+ * @group media
+ * @replaces a hand-built poster Column with a caption
+ */
 @Composable
 fun MediaCard(
     posterUrl: String?,
@@ -203,6 +210,9 @@ private fun MediaCardTitle(title: String, subtitle: String) {
  * carousel skeleton.
  *
  * [description] names the loading state for a screen reader; without one it stays silent.
+ *
+ * @need show a loading placeholder for a poster grid
+ * @group feedback
  */
 @Composable
 fun MediaCardSkeleton(modifier: Modifier = Modifier, description: String? = null) {
