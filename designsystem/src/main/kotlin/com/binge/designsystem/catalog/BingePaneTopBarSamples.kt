@@ -8,13 +8,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
-import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingePaneTopBar
-import com.binge.designsystem.component.ExpressiveIconButton
-import com.binge.designsystem.component.LocalTopBarActionTone
 import com.binge.designsystem.component.rememberPaneTopBarScrollBehavior
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -106,13 +103,7 @@ fun BingePaneTopBarDetailPaneSample() {
                 onBack = {},
                 containerColor = Color.Unspecified,
                 actions = {
-                    ExpressiveIconButton(
-                        onClick = {},
-                        icon = Icons.Filled.Search,
-                        contentDescription = null,
-                        tone = LocalTopBarActionTone.current,
-                        size = dimensionResource(R.dimen.top_bar_icon_size),
-                    )
+                    BingeBarIconAction(icon = Icons.Filled.Search, contentDescription = "Search", onClick = {})
                 },
             )
         }

@@ -16,10 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeTopBar
-import com.binge.designsystem.component.ExpressiveIconButton
-import com.binge.designsystem.component.LocalTopBarActionTint
-import com.binge.designsystem.component.LocalTopBarActionTone
 import com.binge.designsystem.component.TransparentBingeTopBarSample
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
@@ -34,13 +32,7 @@ fun BingeTopBarSample() {
             onBack = {},
             containerColor = Color.Unspecified,
             actions = {
-                ExpressiveIconButton(
-                    onClick = {},
-                    icon = Icons.Filled.Search,
-                    contentDescription = null,
-                    tone = LocalTopBarActionTone.current,
-                    size = dimensionResource(R.dimen.top_bar_icon_size),
-                )
+                BingeBarIconAction(icon = Icons.Filled.Search, contentDescription = "Search", onClick = {})
             },
         )
     }
@@ -165,13 +157,10 @@ fun BingeTopBarThemeFollowingScrimSample() {
                 containerColor = Color.Transparent,
                 scrimFraction = 1f,
                 actions = { glassBackgroundAlpha ->
-                    ExpressiveIconButton(
-                        onClick = {},
+                    BingeBarIconAction(
                         icon = Icons.Filled.Search,
-                        contentDescription = null,
-                        tint = LocalTopBarActionTint.current,
-                        tone = LocalTopBarActionTone.current,
-                        size = dimensionResource(R.dimen.top_bar_icon_size),
+                        contentDescription = "Search",
+                        onClick = {},
                         glassBackgroundAlpha = glassBackgroundAlpha,
                     )
                 },
