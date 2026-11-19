@@ -58,6 +58,7 @@ fun CatalogApp() {
     var fontScale by rememberSaveable { mutableFloatStateOf(deviceFontScale) }
     var rtl by rememberSaveable { mutableStateOf(false) }
     var locale by rememberSaveable { mutableStateOf(SampleLocale.System) }
+    var motion by rememberSaveable { mutableStateOf(true) }
     val gridState = rememberLazyGridState()
 
     val selected = CatalogRegistry.firstOrNull { it.id == selectedId }
@@ -78,11 +79,12 @@ fun CatalogApp() {
             entry = entry,
             variants = CatalogRegistry.variantsOf(entry.group),
             onVariantChange = { selectedId = it.id },
-            overrides = SampleOverrides(dark, fontScale, rtl, locale),
+            overrides = SampleOverrides(dark, fontScale, rtl, locale, motion),
             onDarkChange = { dark = it },
             onFontScaleChange = { fontScale = it },
             onRtlChange = { rtl = it },
             onLocaleChange = { locale = it },
+            onMotionChange = { motion = it },
             onBack = onBack,
         )
     }

@@ -3,9 +3,17 @@ package com.binge.designsystem.preview
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import com.binge.designsystem.theme.BingeBrand
 import com.binge.designsystem.theme.BingeExpressiveTheme
+
+/**
+ * Whether [ScreenshotTheme] switches animation off. True, so a screenshot frame is one stable image whatever animates in
+ * the component. The catalog app provides false around a sample it runs live, so the motion the component has can be
+ * judged on a device; nothing a frame renders provides it, so no baseline changes.
+ */
+val LocalSampleReduceMotion = staticCompositionLocalOf { true }
 
 /**
  * Theme wrapper for previews and Compose screenshot tests.
@@ -21,7 +29,8 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * subclass on annotations of its own, so one brand is set in one place.
  *
  * - `dynamicColor = false` keeps colours deterministic across machines (CI gate).
- * - `reduceMotion = true` disables animation so a single frame is stable.
+ * - `reduceMotion` follows [LocalSampleReduceMotion], true unless the catalog app runs the sample with motion on, so a single
+ *   frame is stable.
  * - [Surface] paints the theme's `background`, the colour a full screen sits on in an app (a `Scaffold`
  *   paints it by default), so a screen frame shows its page as the app does. A Material 3 [Surface]
  *   defaults to `surface`, which differs in dark theme, so the colour is set here. TvScreenshotTheme
@@ -36,7 +45,7 @@ fun ScreenshotTheme(
     brand: BingeBrand = BingeBrand.Binge,
     content: @Composable () -> Unit,
 ) {
-    BingeExpressiveTheme(dynamicColor = false, reduceMotion = true, brand = brand) {
+    BingeExpressiveTheme(dynamicColor = false, reduceMotion = LocalSampleReduceMotion.current, brand = brand) {
         Surface(modifier = modifier, color = MaterialTheme.colorScheme.background) {
             content()
         }
