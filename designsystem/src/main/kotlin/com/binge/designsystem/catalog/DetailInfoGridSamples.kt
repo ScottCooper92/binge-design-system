@@ -52,7 +52,7 @@ fun DetailInfoGridSample() {
     ScreenshotTheme { DetailInfoGrid(entries = EnglishFacts) }
 }
 
-/** The same facts in Spanish, whose labels and values run longer and wrap inside their column. */
+/** The same facts in Spanish, whose labels and values run longer. On the tablet frame they wrap inside their column. */
 @Composable
 fun DetailInfoGridSpanishSample() {
     ScreenshotTheme { DetailInfoGrid(entries = SpanishFacts) }

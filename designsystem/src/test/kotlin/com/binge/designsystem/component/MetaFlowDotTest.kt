@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.R
+import androidx.compose.ui.unit.height
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertTrue
@@ -33,29 +33,43 @@ class MetaFlowDotTest {
     @get:Rule
     val rule = createTakeDownComposeRule()
 
-    @Test
-    fun `an item as wide as the line leaves room for its dot`() {
-        var reserved = 0.dp
+    private fun show(entries: List<MetaEntry>) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
-                reserved = dimensionResource(R.dimen.hero_meta_gap) + dimensionResource(R.dimen.hero_meta_dot_size)
-                Box(Modifier.width(200.dp).testTag("flow")) {
-                    MetaFlow(
-                        entries = listOf(
-                            { Text("Acción · Crimen · Drama · Suspense · Ciencia ficción · Aventura") },
-                            { Text("Next") },
-                        ),
-                    )
-                }
+                Box(Modifier.width(200.dp).testTag("flow")) { MetaFlow(entries) }
             }
         }
         rule.waitForIdle()
+    }
+
+    @Test
+    fun `a full-width content item leaves room for its dot`() {
+        show(
+            listOf(
+                MetaEntry.Content { Text("Acción · Crimen · Drama · Suspense · Ciencia ficción · Aventura") },
+                MetaEntry.Content { Text("Next") },
+            ),
+        )
 
         val flow = rule.onNodeWithTag("flow").getBoundsInRoot()
         val first = rule.onNodeWithText("Acción", substring = true).getBoundsInRoot()
-        assertTrue(
-            "the long item ends ${flow.right - first.right} short of the line's end; the dot needs $reserved",
-            first.right <= flow.right - reserved,
+        val reserved = flow.right - first.right
+        assertTrue("the item leaves $reserved for its dot", reserved >= 13.dp)
+    }
+
+    @Test
+    fun `a wrapped text item draws its dot on the line the text ends on`() {
+        show(
+            listOf(
+                MetaEntry.WrappingText("Acción · Crimen · Drama · Suspense · Ciencia ficción · Aventura", Color.Unspecified),
+                MetaEntry.Content { Text("Next") },
+            ),
         )
+
+        val text = rule.onNodeWithText("Acción", substring = true).getBoundsInRoot()
+        val dot = rule.onNodeWithTag(META_DOT_TAG).getBoundsInRoot()
+        assertTrue("the text wraps over several lines", text.height > 40.dp)
+        assertTrue("the dot sits in the text's last line, not beside its middle", dot.top >= text.bottom - text.height / 2)
+        assertTrue("the dot is inside the text's own width", dot.right <= text.right + 1.dp)
     }
 }
