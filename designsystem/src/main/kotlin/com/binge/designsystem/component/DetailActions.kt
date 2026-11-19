@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.isExpandedLayout
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeShapes
 
 /** From this many round actions the primary takes a row of its own, so its label keeps the room it needs at a large font. */
@@ -43,7 +44,7 @@ class DetailRoundAction(
  * stacked); the caller applies it to its outermost node and draws whatever button its page needs, so nothing here knows what the
  * primary means. On a phone, from two round actions up the primary takes a row of its own and the round buttons sit centred in a row
  * under it, so the primary's label keeps its room at a large font; at the expanded width, and with fewer round actions, they sit in one row
- * with the primary taking the rest. The row is inset by the content inset on both sides.
+ * with the primary taking the rest. The row is inset by the screen's content inset (16, 24 or 32dp by width) on both sides, and the gaps between its buttons are `padding_m`. A page adds the reading margin through `modifier.readingMargin()`.
  *
  * @need lay out a detail page's primary action beside its round secondary actions
  * @group detail
@@ -57,7 +58,7 @@ fun DetailActions(
     modifier: Modifier = Modifier,
 ) {
     val gap = dimensionResource(R.dimen.padding_m)
-    val edge = modifier.fillMaxWidth().padding(horizontal = gap)
+    val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
     if (roundActions.size >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             primary(Modifier.fillMaxWidth())
@@ -102,7 +103,7 @@ private fun RowScope.RoundActions(actions: List<DetailRoundAction>) {
 fun DetailActionsSkeleton(modifier: Modifier = Modifier, buttons: Int = 0) {
     val gap = dimensionResource(R.dimen.padding_m)
     val plate = Modifier.height(dimensionResource(R.dimen.button_filled_height))
-    val edge = modifier.fillMaxWidth().padding(horizontal = gap)
+    val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
     if (buttons >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             SkeletonPlate(plate.fillMaxWidth())
