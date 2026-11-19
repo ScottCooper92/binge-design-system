@@ -27,6 +27,7 @@
     <string name="cd_clear_query">Clear search</string>
     <string name="cd_remove_filter">Remove filter</string>
     <string name="cd_list_item_external">Opens in browser</string>
+    <string name="cd_link_chip_opens_outside">%1$s, opens outside the app</string>
     <string name="cd_list_item_loading">In progress</string>
     <string name="cd_option_excluded">Excluded</string>
     <string name="cd_group_expanded">Expanded</string>

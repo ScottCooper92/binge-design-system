@@ -101,6 +101,8 @@
     <!-- Stroke width for small inline circular progress spinners -->
     <dimen name="progress_stroke_width">2dp</dimen>
     <dimen name="icon_size_l">20dp</dimen>
+    <!-- The open-in-new glyph that ends a control leaving the app: the size of a chip's own icon. -->
+    <dimen name="external_link_icon_size">18dp</dimen>
     <!-- Filter chips -->
     <dimen name="chip_spacing">8dp</dimen>
     <!-- The fade below a filter pager's pinned chips. Content scrolls *under* the chips, so rows

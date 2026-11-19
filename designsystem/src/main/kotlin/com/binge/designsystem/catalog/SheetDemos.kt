@@ -141,3 +141,39 @@ private fun ColumnScope.DockingSheetBody(onDone: () -> Unit) {
         BingeFilledButton(label = "Done", onClick = onDone, modifier = Modifier.fillMaxWidth())
     }
 }
+
+private const val HEIGHT_DEMO_ROWS = 6
+
+/**
+ * A bottom sheet whose content changes height, opened for real: each press of the buttons adds or removes rows, and the sheet follows
+ * on the theme's spatial spring instead of jumping to the new height. With reduced motion on (the system setting) it jumps, as it
+ * did before. A still frame cannot show either, so this is where to watch it.
+ */
+@Composable
+fun BingeBottomSheetHeightDemo() {
+    ScreenshotTheme {
+        var open by remember { mutableStateOf(false) }
+        var rows by remember { mutableStateOf(2) }
+        Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_m))) {
+            BingeOutlinedButton(label = "Open a sheet that changes height", onClick = { open = true })
+        }
+        if (open) {
+            BingeBottomSheet(onDismissRequest = { open = false }) {
+                Column(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                ) {
+                    repeat(rows) { Text("Row ${it + 1}", style = MaterialTheme.typography.bodyLarge) }
+                    BingeFilledButton(label = "Add a row", onClick = {
+                        if (rows <
+                            HEIGHT_DEMO_ROWS
+                        ) {
+                            rows++
+                        }
+                    }, enabled = rows < HEIGHT_DEMO_ROWS)
+                    BingeTextButton(label = "Remove a row", onClick = { if (rows > 1) rows-- }, enabled = rows > 1)
+                }
+            }
+        }
+    }
+}
