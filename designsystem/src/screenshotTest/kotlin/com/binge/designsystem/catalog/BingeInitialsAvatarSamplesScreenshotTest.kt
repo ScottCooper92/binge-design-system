@@ -26,4 +26,18 @@ class BingeInitialsAvatarSamplesScreenshotTest {
     fun AvatarSizes() {
         BingeInitialsAvatarSizesSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun AvatarTones() {
+        BingeInitialsAvatarTonesSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun AvatarBrandTones() {
+        BingeInitialsAvatarBrandTonesSample()
+    }
 }

@@ -54,13 +54,15 @@ class TokenContrastTest {
         scheme: androidx.compose.material3.ColorScheme,
     ): List<Pair> {
         val text = WCAG_CONTRAST_NORMAL
+        // The theme derives the avatar tones from the scheme's own primary, so measure what it would provide.
+        val avatar = avatarTones(scheme.primary, isDark = theme.endsWith("dark"))
         val pairs = mutableListOf(
             Pair("$theme onSuccessContainer/successContainer", colors.onSuccessContainer, colors.successContainer, text),
             Pair("$theme onScrim/scrim", colors.onScrim, colors.scrim, text),
             // OnColors flags this as THE dynamic-colour risk: one ink assumed to read on every avatar tone.
-            *colors.avatarPalette
+            *avatar.tones
                 .mapIndexed { i, tone ->
-                    Pair("$theme avatarInk/avatarPalette[$i]", colors.avatarInk, tone, text)
+                    Pair("$theme avatarInk/avatarPalette[$i]", avatar.ink, tone, text)
                 }.toTypedArray(),
             // Hand-authored M3 scheme text pairs — catches a regression in the scheme itself.
             Pair("$theme onSurface/surface", scheme.onSurface, scheme.surface, text),

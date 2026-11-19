@@ -2,6 +2,7 @@ package com.binge.designsystem.tv.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.tv.material3.ColorScheme
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.theme.DarkBingeColors
@@ -9,6 +10,7 @@ import com.binge.designsystem.theme.LocalBingeColors
 import com.binge.designsystem.theme.LocalBingeDarkTheme
 import com.binge.designsystem.theme.LocalReduceMotion
 import com.binge.designsystem.theme.systemReduceMotion
+import com.binge.designsystem.theme.withAvatarTonesFor
 
 /**
  * The TV theme root. Provide it once, at the TV navigation host — never nested inside
@@ -48,8 +50,10 @@ fun BingeTvTheme(
     style: TvStyle = LocalTvStyle.current,
     content: @Composable () -> Unit,
 ) {
+    // The avatar tones lean to the brand's primary, as they do on the phone.
+    val bingeColors = remember(colorScheme.primary) { DarkBingeColors.withAvatarTonesFor(colorScheme.primary, isDark = true) }
     CompositionLocalProvider(
-        LocalBingeColors provides DarkBingeColors,
+        LocalBingeColors provides bingeColors,
         LocalBingeDarkTheme provides true,
         LocalReduceMotion provides reduceMotion,
         LocalTvStyle provides style,
