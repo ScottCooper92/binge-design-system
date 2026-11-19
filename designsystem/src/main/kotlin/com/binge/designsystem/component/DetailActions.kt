@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.isExpandedLayout
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeShapes
 
 /** From this many round actions the primary takes a row of its own, so its label keeps the room it needs at a large font. */
@@ -57,7 +58,7 @@ fun DetailActions(
     modifier: Modifier = Modifier,
 ) {
     val gap = dimensionResource(R.dimen.padding_m)
-    val edge = modifier.fillMaxWidth().padding(horizontal = gap)
+    val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
     if (roundActions.size >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             primary(Modifier.fillMaxWidth())
@@ -102,7 +103,7 @@ private fun RowScope.RoundActions(actions: List<DetailRoundAction>) {
 fun DetailActionsSkeleton(modifier: Modifier = Modifier, buttons: Int = 0) {
     val gap = dimensionResource(R.dimen.padding_m)
     val plate = Modifier.height(dimensionResource(R.dimen.button_filled_height))
-    val edge = modifier.fillMaxWidth().padding(horizontal = gap)
+    val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
     if (buttons >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             SkeletonPlate(plate.fillMaxWidth())

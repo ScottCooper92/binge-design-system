@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -158,11 +159,12 @@ fun <T> DetailPeopleLine(
             items(people, key = itemKey) { item ->
                 val shown = person(item)
                 val roleColor = MaterialTheme.colorScheme.onSurfaceVariant
+                val separator = stringResource(R.string.log_row_meta_separator)
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(shown.name) }
                         if (!shown.subtitle.isNullOrBlank()) {
-                            withStyle(SpanStyle(color = roleColor)) { append(" · ${shown.subtitle}") }
+                            withStyle(SpanStyle(color = roleColor)) { append("$separator${shown.subtitle}") }
                         }
                     },
                     style = MaterialTheme.typography.bodyMedium,

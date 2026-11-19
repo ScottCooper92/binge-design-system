@@ -2,6 +2,7 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithText
@@ -14,7 +15,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** The people and poster rails and the one-line cast start their heading where a plain section header does, at every width. */
+/** The action row, the people and poster rails and the one-line cast start where a plain section header does, at every width. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class DetailRailsAlignmentTest {
@@ -32,6 +33,7 @@ class DetailRailsAlignmentTest {
             BingeExpressiveTheme(dynamicColor = false) {
                 Column(Modifier.fillMaxWidth()) {
                     SectionHeader(title = "Header")
+                    DetailActions(primary = { Text("Primary", it) }, roundActions = emptyList())
                     DetailPeopleRail("People", listOf("a"), { it }, { DetailPerson("Ada", null, null) }, {})
                     DetailPosterRail("Posters", listOf("b"), { it }, { DetailPoster(null, "Bee", null) }, {})
                     DetailPeopleLine("Line", listOf("c"), { it }, { DetailPerson("Cy", null, null) }, {})
@@ -40,12 +42,16 @@ class DetailRailsAlignmentTest {
         }
         rule.waitForIdle()
 
-        listOf("People", "Posters", "Line").forEach { assertEquals(it, left("Header"), left(it), 0.5f) }
+        listOf("Primary", "People", "Posters", "Line").forEach { assertEquals(it, left("Header"), left(it), 0.5f) }
     }
 
     @Test
     @Config(qualifiers = "w411dp-h891dp-xhdpi")
     fun `at a phone width the rails start where a section header does`() = assertAligned()
+
+    @Test
+    @Config(qualifiers = "w700dp-h900dp-xhdpi")
+    fun `at a medium width the rails start where a section header does`() = assertAligned()
 
     @Test
     @Config(qualifiers = "w1000dp-h800dp-xhdpi")
