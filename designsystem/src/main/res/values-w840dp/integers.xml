@@ -2,4 +2,5 @@
 <resources>
     <!-- >=840dp available width (expanded): four poster columns. -->
     <integer name="media_grid_columns">4</integer>
+    <integer name="detail_info_columns">3</integer>
 </resources>
