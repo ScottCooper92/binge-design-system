@@ -68,6 +68,9 @@ private const val SCRIM_SOLID_START_FRACTION = TITLE_SCRIM_SWITCH_FRACTION
  * lays a solid surface in [scrimColor] over the bar's own height, reaching full opacity at a [fraction] of 1. Below it
  * nothing changes, and the tail past the bar keeps tapering as before.
  *
+ * [solidSurface] turns that solid off. [OverlaidHeaderContent] passes false: its box is the header plus a fade band that
+ * has to taper into the content below, and a solid over it would end in a hard edge.
+ *
  * Call it as the first child of the [Box] the bar sits in, so it fills the bar's own bounds. A
  * non-zero [tailHeight] paints past those bounds too, so it needs to sit over content the bar has no
  * other claim on (a screen transparent-bars scroll over, never a [Box] sized to the bar alone).
@@ -78,6 +81,7 @@ internal fun BoxScope.TopBarScrim(
     modifier: Modifier = Modifier,
     scrimColor: Color = BingeTheme.colors.scrim,
     tailHeight: Dp = dimensionResource(R.dimen.zero),
+    solidSurface: Boolean = true,
 ) {
     if (fraction <= 0f) return
     val scrim = scrimColor
@@ -88,7 +92,7 @@ internal fun BoxScope.TopBarScrim(
                 .matchParentSize()
                 .drawBehind {
                     val solid = ((fraction - SCRIM_SOLID_START_FRACTION) / (1f - SCRIM_SOLID_START_FRACTION)).coerceIn(0f, 1f)
-                    if (solid > 0f) drawRect(scrim, alpha = solid, size = size)
+                    if (solidSurface && solid > 0f) drawRect(scrim, alpha = solid, size = size)
                     val paintHeight = size.height + tail.toPx()
                     // The caller's own height as a fraction of the taller paint area, so SCRIM_MID_STOP/
                     // SCRIM_LATE_STOP land at the same absolute position within it as a zero tailHeight
