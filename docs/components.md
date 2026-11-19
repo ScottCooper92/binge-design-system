@@ -32,6 +32,7 @@ sample to copy and what it replaces. If a need is not here, check `catalog/` bef
 
 | Need | Component | What it is | Sample | Replaces |
 | --- | --- | --- | --- | --- |
+| add an icon action to a screen's top bar, beside Back | `BingeBarIconAction` | An icon action in a screen's top bar, in the round button the bar draws beside Back | `BingeBarIconActionSample` | a hand-built ExpressiveIconButton wired to the bar's tone, tint and glass fade |
 | float a back button and actions over a hero | `DetailOverlayTopBar` | Transparent overlay top bar for a DetailHero-backed screen | `DetailOverlayTopBarMidScrollSample` | a hand-built transparent top bar over an image |
 | frame the app with a bottom bar or side rail for top-level destinations | `BingeNavSuiteShell` | The app shell that frames screens with a bottom bar or a side rail of top-level destinations | `BingeNavSuiteShellBottomBarSample` | a hand-built Scaffold with a navigation bar or rail |
 | give a pane a top bar that adapts to sharing the window | `BingePaneTopBar` | A screen's top bar that knows which pane it is in | `BingePaneTopBarAloneSample` | a hand-built top bar that changes when a second pane is shown |
