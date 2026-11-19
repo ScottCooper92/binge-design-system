@@ -110,6 +110,7 @@
     <dimen name="filter_pager_scrim_height">24dp</dimen>
     <!-- Bounds the catalog sample for BingeFilterChipPager, which is otherwise fillMaxSize. -->
     <dimen name="catalog_filter_chip_pager_height">240dp</dimen>
+    <dimen name="catalog_filter_sheet_height">640dp</dimen>
     <dimen name="catalog_tabbed_pager_height">240dp</dimen>
     <dimen name="catalog_tab_row_flush_padding">0dp</dimen>
     <!-- The width the WrappingRow catalog sample pins its row to, narrow enough that the tags wrap. -->
@@ -201,6 +202,12 @@
     <dimen name="sheet_wash_fade">32dp</dimen>
     <!-- How far above a bottom sheet's content its wash starts, so it covers the drag handle; the sheet's shape clips the excess. -->
     <dimen name="sheet_wash_overdraw">48dp</dimen>
+    <!-- The filter sheet's body: its side inset, the gap above and below each section, the heading's gap and the chips' gap. -->
+    <dimen name="filter_sheet_padding_h">20dp</dimen>
+    <dimen name="filter_sheet_section_padding_top">14dp</dimen>
+    <dimen name="filter_sheet_section_padding_bottom">6dp</dimen>
+    <dimen name="filter_sheet_section_title_gap">10dp</dimen>
+    <dimen name="filter_sheet_chip_spacing">8dp</dimen>
     <dimen name="discover_filter_chip_padding_h">14dp</dimen>
     <dimen name="discover_filter_chip_padding_v">8dp</dimen>
     <dimen name="discover_filter_chip_icon">14dp</dimen>
