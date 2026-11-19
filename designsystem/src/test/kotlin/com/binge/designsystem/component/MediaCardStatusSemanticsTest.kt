@@ -10,6 +10,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.hasClickAction
 import com.binge.designsystem.R
@@ -35,6 +36,7 @@ class MediaCardStatusSemanticsTest {
     val rule = createTakeDownComposeRule()
 
     private var status by mutableStateOf<MediaCardStatus?>(null)
+    private var favourite by mutableStateOf(false)
 
     private fun show(initial: MediaCardStatus?) {
         status = initial
@@ -46,6 +48,7 @@ class MediaCardStatusSemanticsTest {
                     rating = null,
                     onClick = {},
                     status = status,
+                    favourite = favourite,
                     modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
                 )
             }
@@ -85,5 +88,35 @@ class MediaCardStatusSemanticsTest {
 
         rule.onNode(hasClickAction()).assertHasClickAction()
         rule.onNode(hasClickAction()).assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.StateDescription))
+    }
+
+    @Test
+    fun `a favourite is announced with the card, and is not a separate target`() {
+        show(null)
+        favourite = true
+        rule.waitForIdle()
+
+        assertEquals("Favourite", stateDescriptionOfCard())
+        // One click target, the card; the heart is drawn only and adds no node that takes a click or a focus.
+        rule.onAllNodes(hasClickAction()).assertCountEquals(1)
+    }
+
+    @Test
+    fun `a favourite with a status reads the favourite first`() {
+        show(MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive))
+        favourite = true
+        rule.waitForIdle()
+
+        assertEquals("Favourite, Available", stateDescriptionOfCard())
+        rule.onAllNodes(hasClickAction()).assertCountEquals(1)
+    }
+
+    @Test
+    fun `a card that is not a favourite does not say so`() {
+        show(MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive))
+        favourite = false
+        rule.waitForIdle()
+
+        assertEquals("Available", stateDescriptionOfCard())
     }
 }
