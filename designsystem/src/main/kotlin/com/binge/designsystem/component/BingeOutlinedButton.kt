@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +31,9 @@ import com.binge.designsystem.theme.BingeShapes
  * commits or opens something irreversible. Naming it keeps the colour in one place, and keeps the
  * next destructive button from quietly defaulting to `primary` — which is how a repository ends up
  * with an error-toned confirmation behind a neutral trigger.
+ *
+ * Disabled, the label takes `colors`' disabled content colour and the outline is Material 3's disabled outline (`onSurface`
+ * at 12%), so both grey together; enabled, the outline is the content colour.
  *
  * [showLabel] collapses the button to icon-only, keeping the same pill shape and tap target. It
  * requires a [leadingIcon]: once the label's [Text] isn't there, the icon is what carries the
@@ -65,7 +69,7 @@ fun BingeOutlinedButton(
         shape = BingeShapes.Medium,
         enabled = enabled,
         colors = colors,
-        border = BorderStroke(dimensionResource(R.dimen.hairline_thickness), colors.contentColor),
+        border = BorderStroke(dimensionResource(R.dimen.hairline_thickness), outlineColor(enabled, colors)),
     ) {
         if (loading) {
             CircularProgressIndicator(
@@ -92,6 +96,17 @@ fun BingeOutlinedButton(
         }
     }
 }
+
+/** Material 3's disabled outline for an outlined button: `onSurface` at 12%. */
+private const val DISABLED_OUTLINE_ALPHA = 0.12f
+
+/**
+ * The outline: the content colour while enabled, and the muted disabled outline otherwise, so the outline greys with the
+ * label rather than staying at full strength round a disabled button.
+ */
+@Composable
+private fun outlineColor(enabled: Boolean, colors: ButtonColors): Color =
+    if (enabled) colors.contentColor else MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_OUTLINE_ALPHA)
 
 @Preview(showBackground = true)
 @Composable
