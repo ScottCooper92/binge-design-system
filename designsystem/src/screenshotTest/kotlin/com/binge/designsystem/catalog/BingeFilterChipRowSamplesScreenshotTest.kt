@@ -43,4 +43,11 @@ class BingeFilterChipRowSamplesScreenshotTest {
     fun ScrimmedPager() {
         BingeFilterChipPagerScrimmedSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun ScrimmedPagerHalf() {
+        BingeFilterChipPagerScrimmedHalfSample()
+    }
 }
