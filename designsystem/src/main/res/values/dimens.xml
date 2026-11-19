@@ -348,6 +348,10 @@
     <dimen name="detail_bottom_spacing">32dp</dimen>
     <!-- The catalog sample for the shared navigation motion: the fixed height of its two-screen stage. -->
     <dimen name="nav_motion_sample_height">180dp</dimen>
+    <!-- The catalog sample for the floating composer with the keyboard open: the height of its window. -->
+    <dimen name="floating_composer_sample_window_height">560dp</dimen>
+    <!-- The same sample: the height of the keyboard plate, and the bottom inset the card is given. -->
+    <dimen name="floating_composer_sample_keyboard_height">280dp</dimen>
     <dimen name="icon_size_m">18dp</dimen>
     <dimen name="chip_padding_h">18dp</dimen>
     <dimen name="chip_padding_v">12dp</dimen>

@@ -45,11 +45,12 @@ const val FLOATING_COMPOSER_MAX_LINES = 5
  * has text and [enabled] is set, and shows a spinner in place of its glyph while [sending] is set. The
  * caller owns the text: clear [value] when the send starts and the field keeps focus, because focus never
  * moves to the button; on a failure, put the text back and the card is as it was. [readOnly] holds the
- * field without dropping the keyboard, for a caller whose other action in the card is in flight.
+ * field without dropping the keyboard, for a caller whose send or other action in the card is in flight.
  *
  * The card clears the system bars and the keyboard itself, by [windowInsets], with the window's own side and
  * bottom insets by default. A caller must not pad for the keyboard as well. The height it takes from the
- * bottom of its parent, insets included, comes back through [onOccupiedHeightChange] so the content
+ * bottom of its parent, insets included, comes back through [onOccupiedHeightChange] (padding the caller
+ * adds to [modifier] outside the card is not part of it) so the content
  * scrolling under the card can end above it: add that to the content's bottom padding.
  *
  * Placeholder and send description are parameters, because the consumer owns the words.

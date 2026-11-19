@@ -16,7 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.component.BingeFloatingComposer
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -103,18 +104,20 @@ fun BingeFloatingComposerSendingSample() {
 @Composable
 fun BingeFloatingComposerKeyboardOpenSample() {
     var text by remember { mutableStateOf("Fixed in the latest") }
+    val windowHeight = dimensionResource(R.dimen.floating_composer_sample_window_height)
+    val keyboardHeight = dimensionResource(R.dimen.floating_composer_sample_keyboard_height)
     ScreenshotTheme {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(SAMPLE_WINDOW_HEIGHT)
+                .height(windowHeight)
                 .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.BottomCenter,
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(SAMPLE_KEYBOARD_HEIGHT)
+                    .height(keyboardHeight)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
             )
             BingeFloatingComposer(
@@ -123,12 +126,9 @@ fun BingeFloatingComposerKeyboardOpenSample() {
                 onSend = { text = "" },
                 placeholder = SAMPLE_PLACEHOLDER,
                 sendDescription = SAMPLE_SEND,
-                windowInsets = WindowInsets(bottom = SAMPLE_KEYBOARD_HEIGHT),
+                windowInsets = WindowInsets(bottom = keyboardHeight),
                 leadingActions = { BingeFilterChip(label = "Resolve", selected = false, onClick = {}) },
             )
         }
     }
 }
-
-private val SAMPLE_WINDOW_HEIGHT = 560.dp
-private val SAMPLE_KEYBOARD_HEIGHT = 280.dp
