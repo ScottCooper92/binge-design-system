@@ -11,10 +11,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.width
 import com.binge.designsystem.testing.assertNoTextClipped
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -29,6 +32,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 private val NARROW_PARENT = 80.dp
+private val WEIGHTED_ROW = 360.dp
 
 /**
  * A [LabelledIconButton]'s width is a floor, so at a large font a short label such as "Trailer" or "Tráiler" reads in full on one line rather
@@ -148,5 +152,27 @@ class LabelledIconButtonLabelTest {
         assertEquals(1, layoutOf("Subscribe").lineCount)
         assertFalse(layoutOf("Subscribe").isLineEllipsized(0))
         assertTrue("no text node was checked", rule.assertNoTextClipped() >= 2)
+    }
+
+    @Test
+    fun `a button given a weight fills its slot and keeps its label centred in it`() {
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2.0f)) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    Row(Modifier.width(WEIGHTED_ROW)) {
+                        LabelledIconButton(icon = Icons.Filled.PlayArrow, label = "Subscribe", onClick = {}, modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertEquals(1, layoutOf("Subscribe").lineCount)
+        assertFalse(layoutOf("Subscribe").isLineEllipsized(0))
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
+        val button = rule.onNode(hasClickAction()).getUnclippedBoundsInRoot()
+        val label = rule.onNodeWithText("Subscribe", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertEquals("the slot's width is the button's", WEIGHTED_ROW.value, button.width.value, 0.5f)
+        assertEquals("the label is centred in the slot", (button.left + button.width / 2).value, (label.left + label.width / 2).value, 1f)
     }
 }
