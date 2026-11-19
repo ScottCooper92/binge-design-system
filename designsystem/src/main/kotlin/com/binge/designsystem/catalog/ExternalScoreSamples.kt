@@ -93,6 +93,25 @@ fun DetailHeroScoresSpanishSample() {
     }
 }
 
+/**
+ * [DetailHero] whose genre list alone fills the line, with scores after it. At a large font the genres take the whole
+ * width and still end on their dot, and the scores start the next line.
+ */
+@Composable
+fun DetailHeroLongGenresSample() {
+    ScreenshotTheme {
+        DetailHero(
+            title = "El caballero oscuro",
+            backdropUrl = null,
+            tagline = null,
+            metaText = "2008 · 2 h 32 min",
+            genres = listOf("Acción", "Crimen", "Drama", "Suspense", "Ciencia ficción", "Aventura"),
+            externalScores = SpanishScores,
+            onBack = {},
+        )
+    }
+}
+
 /** [DetailCinematicHeader] with the scores after the genres. */
 @Composable
 fun DetailCinematicHeaderScoresSample() {
