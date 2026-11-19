@@ -24,6 +24,10 @@ private const val SCRIM_LATE_STOP = 0.90f
 // colour above this fraction, and still light enough below it for onSurface — see #93.
 private const val TITLE_SCRIM_SWITCH_FRACTION = 0.75f
 
+// The solid surface behind the bar's own height starts where the title's colour has already switched, so nothing
+// above this fraction changes, and reaches full opacity at a fraction of 1.
+private const val SCRIM_SOLID_START_FRACTION = TITLE_SCRIM_SWITCH_FRACTION
+
 /**
  * The ramp that keeps a transparent top bar legible over whatever scrolls beneath it: opaque at the
  * status bar, thinning as it descends, and only fading fully away *past* [SCRIM_LATE_STOP] — deep
@@ -59,6 +63,11 @@ private const val TITLE_SCRIM_SWITCH_FRACTION = 0.75f
  * the default stays black-always for a bar scrimming unpredictable content, where only a
  * guaranteed-dark tone keeps contrast regardless of what scrolls under it.
  *
+ * The gradient alone is 50 to 60% opaque in the bar's lower half, where the title and actions sit, so a row scrolled
+ * under a fully collapsed bar would still read through it. From [SCRIM_SOLID_START_FRACTION] the scrim therefore also
+ * lays a solid surface in [scrimColor] over the bar's own height, reaching full opacity at a [fraction] of 1. Below it
+ * nothing changes, and the tail past the bar keeps tapering as before.
+ *
  * Call it as the first child of the [Box] the bar sits in, so it fills the bar's own bounds. A
  * non-zero [tailHeight] paints past those bounds too, so it needs to sit over content the bar has no
  * other claim on (a screen transparent-bars scroll over, never a [Box] sized to the bar alone).
@@ -78,6 +87,8 @@ internal fun BoxScope.TopBarScrim(
             modifier
                 .matchParentSize()
                 .drawBehind {
+                    val solid = ((fraction - SCRIM_SOLID_START_FRACTION) / (1f - SCRIM_SOLID_START_FRACTION)).coerceIn(0f, 1f)
+                    if (solid > 0f) drawRect(scrim, alpha = solid, size = size)
                     val paintHeight = size.height + tail.toPx()
                     // The caller's own height as a fraction of the taller paint area, so SCRIM_MID_STOP/
                     // SCRIM_LATE_STOP land at the same absolute position within it as a zero tailHeight
