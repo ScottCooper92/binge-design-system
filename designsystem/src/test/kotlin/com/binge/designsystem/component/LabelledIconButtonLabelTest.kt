@@ -1,13 +1,17 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.assertNoTextClipped
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -20,6 +24,8 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+
+private val NARROW_PARENT = 80.dp
 
 /**
  * A [LabelledIconButton]'s width is a floor, so at a large font a short label such as "Trailer" or "Tráiler" reads in full on one line rather
@@ -82,24 +88,42 @@ class LabelledIconButtonLabelTest {
         assertTrue(layout.isLineEllipsized(1))
     }
 
+    @Test fun `Subscribe reads in full at 1_0`() = assertReadsInFull("Subscribe", 1.0f)
+
+    @Test fun `Subscribe reads in full at 1_3`() = assertReadsInFull("Subscribe", 1.3f)
+
+    @Test fun `Subscribe reads in full at 2_0, as the cap grows with the font`() = assertReadsInFull("Subscribe", 2.0f)
+
+    @Test fun `Suscribirse reads in full at 2_0`() = assertReadsInFull("Suscribirse", 2.0f)
+
     @Test
-    fun `a single word wider than the cap stays whole on one line and is cut with an ellipsis at 2_0`() {
-        val word = "Subscribe"
+    fun `a word wider than even the scaled cap stays whole on one line and is cut with an ellipsis at 2_0`() {
+        val word = "Unsubscribefromeverything"
         show(word, 2.0f)
 
         val layout = layoutOf(word)
-        assertEquals(1, layout.lineCount)
+        assertEquals("the word was broken across lines", 1, layout.lineCount)
         assertTrue(layout.isLineEllipsized(0))
         assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
     }
 
     @Test
-    fun `a single word that fits is not touched at 1_0`() {
+    fun `a word the parent leaves too little room for is not broken either`() {
         val word = "Subscribe"
-        show(word, 1.0f)
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2.0f)) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    // Narrower than the word needs at 2x, though inside the scaled cap.
+                    Box(Modifier.width(NARROW_PARENT)) {
+                        LabelledIconButton(icon = Icons.Filled.PlayArrow, label = word, onClick = {})
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
 
         val layout = layoutOf(word)
-        assertEquals(1, layout.lineCount)
-        assertFalse(layout.isLineEllipsized(0))
+        assertEquals("the word was broken across lines", 1, layout.lineCount)
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
     }
 }
