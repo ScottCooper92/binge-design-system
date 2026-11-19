@@ -232,3 +232,101 @@ fun MediaCardEpisodeSample() {
         }
     }
 }
+
+/** A favourite, marked by a small heart top-end: drawn and announced with the card, not tappable. The type badge sits top-start. */
+@Composable
+fun MediaCardFavouriteSample() {
+    ScreenshotTheme {
+        MediaCard(
+            posterUrl = null,
+            title = "Past Lives",
+            rating = 7.8f,
+            onClick = {},
+            typeBadge = MediaTypeTagType.Movie,
+            favourite = true,
+            modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+        )
+    }
+}
+
+/** A favourite with a status, and a favourite with a status and an action: the heart, the dot and the action sit side by side, never over one another. */
+@Composable
+fun MediaCardFavouriteWithStatusSample() {
+    ScreenshotTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            MediaCard(
+                posterUrl = null,
+                title = "Arrival",
+                rating = 7.9f,
+                onClick = {},
+                favourite = true,
+                status = MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive),
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+            MediaCard(
+                posterUrl = null,
+                title = "Arrival",
+                rating = 7.9f,
+                onClick = {},
+                favourite = true,
+                status = MediaCardStatus(label = "Requested", sentiment = BingeSentiment.Info),
+                topEndAction = MediaCardAction(icon = Icons.Filled.Close, contentDescription = "Remove", onClick = {}),
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+        }
+    }
+}
+
+/** A favourite with each status, a row of five: the heart sits to the start of each sentiment's dot. */
+@Composable
+fun MediaCardFavouriteSentimentsSample() {
+    ScreenshotTheme {
+        FavouriteSentimentsRow(posterUrl = null)
+    }
+}
+
+/** The same five on a near-white poster, where the scrim disc is what holds the heart at 3:1. */
+@Composable
+fun MediaCardFavouriteLightPosterSample() {
+    ScreenshotTheme {
+        WithPreviewImage(widthPx = LIGHT_POSTER_WIDTH_PX, heightPx = LIGHT_POSTER_HEIGHT_PX, color = LIGHT_POSTER_COLOR) {
+            FavouriteSentimentsRow(posterUrl = "light-poster")
+        }
+    }
+}
+
+/** A favourite at the wider card a TV poster row draws, with a status: the marks keep their size and corner as the card grows. */
+@Composable
+fun MediaCardFavouriteWideSample() {
+    ScreenshotTheme {
+        MediaCard(
+            posterUrl = null,
+            title = "Arrival",
+            rating = 7.9f,
+            onClick = {},
+            favourite = true,
+            status = MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive),
+            modifier = Modifier.width(dimensionResource(R.dimen.detail_cinematic_poster_width)),
+        )
+    }
+}
+
+@Composable
+private fun FavouriteSentimentsRow(posterUrl: String?) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.padding_sm)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+    ) {
+        BingeSentiment.entries.forEach { sentiment ->
+            MediaCard(
+                posterUrl = posterUrl,
+                title = sentiment.name,
+                rating = null,
+                onClick = {},
+                favourite = true,
+                status = MediaCardStatus(label = sentiment.name, sentiment = sentiment),
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}

@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.progressBarRangeInfo
@@ -53,6 +54,11 @@ import com.binge.designsystem.theme.fill
 /**
  * A poster tile for a grid or carousel: the image with a title, rating and optional badges and progress.
  *
+ * [favourite] marks the title as a favourite with a small filled heart at the poster's top-end corner, as [status] marks where a request stands
+ * with a dot: drawn, not tappable, with no ripple and no focus target of its own. The card announces "Favourite" in its merged state description,
+ * ahead of the [status] label ("Arrival, Favourite, Available"). When the corner holds more than one mark they sit side by side
+ * and never overlap, in this order from the start: the favourite heart, the status dot, then the [topEndAction].
+ *
  * @need show a poster tile with a title and rating
  * @group media
  * @replaces a hand-built poster Column with a caption
@@ -70,8 +76,13 @@ fun MediaCard(
     status: MediaCardStatus? = null,
     progress: Float? = null,
     subtitle: String? = null,
+    favourite: Boolean = false,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    // The marks are drawn, so what they mean is in the card's own announcement: the favourite first, then the status.
+    val favouriteLabel = stringResource(R.string.media_card_favourite)
+    val separator = stringResource(R.string.list_separator)
+    val announcedState = listOfNotNull(favouriteLabel.takeIf { favourite }, status?.label).joinToString(separator).ifEmpty { null }
 
     Column(
         modifier = modifier
@@ -86,8 +97,8 @@ fun MediaCard(
                 role = Role.Button,
                 onClick = onClick,
             )
-            // A dot alone cannot carry the status, so its words join the card's own announcement ("Arrival, Available").
-            .semantics { if (status != null) stateDescription = status.label },
+            // A dot or a heart alone cannot carry what it marks, so its words join the card's own announcement ("Arrival, Favourite, Available").
+            .semantics { if (announcedState != null) stateDescription = announcedState },
     ) {
         Card(
             shape = BingeShapes.MediaCard,
@@ -112,6 +123,7 @@ fun MediaCard(
                     userRating = userRating,
                     typeBadge = typeBadge,
                     status = status,
+                    favourite = favourite,
                     topEndAction = topEndAction,
                     liftChips = progress != null,
                 )
@@ -235,7 +247,7 @@ fun MediaCardSkeleton(modifier: Modifier = Modifier, description: String? = null
 /**
  * The stacked poster overlays: the community [rating] bottom-start, the user's own [userRating] as an
  * accent chip bottom-end, the [typeBadge] top-start (for mixed movie/TV grids), and the contextual
- * [topEndAction] top-end. Each is optional so a plain [MediaCard] renders an image alone.
+ * [topEndAction] top-end, with the [favourite] heart and the [status] dot beside it. Each is optional so a plain [MediaCard] renders an image alone.
  */
 @Composable
 private fun MediaCardOverlays(
@@ -243,6 +255,7 @@ private fun MediaCardOverlays(
     userRating: Float?,
     typeBadge: MediaTypeTagType?,
     status: MediaCardStatus?,
+    favourite: Boolean,
     topEndAction: MediaCardAction?,
     liftChips: Boolean,
 ) {
@@ -284,8 +297,8 @@ private fun MediaCardOverlays(
                     .padding(badgeInset),
             )
         }
-        if (status != null || topEndAction != null) {
-            // The status dot and the action share the top-end corner: the dot sits to the start of the action, never under it.
+        if (status != null || favourite || topEndAction != null) {
+            // The favourite heart, the status dot and the action share the top-end corner: each sits to the start of the next, never under it.
             Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -297,6 +310,7 @@ private fun MediaCardOverlays(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (favourite) FavouriteMark()
                 if (status != null) {
                     // The chip's dot, a little larger, on a thin scrim so it holds 3:1 over a bright poster. The label is in the card's semantics.
                     StatusDot(

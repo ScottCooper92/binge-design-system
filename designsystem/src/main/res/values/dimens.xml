@@ -248,6 +248,9 @@
     <!-- The poster status dot: its fill, and the ring around it that keeps it visible on a light poster. -->
     <dimen name="media_card_status_dot_size">9dp</dimen>
     <dimen name="media_card_status_dot_halo_size">17dp</dimen>
+    <!-- The favourite mark on a poster: a heart on a thin scrim disc, a little larger than the status dot beside it. -->
+    <dimen name="media_card_favourite_size">20dp</dimen>
+    <dimen name="media_card_favourite_icon_size">12dp</dimen>
     <!-- Portrait-phone / tall-window hero height (unchanged). values-sw600dp lifts it to the
          taller cinematic value on tablets; the landscape-phone cap is computed off the window
          height in code (min(60% window, hero_height_compact_cap)) so the first rail always peeks. -->
