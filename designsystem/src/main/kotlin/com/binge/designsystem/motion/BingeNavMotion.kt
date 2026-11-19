@@ -43,7 +43,13 @@ const val NAV_TAB_PREDICTIVE_POP_SCALE = 0.96f
 const val NAV_TAB_PREDICTIVE_POP_ALPHA = 0.96f
 
 /**
- * The four screen transitions apps built on this design system share, so a push, a pop and a predictive back gesture look the same in
+ * The duration of a tab switch's cross-fade. It is Navigation 3's own default scene transition, which is what a tab switch gets in an app
+ * that draws every tab's back stack in one navigation display, so an app that draws one tab at a time matches it.
+ */
+const val NAV_TAB_SWITCH_DURATION_MS = 700
+
+/**
+ * The five screen transitions apps built on this design system share, so a push, a pop and a predictive back gesture look the same in
  * each of them. They carry no data: hand them to a `NavDisplay` as `transitionSpec`, `popTransitionSpec` and `predictivePopTransitionSpec`.
  *
  * Why they look as they do:
@@ -54,6 +60,7 @@ const val NAV_TAB_PREDICTIVE_POP_ALPHA = 0.96f
  * - **Predictive pop** is the same motion with a fade target of [NAV_PREDICTIVE_POP_ALPHA], so the preview under the finger is a subtle peek.
  * - **Tab predictive pop** is the same at a lighter [NAV_TAB_PREDICTIVE_POP_SCALE] scale and [NAV_TAB_PREDICTIVE_POP_ALPHA] alpha, for a drill-down inside a tab, which does not
  *   cover the window.
+ * - **Tab switch** cross-fades the outgoing tab into the incoming one over [NAV_TAB_SWITCH_DURATION_MS]. Nothing slides or scales, so reduce motion changes nothing.
  *
  * Under reduce motion nothing slides or scales: the forward transition is a crossfade, and each pop is a fade-out of the popped screen over the same duration. Use [rememberBingeNavMotion] from
  * composition, or the builders directly with the flag a caller already holds.
@@ -64,6 +71,7 @@ class BingeNavMotion internal constructor(
     val detailPop: ContentTransform,
     val detailPredictivePop: ContentTransform,
     val tabPredictivePop: ContentTransform,
+    val tabSwitch: ContentTransform,
 )
 
 /** The shared transitions for [LocalReduceMotion] and the current layout direction, remembered so a recomposition keeps the same instances. */
@@ -76,6 +84,7 @@ fun rememberBingeNavMotion(layoutDirection: LayoutDirection = LocalLayoutDirecti
             detailPop = bingeDetailPop(reduceMotion),
             detailPredictivePop = bingeDetailPredictivePop(reduceMotion),
             tabPredictivePop = bingeTabPredictivePop(reduceMotion),
+            tabSwitch = bingeTabSwitch(),
         )
     }
 }
@@ -105,6 +114,15 @@ fun bingeDetailPredictivePop(reduceMotion: Boolean): ContentTransform =
 /** A drill-down inside a tab being dragged away: the lighter [NAV_TAB_PREDICTIVE_POP_SCALE] scale and [NAV_TAB_PREDICTIVE_POP_ALPHA] alpha. */
 fun bingeTabPredictivePop(reduceMotion: Boolean): ContentTransform =
     pop(reduceMotion, scale = NAV_TAB_PREDICTIVE_POP_SCALE, alpha = NAV_TAB_PREDICTIVE_POP_ALPHA)
+
+/**
+ * Switching to another tab: the old tab fades out as the new one fades in, over [NAV_TAB_SWITCH_DURATION_MS]. A cross-fade moves
+ * nothing, so it is the same under reduce motion and the builder takes no flag.
+ */
+fun bingeTabSwitch(): ContentTransform {
+    val spec = tween<Float>(NAV_TAB_SWITCH_DURATION_MS)
+    return ContentTransform(fadeIn(spec), fadeOut(spec))
+}
 
 private fun pop(
     reduceMotion: Boolean,
