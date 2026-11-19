@@ -167,18 +167,9 @@ annotation class ScreenPreviews
 annotation class ScreenWidthPreviews
 
 /**
- * [ScreenPreviews] without its `tablet` cell, for a screen whose layouts have no breakpoint above the foldable's: the
- * tablet cell would only re-render the foldable's layout wider. The four cells are [ScreenPreviews]' own, spec for
- * spec, so a frame that moves between the two keeps its baselines. [TabletScreenPreview] is the cell this leaves out.
+ * [ScreenPreviews]' `tablet` cell alone, spec for spec, for a frame that adds the wide layout to a single phone cell: a
+ * screen with a split that opens at the tablet's width, where the foldable and landscape cells would repeat the phone.
  */
-@PreviewWrapper(ScreenshotThemeWrapper::class)
-@Preview(name = "phone", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
-@Preview(name = "phone-light", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_NO, locale = SOURCE_LOCALE)
-@Preview(name = "phone-land", device = PHONE_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
-@Preview(name = "foldable", device = FOLDABLE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
-annotation class ScreenPreviewsWithoutTablet
-
-/** [ScreenPreviews]' `tablet` cell alone: the one [ScreenPreviewsWithoutTablet] leaves out. */
 @PreviewWrapper(ScreenshotThemeWrapper::class)
 @Preview(name = "tablet", device = TABLET_LANDSCAPE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
 annotation class TabletScreenPreview
