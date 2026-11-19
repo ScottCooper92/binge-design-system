@@ -217,6 +217,18 @@ sample to copy and what it replaces. If a need is not here, check `catalog/` bef
 | show that one season failed to load, with its own retry | `SeasonFailedRow` | A season whose episodes failed to load: its own message and, when onRetry is set, a text button labelled retryLabel, under its header and leaving the other seasons untouched | `SeasonSectionsListFailedSample` | a hand-built message and retry button under a season header |
 | show the loading or failed state of a hero detail page | `HeroDetailStateScreen` | The frame a HeroDetailScreen page shows before it has a hero: its loading skeleton or its failure, under the same back control at rest, so back works whether or not the load does. content draws from the top of the window, as the hero would, and the status bar follows the theme, since no artwork sits under it yet | `HeroDetailStateScreenSample` | a hand-built loading or error frame with a back control |
 
+## Detail pages
+
+| Need | Component | What it is | Sample | Replaces |
+| --- | --- | --- | --- | --- |
+| build a film, series or person page: a full-bleed hero that becomes a cinematic header at the expanded width | `MediaHeroDetailPage` | A media-hero detail page, a film's, a series' or a person's, on HeroDetailScreen: the hero runs full-bleed, the bar fades in over it, and footer sits below the scroll | `MediaHeroDetailPageSample` | a hand-built HeroDetailScreen with its own hero and its expanded-width header |
+| hold a line of text's height with a shimmer plate while its content loads | `TextPlate` | A plate one line of style tall: blank text sets the height, so it is the line's at any font size, and the shimmer is inset from the top and bottom of it, so lines stacked one on the next read as separate bars | — | a hand-built plate whose height is a fixed dp instead of the font's |
+| hold a media page's hero at its loaded height while the page loads | `TitleHeroSkeleton` | The hero of a MediaHeroDetailPage while it loads: the page's own DetailHero laid out on placeholder text under one plain shimmer, so its height is the loaded hero's, which grows with the title, the genres and the tagline, and no placeholder image is drawn in it | `MediaPageSkeletonSample` | a hand-built shimmer plate for a detail hero |
+| hold a media page's overview at its loaded height while the page loads | `OverviewSkeleton` | The heading, the collapsed synopsis and the expand toggle's row of an OverviewSection while the page loads | — | a hand-built shimmer plate for a synopsis |
+| hold a media page's stat rows at their loaded height while the page loads | `StatsRowsSkeleton` | The stat rows of a TitleStatsRows while the page loads: statCount blank stats in the page's own DetailStatRow, laid out by statsPerRow, so a large font breaks them into the rows the page does and each is the height of the page's | — | a hand-built shimmer plate for a row of stats |
+| show a title's stats (rating, year, runtime, certification) under its hero, breaking into two to a row at a large font | `TitleStatsRows` | The stats of a page in DetailStatRows, each inset by the reading margin: one row of all of them, or two to a row from a font scale of 1.5, where a label of four across breaks mid-word | `TitleStatsRowsSample` | a hand-built DetailStatRow with its own large-font chunking |
+| show a title's synopsis under a heading, collapsed with a toggle | `OverviewSection` | The heading over a title's synopsis, and the synopsis in an ExpandableOverview under it, as Binge's detail pages have it | `OverviewSectionSample` | a hand-built heading over an ExpandableOverview |
+
 ## TV
 
 | Need | Component | What it is | Sample | Replaces |
