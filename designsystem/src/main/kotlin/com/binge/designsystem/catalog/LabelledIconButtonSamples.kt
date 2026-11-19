@@ -32,6 +32,21 @@ fun LabelledIconButtonSpanishRowSample() {
     LabelledIconButtonRow(trailer = "Tráiler", share = "Compartir", longLabel = "Añadir a una lista con amigos")
 }
 
+/**
+ * A row whose last label is one long word, wider than a button's cap at a large font: it stays whole on one line and ends in an
+ * ellipsis instead of being broken across two lines in the middle of the word.
+ */
+@Composable
+fun LabelledIconButtonLongWordSample() {
+    LabelledIconButtonRow(trailer = "Trailer", share = "Share", longLabel = "Subscribe")
+}
+
+/** The same in Spanish, where "Compartir" is the word that no longer fits at 2x. */
+@Composable
+fun LabelledIconButtonSpanishLongWordSample() {
+    LabelledIconButtonRow(trailer = "Tráiler", share = "Compartir", longLabel = "Suscribirse")
+}
+
 /** The row with every button disabled: the circles and labels dim, and nothing takes a tap. */
 @Composable
 fun LabelledIconButtonDisabledSample() {

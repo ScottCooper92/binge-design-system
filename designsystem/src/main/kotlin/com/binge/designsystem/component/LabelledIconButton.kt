@@ -22,14 +22,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -41,7 +45,8 @@ import com.binge.designsystem.theme.BingeShapes
  *
  * The button is a column whose width is a floor, not a size: at least a little wider than the circle, so a short label has room and the circle
  * stays on its middle, and growing with the label up to a cap, so a long label or a large font reads in full instead of being cut to "Trail…".
- * Past the cap the label wraps, centred, to two lines and ellipsizes after that, so no one button pushes a row of them off the screen. A short
+ * Past the cap the label wraps, centred, to two lines and ellipsizes after that, so no one button pushes a row of them off the screen. A
+ * single word wider than the cap does not wrap, since that would split it: it stays on one line and ellipsizes whole. A short
  * label at a normal font keeps the floor's width. The caller owns the words, and the spacing between buttons.
  *
  * The whole column is one click target: a tap on the label presses the button too. It is one accessibility item with the button role,
@@ -64,6 +69,8 @@ fun LabelledIconButton(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val announced = contentDescription ?: label
+    val labelStyle = MaterialTheme.typography.labelMedium
+    val labelFits = labelWordsFit(label, labelStyle, dimensionResource(R.dimen.labelled_icon_button_max_width))
     Column(
         modifier = modifier
             .widthIn(
@@ -101,13 +108,34 @@ fun LabelledIconButton(
         }
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
+            style = labelStyle,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
-            maxLines = 2,
+            // A single word wider than the cap would be broken in the middle of the word to wrap. It stays whole on one line and takes the
+            // ellipsis instead, so the reader's font size is respected and no word is split.
+            maxLines = if (labelFits) 2 else 1,
+            softWrap = labelFits,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xs)),
         )
+    }
+}
+
+/** Whether every word of [label] fits on a line [maxWidth] wide at [style] and the current font scale, so wrapping never has to split a word. */
+@Composable
+private fun labelWordsFit(
+    label: String,
+    style: TextStyle,
+    maxWidth: Dp,
+): Boolean {
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    return remember(label, style, density, maxWidth) {
+        val maxWidthPx = with(density) { maxWidth.roundToPx() }
+        label
+            .split(' ')
+            .filter { it.isNotEmpty() }
+            .all { word -> textMeasurer.measure(word, style).size.width <= maxWidthPx }
     }
 }
 
