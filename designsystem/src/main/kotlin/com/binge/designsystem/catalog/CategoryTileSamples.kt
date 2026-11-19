@@ -54,6 +54,21 @@ fun BackdropTileSample() {
     }
 }
 
+/**
+ * The same tile with `showTitle = false`: the picture alone, for artwork that already has its name drawn in. The name is still the
+ * accessibility label.
+ */
+@Composable
+fun BackdropTilePictureOnlySample() {
+    ScreenshotTheme {
+        WithPreviewImage(BACKDROP_WIDTH_PX, BACKDROP_HEIGHT_PX) {
+            LooseFrame {
+                BackdropTile(title = "Action", imageUrl = BACKDROP_URL, onClick = {}, showTitle = false)
+            }
+        }
+    }
+}
+
 /** A name too long for one line: it wraps to two lines and then ellipsises, over the same scrim. */
 @Composable
 fun BackdropTileLongTitleSample() {

@@ -12,6 +12,7 @@ import com.binge.designsystem.preview.WorstCaseFontPreviews
 class CategoryTileSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
+    @WorstCaseFontPreviews
     @Composable
     fun Backdrop() {
         BackdropTileSample()
@@ -23,6 +24,14 @@ class CategoryTileSamplesScreenshotTest {
     @Composable
     fun BackdropLongTitle() {
         BackdropTileLongTitleSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun BackdropPictureOnly() {
+        BackdropTilePictureOnlySample()
     }
 
     @PreviewTest

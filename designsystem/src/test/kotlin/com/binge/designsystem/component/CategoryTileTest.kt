@@ -42,6 +42,28 @@ class CategoryTileTest {
     }
 
     @Test
+    fun `a backdrop tile with its title hidden draws no text and still announces the title`() {
+        var clicks = 0
+        rule.setContent {
+            TestTheme { BackdropTile(title = "Action", imageUrl = "sample://backdrop", onClick = { clicks++ }, showTitle = false) }
+        }
+
+        rule.onAllNodesWithText("Action", useUnmergedTree = true).assertCountEquals(0)
+        rule.onNode(hasClickAction()).assertContentDescriptionEquals("Action").performClick()
+
+        assertEquals(1, clicks)
+    }
+
+    @Test
+    fun `a backdrop tile with its title hidden announces its description when given one`() {
+        rule.setContent {
+            TestTheme { BackdropTile(title = "Sci-Fi", imageUrl = null, onClick = {}, description = "Science Fiction", showTitle = false) }
+        }
+
+        rule.onNode(hasClickAction()).assertContentDescriptionEquals("Science Fiction")
+    }
+
+    @Test
     fun `a logo tile with no logo shows its name and is one click target`() {
         var clicks = 0
         rule.setContent { TestTheme { LogoTile(name = "Example Studio", logoUrl = null, onClick = { clicks++ }) } }
