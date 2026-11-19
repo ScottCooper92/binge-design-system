@@ -46,6 +46,8 @@
     <!-- Hub HeroCarousel: meta row. Runtime as hours+minutes, and a TV season count. -->
     <!-- Joins the items of a spoken or written list. A locale-shaped symbol: Arabic uses "،" and Japanese "、". -->
     <string name="list_separator">", "</string>
+    <!-- Announced with a poster card that is a favourite; the heart that marks it is never drawn with words. -->
+    <string name="media_card_favourite">Favourite</string>
     <string name="hero_meta_runtime">%1$dh %2$dm</string>
     <plurals name="hero_meta_seasons">
         <item quantity="one">%1$d season</item>

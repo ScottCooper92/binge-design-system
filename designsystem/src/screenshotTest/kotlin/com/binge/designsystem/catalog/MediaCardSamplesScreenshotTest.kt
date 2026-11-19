@@ -5,6 +5,8 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 /**
  * Screenshot coverage for the poster-card catalog samples, on the colour axis only. The samples bound their own card
@@ -101,5 +103,45 @@ class MediaCardSamplesScreenshotTest {
     @Composable
     fun Episode() {
         MediaCardEpisodeSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun Favourite() {
+        MediaCardFavouriteSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun FavouriteWithStatus() {
+        MediaCardFavouriteWithStatusSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "fav-sentiments", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "fav-sentiments-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun FavouriteSentiments() {
+        MediaCardFavouriteSentimentsSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "fav-light-poster", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "fav-light-poster-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun FavouriteLightPoster() {
+        MediaCardFavouriteLightPosterSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun FavouriteWide() {
+        MediaCardFavouriteWideSample()
     }
 }
