@@ -33,15 +33,16 @@ fun LabelledIconButtonSpanishRowSample() {
 }
 
 /**
- * A row whose last label is one long word, wider than a button's cap at a large font: it stays whole on one line and ends in an
- * ellipsis instead of being broken across two lines in the middle of the word.
+ * A row whose last label is one long word. The button's cap grows with the font, so the word reads whole at the normal size, at 1.3x and at
+ * 2x, on one line and never broken across two lines in the middle. A word wider than even the scaled cap, or than the row leaves it, stays
+ * whole and ends in an ellipsis.
  */
 @Composable
 fun LabelledIconButtonLongWordSample() {
     LabelledIconButtonRow(trailer = "Trailer", share = "Share", longLabel = "Subscribe")
 }
 
-/** The same in Spanish, where "Compartir" is the word that no longer fits at 2x. */
+/** The same in Spanish, whose long word "Suscribirse" also reads whole at 2x as the cap scales with the font. */
 @Composable
 fun LabelledIconButtonSpanishLongWordSample() {
     LabelledIconButtonRow(trailer = "Tráiler", share = "Compartir", longLabel = "Suscribirse")
