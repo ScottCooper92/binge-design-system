@@ -21,6 +21,8 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeMediumTopBar
+import com.binge.designsystem.component.ExpressiveIconButton
+import com.binge.designsystem.component.LocalTopBarActionTone
 import com.binge.designsystem.component.TransparentBingeMediumTopBarSample
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
@@ -230,7 +232,14 @@ fun BingeMediumTopBarThemeFollowingScrimSample() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchAction() {
-    BingeBarIconAction(icon = Icons.Filled.Search, contentDescription = "Search", onClick = {})
+    // Not BingeBarIconAction: this action takes the bar's tone but not its tint, which the collapsed frames depend on, and the wrapper reads both.
+    ExpressiveIconButton(
+        onClick = {},
+        icon = Icons.Filled.Search,
+        contentDescription = null,
+        tone = LocalTopBarActionTone.current,
+        size = dimensionResource(R.dimen.top_bar_icon_size),
+    )
 }
 
 private const val BEFORE_SCRIM_SWITCH_FRACTION = 0.5f
