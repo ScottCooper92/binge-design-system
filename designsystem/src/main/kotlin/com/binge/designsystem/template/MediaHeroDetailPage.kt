@@ -39,7 +39,7 @@ class MediaWideHeader(
  * @param wideHeader at the expanded width, a page that passes this swaps in [DetailCinematicHeader], with the poster, synopsis and
  *   stats beside the title; without it, or on a narrower window, the single-column hero stays.
  * @param onBack null where the pane beside this one already offers the way back.
- * @param inFlight shows a moderation under way.
+ * @param inFlight shows a change under way.
  * @param genres drawn under the title in the accent colour, with the italic [tagline] under them.
  * @param externalScores review scores from other sources, on a line of their own in either header.
  *

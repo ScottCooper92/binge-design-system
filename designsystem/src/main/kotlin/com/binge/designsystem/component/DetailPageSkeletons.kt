@@ -26,6 +26,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.modifier.skeleton
+import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.template.readingMargin
 import com.binge.designsystem.theme.BingeShapes
@@ -80,7 +81,7 @@ fun DetailHeroSkeleton(
 /**
  * The stat rows of a [DetailStatsRows] while the page loads: [count] blank stats in the page's own [DetailStatRow], laid out by
  * [statsPerRow], so a large font breaks them into the rows the page does and each is the height of the page's. The shimmer covers
- * the row. The first row carries the [LayoutAnchors.Detail.STATS] anchor through [modifier].
+ * the row. The [modifier] sits on the block, so a [LayoutAnchors.Detail.STATS] anchor on it spans the rows as the page's does.
  *
  * @need hold a media page's stat rows at their loaded height while the page loads
  * @group detail
@@ -89,9 +90,9 @@ fun DetailHeroSkeleton(
 @Composable
 fun DetailStatsRowsSkeleton(modifier: Modifier = Modifier, count: Int = STAT_COUNT) {
     val blank = List(count) { DetailStat(Icons.Filled.Star, " ", " ") }
-    Column(Modifier.readingMargin(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
-        blank.chunked(statsPerRow()).forEachIndexed { index, row ->
-            Box((if (index == 0) modifier else Modifier).fillMaxWidth().padding(resolvedContentPadding())) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
+        blank.chunked(statsPerRow()).forEach { row ->
+            Box(Modifier.readingMargin().fillMaxWidth().padding(resolvedContentPadding())) {
                 DetailStatRow(row, Modifier.skeleton(visible = true, shape = BingeShapes.Large), contentPadding = PaddingValues())
             }
         }
@@ -109,7 +110,7 @@ fun DetailStatsRowsSkeleton(modifier: Modifier = Modifier, count: Int = STAT_COU
  */
 @Composable
 fun DetailOverviewSkeleton(modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_m)).then(modifier)) {
+    Column(modifier = modifier.readingMargin().padding(horizontal = resolvedContentInset())) {
         TextPlate(MaterialTheme.typography.titleMedium, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
         Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
         repeat(OVERVIEW_LINE_COUNT) { index ->

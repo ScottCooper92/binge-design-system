@@ -22,7 +22,6 @@ import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.HeroDetailScreen
-import com.binge.designsystem.template.readingMargin
 
 /**
  * The page of [MediaHeroDetailPageSample] while it loads, on the same [HeroDetailScreen] frame: the bar with its back control is there
@@ -49,7 +48,7 @@ fun MediaPageSkeletonSample() {
                         Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)),
                         count = MediaPageStats.size,
                     )
-                    DetailOverviewSkeleton(Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+                    DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
                 }
             }
         }
