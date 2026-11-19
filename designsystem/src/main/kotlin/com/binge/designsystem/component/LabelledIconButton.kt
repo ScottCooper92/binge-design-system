@@ -6,10 +6,9 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
@@ -40,9 +39,10 @@ import com.binge.designsystem.theme.BingeShapes
  * A round tonal icon button with a short [label] under it, for a row of secondary actions beside a primary one (a detail page's
  * "Trailer" and "Share" next to "Request"). The circle is [ExpressiveIconButton]'s tonal button: the same size and container.
  *
- * The button is a column of a fixed width, a little wider than the circle, so a short label has room and the label can never push the
- * circle off its middle. The label is one line, centred and ellipsized, at any font size. The caller owns the words, and the spacing
- * between buttons.
+ * The button is a column whose width is a floor, not a size: at least a little wider than the circle, so a short label has room and the circle
+ * stays on its middle, and growing with the label up to a cap, so a long label or a large font reads in full instead of being cut to "Trail…".
+ * Past the cap the label wraps, centred, to two lines and ellipsizes after that, so no one button pushes a row of them off the screen. A short
+ * label at a normal font keeps the floor's width. The caller owns the words, and the spacing between buttons.
  *
  * The whole column is one click target: a tap on the label presses the button too. It is one accessibility item with the button role,
  * announcing [contentDescription], or the [label] when that is null, so the label is not a focus stop of its own. Pressing scales the
@@ -66,8 +66,10 @@ fun LabelledIconButton(
     val announced = contentDescription ?: label
     Column(
         modifier = modifier
-            .width(dimensionResource(R.dimen.labelled_icon_button_width))
-            .alpha(if (enabled) 1f else DISABLED_ALPHA)
+            .widthIn(
+                min = dimensionResource(R.dimen.labelled_icon_button_width),
+                max = dimensionResource(R.dimen.labelled_icon_button_max_width),
+            ).alpha(if (enabled) 1f else DISABLED_ALPHA)
             .pressScale(interactionSource)
             // The indication is drawn on the circle below, from this same source, so the ripple is the circle's and not the column's.
             .clickable(
@@ -102,11 +104,9 @@ fun LabelledIconButton(
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.padding_xs)),
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xs)),
         )
     }
 }

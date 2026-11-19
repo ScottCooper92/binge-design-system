@@ -17,15 +17,16 @@ import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
  * Public samples for [LabelledIconButton]: a round tonal icon button with a label under it, as a detail page's action row shows them.
- * Each sample is a row of three buttons, the last with a label too long for its column, which ellipsizes on one line rather than
- * growing the button. The words are the sample's own, since the caller owns them in the app.
+ * Each sample is a row of three buttons, the last with a label too long for one line, which grows the button to its cap and then wraps to
+ * two lines, centred. A short label keeps the narrow floor width; a large font widens the button rather than cutting "Trailer" to "Trail…".
+ * The words are the sample's own, since the caller owns them in the app.
  */
 @Composable
 fun LabelledIconButtonRowSample() {
     LabelledIconButtonRow(trailer = "Trailer", share = "Share", longLabel = "Add to a list with friends")
 }
 
-/** The same row in Spanish, whose words run longer than English: the labels ellipsize rather than push the circles. */
+/** The same row in Spanish, whose words run longer than English: the buttons widen to read them in full, then wrap. */
 @Composable
 fun LabelledIconButtonSpanishRowSample() {
     LabelledIconButtonRow(trailer = "Tráiler", share = "Compartir", longLabel = "Añadir a una lista con amigos")

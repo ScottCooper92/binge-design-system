@@ -30,6 +30,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
@@ -40,6 +41,8 @@ import com.binge.designsystem.formatRuntime
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
+import com.binge.designsystem.theme.accent
+import com.binge.designsystem.theme.fill
 
 private const val HERO_PILL_ALPHA = 0.16f
 private const val HERO_PILL_LIGHT_THEME_ALPHA = 0.88f
@@ -219,28 +222,25 @@ private fun HeroMetaRow(item: HeroItem) {
             add(HeroMetaPart(item.genres.take(MAX_META_GENRES).joinToString(" · "), isGenre = true))
         }
     }
-    if (item.rating == null && parts.isEmpty()) return
-    Row(
-        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.hero_meta_gap)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        item.rating?.let { HeroRating(it) }
-        parts.forEachIndexed { i, part ->
-            if (i > 0 || item.rating != null) HeroMetaDot()
-            Text(
-                text = part.text,
-                style = MaterialTheme.typography.labelLarge,
-                color = if (part.isGenre) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
-                },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+    if (item.rating == null && parts.isEmpty() && item.externalScores.isEmpty() && item.status == null) return
+    val ink = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
+    val entries = buildList<@Composable () -> Unit> {
+        item.rating?.let { add { HeroRating(it) } }
+        parts.forEach { part ->
+            add {
+                Text(
+                    text = part.text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
+        item.externalScores.forEach { score -> add { ExternalScoreItem(score, color = ink) } }
+        item.status?.let { status -> add { HeroStatus(status) } }
     }
+    MetaFlow(entries = entries, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s)))
 }
 
 @Composable
@@ -273,8 +273,26 @@ private fun HeroRating(rating: Float) {
     }
 }
 
+/** The title's status as the last meta item: the sentiment's dot, then its label, read as the label alone. */
 @Composable
-private fun HeroMetaDot() {
+private fun HeroStatus(status: MediaCardStatus) {
+    Row(
+        modifier = Modifier.clearAndSetSemantics { contentDescription = status.label },
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.external_score_gap)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        StatusDot(status.sentiment.fill())
+        Text(
+            text = status.label,
+            style = MaterialTheme.typography.labelLarge,
+            color = status.sentiment.accent(),
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+internal fun HeroMetaDot() {
     Box(
         modifier = Modifier
             .size(dimensionResource(R.dimen.hero_meta_dot_size))
