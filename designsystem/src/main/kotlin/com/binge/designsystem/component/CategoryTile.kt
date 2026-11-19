@@ -47,6 +47,11 @@ import com.binge.designsystem.theme.BingeTheme
  * The tile is one click target and one accessibility item announcing [description], or [title] when
  * [description] is null. Pass [description] only when the spoken label should differ from the title.
  *
+ * With [showTitle] false the tile draws the picture alone: no title text and no scrim, since the scrim exists only to carry the
+ * text. The title stays as the accessibility label, so a screen reader announces the same thing. Use it for artwork that already has
+ * its name drawn in, such as a media server's default library image, which would otherwise show the name twice. With no image URL
+ * the tile is then a bare surface.
+ *
  * @need show a category as a wide image tile with a title
  * @group cards
  * @replaces a hand-built Box with an image and a gradient scrim
@@ -58,6 +63,7 @@ fun BackdropTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     description: String? = null,
+    showTitle: Boolean = true,
 ) {
     CategoryTileFrame(label = description ?: title, onClick = onClick, modifier = modifier) {
         if (imageUrl == null) {
@@ -72,7 +78,7 @@ fun BackdropTile(
                 error = { ImagePlaceholder(Modifier.fillMaxSize()) },
             )
         }
-        if (imageUrl != null) {
+        if (imageUrl != null && showTitle) {
             val scrim = BingeTheme.colors.scrim
             Box(
                 Modifier
@@ -86,16 +92,18 @@ fun BackdropTile(
                     ),
             )
         }
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-            color = if (imageUrl == null) MaterialTheme.colorScheme.onSurface else BingeTheme.colors.onScrim,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(dimensionResource(R.dimen.padding_sm)),
-        )
+        if (showTitle) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                color = if (imageUrl == null) MaterialTheme.colorScheme.onSurface else BingeTheme.colors.onScrim,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(dimensionResource(R.dimen.padding_sm)),
+            )
+        }
     }
 }
 
