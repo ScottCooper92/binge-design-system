@@ -67,7 +67,7 @@ class MetaFlowDotTest {
         )
 
         val text = rule.onNodeWithText("Acción", substring = true).getBoundsInRoot()
-        val dot = rule.onNodeWithTag(META_DOT_TAG).getBoundsInRoot()
+        val dot = rule.onNodeWithTag(META_DOT_TAG, useUnmergedTree = true).getBoundsInRoot()
         assertTrue("the text wraps over several lines", text.height > 40.dp)
         assertTrue("the dot sits in the text's last line, not beside its middle", dot.top >= text.bottom - text.height / 2)
         assertTrue("the dot is inside the text's own width", dot.right <= text.right + 1.dp)

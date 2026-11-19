@@ -23,6 +23,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
@@ -195,6 +197,8 @@ private fun WrappingMetaText(entry: MetaEntry.WrappingText, withDot: Boolean) {
     Text(
         text = text,
         inlineContent = inline,
+        // The inline dot's alternate text must not reach a screen reader: it reads the words alone.
+        modifier = if (withDot) Modifier.clearAndSetSemantics { this.text = AnnotatedString(entry.text) } else Modifier,
         style = MaterialTheme.typography.labelLarge,
         color = entry.color,
     )
