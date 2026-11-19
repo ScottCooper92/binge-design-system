@@ -57,3 +57,21 @@ fun DetailInfoGridSample() {
 fun DetailInfoGridSpanishSample() {
     ScreenshotTheme { DetailInfoGrid(entries = SpanishFacts) }
 }
+
+/**
+ * A fact whose value is one long word, beside a short one. The line with the long word stacks its facts at the full
+ * width, so the word is not broken mid-word, and the line below keeps its two columns.
+ */
+@Composable
+fun DetailInfoGridLongWordSample() {
+    ScreenshotTheme {
+        DetailInfoGrid(
+            entries = listOf(
+                DetailInfoEntry(Icons.Filled.Business, "Studio", "Supercalifragilisticexpialidocious"),
+                DetailInfoEntry(Icons.Filled.CalendarMonth, "Released", "18 July 2008"),
+                DetailInfoEntry(Icons.Filled.Info, "Status", "Released"),
+                DetailInfoEntry(Icons.Filled.AttachMoney, "Budget", "$185,000,000"),
+            ),
+        )
+    }
+}
