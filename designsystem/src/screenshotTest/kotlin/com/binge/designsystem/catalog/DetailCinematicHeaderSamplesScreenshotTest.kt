@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.android.tools.screenshot.PreviewTest
 
 private const val CINEMATIC_PREVIEW_WIDTH_DP = 900
+private const val FOLDABLE_PREVIEW_WIDTH_DP = 840
 
 /**
  * Screenshot coverage for the cinematic-header catalog sample — renders the shared
@@ -60,5 +61,14 @@ class DetailCinematicHeaderSamplesScreenshotTest {
     @Composable
     fun HeaderSynopsisOverflow() {
         DetailCinematicHeaderSynopsisOverflowSample()
+    }
+
+    /** The most copy the header carries, at a foldable width and a large font: the header grows, nothing is cropped. */
+    @PreviewTest
+    @Preview(name = "fold-font13", widthDp = FOLDABLE_PREVIEW_WIDTH_DP, fontScale = 1.3f, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "fold-font20", widthDp = FOLDABLE_PREVIEW_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun HeaderLongCopy() {
+        DetailCinematicHeaderLongCopySample()
     }
 }

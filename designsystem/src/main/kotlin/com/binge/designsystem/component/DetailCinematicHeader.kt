@@ -3,15 +3,14 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalContentColor
@@ -117,7 +116,9 @@ fun DetailCinematicHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(dimensionResource(R.dimen.detail_cinematic_header_height))
+            // At least this tall, and taller where the copy needs it, so a large font grows the header instead of
+            // cropping the facts row at its foot. The layers below match whatever height that gives.
+            .heightIn(min = dimensionResource(R.dimen.detail_cinematic_header_height))
             .onGloballyPositioned { headerOrigin = it.positionInRoot() },
     ) {
         // No backdrop at all leaves the wash alone: a placeholder icon would read as an image that failed to load.
@@ -126,7 +127,7 @@ fun DetailCinematicHeader(
                 model = backdropUrl,
                 contentDescription = title,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.matchParentSize(),
                 // The copy column below stretches up to the poster's height, reaching well past the
                 // backdrop's vertical centre - ImagePlaceholder's default centred icon would land on
                 // top of the synopsis. Top-aligned keeps it in the band above the copy row, which the
@@ -138,8 +139,9 @@ fun DetailCinematicHeader(
         HeroBackdropMeshWash(
             accentStart = MaterialTheme.colorScheme.primaryFixedDim,
             accentEnd = BingeTheme.colors.accentPurple,
+            modifier = Modifier.matchParentSize(),
         )
-        CopyHuggingScrim(copyBounds) { headerOrigin }
+        CopyHuggingScrim(copyBounds, Modifier.matchParentSize()) { headerOrigin }
 
         CinematicCopyRow(
             title = title,
@@ -177,11 +179,10 @@ private fun CinematicCopyRow(
             .padding(
                 start = dimensionResource(R.dimen.detail_cinematic_header_padding),
                 end = dimensionResource(R.dimen.detail_cinematic_header_padding),
-            )
-            // No bottom padding here — every caller already follows this header with its own
-            // spacer, and stacking one here doubled that gap. IntrinsicSize.Max below lets the
-            // copy column's fillMaxHeight() latch onto the poster's own (aspectRatio-computed) height.
-            .height(IntrinsicSize.Max),
+            ),
+        // No bottom padding here — every caller already follows this header with its own spacer, and stacking
+        // one here doubled that gap. The row is as tall as its taller child as laid out, not as an intrinsic
+        // pass guesses: that pass counts a label one line short at a large font.
         horizontalArrangement =
             Arrangement.spacedBy(dimensionResource(R.dimen.detail_cinematic_poster_copy_spacing)),
         verticalAlignment = Alignment.Top,
@@ -197,10 +198,13 @@ private fun CinematicCopyRow(
             loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
             error = { ImagePlaceholder(Modifier.fillMaxSize()) },
         )
-        Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
-            // Pushes the copy down to sit just above the facts row, so the fade behind it stays low
-            // and the art above it stays raw.
-            Spacer(Modifier.weight(1f))
+        // At least the poster's height, with the copy at the foot of it, so the fade behind the copy stays low and the
+        // art above it stays raw. The copy can run taller than the poster, and the column grows with it.
+        val posterHeight = dimensionResource(R.dimen.detail_cinematic_poster_width) / CARD_ASPECT_RATIO
+        Column(
+            modifier = Modifier.weight(1f).heightIn(min = posterHeight),
+            verticalArrangement = Arrangement.Bottom,
+        ) {
             Spacer(Modifier.onGloballyPositioned { copyBounds.copyTop = it.positionInRoot().y })
             val titleStyle = DetailHeroDefaults.cinematicTitleStyle()
             val lineGap = dimensionResource(R.dimen.padding_xs)
@@ -327,13 +331,17 @@ private fun reportsLineEnd(bounds: CinematicCopyBounds, line: CopyLine): Modifie
  * position is read in the draw phase and does not recompose the header.
  */
 @Composable
-private fun CopyHuggingScrim(bounds: CinematicCopyBounds, headerOrigin: () -> Offset) {
+private fun CopyHuggingScrim(
+    bounds: CinematicCopyBounds,
+    modifier: Modifier = Modifier,
+    headerOrigin: () -> Offset,
+) {
     val page = MaterialTheme.colorScheme.background
     val density = LocalDensity.current
     val bandPx = with(density) { dimensionResource(R.dimen.hero_copy_fade_band).toPx() }
     val falloffPx = with(density) { dimensionResource(R.dimen.hero_copy_fade_falloff).toPx() }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             // The horizontal mask applies to the copy fade only, so it needs its own layer to mask into.
             .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
