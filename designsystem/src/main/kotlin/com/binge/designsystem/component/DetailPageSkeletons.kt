@@ -50,7 +50,7 @@ private const val OVERVIEW_LAST_LINE_FRACTION = 0.6f
  * @sample MediaPageSkeletonSample
  */
 @Composable
-fun TitleHeroSkeleton(
+fun DetailHeroSkeleton(
     cinematic: Boolean,
     modifier: Modifier = Modifier,
     title: String = PLACEHOLDER_TITLE,
@@ -78,7 +78,7 @@ fun TitleHeroSkeleton(
 }
 
 /**
- * The stat rows of a [TitleStatsRows] while the page loads: [statCount] blank stats in the page's own [DetailStatRow], laid out by
+ * The stat rows of a [DetailStatsRows] while the page loads: [count] blank stats in the page's own [DetailStatRow], laid out by
  * [statsPerRow], so a large font breaks them into the rows the page does and each is the height of the page's. The shimmer covers
  * the row. The first row carries the [LayoutAnchors.Detail.STATS] anchor through [modifier].
  *
@@ -87,8 +87,8 @@ fun TitleHeroSkeleton(
  * @replaces a hand-built shimmer plate for a row of stats
  */
 @Composable
-fun StatsRowsSkeleton(modifier: Modifier = Modifier, statCount: Int = STAT_COUNT) {
-    val blank = List(statCount) { DetailStat(Icons.Filled.Star, " ", " ") }
+fun DetailStatsRowsSkeleton(modifier: Modifier = Modifier, count: Int = STAT_COUNT) {
+    val blank = List(count) { DetailStat(Icons.Filled.Star, " ", " ") }
     Column(Modifier.readingMargin(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
         blank.chunked(statsPerRow()).forEachIndexed { index, row ->
             Box((if (index == 0) modifier else Modifier).fillMaxWidth().padding(resolvedContentPadding())) {
@@ -99,7 +99,7 @@ fun StatsRowsSkeleton(modifier: Modifier = Modifier, statCount: Int = STAT_COUNT
 }
 
 /**
- * The heading, the collapsed synopsis and the expand toggle's row of an [OverviewSection] while the page loads. Each line is a blank
+ * The heading, the collapsed synopsis and the expand toggle's row of an [DetailOverviewSection] while the page loads. Each line is a blank
  * [Text] in the page's own style under a plate, so its height follows the font as the page's does, and the toggle is the touch
  * target the page's button is.
  *
@@ -108,7 +108,7 @@ fun StatsRowsSkeleton(modifier: Modifier = Modifier, statCount: Int = STAT_COUNT
  * @replaces a hand-built shimmer plate for a synopsis
  */
 @Composable
-fun OverviewSkeleton(modifier: Modifier = Modifier) {
+fun DetailOverviewSkeleton(modifier: Modifier = Modifier) {
     Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_m)).then(modifier)) {
         TextPlate(MaterialTheme.typography.titleMedium, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
         Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))

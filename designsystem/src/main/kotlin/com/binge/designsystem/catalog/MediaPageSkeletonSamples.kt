@@ -14,9 +14,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
-import com.binge.designsystem.component.OverviewSkeleton
-import com.binge.designsystem.component.StatsRowsSkeleton
-import com.binge.designsystem.component.TitleHeroSkeleton
+import com.binge.designsystem.component.DetailHeroSkeleton
+import com.binge.designsystem.component.DetailOverviewSkeleton
+import com.binge.designsystem.component.DetailStatsRowsSkeleton
 import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
@@ -40,16 +40,16 @@ fun MediaPageSkeletonSample() {
             horizontalInset = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_padding else R.dimen.padding_m),
             contentMaxWidth = Dp.Infinity,
             darkStatusBar = false,
-            hero = { TitleHeroSkeleton(cinematic) },
+            hero = { DetailHeroSkeleton(cinematic) },
         ) {
             Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
             Column(Modifier.clearAndSetSemantics {}, verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
                 if (!cinematic) {
-                    StatsRowsSkeleton(
+                    DetailStatsRowsSkeleton(
                         Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)),
-                        statCount = MediaPageStats.size,
+                        count = MediaPageStats.size,
                     )
-                    OverviewSkeleton(Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+                    DetailOverviewSkeleton(Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
                 }
             }
         }

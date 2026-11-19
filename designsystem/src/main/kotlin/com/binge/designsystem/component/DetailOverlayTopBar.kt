@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -183,7 +184,14 @@ fun BoxScope.DetailOverlayTopBar(
                     .weight(1f)
                     .then(if (progress <= 0f) Modifier.semantics { hideFromAccessibility() } else Modifier),
             )
-            actions(glassBackgroundAlpha)
+            // The actions read the bar's tone and tint, as they do on the other bars, so a BingeBarIconAction here is the same
+            // glass circle as Back, its glyph handing from white to the theme's colour with the fade.
+            CompositionLocalProvider(
+                LocalTopBarActionTone provides IconButtonTone.Glass,
+                LocalTopBarActionTint provides iconTint,
+            ) {
+                actions(glassBackgroundAlpha)
+            }
         }
     }
 }

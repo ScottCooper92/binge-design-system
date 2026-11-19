@@ -10,7 +10,7 @@ import com.binge.designsystem.template.readingMargin
 private const val LARGE_FONT_SCALE = 1.5f
 
 /**
- * How many stats a page puts on a row: all of them, or two at a large font. [StatsRowsSkeleton] and the page lay their cells out by the
+ * How many stats a page puts on a row: all of them, or two at a large font. [DetailStatsRowsSkeleton] and the page lay their cells out by the
  * same rule, so a skeleton breaks into the rows the page does.
  *
  * @need decide how many stats go on one row at the current font scale
@@ -28,10 +28,10 @@ fun statsPerRow(): Int = if (LocalDensity.current.fontScale >= LARGE_FONT_SCALE)
  * @need show a title's stats (rating, year, runtime, certification) under its hero, breaking into two to a row at a large font
  * @group detail
  * @replaces a hand-built DetailStatRow with its own large-font chunking
- * @sample TitleStatsRowsSample
+ * @sample DetailStatsRowsSample
  */
 @Composable
-fun TitleStatsRows(stats: List<DetailStat>, modifier: Modifier = Modifier) {
+fun DetailStatsRows(stats: List<DetailStat>, modifier: Modifier = Modifier) {
     val perRow = statsPerRow()
     val margin = modifier.readingMargin()
     stats.chunked(perRow).forEachIndexed { index, row ->

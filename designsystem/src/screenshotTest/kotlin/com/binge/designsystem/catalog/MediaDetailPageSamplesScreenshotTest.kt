@@ -55,11 +55,17 @@ class MediaDetailPageSamplesScreenshotTest {
     @ComponentPreviews
     @WorstCaseFontPreviews
     @Composable
-    fun stats() = TitleStatsRowsSample()
+    fun stats() = DetailStatsRowsSample()
 
     @PreviewTest
     @ComponentPreviews
     @WorstCaseFontPreviews
     @Composable
-    fun overview() = OverviewSectionSample()
+    fun overview() = DetailOverviewSectionSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun info() = DetailInfoSectionSample()
 }

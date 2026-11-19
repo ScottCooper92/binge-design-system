@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeBarIconAction
-import com.binge.designsystem.component.OverviewSection
-import com.binge.designsystem.component.TitleStatsRows
+import com.binge.designsystem.component.DetailOverviewSection
+import com.binge.designsystem.component.DetailStatsRows
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.MediaHeroDetailPage
 import com.binge.designsystem.template.MediaWideHeader
@@ -43,8 +43,8 @@ fun MediaHeroDetailPageSample() {
             Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
             // The sections sit in a column that spaces them, so the stat rows, which are one row each, are spaced too.
             Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
-                TitleStatsRows(MediaPageStats)
-                OverviewSection(heading = "Overview", overview = MEDIA_PAGE_OVERVIEW)
+                DetailStatsRows(MediaPageStats)
+                DetailOverviewSection(heading = "Overview", text = MEDIA_PAGE_OVERVIEW)
             }
         }
     }

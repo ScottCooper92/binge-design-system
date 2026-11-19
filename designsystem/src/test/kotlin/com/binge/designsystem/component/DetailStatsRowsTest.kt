@@ -27,12 +27,12 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * [TitleStatsRows] puts all of a page's stats on one row, and two to a row from a font scale of 1.5; [readingMargin] and
+ * [DetailStatsRows] puts all of a page's stats on one row, and two to a row from a font scale of 1.5; [readingMargin] and
  * [readingInset] start a section at the margin [LocalHeroReadingMargin] gives it.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w411dp-h891dp-xhdpi")
-class TitleStatsRowsTest {
+class DetailStatsRowsTest {
     @get:Rule
     val rule = createTakeDownComposeRule()
 
@@ -42,7 +42,7 @@ class TitleStatsRowsTest {
         rule.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
-                BingeExpressiveTheme(dynamicColor = false) { Column { TitleStatsRows(stats) } }
+                BingeExpressiveTheme(dynamicColor = false) { Column { DetailStatsRows(stats) } }
             }
         }
         rule.waitForIdle()
