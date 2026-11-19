@@ -29,7 +29,8 @@ import com.binge.designsystem.uppercaseLocalised
  * [tint] paints a same-hue wash behind a saturated label + icon (pass a `BingeSentiment.accent()`
  * for [tint], and its `fill()` for [fill]); a null [tint] is neutral — a `surfaceContainerHigh`
  * wash with `onSurfaceVariant` text. [uppercase] (default) matches the design's type tags (MOVIE,
- * VIDEO…); pass `false` for cased labels such as roles (Owner / Admin).
+ * VIDEO…); pass `false` for cased labels such as roles (Owner / Admin). [compact] is the smaller form for a
+ * row of many tags under a title (see [TagRow]): tighter padding and the regular small label, not the bold one.
  *
  * @need label an item with a short classification
  * @group cards
@@ -43,6 +44,7 @@ fun BingeTag(
     tint: Color? = null,
     fill: Color? = null,
     uppercase: Boolean = true,
+    compact: Boolean = false,
 ) {
     val content = tint ?: MaterialTheme.colorScheme.onSurfaceVariant
     // The icon is graphical (3:1), so it can run brighter than the label: callers pass a saturated
@@ -59,8 +61,8 @@ fun BingeTag(
             .clip(BingeShapes.Tag)
             .background(container)
             .padding(
-                horizontal = dimensionResource(R.dimen.padding_s),
-                vertical = dimensionResource(R.dimen.tag_padding_v),
+                horizontal = dimensionResource(if (compact) R.dimen.tag_compact_padding_h else R.dimen.padding_s),
+                vertical = dimensionResource(if (compact) R.dimen.tag_compact_padding_v else R.dimen.tag_padding_v),
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
@@ -75,7 +77,7 @@ fun BingeTag(
         }
         Text(
             text = if (uppercase) label.uppercaseLocalised() else label,
-            style = MaterialTheme.typography.labelSmallEmphasis,
+            style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelSmallEmphasis,
             color = content,
         )
     }
