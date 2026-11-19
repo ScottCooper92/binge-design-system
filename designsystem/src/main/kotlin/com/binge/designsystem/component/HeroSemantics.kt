@@ -35,5 +35,7 @@ internal fun heroContentDescription(item: HeroItem): String {
         item.year,
         heroRuntimeOrSeasons(item),
         genres,
+        *item.externalScores.map { it.contentDescription }.toTypedArray(),
+        item.status?.label,
     ).joinToString(separator)
 }

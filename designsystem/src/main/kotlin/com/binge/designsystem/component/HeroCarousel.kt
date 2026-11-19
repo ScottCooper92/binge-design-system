@@ -66,6 +66,8 @@ private const val HERO_COMPACT_HEIGHT_FRACTION = 0.6f
  * optional: the cinematic meta row renders whatever the caller supplies — today the hub mappers pass
  * only rating + genres, so the richer fields are a future data-layer follow-up. [rank] is the title's place
  * in a trending list, drawn and announced as "#N trending today"; leave it null for a list that is not one.
+ * [externalScores] follow the genres on the meta row, each an icon and its value. [status], when set, comes last: its
+ * sentiment-coloured dot and translated label.
  */
 data class HeroItem(
     val id: Int,
@@ -78,6 +80,8 @@ data class HeroItem(
     val seasons: Int? = null,
     val tagline: String? = null,
     val rank: Int? = null,
+    val externalScores: List<ExternalScore> = emptyList(),
+    val status: MediaCardStatus? = null,
 )
 
 /**

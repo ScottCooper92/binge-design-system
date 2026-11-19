@@ -77,7 +77,7 @@ fun StatusChip(
 }
 
 @Composable
-private fun StatusDot(fill: Color) {
+internal fun StatusDot(fill: Color) {
     Box(
         modifier =
             Modifier
