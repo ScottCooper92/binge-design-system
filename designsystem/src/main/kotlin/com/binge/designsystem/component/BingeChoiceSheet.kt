@@ -592,6 +592,44 @@ fun <T> SingleChoiceList(
     initialQuery: String = "",
     onSelect: (T) -> Unit,
 ) {
+    // Held out here so a retry, which goes through loading, keeps what was typed.
+    var query by rememberSaveable { mutableStateOf(initialQuery) }
+    // As the multi-choice list: open the sheet fully while the keyboard is up so the field is not under it.
+    val dock = LocalBingeSheetDock.current
+    val needsRoom = filterPlaceholder != null && imeVisible && dock?.canExpand == true
+    LaunchedEffect(needsRoom) { if (needsRoom) dock.expand() }
+    // Loading, failed and ready are three kinds of content; filtering or choosing within a ready list is not a change of kind.
+    BingeSheetStateSwitch(choices, modifier = modifier, contentKey = { it::class }) { state ->
+        SingleChoiceListContent(
+            choices = state,
+            selected = selected,
+            suggested = suggested,
+            pinned = pinned,
+            underNavigationBar = underNavigationBar,
+            filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
+            query = query,
+            onQueryChange = { query = it },
+            onSelect = onSelect,
+        )
+    }
+}
+
+/** What [SingleChoiceList] draws for one state of [choices]; the switch around it animates a change of state. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun <T> SingleChoiceListContent(
+    choices: BingeChoiceList<T>,
+    selected: T?,
+    suggested: List<T>,
+    pinned: List<T>,
+    underNavigationBar: Boolean,
+    filterPlaceholder: String?,
+    noMatchLabel: String?,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSelect: (T) -> Unit,
+) {
     val markSlot = choices is BingeChoiceList.Ready && choices.choices.any { it.isMarked() }
     if (filterPlaceholder == null) {
         if (choices is BingeChoiceList.Ready && isLongList(choices.choices.size)) {
@@ -602,26 +640,21 @@ fun <T> SingleChoiceList(
                 suggested = suggested,
                 pinned = pinned,
                 underNavigationBar = underNavigationBar,
-                modifier = modifier.selectableGroup(),
+                modifier = Modifier.selectableGroup(),
             ) { choice, clearOfRail -> RadioChoiceRow(choice, choice.value == selected, markSlot, clearOfRail) { onSelect(choice.value) } }
             return
         }
-        ChoiceListBody(choices, modifier.selectableGroup(), underNavigationBar) { ready ->
+        ChoiceListBody(choices, Modifier.selectableGroup(), underNavigationBar) { ready ->
             for (choice in ready.pinnedFirst(pinned)) RadioChoiceRow(choice, choice.value == selected, markSlot) { onSelect(choice.value) }
         }
         return
     }
-    var query by rememberSaveable { mutableStateOf(initialQuery) }
-    // As the multi-choice list: open the sheet fully while the keyboard is up so the field is not under it.
-    val dock = LocalBingeSheetDock.current
-    val needsRoom = imeVisible && dock?.canExpand == true
-    LaunchedEffect(needsRoom) { if (needsRoom) dock.expand() }
-    Column(modifier) {
+    Column {
         if (choices is BingeChoiceList.Ready) {
             BingeSearchField(
                 query = query,
-                onQueryChange = { query = it },
-                onClear = { query = "" },
+                onQueryChange = onQueryChange,
+                onClear = { onQueryChange("") },
                 placeholder = filterPlaceholder,
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                 modifier =
@@ -677,6 +710,7 @@ internal fun <T> MultiChoiceList(
     suggested: List<T> = emptyList(),
     pinned: List<T> = emptyList(),
 ) {
+    // Held out here so a retry, which goes through loading, keeps what was typed.
     var query by rememberSaveable { mutableStateOf(initialQuery) }
     // The sheet's keyboard inset pads the bottom of its content, which is off screen while it rests part-way, so the
     // keyboard would rise over the filter. Open the sheet fully while the keyboard is up, as a picker does: the filter
@@ -685,12 +719,46 @@ internal fun <T> MultiChoiceList(
     val dock = LocalBingeSheetDock.current
     val needsRoom = filterPlaceholder != null && imeVisible && dock?.canExpand == true
     LaunchedEffect(needsRoom) { if (needsRoom) dock.expand() }
-    Column(modifier) {
+    // Loading, failed and ready are three kinds of content; filtering or ticking within a ready list is not a change of kind.
+    BingeSheetStateSwitch(choices, modifier = modifier, contentKey = { it::class }) { state ->
+        MultiChoiceListContent(
+            choices = state,
+            chosen = chosen,
+            leading = leading,
+            filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
+            onCheckedChange = onCheckedChange,
+            query = query,
+            onQueryChange = { query = it },
+            underNavigationBar = underNavigationBar,
+            suggested = suggested,
+            pinned = pinned,
+        )
+    }
+}
+
+/** What [MultiChoiceList] draws for one state of [choices]; the switch around it animates a change of state. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun <T> MultiChoiceListContent(
+    choices: BingeChoiceList<T>,
+    chosen: Set<T>,
+    leading: Set<T>,
+    filterPlaceholder: String?,
+    noMatchLabel: String?,
+    onCheckedChange: (T, Boolean) -> Unit,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    underNavigationBar: Boolean,
+    suggested: List<T>,
+    pinned: List<T>,
+) {
+    Column {
         if (filterPlaceholder != null && choices is BingeChoiceList.Ready) {
             BingeSearchField(
                 query = query,
-                onQueryChange = { query = it },
-                onClear = { query = "" },
+                onQueryChange = onQueryChange,
+                onClear = { onQueryChange("") },
                 placeholder = filterPlaceholder,
                 // The field's own default is the sheet's colour, which would leave it invisible here.
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,

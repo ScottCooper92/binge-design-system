@@ -164,14 +164,9 @@ fun BingeBottomSheetHeightDemo() {
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
                 ) {
                     repeat(rows) { Text("Row ${it + 1}", style = MaterialTheme.typography.bodyLarge) }
-                    BingeFilledButton(label = "Add a row", onClick = {
-                        if (rows <
-                            HEIGHT_DEMO_ROWS
-                        ) {
-                            rows++
-                        }
-                    }, enabled = rows < HEIGHT_DEMO_ROWS)
-                    BingeTextButton(label = "Remove a row", onClick = { if (rows > 1) rows-- }, enabled = rows > 1)
+                    // Each button is disabled at its limit, so a press never goes past it.
+                    BingeFilledButton(label = "Add a row", onClick = { rows++ }, enabled = rows < HEIGHT_DEMO_ROWS)
+                    BingeTextButton(label = "Remove a row", onClick = { rows-- }, enabled = rows > 1)
                 }
             }
         }
