@@ -3,11 +3,17 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.FilterControlHandlers
@@ -15,6 +21,7 @@ import com.binge.designsystem.template.FilterControlUi
 import com.binge.designsystem.template.FilterDateBoundsUi
 import com.binge.designsystem.template.FilterOptionUi
 import com.binge.designsystem.template.FilterSectionContent
+import com.binge.designsystem.template.FilterSectionSheet
 import com.binge.designsystem.template.FilterSectionUi
 import java.time.LocalDate
 import java.util.Locale
@@ -159,6 +166,50 @@ fun FilterSectionAccessorySample() {
                 doneLabel = "Apply",
                 onClear = { included = emptySet() },
                 onDone = {},
+                handlers =
+                    FilterControlHandlers(
+                        onOptionClick = { _, id -> included = if (id in included) included - id else included + id },
+                    ),
+                footerAccessory = {
+                    BingeFilterChip(label = "Match all", selected = matchAll, onClick = { matchAll = !matchAll })
+                },
+            )
+        }
+    }
+}
+
+/**
+ * A filter's own sheet opened for real, over a button: it stacks over the page as a bottom sheet, its Clear and Apply work, and the
+ * genre chips and the match-all chip beside Apply change as they are tapped. Apply and a swipe down both close it.
+ */
+@Composable
+fun FilterSectionSheetDemo() {
+    var open by remember { mutableStateOf(false) }
+    var matchAll by remember { mutableStateOf(false) }
+    var included by remember { mutableStateOf(setOf("Action")) }
+    val genres = listOf("Action", "Comedy", "Drama", "Horror", "Romance")
+    ScreenshotTheme {
+        Column(Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.padding_m))) {
+            BingeFilledButton(label = "Open the genres filter", onClick = { open = true })
+        }
+        if (open) {
+            FilterSectionSheet(
+                section =
+                    FilterSectionUi(
+                        id = GENRES_ID,
+                        title = "Genres",
+                        control =
+                            FilterControlUi.MultiChoice(
+                                options = genres.map { FilterOptionUi(it, it) },
+                                includedIds = included,
+                                excludedIds = emptySet(),
+                            ),
+                    ),
+                clearLabel = "Clear",
+                clearEnabled = included.isNotEmpty(),
+                doneLabel = if (included.isEmpty()) "Close" else "Apply",
+                onClear = { included = emptySet() },
+                onDismiss = { open = false },
                 handlers =
                     FilterControlHandlers(
                         onOptionClick = { _, id -> included = if (id in included) included - id else included + id },

@@ -216,7 +216,7 @@ private fun FilterSheetHeader(
 
 /** A titled group in the body; a null [title] leaves the heading out. */
 @Composable
-internal fun FilterSheetSection(title: String?, content: @Composable () -> Unit) {
+private fun FilterSheetSection(title: String?, content: @Composable () -> Unit) {
     Column(
         modifier =
             Modifier
