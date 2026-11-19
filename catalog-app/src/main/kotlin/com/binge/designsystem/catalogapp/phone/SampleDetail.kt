@@ -71,6 +71,7 @@ fun SampleDetail(
     onRtlChange: (Boolean) -> Unit,
     onLocaleChange: (SampleLocale) -> Unit,
     onBack: (() -> Unit)?,
+    onMotionChange: (Boolean) -> Unit = {},
 ) {
     var showTweaks by rememberSaveable { mutableStateOf(false) }
     val tweaked = overrides != SampleOverrides(dark = isSystemInDarkTheme(), fontScale = LocalDensity.current.fontScale, rtl = false)
@@ -108,6 +109,7 @@ fun SampleDetail(
             onFontScaleChange = onFontScaleChange,
             onRtlChange = onRtlChange,
             onLocaleChange = onLocaleChange,
+            onMotionChange = onMotionChange,
             onDismissRequest = { showTweaks = false },
             variants = if (onePerScreen && variants.size > 1) variants else emptyList(),
             selected = entry,

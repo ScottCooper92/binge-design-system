@@ -42,12 +42,23 @@ fun TweaksSheet(
     onRtlChange: (Boolean) -> Unit,
     onLocaleChange: (SampleLocale) -> Unit,
     onDismissRequest: () -> Unit,
+    onMotionChange: (Boolean) -> Unit = {},
     variants: List<CatalogEntry> = emptyList(),
     selected: CatalogEntry? = null,
     onVariantChange: (CatalogEntry) -> Unit = {},
 ) {
     val controls: @Composable () -> Unit = {
-        TweakControls(overrides, onDarkChange, onFontScaleChange, onRtlChange, onLocaleChange, variants, selected, onVariantChange)
+        TweakControls(
+            overrides,
+            onDarkChange,
+            onFontScaleChange,
+            onRtlChange,
+            onLocaleChange,
+            onMotionChange,
+            variants,
+            selected,
+            onVariantChange,
+        )
     }
     if (booleanResource(R.bool.catalog_tweaks_side_sheet)) {
         BingeModalSideSheet(onDismissRequest = onDismissRequest) { controls() }
@@ -63,6 +74,7 @@ private fun TweakControls(
     onFontScaleChange: (Float) -> Unit,
     onRtlChange: (Boolean) -> Unit,
     onLocaleChange: (SampleLocale) -> Unit,
+    onMotionChange: (Boolean) -> Unit,
     variants: List<CatalogEntry>,
     selected: CatalogEntry?,
     onVariantChange: (CatalogEntry) -> Unit,
@@ -97,6 +109,11 @@ private fun TweakControls(
                 label = stringResource(R.string.control_rtl),
                 selected = overrides.rtl,
                 onClick = { onRtlChange(!overrides.rtl) },
+            )
+            BingeFilterChip(
+                label = stringResource(R.string.control_motion),
+                selected = overrides.motion,
+                onClick = { onMotionChange(!overrides.motion) },
             )
         }
         TweakSection(stringResource(R.string.control_font_scale)) {

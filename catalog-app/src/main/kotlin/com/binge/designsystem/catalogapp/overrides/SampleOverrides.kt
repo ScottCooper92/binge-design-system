@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import com.binge.designsystem.preview.LocalSampleReduceMotion
 import java.util.Locale
 
 /** Font scales the detail view offers: the default, a common accessibility setting, and the maximum. */
@@ -40,6 +41,8 @@ data class SampleOverrides(
     val fontScale: Float,
     val rtl: Boolean,
     val locale: SampleLocale = SampleLocale.System,
+    // On by default: the catalog app is where a maintainer judges motion. A frame never goes through it.
+    val motion: Boolean = true,
 )
 
 /**
@@ -73,6 +76,7 @@ fun WithOverrides(overrides: SampleOverrides, content: @Composable () -> Unit) {
         LocalConfiguration provides configuration,
         LocalDensity provides Density(density.density, overrides.fontScale),
         LocalLayoutDirection provides if (mirrored) LayoutDirection.Rtl else LayoutDirection.Ltr,
+        LocalSampleReduceMotion provides !overrides.motion,
         content = content,
     )
 }
