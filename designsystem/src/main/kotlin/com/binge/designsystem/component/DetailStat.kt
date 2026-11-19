@@ -3,6 +3,7 @@ package com.binge.designsystem.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
@@ -30,7 +31,11 @@ data class DetailStat(
 @Composable
 fun ratingSubLabel(voteCount: Int): String =
     if (voteCount > 0) {
-        pluralStringResource(R.plurals.detail_stat_votes, voteCount, voteCount.formatVoteCount())
+        pluralStringResource(
+            R.plurals.detail_stat_votes,
+            voteCount,
+            voteCount.formatVoteCount(LocalConfiguration.current.locales[0]),
+        )
     } else {
         stringResource(R.string.detail_rating)
     }

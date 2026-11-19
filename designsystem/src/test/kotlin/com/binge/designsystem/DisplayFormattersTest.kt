@@ -34,9 +34,14 @@ class DisplayFormattersTest {
     }
 
     @Test
-    fun `formatVoteCount does not crash on a comma-decimal locale at the unit boundary`() {
+    fun `formatVoteCount does not crash on an English locale with a comma decimal at the unit boundary`() {
+        assertEquals("1,0M", 999_950.formatVoteCount(Locale.forLanguageTag("en-ZA")))
+    }
+
+    @Test
+    fun `formatVoteCount takes the locale it is given, not the default`() {
         Locale.setDefault(Locale.GERMANY)
-        assertEquals("1,0M", 999_950.formatVoteCount())
+        assertEquals("1.5k", 1_500.formatVoteCount(Locale.UK))
     }
 
     @ParameterizedTest
@@ -50,6 +55,12 @@ class DisplayFormattersTest {
     fun `formatRating uses the locale decimal separator without crashing`() {
         Locale.setDefault(Locale.GERMANY)
         assertEquals("7,5", 7.46f.formatRating())
+    }
+
+    @Test
+    fun `formatRating takes the locale it is given, not the default`() {
+        Locale.setDefault(Locale.UK)
+        assertEquals("7,5", 7.46f.formatRating(Locale.GERMANY))
     }
 
     @ParameterizedTest
