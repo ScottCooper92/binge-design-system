@@ -46,7 +46,7 @@ private fun StatusButtons(
 }
 
 /**
- * The states of a request, as a title page shows them: Request, filled and neutral, for the open action, then Requested,
+ * The states of a request, as a title page shows them: Request, solid and neutral, for the open action, then Requested,
  * Processing, Available and Partly available, tonal with their status dots. The mapping of states onto sentiments is the
  * consumer's; this one only illustrates it.
  */
