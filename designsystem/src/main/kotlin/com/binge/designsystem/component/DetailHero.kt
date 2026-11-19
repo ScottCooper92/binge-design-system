@@ -118,7 +118,7 @@ fun DetailHero(
     // Replaces the text title, for a hero that shows a title logo. The caller owns loading and tinting,
     // and gives it a fixed height so text and logo swap without moving the layout.
     titleContent: (@Composable () -> Unit)? = null,
-    // Review scores after the genres, each an icon and its value, on the same line.
+    // Review scores, each an icon and its value, on a line of their own after the tagline and the meta text.
     externalScores: List<ExternalScore> = emptyList(),
 ) {
     val eyebrowText = eyebrow?.takeIf { it.isNotBlank() }
@@ -296,13 +296,9 @@ private fun HeroTextColumn(
                 modifier = Modifier.semantics { heading() },
             )
         }
-        if (!eyebrowText.isNullOrBlank() || externalScores.isNotEmpty()) {
+        if (!eyebrowText.isNullOrBlank()) {
             Spacer(Modifier.height(lineGap))
-            GenreScoreLine(
-                genres = eyebrowText,
-                scores = externalScores,
-                scoreColor = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA),
-            )
+            GenreLine(genres = eyebrowText)
         }
         if (!tagline.isNullOrBlank()) {
             Spacer(Modifier.height(lineGap))
@@ -323,6 +319,13 @@ private fun HeroTextColumn(
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+            )
+        }
+        if (externalScores.isNotEmpty()) {
+            Spacer(Modifier.height(lineGap))
+            ExternalScoreLine(
+                scores = externalScores,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA),
             )
         }
         if (metaContent != null) {

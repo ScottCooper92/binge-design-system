@@ -61,7 +61,7 @@ fun ExternalScoreLineRottenSample() {
     }
 }
 
-/** [DetailHero] with the scores after the genres. */
+/** [DetailHero] with the scores on their own line after the tagline and the meta text. */
 @Composable
 fun DetailHeroScoresSample() {
     ScreenshotTheme {
@@ -94,8 +94,8 @@ fun DetailHeroScoresSpanishSample() {
 }
 
 /**
- * [DetailHero] whose genre list alone fills the line, with scores after it. At a large font the genres take the whole
- * width and still end on their dot, and the scores start the next line.
+ * [DetailHero] whose genre list alone fills the line, with scores on their own line below. At a large font the genres
+ * wrap and the scores stay on the line after the meta text.
  */
 @Composable
 fun DetailHeroLongGenresSample() {
@@ -112,7 +112,7 @@ fun DetailHeroLongGenresSample() {
     }
 }
 
-/** [DetailCinematicHeader] with the scores after the genres. */
+/** [DetailCinematicHeader] with the scores on their own line after the tagline. */
 @Composable
 fun DetailCinematicHeaderScoresSample() {
     ScreenshotTheme {
@@ -129,7 +129,7 @@ fun DetailCinematicHeaderScoresSample() {
     }
 }
 
-/** [HeroCarousel] whose slide carries the scores after the genres and, last, an Available status. */
+/** [HeroCarousel] whose slide carries an Available status after the genres and the scores on their own last line. */
 @Composable
 fun HeroCarouselScoresSample() {
     ScreenshotTheme {

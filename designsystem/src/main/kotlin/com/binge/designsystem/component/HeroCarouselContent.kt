@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -242,10 +244,16 @@ private fun HeroMetaRow(item: HeroItem) {
                 },
             )
         }
-        item.externalScores.forEach { score -> add(MetaEntry.Content { ExternalScoreItem(score, color = ink) }) }
         item.status?.let { status -> add(MetaEntry.Content { HeroStatus(status) }) }
     }
-    MetaFlow(entries = entries, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s)))
+    Column(modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s))) {
+        if (entries.isNotEmpty()) MetaFlow(entries = entries)
+        // The scores sit on a line of their own, last, so a wrap never changes the rating and genre line above.
+        if (item.externalScores.isNotEmpty()) {
+            if (entries.isNotEmpty()) Spacer(Modifier.height(dimensionResource(R.dimen.padding_xs)))
+            ExternalScoreLine(scores = item.externalScores, color = ink)
+        }
+    }
 }
 
 @Composable

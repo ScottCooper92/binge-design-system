@@ -108,7 +108,7 @@ fun DetailCinematicHeader(
     // Replaces the text title, for a header that shows a title logo. The caller owns loading and tinting,
     // and gives it a fixed height so text and logo swap without moving the layout.
     titleContent: (@Composable () -> Unit)? = null,
-    // Review scores after the genres, each an icon and its value, on the same line.
+    // Review scores, each an icon and its value, on a line of their own after the tagline.
     externalScores: List<ExternalScore> = emptyList(),
 ) {
     val eyebrow = genres.takeIf { it.isNotEmpty() }?.joinToString(" · ")
@@ -222,15 +222,10 @@ private fun CinematicCopyRow(
                     autoSize = DetailHeroDefaults.cinematicTitleAutoSize(),
                 )
             }
-            if (!eyebrow.isNullOrBlank() || externalScores.isNotEmpty()) {
+            if (!eyebrow.isNullOrBlank()) {
                 Spacer(Modifier.height(lineGap))
-                // Genres in the theme's accent, as on DetailHero and the TV hero; the scores follow them.
-                GenreScoreLine(
-                    genres = eyebrow,
-                    scores = externalScores,
-                    scoreColor = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
-                    modifier = reportsLineEnd(copyBounds, CopyLine.Genres),
-                )
+                // Genres in the theme's accent, as on DetailHero and the TV hero.
+                GenreLine(genres = eyebrow, modifier = reportsLineEnd(copyBounds, CopyLine.Genres))
             }
             if (!tagline.isNullOrBlank()) {
                 Spacer(Modifier.height(lineGap))
@@ -242,6 +237,14 @@ private fun CinematicCopyRow(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
+                )
+            }
+            if (externalScores.isNotEmpty()) {
+                Spacer(Modifier.height(lineGap))
+                ExternalScoreLine(
+                    scores = externalScores,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = CINEMATIC_SYNOPSIS_ALPHA),
+                    modifier = reportsLineEnd(copyBounds, CopyLine.Scores),
                 )
             }
             if (!synopsis.isNullOrBlank()) {
@@ -269,7 +272,7 @@ private fun CinematicCopyRow(
 }
 
 /** The copy lines whose end edges [CopyHuggingScrim] falls away from. */
-private enum class CopyLine { Title, Genres, Tagline, Synopsis }
+private enum class CopyLine { Title, Genres, Tagline, Scores, Synopsis }
 
 /**
  * Where the cinematic copy sits, in root coordinates, as the layout reports it: the top of the copy,

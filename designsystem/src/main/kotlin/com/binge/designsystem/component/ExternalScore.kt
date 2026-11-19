@@ -226,21 +226,11 @@ fun ExternalScoreLine(
     )
 }
 
-/**
- * The genre line of a detail header with [scores] after it: the genres in the accent, then each score, separated by
- * the meta dot. Stays on one line when it fits and wraps between items when it does not.
- */
+/** The genre line of a detail header: the genres in the accent, wrapping between words when they do not fit. */
 @Composable
-internal fun GenreScoreLine(
-    genres: String?,
-    scores: List<ExternalScore>,
-    scoreColor: Color,
-    modifier: Modifier = Modifier,
-) {
-    val genreColor = MaterialTheme.colorScheme.primary
-    val entries = buildList<MetaEntry> {
-        if (!genres.isNullOrBlank()) add(MetaEntry.WrappingText(genres, genreColor))
-        scores.forEach { score -> add(MetaEntry.Content { ExternalScoreItem(score, scoreColor) }) }
-    }
-    MetaFlow(entries = entries, modifier = modifier)
+internal fun GenreLine(genres: String, modifier: Modifier = Modifier) {
+    MetaFlow(
+        entries = listOf(MetaEntry.WrappingText(genres, MaterialTheme.colorScheme.primary)),
+        modifier = modifier,
+    )
 }
