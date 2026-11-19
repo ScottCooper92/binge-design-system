@@ -96,8 +96,9 @@ fun SeasonPickerSheet(
     selected: Int,
     onSelect: (Int) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = onDismiss) { nav ->
+    BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = onDismiss, modifier = modifier) { nav ->
         TaskSheetTopClearance(nav)
         SeasonPickerContent(rows, selected, onSelect)
     }
@@ -133,6 +134,7 @@ fun SeasonPickerContent(
                 trailingContent = if (isSelected) {
                     { Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
                 } else {
+                    // An empty slot, so the row draws no chevron: ItemGroup puts one in a row that has no trailing content.
                     { Spacer(Modifier) }
                 },
             )
