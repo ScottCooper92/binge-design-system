@@ -56,6 +56,22 @@ class MediaCardSamplesScreenshotTest {
     }
 
     @PreviewTest
+    @Preview(name = "sentiments", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "sentiments-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun StatusSentiments() {
+        MediaCardStatusSentimentsSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "dark-poster", uiMode = UI_MODE_NIGHT_NO)
+    @Preview(name = "dark-poster-dark", uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun StatusDarkPoster() {
+        MediaCardStatusDarkPosterSample()
+    }
+
+    @PreviewTest
     @Preview(name = "light-poster", uiMode = UI_MODE_NIGHT_NO)
     @Preview(name = "light-poster-dark", uiMode = UI_MODE_NIGHT_YES)
     @Composable

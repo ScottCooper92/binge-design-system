@@ -1,8 +1,9 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -120,22 +121,49 @@ fun MediaCardStatusSample() {
     }
 }
 
-/** The status dot on a near-white poster, where the dot's ring is what keeps it visible. */
+/** Every sentiment's status dot on the default poster, a row of five. The dot is the one a status chip draws, a little larger. */
+@Composable
+fun MediaCardStatusSentimentsSample() {
+    ScreenshotTheme {
+        StatusSentimentsRow(posterUrl = null)
+    }
+}
+
+/** The same five dots on a near-white poster, where the thin scrim behind the halo is what keeps each at 3:1. */
 @Composable
 fun MediaCardStatusLightPosterSample() {
     ScreenshotTheme {
         WithPreviewImage(widthPx = LIGHT_POSTER_WIDTH_PX, heightPx = LIGHT_POSTER_HEIGHT_PX, color = LIGHT_POSTER_COLOR) {
-            // In a Column, so the theme's Surface does not stretch the card past its own width.
-            Column {
-                MediaCard(
-                    posterUrl = "light-poster",
-                    title = "Arrival",
-                    rating = null,
-                    onClick = {},
-                    status = MediaCardStatus(label = "Processing", sentiment = BingeSentiment.Caution),
-                    modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
-                )
-            }
+            StatusSentimentsRow(posterUrl = "light-poster")
+        }
+    }
+}
+
+/** The same five dots on a near-black poster, where the halo reads on its own. */
+@Composable
+fun MediaCardStatusDarkPosterSample() {
+    ScreenshotTheme {
+        WithPreviewImage(widthPx = LIGHT_POSTER_WIDTH_PX, heightPx = LIGHT_POSTER_HEIGHT_PX, color = DARK_POSTER_COLOR) {
+            StatusSentimentsRow(posterUrl = "dark-poster")
+        }
+    }
+}
+
+@Composable
+private fun StatusSentimentsRow(posterUrl: String?) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.padding_sm)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+    ) {
+        BingeSentiment.entries.forEach { sentiment ->
+            MediaCard(
+                posterUrl = posterUrl,
+                title = sentiment.name,
+                rating = null,
+                onClick = {},
+                status = MediaCardStatus(label = sentiment.name, sentiment = sentiment),
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }
@@ -159,6 +187,7 @@ fun MediaCardStatusWithActionSample() {
 private const val LIGHT_POSTER_WIDTH_PX = 300
 private const val LIGHT_POSTER_HEIGHT_PX = 450
 private const val LIGHT_POSTER_COLOR = 0xFFF4F1EA.toInt()
+private const val DARK_POSTER_COLOR = 0xFF14110F.toInt()
 
 /** A title the user is part-way through: the bar along the poster's bottom edge says how far, here 40%. */
 @Composable
