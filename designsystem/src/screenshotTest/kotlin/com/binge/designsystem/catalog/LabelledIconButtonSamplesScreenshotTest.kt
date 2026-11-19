@@ -45,4 +45,20 @@ class LabelledIconButtonSamplesScreenshotTest {
     fun SpanishLongWord() {
         LabelledIconButtonSpanishLongWordSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun TrailingMark() {
+        LabelledIconButtonTrailingMarkSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun SpanishTrailingMark() {
+        LabelledIconButtonSpanishTrailingMarkSample()
+    }
 }
