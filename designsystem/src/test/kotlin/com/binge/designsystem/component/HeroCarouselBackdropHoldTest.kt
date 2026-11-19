@@ -39,7 +39,7 @@ class HeroCarouselBackdropHoldTest {
     )
 
     /** The loads the carousel asked for, each held open until the test finishes it. */
-    private val loads = mutableMapOf<String, CompletableDeferred<Unit>>()
+    private val loads = mutableMapOf<String, CompletableDeferred<Boolean>>()
     private val loader = HeroBackdropLoader { url, _ -> loads.getOrPut(url.orEmpty()) { CompletableDeferred() }.await() }
 
     @Before
@@ -59,7 +59,7 @@ class HeroCarouselBackdropHoldTest {
             }
         }
 
-    private fun finishLoad(url: String) = loads.getOrPut(url) { CompletableDeferred() }.complete(Unit)
+    private fun finishLoad(url: String) = loads.getOrPut(url) { CompletableDeferred() }.complete(true)
 
     private fun advanceFrames(count: Int = FRAMES) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
 
