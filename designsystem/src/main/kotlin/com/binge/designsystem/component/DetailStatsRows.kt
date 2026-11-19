@@ -1,8 +1,12 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.R
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.template.readingMargin
@@ -22,8 +26,8 @@ fun statsPerRow(): Int = if (LocalDensity.current.fontScale >= LARGE_FONT_SCALE)
 
 /**
  * The stats of a page in [DetailStatRow]s, each inset by the reading margin: one row of all of them, or two to a row from a font
- * scale of 1.5, where a label of four across breaks mid-word. The first row carries the [LayoutAnchors.Detail.STATS] anchor a page's
- * skeleton is checked against.
+ * scale of 1.5, where a label of four across breaks mid-word. The rows are spaced by the page's gap, and the block carries the
+ * [LayoutAnchors.Detail.STATS] anchor a page's skeleton is checked against. The [modifier] sits on the block.
  *
  * @need show a title's stats (rating, year, runtime, certification) under its hero, breaking into two to a row at a large font
  * @group detail
@@ -32,12 +36,12 @@ fun statsPerRow(): Int = if (LocalDensity.current.fontScale >= LARGE_FONT_SCALE)
  */
 @Composable
 fun DetailStatsRows(stats: List<DetailStat>, modifier: Modifier = Modifier) {
-    val perRow = statsPerRow()
-    val margin = modifier.readingMargin()
-    stats.chunked(perRow).forEachIndexed { index, row ->
-        DetailStatRow(
-            stats = row,
-            modifier = if (index == 0) margin.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)) else margin,
-        )
+    Column(
+        modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+    ) {
+        stats.chunked(statsPerRow()).forEach { row ->
+            DetailStatRow(stats = row, modifier = Modifier.readingMargin())
+        }
     }
 }

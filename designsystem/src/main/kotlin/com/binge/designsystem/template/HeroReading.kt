@@ -3,9 +3,8 @@ package com.binge.designsystem.template
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
-import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentInset
 
 /**
  * The margin of a hero page's body, the one Binge's detail pages follow: [HeroDetailScreen] measures the width it leaves the
@@ -22,7 +21,7 @@ import com.binge.designsystem.R
 fun Modifier.readingMargin(): Modifier = padding(horizontal = LocalHeroReadingMargin.current)
 
 /**
- * The inset a section or a rail starts at: the screen's own, plus the reading margin, so a rail's first card lines up with the
+ * The inset a section or a rail starts at: the screen's own content inset (16, 24 or 32dp by width, as the section headers use), plus the reading margin, so a rail's first card lines up with the
  * column and the rail still bleeds to the window's edge.
  *
  * @need start a rail on a hero page at the column's edge while it bleeds to the window's
@@ -30,4 +29,4 @@ fun Modifier.readingMargin(): Modifier = padding(horizontal = LocalHeroReadingMa
  * @replaces a hand-built start padding that adds the reading margin
  */
 @Composable
-fun readingInset(): Dp = dimensionResource(R.dimen.padding_m) + LocalHeroReadingMargin.current
+fun readingInset(): Dp = resolvedContentInset() + LocalHeroReadingMargin.current

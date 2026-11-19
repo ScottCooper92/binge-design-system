@@ -104,4 +104,33 @@ class DetailStatsRowsTest {
             0.5f,
         )
     }
+
+    @Test
+    fun `the stats, the overview and their skeletons all start at the same margin`() {
+        rule.setContent {
+            CompositionLocalProvider(LocalHeroReadingMargin provides 24.dp) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    Column(Modifier.fillMaxWidth()) {
+                        DetailStatsRows(stats.take(1))
+                        DetailOverviewSection(heading = "Overview heading", text = "A synopsis.")
+                        DetailOverviewSkeleton()
+                        DetailStatsRowsSkeleton(count = 1)
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        val stat = rule
+            .onNodeWithText("label a", useUnmergedTree = true)
+            .getBoundsInRoot()
+            .left.value
+        val heading = rule
+            .onNodeWithText("Overview heading")
+            .getBoundsInRoot()
+            .left.value
+
+        assertTrue("the stat starts past the margin, at $stat", stat >= 24f)
+        assertEquals("the overview heading starts at 40, the margin and the screen's gap", 40f, heading, 0.5f)
+    }
 }
