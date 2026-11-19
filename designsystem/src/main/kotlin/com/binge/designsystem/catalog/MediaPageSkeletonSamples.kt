@@ -18,11 +18,8 @@ import com.binge.designsystem.component.DetailHeroSkeleton
 import com.binge.designsystem.component.DetailOverviewSkeleton
 import com.binge.designsystem.component.DetailStatsRowsSkeleton
 import com.binge.designsystem.isExpandedLayout
-import com.binge.designsystem.layout.LayoutAnchors
-import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.HeroDetailScreen
-import com.binge.designsystem.template.readingMargin
 
 /**
  * The page of [MediaHeroDetailPageSample] while it loads, on the same [HeroDetailScreen] frame: the bar with its back control is there
@@ -45,11 +42,8 @@ fun MediaPageSkeletonSample() {
             Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
             Column(Modifier.clearAndSetSemantics {}, verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
                 if (!cinematic) {
-                    DetailStatsRowsSkeleton(
-                        Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)),
-                        count = MediaPageStats.size,
-                    )
-                    DetailOverviewSkeleton(Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+                    DetailStatsRowsSkeleton(count = MediaPageStats.size)
+                    DetailOverviewSkeleton()
                 }
             }
         }

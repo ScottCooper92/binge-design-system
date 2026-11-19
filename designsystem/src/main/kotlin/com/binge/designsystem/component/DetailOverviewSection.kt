@@ -12,10 +12,11 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
+import com.binge.designsystem.template.readingMargin
 
 /**
  * The [heading] over a synopsis or a biography, and the [text] in an [ExpandableOverview] under it, as Binge's detail pages have it. Draws
- * nothing where [text] is null. It carries the [LayoutAnchors.Detail.OVERVIEW] anchor a page's skeleton is checked against.
+ * nothing where [text] is null. It insets itself by the reading margin and carries the [LayoutAnchors.Detail.OVERVIEW] anchor a page's skeleton is checked against.
  *
  * @need show a title's synopsis under a heading, collapsed with a toggle
  * @group detail
@@ -31,6 +32,7 @@ fun DetailOverviewSection(
     if (text == null) return
     Column(
         modifier
+            .readingMargin()
             .padding(horizontal = dimensionResource(R.dimen.padding_m))
             .layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)),
     ) {

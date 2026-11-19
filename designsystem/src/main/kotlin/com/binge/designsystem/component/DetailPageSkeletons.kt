@@ -80,7 +80,7 @@ fun DetailHeroSkeleton(
 /**
  * The stat rows of a [DetailStatsRows] while the page loads: [count] blank stats in the page's own [DetailStatRow], laid out by
  * [statsPerRow], so a large font breaks them into the rows the page does and each is the height of the page's. The shimmer covers
- * the row. The first row carries the [LayoutAnchors.Detail.STATS] anchor through [modifier].
+ * the row. The first row carries the [LayoutAnchors.Detail.STATS] anchor.
  *
  * @need hold a media page's stat rows at their loaded height while the page loads
  * @group detail
@@ -89,9 +89,10 @@ fun DetailHeroSkeleton(
 @Composable
 fun DetailStatsRowsSkeleton(modifier: Modifier = Modifier, count: Int = STAT_COUNT) {
     val blank = List(count) { DetailStat(Icons.Filled.Star, " ", " ") }
-    Column(Modifier.readingMargin(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
+    Column(modifier.readingMargin(), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
         blank.chunked(statsPerRow()).forEachIndexed { index, row ->
-            Box((if (index == 0) modifier else Modifier).fillMaxWidth().padding(resolvedContentPadding())) {
+            val anchor = if (index == 0) Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)) else Modifier
+            Box(anchor.fillMaxWidth().padding(resolvedContentPadding())) {
                 DetailStatRow(row, Modifier.skeleton(visible = true, shape = BingeShapes.Large), contentPadding = PaddingValues())
             }
         }
@@ -99,7 +100,7 @@ fun DetailStatsRowsSkeleton(modifier: Modifier = Modifier, count: Int = STAT_COU
 }
 
 /**
- * The heading, the collapsed synopsis and the expand toggle's row of an [DetailOverviewSection] while the page loads. Each line is a blank
+ * The heading, the collapsed synopsis and the expand toggle's row of an [DetailOverviewSection] while the page loads, inset by the reading margin and carrying the [LayoutAnchors.Detail.OVERVIEW] anchor. Each line is a blank
  * [Text] in the page's own style under a plate, so its height follows the font as the page's does, and the toggle is the touch
  * target the page's button is.
  *
@@ -109,7 +110,12 @@ fun DetailStatsRowsSkeleton(modifier: Modifier = Modifier, count: Int = STAT_COU
  */
 @Composable
 fun DetailOverviewSkeleton(modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_m)).then(modifier)) {
+    Column(
+        modifier
+            .readingMargin()
+            .padding(horizontal = dimensionResource(R.dimen.padding_m))
+            .layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)),
+    ) {
         TextPlate(MaterialTheme.typography.titleMedium, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
         Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
         repeat(OVERVIEW_LINE_COUNT) { index ->

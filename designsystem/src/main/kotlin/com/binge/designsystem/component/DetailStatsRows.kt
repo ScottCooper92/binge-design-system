@@ -1,8 +1,12 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.R
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.template.readingMargin
@@ -33,11 +37,13 @@ fun statsPerRow(): Int = if (LocalDensity.current.fontScale >= LARGE_FONT_SCALE)
 @Composable
 fun DetailStatsRows(stats: List<DetailStat>, modifier: Modifier = Modifier) {
     val perRow = statsPerRow()
-    val margin = modifier.readingMargin()
-    stats.chunked(perRow).forEachIndexed { index, row ->
-        DetailStatRow(
-            stats = row,
-            modifier = if (index == 0) margin.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)) else margin,
-        )
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
+        stats.chunked(perRow).forEachIndexed { index, row ->
+            val margin = Modifier.readingMargin()
+            DetailStatRow(
+                stats = row,
+                modifier = if (index == 0) margin.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)) else margin,
+            )
+        }
     }
 }
