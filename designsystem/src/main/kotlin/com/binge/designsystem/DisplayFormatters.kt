@@ -5,6 +5,7 @@ import android.icu.text.RelativeDateTimeFormatter
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import java.math.BigDecimal
@@ -64,6 +65,10 @@ fun Int.formatVoteCount(locale: Locale = Locale.getDefault()): String {
  * [roundsToStep] stays locale-invariant to avoid a parse crash.
  */
 fun Float.formatRating(locale: Locale = Locale.getDefault()): String = "%.1f".format(locale, this)
+
+/** [formatRating] for the locale of the configuration this is composed in, which is the page's, not the device's. */
+@Composable
+internal fun Float.formatRatingForPage(): String = formatRating(LocalConfiguration.current.locales[0])
 
 private fun roundsToStep(value: Double, step: Double): Boolean = BigDecimal(value).setScale(1, RoundingMode.HALF_UP).toDouble() >= step
 

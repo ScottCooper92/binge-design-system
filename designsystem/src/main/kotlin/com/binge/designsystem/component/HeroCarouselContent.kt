@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import com.binge.designsystem.R
-import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRatingForPage
 import com.binge.designsystem.formatRuntime
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.theme.BingeShapes
@@ -279,7 +279,7 @@ private fun HeroRating(rating: Float) {
             modifier = Modifier.size(dimensionResource(R.dimen.hero_meta_star_size)),
         )
         Text(
-            text = rating.formatRating(),
+            text = rating.formatRatingForPage(),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA),
         )

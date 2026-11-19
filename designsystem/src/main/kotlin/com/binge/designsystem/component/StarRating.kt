@@ -21,7 +21,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
-import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRatingForPage
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
 import java.util.Locale
@@ -59,7 +59,7 @@ fun StarRating(
     onRatingChange: ((Float) -> Unit)? = null,
 ) {
     val halves = if (interactive) interactiveHalves(rating) else ratingToHalves(rating)
-    val ratingDescription = stringResource(R.string.cd_rating_out_of_ten, announcedRating(rating).formatRating())
+    val ratingDescription = stringResource(R.string.cd_rating_out_of_ten, announcedRating(rating).formatRatingForPage())
 
     Row(
         modifier = modifier.semantics { contentDescription = ratingDescription },
@@ -77,10 +77,10 @@ fun StarRating(
                 starHalves = starHalves,
                 starSize = starSize,
                 onTap = handler?.let { { it(tapValue.toFloat()) } },
-                tapLabel = handler?.let { stringResource(R.string.cd_rate_out_of_ten, tapValue.toFloat().formatRating()) },
+                tapLabel = handler?.let { stringResource(R.string.cd_rate_out_of_ten, tapValue.toFloat().formatRatingForPage()) },
                 onLongPress = handler?.let { { it(halfValue.toFloat()) } },
                 longPressLabel =
-                    handler?.let { stringResource(R.string.cd_rate_out_of_ten, halfValue.toFloat().formatRating()) },
+                    handler?.let { stringResource(R.string.cd_rate_out_of_ten, halfValue.toFloat().formatRatingForPage()) },
             )
         }
     }

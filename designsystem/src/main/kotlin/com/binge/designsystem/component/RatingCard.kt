@@ -41,7 +41,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
-import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRatingForPage
 import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
@@ -218,7 +218,7 @@ private fun RatedBody(
                 ) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text = userRating.formatRating(),
+                            text = userRating.formatRatingForPage(),
                             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
                             color = contentColor,
                         )
@@ -323,7 +323,7 @@ private fun ReviewsFooter(
             Text(
                 text =
                     if (averageReviewRating != null) {
-                        stringResource(subtitle, averageReviewRating.formatRating())
+                        stringResource(subtitle, averageReviewRating.formatRatingForPage())
                     } else {
                         stringResource(subtitleNoAverage)
                     },

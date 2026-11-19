@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
-import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRatingForPage
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.BingeTheme
@@ -95,7 +95,7 @@ fun RatingChip(
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.rating_chip_star_spacing)))
         Text(
-            text = rating.formatRating(),
+            text = rating.formatRatingForPage(),
             style = textStyle,
             color = foreground,
         )
