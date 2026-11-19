@@ -106,7 +106,7 @@ data class HeroItem(
  * [heroActions] is a caller-filled slot for per-item CTAs (e.g. Play / Add to list); the
  * backdrop itself stays tappable via [onItemClick].
  *
- * [onItemTapped] reports the slide that was open when the backdrop was tapped. It rides alongside
+ * [onItemTapped] reports the slide whose art was tapped, which is the slide [onItemClick] routes to. It rides alongside
  * [onItemClick] rather than widening it, for the reason `PosterCarousel.onItemTapped` gives: routing
  * wants the id and reporting wants the position. The paged index lives in here and nowhere else, so
  * a caller could not derive it. Defaults to a no-op so previews compose unchanged.
@@ -220,9 +220,11 @@ fun HeroCarousel(
             items = items,
             index = shownIndex,
             placeholderOn = firstSlide,
-            onItemClick = { id ->
-                onItemTapped(current)
-                onItemClick(id)
+            // The slide the tap landed on: while the backdrop holds the previous art, that is not `current`, and the id
+            // routed and the position reported must name the same slide.
+            onItemClick = { page ->
+                onItemTapped(page)
+                onItemClick(items[page].id)
             },
             reduceMotion = reduceMotion,
             copyBounds = copyBounds,
@@ -261,7 +263,7 @@ private fun BoxScope.HeroBackdrop(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable(role = Role.Button) { onItemClick(item.id) }
+                .clickable(role = Role.Button) { onItemClick(page) }
                 .semantics { contentDescription = description },
         ) {
             SubcomposeAsyncImage(

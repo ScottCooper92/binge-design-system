@@ -7,11 +7,13 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import kotlinx.coroutines.CompletableDeferred
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -45,11 +47,14 @@ class HeroCarouselBackdropHoldTest {
         rule.mainClock.autoAdvance = false
     }
 
+    private val routed = mutableListOf<Int>()
+    private val reported = mutableListOf<Int>()
+
     private fun show(reduceMotion: Boolean = false) =
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false, reduceMotion = reduceMotion) {
                 CompositionLocalProvider(LocalHeroBackdropLoader provides loader) {
-                    HeroCarousel(items = items, onItemClick = {})
+                    HeroCarousel(items = items, onItemClick = { routed += it }, onItemTapped = { reported += it })
                 }
             }
         }
@@ -83,6 +88,25 @@ class HeroCarouselBackdropHoldTest {
         rule.mainClock.advanceTimeBy(SETTLE_MS)
         backdrops("Alpha").assertCountEquals(0)
         backdrops("Beta").assertCountEquals(1)
+    }
+
+    @Test
+    fun `a tap on the held backdrop reports the position of the slide it routes to`() {
+        show()
+        advanceFrames()
+        rule.onNodeWithContentDescription("Show Beta").performClick()
+        advanceFrames()
+        // The dots have moved to Beta; the art on screen is still Alpha's.
+        rule.onNodeWithContentDescription("Show Beta").assertIsSelected()
+
+        rule
+            .onAllNodes(
+                hasContentDescription("Alpha", substring = true) and SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button),
+            ).onFirst()
+            .performClick()
+
+        assertEquals(listOf(1), routed)
+        assertEquals(listOf(0), reported)
     }
 
     @Test
