@@ -29,6 +29,8 @@ import com.binge.designsystem.theme.BingeShapes
  * While [loading] the button shows a spinner and swallows taps, so an in-flight action cannot be re-triggered; set
  * [tapsWhileLoading] for a button whose tap is not that action, such as one that opens a sheet that shows the loading itself.
  *
+ * [leading] is drawn before the icon and the label, for a mark that is not an icon, such as [BingeStatusButton]'s status dot.
+ *
  * The fill is the fixed amber, the same in both themes. Light `primary` is a darker amber tuned for
  * text, and as a large fill it reads muddy.
  *
@@ -51,6 +53,7 @@ fun BingeFilledButton(
         containerColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primaryFixedDim,
         contentColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimaryFixed,
     ),
+    leading: (@Composable () -> Unit)? = null,
 ) {
     Button(
         // Swallow taps while loading so the in-flight action can't be re-triggered,
@@ -75,6 +78,10 @@ fun BingeFilledButton(
                 strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
             )
         } else {
+            if (leading != null) {
+                leading()
+                Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
+            }
             if (leadingIcon != null) {
                 Icon(
                     imageVector = leadingIcon,
