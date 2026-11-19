@@ -1,6 +1,9 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -125,5 +128,25 @@ class LabelledIconButtonLabelTest {
         val layout = layoutOf(word)
         assertEquals("the word was broken across lines", 1, layout.lineCount)
         assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
+    }
+
+    @Test
+    fun `a row of buttons sized with intrinsic measurement does not throw, and each reads in full`() {
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2.0f)) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    // IntrinsicSize.Min measures the row's children for their intrinsic sizes, which a subcomposing layout cannot answer.
+                    Row(Modifier.height(IntrinsicSize.Min)) {
+                        LabelledIconButton(icon = Icons.Filled.PlayArrow, label = "Trailer", onClick = {})
+                        LabelledIconButton(icon = Icons.Filled.PlayArrow, label = "Subscribe", onClick = {})
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertEquals(1, layoutOf("Subscribe").lineCount)
+        assertFalse(layoutOf("Subscribe").isLineEllipsized(0))
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 2)
     }
 }
