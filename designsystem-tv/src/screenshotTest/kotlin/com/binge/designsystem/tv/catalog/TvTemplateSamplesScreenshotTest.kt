@@ -73,6 +73,11 @@ class TvTemplateSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun stepFlowSingleStep() = Frame { TvStepFlowSingleStepSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun stepFlowLoading() = Frame { TvStepFlowLoadingSample() }
 
     @PreviewTest

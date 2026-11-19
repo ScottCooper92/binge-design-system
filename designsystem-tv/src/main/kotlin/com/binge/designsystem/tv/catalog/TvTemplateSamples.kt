@@ -277,6 +277,24 @@ fun TvStepFlowSample() {
     }
 }
 
+/** A flow with a single step: no read-out and no dots, as on the phone, so the step opens at the top of the page. */
+@Composable
+fun TvStepFlowSingleStepSample() {
+    TvStepFlow(
+        stepCount = 1,
+        currentStep = 0,
+        footerActions = {
+            TvButtonSurface("Continue", TvButtonStyle.Primary, enabled = true, isFocused = true)
+        },
+    ) {
+        TvStepHeading(
+            kicker = "Welcome",
+            title = "Let's get you set up",
+            subtitle = "One thing to confirm before you start.",
+        )
+    }
+}
+
 /** A step whose choices are still loading: the same frame, with a plate where the content will land. */
 @Composable
 fun TvStepFlowLoadingSample() {
