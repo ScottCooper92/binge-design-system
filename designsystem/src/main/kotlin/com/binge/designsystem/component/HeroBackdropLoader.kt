@@ -41,3 +41,25 @@ internal fun rememberHeroBackdropLoader(): HeroBackdropLoader {
         }
     }
 }
+
+/** The images the hero carousel has already waited for, so it knows which slides arrive loaded and which still need a plate. */
+internal class HeroBackdropReadiness {
+    private val loaded = mutableSetOf<String>()
+
+    fun markLoaded(url: String?) {
+        if (!url.isNullOrBlank()) loaded += url
+    }
+
+    /** A slide draws the plate while loading unless its image was waited for: it is held behind the previous backdrop instead. */
+    fun needsPlaceholder(url: String?): Boolean = url.isNullOrBlank() || url !in loaded
+}
+
+/** Loads [url] and records that it was waited for, whether the load succeeded or failed: a failure shows its own plate. */
+internal suspend fun HeroBackdropLoader.loadAndMark(
+    readiness: HeroBackdropReadiness,
+    url: String?,
+    size: IntSize,
+) {
+    load(url, size)
+    readiness.markLoaded(url)
+}

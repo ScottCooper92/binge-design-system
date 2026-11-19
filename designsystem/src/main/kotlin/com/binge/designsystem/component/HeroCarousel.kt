@@ -147,18 +147,20 @@ fun HeroCarousel(
     }
     var shown by remember { mutableIntStateOf(current) }
     val shownIndex = shown.coerceIn(0, count - 1)
-    val firstSlide = remember { current }
+    // Which images the carousel has already waited for. A slide whose image is in this set arrives loaded, so it draws no plate
+    // while it settles; any other (the first slide, or a slide a refreshed list gave a new image) shows the plate until it loads.
+    val readiness = remember { HeroBackdropReadiness() }
     LaunchedEffect(current, items) {
         if (shown != current) {
-            loader.load(items[current].imageUrl, backdropSize)
+            loader.loadAndMark(readiness, items[current].imageUrl, backdropSize)
             shown = current
         }
     }
     // The neighbours load while the current slide dwells, so an advance or a swipe finds its image in the cache.
     LaunchedEffect(current, items) {
         if (count > 1) {
-            loader.load(items[(current + 1) % count].imageUrl, backdropSize)
-            loader.load(items[(current - 1 + count) % count].imageUrl, backdropSize)
+            loader.loadAndMark(readiness, items[(current + 1) % count].imageUrl, backdropSize)
+            loader.loadAndMark(readiness, items[(current - 1 + count) % count].imageUrl, backdropSize)
         }
     }
 
@@ -174,7 +176,7 @@ fun HeroCarousel(
         delay(AUTO_ADVANCE_MS)
         // The next slide's art first, so the title, the dots and the backdrop change together.
         val next = (index + 1) % count
-        loader.load(items[next.coerceIn(0, count - 1)].imageUrl, backdropSize)
+        loader.loadAndMark(readiness, items[next.coerceIn(0, count - 1)].imageUrl, backdropSize)
         index = next
     }
 
@@ -219,7 +221,7 @@ fun HeroCarousel(
         HeroBackdrop(
             items = items,
             index = shownIndex,
-            placeholderOn = firstSlide,
+            readiness = readiness,
             // The slide the tap landed on: while the backdrop holds the previous art, that is not `current`, and the id
             // routed and the position reported must name the same slide.
             onItemClick = { page ->
@@ -245,7 +247,7 @@ fun HeroCarousel(
 private fun BoxScope.HeroBackdrop(
     items: List<HeroItem>,
     index: Int,
-    placeholderOn: Int,
+    readiness: HeroBackdropReadiness,
     onItemClick: (Int) -> Unit,
     reduceMotion: Boolean,
     copyBounds: Map<Int, HeroCopyBounds>,
@@ -273,9 +275,10 @@ private fun BoxScope.HeroBackdrop(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                // Only the first slide's first load shows the plate. Later slides arrive already loaded, and while one still
-                // loads the previous backdrop is what is held, so a plate here would be the flash this avoids.
-                loading = if (page == placeholderOn) {
+                // A slide the carousel waited for arrives loaded, and while one is still loading the previous backdrop is what is
+                // held, so a plate there would be the flash this avoids. One it never waited for (the first, or a refreshed list's
+                // new image) shows the plate until its image arrives.
+                loading = if (readiness.needsPlaceholder(item.imageUrl)) {
                     { ImagePlaceholder(Modifier.fillMaxSize()) }
                 } else {
                     null
