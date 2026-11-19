@@ -65,6 +65,15 @@ fun Int.formatVoteCount(locale: Locale = Locale.getDefault()): String {
  */
 fun Float.formatRating(locale: Locale = Locale.getDefault()): String = "%.1f".format(locale, this)
 
+/**
+ * [formatRating] for the locale the library's string resources resolved to ([resourceLocale]), so a rating agrees with
+ * the words beside it, such as "Rating: 7.5 out of 10", and with the vote count under it. A language the library does
+ * not ship reads "7.5" whatever the configuration's separator is; a shipped one, such as `es`, reads "7,5" even when the
+ * device default is English.
+ */
+@Composable
+internal fun Float.formatRatingForPage(): String = formatRating(resourceLocale())
+
 private fun roundsToStep(value: Double, step: Double): Boolean = BigDecimal(value).setScale(1, RoundingMode.HALF_UP).toDouble() >= step
 
 /**
@@ -251,3 +260,14 @@ fun clockHoursText(
     is24Hour: Boolean,
     locale: Locale,
 ): String = clockTimeText(Math.round(hour * MINUTES_PER_HOUR).toInt(), is24Hour, locale)
+
+/**
+ * The locale the library's string resources resolve to for the current configuration, which is the language of the
+ * words they supply: the device's language when the library ships it, the default (English) when it does not. A number
+ * is formatted in this locale beside a word from the resources, so the two agree: a device in a language the library
+ * does not ship reads "1.3k votes", where the device's own locale would put its own digits and unit beside an English
+ * word. It reads the language tag from a resource, [R.string.resource_locale_tag], which resolves exactly as the
+ * strings beside it do, so a language added with its own `values-xx` folder follows with no code change.
+ */
+@Composable
+internal fun resourceLocale(): Locale = Locale.forLanguageTag(stringResource(R.string.resource_locale_tag))

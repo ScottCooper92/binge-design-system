@@ -3,7 +3,7 @@ package com.binge.designsystem.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
-import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRatingForPage
 
 /**
  * What a screen reader reads for the hub hero — the whole card, on the one node that opens it.
@@ -22,7 +22,7 @@ import com.binge.designsystem.formatRating
 internal fun heroContentDescription(item: HeroItem): String {
     val separator = stringResource(R.string.list_separator)
     val trending = item.rank?.let { stringResource(R.string.hero_trending_today, it) }
-    val rating = item.rating?.let { stringResource(R.string.cd_rating_out_of_ten, it.formatRating()) }
+    val rating = item.rating?.let { stringResource(R.string.cd_rating_out_of_ten, it.formatRatingForPage()) }
     val genres = item.genres
         .take(MAX_META_GENRES)
         .takeIf { it.isNotEmpty() }

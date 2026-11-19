@@ -21,7 +21,7 @@ import com.binge.designsystem.BACKDROP_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.component.ListRow
 import com.binge.designsystem.component.ListRowPoster
-import com.binge.designsystem.formatRating
+import com.binge.designsystem.formatRatingForPage
 import com.binge.designsystem.modifier.describedAs
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.theme.BingeTheme
@@ -122,7 +122,7 @@ private fun EpisodeRowSubtitle(rating: Float, airDate: String?) {
                 modifier = Modifier.size(dimensionResource(R.dimen.rating_chip_star_size)),
             )
             Text(
-                text = rating.formatRating(),
+                text = rating.formatRatingForPage(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
