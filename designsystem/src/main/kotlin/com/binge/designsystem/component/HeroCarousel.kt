@@ -36,6 +36,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +45,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
@@ -93,6 +95,10 @@ data class HeroItem(
  * translating pager can't reproduce — so paging is a [Crossfade] over the focused index plus manual
  * horizontal-drag navigation.
  *
+ * The backdrop never shows a placeholder over the previous one. It holds the previous slide until the next slide's image has
+ * loaded (or failed, or has none), the neighbours' images load while a slide dwells, and autoplay advances only once the next
+ * image is in. The copy and the dots change at once.
+ *
  * Height adapts to the window's *height* (see [rememberHeroHeight]): short windows (landscape phone)
  * cap it off the window height so the first content rail peeks; tall windows (portrait phone, tablet)
  * use the full [R.dimen.hero_height].
@@ -100,7 +106,7 @@ data class HeroItem(
  * [heroActions] is a caller-filled slot for per-item CTAs (e.g. Play / Add to list); the
  * backdrop itself stays tappable via [onItemClick].
  *
- * [onItemTapped] reports the slide that was open when the backdrop was tapped. It rides alongside
+ * [onItemTapped] reports the slide whose art was tapped, which is the slide [onItemClick] routes to. It rides alongside
  * [onItemClick] rather than widening it, for the reason `PosterCarousel.onItemTapped` gives: routing
  * wants the id and reporting wants the position. The paged index lives in here and nowhere else, so
  * a caller could not derive it. Defaults to a no-op so previews compose unchanged.
@@ -132,6 +138,34 @@ fun HeroCarousel(
     var dragging by remember { mutableStateOf(false) }
     val current = index.coerceIn(0, count - 1)
 
+    // The backdrop holds the previous slide until the wanted one's image is in. Without that, the incoming slide's
+    // placeholder fades in over the outgoing backdrop for as long as the image takes, which on a first, cold load is
+    // what the user watches. The copy and the dots follow `current`, so they never wait.
+    val loader = rememberHeroBackdropLoader()
+    // The window's width, not the hero's own: an upper bound, so Coil's cache accepts the image for a hero that is narrower, as one beside a
+    // navigation rail is.
+    val backdropSize = with(LocalDensity.current) {
+        IntSize(LocalWindowInfo.current.containerSize.width, heroHeight.roundToPx())
+    }
+    var shown by remember { mutableIntStateOf(current) }
+    val shownIndex = shown.coerceIn(0, count - 1)
+    // Which images the carousel has already waited for. A slide whose image is in this set arrives loaded, so it draws no plate
+    // while it settles; any other (the first slide, or a slide a refreshed list gave a new image) shows the plate until it loads.
+    val readiness = remember { HeroBackdropReadiness() }
+    LaunchedEffect(current, items) {
+        if (shown != current) {
+            loader.loadAndMark(readiness, items[current].imageUrl, backdropSize)
+            shown = current
+        }
+    }
+    // The neighbours load while the current slide dwells, so an advance or a swipe finds its image in the cache.
+    LaunchedEffect(current, items) {
+        if (count > 1) {
+            loader.loadAndMark(readiness, items[(current + 1) % count].imageUrl, backdropSize)
+            loader.loadAndMark(readiness, items[(current - 1 + count) % count].imageUrl, backdropSize)
+        }
+    }
+
     // Autoplay is a motion effect, so reduce-motion holds on the current slide (manual paging only). So does an assistive technology, which
     // is reading the page to a user who has not moved it: it changes under them, and with it the description they are on.
     val reduceMotion = LocalReduceMotion.current
@@ -142,7 +176,10 @@ fun HeroCarousel(
     LaunchedEffect(count, dragging, current, reduceMotion, assistiveTechnology) {
         if (count <= 1 || dragging || reduceMotion || assistiveTechnology) return@LaunchedEffect
         delay(AUTO_ADVANCE_MS)
-        index = (index + 1) % count
+        // The next slide's art first, so the title, the dots and the backdrop change together.
+        val next = (index + 1) % count
+        loader.loadAndMark(readiness, items[next.coerceIn(0, count - 1)].imageUrl, backdropSize)
+        index = next
     }
 
     val dragThreshold = dimensionResource(R.dimen.hero_drag_threshold)
@@ -185,10 +222,13 @@ fun HeroCarousel(
         val copyBounds = remember { mutableStateMapOf<Int, HeroCopyBounds>() }
         HeroBackdrop(
             items = items,
-            index = current,
-            onItemClick = { id ->
-                onItemTapped(current)
-                onItemClick(id)
+            index = shownIndex,
+            readiness = readiness,
+            // The slide the tap landed on: while the backdrop holds the previous art, that is not `current`, and the id
+            // routed and the position reported must name the same slide.
+            onItemClick = { page ->
+                onItemTapped(page)
+                onItemClick(items[page].id)
             },
             reduceMotion = reduceMotion,
             copyBounds = copyBounds,
@@ -209,6 +249,7 @@ fun HeroCarousel(
 private fun BoxScope.HeroBackdrop(
     items: List<HeroItem>,
     index: Int,
+    readiness: HeroBackdropReadiness,
     onItemClick: (Int) -> Unit,
     reduceMotion: Boolean,
     copyBounds: Map<Int, HeroCopyBounds>,
@@ -226,7 +267,7 @@ private fun BoxScope.HeroBackdrop(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable(role = Role.Button) { onItemClick(item.id) }
+                .clickable(role = Role.Button) { onItemClick(page) }
                 .semantics { contentDescription = description },
         ) {
             SubcomposeAsyncImage(
@@ -236,7 +277,14 @@ private fun BoxScope.HeroBackdrop(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
+                // A slide the carousel waited for arrives loaded, and while one is still loading the previous backdrop is what is
+                // held, so a plate there would be the flash this avoids. One it never waited for (the first, or a refreshed list's
+                // new image) shows the plate until its image arrives.
+                loading = if (readiness.needsPlaceholder(item.imageUrl)) {
+                    { ImagePlaceholder(Modifier.fillMaxSize()) }
+                } else {
+                    null
+                },
                 error = { ImagePlaceholder(Modifier.fillMaxSize()) },
             )
             copyBounds[item.id]?.let { HeroCopyHuggingScrim(it) }
