@@ -116,6 +116,22 @@ class BingeSheetPageTransitionTest {
     }
 
     @Test
+    fun `a page popped and pushed again before its exit ends is not reported once it is back`() {
+        show()
+        act { nav!!.push("detail") }
+        settle()
+
+        act { nav!!.pop() }
+        advanceFrames()
+        act { nav!!.push("detail") }
+        assertEquals("heard going back at the re-push, before it lands", listOf("detail"), leftPages)
+
+        settle()
+        rule.onAllNodesWithText(DETAIL).assertCountEquals(1)
+        assertEquals("not reported again while it is the live page", listOf("detail"), leftPages)
+    }
+
+    @Test
     fun `reduced motion fades without sliding and settles at once`() {
         show(reduceMotion = true)
         act { nav!!.push("detail") }

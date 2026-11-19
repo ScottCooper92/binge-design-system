@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
-/** How far a page slides as it arrives or leaves, as a fraction of its width: a short shift that reads as direction, not travel. */
-private const val SHEET_PAGE_SLIDE_FRACTION = 8
+/** How far a page slides as it arrives or leaves, as one part in this many of its width: a short shift that reads as direction, not travel. */
+private const val SHEET_PAGE_SLIDE_DIVISOR = 8
 
 /** The page a sheet shows and how deep the stack is, which is all a transition needs to know which way it is going. */
 @Stable
@@ -62,8 +62,8 @@ internal fun AnimatedSheetPages(
                 // The page that is arriving draws above the one it replaces on a push, and below the one it reveals on a pop.
                 val enterFrom = if (forward) direction else -direction
                 ContentTransform(
-                    targetContentEnter = slideInHorizontally(motion.spatial()) { enterFrom * it / SHEET_PAGE_SLIDE_FRACTION } + fadeIn,
-                    initialContentExit = slideOutHorizontally(motion.spatial()) { -enterFrom * it / SHEET_PAGE_SLIDE_FRACTION } + fadeOut,
+                    targetContentEnter = slideInHorizontally(motion.spatial()) { enterFrom * it / SHEET_PAGE_SLIDE_DIVISOR } + fadeIn,
+                    initialContentExit = slideOutHorizontally(motion.spatial()) { -enterFrom * it / SHEET_PAGE_SLIDE_DIVISOR } + fadeOut,
                     targetContentZIndex = if (forward) 1f else -1f,
                     sizeTransform = SizeTransform { _, _ -> motion.spatial() },
                 )

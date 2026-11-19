@@ -146,12 +146,18 @@ fun BingeAdaptiveSheet(
         val gone = leaving.toList()
         leaving.clear()
         gone.forEach { page ->
-            if (page !in pages) pageContent.drop(page)
+            pageContent.drop(page)
             latestOnPageBack(page)
         }
     }
     val latestFlush by rememberUpdatedState(flushLeft)
     DisposableEffect(Unit) { onDispose { latestFlush() } }
+    // A page pushed again before its exit has ended is heard going back now, before the push lands, so the caller sees pop then push
+    // and is never told a page left while it is the one showing. Its saved state is kept, as the exit is still drawing it.
+    val pushPage: (String) -> Unit = { page ->
+        if (leaving.remove(page)) latestOnPageBack(page)
+        pages.add(page)
+    }
     val popPage: () -> Unit = {
         if (pages.size > 1) {
             leaving += pages.removeAt(pages.lastIndex)
@@ -164,6 +170,7 @@ fun BingeAdaptiveSheet(
         BingeTaskSideSheet(
             pages = pages,
             onDismissRequest = onDismissRequest,
+            pushPage = pushPage,
             popPage = popPage,
             locked = !gesturesEnabled,
             scrimDismisses = dismissOnClickOutside,
@@ -180,7 +187,7 @@ fun BingeAdaptiveSheet(
                 depth = shown.depth,
                 stacksPages = stacks,
                 inSideSheet = false,
-                onPush = { page -> if (stacks) pages.add(page) },
+                onPush = { page -> if (stacks) pushPage(page) },
                 onBack = popPage,
             )
         }
@@ -246,8 +253,9 @@ const val ROOT_PAGE = "root"
 
 @Composable
 private fun BingeTaskSideSheet(
-    pages: MutableList<String>,
+    pages: List<String>,
     onDismissRequest: () -> Unit,
+    pushPage: (page: String) -> Unit,
     popPage: () -> Unit,
     locked: Boolean,
     scrimDismisses: Boolean,
@@ -264,7 +272,7 @@ private fun BingeTaskSideSheet(
         panel = {
             TaskSheetPanel(
                 pages = pages,
-                onPush = { page -> pages.add(page) },
+                onPush = pushPage,
                 onBack = popPage,
                 backEnabled = !locked,
                 backLabel = backLabel(pages.last()),
