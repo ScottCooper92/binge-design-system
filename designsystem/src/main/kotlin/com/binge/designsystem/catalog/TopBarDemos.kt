@@ -36,6 +36,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeMediumTopBar
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.component.BingeTopBar
@@ -44,8 +45,6 @@ import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.DetailOverlayTopBar
 import com.binge.designsystem.component.ExpressiveIconButton
 import com.binge.designsystem.component.IconButtonTone
-import com.binge.designsystem.component.LocalTopBarActionTint
-import com.binge.designsystem.component.LocalTopBarActionTone
 import com.binge.designsystem.component.StatusBarScrim
 import com.binge.designsystem.component.measuredHeroHeight
 import com.binge.designsystem.component.rememberMeasuredHeroHeight
@@ -123,13 +122,10 @@ private fun FractionLabel(
 /** A search action that takes the bar's tone and tint, so it follows the bar from glass to solid. */
 @Composable
 private fun SearchAction(glassBackgroundAlpha: Float) {
-    ExpressiveIconButton(
-        onClick = {},
+    BingeBarIconAction(
         icon = Icons.Filled.Search,
-        contentDescription = null,
-        tint = LocalTopBarActionTint.current,
-        tone = LocalTopBarActionTone.current,
-        size = dimensionResource(R.dimen.top_bar_icon_size),
+        contentDescription = "Search",
+        onClick = {},
         glassBackgroundAlpha = glassBackgroundAlpha,
     )
 }

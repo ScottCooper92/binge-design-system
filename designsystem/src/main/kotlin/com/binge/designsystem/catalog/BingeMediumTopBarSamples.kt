@@ -19,9 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeMediumTopBar
 import com.binge.designsystem.component.ExpressiveIconButton
-import com.binge.designsystem.component.LocalTopBarActionTint
 import com.binge.designsystem.component.LocalTopBarActionTone
 import com.binge.designsystem.component.TransparentBingeMediumTopBarSample
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -88,13 +88,10 @@ internal fun TopBarOverContent(bar: @Composable () -> Unit) {
 /** A Share action that follows the bar's tone, tint and glass hand-off, as a real action does. */
 @Composable
 internal fun TopBarShareAction(glassBackgroundAlpha: Float) {
-    ExpressiveIconButton(
-        onClick = {},
+    BingeBarIconAction(
         icon = Icons.Filled.Share,
-        contentDescription = null,
-        tint = LocalTopBarActionTint.current,
-        tone = LocalTopBarActionTone.current,
-        size = dimensionResource(R.dimen.top_bar_icon_size),
+        contentDescription = "Share",
+        onClick = {},
         glassBackgroundAlpha = glassBackgroundAlpha,
     )
 }
@@ -220,13 +217,10 @@ fun BingeMediumTopBarThemeFollowingScrimSample() {
                 containerColor = Color.Transparent,
                 scrimFraction = 1f,
                 actions = { glassBackgroundAlpha ->
-                    ExpressiveIconButton(
-                        onClick = {},
+                    BingeBarIconAction(
                         icon = Icons.Filled.Search,
-                        contentDescription = null,
-                        tint = LocalTopBarActionTint.current,
-                        tone = LocalTopBarActionTone.current,
-                        size = dimensionResource(R.dimen.top_bar_icon_size),
+                        contentDescription = "Search",
+                        onClick = {},
                         glassBackgroundAlpha = glassBackgroundAlpha,
                     )
                 },
@@ -238,6 +232,7 @@ fun BingeMediumTopBarThemeFollowingScrimSample() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchAction() {
+    // Not BingeBarIconAction: this action takes the bar's tone but not its tint, which the collapsed frames depend on, and the wrapper reads both.
     ExpressiveIconButton(
         onClick = {},
         icon = Icons.Filled.Search,
