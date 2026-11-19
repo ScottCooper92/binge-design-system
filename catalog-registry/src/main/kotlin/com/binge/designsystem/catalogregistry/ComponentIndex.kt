@@ -18,6 +18,7 @@ enum class IndexGroup(
     Media("media", "Media and carousels"),
     Inputs("inputs", "Inputs"),
     Feedback("feedback", "Feedback and state"),
+    Detail("detail", "Detail pages"),
     Tv("tv", "TV"),
 }
 
