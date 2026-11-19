@@ -9,9 +9,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.R
@@ -35,8 +35,7 @@ class DetailActionsTest {
     @get:Rule
     val rule = createTakeDownComposeRule()
 
-    private fun actions(count: Int) =
-        List(count) { DetailRoundAction(Icons.Filled.PlayArrow, "Action $it", onClick = {}) }
+    private fun actions(count: Int) = List(count) { DetailRoundAction(Icons.Filled.PlayArrow, "Action $it", onClick = {}) }
 
     private fun show(fontScale: Float = 1f, content: @androidx.compose.runtime.Composable () -> Unit) {
         rule.setContent {
@@ -99,6 +98,7 @@ class DetailActionsTest {
             }
             Column(Modifier.testTag("skeleton")) { DetailActionsSkeleton(buttons = count) }
         }
+
         fun heightOf(tag: String) = rule.onNodeWithTag(tag).getBoundsInRoot().let { (it.bottom - it.top).value }
 
         assertEquals("buttons=$count at ${fontScale}x", heightOf("loaded"), heightOf("skeleton"), 1f)
