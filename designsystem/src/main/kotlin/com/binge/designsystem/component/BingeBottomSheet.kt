@@ -1,10 +1,13 @@
 package com.binge.designsystem.component
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
@@ -57,6 +60,10 @@ import kotlinx.coroutines.launch
  * row can scroll clear of the bar. The status bar and the IME are still inset, so a field in the sheet is not covered by the
  * keyboard. Both forms also inset the window's sides where the sheet reaches them, so on a narrow landscape window
  * the content clears a side cutout or a side navigation bar, and a wider window's centred sheet is not pushed off-centre.
+ *
+ * When the content changes height (a list finishes loading, an error replaces the rows, a section appears) the sheet follows it on the
+ * theme's spatial spring rather than jumping, as [SheetMotion] reads it; under reduced motion it jumps, as before. A sheet whose
+ * content holds still looks exactly as it did.
  *
  * Otherwise the content insets are [ModalBottomSheet]'s default —
  * `BottomSheetDefaults.modalWindowInsets`, `safeDrawing.only(Bottom + Top)` — plus those sides. The default already includes
@@ -128,7 +135,7 @@ fun BingeBottomSheet(
             scope.launch { sheetState.hide() }.invokeOnCompletion { if (!sheetState.isVisible) onDismissRequest() }
         }
         if (gesturesEnabled) HideImeOnBack()
-        CompositionLocalProvider(LocalBingeSheetDock provides dock) { content() }
+        CompositionLocalProvider(LocalBingeSheetDock provides dock) { SheetAnimatedColumn(content) }
     }
 }
 
@@ -189,3 +196,18 @@ internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
 
 /** The gap, in pixels, between a centred sheet at most [sheetMaxWidth] wide and each side of a [windowWidth] window. */
 internal fun sheetSideMargin(windowWidth: Int, sheetMaxWidth: Int): Int = ((windowWidth - sheetMaxWidth) / 2).coerceAtLeast(0)
+
+/**
+ * A sheet's content in a column that animates its own height, so the sheet, which is as tall as its content, follows a change on the
+ * theme's spatial spring instead of jumping to it. Under reduced motion there is no animation modifier at all and the height changes
+ * at once. The column is the width of the sheet and lays its children out as the sheet's own column did, so a sheet whose height
+ * holds still is unchanged.
+ */
+@Composable
+internal fun SheetAnimatedColumn(content: @Composable ColumnScope.() -> Unit) {
+    val motion = rememberSheetMotion()
+    Column(
+        modifier = Modifier.fillMaxWidth().then(if (motion.reduceMotion) Modifier else Modifier.animateContentSize(motion.spatial())),
+        content = content,
+    )
+}
