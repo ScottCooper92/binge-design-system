@@ -16,11 +16,11 @@ import org.robolectric.annotation.Config
 import java.util.Locale
 
 /**
- * The shared rating components format for the locale of the configuration they are composed in, not the device's
- * default. With the device default English and the configuration German, a rating reads "7,5" and not "7.5".
+ * The shared rating components format for the locale the library's string resources resolved to, not the device's
+ * default. With the device default English and the configuration Spanish (shipped), a rating reads "7,5" and not "7.5".
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], application = android.app.Application::class, shadows = [ShadowMeshSpecification::class], qualifiers = "de")
+@Config(sdk = [34], application = android.app.Application::class, shadows = [ShadowMeshSpecification::class], qualifiers = "es")
 class RatingLocaleTest {
     @get:Rule
     val rule = createTakeDownComposeRule()
@@ -38,7 +38,7 @@ class RatingLocaleTest {
     }
 
     @Test
-    fun `the rating chip reads the configuration's separator`() {
+    fun `the rating chip reads the resource locale's separator`() {
         rule.setContent { TestTheme { RatingChip(rating = 7.5f) } }
 
         rule.onNodeWithText("7,5").assertExists()
@@ -46,14 +46,14 @@ class RatingLocaleTest {
     }
 
     @Test
-    fun `the star rating announces the configuration's separator`() {
+    fun `the star rating announces the resource locale's separator`() {
         rule.setContent { TestTheme { StarRating(rating = 7.5f) } }
 
         rule.onNodeWithContentDescription("7,5", substring = true).assertContentDescriptionContains("7,5", substring = true)
     }
 
     @Test
-    fun `the episode row rating reads the configuration's separator`() {
+    fun `the episode row rating reads the resource locale's separator`() {
         rule.setContent {
             TestTheme { EpisodeListRow(episodeNumber = 1, name = "Pilot", stillUrl = null, onClick = null, rating = 7.5f) }
         }
@@ -62,7 +62,7 @@ class RatingLocaleTest {
     }
 
     @Test
-    fun `the hero rating reads the configuration's separator`() {
+    fun `the hero rating reads the resource locale's separator`() {
         rule.setContent {
             TestTheme {
                 HeroCarousel(
@@ -76,7 +76,7 @@ class RatingLocaleTest {
     }
 
     @Test
-    fun `the device default does not matter when the configuration is German`() {
+    fun `the device default does not matter when the configuration is Spanish`() {
         Locale.setDefault(Locale.US)
         rule.setContent { TestTheme { RatingChip(rating = 7.5f) } }
 
@@ -84,7 +84,40 @@ class RatingLocaleTest {
     }
 }
 
-/** With an English configuration a rating reads a point, even when the device default is German. */
+/**
+ * A language the library does not ship takes the English words, so the rating takes the English separator beside them,
+ * as the vote count does, whatever the configuration's own separator is.
+ */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = android.app.Application::class, qualifiers = "de")
+class RatingUnshippedLocaleTest {
+    @get:Rule
+    val rule = createTakeDownComposeRule()
+
+    private val defaultLocale = Locale.getDefault()
+
+    @After
+    fun restoreLocale() {
+        Locale.setDefault(defaultLocale)
+    }
+
+    @Test
+    fun `an unshipped configuration reads a point`() {
+        Locale.setDefault(Locale.GERMANY)
+        rule.setContent { TestTheme { RatingChip(rating = 7.5f) } }
+
+        rule.onNodeWithText("7.5").assertExists()
+    }
+
+    @Test
+    fun `the star rating announces a point beside the English words`() {
+        rule.setContent { TestTheme { StarRating(rating = 7.5f) } }
+
+        rule.onNodeWithContentDescription("7.5", substring = true).assertContentDescriptionContains("7.5", substring = true)
+    }
+}
+
+/** With an English configuration a rating reads a point, even when the device default is Spanish. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "en")
 class RatingEnglishLocaleTest {
@@ -100,7 +133,7 @@ class RatingEnglishLocaleTest {
 
     @Test
     fun `an English configuration reads a point`() {
-        Locale.setDefault(Locale.GERMANY)
+        Locale.setDefault(Locale("es", "ES"))
         rule.setContent { TestTheme { RatingChip(rating = 7.5f) } }
 
         rule.onNodeWithText("7.5").assertExists()
