@@ -278,7 +278,7 @@ private fun HeroRating(rating: Float) {
 private fun HeroStatus(status: MediaCardStatus) {
     Row(
         modifier = Modifier.clearAndSetSemantics { contentDescription = status.label },
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.external_score_gap)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.meta_item_icon_gap)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         StatusDot(status.sentiment.fill())

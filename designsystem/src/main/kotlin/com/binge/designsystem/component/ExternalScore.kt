@@ -1,8 +1,9 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -34,7 +34,7 @@ enum class ExternalScoreKind {
     /** Audience score: popcorn. */
     Audience,
 
-    /** An IMDb-style user rating: a small text badge. */
+    /** An IMDb-style user rating: a small outlined text tag in the theme's own ink, not IMDb's colours. */
     Imdb,
 }
 
@@ -50,12 +50,10 @@ data class ExternalScore(
 )
 
 private const val IMDB_BADGE_TEXT = "IMDb"
-private val ImdbYellow = Color(0xFFF5C518)
-private val ImdbInk = Color(0xFF000000)
 
 /**
  * A score's glyph and value as one item, read by a screen reader as [ExternalScore.contentDescription].
- * The glyphs are our own drawings and look the same in light and dark. [color] is the value's ink.
+ * The glyphs are our own drawings and look the same in light and dark; the IMDb tag takes the theme's ink. [color] is the value's ink.
  */
 @Composable
 internal fun ExternalScoreItem(
@@ -65,7 +63,7 @@ internal fun ExternalScoreItem(
 ) {
     Row(
         modifier = modifier.clearAndSetSemantics { contentDescription = score.contentDescription },
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.external_score_gap)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.meta_item_icon_gap)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ExternalScoreGlyph(score.kind)
@@ -96,13 +94,15 @@ private fun ExternalScoreGlyph(kind: ExternalScoreKind) {
         Text(
             text = IMDB_BADGE_TEXT,
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.ExtraBold,
-            color = ImdbInk,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             modifier = Modifier
-                .clip(BingeShapes.ElementExtraSmall)
-                .background(ImdbYellow)
-                .padding(
+                .border(
+                    width = dimensionResource(R.dimen.external_score_badge_border),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    shape = BingeShapes.ElementExtraSmall,
+                ).padding(
                     horizontal = dimensionResource(R.dimen.external_score_badge_padding_h),
                     vertical = dimensionResource(R.dimen.external_score_badge_padding_v),
                 ),
@@ -126,7 +126,8 @@ internal fun MetaFlow(entries: List<@Composable () -> Unit>, modifier: Modifier 
     ) {
         entries.forEachIndexed { index, entry ->
             Row(horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
-                entry()
+                // The entry takes what the dot leaves, so an item as wide as the line still ends on its dot.
+                Box(Modifier.weight(1f, fill = false)) { entry() }
                 if (index < entries.lastIndex) HeroMetaDot()
             }
         }

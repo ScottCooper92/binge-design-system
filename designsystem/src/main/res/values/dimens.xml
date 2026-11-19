@@ -261,10 +261,11 @@
     <dimen name="hero_meta_gap">10dp</dimen>
     <dimen name="hero_meta_star_size">16dp</dimen>
     <dimen name="hero_meta_dot_size">3dp</dimen>
-    <!-- An external score in a meta line: its glyph, the gap to its value, the IMDb-style badge's padding, and the
-         gap between wrapped lines of the meta line. -->
+    <!-- A meta-line item with a leading glyph (an external score, a status): the glyph's size and its gap to the text; the
+         IMDb-style tag's outline and padding; and the gap between wrapped lines of the meta line. -->
     <dimen name="external_score_icon_size">16dp</dimen>
-    <dimen name="external_score_gap">4dp</dimen>
+    <dimen name="meta_item_icon_gap">4dp</dimen>
+    <dimen name="external_score_badge_border">1dp</dimen>
     <dimen name="external_score_badge_padding_h">4dp</dimen>
     <dimen name="external_score_badge_padding_v">1dp</dimen>
     <dimen name="meta_flow_line_gap">2dp</dimen>
