@@ -46,6 +46,7 @@
     </plurals>
     <string name="cd_rating_out_of_ten">Valoración: %1$s sobre 10</string>
     <string name="cd_rate_out_of_ten">Valorar con %1$s sobre 10</string>
+    <string name="resource_locale_tag">es</string>
     <plurals name="detail_stat_votes">
         <item quantity="one">%1$s voto</item>
         <item quantity="many">%1$s de votos</item>

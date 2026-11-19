@@ -3,11 +3,11 @@ package com.binge.designsystem.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
 import com.binge.designsystem.formatVoteCount
+import java.util.Locale
 
 /**
  * One cell of a [DetailStatRow]. [accent], when specified, colours the cell's icon, value and label, so one stat can carry a
@@ -34,8 +34,19 @@ fun ratingSubLabel(voteCount: Int): String =
         pluralStringResource(
             R.plurals.detail_stat_votes,
             voteCount,
-            voteCount.formatVoteCount(LocalConfiguration.current.locales[0]),
+            voteCount.formatVoteCount(resourceLocale()),
         )
     } else {
         stringResource(R.string.detail_rating)
     }
+
+/**
+ * The locale the library's string resources resolve to for the current configuration, which is the language of the
+ * words they supply: the device's language when the library ships it, the default (English) when it does not. A number
+ * is formatted in this locale beside a word from the resources, so the two agree: a device in a language the library
+ * does not ship reads "1.3k votes", where the device's own locale would put its own digits and unit beside an English
+ * word. It reads the language tag from a resource, [R.string.resource_locale_tag], which resolves exactly as the
+ * strings beside it do, so a language added with its own `values-xx` folder follows with no code change.
+ */
+@Composable
+internal fun resourceLocale(): Locale = Locale.forLanguageTag(stringResource(R.string.resource_locale_tag))
