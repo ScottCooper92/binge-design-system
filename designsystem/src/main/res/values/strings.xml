@@ -54,6 +54,9 @@
     <!-- TalkBack content/state descriptions for shared design-system controls. -->
     <string name="cd_rating_out_of_ten">Rating: %1$s out of 10</string>
     <string name="cd_rate_out_of_ten">Rate %1$s out of 10</string>
+    <!-- The language of this folder, as a BCP 47 tag. Every values-xx folder gives its own: it is how a number is formatted in
+         the language the words around it resolved to. Deliberately translatable, so lint reports a language that lacks it. -->
+    <string name="resource_locale_tag">en</string>
     <plurals name="detail_stat_votes">
         <item quantity="one">%1$s vote</item>
         <item quantity="other">%1$s votes</item>
