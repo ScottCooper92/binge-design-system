@@ -3,6 +3,7 @@ package com.binge.designsystem.component
 import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -90,5 +91,33 @@ class TopBarScrimSolidTest {
     @Test
     fun `at the start of the solid ramp the content still shows`() {
         assertTrue("the content shows", distanceFromPage(0.75f) > 100)
+    }
+
+    /** The pixel [y] dp down a pinned header over a bright page, fully scrimmed: the header is 40dp tall, then its fade band. */
+    private fun pinnedHeaderDistanceFromPage(y: Int): Int {
+        var density = 1f
+        rule.setContent {
+            density = LocalDensity.current.density
+            BingeExpressiveTheme(dynamicColor = false) {
+                page = MaterialTheme.colorScheme.background
+                Box(Modifier.width(300.dp).height(200.dp).testTag("page")) {
+                    OverlaidHeaderContent(
+                        header = { Box(Modifier.fillMaxWidth().height(40.dp)) },
+                        headerBackground = Color.Transparent,
+                        scrimFraction = 1f,
+                    ) {
+                        Box(Modifier.fillMaxSize().background(Color.Red))
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        val bitmap: Bitmap = rule.onNodeWithTag("page").captureToImage().asAndroidBitmap()
+        return distance(bitmap.getPixel((250 * density).toInt(), (y * density).toInt()), page.toArgb())
+    }
+
+    @Test
+    fun `a pinned header's fade band tapers and does not end in a solid hard edge`() {
+        assertTrue("the content shows in the band", pinnedHeaderDistanceFromPage(60) > 100)
     }
 }
