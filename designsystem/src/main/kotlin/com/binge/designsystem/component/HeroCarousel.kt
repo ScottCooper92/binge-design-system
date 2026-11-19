@@ -142,6 +142,8 @@ fun HeroCarousel(
     // placeholder fades in over the outgoing backdrop for as long as the image takes, which on a first, cold load is
     // what the user watches. The copy and the dots follow `current`, so they never wait.
     val loader = rememberHeroBackdropLoader()
+    // The window's width, not the hero's own: an upper bound, so Coil's cache accepts the image for a hero that is narrower, as one beside a
+    // navigation rail is.
     val backdropSize = with(LocalDensity.current) {
         IntSize(LocalWindowInfo.current.containerSize.width, heroHeight.roundToPx())
     }
