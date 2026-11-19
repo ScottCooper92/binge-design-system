@@ -10,7 +10,9 @@ import androidx.compose.ui.graphics.luminance
 
 /**
  * Extended color palette for tokens outside Material 3's ColorScheme — accents, image-overlay
- * colors (scrims, glass), the rating-distribution bucket gradient, and the initials-avatar palette.
+ * colors (scrims, glass), the rating-distribution bucket gradient, and the initials-avatar palette. The avatar
+ * palette and its ink are the exception to the shared tokens: the theme derives them from its own primary (see
+ * [avatarTones]), so the values here are Binge's and a brand or dynamic scheme replaces them.
  *
  * `scrim` is the overlay base; call sites apply their own alpha (e.g. `scrim.copy(alpha = 0.55f)`)
  * so one gradient can reuse the same base at multiple intensities. Tokens that render on imagery
@@ -86,21 +88,13 @@ private val DarkBucketGradient = listOf(
 )
 
 /**
- * Deterministic pastel tones for initials-fallback avatars, theme-agnostic by design: light enough
- * that `avatarInk` (near-black) reads on every tone in both themes — `colorScheme.onSurface` would
- * print white text on pastel pink in dark mode.
+ * The avatar tones for Binge's own primary: what a theme carries until it derives its own from the scheme in effect.
+ * Held in one place so the light and dark sets are built once.
  */
-private val AvatarPalette = listOf(
-    Color(0xFFFF8A80),
-    Color(0xFFFFB74D),
-    Color(0xFFFFD54F),
-    Color(0xFFAED581),
-    Color(0xFF4DD0E1),
-    Color(0xFF7986CB),
-    Color(0xFFBA68C8),
-    Color(0xFFF06292),
-)
-private val AvatarInk = Color(0xFF1A1A1A)
+private object BingeAvatarTones {
+    val light = avatarTones(LightColorScheme.primary, isDark = false)
+    val dark = avatarTones(DarkColorScheme.primary, isDark = true)
+}
 
 /**
  * Favourite heart red, tuned per theme so the active heart reads as "favourite red"
@@ -130,8 +124,8 @@ internal val LightBingeColors = BingeColors(
     onScrim = Color.White,
     titleShadow = Color.Black.copy(alpha = 0.4f),
     ratingBucketGradient = LightBucketGradient,
-    avatarPalette = AvatarPalette,
-    avatarInk = AvatarInk,
+    avatarPalette = BingeAvatarTones.light.tones,
+    avatarInk = BingeAvatarTones.light.ink,
 )
 
 val DarkBingeColors = BingeColors(
@@ -154,8 +148,8 @@ val DarkBingeColors = BingeColors(
     onScrim = Color.White,
     titleShadow = Color.Black.copy(alpha = 0.4f),
     ratingBucketGradient = DarkBucketGradient,
-    avatarPalette = AvatarPalette,
-    avatarInk = AvatarInk,
+    avatarPalette = BingeAvatarTones.dark.tones,
+    avatarInk = BingeAvatarTones.dark.ink,
 )
 
 val LocalBingeColors = staticCompositionLocalOf<BingeColors> {

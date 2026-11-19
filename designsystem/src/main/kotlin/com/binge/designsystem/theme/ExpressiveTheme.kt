@@ -91,7 +91,10 @@ fun BingeExpressiveTheme(
         else -> brand.light
     }
 
-    val bingeColors = if (darkTheme) DarkBingeColors else LightBingeColors
+    // The avatar tones lean to the scheme in effect: a brand's primary, or the wallpaper's under dynamic colour.
+    val bingeColors = remember(darkTheme, colorScheme.primary) {
+        (if (darkTheme) DarkBingeColors else LightBingeColors).withAvatarTonesFor(colorScheme.primary, darkTheme)
+    }
 
     CompositionLocalProvider(
         LocalReduceMotion provides reduceMotion,
