@@ -1,5 +1,6 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -128,6 +129,11 @@ internal fun filterChipRowPadding(consumed: WindowInsets): PaddingValues {
 /** The consumed insets a chip row starts from, before an ancestor reports any. */
 internal val NoInsets = WindowInsets(0, 0, 0, 0)
 
+/** Where a pager is moving to for a selection change, held so a settle in the middle of the move is not mistaken for a swipe. */
+private class FilterPagerMove {
+    var page: Int? = null
+}
+
 /**
  * A [PagerState] for [pageCount] pages kept in two-way sync with a selection the caller owns: an
  * external change to [selectedIndex] animates the pager, and a settled swipe reports the new page
@@ -146,10 +152,25 @@ fun rememberFilterPagerState(
     val pagerState = rememberPagerState(
         initialPage = selectedIndex.coerceIn(0, (pageCount - 1).coerceAtLeast(0)),
     ) { pageCount }
+    // The page the pager is itself moving to for a selection change, or null when it is not. A settle while it is set is not a swipe: a move that
+    // the next one replaces leaves the pager still for an instant on the page it was cancelled on, and reporting that page would overwrite the
+    // selection the caller has just made.
+    val moveTarget = remember { FilterPagerMove() }
     // A chip tap (or any external selection change) animates the pager to that page. It also re-runs when the page count changes, because a
     // selection made while the pages were not there yet (an empty list that fills) has nowhere to go until they are, and the pager starts on page 0.
     LaunchedEffect(selectedIndex, pageCount) {
-        if (selectedIndex in 0 until pageCount && selectedIndex != pagerState.currentPage) pagerState.animateScrollToPage(selectedIndex)
+        if (selectedIndex in 0 until pageCount && selectedIndex != pagerState.currentPage) {
+            moveTarget.page = selectedIndex
+            pagerState.animateScrollToPage(selectedIndex)
+            // Cleared on arrival only. A move cancelled by the next one keeps the record, so the gap before the next move starts is covered.
+            moveTarget.page = null
+        } else {
+            moveTarget.page = null
+        }
+    }
+    // A reader who puts a finger on the pager takes it over from any move in flight, and the settle that follows is theirs.
+    LaunchedEffect(pagerState) {
+        pagerState.interactionSource.interactions.collect { if (it is DragInteraction.Start) moveTarget.page = null }
     }
     // A settled swipe reports the new page back up. The collect lambda outlives its composition (the
     // effect is keyed only on pagerState), so read selectedIndex + callback through rememberUpdatedState;
@@ -162,6 +183,8 @@ fun rememberFilterPagerState(
             // began on page 0 (no pages yet, or a restored page the caller has since moved off) overwrite the caller's selection.
             .drop(1)
             .collect { page ->
+                // Nor is a settle in the middle of the pager's own move to the caller's selection.
+                if (moveTarget.page != null) return@collect
                 if (pagerState.pageCount > 0 && page != latestSelectedIndex) latestOnSelectedIndexChange(page)
             }
     }
