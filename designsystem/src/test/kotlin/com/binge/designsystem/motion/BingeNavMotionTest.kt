@@ -1,6 +1,7 @@
 package com.binge.designsystem.motion
 
 import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.ui.unit.LayoutDirection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -17,6 +18,25 @@ class BingeNavMotionTest {
         assertEquals(0.9f, NAV_PREDICTIVE_POP_ALPHA, 0f)
         assertEquals(0.96f, NAV_TAB_PREDICTIVE_POP_SCALE, 0f)
         assertEquals(0.96f, NAV_TAB_PREDICTIVE_POP_ALPHA, 0f)
+        assertEquals(700, NAV_TAB_SWITCH_DURATION_MS)
+    }
+
+    @Test
+    fun `a tab switch cross-fades, the new tab enters and the old one exits, and neither draws above`() {
+        val switch = bingeTabSwitch()
+
+        assertNotEquals(EnterTransition.None, switch.targetContentEnter)
+        assertNotEquals(ExitTransition.None, switch.initialContentExit)
+        assertEquals(0f, switch.targetContentZIndex, 0f)
+    }
+
+    @Test
+    fun `a tab switch is a fade and not a pop or a push, so it differs from each`() {
+        val switch = bingeTabSwitch()
+
+        assertNotEquals(bingeDetailForward(reduceMotion = false).targetContentEnter, switch.targetContentEnter)
+        assertNotEquals(bingeDetailForward(reduceMotion = true).targetContentEnter, switch.targetContentEnter)
+        assertNotEquals(bingeDetailPop(reduceMotion = false).initialContentExit, switch.initialContentExit)
     }
 
     @Test
