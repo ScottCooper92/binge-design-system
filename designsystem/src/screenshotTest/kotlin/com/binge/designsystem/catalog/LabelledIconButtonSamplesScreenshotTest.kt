@@ -29,4 +29,20 @@ class LabelledIconButtonSamplesScreenshotTest {
     fun Disabled() {
         LabelledIconButtonDisabledSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun LongWord() {
+        LabelledIconButtonLongWordSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun SpanishLongWord() {
+        LabelledIconButtonSpanishLongWordSample()
+    }
 }

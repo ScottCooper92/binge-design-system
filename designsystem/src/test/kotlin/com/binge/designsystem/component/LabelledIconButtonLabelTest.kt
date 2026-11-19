@@ -81,4 +81,25 @@ class LabelledIconButtonLabelTest {
         assertEquals(2, layout.lineCount)
         assertTrue(layout.isLineEllipsized(1))
     }
+
+    @Test
+    fun `a single word wider than the cap stays whole on one line and is cut with an ellipsis at 2_0`() {
+        val word = "Subscribe"
+        show(word, 2.0f)
+
+        val layout = layoutOf(word)
+        assertEquals(1, layout.lineCount)
+        assertTrue(layout.isLineEllipsized(0))
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
+    }
+
+    @Test
+    fun `a single word that fits is not touched at 1_0`() {
+        val word = "Subscribe"
+        show(word, 1.0f)
+
+        val layout = layoutOf(word)
+        assertEquals(1, layout.lineCount)
+        assertFalse(layout.isLineEllipsized(0))
+    }
 }
