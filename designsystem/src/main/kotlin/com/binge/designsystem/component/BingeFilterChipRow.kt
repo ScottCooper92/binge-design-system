@@ -36,6 +36,7 @@ import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
+import kotlinx.coroutines.flow.drop
 
 /**
  * A horizontally-scrolling row of [BingeFilterChip]s — the selected one filled in the primary accent,
@@ -145,9 +146,10 @@ fun rememberFilterPagerState(
     val pagerState = rememberPagerState(
         initialPage = selectedIndex.coerceIn(0, (pageCount - 1).coerceAtLeast(0)),
     ) { pageCount }
-    // A chip tap (or any external selection change) animates the pager to that page.
-    LaunchedEffect(selectedIndex) {
-        if (selectedIndex != pagerState.currentPage) pagerState.animateScrollToPage(selectedIndex)
+    // A chip tap (or any external selection change) animates the pager to that page. It also re-runs when the page count changes, because a
+    // selection made while the pages were not there yet (an empty list that fills) has nowhere to go until they are, and the pager starts on page 0.
+    LaunchedEffect(selectedIndex, pageCount) {
+        if (selectedIndex in 0 until pageCount && selectedIndex != pagerState.currentPage) pagerState.animateScrollToPage(selectedIndex)
     }
     // A settled swipe reports the new page back up. The collect lambda outlives its composition (the
     // effect is keyed only on pagerState), so read selectedIndex + callback through rememberUpdatedState;
@@ -155,9 +157,13 @@ fun rememberFilterPagerState(
     val latestSelectedIndex by rememberUpdatedState(selectedIndex)
     val latestOnSelectedIndexChange by rememberUpdatedState(onSelectedIndexChange)
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }.collect { page ->
-            if (page != latestSelectedIndex) latestOnSelectedIndexChange(page)
-        }
+        snapshotFlow { pagerState.settledPage }
+            // The first value is where the pager started, not something the reader did, so it is never reported. Reporting it let a pager that
+            // began on page 0 (no pages yet, or a restored page the caller has since moved off) overwrite the caller's selection.
+            .drop(1)
+            .collect { page ->
+                if (pagerState.pageCount > 0 && page != latestSelectedIndex) latestOnSelectedIndexChange(page)
+            }
     }
     return pagerState
 }
