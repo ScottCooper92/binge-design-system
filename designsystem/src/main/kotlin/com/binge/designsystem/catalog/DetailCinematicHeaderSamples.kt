@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.DetailCinematicHeader
 import com.binge.designsystem.component.DetailStat
+import com.binge.designsystem.component.ExternalScore
+import com.binge.designsystem.component.ExternalScoreKind
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
@@ -102,6 +104,37 @@ fun DetailCinematicHeaderSynopsisOverflowSample() {
             backdropUrl = null,
             posterUrl = null,
             synopsisInitiallyOverflowing = true,
+        )
+    }
+}
+
+/**
+ * [DetailCinematicHeader] with a long title, four genres, the scores, a synopsis and four facts: the most copy it
+ * carries. At a large font the copy is taller than the header's own minimum, and the header grows to fit it, so the
+ * facts row at its foot is shown whole.
+ */
+@Composable
+fun DetailCinematicHeaderLongCopySample() {
+    ScreenshotTheme {
+        DetailCinematicHeader(
+            title = "The Lord of the Rings: The Fellowship of the Ring",
+            genres = listOf("Adventure", "Fantasy", "Action", "Drama"),
+            synopsis = "A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful " +
+                "One Ring and save Middle-earth from the Dark Lord Sauron.",
+            tagline = "One ring to rule them all.",
+            stats = listOf(
+                DetailStat(Icons.Filled.Star, "8.9", "24.0k votes"),
+                DetailStat(Icons.Filled.Star, "2001", "Released"),
+                DetailStat(Icons.Filled.Star, "2h 58m", "Runtime"),
+                DetailStat(Icons.Filled.Star, "PG-13", "Rated"),
+            ),
+            backdropUrl = null,
+            posterUrl = null,
+            externalScores = listOf(
+                ExternalScore(ExternalScoreKind.CriticsFresh, "91%", "Critics 91 percent"),
+                ExternalScore(ExternalScoreKind.Audience, "95%", "Audience 95 percent"),
+                ExternalScore(ExternalScoreKind.Imdb, "8.9", "IMDb 8.9"),
+            ),
         )
     }
 }
