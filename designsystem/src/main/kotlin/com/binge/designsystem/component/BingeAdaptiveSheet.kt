@@ -21,7 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateListOf
@@ -107,6 +109,12 @@ class BingeSheetNav internal constructor(
  * [BingeSheetNav.pop], through [onPageBack], and can drop that page's state there. It is not called for the sheet closing,
  * which is [onDismissRequest]; the caller drops whatever pages remain then.
  *
+ * Pages transition (#1272): a pushed page slides in from the end edge on the theme's spatial spring as the old one eases away and both fade, a popped
+ * one the reverse, mirrored in a right-to-left layout, and the sheet's height follows. Under reduced motion nothing slides and the swap is a short
+ * fade. The page that is leaving stays on screen, drawn as itself, until its exit ends, so [onPageBack] for a page popped is called then and not at
+ * the moment of the pop (a sheet that closes first reports it as it goes); a caller that drops a page's state there is not pulling it out from under
+ * a page still showing.
+ *
  * @need open a sheet that is a bottom sheet on phones and a side sheet on wide windows
  * @group sheets
  * @replaces choosing between a bottom sheet and a side sheet by hand
@@ -130,11 +138,29 @@ fun BingeAdaptiveSheet(
 ) {
     val pages = rememberSaveable(root, saver = PageStackSaver) { mutableStateListOf(root) }
     val pageContent = rememberSheetPageContent(root, content)
+    // A page popped is reported, and its saved state dropped, once its exit has finished: until then it is still on screen and still
+    // reading whatever the caller keeps for it. A sheet that closes first reports them as it goes, so every page left is heard.
+    val latestOnPageBack by rememberUpdatedState(onPageBack)
+    val leaving = remember { mutableListOf<String>() }
+    val flushLeft: () -> Unit = {
+        val gone = leaving.toList()
+        leaving.clear()
+        gone.forEach { page ->
+            pageContent.drop(page)
+            latestOnPageBack(page)
+        }
+    }
+    val latestFlush by rememberUpdatedState(flushLeft)
+    DisposableEffect(Unit) { onDispose { latestFlush() } }
+    // A page pushed again before its exit has ended is heard going back now, before the push lands, so the caller sees pop then push
+    // and is never told a page left while it is the one showing. Its saved state is kept, as the exit is still drawing it.
+    val pushPage: (String) -> Unit = { page ->
+        if (leaving.remove(page)) latestOnPageBack(page)
+        pages.add(page)
+    }
     val popPage: () -> Unit = {
         if (pages.size > 1) {
-            val popped = pages.removeAt(pages.lastIndex)
-            pageContent.drop(popped)
-            onPageBack(popped)
+            leaving += pages.removeAt(pages.lastIndex)
         } else {
             onDismissRequest()
         }
@@ -144,24 +170,27 @@ fun BingeAdaptiveSheet(
         BingeTaskSideSheet(
             pages = pages,
             onDismissRequest = onDismissRequest,
+            pushPage = pushPage,
             popPage = popPage,
             locked = !gesturesEnabled,
             scrimDismisses = dismissOnClickOutside,
             backLabel = backLabel,
+            onPageSettled = flushLeft,
             modifier = modifier,
             content = hosted,
         )
     } else {
         val stacks = kind == BingeSheetKind.Task && stackPagesWhenCompact
-        val nav =
+        val navFor: (SheetPageState) -> BingeSheetNav = { shown ->
             BingeSheetNav(
-                page = pages.last(),
-                depth = pages.size,
+                page = shown.page,
+                depth = shown.depth,
                 stacksPages = stacks,
                 inSideSheet = false,
-                onPush = { page -> if (stacks) pages.add(page) },
+                onPush = { page -> if (stacks) pushPage(page) },
                 onBack = popPage,
             )
+        }
         BingeBottomSheet(
             onDismissRequest = onDismissRequest,
             modifier = modifier,
@@ -177,7 +206,11 @@ fun BingeAdaptiveSheet(
             BackHandler(enabled = kind == BingeSheetKind.Task && pages.size > 1 && gesturesEnabled && !imeVisible) { popPage() }
             val wash = rememberBingeSheetWash()
             CompositionLocalProvider(LocalBingeSheetWash provides wash) {
-                Column(modifier = Modifier.fillMaxWidth().bingeSheetWashBehind(wash, overdrawTop = true)) { hosted(nav) }
+                AnimatedSheetPages(
+                    state = SheetPageState(pages.last(), pages.size),
+                    modifier = Modifier.fillMaxWidth().bingeSheetWashBehind(wash, overdrawTop = true),
+                    onSettled = flushLeft,
+                ) { shown -> Column(modifier = Modifier.fillMaxWidth()) { hosted(navFor(shown)) } }
             }
         }
     }
@@ -220,12 +253,14 @@ const val ROOT_PAGE = "root"
 
 @Composable
 private fun BingeTaskSideSheet(
-    pages: MutableList<String>,
+    pages: List<String>,
     onDismissRequest: () -> Unit,
+    pushPage: (page: String) -> Unit,
     popPage: () -> Unit,
     locked: Boolean,
     scrimDismisses: Boolean,
     backLabel: (page: String) -> String?,
+    onPageSettled: () -> Unit,
     modifier: Modifier,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
@@ -235,12 +270,13 @@ private fun BingeTaskSideSheet(
         onScrimTap = { if (scrimDismisses) onDismissRequest() },
         hideImeOnBack = !locked,
         panel = {
-            BingeTaskSheetPanel(
+            TaskSheetPanel(
                 pages = pages,
-                onPush = { page -> pages.add(page) },
+                onPush = pushPage,
                 onBack = popPage,
                 backEnabled = !locked,
                 backLabel = backLabel(pages.last()),
+                onPageSettled = onPageSettled,
                 modifier = modifier,
                 content = content,
             )
@@ -273,21 +309,51 @@ fun BingeTaskSheetPanel(
     backLabel: String? = null,
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
 ) {
+    TaskSheetPanel(
+        pages = pages,
+        onPush = onPush,
+        onBack = onBack,
+        modifier = modifier,
+        backEnabled = backEnabled,
+        backLabel = backLabel,
+        onPageSettled = {},
+        content = content,
+    )
+}
+
+/** [BingeTaskSheetPanel] with the hook the sheet that owns the stack uses to hear that a popped page has finished leaving. */
+@Composable
+private fun TaskSheetPanel(
+    pages: List<String>,
+    onPush: (page: String) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier,
+    backEnabled: Boolean,
+    backLabel: String?,
+    onPageSettled: () -> Unit,
+    content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
+) {
     val wash = rememberBingeSheetWash()
     BingeSideSheetPanel(modifier = modifier, width = dimensionResource(R.dimen.task_sheet_width), wash = wash) {
         CompositionLocalProvider(LocalBingeSheetWash provides wash) {
             Column(modifier = Modifier.fillMaxSize()) {
-                val nav =
-                    BingeSheetNav(
-                        page = pages.last(),
-                        depth = pages.size,
-                        stacksPages = true,
-                        inSideSheet = true,
-                        onPush = onPush,
-                        onBack = onBack,
-                    )
                 if (pages.size > 1) BingeSheetBackBar(onBack, enabled = backEnabled, label = backLabel)
-                key(nav.page) { SheetPageWithFooter { content(nav) } }
+                AnimatedSheetPages(
+                    state = SheetPageState(pages.last(), pages.size),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    onSettled = onPageSettled,
+                ) { shown ->
+                    val nav =
+                        BingeSheetNav(
+                            page = shown.page,
+                            depth = shown.depth,
+                            stacksPages = true,
+                            inSideSheet = true,
+                            onPush = onPush,
+                            onBack = onBack,
+                        )
+                    Column(modifier = Modifier.fillMaxSize()) { SheetPageWithFooter { content(nav) } }
+                }
             }
         }
     }
