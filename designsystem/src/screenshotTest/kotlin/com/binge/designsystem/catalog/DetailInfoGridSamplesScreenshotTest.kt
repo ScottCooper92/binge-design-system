@@ -18,6 +18,14 @@ class DetailInfoGridSamplesScreenshotTest {
     }
 
     @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun LongWord() {
+        DetailInfoGridLongWordSample()
+    }
+
+    @PreviewTest
     @TabletScreenPreview
     @Composable
     fun Tablet() {
