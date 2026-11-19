@@ -183,6 +183,7 @@
     <dimen name="list_row_padding">10dp</dimen>
     <dimen name="list_row_gap">14dp</dimen>
     <dimen name="list_row_poster_width">72dp</dimen>
+    <dimen name="list_row_logo_padding">10dp</dimen>
     <dimen name="list_row_spacing">10dp</dimen>
     <dimen name="list_row_skeleton_height">128dp</dimen>
     <!-- Discover screen + filter sheet -->
