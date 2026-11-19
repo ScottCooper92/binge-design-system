@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -247,7 +248,10 @@ private fun FilterSectionControl(
 ) {
     val spacing = dimensionResource(R.dimen.filter_sheet_chip_spacing)
     FlowRow(
-        modifier = Modifier.fillMaxWidth(),
+        // The chips of a single choice are radio buttons, so a screen reader reads them as one group.
+        modifier = Modifier.fillMaxWidth().then(
+            if (section.control is FilterControlUi.SingleChoice) Modifier.selectableGroup() else Modifier,
+        ),
         horizontalArrangement = Arrangement.spacedBy(spacing),
         verticalArrangement = Arrangement.spacedBy(spacing),
     ) {
