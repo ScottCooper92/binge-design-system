@@ -342,6 +342,10 @@
     <dimen name="hero_pull_in_bar_lift">28dp</dimen>
     <!-- Episode list row: the backdrop still's width (the rest of the chrome comes from ListRow). -->
     <dimen name="episode_row_still_width">132dp</dimen>
+    <!-- Episode browse row: the backdrop still's width. The card row's still (episode_row_still_width) is a step narrower. -->
+    <dimen name="episode_browse_row_still_width">144dp</dimen>
+    <!-- Clear space under the last row of a season-grouped episode list. -->
+    <dimen name="detail_bottom_spacing">32dp</dimen>
     <!-- The catalog sample for the shared navigation motion: the fixed height of its two-screen stage. -->
     <dimen name="nav_motion_sample_height">180dp</dimen>
     <dimen name="icon_size_m">18dp</dimen>

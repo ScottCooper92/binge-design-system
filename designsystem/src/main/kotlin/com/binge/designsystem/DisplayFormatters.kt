@@ -206,10 +206,19 @@ internal fun downloadEtaHours(etaMinutes: Int): Int? =
  * A runtime as hours and minutes in the shown language ("2h 15m", "2 h 15 min"). The one place the split into
  * hours and minutes happens, so every screen and companion app that shows a runtime reads it the same way.
  * A runtime under an hour reads "0h 45m", as the hero always has. [minutes] is not negative: a caller with an
- * unknown runtime shows nothing rather than passing a sentinel.
+ * unknown runtime shows nothing rather than passing a sentinel. [formatRuntimeMinutes] is the other form, for a dense
+ * row that reads a runtime as minutes alone.
  */
 @Composable
 fun formatRuntime(minutes: Int): String = stringResource(R.string.hero_meta_runtime, minutes / MINUTES_PER_HOUR, minutes % MINUTES_PER_HOUR)
+
+/**
+ * A runtime as minutes alone in the shown language ("73 min"), for a dense row such as an episode's eyebrow, where
+ * "1h 13m" would read as a different figure from the hero's. The one place this form is built, as [formatRuntime] is for
+ * hours and minutes. [minutes] is not negative.
+ */
+@Composable
+fun formatRuntimeMinutes(minutes: Int): String = stringResource(R.string.detail_runtime_minutes, minutes)
 
 private const val CLOCK_MINUTES_PER_DAY = 1440
 
