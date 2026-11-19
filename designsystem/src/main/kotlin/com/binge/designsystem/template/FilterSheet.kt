@@ -1,17 +1,13 @@
 package com.binge.designsystem.template
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -24,17 +20,15 @@ import androidx.compose.ui.text.font.FontWeight
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeActionFooter
 import com.binge.designsystem.component.BingeAdaptiveSheet
-import com.binge.designsystem.component.BingeChoiceChip
 import com.binge.designsystem.component.BingeSheetDockingHeader
 import com.binge.designsystem.component.BingeSheetKind
 import com.binge.designsystem.component.BingeSheetTopBar
 import com.binge.designsystem.component.BingeTextButton
-import com.binge.designsystem.component.IncludeExcludeChip
-import com.binge.designsystem.component.IncludeExcludeState
 import com.binge.designsystem.component.ItemGroup
 import com.binge.designsystem.component.ListItem
 import com.binge.designsystem.component.LocalBingeSheetDock
 import com.binge.designsystem.component.bingeSheetPinnedFooter
+import java.time.LocalDate
 
 /**
  * A filter sheet: a title with the count of what is applied and a Clear all, a scrolling body, and a Show results button
@@ -67,6 +61,8 @@ fun FilterSheet(
     onOptionClick: (sectionId: String, optionId: String) -> Unit = { _, _ -> },
     onOptionLongClick: (sectionId: String, optionId: String) -> Unit = { _, _ -> },
     optionLongClickLabel: String? = null,
+    onRangeChange: (sectionId: String, values: ClosedFloatingPointRange<Float>) -> Unit = { _, _ -> },
+    onDateBoundChange: (sectionId: String, isEnd: Boolean, date: LocalDate?) -> Unit = { _, _, _ -> },
     onRowClick: (rowId: String) -> Unit = {},
 ) {
     BingeAdaptiveSheet(
@@ -90,6 +86,8 @@ fun FilterSheet(
             onOptionClick = onOptionClick,
             onOptionLongClick = onOptionLongClick,
             optionLongClickLabel = optionLongClickLabel,
+            onRangeChange = onRangeChange,
+            onDateBoundChange = onDateBoundChange,
             onRowClick = onRowClick,
         )
     }
@@ -118,9 +116,20 @@ fun ColumnScope.FilterSheetContent(
     onOptionClick: (sectionId: String, optionId: String) -> Unit = { _, _ -> },
     onOptionLongClick: (sectionId: String, optionId: String) -> Unit = { _, _ -> },
     optionLongClickLabel: String? = null,
+    onRangeChange: (sectionId: String, values: ClosedFloatingPointRange<Float>) -> Unit = { _, _ -> },
+    onDateBoundChange: (sectionId: String, isEnd: Boolean, date: LocalDate?) -> Unit = { _, _, _ -> },
     onRowClick: (rowId: String) -> Unit = {},
     clearAllEnabled: Boolean = appliedLabel != null,
 ) {
+    val callbacks =
+        FilterControlHandlers(
+            onSingleSelect = onSingleSelect,
+            onOptionClick = onOptionClick,
+            onOptionLongClick = onOptionLongClick,
+            optionLongClickLabel = optionLongClickLabel,
+            onRangeChange = onRangeChange,
+            onDateBoundChange = onDateBoundChange,
+        )
     BingeSheetDockingHeader(
         header = {
             FilterSheetHeader(
@@ -148,13 +157,7 @@ fun ColumnScope.FilterSheetContent(
     ) {
         sections.forEach { section ->
             FilterSheetSection(title = section.title) {
-                FilterSectionControl(
-                    section = section,
-                    onSingleSelect = onSingleSelect,
-                    onOptionClick = onOptionClick,
-                    onOptionLongClick = onOptionLongClick,
-                    optionLongClickLabel = optionLongClickLabel,
-                )
+                FilterSectionControl(section = section, callbacks = callbacks)
             }
         }
         if (rows.isNotEmpty()) {
@@ -234,53 +237,5 @@ private fun FilterSheetSection(title: String?, content: @Composable () -> Unit) 
             Spacer(Modifier.height(dimensionResource(R.dimen.filter_sheet_section_title_gap)))
         }
         content()
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun FilterSectionControl(
-    section: FilterSectionUi,
-    onSingleSelect: (String, String) -> Unit,
-    onOptionClick: (String, String) -> Unit,
-    onOptionLongClick: (String, String) -> Unit,
-    optionLongClickLabel: String?,
-) {
-    val spacing = dimensionResource(R.dimen.filter_sheet_chip_spacing)
-    FlowRow(
-        // The chips of a single choice are radio buttons, so a screen reader reads them as one group.
-        modifier = Modifier.fillMaxWidth().then(
-            if (section.control is FilterControlUi.SingleChoice) Modifier.selectableGroup() else Modifier,
-        ),
-        horizontalArrangement = Arrangement.spacedBy(spacing),
-        verticalArrangement = Arrangement.spacedBy(spacing),
-    ) {
-        when (val control = section.control) {
-            is FilterControlUi.SingleChoice ->
-                control.options.forEach { option ->
-                    BingeChoiceChip(
-                        label = option.label,
-                        selected = option.id == control.selectedId,
-                        onClick = { onSingleSelect(section.id, option.id) },
-                        icon = option.icon,
-                    )
-                }
-
-            is FilterControlUi.MultiChoice ->
-                control.options.forEach { option ->
-                    IncludeExcludeChip(
-                        label = option.label,
-                        state =
-                            when (option.id) {
-                                in control.includedIds -> IncludeExcludeState.Include
-                                in control.excludedIds -> IncludeExcludeState.Exclude
-                                else -> IncludeExcludeState.Neutral
-                            },
-                        onClick = { onOptionClick(section.id, option.id) },
-                        onLongClick = { onOptionLongClick(section.id, option.id) },
-                        onLongClickLabel = optionLongClickLabel,
-                    )
-                }
-        }
     }
 }
