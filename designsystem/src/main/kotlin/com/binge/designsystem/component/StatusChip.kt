@@ -2,19 +2,14 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
@@ -23,9 +18,6 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.accent
 import com.binge.designsystem.theme.fill
 import com.binge.designsystem.theme.tonalContainer
-
-/** The ring around the dot: the same fill at low alpha, so a solid dot nests in a soft halo. */
-private const val STATUS_CHIP_DOT_HALO_ALPHA = 0.30f
 
 /**
  * A small pill saying where something stands: a request, an issue, a job. The [label] names the state and the
@@ -72,23 +64,6 @@ fun StatusChip(
             color = accent,
             maxLines = if (singleLine) 1 else Int.MAX_VALUE,
             overflow = if (singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
-        )
-    }
-}
-
-@Composable
-internal fun StatusDot(fill: Color) {
-    Box(
-        modifier =
-            Modifier
-                .size(dimensionResource(R.dimen.status_chip_dot_halo_size))
-                .background(fill.copy(alpha = STATUS_CHIP_DOT_HALO_ALPHA), CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        Spacer(
-            Modifier
-                .size(dimensionResource(R.dimen.status_chip_dot_size))
-                .background(fill, CircleShape),
         )
     }
 }

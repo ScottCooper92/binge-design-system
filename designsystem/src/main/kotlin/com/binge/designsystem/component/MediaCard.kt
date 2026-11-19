@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -298,34 +297,20 @@ private fun MediaCardOverlays(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (status != null) MediaCardStatusDot(status)
+                if (status != null) {
+                    // The chip's dot, a little larger, on a thin scrim so it holds 3:1 over a bright poster. The label is in the card's semantics.
+                    StatusDot(
+                        fill = status.sentiment.fill(),
+                        dotSize = dimensionResource(R.dimen.media_card_status_dot_size),
+                        haloSize = dimensionResource(R.dimen.media_card_status_dot_halo_size),
+                        overArtwork = true,
+                    )
+                }
                 if (topEndAction != null) MediaCardActionButton(action = topEndAction)
             }
         }
     }
 }
-
-/**
- * The status as a dot in the sentiment's fill, the colour a [StatusChip]'s dot uses, so it reads as the same status everywhere. A ring in the
- * card's scrim colour keeps it visible on a light poster. It has no words of its own: the label is in the card's semantics.
- */
-@Composable
-private fun MediaCardStatusDot(status: MediaCardStatus) {
-    val ring = dimensionResource(R.dimen.media_card_status_dot_ring)
-    Box(
-        modifier = Modifier
-            .background(BingeTheme.colors.scrim.copy(alpha = STATUS_DOT_RING_ALPHA), CircleShape)
-            .padding(ring),
-    ) {
-        Spacer(
-            Modifier
-                .size(dimensionResource(R.dimen.media_card_status_dot_size))
-                .background(status.sentiment.fill(), CircleShape),
-        )
-    }
-}
-
-private const val STATUS_DOT_RING_ALPHA = 0.7f
 
 @Composable
 private fun MediaCardActionButton(action: MediaCardAction, modifier: Modifier = Modifier) {
