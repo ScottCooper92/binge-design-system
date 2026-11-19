@@ -46,7 +46,7 @@ private val SpanishFacts = listOf(
     DetailInfoEntry(Icons.Filled.AttachMoney, "Presupuesto", "185.000.000 US$"),
 )
 
-/** The facts grid at the end of a detail page: a list on a phone, 2 columns at medium width and 3 at expanded. */
+/** The facts grid at the end of a detail page: 2 columns on a phone (one at a large font), 2 at medium width and 3 at expanded. */
 @Composable
 fun DetailInfoGridSample() {
     ScreenshotTheme { DetailInfoGrid(entries = EnglishFacts) }

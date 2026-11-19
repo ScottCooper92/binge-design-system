@@ -14,9 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalPaneWidth
 import com.binge.designsystem.R
 import com.binge.designsystem.resolvedContentPadding
@@ -39,27 +42,35 @@ fun DetailInfoEntry(
     value: String?,
 ): DetailInfoEntry = DetailInfoEntry(icon, label, InfoValue.Plain(value.orEmpty()))
 
+/** The font scale from which a compact [DetailInfoGrid] falls back to one column, so a value keeps a readable width. */
+private const val SINGLE_COLUMN_FONT_SCALE = 1.5f
+
 /**
- * How many columns a [DetailInfoGrid] has: 1 (a list) on a phone, 2 from 600dp and 3 from 840dp. Measured against
+ * How many columns a [DetailInfoGrid] has: 2 on a phone, 2 from 600dp and 3 from 840dp. On a phone at a font scale of
+ * 1.5 or more it is 1 (a list), because two columns leave a value too little width to read. Measured against
  * [LocalPaneWidth] when the page shares the window with another pane, and against the window otherwise, the way
  * [com.binge.designsystem.mediaGridColumns] does.
  */
 @Composable
 fun detailInfoColumns(): Int {
-    val paneWidth = LocalPaneWidth.current ?: return integerResource(R.integer.detail_info_columns)
     val mediumBreakpoint = dimensionResource(R.dimen.content_inset_medium_breakpoint)
     val expandedBreakpoint = dimensionResource(R.dimen.content_inset_expanded_breakpoint)
-    return when {
+    val paneWidth = LocalPaneWidth.current
+    val columns = when {
+        paneWidth == null -> integerResource(R.integer.detail_info_columns)
         paneWidth >= expandedBreakpoint -> integerResource(R.integer.detail_info_columns_expanded)
         paneWidth >= mediumBreakpoint -> integerResource(R.integer.detail_info_columns_medium)
         else -> integerResource(R.integer.detail_info_columns_compact)
     }
+    val width = paneWidth ?: LocalConfiguration.current.screenWidthDp.dp
+    val largeFont = LocalDensity.current.fontScale >= SINGLE_COLUMN_FONT_SCALE
+    return if (largeFont && width < mediumBreakpoint) 1 else columns
 }
 
 /**
  * The facts at the end of a detail page (director, dates, languages, studios, status, budget), each an icon, a muted
- * label and its value. They sit in columns across the width, 3 at expanded width and 2 at medium, and as one list on a
- * phone. A long value wraps inside its own column, and a blank one is left out. The grid insets itself by
+ * label and its value. They sit in columns across the width, 3 at expanded width and 2 at medium and compact, falling
+ * back to one list on a phone at a large font. A long value wraps inside its own column, and a blank one is left out. The grid insets itself by
  * [LocalHeroReadingMargin] and the page's own content padding, so it lines up with the sections around it on a wide window.
  *
  * Laid out as the TV detail page's info columns are, so phone, tablet and TV read the same. [columns] overrides the
