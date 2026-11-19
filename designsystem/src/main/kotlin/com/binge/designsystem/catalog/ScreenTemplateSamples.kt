@@ -19,9 +19,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudOff
@@ -857,17 +859,23 @@ private fun RetryDemo(modifier: Modifier = Modifier, failure: @Composable (retry
 }
 
 @Composable
-internal fun SampleRows(padding: PaddingValues, descending: Boolean = false) {
+internal fun SampleRows(
+    padding: PaddingValues,
+    descending: Boolean = false,
+    listState: LazyListState = rememberLazyListState(),
+    rows: Int = SAMPLE_ROWS,
+) {
     // Through ScreenBody, as a screen's own list goes: the side insets stay outside the scroll, so the rows clear a
     // side cutout or navigation bar.
     ScreenBody(padding) { inner ->
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = inner.screenListPadding(),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
-            items(SAMPLE_ROWS) { index ->
-                val row = if (descending) SAMPLE_ROWS - index else index + 1
+            items(rows) { index ->
+                val row = if (descending) rows - index else index + 1
                 ListRow { textModifier ->
                     Text(text = "Row $row", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
                 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -25,14 +26,18 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -53,6 +58,7 @@ import com.binge.designsystem.paneBackOrNull
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.resolvedContentPadding
+import kotlinx.coroutines.flow.first
 
 /** Which top bar a [BingeScreenScaffold] carries. */
 enum class ScreenBar {
@@ -107,6 +113,11 @@ enum class ScreenBarChrome {
  * [content] is handed padding that already clears the bar, the header, the system bars, a cutout and a
  * floating navigation bar. Split it with [screenOuterPadding] and [screenInnerPadding], or use [ScreenBody].
  *
+ * [listState], when the body is a lazy list, lets a collapsing or large bar arrive collapsed over a list that is
+ * already scrolled: one opened part way down, or jumped there by `scrollToItem` before the user has touched it. The
+ * bar's collapse otherwise moves only through the user's scroll, so such a list would sit under a fully expanded bar.
+ * Once the user scrolls, the bar behaves as it always does. Leave it null for a body that opens at the top.
+ *
  * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
  * Both default to absent, so existing titles keep their behaviour and appearance.
  *
@@ -132,12 +143,18 @@ fun BingeScreenScaffold(
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     barChrome: ScreenBarChrome = ScreenBarChrome.Glass,
+    listState: LazyListState? = null,
     content: @Composable (padding: PaddingValues) -> Unit,
 ) {
     val barColor = if (barChrome == ScreenBarChrome.Plain) Color.Unspecified else Color.Transparent
     val ownBehavior = rememberScreenBarScrollBehavior(bar)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
     val scrim = screenBarScrim(bar, behavior)
+    val bodyTouch = if (behavior != null && listState != null && bar.collapses()) {
+        rememberCollapsedForScrolledList(behavior, listState)
+    } else {
+        null
+    }
     val rowFocus = LocalRowFocus.current
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
@@ -145,6 +162,7 @@ fun BingeScreenScaffold(
     var consumed by remember { mutableStateOf(WindowInsets(0, 0, 0, 0)) }
     Scaffold(
         modifier = (behavior?.let { modifier.nestedScroll(barConnection(bar, it, rowFocus)) } ?: modifier)
+            .then(bodyTouch ?: Modifier)
             .onConsumedWindowInsetsChanged { consumed = it },
         contentWindowInsets = WindowInsets(0),
         topBar = {
@@ -278,7 +296,8 @@ fun PaddingValues.screenListPadding(): PaddingValues {
 /**
  * The connection a [bar]'s [behavior] listens to the body through. A sliding bar leaves its height alone for the scroll a row focus makes to
  * bring a row into view, so a screen opened on a row still has its bar. The collapsing and large bars are left as they were: a collapsing bar
- * arrives collapsed and scrimmed over the rows scrolled under it, which is how it should look.
+ * arrives collapsed and scrimmed over the rows the user scrolled under it, which is how it should look. A list that
+ * starts scrolled passes its state as `listState`, which collapses the bar for it ([rememberCollapsedForScrolledList]).
  */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -343,3 +362,41 @@ private fun screenPadding(
         bottom = max(bottomBar, navigation),
     )
 }
+
+private fun ScreenBar.collapses(): Boolean = this == ScreenBar.Collapsing || this == ScreenBar.Large
+
+/**
+ * Collapses [behavior]'s bar once for a list that is already scrolled when the user has not yet touched it, and returns the
+ * modifier that tells it when the user does. A collapsing bar moves only through nested scroll, which a restored position or a
+ * programmatic `scrollToItem` never dispatches, so such a list would sit under a fully expanded bar.
+ *
+ * The collapse waits for the bar's height limit to be measured (it is not known until the first layout), happens at most
+ * once, and never after the user has scrolled the body: from then on the bar follows the user as it always does.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun rememberCollapsedForScrolledList(behavior: TopAppBarScrollBehavior, listState: LazyListState): Modifier {
+    var userScrolled by remember(behavior, listState) { mutableStateOf(false) }
+    val touch = remember(behavior, listState) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (source == NestedScrollSource.UserInput) userScrolled = true
+                return Offset.Zero
+            }
+        }
+    }
+    LaunchedEffect(behavior, listState) {
+        snapshotFlow {
+            val limit = behavior.state.heightOffsetLimit
+            // Unmeasured, the limit is a huge negative placeholder; measured it is the bar's collapsible height.
+            val measured = limit < 0f && limit > UNMEASURED_LIMIT
+            val scrolled = listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
+            measured && scrolled && !userScrolled
+        }.first { it }
+        behavior.state.heightOffset = behavior.state.heightOffsetLimit
+    }
+    return Modifier.nestedScroll(touch)
+}
+
+/** Half of the placeholder limit a bar reports before it is measured, so only a measured limit lies above it. */
+private const val UNMEASURED_LIMIT = -Float.MAX_VALUE / 2
