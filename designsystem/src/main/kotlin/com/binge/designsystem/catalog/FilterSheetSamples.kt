@@ -47,7 +47,7 @@ fun FilterSheetSpanishSample() {
 
 private class FilterCopy(
     val title: String,
-    val applied: String,
+    val applied: (Int) -> String,
     val clearAll: String,
     val showResults: String,
     val contentTitle: String,
@@ -72,7 +72,7 @@ private class FilterCopy(
 private val EnglishFilterCopy =
     FilterCopy(
         title = "Filters",
-        applied = "3 applied",
+        applied = { "$it applied" },
         clearAll = "Clear all",
         showResults = "Show results",
         contentTitle = "Content",
@@ -97,7 +97,7 @@ private val EnglishFilterCopy =
 private val SpanishFilterCopy =
     FilterCopy(
         title = "Filtros",
-        applied = "3 aplicados",
+        applied = { "$it aplicados" },
         clearAll = "Borrar todo",
         showResults = "Mostrar resultados",
         contentTitle = "Contenido",
@@ -127,6 +127,8 @@ private const val SHOWS_ID = "shows"
 private const val POPULAR_ID = "popular"
 private const val RATING_ID = "rating"
 private const val NEWEST_ID = "newest"
+private const val DEFAULT_KIND_ID = MOVIES_ID
+private const val DEFAULT_SORT_ID = NEWEST_ID
 
 @Composable
 private fun FilterSheetFrame(copy: FilterCopy) {
@@ -134,14 +136,14 @@ private fun FilterSheetFrame(copy: FilterCopy) {
     var sort by remember { mutableStateOf(POPULAR_ID) }
     var included by remember { mutableStateOf(setOf(copy.genres[0])) }
     var excluded by remember { mutableStateOf(setOf(copy.genres[3])) }
-    val applied = included.size + excluded.size + 1
+    val applied = included.size + excluded.size + (if (kind != DEFAULT_KIND_ID) 1 else 0) + (if (sort != DEFAULT_SORT_ID) 1 else 0)
     ScreenshotTheme {
         Column(Modifier.height(dimensionResource(R.dimen.catalog_filter_sheet_height))) {
             FilterSheetContent(
                 title = copy.title,
                 clearAllLabel = copy.clearAll,
                 showResultsLabel = copy.showResults,
-                appliedLabel = if (applied > 0) copy.applied else null,
+                appliedLabel = if (applied > 0) copy.applied(applied) else null,
                 sections =
                     listOf(
                         FilterSectionUi(
@@ -205,8 +207,8 @@ private fun FilterSheetFrame(copy: FilterCopy) {
                 },
                 onApply = {},
                 onClearAll = {
-                    kind = MOVIES_ID
-                    sort = POPULAR_ID
+                    kind = DEFAULT_KIND_ID
+                    sort = DEFAULT_SORT_ID
                     included = emptySet()
                     excluded = emptySet()
                 },

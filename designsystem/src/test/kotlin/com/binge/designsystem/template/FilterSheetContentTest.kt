@@ -104,7 +104,7 @@ class FilterSheetContentTest {
     }
 
     @Test
-    fun `clear all is inert with nothing applied and fires with something applied`() {
+    fun `clear all is inert with nothing applied`() {
         show(appliedLabel = null)
         rule.onNodeWithText("Clear all").assertIsNotEnabled().performClick()
         assertEquals(0, cleared)

@@ -1,6 +1,5 @@
 package com.binge.designsystem.template
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeActionFooter
@@ -29,13 +27,13 @@ import com.binge.designsystem.component.BingeChoiceChip
 import com.binge.designsystem.component.BingeSheetDockingHeader
 import com.binge.designsystem.component.BingeSheetKind
 import com.binge.designsystem.component.BingeSheetTopBar
+import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.IncludeExcludeChip
 import com.binge.designsystem.component.IncludeExcludeState
 import com.binge.designsystem.component.ItemGroup
 import com.binge.designsystem.component.ListItem
 import com.binge.designsystem.component.LocalBingeSheetDock
 import com.binge.designsystem.component.bingeSheetPinnedFooter
-import com.binge.designsystem.theme.labelLargeEmphasis
 
 /**
  * A filter sheet: a title with the count of what is applied and a Clear all, a scrolling body, and a Show results button
@@ -137,7 +135,7 @@ fun ColumnScope.FilterSheetContent(
                 title = title,
                 subtitle = appliedLabel,
                 onClose = onClose,
-                actions = { FilterSheetHeaderAction(label = clearAllLabel, enabled = clearAllEnabled, onClick = onClearAll) },
+                actions = { BingeTextButton(label = clearAllLabel, onClick = onClearAll, enabled = clearAllEnabled) },
             )
         },
     )
@@ -208,29 +206,9 @@ private fun FilterSheetHeader(
                 )
             }
         }
-        FilterSheetHeaderAction(label = clearAllLabel, enabled = clearAllEnabled, onClick = onClearAll)
+        BingeTextButton(label = clearAllLabel, onClick = onClearAll, enabled = clearAllEnabled)
     }
 }
-
-/** A text action in the sheet's header: the primary colour while [enabled], faded and inert while not. */
-@Composable
-private fun FilterSheetHeaderAction(
-    label: String,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    Text(
-        text = label,
-        style = MaterialTheme.typography.labelLargeEmphasis,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = if (enabled) 1f else DISABLED_ACTION_ALPHA),
-        modifier =
-            Modifier
-                .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-                .padding(dimensionResource(R.dimen.padding_xs)),
-    )
-}
-
-private const val DISABLED_ACTION_ALPHA = 0.4f
 
 /** A titled group in the body; a null [title] leaves the heading out. */
 @Composable
