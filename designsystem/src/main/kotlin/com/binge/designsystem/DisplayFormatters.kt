@@ -1,5 +1,6 @@
 package com.binge.designsystem
 
+import android.icu.text.CompactDecimalFormat
 import android.icu.text.RelativeDateTimeFormatter
 import android.text.format.DateFormat
 import android.text.format.DateUtils
@@ -33,13 +34,21 @@ private const val MIN_COLLAPSED_RUN = 3
 private const val RELATIVE_DATE_WINDOW_MILLIS = 30L * 24 * 60 * 60 * 1000
 
 /**
- * Abbreviated units for [formatVoteCount] in ascending order, each [VOTE_COUNT_STEP]× the previous.
- * A Kotlin constant, not a string resource: these SI-style abbreviations are not translated.
+ * Abbreviated English units for [formatVoteCount] in ascending order, each [VOTE_COUNT_STEP]× the previous.
+ * A Kotlin constant, not a string resource: other languages take their units from ICU instead.
  */
 private val VOTE_COUNT_UNITS = listOf("", "k", "M", "B")
 
-fun Int.formatVoteCount(): String {
+/**
+ * A vote count in short form for [locale]. English reads "9.0k", "3.1k", "1.0M"; every other language follows ICU's
+ * compact short format, so the separator and the unit are the language's own ("24 mil" in Spanish, "1,2 M"). Below
+ * 1,000 the count is shown as it is.
+ */
+fun Int.formatVoteCount(locale: Locale = Locale.getDefault()): String {
     if (this < VOTE_COUNT_THOUSAND) return toString()
+    if (locale.language != Locale.ENGLISH.language) {
+        return CompactDecimalFormat.getInstance(locale, CompactDecimalFormat.CompactStyle.SHORT).format(this.toLong())
+    }
     var value = this / VOTE_COUNT_STEP
     var unitIndex = 1
     // Choose the unit after rounding: 999_950 rounds to 1000.0k, which should read as 1.0M.
@@ -47,14 +56,14 @@ fun Int.formatVoteCount(): String {
         value /= VOTE_COUNT_STEP
         unitIndex++
     }
-    return "%.1f%s".format(Locale.getDefault(), value, VOTE_COUNT_UNITS[unitIndex])
+    return "%.1f%s".format(locale, value, VOTE_COUNT_UNITS[unitIndex])
 }
 
 /**
  * Locale-aware separator (e.g. "7,3" under de), passed explicitly to satisfy Lint's DefaultLocale.
  * [roundsToStep] stays locale-invariant to avoid a parse crash.
  */
-fun Float.formatRating(): String = "%.1f".format(Locale.getDefault(), this)
+fun Float.formatRating(locale: Locale = Locale.getDefault()): String = "%.1f".format(locale, this)
 
 private fun roundsToStep(value: Double, step: Double): Boolean = BigDecimal(value).setScale(1, RoundingMode.HALF_UP).toDouble() >= step
 
