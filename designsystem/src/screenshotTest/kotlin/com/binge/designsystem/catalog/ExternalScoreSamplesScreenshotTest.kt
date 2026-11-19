@@ -68,4 +68,12 @@ class ExternalScoreSamplesScreenshotTest {
     fun CarouselStatus() {
         HeroCarouselStatusSample()
     }
+
+    @PreviewTest
+    @LocalePreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun HeroLongGenres() {
+        DetailHeroLongGenresSample()
+    }
 }

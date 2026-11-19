@@ -4,4 +4,5 @@
     <integer name="media_grid_columns">3</integer>
     <!-- >=600dp available width (medium): two search-result columns. -->
     <integer name="search_result_columns">2</integer>
+    <integer name="detail_info_columns">2</integer>
 </resources>

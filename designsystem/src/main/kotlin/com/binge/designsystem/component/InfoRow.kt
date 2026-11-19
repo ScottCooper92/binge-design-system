@@ -57,7 +57,7 @@ data class InfoRowEntry(
 /** Plain-text [InfoRowEntry] convenience — the common non-linkable case. */
 fun InfoRowEntry(label: String, value: String?): InfoRowEntry = InfoRowEntry(label, InfoValue.Plain(value.orEmpty()))
 
-private fun InfoValue.isBlank(): Boolean =
+internal fun InfoValue.isBlank(): Boolean =
     when (this) {
         is InfoValue.Plain -> text.isBlank()
         is InfoValue.Link -> text.isBlank()
@@ -117,7 +117,7 @@ fun InfoRow(
 }
 
 @Composable
-private fun InfoRowText(text: String) {
+internal fun InfoRowText(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
@@ -126,7 +126,7 @@ private fun InfoRowText(text: String) {
 }
 
 @Composable
-private fun InfoRowLink(text: String, onClick: () -> Unit) {
+internal fun InfoRowLink(text: String, onClick: () -> Unit) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
@@ -137,7 +137,7 @@ private fun InfoRowLink(text: String, onClick: () -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun InfoRowLinks(links: List<InfoLink>) {
+internal fun InfoRowLinks(links: List<InfoLink>) {
     val tokens = links.filter { it.text.isNotBlank() }
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
