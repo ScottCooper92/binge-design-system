@@ -33,7 +33,8 @@ import com.binge.designsystem.tv.R as TvR
  * [footerActions] with an optional [footerHint]. For onboarding before the shell and for setup or sign-in.
  *
  * [currentStep] is zero-based. [progressLabel] defaults to the phone flow's own "Step 2 of 3", and a consumer
- * passes its own to say more. BACK steps back through
+ * passes its own to say more. A single step ([stepCount] of 1 or less) draws no read-out and no dots, as the phone
+ * flow does. BACK steps back through
  * [onBack] when it is non-null and falls through when it is null, and there is no on-screen Back: the remote's
  * key is the one every TV user knows. Focus lands on [entry] each time the step changes. A non-null
  * [loadingLabel] replaces the content with a plate carrying it, so a step never shows an empty frame while it
@@ -65,6 +66,8 @@ fun TvStepFlow(
 ) {
     BackHandler(enabled = onBack != null) { onBack?.invoke() }
     val padding = tvPagePadding(hosting)
+    // One step has no position to read out, so neither "Step 1 of 1" nor the dots are drawn, as on the phone flow.
+    val showsProgress = stepCount > 1
     Box(
         modifier =
             modifier
@@ -73,7 +76,7 @@ fun TvStepFlow(
                 .then(tvPageArrival(hosting, entry, arrivalEnabled && loadingLabel == null, key = currentStep)),
     ) {
         Column(modifier = Modifier.fillMaxSize().then(if (chromeOverContent) Modifier else Modifier.padding(padding))) {
-            if (!chromeOverContent) TvStepProgress(stepCount, currentStep, progressLabel)
+            if (!chromeOverContent && showsProgress) TvStepProgress(stepCount, currentStep, progressLabel)
             Box(
                 modifier =
                     Modifier
@@ -97,7 +100,7 @@ fun TvStepFlow(
                 TvStepFooter(hint = footerHint, actions = footerActions)
             }
         }
-        if (chromeOverContent) {
+        if (chromeOverContent && showsProgress) {
             Box(modifier = Modifier.padding(padding)) {
                 TvStepProgress(stepCount, currentStep, progressLabel)
             }
