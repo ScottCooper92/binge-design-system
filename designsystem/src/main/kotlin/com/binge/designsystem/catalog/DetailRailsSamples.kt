@@ -3,6 +3,7 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
+import com.binge.designsystem.component.DetailPeopleLine
 import com.binge.designsystem.component.DetailPeopleRail
 import com.binge.designsystem.component.DetailPerson
 import com.binge.designsystem.component.DetailPoster
@@ -58,6 +59,21 @@ fun DetailPosterRailSample() {
                     status = if (title == titles.first()) MediaCardStatus("Available", BingeSentiment.Positive) else null,
                 )
             },
+            onOpen = {},
+            onSeeAll = {},
+        )
+    }
+}
+
+/** The cast as one line of names and roles, with no photos: each name is a tap target, and the heading links to the full list. */
+@Composable
+fun DetailPeopleLineSample() {
+    ScreenshotTheme {
+        DetailPeopleLine(
+            title = "Cast",
+            people = people,
+            itemKey = { it.first },
+            person = { DetailPerson(name = it.first, subtitle = it.second, photoUrl = null) },
             onOpen = {},
             onSeeAll = {},
         )

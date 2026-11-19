@@ -50,4 +50,10 @@ class DetailActionsRailsSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun posterRail() = DetailPosterRailSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun peopleLine() = DetailPeopleLineSample()
 }

@@ -1,10 +1,25 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.template.readingInset
@@ -108,5 +123,56 @@ fun <T> DetailPosterRail(
             progress = shown.progress,
             subtitle = shown.subtitle,
         )
+    }
+}
+
+/**
+ * The one-line variant of [DetailPeopleRail], for a cast that reads as a line of names: under its heading each person is a single line of
+ * name and role ("Amara Okafor · Lead") with no photo, in a row that scrolls sideways. [itemKey], [person] (its photo is not drawn), [onOpen]
+ * and [onSeeAll] are as in [DetailPeopleRail]. Each name is a tap target of the minimum touch size and is read out with its role. Draws
+ * nothing for an empty list.
+ *
+ * @need show a detail page's cast as a compact one-line row of names and roles
+ * @group detail
+ * @replaces a hand-built LazyRow of name and role text
+ * @sample DetailPeopleLineSample
+ */
+@Composable
+fun <T> DetailPeopleLine(
+    title: String,
+    people: List<T>,
+    itemKey: (T) -> Any,
+    person: (T) -> DetailPerson,
+    onOpen: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    onSeeAll: (() -> Unit)? = null,
+    horizontalPadding: Dp = readingInset(),
+) {
+    if (people.isEmpty()) return
+    Column(modifier) {
+        SectionHeader(title = title, onMoreClick = onSeeAll, horizontalPadding = horizontalPadding)
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = horizontalPadding),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+        ) {
+            items(people, key = itemKey) { item ->
+                val shown = person(item)
+                val roleColor = MaterialTheme.colorScheme.onSurfaceVariant
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(shown.name) }
+                        if (!shown.subtitle.isNullOrBlank()) {
+                            withStyle(SpanStyle(color = roleColor)) { append(" · ${shown.subtitle}") }
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .minimumInteractiveComponentSize()
+                        .clickable(role = Role.Button) { onOpen(item) },
+                )
+            }
+        }
     }
 }
