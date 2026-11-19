@@ -30,4 +30,11 @@ class DetailInfoGridSamplesScreenshotTest {
     fun Spanish() {
         DetailInfoGridSpanishSample()
     }
+
+    @PreviewTest
+    @TabletScreenPreview
+    @Composable
+    fun SpanishTablet() {
+        DetailInfoGridSpanishSample()
+    }
 }

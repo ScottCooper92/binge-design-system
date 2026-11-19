@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +45,8 @@ import com.binge.designsystem.theme.BingeTheme
 import com.binge.designsystem.theme.accent
 import com.binge.designsystem.theme.fill
 
+/** Marks the meta dot so a test can find it. */
+internal const val META_DOT_TAG = "meta-dot"
 private const val HERO_PILL_ALPHA = 0.16f
 private const val HERO_PILL_LIGHT_THEME_ALPHA = 0.88f
 private const val HERO_TAGLINE_ALPHA = 0.86f
@@ -224,21 +227,23 @@ private fun HeroMetaRow(item: HeroItem) {
     }
     if (item.rating == null && parts.isEmpty() && item.externalScores.isEmpty() && item.status == null) return
     val ink = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
-    val entries = buildList<@Composable () -> Unit> {
-        item.rating?.let { add { HeroRating(it) } }
+    val entries = buildList<MetaEntry> {
+        item.rating?.let { add(MetaEntry.Content { HeroRating(it) }) }
         parts.forEach { part ->
-            add {
-                Text(
-                    text = part.text,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            add(
+                MetaEntry.Content {
+                    Text(
+                        text = part.text,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
+            )
         }
-        item.externalScores.forEach { score -> add { ExternalScoreItem(score, color = ink) } }
-        item.status?.let { status -> add { HeroStatus(status) } }
+        item.externalScores.forEach { score -> add(MetaEntry.Content { ExternalScoreItem(score, color = ink) }) }
+        item.status?.let { status -> add(MetaEntry.Content { HeroStatus(status) }) }
     }
     MetaFlow(entries = entries, modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s)))
 }
@@ -295,6 +300,7 @@ private fun HeroStatus(status: MediaCardStatus) {
 internal fun HeroMetaDot() {
     Box(
         modifier = Modifier
+            .testTag(META_DOT_TAG)
             .size(dimensionResource(R.dimen.hero_meta_dot_size))
             .clip(BingeShapes.Pill)
             .background(MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_DOT_ALPHA)),

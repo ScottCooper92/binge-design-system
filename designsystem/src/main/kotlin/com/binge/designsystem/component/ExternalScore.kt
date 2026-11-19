@@ -7,19 +7,29 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 
@@ -110,13 +120,30 @@ private fun ExternalScoreGlyph(kind: ExternalScoreKind) {
     }
 }
 
+/** One item of a [MetaFlow] line. */
+internal sealed interface MetaEntry {
+    /** An item that draws itself and stays whole, such as a score or a status. Its dot follows it on its own line. */
+    class Content(
+        val content: @Composable () -> Unit,
+    ) : MetaEntry
+
+    /**
+     * Text that may wrap over several lines, such as a list of genres. Its dot is drawn inline after its last word, so
+     * it sits on the line the text ends on rather than at the far edge beside the middle of a wrapped block.
+     */
+    class WrappingText(
+        val text: String,
+        val color: Color,
+    ) : MetaEntry
+}
+
 /**
  * A meta line: [entries] side by side, each followed by the meta dot except the last, so a line that wraps at a large
  * font ends on a dot rather than starting on one.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun MetaFlow(entries: List<@Composable () -> Unit>, modifier: Modifier = Modifier) {
+internal fun MetaFlow(entries: List<MetaEntry>, modifier: Modifier = Modifier) {
     val gap = dimensionResource(R.dimen.hero_meta_gap)
     FlowRow(
         modifier = modifier,
@@ -125,13 +152,56 @@ internal fun MetaFlow(entries: List<@Composable () -> Unit>, modifier: Modifier 
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         entries.forEachIndexed { index, entry ->
-            Row(horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
-                // The entry takes what the dot leaves, so an item as wide as the line still ends on its dot.
-                Box(Modifier.weight(1f, fill = false)) { entry() }
-                if (index < entries.lastIndex) HeroMetaDot()
+            val last = index == entries.lastIndex
+            when (entry) {
+                is MetaEntry.Content ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
+                        // The entry takes what the dot leaves, so an item as wide as the line still ends on its dot.
+                        Box(Modifier.weight(1f, fill = false)) { entry.content() }
+                        if (!last) HeroMetaDot()
+                    }
+                is MetaEntry.WrappingText -> WrappingMetaText(entry, withDot = !last)
             }
         }
     }
+}
+
+private const val META_DOT_ID = "meta-dot"
+
+/** The word joiner keeps the inline dot on the line of the word before it. */
+private const val WORD_JOINER = "\u2060"
+
+@Composable
+private fun WrappingMetaText(entry: MetaEntry.WrappingText, withDot: Boolean) {
+    val density = LocalDensity.current
+    // The gap before the dot and the dot itself; the flow's own gap follows it, as it follows any entry.
+    val dotSlot = with(density) { (dimensionResource(R.dimen.hero_meta_gap) + dimensionResource(R.dimen.hero_meta_dot_size)).toSp() }
+    val text = buildAnnotatedString {
+        append(entry.text)
+        if (withDot) {
+            append(WORD_JOINER)
+            appendInlineContent(META_DOT_ID)
+        }
+    }
+    val inline = if (withDot) {
+        mapOf(
+            META_DOT_ID to InlineTextContent(
+                Placeholder(width = dotSlot, height = 1.em, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) { HeroMetaDot() }
+            },
+        )
+    } else {
+        emptyMap()
+    }
+    Text(
+        text = text,
+        inlineContent = inline,
+        // The inline dot's alternate text must not reach a screen reader: it reads the words alone.
+        modifier = if (withDot) Modifier.clearAndSetSemantics { this.text = AnnotatedString(entry.text) } else Modifier,
+        style = MaterialTheme.typography.labelLarge,
+        color = entry.color,
+    )
 }
 
 /**
@@ -150,7 +220,10 @@ fun ExternalScoreLine(
     color: Color = MaterialTheme.colorScheme.onBackground,
 ) {
     if (scores.isEmpty()) return
-    MetaFlow(entries = scores.map { score -> { ExternalScoreItem(score, color) } }, modifier = modifier)
+    MetaFlow(
+        entries = scores.map { score -> MetaEntry.Content { ExternalScoreItem(score, color) } },
+        modifier = modifier,
+    )
 }
 
 /**
@@ -164,17 +237,10 @@ internal fun GenreScoreLine(
     scoreColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    val entries = buildList<@Composable () -> Unit> {
-        if (!genres.isNullOrBlank()) {
-            add {
-                Text(
-                    text = genres,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-        scores.forEach { score -> add { ExternalScoreItem(score, scoreColor) } }
+    val genreColor = MaterialTheme.colorScheme.primary
+    val entries = buildList<MetaEntry> {
+        if (!genres.isNullOrBlank()) add(MetaEntry.WrappingText(genres, genreColor))
+        scores.forEach { score -> add(MetaEntry.Content { ExternalScoreItem(score, scoreColor) }) }
     }
     MetaFlow(entries = entries, modifier = modifier)
 }
