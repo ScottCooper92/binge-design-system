@@ -52,7 +52,7 @@ class TvRowEntryContractTest {
      *
      * The save and the restore go through a [SaveableStateRegistry] directly, as an Activity's does, and not through
      * `StateRestorationTester`. That tester round-trips the state through a `Bundle`, and Robolectric's pooled `Parcel`
-     * can come back already recycled by an earlier test in the same JVM ("Parcel recycled earlier than expected", #1069).
+     * can come back already recycled by an earlier test in the same JVM ("Parcel recycled earlier than expected").
      * An index needs no `Parcel`, so this case cannot be hit by that leak.
      */
     @Test

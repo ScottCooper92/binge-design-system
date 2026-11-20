@@ -6,7 +6,7 @@ import java.io.File
 
 /**
  * A test that leaves work pending on Compose's shared UI dispatcher when its rule disposes breaks later tests in the same
- * JVM, depending on order (#1067). The take-down rules drain it, so a plain `createComposeRule()`,
+ * JVM, depending on order. The take-down rules drain it, so a plain `createComposeRule()`,
  * `createKeyboardComposeRule()` or `createAndroidComposeRule()` in these modules' tests is a hazard that CI cannot see until
  * some other test falls over.
  */
@@ -38,7 +38,7 @@ class ComposeRuleGuardTest {
                 .filter { it !in allowed }
 
         assertTrue(
-            "Use createTakeDownComposeRule(), createTakeDownKeyboardComposeRule() or createTakeDownAndroidComposeRule() (#1067), not a plain rule, in: $offenders",
+            "Use createTakeDownComposeRule(), createTakeDownKeyboardComposeRule() or createTakeDownAndroidComposeRule(), not a plain rule, in: $offenders",
             offenders.isEmpty(),
         )
     }

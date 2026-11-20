@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 
 private const val SYNOPSIS = "A spice war on a desert world."
 
-/** A synopsis OK opens is a control, so it announces as a button (#472). */
+/** A synopsis OK opens is a control, so it announces as a button. */
 @RunWith(RobolectricTestRunner::class)
 @Config(
     sdk = [34],

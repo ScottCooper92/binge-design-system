@@ -42,7 +42,7 @@ private const val REMEMBERED = 4
 private const val ARRIVAL_WAIT_MILLIS = 500L
 
 /**
- * [TvImmersiveGrid]'s focus memory, which no frame can show (#395). Focus that leaves the grid comes back on the
+ * [TvImmersiveGrid]'s focus memory, which no frame can show. Focus that leaves the grid comes back on the
  * cell it left. As an overlay the grid claims focus only once its remembered cell is loaded: a paged source can
  * report a count before that cell's page arrives, and offering focus to a cell not yet composed would time out.
  */

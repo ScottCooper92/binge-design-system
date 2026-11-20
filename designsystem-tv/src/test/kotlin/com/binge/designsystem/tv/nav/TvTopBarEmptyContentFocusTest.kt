@@ -32,7 +32,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * A destination that composes nothing focusable, under the top bar (#3999). Under the old left rail the content pane's sink and
+ * A destination that composes nothing focusable, under the top bar. Under the old left rail the content pane's sink and
  * the platform's recovery search were measured alternating focus every other frame. The bar has no content-pane sink, and its
  * handoff offers focus into a group with nothing to take it, which fails without moving focus. Each test steps the clock frame
  * by frame for longer than the handoff's 8 s budget and records the focused node per frame: focus moves at most once, onto the

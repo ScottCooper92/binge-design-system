@@ -108,7 +108,7 @@ fun BingeTextField(
     // a focus requester) would put the caret before its text. Own the selection: it goes to the end when the field gains focus (a tap
     // that follows still places it where the user touched), follows the user from there, and goes back to the end when the value is
     // changed from outside while focused. A value the caller rewrites from what was typed (a filter) keeps the caret where it was, moved
-    // by what was removed, rather than counting as a change from outside (#1158). An unfocused field keeps the selection at 0, because a
+    // by what was removed, rather than counting as a change from outside. An unfocused field keeps the selection at 0, because a
     // text field scrolls to its caret, and a long saved value (a URL) should show its start while nobody is editing it.
     val caret = rememberFieldCaret(value, TextFieldValue(value))
     val fieldValue = if (focused) caret.shown(value) else TextFieldValue(value)

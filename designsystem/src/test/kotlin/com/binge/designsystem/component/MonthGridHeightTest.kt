@@ -4,7 +4,7 @@ import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/** The month grid grows with its font size rather than clipping its last row (#379). */
+/** The month grid grows with its font size rather than clipping its last row. */
 class MonthGridHeightTest {
     private fun height(lineHeight: Int) =
         monthGridHeight(lineHeight = lineHeight.dp, cellMin = 48.dp, cellPadding = 8.dp, gap = 8.dp, floor = 216.dp)

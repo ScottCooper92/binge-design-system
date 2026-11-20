@@ -28,7 +28,7 @@ private const val GROUP_NOTE = "Changed from your phone."
 private const val ACTION_SET_UP = "Set up"
 
 /**
- * A [TvListPaneBoard] pane's options are one selectable group (#678), as [com.binge.designsystem.tv.component.TvOptionGroup]'s
+ * A [TvListPaneBoard] pane's options are one selectable group, as [com.binge.designsystem.tv.component.TvOptionGroup]'s
  * and [com.binge.designsystem.tv.component.TvChoiceRow]'s are, so a screen reader announces them as a set. The list's
  * rows are not: moving along them describes a row, it chooses nothing.
  */
@@ -63,7 +63,7 @@ class TvListPaneSemanticsTest {
         assertEquals(1, uhd.config[SemanticsProperties.CollectionItemInfo].rowIndex)
     }
 
-    /** A shortcut that opens a screen is not one of the choices (#793): a button, and outside the group's count. */
+    /** A shortcut that opens a screen is not one of the choices: a button, and outside the group's count. */
     @Test
     fun `an action option announces as a button, with no state, and is not counted as a choice`() {
         setBoard(pinned = listOf(TvPaneOption(label = ACTION_SET_UP, action = true)))

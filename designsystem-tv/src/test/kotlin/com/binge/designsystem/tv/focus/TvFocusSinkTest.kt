@@ -68,7 +68,7 @@ class TvFocusSinkTest {
         composeTestRule.onNodeWithTag(ENTRY_TARGET).assertIsFocused()
     }
 
-    /** The rail sits at the start edge, which is the right under RTL, so the exit follows it (#429). */
+    /** The rail sits at the start edge, which is the right under RTL, so the exit follows it. */
     @Test
     fun `under RTL right moves focus to the supplied entry and left is inert`() {
         setSinkWithEntry(LayoutDirection.Rtl)

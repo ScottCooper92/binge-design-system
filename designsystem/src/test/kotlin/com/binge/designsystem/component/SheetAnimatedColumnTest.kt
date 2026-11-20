@@ -25,7 +25,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * A sheet's content animates its own height (#1272): a change of height eases on the theme's spatial spring, so a sheet as tall as
+ * A sheet's content animates its own height: a change of height eases on the theme's spatial spring, so a sheet as tall as
  * its content follows it, and under reduced motion it lands at once with nothing in between. The clock is paused so a frame part-way
  * through the change can be read.
  */

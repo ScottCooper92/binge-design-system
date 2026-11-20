@@ -39,7 +39,7 @@ private const val SEARCH = "Search"
 private const val EXAMPLE = "http://192.168.1.10:5055"
 
 /**
- * The fields under a real D-pad (#580). A TV raises the keyboard whenever a text input holds focus, so "the keyboard
+ * The fields under a real D-pad. A TV raises the keyboard whenever a text input holds focus, so "the keyboard
  * stays down" is "the input is not focused": the frame takes focus, and only select hands it to the input.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -105,7 +105,7 @@ class TvTextFieldFocusTest {
     }
 
     /**
-     * A hardware Enter submits on its key-down (#598). The frame takes focus back before the key-up arrives, and that
+     * A hardware Enter submits on its key-down. The frame takes focus back before the key-up arrives, and that
      * key-up belongs to the press that submitted, so it must not start editing again and raise the keyboard. Down and
      * up go in separately, with a recomposition between them, which is when the frame's gate would read open.
      */

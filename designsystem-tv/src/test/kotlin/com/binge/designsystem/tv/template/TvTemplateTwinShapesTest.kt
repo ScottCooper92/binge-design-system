@@ -21,7 +21,7 @@ import org.robolectric.annotation.Config
 
 private val Copy = DecisionCopy(title = "Title", subtitle = "Subtitle")
 
-/** The TV templates take their content in the phone twins' shapes: one action type, one step read-out (#705). */
+/** The TV templates take their content in the phone twins' shapes: one action type, one step read-out. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvTemplateTwinShapesTest {

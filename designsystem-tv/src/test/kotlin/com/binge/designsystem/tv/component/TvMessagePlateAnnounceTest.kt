@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config
 
 private val PoliteLiveRegion = SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite)
 
-/** A failure plate is announced as a whole, as the phone's `ErrorScreen` is (#526). */
+/** A failure plate is announced as a whole, as the phone's `ErrorScreen` is. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvMessagePlateAnnounceTest {

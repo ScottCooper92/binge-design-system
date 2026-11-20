@@ -77,7 +77,7 @@ fun BingeSearchField(
     // The String overload of BasicTextField starts its selection at 0, so a field that opens with a query (a screen restored on Back)
     // would put the caret before it. Own the selection: it starts at the end, follows the user once they move it, and goes back to the
     // end when the query is changed from outside (a clear, a restore). A query the caller rewrites from what was typed keeps the caret
-    // where it was (#1158).
+    // where it was.
     val caret = rememberFieldCaret(query, TextFieldValue(query, TextRange(query.length)))
     val shown = caret.shown(query)
     Row(

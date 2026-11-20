@@ -48,7 +48,7 @@ internal fun TvCompactActionButton(
  *
  * [announce] makes the plate one polite live region carrying the headline and body, as `TvErrorPlate` is and the
  * phone's `MessageScreen` can be. Set it for a screen-wide failure: otherwise a screen reader hears only the focused
- * button, or, with no action, nothing at all (#596).
+ * button, or, with no action, nothing at all.
  *
  * Two shapes differ from the phone's `MessageScreen` on purpose. [loading] is a flag here, not a separate page,
  * because the page must keep holding focus while it loads. And there is no free `actions` slot: focus has to land

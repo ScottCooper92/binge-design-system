@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowDialog
 
 /**
- * Back with the keyboard up must not hand focus to anything else (#1024). Pressing Back is a key event, so the window is in
+ * Back with the keyboard up must not hand focus to anything else. Pressing Back is a key event, so the window is in
  * keyboard input mode, where clearing focus moves it to the first focusable node: the sheet's drag handle, which then drew
  * a focus box that stayed until the sheet closed. Run in keyboard input mode, as that press is.
  */

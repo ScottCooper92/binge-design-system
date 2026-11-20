@@ -31,7 +31,7 @@ private const val TOLERANCE = 1f
 /** A navigation bar down the start side, as three-button navigation sits in landscape. */
 private val SideBar = 48.dp
 
-/** A [HeroDetailScreen] page clears the side insets on its outer edges only, as a pane does (#373). */
+/** A [HeroDetailScreen] page clears the side insets on its outer edges only, as a pane does. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w1000dp-h800dp")
 class HeroDetailScreenPaneInsetsTest {

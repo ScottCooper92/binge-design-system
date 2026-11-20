@@ -129,13 +129,13 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun decisionBodyInStepFlow() = DecisionBodyInStepFlowSample()
 
-    /** A note in two paragraphs, the second in the variant colour (#673). */
+    /** A note in two paragraphs, the second in the variant colour. */
     @PreviewTest
     @ScreenStatePreview
     @Composable
     fun decisionBodyNoteContent() = DecisionBodyNoteContentSample()
 
-    /** The decision's hero and heading in the flow's aside, so the landscape cells split it beside the points (#638). */
+    /** The decision's hero and heading in the flow's aside, so the landscape cells split it beside the points. */
     @PreviewTest
     @ScreenPreviews
     @Composable
@@ -173,7 +173,7 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun heroDetail() = HeroDetailScreenSample()
 
-    /** Font scale 2.0 on a landscape phone: the hero grows to hold its copy, which sits below the overlay bar (#655). */
+    /** Font scale 2.0 on a landscape phone: the hero grows to hold its copy, which sits below the overlay bar. */
     @PreviewTest
     @Preview(
         name = "land-font20",

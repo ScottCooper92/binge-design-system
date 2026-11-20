@@ -25,7 +25,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
-/** Every custom clickable says it is a button, and the ones with no text say what they do (#378). */
+/** Every custom clickable says it is a button, and the ones with no text say what they do. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class ClickableSemanticsTest {

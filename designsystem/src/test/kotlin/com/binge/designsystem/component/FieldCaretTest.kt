@@ -5,7 +5,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/** The rule that decides where a text field's caret goes when the caller's value differs from what was typed (#1158). */
+/** The rule that decides where a text field's caret goes when the caller's value differs from what was typed. */
 class FieldCaretTest {
     private fun typed(text: String, caret: Int) = TextFieldValue(text, TextRange(caret))
 

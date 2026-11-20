@@ -26,7 +26,7 @@ private const val TOLERANCE = 1f
 /** A camera cutout down the start side, as a phone held in landscape has. */
 private val Cutout = 40.dp
 
-/** The medium bar takes its side insets from `paneSideInsets()`, as the body below it does (#352). */
+/** The medium bar takes its side insets from `paneSideInsets()`, as the body below it does. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w800dp-h400dp")
 class BingeMediumTopBarSideInsetsTest {
