@@ -108,6 +108,7 @@ class CollectionDetailCallbacks(
  * @need build a collection's page with a hero, an overview and its parts as rows
  * @group screens
  * @replaces a hand-built hero page of a collection and a list of its titles
+ * @sample CollectionDetailReadySample
  */
 @Composable
 fun CollectionDetailScreen(

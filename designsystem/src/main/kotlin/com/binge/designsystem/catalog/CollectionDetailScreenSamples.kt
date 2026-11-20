@@ -19,6 +19,7 @@ import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.StatusChip
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.preview.WithPreviewImage
 import com.binge.designsystem.template.CollectionDetail
 import com.binge.designsystem.template.CollectionDetailCallbacks
 import com.binge.designsystem.template.CollectionDetailScreen
@@ -26,6 +27,8 @@ import com.binge.designsystem.template.CollectionDetailState
 import com.binge.designsystem.template.ScreenFooter
 import com.binge.designsystem.theme.BingeSentiment
 
+private const val POSTER_WIDTH_PX = 400
+private const val POSTER_HEIGHT_PX = 600
 private const val OVERVIEW =
     "Three friends, one lighthouse and a coastline that keeps changing. The series follows what they find there, and what it costs them to leave."
 private const val BLURB =
@@ -109,7 +112,10 @@ fun CollectionDetailEmptySample() = SampleScreen(CollectionDetailState.Content(s
 
 /** A collection with a poster and no backdrop, as a hand-made box set often is: the poster is the picture behind the hero, and beside the title at an expanded width. */
 @Composable
-fun CollectionDetailPosterOnlySample() = SampleScreen(CollectionDetailState.Content(sampleCollection(posterUrl = "sample-poster")))
+fun CollectionDetailPosterOnlySample() =
+    WithPreviewImage(POSTER_WIDTH_PX, POSTER_HEIGHT_PX) {
+        SampleScreen(CollectionDetailState.Content(sampleCollection(posterUrl = "sample://poster")))
+    }
 
 /** A collection with no overview and no blurbs: those blocks take no room, and the rows stay as short as their text. */
 @Composable
