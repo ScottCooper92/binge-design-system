@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -380,6 +381,131 @@ class SearchScreenTest {
         pages = pages - "all"
         rule.waitForIdle()
         pages = pages + ("all" to all)
+        rule.waitForIdle()
+
+        assertScrolledAway("a title 0")
+    }
+
+    /**
+     * Hosts the screen the way an app does: every `onType` makes the holder emit a new [SearchState.Ready], with new `types` for the new selection
+     * and a new `pages` map of new lists with equal content, so nothing the screen keeps can hang on the identity of the state, the types or the map.
+     */
+    private fun showAsAnApp(emptyKeys: Set<String> = emptySet()) {
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            val pages =
+                mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40)).mapValues { (key, list) ->
+                    if (key in emptyKeys) emptyList() else list
+                }
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "past",
+                    state = SearchState.Ready(
+                        named("a"),
+                        loaded = 3,
+                        hasMore = false,
+                        types = SearchTypes(types.chips, selected),
+                        pages = pages,
+                    ),
+                    callbacks = callbacks(onType = { selected = it }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    private fun scrollAllThenTapAwayAndBack(away: String) {
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        rule.onNodeWithText(away).performClick()
+        rule.waitForIdle()
+        rule.onNodeWithText("All").performClick()
+        rule.waitForIdle()
+
+        assertScrolledAway("a title 0")
+    }
+
+    @Test
+    fun `an app's new state on each type keeps a page's scroll through a chip tap away and back`() {
+        showAsAnApp()
+        scrollAllThenTapAwayAndBack("Movies")
+    }
+
+    @Test
+    fun `an app's new state on each type keeps a page's scroll through a tap to an empty page and back`() {
+        showAsAnApp(emptyKeys = setOf("people"))
+        scrollAllThenTapAwayAndBack("People")
+    }
+
+    @Test
+    fun `a page keeps its scroll when the screen shows another state between two type taps`() {
+        var interlude by mutableStateOf(false)
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            val pages = mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40))
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "past",
+                    state = if (interlude) {
+                        SearchState.Loading
+                    } else {
+                        SearchState.Ready(
+                            named("a"),
+                            loaded = 3,
+                            hasMore = false,
+                            types = SearchTypes(types.chips, selected),
+                            pages = pages,
+                        )
+                    },
+                    callbacks = callbacks(onType = { selected = it }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        interlude = true
+        rule.waitForIdle()
+        interlude = false
+        rule.waitForIdle()
+
+        assertScrolledAway("a title 0")
+    }
+
+    @Test
+    fun `a page keeps its scroll through a saved state restore`() {
+        val restoration = StateRestorationTester(rule)
+        restoration.setContent {
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "past",
+                    state = SearchState.Ready(
+                        named("a"),
+                        loaded = 3,
+                        hasMore = false,
+                        types = SearchTypes(types.chips, "all"),
+                        pages = mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40)),
+                    ),
+                    callbacks = callbacks(),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        restoration.emulateSavedInstanceStateRestore()
         rule.waitForIdle()
 
         assertScrolledAway("a title 0")

@@ -33,11 +33,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -224,6 +227,7 @@ fun SearchScreen(
     val collapsed = if (bar == ScreenBar.Small) 0f else scrollBehavior?.state?.collapsedFraction ?: 0f
     val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE
     val paged = state.pagedTypes()
+    val pageStates = rememberSaveable(saver = SearchPageStates.Saver) { SearchPageStates() }
     val pager = rememberFilterPager(
         selectedIndex = paged?.selectedIndex ?: 0,
         onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },
@@ -260,6 +264,7 @@ fun SearchScreen(
                         failedContent = failedContent,
                         paged = paged,
                         pager = pager,
+                        pageStates = pageStates,
                     )
                 }
             }
@@ -292,6 +297,7 @@ private fun SearchBody(
     failedContent: (@Composable (Modifier) -> Unit)?,
     paged: PagedTypes?,
     pager: FilterPager,
+    pageStates: SearchPageStates,
 ) {
     // The plates (no results, failed, a type with nothing in it) clear the navigation bar and the floating pill as the lists do.
     val platePadding = navOverlayPadding(PaddingValues(top = top, bottom = bottom))
@@ -313,9 +319,6 @@ private fun SearchBody(
             )
         is SearchState.Ready ->
             if (paged != null) {
-                // One saved grid state per page, held above the pager: a page the pager disposes, a page whose entry goes missing while
-                // its type reloads and a recreated activity all come back where the list was left.
-                val gridStates = paged.chips.associate { chip -> chip.key to rememberPageGridState(chip.key) }
                 HorizontalPager(
                     state = pager.state,
                     modifier = Modifier.fillMaxSize(),
@@ -333,7 +336,7 @@ private fun SearchBody(
                             moreFailedLabel = moreFailedLabel,
                             resultTrailing = resultTrailing,
                             platePadding = platePadding,
-                            gridState = gridStates.getValue(paged.chips[page].key),
+                            gridState = pageStates.stateFor(paged.chips[page].key),
                         )
                     }
                 }
@@ -392,10 +395,35 @@ private fun NoResultsBody(
     }
 }
 
-/** A page's grid state, saved under the page's own chip key so it outlives the page's composition. */
-@Composable
-private fun rememberPageGridState(chipKey: String): LazyGridState =
-    key(chipKey) { rememberSaveable(saver = LazyGridState.Saver, key = SEARCH_PAGE_KEY_PREFIX + chipKey) { LazyGridState() } }
+/**
+ * The grid state of each page, by the page's chip key and nothing else. It is held by [SearchScreen] itself, above everything that follows the state,
+ * so a page the pager disposes, another state shown in between (loading, say), a new state or types or map on every tap and a recreated activity all
+ * leave a page where its list was. Saved as the first visible item and its offset, so it outlives the process too.
+ */
+@Stable
+private class SearchPageStates {
+    private val states = mutableMapOf<String, LazyGridState>()
+
+    fun stateFor(chipKey: String): LazyGridState = states.getOrPut(chipKey) { LazyGridState() }
+
+    companion object {
+        val Saver: Saver<SearchPageStates, Any> =
+            listSaver(
+                save = { holder ->
+                    holder.states.flatMap { (key, state) -> listOf(key, state.firstVisibleItemIndex, state.firstVisibleItemScrollOffset) }
+                },
+                restore = { saved ->
+                    SearchPageStates().also { holder ->
+                        saved.chunked(PAGE_STATE_FIELDS).forEach { (key, index, offset) ->
+                            holder.states[key as String] = LazyGridState(index as Int, offset as Int)
+                        }
+                    }
+                },
+            )
+    }
+}
+
+private const val PAGE_STATE_FIELDS = 3
 
 /** The chips a paged body swipes between, the one chosen, and each chip's results; null when the state does not page. */
 @Immutable
