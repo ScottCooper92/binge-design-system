@@ -34,7 +34,7 @@ class TvTemplateSamplesScreenshotTest {
     @Composable
     fun decisionPageNoteContent() = Frame { TvDecisionPageNoteContentSample() }
 
-    /** A decision as one step of a step flow: the flow's read-out and footer, the body between them (#638). */
+    /** A decision as one step of a step flow: the flow's read-out and footer, the body between them. */
     @PreviewTest
     @TvPreviews
     @Composable

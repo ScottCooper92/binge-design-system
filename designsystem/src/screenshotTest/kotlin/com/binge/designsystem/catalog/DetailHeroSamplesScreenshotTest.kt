@@ -37,7 +37,7 @@ class DetailHeroSamplesScreenshotTest {
         DetailHeroTitleFallbackSample()
     }
 
-    /** Font scale 2.0 on a landscape phone, the shortest band: the copy clears the back button and the band grows (#533). */
+    /** Font scale 2.0 on a landscape phone, the shortest band: the copy clears the back button and the band grows. */
     @PreviewTest
     @Preview(
         name = "land-font20",

@@ -179,9 +179,9 @@ private fun DecisionLandscape(
  * A decision's kicker, title, subtitle and note, as [DecisionScreen] and [DecisionBody] head theirs. Public for a
  * decision that is one step of a [StepFlowScreen]: it goes in the flow's heading slot, [DecisionHero] in its aside and
  * [com.binge.designsystem.component.DecisionPointsCard] in its content, so a split step puts the hero and heading on
- * the start side and the points on the end (#638).
+ * the start side and the points on the end.
  *
- * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour (#673). It sits
+ * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour. It sits
  * where the note does, and its paragraphs are spaced as the heading's lines are. A bare `Text` in it reads as the note
  * would: the slot provides the note's style and colour, so only a paragraph that differs names its own.
  *

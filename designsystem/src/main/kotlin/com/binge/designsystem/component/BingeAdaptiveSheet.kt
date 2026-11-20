@@ -109,7 +109,7 @@ class BingeSheetNav internal constructor(
  * [BingeSheetNav.pop], through [onPageBack], and can drop that page's state there. It is not called for the sheet closing,
  * which is [onDismissRequest]; the caller drops whatever pages remain then.
  *
- * Pages transition (#1272): a pushed page slides in from the end edge on the theme's spatial spring as the old one eases away and both fade, a popped
+ * Pages transition: a pushed page slides in from the end edge on the theme's spatial spring as the old one eases away and both fade, a popped
  * one the reverse, mirrored in a right-to-left layout, and the sheet's height follows. Under reduced motion nothing slides and the swap is a short
  * fade. The page that is leaving stays on screen, drawn as itself, until its exit ends, so [onPageBack] for a page popped is called then and not at
  * the moment of the pop (a sheet that closes first reports it as it goes); a caller that drops a page's state there is not pulling it out from under
@@ -221,8 +221,7 @@ fun BingeAdaptiveSheet(
 }
 
 /**
- * Draws a sheet's pages so one survives the sheet turning from a bottom sheet into a side sheet or back (a rotation, a fold;
- * jellyfin#301). The two draw in different windows, so a `rememberSaveable` in the content has a different positional key in
+ * Draws a sheet's pages so one survives the sheet turning from a bottom sheet into a side sheet or back (a rotation, a fold). The two draw in different windows, so a `rememberSaveable` in the content has a different positional key in
  * each and is not found again after the activity is recreated. A [movableContentOf] made above both composes the
  * pages under the same key wherever they are shown, and a [SaveableStateHolder] keeps each page's saved state.
  */

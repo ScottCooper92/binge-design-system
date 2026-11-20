@@ -27,7 +27,7 @@ private const val NODE = "control"
 private val Backdrop = Color(0xFF336699)
 
 /**
- * A focused [tvClickable] draws nothing of its own (#839). TV components draw their own focus, so foundation's default
+ * A focused [tvClickable] draws nothing of its own. TV components draw their own focus, so foundation's default
  * indication would only lay a translucent rectangle over the control's bounds, showing as square corners behind a pill.
  */
 @RunWith(RobolectricTestRunner::class)

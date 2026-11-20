@@ -67,7 +67,7 @@ import kotlin.math.abs
  * measure `com.binge.designsystem.tv.layout.TvLayoutAnchors`; phone callers measure
  * [com.binge.designsystem.layout.LayoutAnchors]. A consumer depends on it with
  * `testImplementation(testFixtures(libs.binge.designsystem))`, which the composite build's existing module
- * substitution resolves (#183).
+ * substitution resolves.
  */
 fun ComposeContentTestRule.assertSkeletonReservesGeometry(
     anchors: List<String>,

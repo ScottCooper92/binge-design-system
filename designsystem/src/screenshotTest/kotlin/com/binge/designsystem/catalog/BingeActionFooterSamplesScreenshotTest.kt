@@ -29,7 +29,7 @@ class BingeActionFooterSamplesScreenshotTest {
         BingeActionFooterOnPageSample()
     }
 
-    /** The `leadingIcon` variant — see #132. */
+    /** The `leadingIcon` variant. */
     @PreviewTest
     @ComponentPreviews
     @Composable

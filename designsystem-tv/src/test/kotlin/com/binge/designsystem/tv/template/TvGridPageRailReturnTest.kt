@@ -38,7 +38,7 @@ private const val CELL = 7
 private const val TAG_RAIL = "rail"
 
 /**
- * **A rail round trip lands back on the exact cell, on a grid with no focus-keeper (#1491).**
+ * **A rail round trip lands back on the exact cell, on a grid with no focus-keeper.**
  *
  * `TvGridPage`/`TvMediaGrid` used to install their entry-redirect focus group only when the caller supplied an
  * `entryFocusRequester` — which the see-all, collection and list-detail grids do not. So → back from the rail
@@ -138,7 +138,7 @@ class TvGridPageRailReturnTest {
     /**
      * [CELL] is seeded as the pane's focus memory so `cell(CELL).requestFocus()` below actually lands there.
      *
-     * Since #1727 the grid's entry group always resolves — to the remembered cell, or the first one — so a
+     * The grid's entry group always resolves — to the remembered cell, or the first one — so a
      * request aimed at any *other* cell is an entry into the group and is redirected. Seeding the memory the
      * test is about makes the entry cell and the requested cell the same node, which is also the state these
      * cases model: a user who has already browsed to column 2 before stepping out to the rail.

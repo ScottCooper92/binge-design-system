@@ -46,7 +46,7 @@ private const val CARDS = 4
 
 /**
  * A detail page routes arriving focus to the caller's action row, and back to the section the user browsed once they
- * have left the hero (#395). The hero opens with a focusable synopsis above the actions, so a geometric pick from the
+ * have left the hero. The hero opens with a focusable synopsis above the actions, so a geometric pick from the
  * rail would land there rather than on the row the page routes to.
  */
 @RunWith(RobolectricTestRunner::class)

@@ -85,7 +85,7 @@ fun WithOverrides(overrides: SampleOverrides, content: @Composable () -> Unit) {
  * This context with its resources in [locale]. A wrapper over this context rather than the bare one
  * `createConfigurationContext` returns, so the activity stays reachable by unwrapping: a sample that
  * hands [LocalContext] to `WindowInfoTracker`, as `FoldPosture` does, needs a UI context, and a bare
- * configuration context is not one (#215).
+ * configuration context is not one.
  */
 internal fun Context.localizedTo(locale: Locale): Context {
     val resources =

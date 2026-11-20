@@ -26,7 +26,7 @@ private val NavigationBar = 48.dp
 private const val TOLERANCE = 0.5f
 
 /**
- * The strip the floating pill publishes counts the bottom inset and not the top one (#423). Its measured
+ * The strip the floating pill publishes counts the bottom inset and not the top one. Its measured
  * correction once sat before the insets padding, so the status bar's height reached every list's bottom padding.
  */
 @RunWith(RobolectricTestRunner::class)

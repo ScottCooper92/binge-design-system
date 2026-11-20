@@ -34,7 +34,7 @@ private const val TOLERANCE = 1f
 /**
  * The components under a detail hero take their side padding from the pane, as the hero does: in the end pane the
  * edge shared with the list gets the inner inset and the window-edge inset is 16dp at this width, so each content edge
- * moves in by 8dp (#534). A lone stat is centred in the row, so it moves by half that.
+ * moves in by 8dp. A lone stat is centred in the row, so it moves by half that.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)

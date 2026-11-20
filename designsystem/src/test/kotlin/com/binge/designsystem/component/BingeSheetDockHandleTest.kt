@@ -36,7 +36,7 @@ import org.robolectric.annotation.Config
  *
  * The taps are real touches, on a sheet short enough to float when expanded. A sheet tall enough to reach
  * the status bar docks instead, and a fully docked sheet does not place its handle at all, so there is
- * nothing to tap: the last test pins that, and it is why touch taps once looked lost here (#709).
+ * nothing to tap: the last test pins that, and it is why touch taps once looked lost here.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @RunWith(RobolectricTestRunner::class)

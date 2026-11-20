@@ -7,7 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Which hero slides draw a placeholder while their image loads (#1300). A slide the carousel waited for arrives loaded and draws
+ * Which hero slides draw a placeholder while their image loads. A slide the carousel waited for arrives loaded and draws
  * none, so it never flashes a plate over the previous backdrop; one it never waited for (the first slide, or a refreshed list's
  * new image) does. Coil's own loading state is not observable in a unit test, so the rule is pinned here.
  */

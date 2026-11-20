@@ -19,7 +19,7 @@ private val PoliteLiveRegion = SemanticsMatcher.expectValue(SemanticsProperties.
 private const val HEADLINE = "Can't reach the server"
 private const val BODY = "Check the connection and try again."
 
-/** A screen-wide failure on a [TvMessagePage] is announced as a whole when the page is told to (#596). */
+/** A screen-wide failure on a [TvMessagePage] is announced as a whole when the page is told to. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvMessagePageAnnounceTest {

@@ -15,7 +15,7 @@ import java.util.Locale
 /**
  * A locale override hands the sample a context whose strings are in that locale, and which still
  * unwraps to the activity. A bare configuration context would lose the activity, and with it the fold
- * `FoldPosture` reads through `WindowInfoTracker` (#215).
+ * `FoldPosture` reads through `WindowInfoTracker`.
  */
 @RunWith(RobolectricTestRunner::class)
 class LocalizedContextTest {

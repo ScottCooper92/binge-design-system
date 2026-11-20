@@ -19,7 +19,7 @@ private const val SLOT_FIRST = "Nothing is sent until you say yes."
 private const val SLOT_SECOND = "Nothing is kept for longer than ninety days."
 
 /**
- * [DecisionScreen] passes its note slot to both of its layouts (#675): the portrait one through [DecisionBody], the
+ * [DecisionScreen] passes its note slot to both of its layouts: the portrait one through [DecisionBody], the
  * landscape one through the start column's [DecisionHeading]. Either way the slot replaces `copy.note`.
  */
 @RunWith(RobolectricTestRunner::class)
