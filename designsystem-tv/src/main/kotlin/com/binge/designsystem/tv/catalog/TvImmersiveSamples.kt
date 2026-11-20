@@ -15,6 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -240,20 +244,31 @@ fun TvImmersiveHubPendingRowSample() {
     )
 }
 
-private val FailedSampleRow =
+private const val FAILED_ROW_KEY = "failed"
+
+private fun failedSampleRow(onRetry: () -> Unit) =
     TvHubRow<SampleTitle>(
-        key = "failed",
+        key = FAILED_ROW_KEY,
         title = "Your requests",
         items = emptyList(),
-        failure = TvHubRowFailure(message = "These requests could not be loaded.", retryLabel = "Retry", onRetry = {}),
+        failure = TvHubRowFailure(message = "These requests could not be loaded.", retryLabel = "Retry", onRetry = onRetry),
     )
 
 /** The second row could not be read: it keeps its slot and says so, with its retry focused, in place of its cards. */
 @Composable
 fun TvImmersiveHubFailedRowSample() {
+    // Seeded as failed, so the frame is unchanged; Retry loads the row's cards in place, as a real source does.
+    var failed by remember { mutableStateOf(true) }
+    val row = if (failed) {
+        failedSampleRow {
+            failed = false
+        }
+    } else {
+        TvHubRow(key = FAILED_ROW_KEY, title = "Your requests", items = SampleRows.first().items)
+    }
     SampleHub(
-        initialFocused = FailedSampleRow.key to 0,
-        rows = SampleRows.take(1) + FailedSampleRow + SampleRows.drop(1),
+        initialFocused = FAILED_ROW_KEY to 0,
+        rows = SampleRows.take(1) + row + SampleRows.drop(1),
     )
 }
 
