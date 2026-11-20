@@ -69,8 +69,8 @@ import com.binge.designsystem.searchResultColumns
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
-/** The lazy key of the append footer; an app's own keys are text too, so it is namespaced. */
-private const val FOOTER_KEY = "search-footer"
+/** The lazy key of the append footer. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
+private const val FOOTER_KEY = "binge:search-footer"
 
 /** How many rows of plates the loading skeleton draws. */
 const val SEARCH_SKELETON_ROWS: Int = 6
@@ -435,7 +435,7 @@ private fun IdleBody(
         )
     LazyColumn(contentPadding = listPadding) {
         if (state.recents.isNotEmpty()) {
-            item(key = "recents") {
+            item(key = "binge:search-recents") {
                 RecentSearches(state.recents, recents, onSelect = callbacks.onPickRecent, onClear = callbacks.onClearRecents)
             }
         }
@@ -501,8 +501,14 @@ private fun ResultsList(
             isNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount, ahead = SEARCH_LOAD_MORE_AHEAD)
         }
     }
-    LaunchedEffect(gridState, state.hasMore, state.loaded) {
-        if (state.hasMore) snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { callbacks.onLoadMore() }
+    // Keyed on the paging flags too, so a page that added nothing still asks again while the app says there is more; see PagedGridScreen.
+    LaunchedEffect(gridState, state.hasMore, state.loaded, state.appending, state.appendFailed) {
+        if (state.hasMore &&
+            !state.appending &&
+            !state.appendFailed
+        ) {
+            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { callbacks.onLoadMore() }
+        }
     }
     val empty = state.results.isEmpty()
     val settled = !state.hasMore && !state.appending && !state.appendFailed

@@ -2,6 +2,9 @@ package com.binge.designsystem.template
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
@@ -178,5 +181,37 @@ class SearchScreenTest {
         rule.onNodeWithText("Try again").assertExists()
         rule.onNodeWithText("Allow").performClick()
         assertEquals(1, allowed)
+    }
+
+    @Test
+    fun `a page that added nothing asks again while the screen still has more`() {
+        val asked = mutableListOf<Int>()
+        var state by mutableStateOf<SearchState>(SearchState.Ready(results(3), loaded = 3, hasMore = true, types = types))
+        rule.setContent {
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "past",
+                    state = state,
+                    callbacks = callbacks(onLoadMore = { asked += asked.size }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        assertEquals(1, asked.size)
+        state = SearchState.Ready(results(3), loaded = 3, hasMore = true, appending = true, types = types)
+        rule.waitForIdle()
+        assertEquals(1, asked.size)
+        state = SearchState.Ready(results(3), loaded = 3, hasMore = true, types = types)
+        rule.waitForIdle()
+        assertEquals(2, asked.size)
+    }
+
+    @Test
+    fun `a result keyed like the footer still renders beside it`() {
+        val odd = MediaResult("search-footer", MediaResultKind.Poster, null, "Odd key", "Movie", rating = 7f)
+        show(SearchState.Ready(listOf(odd) + results(2), loaded = 3, hasMore = true, appending = true, types = types))
+        rule.onNodeWithText("Odd key").assertIsDisplayed()
     }
 }

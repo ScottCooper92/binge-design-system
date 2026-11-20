@@ -2,6 +2,9 @@ package com.binge.designsystem.template
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
@@ -183,5 +186,35 @@ class PagedGridScreenTest {
         rule.onNodeWithText("Try again").assertExists()
         rule.onNodeWithText("Allow").performClick()
         assertEquals(1, allowed)
+    }
+
+    @Test
+    fun `a page that added nothing asks again while the grid still has more`() {
+        var asked = 0
+        var state by mutableStateOf<PagedGridState>(PagedGridState.Ready(items(SHORT), hasMore = true))
+        rule.setContent {
+            TestTheme {
+                PagedGridScreen(
+                    title = "Discover",
+                    state = state,
+                    callbacks = PagedGridCallbacks(onOpenItem = {}, onLoadMore = { asked++ }, onRetry = {}),
+                )
+            }
+        }
+        rule.waitForIdle()
+        assertEquals(1, asked)
+        state = PagedGridState.Ready(items(SHORT), hasMore = true, appending = true)
+        rule.waitForIdle()
+        assertEquals(1, asked)
+        state = PagedGridState.Ready(items(SHORT), hasMore = true)
+        rule.waitForIdle()
+        assertEquals(2, asked)
+    }
+
+    @Test
+    fun `an item keyed like the footer still renders beside it`() {
+        val odd = GridItem(key = "paged-grid-footer", posterUrl = null, title = "Odd key", rating = 7f)
+        show(PagedGridState.Ready(listOf(odd) + items(SHORT), hasMore = true, appending = true))
+        rule.onNodeWithText("Odd key").assertIsDisplayed()
     }
 }

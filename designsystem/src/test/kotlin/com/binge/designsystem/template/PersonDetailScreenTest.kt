@@ -305,4 +305,19 @@ class PersonDetailScreenTest {
         rule.onNodeWithText("Allow").performClick()
         assertEquals(1, allowed)
     }
+
+    @Test
+    fun `items keyed like the row's own tiles still render beside them`() {
+        val odd =
+            listOf("append", "see-all", "binge:person-append", "binge:person-see-all").map {
+                GridItem(key = it, posterUrl = null, title = "Odd $it", rating = 7f)
+            }
+        show(
+            PersonDetailState.Content(
+                person(CreditsState.Ready(listOf(CreditSection("a", "Acting", odd, hasMore = true, appending = true)))),
+            ),
+            PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {}, onSeeAll = {}),
+        )
+        rule.onNodeWithText("Odd append").assertIsDisplayed()
+    }
 }
