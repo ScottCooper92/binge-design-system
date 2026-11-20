@@ -51,12 +51,13 @@ private fun sampleCollection(
     overview: String? = OVERVIEW,
     parts: List<MediaResult> = parts(),
     posterUrl: String? = null,
+    partsHeading: String? = "Movies",
 ) = CollectionDetail(
     title = "The Lighthouse Collection",
     posterUrl = posterUrl,
     metaText = "3 movies",
     overview = overview,
-    partsHeading = "Movies",
+    partsHeading = partsHeading,
     parts = parts,
     emptyTitle = "No movies yet",
     emptyMessage = "This collection has no titles to show.",
@@ -121,3 +122,7 @@ fun CollectionDetailPosterOnlySample() =
 @Composable
 fun CollectionDetailPlainSample() =
     SampleScreen(CollectionDetailState.Content(sampleCollection(overview = null, parts = parts(blurbs = false))))
+
+/** A collection with an overview and no heading over its parts: the page leaves a gap under the overview, where a heading's own padding would have been. */
+@Composable
+fun CollectionDetailNoHeadingSample() = SampleScreen(CollectionDetailState.Content(sampleCollection(partsHeading = null)))

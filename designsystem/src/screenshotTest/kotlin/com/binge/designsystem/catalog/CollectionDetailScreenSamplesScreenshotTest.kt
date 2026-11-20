@@ -42,4 +42,9 @@ class CollectionDetailScreenSamplesScreenshotTest {
     @ScreenWidthPreviews
     @Composable
     fun plain() = CollectionDetailPlainSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun noHeading() = CollectionDetailNoHeadingSample()
 }

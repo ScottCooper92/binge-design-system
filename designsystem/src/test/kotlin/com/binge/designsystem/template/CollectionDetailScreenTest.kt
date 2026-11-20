@@ -20,6 +20,7 @@ import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.assertNoTextClipped
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,15 +31,19 @@ import org.robolectric.annotation.GraphicsMode
 private fun part(i: Int, blurb: String? = null) =
     MediaResult(key = "p$i", kind = MediaResultKind.Poster, imageUrl = null, name = "Part $i", rating = 7f, meta = "20$i", blurb = blurb)
 
-private fun collection(parts: List<MediaResult>, overview: String? = "An overview.") =
-    CollectionDetail(
-        title = "Saga",
-        metaText = "2 movies",
-        overview = overview,
-        parts = parts,
-        emptyTitle = "Nothing here",
-        emptyMessage = "No titles.",
-    )
+private fun collection(
+    parts: List<MediaResult>,
+    overview: String? = "An overview.",
+    partsHeading: String? = null,
+) = CollectionDetail(
+    title = "Saga",
+    metaText = "2 movies",
+    overview = overview,
+    parts = parts,
+    partsHeading = partsHeading,
+    emptyTitle = "Nothing here",
+    emptyMessage = "No titles.",
+)
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, shadows = [ShadowMeshSpecification::class], qualifiers = "w412dp-h900dp")
@@ -162,6 +167,24 @@ class CollectionDetailScreenTest {
             assertEquals("row $index top", shown.top, plate.top, 0.5f)
             assertEquals("row $index height", shown.height, plate.height, 0.5f)
         }
+    }
+
+    private fun gapUnderOverview(partsHeading: String?): Float {
+        show(CollectionDetailState.Content(collection(listOf(part(1), part(2)), partsHeading = partsHeading)))
+        val overview = rule.onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW))).fetchSemanticsNode().boundsInRoot
+        val first = rule.onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM))).fetchSemanticsNode().boundsInRoot
+        return first.top - overview.bottom
+    }
+
+    @Test
+    fun `with no parts heading the first part keeps a gap under the overview`() {
+        // padding_m is 16dp and a phone's density here is 1px a dp.
+        assertEquals(16f, gapUnderOverview(partsHeading = null), 0.5f)
+    }
+
+    @Test
+    fun `a parts heading keeps the gap it always supplied`() {
+        assertTrue("the heading's room is more than the bare gap", gapUnderOverview(partsHeading = "Movies") > 16f)
     }
 
     private fun assertUnclippedAt(scale: Float) {

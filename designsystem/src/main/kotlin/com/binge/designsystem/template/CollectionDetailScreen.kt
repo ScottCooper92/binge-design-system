@@ -204,6 +204,8 @@ private fun ColumnScope.CollectionContent(
         text = collection.overview,
     )
     collection.partsHeading?.let { SectionHeader(title = it, horizontalPadding = readingInset(), startPadding = readingInset()) }
+    // The heading's own padding is the gap under the overview. With no heading the parts would sit right under it, so the page leaves one.
+    if (collection.partsHeading == null && collection.overview != null) Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
     Column(
         Modifier.fillMaxWidth().readingMargin().padding(horizontal = resolvedContentInset()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
