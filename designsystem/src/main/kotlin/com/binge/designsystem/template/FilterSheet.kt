@@ -43,8 +43,10 @@ import java.time.LocalDate
  *
  * A row can open a second level: with [detail] set, a tap on a row calls [onRowClick] and then opens [detail] for that row as a page
  * of the sheet, on a phone and in the side sheet alike, with the sheet's own slide, Back and state. It is for a filter with too
- * many options for the body (a library's years): draw [FilterSectionContent] in it, with its `onBack` set to the nav's `pop` and a
- * `search` to find an option, and the user lands back on the sheet where they left it. [onDetailBack] is told which row's page was
+ * many options for the body (a library's years): draw [FilterSectionContent] in it, with a `search` to find an option, and the user
+ * lands back on the sheet where they left it. Set its `onBack` to the nav's `pop` on a phone only, as
+ * `if (isExpandedLayout()) null else nav::pop`: the side sheet draws its own Back bar above a second page, so an arrow of the
+ * section's own would be a second one. [onDetailBack] is told which row's page was
  * left, however (the arrow, system Back, a swipe). Without [detail] the sheet is as it was, and the caller stacks its own.
  *
  * @need let the user narrow a catalogue by several filters in one sheet

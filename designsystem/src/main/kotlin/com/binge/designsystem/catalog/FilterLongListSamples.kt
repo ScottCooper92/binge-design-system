@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilledButton
+import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.FilterControlHandlers
 import com.binge.designsystem.template.FilterControlUi
@@ -157,7 +158,7 @@ fun FilterSheetSecondLevelDemo() {
                             included =
                                 if (id in included) included - id else included + id
                         }),
-                        onBack = { nav.pop() },
+                        onBack = if (isExpandedLayout()) null else nav::pop,
                         search =
                             FilterSearchUi(
                                 query = query,
