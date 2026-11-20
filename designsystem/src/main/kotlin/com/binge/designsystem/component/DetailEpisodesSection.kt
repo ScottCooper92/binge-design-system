@@ -26,11 +26,13 @@ private const val EPISODES_SHOWN = 5
  * One episode in a [DetailEpisodesSection]: its [number], [name], the [stillUrl], already built, its [rating] (null or zero draws none) and
  * its [airDate], already formatted. An episode part way through has a [progress] bar, from 0 to 1. A [played] episode draws a check at the end of its row,
  * announced as [playedLabel], which the caller words. [trailing] is a slot at the end of the row for a mark or a toggle the caller owns, and replaces the check.
- * The caller owns the words and the date format.
+ * A null [number], a special that has none, draws the row without its overline. [supporting] is one more short fact (a runtime) after the date, and
+ * [key] is the app's own identity for the episode, handed to [DetailEpisodesSection]'s `onOpenEpisode` when the row is tapped; with no key the row
+ * is not tapped. The caller owns the words and the date format.
  */
 @Immutable
 class EpisodeRow(
-    val number: Int,
+    val number: Int?,
     val name: String,
     val stillUrl: String?,
     val rating: Float? = null,
@@ -39,12 +41,14 @@ class EpisodeRow(
     val played: Boolean = false,
     val playedLabel: String? = null,
     val trailing: (@Composable () -> Unit)? = null,
+    val key: String? = null,
+    val supporting: String? = null,
 )
 
 /**
  * The episodes of one season on a series page: the [title] header with the season dropdown ([seasonLabel] names the season shown and
  * [onSeasonClick] opens the picker; with either null there is no dropdown, as a show with one season has nothing to choose), a [subtitle]
- * line ("Season 1 · 9 episodes · 2022"), then the first [shown] of [episodes] as display-only [EpisodeListRow]s and, when there are more
+ * line ("Season 1 · 9 episodes · 2022"), then the first [shown] of [episodes] as [EpisodeListRow]s (display-only unless [onOpenEpisode] is given and the episode has a key) and, when there are more
  * and [onViewAll] is given, a button labelled [viewAllLabel] for the rest. While the season loads or has failed, [stateContent] is drawn in
  * place of the rows, so the caller's own loading and error views stay in place, drawn inside the same inset as the rows. The header, the subtitle and the rows start at the page's
  * reading inset, so they line up with the sections around them.
@@ -64,6 +68,7 @@ fun DetailEpisodesSection(
     onSeasonClick: (() -> Unit)? = null,
     viewAllLabel: String? = null,
     onViewAll: (() -> Unit)? = null,
+    onOpenEpisode: ((key: String) -> Unit)? = null,
     shown: Int = EPISODES_SHOWN,
     stateContent: (@Composable () -> Unit)? = null,
 ) {
@@ -97,11 +102,12 @@ fun DetailEpisodesSection(
                     episodeNumber = episode.number,
                     name = episode.name,
                     stillUrl = episode.stillUrl,
-                    onClick = null,
+                    onClick = episode.key?.let { key -> onOpenEpisode?.let { open -> { open(key) } } },
                     modifier = Modifier.padding(horizontal = inset),
                     rating = episode.rating ?: 0f,
                     airDate = episode.airDate,
                     progress = episode.progress,
+                    supporting = episode.supporting,
                     trailingContent = episode.trailing ?: episode.played.takeIf { it }?.let {
                         { PlayedMark(episode.playedLabel) }
                     },

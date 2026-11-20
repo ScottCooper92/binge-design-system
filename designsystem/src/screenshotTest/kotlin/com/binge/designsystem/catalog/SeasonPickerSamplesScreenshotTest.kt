@@ -36,4 +36,10 @@ class SeasonPickerSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun episodesLoading() = DetailEpisodesSectionLoadingSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun episodesOpenable() = DetailEpisodesSectionOpenableSample()
 }

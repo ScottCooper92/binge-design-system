@@ -6,6 +6,10 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.EpisodeListRow
 import com.binge.designsystem.component.EpisodeListRowSkeleton
 import com.binge.designsystem.preview.ScreenshotTheme
@@ -84,5 +88,25 @@ fun EpisodeListRowMarksSample() {
                 },
             )
         }
+    }
+}
+
+/**
+ * A special, which has no episode number, so the row draws no "EP" overline, with a runtime after the date as its supporting fact. The row
+ * can be tapped, so it is a button; tapping it in the catalog counts a tap.
+ */
+@Composable
+fun EpisodeListRowSpecialSample() {
+    ScreenshotTheme {
+        var taps by remember { mutableIntStateOf(0) }
+        EpisodeListRow(
+            episodeNumber = null,
+            name = if (taps == 0) "Behind the scenes" else "Behind the scenes ($taps)",
+            stillUrl = null,
+            rating = 7.4f,
+            airDate = "Mar 1, 2023",
+            onClick = { taps++ },
+            supporting = "45 min",
+        )
     }
 }

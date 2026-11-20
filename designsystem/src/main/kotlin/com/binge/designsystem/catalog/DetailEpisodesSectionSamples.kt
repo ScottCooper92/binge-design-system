@@ -5,6 +5,7 @@ package com.binge.designsystem.catalog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.binge.designsystem.component.DetailEpisodesSection
@@ -62,6 +63,35 @@ fun DetailEpisodesSectionLoadingSample() {
             seasonLabel = "Season 1",
             onSeasonClick = {},
             stateContent = { repeat(2) { EpisodeListRowSkeleton() } },
+        )
+    }
+}
+
+/**
+ * The episodes of a season that can be opened: each row has a key and a runtime after the date, and a special has no number, so its row has
+ * no overline. Tapping a row in the catalog puts its key in the subtitle.
+ */
+@Composable
+fun DetailEpisodesSectionOpenableSample() {
+    ScreenshotTheme {
+        var opened by remember { mutableStateOf<String?>(null) }
+        DetailEpisodesSection(
+            title = "Episodes",
+            episodes = listOf(
+                EpisodeRow(
+                    null,
+                    "Behind the scenes",
+                    null,
+                    rating = 7.4f,
+                    airDate = "Mar 1, 2008",
+                    key = "special-1",
+                    supporting = "45 min",
+                ),
+                EpisodeRow(1, "Pilot", null, rating = 8.5f, airDate = "Jan 20, 2008", key = "ep-1", supporting = "58 min"),
+                EpisodeRow(2, "Cat's in the Bag", null, rating = 8.4f, airDate = "Jan 27, 2008", key = "ep-2", supporting = "48 min"),
+            ),
+            subtitle = opened?.let { "Opened $it" } ?: "Season 1 · 7 episodes · 2008",
+            onOpenEpisode = { opened = it },
         )
     }
 }
