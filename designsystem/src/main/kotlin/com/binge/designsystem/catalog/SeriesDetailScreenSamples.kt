@@ -32,7 +32,16 @@ private val seasons = listOf(
     SeasonRow(3, "Season 3", "13 episodes · 2010"),
 )
 
-private val episodeNames = listOf("Pilot", "Cat's in the Bag", "And the Bag's in the River", "Cancer Man", "Gray Matter", "Crazy Handful of Nothin'", "A No-Rough-Stuff-Type Deal")
+private val episodeNames =
+    listOf(
+        "Pilot",
+        "Cat's in the Bag",
+        "And the Bag's in the River",
+        "Cancer Man",
+        "Gray Matter",
+        "Crazy Handful of Nothin'",
+        "A No-Rough-Stuff-Type Deal",
+    )
 
 private fun episodes() =
     episodeNames.mapIndexed { index, name ->
@@ -49,7 +58,8 @@ private fun episodes() =
     }
 
 /** A lean series page, so the episodes section sits in the frame: the title, the stats and the synopsis, then the episodes. */
-private fun series() = MediaDetail(title = MEDIA_PAGE_TITLE, genres = MEDIA_PAGE_GENRES, stats = MediaPageStats, overview = MEDIA_PAGE_OVERVIEW)
+private fun series() =
+    MediaDetail(title = MEDIA_PAGE_TITLE, genres = MEDIA_PAGE_GENRES, stats = MediaPageStats, overview = MEDIA_PAGE_OVERVIEW)
 
 @Composable
 private fun SeriesPage(episodes: EpisodesState, seasonCount: Int = seasons.size) {

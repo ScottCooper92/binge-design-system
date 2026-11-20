@@ -32,10 +32,15 @@ sealed interface EpisodesState {
     data object Loading : EpisodesState
 
     /** The read failed. [message] is the app's own; Try again is offered when [retryable]. */
-    class Failed(val message: String, val retryable: Boolean = true) : EpisodesState
+    class Failed(
+        val message: String,
+        val retryable: Boolean = true,
+    ) : EpisodesState
 
     /** The season's [episodes]. */
-    class Ready(val episodes: List<EpisodeRow>) : EpisodesState
+    class Ready(
+        val episodes: List<EpisodeRow>,
+    ) : EpisodesState
 }
 
 /**
@@ -146,10 +151,7 @@ private fun SeriesEpisodes(
 
 /** A season whose episodes did not load: the app's message, and Try again where another attempt can help. */
 @Composable
-private fun EpisodesFailure(
-    state: EpisodesState.Failed,
-    onRetry: () -> Unit,
-) {
+private fun EpisodesFailure(state: EpisodesState.Failed, onRetry: () -> Unit) {
     Column(Modifier.padding(vertical = dimensionResource(R.dimen.padding_s))) {
         Text(state.message)
         if (state.retryable) {
