@@ -100,10 +100,12 @@ class MediaResultRowTest {
             }
         }
         rule.waitForIdle()
-        MediaResultKind.entries.forEach { kind ->
-            val row = rule.onNodeWithTag("row-$kind").getBoundsInRoot()
-            val skeleton = rule.onNodeWithTag("skeleton-$kind").getBoundsInRoot()
-            assertEquals("$kind", (row.bottom - row.top).value, (skeleton.bottom - skeleton.top).value, 1f)
-        }
+        val heights =
+            MediaResultKind.entries.associateWith { kind ->
+                val row = rule.onNodeWithTag("row-$kind").getBoundsInRoot()
+                val skeleton = rule.onNodeWithTag("skeleton-$kind").getBoundsInRoot()
+                (row.bottom - row.top).value to (skeleton.bottom - skeleton.top).value
+            }
+        heights.forEach { (kind, pair) -> assertEquals("$kind of $heights", pair.first, pair.second, 1f) }
     }
 }
