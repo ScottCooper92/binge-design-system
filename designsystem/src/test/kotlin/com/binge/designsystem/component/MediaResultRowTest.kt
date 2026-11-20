@@ -1,13 +1,15 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -81,19 +83,27 @@ class MediaResultRowTest {
         rule.onNodeWithText("Greta Lee").assertExists()
     }
 
-    private fun heightOf(content: @androidx.compose.runtime.Composable () -> Unit): Int {
-        rule.setContent { TestTheme { Box(Modifier.width(412.dp)) { content() } } }
-        rule.waitForIdle()
-        val bounds = rule.onRoot().getBoundsInRoot()
-        return (bounds.bottom - bounds.top).value.toInt()
-    }
-
     @Test
     fun `a skeleton is as tall as the row it stands in for, for every kind`() {
+        rule.setContent {
+            TestTheme {
+                Column(Modifier.width(412.dp)) {
+                    MediaResultKind.entries.forEach { kind ->
+                        MediaResultRow(
+                            MediaResult("k", kind, null, "Name", "Subtitle"),
+                            onClick = {},
+                            modifier = Modifier.testTag("row-$kind"),
+                        )
+                        MediaResultRowSkeleton(kind = kind, modifier = Modifier.testTag("skeleton-$kind"))
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
         MediaResultKind.entries.forEach { kind ->
-            val row = heightOf { MediaResultRow(MediaResult("k", kind, null, "Name", "Subtitle"), onClick = {}) }
-            val skeleton = heightOf { MediaResultRowSkeleton(kind = kind) }
-            assertEquals("$kind", row, skeleton)
+            val row = rule.onNodeWithTag("row-$kind").getBoundsInRoot()
+            val skeleton = rule.onNodeWithTag("skeleton-$kind").getBoundsInRoot()
+            assertEquals("$kind", (row.bottom - row.top).value, (skeleton.bottom - skeleton.top).value, 1f)
         }
     }
 }
