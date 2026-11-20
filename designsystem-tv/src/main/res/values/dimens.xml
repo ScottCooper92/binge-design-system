@@ -137,7 +137,7 @@
     <dimen name="tv_thumbnail_card_width">200dp</dimen>
     <dimen name="tv_media_grid_row_gap">16dp</dimen>
     <dimen name="tv_card_caption_gap">16dp</dimen>
-    <dimen name="tv_skeleton_caption_line_height">28dp</dimen>
+    <dimen name="tv_skeleton_caption_plate_inset">4dp</dimen>
     <dimen name="tv_placeholder_glyph_max">56dp</dimen>
     <dimen name="tv_immersive_row_gap">24dp</dimen>
     <dimen name="tv_immersive_grid_row_gap">16dp</dimen>
