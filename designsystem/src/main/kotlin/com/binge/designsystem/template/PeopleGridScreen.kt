@@ -182,10 +182,7 @@ fun PeopleGridScreen(
             )
         }
         if (tabs.size == 1) {
-            // The same outer box the pager sits in, so the window's side insets (a side navigation bar, a cutout) are cleared with one tab as with two.
-            Box(Modifier.fillMaxSize().padding(padding.screenOuterPadding()).consumeWindowInsets(padding.screenOuterPadding())) {
-                page(PaddingValues(top = padding.calculateTopPadding()), 0)
-            }
+            ScreenBody(padding) { page(PaddingValues(top = it.calculateTopPadding()), 0) }
         } else {
             BingeTabbedPager(
                 tabs = tabs.map { it.label },
