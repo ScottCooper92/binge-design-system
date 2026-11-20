@@ -46,7 +46,7 @@ private const val TAB_SCALE_MILLIS = 150
 private const val CURRENT_TAB_ALPHA = 0.2f
 
 /** The signed-in avatar's menu: its [rows], and [onOpenChange] to tell the scaffold when it opens or closes. */
-class TvTopBarAccount(
+internal class TvTopBarAccount(
     val rows: List<TvAccountMenuRow>,
     val onOpenChange: (Boolean) -> Unit,
 )
@@ -55,14 +55,11 @@ class TvTopBarAccount(
  * The tab bar across the top of a TV shell: [slots] with the account avatar at the start, the tabs centred and a button at the end.
  * A tab commits on click, not on focus. Entering the bar returns to the tab focus last left, [entryOverride] naming another
  * once. [holdOpen] keeps the tabs at full size and the bar above the page while the avatar's menu is open. Every key in
- * [iconOnlyKeys] draws its icon without a label. Down from any item lands on [down].
- *
- * @need show tabs across the top of a tv screen with an account avatar and a button at the ends
- * @group tv
- * @replaces a hand-built tv top bar
+ * [iconOnlyKeys] draws its icon without a label. Down from any item lands on [down]. A signed-in header needs at least one
+ * item in [slots], since Right out of the avatar goes to the first.
  */
 @Composable
-fun TvTabTopBar(
+internal fun TvTabTopBar(
     slots: TvTopBarSlots,
     selectedKey: Any,
     requesters: Map<Any, FocusRequester>,
@@ -187,7 +184,7 @@ private fun TopBarAvatar(
 
 /**
  * One of the bar's controls. A destination passes [selected] and is a tab, which the accessibility bridge reports as selected
- * (a button's selection reads as checked, #3994); null makes it a plain button.
+ * (a button's selection reads as checked); null makes it a plain button.
  */
 @Composable
 private fun TopBarItem(
