@@ -58,7 +58,7 @@ import com.binge.designsystem.theme.fill
  * [favourite] marks the title as a favourite with a small filled heart at the poster's top-end corner, as [status] marks where a request stands
  * with a dot: drawn, not tappable, with no ripple and no focus target of its own. The card announces "Favourite" in its merged state description,
  * ahead of the [status] label ("Arrival, Favourite, Available"). When the corner holds more than one mark they sit side by side
- * and never overlap, in this order from the start: the played mark, the favourite heart, the status dot, then the [topEndAction].
+ * and never overlap, in this order from the start: the watched mark or the unwatched count, the favourite heart, the status dot, then the [topEndAction].
  *
  * [watched] draws a tick on a scrim disc and [unwatchedCount] a count badge (above 99 it reads "99+"), for a title or a series the user has or has
  * not finished. They stand for one fact, so a watched card draws the tick alone, and a count of zero draws nothing. Like the heart they are drawn, not
@@ -86,7 +86,7 @@ fun MediaCard(
     unwatchedCount: Int? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    // The marks are drawn, so what they mean is in the card's own announcement: the favourite first, then the status.
+    // The marks are drawn, so what they mean is in the card's own announcement: the watched state first, then the favourite, then the status.
     val favouriteLabel = stringResource(R.string.media_card_favourite)
     val separator = stringResource(R.string.list_separator)
     val watchedLabel = stringResource(R.string.media_card_watched)
@@ -315,7 +315,7 @@ private fun MediaCardOverlays(
             )
         }
         if (status != null || favourite || watched || unwatchedCount != null || topEndAction != null) {
-            // The played mark, the favourite heart, the status dot and the action share the top-end corner: each sits to the start of the next, never under it.
+            // The watched mark or the unwatched count, the favourite heart, the status dot and the action share the top-end corner: each sits to the start of the next, never under it.
             Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)

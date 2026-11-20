@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeTheme
 
@@ -42,10 +43,11 @@ internal fun WatchedMark(modifier: Modifier = Modifier) {
  */
 @Composable
 internal fun UnwatchedCountMark(count: Int, modifier: Modifier = Modifier) {
+    // The card is one merged node that announces "3 unwatched" itself, so the badge's digits must not be read again on top of it.
     CountBadge(
         count = count,
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
-        modifier = modifier,
+        modifier = modifier.clearAndSetSemantics {},
     )
 }
