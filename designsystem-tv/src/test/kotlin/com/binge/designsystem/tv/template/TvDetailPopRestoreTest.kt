@@ -40,7 +40,7 @@ private val CAST_MEMBERS = listOf("Ada", "Ben", "Cleo", "Dev")
 
 /**
  * A detail page rebuilt under a page opened from it (a cast member's, the image viewer) comes back expanded on the tab it was
- * left on, with focus on the card the user had stepped to rather than the first (#4319). A saveable state holder stands in for
+ * left on, with focus on the card the user had stepped to rather than the first. A saveable state holder stands in for
  * the nav entry decorator: hiding the page disposes it, showing it again composes it afresh from the saved state.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -49,7 +49,7 @@ class TvDetailPopRestoreTest {
     @get:Rule
     val composeTestRule = createTakeDownKeyboardComposeRule()
 
-    /** Coil writes painter state off the composition thread, which can kill this run (#2350, #2367). */
+    /** Coil writes painter state off the composition thread, which can kill this run. */
     @get:Rule
     val imageLoaderRule = MainThreadImageLoaderRule()
 
