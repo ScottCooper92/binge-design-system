@@ -46,8 +46,8 @@ private val Rows =
 
 /**
  * Focus that leaves the hub for the rail comes back where it left: on the card last focused in the row, or on
- * the row's see-all tile when that held focus. #308: no frame can show it, and the catalog hosts no rail.
- * The row keeps a slot of its own, so the cases a card arrives in pin the hub's own memory, by id (#311).
+ * the row's see-all tile when that held focus. No frame can show it, and the catalog hosts no rail.
+ * The row keeps a slot of its own, so the cases a card arrives in pin the hub's own memory, by id.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")

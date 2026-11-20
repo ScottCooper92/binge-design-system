@@ -240,7 +240,7 @@ internal fun FormFooter(
 ) {
     ScreenFooter(modifier = modifier) {
         // Min intrinsic height, with both buttons filling it, so a label that wraps further than its neighbour's makes the
-        // pair as tall as the taller rather than leaving the other short with its label off-centre (#840).
+        // pair as tall as the taller rather than leaving the other short with its label off-centre.
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),

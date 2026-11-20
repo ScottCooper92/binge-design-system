@@ -18,12 +18,12 @@ import org.robolectric.annotation.Config
 private val ITEMS = List(3) { GridItem(id = 100 + it, title = "Title $it") }
 
 /**
- * A grid cell reports its **position** when pressed, alongside the routing click that takes the item (#2331).
+ * A grid cell reports its **position** when pressed, alongside the routing click that takes the item.
  *
  * The two callbacks exist because the same press answers two questions, and only one of them may carry an id:
  * `onItemClick` routes by `GridItem.kind`, `onItemTapped` reports where in the results the cell was. A grid
  * that fired them out of step — or reported the focused cell rather than the pressed one — would be invisible
- * to a screenshot and wrong only in the dashboard, which is the same shape of failure #1318 found for clicks
+ * to a screenshot and wrong only in the dashboard, which is the same shape of failure an earlier fix found for clicks
  * themselves.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -52,7 +52,7 @@ class TvGridTapReportingTest {
         // unmerged child, so a text finder resolves to a node with no focus or click action on it.
         val cells = composeTestRule.onAllNodes(hasClickAction())
         // Entry, then → to the target. An explicit requestFocus() on a later cell is redirected by the
-        // pane's tvEntryFocusGroup to wherever the group routes entry (#1410), so it would press cell 0
+        // pane's tvEntryFocusGroup to wherever the group routes entry, so it would press cell 0
         // however far along the fixture aimed — walking there is both correct and the real interaction.
         val entry = cells[0]
         entry.requestFocus()

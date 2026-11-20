@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** A choice list swaps between failed and ready on the sheet's state switch (#1272), in both of the lists a sheet holds. */
+/** A choice list swaps between failed and ready on the sheet's state switch, in both of the lists a sheet holds. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeChoiceListStateSwitchTest {

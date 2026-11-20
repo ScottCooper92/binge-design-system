@@ -26,7 +26,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The row follows its selection (#394): a selection that lands off-screen, as a swipe in the paired pager
+ * The row follows its selection: a selection that lands off-screen, as a swipe in the paired pager
  * makes it, is scrolled into view, and one already visible does not move the row.
  */
 @RunWith(RobolectricTestRunner::class)

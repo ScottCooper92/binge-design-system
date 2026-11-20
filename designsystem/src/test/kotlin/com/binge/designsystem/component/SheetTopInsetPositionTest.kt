@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
  * Where a Material 3 modal sheet puts its drag handle, below its own top, with a 150px top inset passed as `contentWindowInsets`.
  * Expanded, the handle sits one inset down, clear of the status bar. Part-way, it sits at the top: the inset follows the sheet's
  * offset and is not a constant band, so a part-way sheet has no inset-height gap above its handle. `sheetWashOverdraw` relies on
- * this (#1097): a part-way sheet's wash reaches up over the handle only. If a Material update makes the inset constant, this test
+ * this: a part-way sheet's wash reaches up over the handle only. If a Material update makes the inset constant, this test
  * fails and the wash's top overdraw has to add the inset at every position.
  */
 @OptIn(ExperimentalMaterial3Api::class)

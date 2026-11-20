@@ -10,7 +10,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The hero announces a trending rank only for an item that carries one (#365). The rank used to be the slide's
+ * The hero announces a trending rank only for an item that carries one. The rank used to be the slide's
  * position, so any list fed to the hero claimed "#1 trending today" on its first slide.
  */
 @RunWith(RobolectricTestRunner::class)

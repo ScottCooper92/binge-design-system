@@ -31,9 +31,9 @@ fun BingePaneTopBarAloneSample() {
 
 /**
  * The alone form scrolled past its title, at an unspecified `containerColor` — the exact
- * case #121 regressed: the alone form delegates to `BingeMediumTopBar`, which only pins its scrolled
+ * the case that once regressed: the alone form delegates to `BingeMediumTopBar`, which only pins its scrolled
  * colour when given an explicit `containerColor`. Nothing drove `collapsedFraction` above 0 here, so
- * the regression shipped with CI green throughout (#122).
+ * the regression shipped with CI green throughout.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,7 +91,7 @@ fun BingePaneTopBarListPaneSample() {
 /**
  * A detail pane nested below the list's first level, so it keeps its back button: the large title
  * starts on the narrow inner-edge inset, below the row the button sits in. Also the only sample to
- * pass `actions`, so the two-row layout's actions Row renders at least once (#119).
+ * pass `actions`, so the two-row layout's actions Row renders at least once.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

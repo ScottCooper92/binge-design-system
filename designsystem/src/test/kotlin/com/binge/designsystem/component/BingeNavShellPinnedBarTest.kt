@@ -31,7 +31,7 @@ private val TallBar = 240.dp
 private const val TOLERANCE = 0.5f
 
 /**
- * A screen with a pinned bottom bar, shown under the floating pill, keeps its body clear of both (#435). The body's
+ * A screen with a pinned bottom bar, shown under the floating pill, keeps its body clear of both. The body's
  * bottom padding is the larger of the bar and the pill's overlay; it once took the bar whenever the bar had height.
  */
 @RunWith(RobolectricTestRunner::class)

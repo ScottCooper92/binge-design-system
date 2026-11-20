@@ -73,7 +73,7 @@ class ItemGroupSamplesScreenshotTest {
         ItemGroupNoteSample()
     }
 
-    /** The `rowVerticalPadding` override beside [titled]'s default rows (#133). */
+    /** The `rowVerticalPadding` override beside [titled]'s default rows. */
     @PreviewTest
     @ComponentPreviews
     @Composable

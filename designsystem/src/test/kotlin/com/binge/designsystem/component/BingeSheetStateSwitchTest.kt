@@ -21,7 +21,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * A sheet's change of state cross-fades (#1272): both the old and the new content are on screen part-way through the swap, and under
+ * A sheet's change of state cross-fades: both the old and the new content are on screen part-way through the swap, and under
  * reduced motion only the new one ever is. A change inside one kind of content (a list being filtered) is not a swap at all. The clock
  * is paused so a frame part-way through can be read.
  */

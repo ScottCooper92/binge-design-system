@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 private const val TITLE = "Dune: Part Two"
 private const val TOLERANCE = 1f
 
-/** The hero's title lines up with the body under it, which pads the edge shared with another pane less (#359). */
+/** The hero's title lines up with the body under it, which pads the edge shared with another pane less. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class DetailHeroPaneEdgeTest {
