@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilledButton
+import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.FilterControlHandlers
 import com.binge.designsystem.template.FilterControlUi
