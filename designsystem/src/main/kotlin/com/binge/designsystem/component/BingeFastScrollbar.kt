@@ -157,7 +157,8 @@ internal fun FastScrollbar(
     }
     val bubble = if (dragging) bubbleText?.invoke(first) else null
     val jumpTo = { fraction: Float ->
-        val index = (fraction.coerceIn(0f, 1f) * (total - 1)).roundToInt()
+        // The same scale as restFraction: the furthest the list scrolls puts item total - visible first.
+        val index = (fraction.coerceIn(0f, 1f) * (total - visible)).roundToInt()
         scope.launch { source.scrollToItem(index) }
         Unit
     }

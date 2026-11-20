@@ -172,6 +172,17 @@ class BingeFastScrollbarTest {
     }
 
     @Test
+    fun `the end of the track reaches the last item and the thumb stays there`() {
+        show()
+        rule.onNodeWithContentDescription("Scroll position").performSemanticsAction(SemanticsActions.SetProgress) { it(1f) }
+        rule.waitForIdle()
+        val last = state.layoutInfo.visibleItemsInfo.maxOf { it.index }
+        assertEquals("the end of the track did not reach the last item", ITEMS - 1, last)
+        val node = rule.onNodeWithContentDescription("Scroll position").fetchSemanticsNode()
+        assertEquals(1f, node.config[SemanticsProperties.ProgressBarRangeInfo].current, 0.01f)
+    }
+
+    @Test
     fun `a tap on the grid under the scrollbar still lands on the grid`() {
         show()
         rule.onNodeWithTag(GRID).performTouchInput { swipeUp() }
