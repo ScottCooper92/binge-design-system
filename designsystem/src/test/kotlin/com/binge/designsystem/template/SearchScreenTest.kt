@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -228,7 +229,7 @@ class SearchScreenTest {
         pages: Map<String, List<MediaResult>> = pagedResults,
     ) {
         rule.setContent {
-            var selected by mutableStateOf(selectedKey)
+            var selected by remember { mutableStateOf(selectedKey) }
             TestTheme {
                 SearchScreen(
                     title = "Search",
