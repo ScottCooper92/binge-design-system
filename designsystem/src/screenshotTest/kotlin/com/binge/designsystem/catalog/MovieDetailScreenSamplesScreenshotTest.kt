@@ -53,6 +53,11 @@ class MovieDetailScreenSamplesScreenshotTest {
     fun failed() = MovieDetailScreenFailedSample()
 
     @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun failedWithAction() = MovieDetailScreenFailedWithActionSample()
+
+    @PreviewTest
     @Preview(name = "phone-font20", device = PHONE_PORTRAIT_SPEC, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
     @Composable
     fun failedLargeFont() = MovieDetailScreenFailedSample()

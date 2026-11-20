@@ -263,4 +263,16 @@ class PersonDetailScreenTest {
 
     @Test
     fun `nothing is clipped at 2x font`() = assertUnclippedAt(2f)
+
+    @Test
+    fun `a failed page draws its secondary action and a tap reports it`() {
+        var allowed = 0
+        show(
+            PersonDetailState.Failed(secondary = ScreenAction("Allow", { allowed++ })),
+            PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {}),
+        )
+        rule.onNodeWithText("Try again").assertExists()
+        rule.onNodeWithText("Allow").performClick()
+        assertEquals(1, allowed)
+    }
 }

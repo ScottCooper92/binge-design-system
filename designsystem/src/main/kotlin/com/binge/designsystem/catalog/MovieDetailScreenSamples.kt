@@ -41,6 +41,7 @@ import com.binge.designsystem.template.PeopleRail
 import com.binge.designsystem.template.PersonItem
 import com.binge.designsystem.template.PosterItem
 import com.binge.designsystem.template.PosterRail
+import com.binge.designsystem.template.ScreenAction
 import com.binge.designsystem.template.TagItem
 import com.binge.designsystem.template.TagsSection
 import com.binge.designsystem.theme.BingeSentiment
@@ -163,6 +164,23 @@ fun MovieDetailScreenFailedSample() {
         MovieDetailScreen(
             state = DetailState.Failed("We could not reach the server. Check your connection and try again."),
             callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
+        )
+    }
+}
+
+/**
+ * A failure that offers a second action beside Try again, here "Allow" for a permission the failure needs: [DetailState.Failed.secondary]
+ * is drawn beside the retry on the same frame.
+ */
+@Composable
+fun MovieDetailScreenFailedWithActionSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        MovieDetailScreen(
+            state = DetailState.Failed(
+                "Local network access is off, so the server cannot be reached.",
+                secondary = ScreenAction("Allow", {}),
+            ),
+            callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current, onRetry = {}),
         )
     }
 }

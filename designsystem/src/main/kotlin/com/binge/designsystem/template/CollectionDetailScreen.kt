@@ -77,13 +77,14 @@ sealed interface CollectionDetailState {
         val collection: CollectionDetail,
     ) : CollectionDetailState
 
-    /** [title] and [message] default to the words for [kind]; [retryable] shows Try again. */
+    /** [title] and [message] default to the words for [kind]; [retryable] shows Try again; [secondary] is a second action beside it. */
     @Immutable
     class Failed(
         val kind: ErrorKind = ErrorKind.Network,
         val title: String? = null,
         val message: String? = null,
         val retryable: Boolean = true,
+        val secondary: ScreenAction? = null,
     ) : CollectionDetailState
 }
 
@@ -131,6 +132,7 @@ fun CollectionDetailScreen(
                     modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
                     title = state.title,
                     message = state.message,
+                    secondary = state.secondary,
                 )
             }
         collection != null && collection.parts.isEmpty() ->

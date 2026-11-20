@@ -115,12 +115,13 @@ sealed interface DetailState {
     /**
      * Failed. The failure replaces the page on the same frame as the loading page, so the back control does not move. [kind] picks the glyph,
      * the headline and, when [message] is null, the words; give a [message] where the app can say more than the kind does. Try again is
-     * offered only when [retryable], where another attempt can help.
+     * offered only when [retryable], where another attempt can help. [secondary] is a second action beside it, such as a permission the failure needs.
      */
     class Failed(
         val message: String? = null,
         val retryable: Boolean = true,
         val kind: ErrorKind = ErrorKind.Generic,
+        val secondary: ScreenAction? = null,
     ) : DetailState
 }
 

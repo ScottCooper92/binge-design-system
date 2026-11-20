@@ -175,4 +175,13 @@ class PagedGridScreenTest {
     @Test fun `bar, pill and chips are not clipped at 1_3`() = clipping(1.3f)
 
     @Test fun `bar, pill and chips are not clipped at 2_0`() = clipping(2.0f)
+
+    @Test
+    fun `a failed page draws its secondary action and a tap reports it`() {
+        var allowed = 0
+        show(PagedGridState.Failed(ErrorKind.Network, secondary = ScreenAction("Allow", { allowed++ })))
+        rule.onNodeWithText("Try again").assertExists()
+        rule.onNodeWithText("Allow").performClick()
+        assertEquals(1, allowed)
+    }
 }

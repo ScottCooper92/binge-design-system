@@ -138,13 +138,14 @@ sealed interface PersonDetailState {
         val person: PersonDetail,
     ) : PersonDetailState
 
-    /** [title] and [message] default to the words for [kind]; [retryable] shows Try again. */
+    /** [title] and [message] default to the words for [kind]; [retryable] shows Try again; [secondary] is a second action beside it. */
     @Immutable
     class Failed(
         val kind: ErrorKind = ErrorKind.Network,
         val title: String? = null,
         val message: String? = null,
         val retryable: Boolean = true,
+        val secondary: ScreenAction? = null,
     ) : PersonDetailState
 }
 
@@ -197,6 +198,7 @@ fun PersonDetailScreen(
                     modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing),
                     title = state.title,
                     message = state.message,
+                    secondary = state.secondary,
                 )
             }
         else -> {

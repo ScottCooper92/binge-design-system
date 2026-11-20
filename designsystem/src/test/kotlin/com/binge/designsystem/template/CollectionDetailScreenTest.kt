@@ -130,4 +130,16 @@ class CollectionDetailScreenTest {
 
     @Test
     fun `nothing is clipped at 2x font`() = assertUnclippedAt(2f)
+
+    @Test
+    fun `a failed page draws its secondary action and a tap reports it`() {
+        var allowed = 0
+        show(
+            CollectionDetailState.Failed(secondary = ScreenAction("Allow", { allowed++ })),
+            CollectionDetailCallbacks(onBack = {}, onRetry = {}, onOpenPart = {}),
+        )
+        rule.onNodeWithText("Try again").assertExists()
+        rule.onNodeWithText("Allow").performClick()
+        assertEquals(1, allowed)
+    }
 }
