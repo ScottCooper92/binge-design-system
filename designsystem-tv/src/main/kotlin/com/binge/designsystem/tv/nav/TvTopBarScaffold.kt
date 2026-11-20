@@ -22,13 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Constraints
 import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.tv.focus.LocalTvShellArrival
 import com.binge.designsystem.tv.focus.LocalTvUserMoves
@@ -112,6 +116,11 @@ class TvTopBarSlots(
  * the scaffold's root after the shell's own key handling, for an app's debug hook. [gearReturnEpoch] moving puts focus on the end
  * button once, for the sheet it opened closing.
  *
+ * With [contentBehindBar] the page fills the whole screen and the bar is drawn over it, on a scrim that fades to clear, for pages
+ * whose art runs behind the bar. The bar's measured height is provided as [LocalTvTopInset], which the page templates add to their
+ * top overscan so a page's own focusable content clears the bar. Focus is as without it: Down from the bar enters the page,
+ * Up reaches the bar, and Back climbs as before. Off by default, which draws the page below the bar.
+ *
  * Every destination under it claims the focus the shell owes it with [com.binge.designsystem.tv.focus.tvShellArrivalTarget].
  *
  * @need frame a tv screen under a top bar with tabs, with its focus and Back rules
@@ -138,6 +147,7 @@ fun TvTopBarScaffold(
     pendingKeys: Set<Any> = emptySet(),
     rootModifier: Modifier = Modifier,
     gearReturnEpoch: Int = 0,
+    contentBehindBar: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val requesters = rememberRequesters(slots)
@@ -173,39 +183,91 @@ fun TvTopBarScaffold(
         initiallyOpen = accountInitiallyOpen,
     )
 
+    val bar: @Composable () -> Unit = {
+        TvTabTopBar(
+            slots = slots,
+            selectedKey = selectedKey,
+            requesters = requesters,
+            down = contentFocusRequester,
+            onSelect = onSelect,
+            onFocusedChange = { barHasFocus = it },
+            holdOpen = menuOpen,
+            entryOverride = barEntryOverride,
+            account = account,
+            iconOnlyKeys = iconOnlyKeys,
+            pendingKeys = pendingKeys,
+        )
+    }
+    val contentModifier = Modifier
+        .onFocusChanged { contentHasFocus = it.hasFocus }
+        .focusRequester(contentFocusRequester)
+        .focusGroup()
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .shellKeys(choices)
             .then(rootModifier),
     ) {
-        Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-            TvTabTopBar(
-                slots = slots,
-                selectedKey = selectedKey,
-                requesters = requesters,
-                down = contentFocusRequester,
-                onSelect = onSelect,
-                onFocusedChange = { barHasFocus = it },
-                holdOpen = menuOpen,
-                entryOverride = barEntryOverride,
-                account = account,
-                iconOnlyKeys = iconOnlyKeys,
-                pendingKeys = pendingKeys,
-            )
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .onFocusChanged { contentHasFocus = it.hasFocus }
-                    .focusRequester(contentFocusRequester)
-                    .focusGroup(),
-            ) {
+        if (contentBehindBar) {
+            ContentBehindBar(bar = bar, contentModifier = contentModifier) {
                 CompositionLocalProvider(LocalTvUserMoves provides userMoves, LocalTvShellArrival provides choices.arrival) { content() }
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                bar()
+                Box(modifier = Modifier.weight(1f).fillMaxWidth().then(contentModifier)) {
+                    CompositionLocalProvider(
+                        LocalTvUserMoves provides userMoves,
+                        LocalTvShellArrival provides choices.arrival,
+                    ) { content() }
+                }
             }
         }
     }
 }
+
+/** The bar's scrim at its top edge, fading to clear at the bottom of the bar, so tab labels read over a bright backdrop. */
+private const val BAR_SCRIM_TOP_ALPHA = 0.9f
+
+/**
+ * The page across the whole screen with [bar] drawn over its top, on a scrim. The bar is measured first and its height is the
+ * page's [LocalTvTopInset] from the page's very first composition, so no frame shows the page under the bar. The bar is subcomposed
+ * first, as it is below the page, so focus starts as it does there, and is placed last, so it draws above the page.
+ */
+@Composable
+private fun ContentBehindBar(
+    bar: @Composable () -> Unit,
+    contentModifier: Modifier,
+    content: @Composable () -> Unit,
+) {
+    val background = MaterialTheme.colorScheme.background
+    SubcomposeLayout(Modifier.fillMaxSize().background(background)) { constraints ->
+        val bars = subcompose(BarSlot) {
+            Box(
+                Modifier.fillMaxWidth().background(
+                    Brush.verticalGradient(listOf(background.copy(alpha = BAR_SCRIM_TOP_ALPHA), Color.Transparent)),
+                ),
+            ) {
+                bar()
+            }
+        }.map { it.measure(constraints.copy(minWidth = constraints.maxWidth, minHeight = 0)) }
+        val inset = (bars.maxOfOrNull { it.height } ?: 0).toDp()
+        val pages = subcompose(PageSlot) {
+            Box(Modifier.fillMaxSize().then(contentModifier)) {
+                CompositionLocalProvider(LocalTvTopInset provides inset, content = content)
+            }
+        }.map { it.measure(Constraints.fixed(constraints.maxWidth, constraints.maxHeight)) }
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            pages.forEach { it.place(0, 0) }
+            bars.forEach { it.place(0, 0) }
+        }
+    }
+}
+
+private object BarSlot
+
+private object PageSlot
 
 /**
  * Names the gear as the bar's entry each time [epoch] moves, which it does when the Settings sheet the gear opened has closed. A
