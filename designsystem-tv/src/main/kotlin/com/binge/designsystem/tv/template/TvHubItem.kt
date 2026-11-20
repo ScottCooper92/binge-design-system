@@ -10,7 +10,8 @@ import com.binge.designsystem.tv.component.TvImageKind
  *   a series can share a number, so a key is more than a bare id). Focus position and the extras cache are keyed on it.
  * @property year the fact that follows the genres, "2024", or the episode's code when the card opens one episode.
  * @property progress how far into the title the viewer is, 0 to 1, drawn as a bar on the poster; null draws none.
- * @property posterKind what the poster stands in for while it has no artwork, which decides the glyph the plate draws.
+ * @property posterKind what the poster stands in for in the See all card's fan when its image fails to load, which decides the glyph the
+ *   plate draws. A row's own posters have no placeholder: they show the plain fill until their artwork arrives.
  * @property failure a line shown in place of the meta line in the error colour, for a card whose action just failed; null shows the meta.
  */
 data class TvHubItem(

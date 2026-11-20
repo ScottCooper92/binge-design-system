@@ -66,7 +66,12 @@ internal fun TvExpandingPoster(
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
-        TvHubPosterImage(item.posterUrl, item.posterKind, item.title)
+        AsyncImage(
+            model = item.posterUrl,
+            contentDescription = item.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
         item.progress?.let { TvExpandingProgress(it, Modifier.align(Alignment.BottomCenter)) }
     }
 }
