@@ -115,6 +115,23 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun accountMenuSelectedOpen() = Frame { TvAccountMenuSelectedOpenSample() }
 
+    /** The tab scaffold at rest: the avatar, three tabs with Search as an icon, the gear, and the page below. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun tabScaffold() = Frame { TvTopBarScaffoldSample() }
+
+    /** The tab scaffold's account avatar signed in, as the current destination, and focused. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun tabAvatarSignedIn() = Frame { TvTopBarAvatarSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun tabAvatarSignedOut() = Frame { TvTopBarAvatarSignedOutSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
