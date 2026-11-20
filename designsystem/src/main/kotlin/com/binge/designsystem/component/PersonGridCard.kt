@@ -135,7 +135,9 @@ private fun PersonGridCaption(name: String?, role: String?) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = dimensionResource(R.dimen.detail_cast_avatar_label_spacing)),
+            .padding(top = dimensionResource(R.dimen.detail_cast_avatar_label_spacing))
+            // The card's rounded clip would otherwise cut the ends of a line that fills the width at the bottom corners.
+            .padding(horizontal = dimensionResource(R.dimen.padding_s)),
     ) {
         // Two lines of the caption's own style, drawn in nothing: the height comes from the same text layout the real lines use, so it
         // cannot come out shorter than they do at any font scale.
