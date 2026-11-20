@@ -152,7 +152,14 @@ class MediaCardStatusSemanticsTest {
         rule.waitForIdle()
 
         assertEquals("3 unwatched", stateDescriptionOfCard())
-        assertEquals(listOf("Arrival"), textOfCard().filter { it.isNotBlank() }.filter { it != "" }.distinct().filter { it == "Arrival" })
+        assertEquals(
+            listOf("Arrival"),
+            textOfCard()
+                .filter { it.isNotBlank() }
+                .filter { it != "" }
+                .distinct()
+                .filter { it == "Arrival" },
+        )
         assertTrue("the badge's digits leaked into the card's text: ${textOfCard()}", textOfCard().none { it == "3" })
         rule.onAllNodes(hasClickAction()).assertCountEquals(1)
     }
