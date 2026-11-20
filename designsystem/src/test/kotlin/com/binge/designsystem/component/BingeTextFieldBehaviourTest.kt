@@ -30,7 +30,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
-/** Where the caret sits in a pre-filled [BingeTextField] (#1151): at the end of the value, not before it. */
+/** Where the caret sits in a pre-filled [BingeTextField]: at the end of the value, not before it. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeTextFieldBehaviourTest {

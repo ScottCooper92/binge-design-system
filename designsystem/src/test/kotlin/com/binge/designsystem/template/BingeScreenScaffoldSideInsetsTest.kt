@@ -50,7 +50,7 @@ private val RailWidth = 96.dp
 /** A cutout on the start edge, as a landscape phone's camera hole is. */
 private val Cutout = 32.dp
 
-/** The scaffold reserves a side inset once, whoever reserved it first (#371, #372). */
+/** The scaffold reserves a side inset once, whoever reserved it first. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeScreenScaffoldSideInsetsTest {

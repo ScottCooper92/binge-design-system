@@ -169,7 +169,7 @@ fun ItemGroupSelectedSample() {
 }
 
 /**
- * A row that leaves the app carries ↗ instead of the chevron (#51) — shown beside an ordinary
+ * A row that leaves the app carries ↗ instead of the chevron — shown beside an ordinary
  * in-app row so the two read as distinct promises at a glance.
  */
 @Composable
@@ -221,7 +221,7 @@ fun ItemGroupActionSample() {
 
 /**
  * The same rows as [ItemGroupTitledSample] with [ItemGroup]'s `rowVerticalPadding` raised
- * one rung on the padding ramp, for a caller whose rows are its main content (#133).
+ * one rung on the padding ramp, for a caller whose rows are its main content.
  */
 @Composable
 fun ItemGroupTallRowsSample() {

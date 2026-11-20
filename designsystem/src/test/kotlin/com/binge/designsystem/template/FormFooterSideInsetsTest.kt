@@ -33,7 +33,7 @@ private const val TOLERANCE = 1f
 /** A camera cutout down the start side, as a phone held in landscape has. */
 private val Cutout = 40.dp
 
-/** A footer in a `bottomBar` slot clears a side cutout, as the body above it does (#374). */
+/** A footer in a `bottomBar` slot clears a side cutout, as the body above it does. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w800dp-h400dp")
 class FormFooterSideInsetsTest {

@@ -29,7 +29,7 @@ class RelativeDateFormatterTest {
         assertTrue("was '$label'", label.orEmpty().endsWith("ago"))
     }
 
-    /** Past a week the platform drops to its own short date unless asked for weeks (#219). */
+    /** Past a week the platform drops to its own short date unless asked for weeks. */
     @Test
     fun `an instant weeks old inside the window reads in weeks`() {
         assertEquals("1 week ago", formatRelativeOrAbsolute(NOW - 7 * DAY, now = NOW))
@@ -37,7 +37,7 @@ class RelativeDateFormatterTest {
         assertEquals("4 weeks ago", formatRelativeOrAbsolute(NOW - 30 * DAY, now = NOW))
     }
 
-    /** DateUtils would say "0 minutes ago" for anything under a minute (#240). */
+    /** DateUtils would say "0 minutes ago" for anything under a minute. */
     @Test
     fun `an instant under a minute old reads as now`() {
         assertEquals("now", formatRelativeOrAbsolute(NOW, now = NOW))

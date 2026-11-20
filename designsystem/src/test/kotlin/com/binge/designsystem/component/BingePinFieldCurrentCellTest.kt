@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-/** Which box a focused PIN field outlines as the one being typed (#394): it tracks the digits entered. */
+/** Which box a focused PIN field outlines as the one being typed: it tracks the digits entered. */
 class BingePinFieldCurrentCellTest {
     @Test
     fun `the first box is current on an empty focused field`() {

@@ -32,7 +32,7 @@ private const val ROW_COUNT = 60
 private const val DEEP_INDEX = 40
 
 /**
- * A configuration change that reaches an activity that is already stopped keeps the visit's depth (#503).
+ * A configuration change that reaches an activity that is already stopped keeps the visit's depth.
  *
  * [ScrollDepthCarryTest] passes the configuration-change check in. This one runs a real activity, so the check is the
  * activity's own and the depth goes through its saved-state bundle. The relaunch is driven step by step in the

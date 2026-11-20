@@ -24,7 +24,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * Which side a pushed or popped sheet page comes from, in each layout direction (#1272). The transition is hosted on its own, since a
+ * Which side a pushed or popped sheet page comes from, in each layout direction. The transition is hosted on its own, since a
  * sheet's modal window takes its layout direction from the window and not from a local provided around it.
  */
 @RunWith(RobolectricTestRunner::class)

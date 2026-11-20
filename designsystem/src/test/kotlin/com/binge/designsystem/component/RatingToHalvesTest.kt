@@ -45,7 +45,7 @@ class RatingToHalvesTest {
         assertEquals(9, ratingToHalves(9.5f))
     }
 
-    /** The tie is the printed one: anything that prints "7.5" draws what 7.5 draws (#232). */
+    /** The tie is the printed one: anything that prints "7.5" draws what 7.5 draws. */
     @Test
     fun `a value that prints as a tie rounds down with it`() {
         assertEquals(7, ratingToHalves(7.52f))

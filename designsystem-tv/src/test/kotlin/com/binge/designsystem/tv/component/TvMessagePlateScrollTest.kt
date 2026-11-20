@@ -34,7 +34,7 @@ private const val LARGE_FONT_SCALE = 2f
 private const val MAX_PRESSES = 40
 private const val TOLERANCE = 0.5f
 
-/** A body taller than the plate is read with the D-pad (#1141): it scrolls under focus, then focus moves on. */
+/** A body taller than the plate is read with the D-pad: it scrolls under focus, then focus moves on. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvMessagePlateScrollTest {

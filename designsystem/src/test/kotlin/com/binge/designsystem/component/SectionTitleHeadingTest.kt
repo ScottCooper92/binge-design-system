@@ -13,7 +13,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** A screen's or a step's title is a heading, so TalkBack's heading navigation reaches it (#403). */
+/** A screen's or a step's title is a heading, so TalkBack's heading navigation reaches it. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class SectionTitleHeadingTest {

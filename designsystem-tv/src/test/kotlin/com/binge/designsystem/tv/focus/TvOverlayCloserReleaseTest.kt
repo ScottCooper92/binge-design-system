@@ -146,7 +146,7 @@ class TvOverlayCloserReleaseTest {
     }
 
     @Test
-    fun `focus pushed back into the fading panel mid-exit ends on the content once the panel is gone (#975)`() {
+    fun `focus pushed back into the fading panel mid-exit ends on the content once the panel is gone`() {
         setContent(wired = true)
         composeTestRule.mainClock.autoAdvance = false
 
@@ -164,7 +164,7 @@ class TvOverlayCloserReleaseTest {
     }
 
     @Test
-    fun `reopening the panel mid-exit traps again, and a later close still returns focus (#975)`() {
+    fun `reopening the panel mid-exit traps again, and a later close still returns focus`() {
         setContent(wired = true)
         composeTestRule.mainClock.autoAdvance = false
 

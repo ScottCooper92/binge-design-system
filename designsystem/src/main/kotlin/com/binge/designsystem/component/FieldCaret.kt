@@ -49,7 +49,7 @@ private fun TextFieldValue.answeredWith(value: String): TextFieldValue {
 
 /**
  * The text, caret and pending edit a text field owns so it can keep the caret where the user left it when the caller rewrites what
- * was typed (#1158). Shared by [BingeTextField] and [BingeSearchField], so the two cannot disagree about it.
+ * was typed. Shared by [BingeTextField] and [BingeSearchField], so the two cannot disagree about it.
  */
 internal class FieldCaret(
     initial: TextFieldValue,

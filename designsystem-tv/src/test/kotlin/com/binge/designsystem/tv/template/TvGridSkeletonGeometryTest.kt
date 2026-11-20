@@ -15,7 +15,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * `TvGridPage`'s skeleton reserves what its resolved grid fills (#1598).
+ * `TvGridPage`'s skeleton reserves what its resolved grid fills.
  *
  * This one assertion covers the widest surface on the TV app. Every "see all" destination is a `TvGridPage`:
  * Discover, the movies and shows see-all grids, a movie collection, the library grid, and the Lists detail
