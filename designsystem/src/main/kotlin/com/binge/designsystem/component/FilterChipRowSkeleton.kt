@@ -1,18 +1,21 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
@@ -53,12 +56,15 @@ fun FilterChipRowSkeleton(modifier: Modifier = Modifier, description: String? = 
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
         repeat(SKELETON_CHIP_COUNT) {
-            SkeletonPlate(
-                Modifier
-                    .width(dimensionResource(R.dimen.skeleton_filter_chip_width))
-                    .height(dimensionResource(R.dimen.skeleton_filter_chip_height)),
-                shape = BingeShapes.Pill,
-            )
+            // The chip's own height: its vertical padding around one line of its label, so a larger font makes the plate taller as it makes the chip.
+            Box(Modifier.width(dimensionResource(R.dimen.skeleton_filter_chip_width))) {
+                Text(
+                    text = " ",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.alpha(0f).padding(vertical = dimensionResource(R.dimen.chip_padding_v)),
+                )
+                SkeletonPlate(Modifier.matchParentSize(), shape = BingeShapes.Pill)
+            }
         }
     }
 }

@@ -252,17 +252,27 @@ private fun ColumnScope.PersonContent(
         CreditsState.Loading -> CreditsPlaceholder()
         is CreditsState.Failed -> CreditsFailed(credits, callbacks.onRetryCredits)
         is CreditsState.Empty -> CreditsEmpty(credits.message)
-        is CreditsState.Ready ->
+        is CreditsState.Ready -> {
+            // The first rail that is drawn carries the credits anchor the loading rails share, so a test can hold them to the same place.
+            val firstRail = credits.sections.indexOfFirst { it.items.isNotEmpty() }
             credits.sections.forEachIndexed { index, section ->
                 if (section.items.isNotEmpty()) {
                     CreditRail(
                         section,
+                        headerModifier = if (index ==
+                            firstRail
+                        ) {
+                            Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.CREDITS))
+                        } else {
+                            Modifier
+                        },
                         onOpen = callbacks.onOpenCredit,
                         onLoadMore = { callbacks.onLoadMoreCredits(index) },
                         onSeeAll = callbacks.onSeeAll?.let { seeAll -> { seeAll(section.key) } },
                     )
                 }
             }
+        }
     }
     afterCredits()
 }
@@ -337,6 +347,7 @@ private fun CreditsFailed(failed: CreditsState.Failed, onRetry: () -> Unit) {
 @Composable
 private fun CreditRail(
     section: CreditSection,
+    headerModifier: Modifier,
     onOpen: (String) -> Unit,
     onLoadMore: () -> Unit,
     onSeeAll: (() -> Unit)?,
@@ -363,6 +374,7 @@ private fun CreditRail(
     Column(Modifier.fillMaxWidth()) {
         SectionHeader(
             title = section.title,
+            modifier = headerModifier,
             onMoreClick = onSeeAll,
             horizontalPadding = inset,
             startPadding = inset,

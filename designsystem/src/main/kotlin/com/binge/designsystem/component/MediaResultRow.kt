@@ -201,19 +201,9 @@ fun MediaResultRowSkeleton(
         leading = { SkeletonPicture(kind) },
     ) { contentModifier ->
         val top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero)
-        if (blurbLines > 0) {
-            BlurbRowPlates(blurbLines, contentModifier.padding(top = top))
-            return@ListRow
-        }
-        Column(
-            modifier = contentModifier.padding(top = top),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
-            SkeletonPlate(Modifier.fillMaxWidth(NAME_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_name_height)))
-            SkeletonPlate(
-                Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_subtitle_height)),
-            )
-        }
+        // The row's own text at its own font sizes, whether or not it carries a blurb: fixed-height plates stayed as they were at a large font
+        // while the loaded row's text grew, and the rows below shifted down when the list loaded.
+        BlurbRowPlates(blurbLines, contentModifier.padding(top = top))
     }
 }
 

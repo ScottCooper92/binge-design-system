@@ -91,6 +91,7 @@ private fun SampleSearch(
             text = text,
             state = state(selected, recents),
             placeholder = "Movies, series and people",
+            reserveTypeChipsWhileLoading = true,
             idleTitle = "Search the library",
             idleMessage = "Type a title or a name.",
             modifier = modifier,
@@ -148,7 +149,7 @@ fun SearchScreenIdleExtrasSample() =
         },
     )
 
-/** A search under way: rows of loading plates under the field. */
+/** A search under way: a row of chip plates and rows of loading plates under the field, held where the type chips and the results will land. */
 @Composable
 fun SearchScreenLoadingSample() = SampleSearch({ _, _ -> SearchState.Loading }, initialText = "past")
 

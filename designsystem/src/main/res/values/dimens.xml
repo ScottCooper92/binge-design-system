@@ -315,7 +315,6 @@
     <!-- FilterChipRowSkeleton's pill: the chip's own height, so the pill plus BingeFilterChipRow's vertical
          content padding is the band the resolved page puts above its grid (its first tile is reserved where
          it lands, not a chip row too high). -->
-    <dimen name="skeleton_filter_chip_height">44dp</dimen>
     <dimen name="skeleton_filter_chip_width">88dp</dimen>
     <!-- Rating chip -->
     <dimen name="rating_chip_padding_h">8dp</dimen>
