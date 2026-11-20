@@ -126,3 +126,23 @@ fun MediaResultRowSkeletonBlurbSample() =
             MediaResultRowSkeleton(blurbLines = 3)
         }
     }
+
+/**
+ * The row's loading stand-in hinted at a long title, over the row it becomes: the name plate takes the lines the title takes (up to the row's two), at
+ * every font size, so the rows below do not shift when the list loads.
+ */
+@Composable
+fun MediaResultRowSkeletonHintedSample() =
+    ScreenshotTheme {
+        val title = "The Lord of the Rings: The Fellowship of the Ring"
+        Column(
+            Modifier.padding(dimensionResource(R.dimen.screen_content_inset)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            MediaResultRowSkeleton(expectedName = title)
+            MediaResultRow(
+                result = MediaResult("k", MediaResultKind.Poster, null, title, "Movie · 2001", rating = 8.4f),
+                onClick = {},
+            )
+        }
+    }
