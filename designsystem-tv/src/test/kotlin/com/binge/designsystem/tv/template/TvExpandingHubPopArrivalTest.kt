@@ -33,7 +33,7 @@ import org.robolectric.annotation.Config
 private const val BAR = "bar"
 
 /**
- * A pop rebuilds the shell, and a rebuilt shell arms an arrival (#4320), which the hub's entry then claims. The hub is rebuilt under its
+ * A pop rebuilds the shell, and a rebuilt shell arms an arrival, which the hub's entry then claims. The hub is rebuilt under its
  * saved state, as the back stack does, and the card the user opened must still win over the row's first: the class of bug #4346 was on
  * Companions, here for the hub every Movies, TV shows and Account page is built on.
  */
@@ -43,7 +43,7 @@ class TvExpandingHubPopArrivalTest {
     @get:Rule
     val composeTestRule = createTakeDownKeyboardComposeRule()
 
-    /** Coil writes painter state off the composition thread, which can kill this run (#2350, #2367). */
+    /** Coil writes painter state off the composition thread, which can kill this run. */
     @get:Rule
     val imageLoaderRule = MainThreadImageLoaderRule()
 

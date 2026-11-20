@@ -50,7 +50,7 @@ class TvExpandingContinueWatchingFocusTest {
     @get:Rule
     val composeTestRule = createTakeDownKeyboardComposeRule()
 
-    /** Coil writes painter state off the composition thread, which can kill this run (#2350, #2367). */
+    /** Coil writes painter state off the composition thread, which can kill this run. */
     @get:Rule
     val imageLoaderRule = MainThreadImageLoaderRule()
 

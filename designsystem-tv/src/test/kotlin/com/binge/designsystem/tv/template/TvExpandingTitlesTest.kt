@@ -50,7 +50,7 @@ class TvExpandingTitlesTest {
 
     private fun item(id: Int, kind: String) = TvHubItem(key = "${kind}_$id", posterUrl = null, title = "$kind $id", rating = null)
 
-    /** TMDB movie and TV ids are separate number spaces: a mixed row can hold a movie and a show with the same id (#4548). */
+    /** TMDB movie and TV ids are separate number spaces: a mixed row can hold a movie and a show with the same id. */
     @Test
     fun `following a movie does not jump to a show that shares its id`() {
         val movie = item(7, "Movie")
