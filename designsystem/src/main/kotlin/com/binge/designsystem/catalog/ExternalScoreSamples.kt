@@ -129,7 +129,7 @@ fun DetailCinematicHeaderScoresSample() {
     }
 }
 
-/** [HeroCarousel] whose slide carries an Available status after the genres and the scores on their own last line. */
+/** [HeroCarousel] whose slide carries an Available status after the genres, and the rating with the scores together on their own last line. */
 @Composable
 fun HeroCarouselScoresSample() {
     ScreenshotTheme {

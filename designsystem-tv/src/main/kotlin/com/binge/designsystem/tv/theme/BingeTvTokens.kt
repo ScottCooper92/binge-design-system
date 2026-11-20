@@ -14,7 +14,7 @@ import androidx.compose.material3.ColorScheme as M3ColorScheme
  * re-declaring hex values, so a palette change lands on both surfaces at once.
  *
  * Two slots are not a literal copy because tv-material has no `surfaceContainer*` ramp: without it, `Surface`
- * falls back to M3 `surface`, only 8 values from `background` (#0E0E0F), so on a TV with no elevation
+ * falls back to M3 `surface` (#161618), only 8 values from `background` (#0E0E0F), so on a TV with no elevation
  * overlay unfocused cards disappear. The container tones are promoted a step — TV `surface` ← M3
  * `surfaceContainerHigh`, TV `surfaceVariant` ← M3 `surfaceContainer` — keeping the phone ramp's *intent* (a
  * card reads as lifted) across a library with fewer slots. tv-material also renames `outline`/`outlineVariant`

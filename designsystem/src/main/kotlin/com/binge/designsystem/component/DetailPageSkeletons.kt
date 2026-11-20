@@ -129,14 +129,22 @@ fun DetailOverviewSkeleton(modifier: Modifier = Modifier) {
  * A plate one line of [style] tall: blank text sets the height, so it is the line's at any font size, and the shimmer is inset from
  * the top and bottom of it, so lines stacked one on the next read as separate bars.
  *
+ * With [text] the plate is as tall as that text takes in [style] at the width it is given, wrapping included, up to [maxLines]: blank text can
+ * only say one line, and the words a loaded line will hold are the caller's to hint at.
+ *
  * @need hold a line of text's height with a shimmer plate while its content loads
  * @group detail
  * @replaces a hand-built plate whose height is a fixed dp instead of the font's
  */
 @Composable
-fun TextPlate(style: TextStyle, modifier: Modifier = Modifier) {
+fun TextPlate(
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    maxLines: Int = Int.MAX_VALUE,
+) {
     Box(modifier) {
-        Text(text = " ", style = style, modifier = Modifier.alpha(0f))
+        Text(text = text ?: " ", style = style, maxLines = maxLines, modifier = Modifier.alpha(0f))
         Box(
             Modifier
                 .matchParentSize()
