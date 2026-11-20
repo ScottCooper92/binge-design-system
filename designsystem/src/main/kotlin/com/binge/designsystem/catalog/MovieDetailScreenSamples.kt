@@ -185,6 +185,20 @@ fun MovieDetailScreenFailedWithActionSample() {
     }
 }
 
+/** A failure with a headline of the app's own: [DetailState.Failed.title] replaces the kind's "Something went wrong". */
+@Composable
+fun MovieDetailScreenFailedTitledSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        MovieDetailScreen(
+            state = DetailState.Failed(
+                "We could not reach the server. Check your connection and try again.",
+                title = "Can't load this film",
+            ),
+            callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
+        )
+    }
+}
+
 /**
  * A failure another attempt cannot help, such as a film that no longer exists: the same frame with no Try again, and no message of the
  * app's own, so the kind's glyph, headline and words are used.

@@ -267,6 +267,7 @@ private fun DetailPageFailure(
             kind = state.kind,
             onRetry = callbacks.onRetry.takeIf { state.retryable },
             modifier = Modifier.fillMaxSize(),
+            title = state.title,
             message = state.message,
             secondary = state.secondary,
         )

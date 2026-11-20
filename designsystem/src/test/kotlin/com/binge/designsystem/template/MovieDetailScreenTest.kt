@@ -125,4 +125,30 @@ class MovieDetailScreenTest {
         rule.onNodeWithText("Allow").performClick()
         assertEquals(1, allowed)
     }
+
+    @Test
+    fun `a failed page's own title replaces the kind's headline`() {
+        rule.setContent {
+            ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+                MovieDetailScreen(
+                    state = DetailState.Failed("It is gone.", title = "Can't load this film"),
+                    callbacks = MediaDetailCallbacks(onBack = {}),
+                )
+            }
+        }
+        rule.waitForIdle()
+        rule.onNodeWithText("Can't load this film").assertExists()
+        rule.onNodeWithText("Something went wrong").assertDoesNotExist()
+    }
+
+    @Test
+    fun `a failed page with no title keeps the kind's headline`() {
+        rule.setContent {
+            ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+                MovieDetailScreen(state = DetailState.Failed("It is gone."), callbacks = MediaDetailCallbacks(onBack = {}))
+            }
+        }
+        rule.waitForIdle()
+        rule.onNodeWithText("Something went wrong").assertExists()
+    }
 }
