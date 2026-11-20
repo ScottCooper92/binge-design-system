@@ -1,13 +1,21 @@
 package com.binge.designsystem.template
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.unit.dp
+import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,6 +70,52 @@ class PeopleGridScreenTest {
     @Config(fontScale = 2f)
     fun `the skeleton holds it at a font scale of 2`() = check(tabs = 2)
 
+    private fun firstCardLeftUnderSideInset(tabs: Int): Float {
+        rule.setContent {
+            CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(start = SIDE_INSET.dp)) {
+                ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+                    PeopleGridScreen(
+                        title = "Film",
+                        tabs = List(tabs) {
+                            PeopleGridTab(
+                                if (it ==
+                                    0
+                                ) {
+                                    "Cast"
+                                } else {
+                                    "Crew"
+                                },
+                                PeopleGridState.Ready(listOf(PeopleGridSection("cast", null, people))),
+                            )
+                        },
+                        selectedTab = 0,
+                        onTabChange = {},
+                        onOpenPerson = {},
+                        onRetry = {},
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+        return rule
+            .onAllNodes(hasClickAction())
+            .onFirst()
+            .getBoundsInRoot()
+            .left.value
+    }
+
+    @Test
+    fun `a side inset is cleared with one tab as with two`() {
+        val one = firstCardLeftUnderSideInset(tabs = 1)
+        assertTrue("the first card starts at ${one}dp, inside the ${SIDE_INSET}dp inset", one >= SIDE_INSET)
+    }
+
+    @Test
+    fun `a side inset is cleared with two tabs`() {
+        val two = firstCardLeftUnderSideInset(tabs = 2)
+        assertTrue("the first card starts at ${two}dp, inside the ${SIDE_INSET}dp inset", two >= SIDE_INSET)
+    }
+
     @Test
     fun `each section's people are headed once, and the same person may sit in two sections`() {
         val sections =
@@ -72,5 +126,9 @@ class PeopleGridScreenTest {
             )
         // A heading, then its people; a section with nobody draws nothing, so the bubble's indices stay aligned with the grid's.
         assertEquals(listOf("Directing", "Directing", "Directing", "Writing", "Writing"), sectionTitlesByIndex(sections))
+    }
+
+    private companion object {
+        const val SIDE_INSET = 48f
     }
 }
