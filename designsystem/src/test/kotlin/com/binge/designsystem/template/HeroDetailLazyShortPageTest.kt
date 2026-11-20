@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -46,6 +49,7 @@ class HeroDetailLazyShortPageTest {
 
     private var state: LazyListState? = null
     private var heroPx = 0
+    private var windowHeight by mutableStateOf(450.dp)
 
     private fun show(
         items: Int,
@@ -159,14 +163,63 @@ class HeroDetailLazyShortPageTest {
         assertTrue("the hero is back at ${state!!.firstVisibleItemIndex}/${state!!.firstVisibleItemScrollOffset}", heroScrolledOut())
     }
 
+    private fun setSizedContent(setContent: (@androidx.compose.runtime.Composable () -> Unit) -> Unit) {
+        setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                val listState = rememberLazyListState()
+                state = listState
+                heroPx = with(LocalDensity.current) { HERO_HEIGHT.toPx() }.toInt()
+                Box(Modifier.height(windowHeight)) {
+                    HeroDetailLazyScreen(
+                        title = "A title",
+                        onBack = {},
+                        listState = listState,
+                        heroHeight = HERO_HEIGHT,
+                        hero = { Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(Color.DarkGray)) },
+                    ) {
+                        item { Box(Modifier.fillMaxWidth().height(40.dp)) { Text("Item") } }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `a page scrolled to its end keeps the hero away when the window grows`() {
+        setSizedContent { rule.setContent(it) }
+        rule.waitForIdle()
+        scrollToEnd()
+        assertTrue(heroScrolledOut())
+
+        windowHeight = 850.dp
+        rule.waitForIdle()
+
+        assertTrue("the hero is back at ${state!!.firstVisibleItemIndex}/${state!!.firstVisibleItemScrollOffset}", heroScrolledOut())
+    }
+
+    @Test
+    fun `a page scrolled to its end keeps the hero away when restored into a taller window`() {
+        val restoration = InMemoryStateRestorationTester(rule)
+        setSizedContent { restoration.setContent(it) }
+        rule.waitForIdle()
+        scrollToEnd()
+        assertTrue(heroScrolledOut())
+
+        windowHeight = 850.dp
+        restoration.emulateSavedInstanceStateRestore()
+        rule.waitForIdle()
+
+        assertTrue("the hero is back at ${state!!.firstVisibleItemIndex}/${state!!.firstVisibleItemScrollOffset}", heroScrolledOut())
+    }
+
     @Test
     fun `a long list is not given extra room`() {
         show(items = 40, itemHeight = 200)
         scrollToEnd()
 
         val last = state!!.layoutInfo.visibleItemsInfo.last()
-        val spacer = state!!.layoutInfo.totalItemsCount - 1
-        assertTrue("the page ends at item ${last.index}", last.index == spacer - 1 || (last.index == spacer && last.size == 0))
+        assertEquals(state!!.layoutInfo.totalItemsCount - 1, last.index)
+        assertEquals(state!!.layoutInfo.viewportEndOffset, last.offset + last.size)
         assertTrue(!state!!.canScrollForward)
     }
 
