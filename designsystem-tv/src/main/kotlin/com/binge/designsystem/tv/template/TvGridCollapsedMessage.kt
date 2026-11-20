@@ -78,9 +78,12 @@ internal fun BoxScope.TvGridCollapsedMessage(
 /**
  * An empty plate with nothing to press: focusable, with the focus ring around the plate itself (sized to its content and
  * centred in the pane, not the pane), and its text announced as the one focused node.
+ *
+ * @need show an empty message with nothing to press that still takes focus on a TV screen
+ * @group tv
  */
 @Composable
-internal fun FocusableMessagePlate(
+fun FocusableMessagePlate(
     body: String,
     focus: FocusRequester,
     modifier: Modifier = Modifier,
