@@ -183,6 +183,13 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
  * status line, each at its own font size), so the rows below do not shift down when the list loads. [blurbLines] is for a list whose rows
  * carry a blurb, which runs up to three lines: it adds that many blurb lines.
  *
+ * What the name takes depends on its words, which a loading state does not have, so it is one line unless the caller hints. [expectedName] is a string
+ * the loaded name is expected to look like (the longest typical title): the plate lays it out invisibly in the row's own style and width, up to the
+ * row's two lines, so it takes what the name takes at every font size, wrapping included. The width is the row's whole text column: the favourite
+ * and watched marks a loaded row puts beside its name are not reserved, so a title that only just fits on one line here can wrap in a marked row.
+ * The hint applies to a [blurbLines] row too, as its name plate. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
+ * not something a plate can measure: a row whose status wraps still moves.
+ *
  * @need show a loading placeholder for a search result row
  * @group feedback
  */
@@ -192,6 +199,7 @@ fun MediaResultRowSkeleton(
     kind: MediaResultKind = MediaResultKind.Poster,
     description: String? = null,
     blurbLines: Int = 0,
+    expectedName: String? = null,
 ) {
     val topAligned = kind == MediaResultKind.Poster || kind == MediaResultKind.Still
     ListRow(
@@ -203,7 +211,7 @@ fun MediaResultRowSkeleton(
         val top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero)
         // The row's own text at its own font sizes, whether or not it carries a blurb: fixed-height plates stayed as they were at a large font
         // while the loaded row's text grew, and the rows below shifted down when the list loaded.
-        BlurbRowPlates(blurbLines, contentModifier.padding(top = top))
+        BlurbRowPlates(blurbLines, contentModifier.padding(top = top), expectedName)
     }
 }
 
@@ -213,10 +221,19 @@ fun MediaResultRowSkeleton(
  * any font size.
  */
 @Composable
-private fun BlurbRowPlates(lines: Int, modifier: Modifier) {
+private fun BlurbRowPlates(
+    lines: Int,
+    modifier: Modifier,
+    expectedName: String? = null,
+) {
     val gap = dimensionResource(R.dimen.detail_cast_avatar_label_spacing)
     Column(modifier = modifier) {
-        TextPlate(MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(NAME_PLATE_FRACTION))
+        TextPlate(
+            MaterialTheme.typography.titleMedium,
+            Modifier.fillMaxWidth(if (expectedName == null) NAME_PLATE_FRACTION else 1f),
+            text = expectedName,
+            maxLines = 2,
+        )
         Spacer(Modifier.height(gap))
         // The status line: a rating chip is a line of its label style with its own vertical padding.
         TextPlate(

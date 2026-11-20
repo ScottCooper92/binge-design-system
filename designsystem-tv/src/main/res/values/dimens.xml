@@ -17,7 +17,7 @@
     <dimen name="tv_account_menu_outline">1dp</dimen>
     <dimen name="tv_account_menu_shadow">12dp</dimen>
     <dimen name="tv_account_menu_icon_size">24dp</dimen>
-    <dimen name="tv_top_bar_item_padding_horizontal">23dp</dimen>
+    <dimen name="tv_top_bar_item_padding_horizontal">14dp</dimen>
     <!-- Focus ring -->
     <dimen name="tv_focus_ring_width">3dp</dimen>
     <dimen name="tv_focus_ring_offset">4dp</dimen>
@@ -90,11 +90,36 @@
     <!-- Under a top bar, how far the copy may start inside the bar's height, into the faded foot of its scrim. -->
     <dimen name="tv_immersive_top_bar_copy_overlap">8dp</dimen>
     <dimen name="tv_immersive_rows_bottom">120dp</dimen>
-    <dimen name="tv_detail_v2_copy_width">560dp</dimen>
-    <dimen name="tv_detail_v2_logo_width">380dp</dimen>
-    <dimen name="tv_detail_v2_logo_height">120dp</dimen>
-    <dimen name="tv_detail_v2_logo_compact_width">200dp</dimen>
-    <dimen name="tv_detail_v2_logo_compact_height">48dp</dimen>
+    <dimen name="tv_detail_copy_width">560dp</dimen>
+    <dimen name="tv_detail_logo_width">380dp</dimen>
+    <dimen name="tv_detail_logo_height">120dp</dimen>
+    <dimen name="tv_detail_logo_compact_width">200dp</dimen>
+    <dimen name="tv_detail_logo_compact_height">48dp</dimen>
+    <dimen name="tv_detail_column_gap">32dp</dimen>
+    <dimen name="tv_detail_scroll_step">120dp</dimen>
+    <dimen name="tv_detail_cast_slot_height">340dp</dimen>
+    <dimen name="tv_detail_cast_strip_height">240dp</dimen>
+    <dimen name="tv_detail_gallery_row_height">150dp</dimen>
+    <dimen name="tv_detail_wide_slot_height">290dp</dimen>
+    <dimen name="tv_detail_wide_strip_height">150dp</dimen>
+    <dimen name="tv_detail_episode_height">124dp</dimen>
+    <dimen name="tv_detail_episode_copy_width">520dp</dimen>
+    <dimen name="tv_hero_height">360dp</dimen>
+    <dimen name="tv_hero_pill_icon">20dp</dimen>
+    <dimen name="tv_hero_pill_padding_horizontal">12dp</dimen>
+    <dimen name="tv_hero_pill_padding_vertical">6dp</dimen>
+    <dimen name="tv_hub_skeleton_title_width">180dp</dimen>
+    <dimen name="tv_expanding_row_height">180dp</dimen>
+    <dimen name="tv_expanding_row_height_focused">220dp</dimen>
+    <dimen name="tv_expanding_row_details_width">460dp</dimen>
+    <dimen name="tv_expanding_hero_logo_height">96dp</dimen>
+    <dimen name="tv_expanding_progress_inset">10dp</dimen>
+    <dimen name="tv_expanding_sample_slot_width">391dp</dimen>
+    <dimen name="tv_sample_meta_wide">420dp</dimen>
+    <dimen name="tv_sample_meta_medium">300dp</dimen>
+    <dimen name="tv_sample_meta_narrow">160dp</dimen>
+    <dimen name="tv_detail_skeleton_action_width">150dp</dimen>
+    <dimen name="tv_detail_similar_height">290dp</dimen>
     <dimen name="tv_detail_tab_item_padding_horizontal">14dp</dimen>
     <dimen name="tv_detail_meta_gap">10dp</dimen>
     <dimen name="tv_meta_line_gap">10dp</dimen>
@@ -112,7 +137,7 @@
     <dimen name="tv_thumbnail_card_width">200dp</dimen>
     <dimen name="tv_media_grid_row_gap">16dp</dimen>
     <dimen name="tv_card_caption_gap">16dp</dimen>
-    <dimen name="tv_skeleton_caption_line_height">28dp</dimen>
+    <dimen name="tv_skeleton_caption_plate_inset">4dp</dimen>
     <dimen name="tv_placeholder_glyph_max">56dp</dimen>
     <dimen name="tv_immersive_row_gap">24dp</dimen>
     <dimen name="tv_immersive_grid_row_gap">16dp</dimen>
@@ -231,4 +256,7 @@
     <dimen name="tv_overview_text_max_width">760dp</dimen>
     <!-- TvSideSheetNote's leading glyph, sized to the bodyMedium line it leads. -->
     <dimen name="tv_side_sheet_note_icon_size">18dp</dimen>
+    <dimen name="tv_poster_mark_size">24dp</dimen>
+    <dimen name="tv_poster_progress_height">4dp</dimen>
+    <dimen name="tv_filter_page_gap">32dp</dimen>
 </resources>

@@ -1,8 +1,10 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.STANDARD_PHONE_WIDTH_DP
 import com.binge.designsystem.preview.WorstCaseFontPreviews
 
 /**
@@ -44,5 +46,20 @@ class BingeTagSamplesScreenshotTest {
     @Composable
     fun TagRow() {
         TagRowSample()
+    }
+
+    /** The keywords block: even 8dp gaps between tags of any length, and the heading's gap to the first row as elsewhere. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Keywords() {
+        TagRowKeywordsSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "font13-light", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.3f)
+    @Composable
+    fun KeywordsLargeFont() {
+        TagRowKeywordsSample()
     }
 }
