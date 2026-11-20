@@ -332,7 +332,6 @@ class SearchScreenTest {
         val asked = mutableListOf<String>()
         showLongPaged(asked)
         repeat(3) {
-            rule.onNodeWithText("a title 0").takeIf { _ -> true }
             rule.onRoot().performTouchInput { swipeUp() }
         }
         rule.waitForIdle()
