@@ -240,4 +240,7 @@
     <dimen name="tv_overview_text_max_width">760dp</dimen>
     <!-- TvSideSheetNote's leading glyph, sized to the bodyMedium line it leads. -->
     <dimen name="tv_side_sheet_note_icon_size">18dp</dimen>
+    <dimen name="tv_poster_mark_size">24dp</dimen>
+    <dimen name="tv_poster_progress_height">4dp</dimen>
+    <dimen name="tv_filter_page_gap">32dp</dimen>
 </resources>

@@ -108,12 +108,12 @@ class TagRowTest {
 
     @Test fun `each tappable tag's touch bounds are at least 48dp, compact`() = assertTouchBoundsAtLeast48dp(compact = true)
 
-    // The touch bounds above are widened by Compose itself, which overlaps a neighbour's. The fix is in the layout: a tappable tag takes
-    // the room of its touch target, so two never share it.
-    @Test fun `a tappable tag takes 48dp of room`() {
+    // The touch bounds above are widened by Compose itself, into the empty space around the tag. A tappable tag therefore needs no
+    // layout room for them: the gaps between tags stay even, and where two widened targets meet, the nearer tag takes the tap.
+    @Test fun `a tappable tag takes no more room than it looks`() {
         showOne(onTagClick = {})
         val size = rule.onNodeWithTag("row").getUnclippedBoundsInRoot()
-        assertTrue("row is ${size.width} x ${size.height}", size.width >= 48.dp && size.height >= 48.dp)
+        assertTrue("row is ${size.width} x ${size.height}", size.height < 48.dp)
     }
 
     @Test fun `a plain tag takes no more room than it looks`() {

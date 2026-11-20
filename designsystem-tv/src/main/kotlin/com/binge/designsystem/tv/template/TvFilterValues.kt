@@ -215,7 +215,7 @@ private fun TvFilterValuesPinned(
 }
 
 /**
- * The one pinned row the app words itself (Where to watch's services row, in the host app): its [spec] gives the text and icon, and
+ * The one pinned row the app words itself (a row of the app's own services, say): its [spec] gives the text and icon, and
  * says whether a press clears the category or uses the row's own value. It is one composable whose text follows the spec, so the
  * focused row is never replaced and focus stays put across the swap. Where focus enters and leaves it is decided here, not by the
  * caller.
