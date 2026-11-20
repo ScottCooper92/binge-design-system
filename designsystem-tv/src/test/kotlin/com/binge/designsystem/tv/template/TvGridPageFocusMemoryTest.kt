@@ -52,8 +52,7 @@ private const val BAND_CONTROL = "band control"
 private val BAND_CONTROL_SIZE = 48.dp
 
 /**
- * **The grid pane's focus memory survives every load-state change and resets only on a query change
- *.**
+ * **The grid pane's focus memory survives every load-state change and resets only on a query change.**
  *
  * The memory used to be cleared on any non-`Items` state — the wrong signal from both directions: a pop's
  * cached `Loading` pass-through wiped the cell the user was returning to, while an `Items` → `Items`
