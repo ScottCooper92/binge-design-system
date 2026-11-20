@@ -51,7 +51,16 @@ fun TagRowSample() {
 }
 
 private val KeywordTags = listOf(
-    "alaska", "dog", "special forces", "military", "american wilderness", "survival", "rescue", "snow", "friendship", "journey",
+    "alaska",
+    "dog",
+    "special forces",
+    "military",
+    "american wilderness",
+    "survival",
+    "rescue",
+    "snow",
+    "friendship",
+    "journey",
 )
 
 /**
