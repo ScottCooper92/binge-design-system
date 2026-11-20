@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
@@ -47,6 +48,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
@@ -70,6 +72,7 @@ import org.robolectric.annotation.GraphicsMode
 import org.robolectric.shadows.ShadowDialog
 
 private const val CONTENT = "content"
+private const val PAGE = "page"
 private const val ACCOUNT = "Account"
 private const val SEARCH = "Search"
 private const val MOVIES = "Movies"
@@ -128,6 +131,45 @@ class TvTopBarScaffoldFocusTest {
         press(Key.DirectionDown)
         composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
     }
+
+    @Test
+    fun `by default the page sits below the bar and the top inset is zero`() {
+        setBar()
+
+        assertTrue("The page starts under the bar", pageTop() > 0f)
+        assertEquals(0f, pageInset.value, 0f)
+    }
+
+    @Test
+    fun `behind the bar the page fills the screen and the bar's height is the top inset`() {
+        setBar(behindBar = true)
+
+        assertEquals(0f, pageTop(), 0.5f)
+        val tabBottom = composeTestRule
+            .onNodeWithContentDescription(MOVIES)
+            .getUnclippedBoundsInRoot()
+            .bottom.value
+        assertTrue("The inset clears the tabs", pageInset.value >= tabBottom)
+    }
+
+    @Test
+    fun `behind the bar focus keeps its rules, page first then up to the bar and down again`() {
+        setBar(behindBar = true)
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+
+        press(Key.DirectionUp)
+        composeTestRule.onNodeWithContentDescription(MOVIES).assertIsFocused()
+        press(Key.DirectionDown)
+        composeTestRule.onNodeWithTag(CONTENT).assertIsFocused()
+    }
+
+    private var pageInset: Dp = Dp.Unspecified
+
+    private fun pageTop() =
+        composeTestRule
+            .onNodeWithTag(PAGE)
+            .getUnclippedBoundsInRoot()
+            .top.value
 
     @Test
     fun `an icon-only item is a square sized by its padding, not stretched to a minimum height`() {
@@ -554,7 +596,11 @@ class TvTopBarScaffoldFocusTest {
         composeTestRule.waitForIdle()
     }
 
-    private fun setBar(signedIn: Boolean = false, remountContent: Boolean = false) {
+    private fun setBar(
+        signedIn: Boolean = false,
+        remountContent: Boolean = false,
+        behindBar: Boolean = false,
+    ) {
         signedInNow.value = signedIn
         val owner = object : NavigationEventDispatcherOwner {
             override val navigationEventDispatcher: NavigationEventDispatcher = dispatcher
@@ -602,17 +648,22 @@ class TvTopBarScaffoldFocusTest {
                         ),
                         contentFocusRequester = content,
                         iconOnlyKeys = setOf(KEY_SEARCH),
+                        contentBehindBar = behindBar,
                     ) {
+                        pageInset = LocalTvTopInset.current
                         key(if (remountContent) selectedKey else Unit) {
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .testTag(CONTENT)
-                                    .background(CONTENT_COLOUR)
-                                    .shellArrivalTarget()
-                                    .focusRequester(content)
-                                    .focusable(),
-                            )
+                            Box(Modifier.fillMaxSize().testTag(PAGE)) {
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(top = pageInset)
+                                        .testTag(CONTENT)
+                                        .background(CONTENT_COLOUR)
+                                        .shellArrivalTarget()
+                                        .focusRequester(content)
+                                        .focusable(),
+                                )
+                            }
                         }
                     }
                 }
