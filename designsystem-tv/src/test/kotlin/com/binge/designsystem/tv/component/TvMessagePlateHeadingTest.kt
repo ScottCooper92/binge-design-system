@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** The plate's headline is the one heading, as `MessageScreen`'s is on the phone (#478). */
+/** The plate's headline is the one heading, as `MessageScreen`'s is on the phone. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
 class TvMessagePlateHeadingTest {

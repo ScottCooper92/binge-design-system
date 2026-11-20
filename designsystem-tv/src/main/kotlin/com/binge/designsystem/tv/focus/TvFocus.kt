@@ -186,7 +186,7 @@ fun Modifier.tvClickable(
 ): Modifier =
     this
         .onFocusChanged { onFocusChanged(it.isFocused) }
-        // No indication: every TV component draws its own focus, and the default one is a square over the bounds (#839).
+        // No indication: every TV component draws its own focus, and the default one is a square over the bounds.
         .clickable(
             interactionSource = null,
             indication = null,

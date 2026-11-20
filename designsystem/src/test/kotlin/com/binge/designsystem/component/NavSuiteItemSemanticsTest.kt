@@ -19,7 +19,7 @@ private const val MOVIES = "Movies"
 private const val ACCOUNT = "Account"
 
 /**
- * A screen reader reads a destination by its label, once, in every presentation and state (#424): an
+ * A screen reader reads a destination by its label, once, in every presentation and state: an
  * unselected avatar tab whose label is not drawn still has a name, and a selected item whose glyph and label
  * text are both drawn is not read twice. An avatar's initials never stand in for the label.
  */

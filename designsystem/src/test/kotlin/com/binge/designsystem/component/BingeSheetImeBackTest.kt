@@ -33,8 +33,8 @@ private const val KEYBOARD_HEIGHT = 300
 
 /**
  * Back with the soft keyboard up hides the keyboard and leaves the sheet open, so a draft survives the first Back; with it
- * hidden, Back dismisses as it always has (#1019). Back hides the keyboard and does not clear focus: clearing it handed focus
- * to the sheet's drag handle, which drew a focus box around it (#1024). Robolectric fakes the keyboard's insets, not the keyboard,
+ * hidden, Back dismisses as it always has. Back hides the keyboard and does not clear focus: clearing it handed focus
+ * to the sheet's drag handle, which drew a focus box around it. Robolectric fakes the keyboard's insets, not the keyboard,
  * so a test drops them by hand where the real keyboard would; whether the keyboard really hides is a device check.
  */
 @RunWith(RobolectricTestRunner::class)

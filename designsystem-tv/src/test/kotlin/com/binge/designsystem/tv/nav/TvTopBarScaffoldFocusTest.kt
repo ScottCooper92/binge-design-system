@@ -151,7 +151,7 @@ class TvTopBarScaffoldFocusTest {
 
     /**
      * The destinations are tabs, so the accessibility bridge reports their selection as `selected`, which UiAutomator's
-     * `By.selected` and TalkBack read; on a button it would be reported as `checked` (#3994). The gear selects nothing.
+     * `By.selected` and TalkBack read; on a button it would be reported as `checked`. The gear selects nothing.
      */
     @Test
     fun `the destinations are tabs and the gear is a button with no selection`() {
@@ -229,7 +229,7 @@ class TvTopBarScaffoldFocusTest {
         assertEquals("Back on the home tab must fall through to the system", 1, systemBacks)
     }
 
-    /** #4519: the avatar opens the menu by being focused, so Back there closes the menu alone, and the tab stays. */
+    /** The avatar opens the menu by being focused, so Back there closes the menu alone, and the tab stays. */
     @Test
     fun `back with the menu open on the avatar closes only the menu, off the home tab`() {
         selected.value = KEY_TV
@@ -402,7 +402,7 @@ class TvTopBarScaffoldFocusTest {
         composeTestRule.onNodeWithContentDescription(SEARCH).assertIsFocused()
     }
 
-    /** Cancel on the sign-out confirm puts focus back on Sign out, the row that raised it, with the menu still open (#4089). */
+    /** Cancel on the sign-out confirm puts focus back on Sign out, the row that raised it, with the menu still open. */
     @Test
     fun `cancelling the sign-out confirm returns focus to Sign out`() {
         setBar(signedIn = true)
@@ -414,7 +414,7 @@ class TvTopBarScaffoldFocusTest {
         assertSignOutRefocused()
     }
 
-    /** Back on the sign-out confirm returns to Sign out too: Back goes back where it left (#4089). */
+    /** Back on the sign-out confirm returns to Sign out too: Back goes back where it left. */
     @Test
     fun `back on the sign-out confirm returns focus to Sign out`() {
         setBar(signedIn = true)

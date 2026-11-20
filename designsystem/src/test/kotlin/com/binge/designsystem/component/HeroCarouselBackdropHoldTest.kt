@@ -23,7 +23,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The hero carousel keeps the previous backdrop until the next one has loaded (#1297): no placeholder is drawn over it while the
+ * The hero carousel keeps the previous backdrop until the next one has loaded: no placeholder is drawn over it while the
  * image is on its way. The loader is held open by the test, which a real image request cannot be.
  */
 @RunWith(RobolectricTestRunner::class)

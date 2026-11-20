@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * A message plate lays out wherever a screen puts it (#1138 broke three such screens): under a lazy list, under a parent that asks for
+ * A message plate lays out wherever a screen puts it (an earlier regression broke three such screens): under a lazy list, under a parent that asks for
  * an intrinsic size, and filling a box. It never asks for an intrinsic size itself and never subcomposes, so none of these throws.
  */
 @RunWith(RobolectricTestRunner::class)

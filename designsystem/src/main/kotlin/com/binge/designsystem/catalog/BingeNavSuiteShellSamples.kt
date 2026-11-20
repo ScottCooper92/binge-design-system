@@ -119,7 +119,7 @@ fun BingeNavSuiteShellTabletRailSample() {
 /**
  * A screen under the tablet rail, on a window with a camera cutout on its left edge. The rail's overlay already holds
  * the cutout, so the screen's rows start just past the rail, not a cutout's width further in. The bar's title does not
- * clear the rail yet (#605).
+ * clear the rail yet.
  */
 @Composable
 fun BingeNavSuiteShellRailScreenSample() {

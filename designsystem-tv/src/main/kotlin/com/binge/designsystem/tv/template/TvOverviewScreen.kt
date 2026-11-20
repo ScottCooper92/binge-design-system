@@ -108,7 +108,7 @@ fun TvOverviewScreen(
                 )
                 // The start-edge key closes, ↓/↑ scroll the text — the surface is a single focus stop, so a
                 // directional press has no other target and would otherwise fall through to the shell. That
-                // key mirrors with the panel under RTL (#2108).
+                // key mirrors with the panel under RTL.
                 .onPreviewKeyEvent { event ->
                     if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
                     when {

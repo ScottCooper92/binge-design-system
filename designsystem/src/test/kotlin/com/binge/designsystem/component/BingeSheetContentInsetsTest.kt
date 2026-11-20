@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 private val Cutout = 32.dp
 
 /**
- * A sheet's content insets carry the part of a side inset the sheet reaches, in both forms (#459). The sheet is at most
+ * A sheet's content insets carry the part of a side inset the sheet reaches, in both forms. The sheet is at most
  * 640dp wide and centred, so a 660dp window leaves it 10dp from each side and a 32dp cutout reaches 22dp into it,
  * while an 891dp window leaves it clear of the cutout altogether.
  */
