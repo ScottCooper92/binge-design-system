@@ -274,12 +274,24 @@ private fun ColumnScope.PersonPlaceholder(state: PersonDetailState.Loading) {
         Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
         DetailOverviewSkeleton(Modifier.fillMaxWidth().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
     }
-    repeat(state.creditRails) { CarouselSkeleton() }
+    CreditRailSkeletons(state.creditRails)
 }
 
 @Composable
 private fun CreditsPlaceholder() {
-    repeat(2) { CarouselSkeleton() }
+    CreditRailSkeletons(2)
+}
+
+/** [count] rail placeholders on the loaded rails' start, the reading inset, so they do not jump sideways when the credits load. */
+@Composable
+private fun CreditRailSkeletons(count: Int) {
+    val inset = readingInset()
+    repeat(count) { index ->
+        CarouselSkeleton(
+            contentPadding = PaddingValues(horizontal = inset),
+            headerModifier = if (index == 0) Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.CREDITS)) else Modifier,
+        )
+    }
 }
 
 @Composable

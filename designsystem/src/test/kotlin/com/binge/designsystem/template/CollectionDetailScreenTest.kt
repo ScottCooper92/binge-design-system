@@ -99,7 +99,13 @@ class CollectionDetailScreenTest {
     }
 
     @Test
-    fun `the loading rows stand where the loaded parts do`() {
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun `the loading rows stand where the loaded parts do on a wide window`() = loadingRowsStandWhereLoadedPartsDo()
+
+    @Test
+    fun `the loading rows stand where the loaded parts do`() = loadingRowsStandWhereLoadedPartsDo()
+
+    private fun loadingRowsStandWhereLoadedPartsDo() {
         var state by mutableStateOf<CollectionDetailState>(CollectionDetailState.Loading(hasOverview = false, parts = 2))
         rule.setContent {
             TestTheme {

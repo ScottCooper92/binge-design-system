@@ -27,7 +27,10 @@ private const val SKELETON_CARD_COUNT = 6
  * Loading placeholder for a [MediaCarousel] under its [SectionHeader]: the heading plate, then [count] card
  * plates on the loaded row's insets.
  *
- * [description] names the loading state for a screen reader; without one it stays silent.
+ * [description] names the loading state for a screen reader; without one it stays silent. [contentPadding] is the row's start and end, as a
+ * loaded [MediaCarousel]'s: the heading plate takes it, and the cards sit inside it, so they still run to the window's edge. A page
+ * whose loaded rails start at the reading column's edge passes its [com.binge.designsystem.template.readingInset] on both sides, so the
+ * plates start where the loaded rail does and nothing moves sideways when it loads. [headerModifier] goes on the heading plate, for a page that marks where its rails begin.
  *
  * @need show a loading placeholder for a poster row
  * @group feedback
@@ -38,8 +41,10 @@ fun CarouselSkeleton(
     modifier: Modifier = Modifier,
     count: Int = SKELETON_CARD_COUNT,
     description: String? = null,
+    contentPadding: PaddingValues = carouselSkeletonSidePadding(),
+    headerModifier: Modifier = Modifier,
 ) {
-    val sides = carouselSkeletonSidePadding()
+    val sides = contentPadding
     Column(modifier = modifier.fillMaxWidth().describedAs(description)) {
         // Reserve the loaded SectionHeader's row height: its content is floored at the touch target
         // (SectionHeader), so this reserves the same token rather than a line height of its own.
@@ -51,7 +56,7 @@ fun CarouselSkeleton(
             contentAlignment = Alignment.CenterStart,
         ) {
             SkeletonPlate(
-                Modifier
+                headerModifier
                     .width(dimensionResource(R.dimen.skeleton_header_width))
                     .height(dimensionResource(R.dimen.skeleton_header_height)),
             )
