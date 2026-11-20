@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BadgedBox
@@ -112,7 +113,7 @@ fun FilterPill(
  *
  * It fades in with [collapsedFraction] (0 hidden, 1 fully shown), and while it is hidden it takes no taps and is not an accessibility
  * item, so a screen reader never lands on an invisible button. With [activeCount] above 0 the icon takes the `primary` tint, kept at
- * its contrast against the bar, and a [CountBadge] in `error` and `onError` sits at its corner. The caller words
+ * its contrast against the bar, and a [CountBadge] in `error` and `onError` hangs off its corner. The caller words
  * [contentDescription], with the count when filters are applied. A button that is not [enabled] takes no taps and dims by
  * [DISABLED_ALPHA].
  *
@@ -140,17 +141,27 @@ fun CollapsedFilterAction(
     val visible = fraction > 0f
     val active = activeCount > 0
     val tint = if (active) contrastSafeOn(colors.background, colors.primary) else LocalContentColor.current
+    // The button is larger than its icon, so the badge is drawn back in from the button's corner onto the icon's.
+    val inset = dimensionResource(R.dimen.filter_action_badge_inset)
     Box(
         modifier = modifier
             .alpha(fraction * (if (enabled) 1f else DISABLED_ALPHA))
             .then(if (visible) Modifier else Modifier.clearAndSetSemantics {}),
     ) {
-        IconButton(onClick = onClick, enabled = enabled && visible) {
-            BadgedBox(
-                badge = {
-                    if (active) CountBadge(count = activeCount, containerColor = colors.error, contentColor = colors.onError)
-                },
-            ) {
+        // The badge hangs off the button, not inside it: the button clips its content to its circle, which would cut the badge's corner.
+        BadgedBox(
+            badge = {
+                if (active) {
+                    CountBadge(
+                        count = activeCount,
+                        containerColor = colors.error,
+                        contentColor = colors.onError,
+                        modifier = Modifier.offset(x = -inset, y = inset),
+                    )
+                }
+            },
+        ) {
+            IconButton(onClick = onClick, enabled = enabled && visible) {
                 Icon(imageVector = BingeIcons.Discover, contentDescription = contentDescription, tint = tint)
             }
         }

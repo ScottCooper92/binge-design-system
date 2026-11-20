@@ -74,7 +74,7 @@ fun CollapsedFilterActionSample() {
                         contentDescription = described(count),
                         onClick = { count++ },
                     )
-                    Text(text = "$initial, ${fraction.toInt()}", style = MaterialTheme.typography.labelSmall)
+                    Text(text = "$count, ${fraction.toInt()}", style = MaterialTheme.typography.labelSmall)
                 }
             }
         }

@@ -223,6 +223,8 @@
     <dimen name="filter_pill_padding_h">14dp</dimen>
     <dimen name="filter_pill_spacing">6dp</dimen>
     <dimen name="filter_pill_icon">16dp</dimen>
+    <!-- CollapsedFilterAction: how far the count badge is drawn in from the icon button's corner, onto the icon's -->
+    <dimen name="filter_action_badge_inset">8dp</dimen>
     <!-- StatusChip: the pill's padding, the solid dot, its halo, and the gap before the label -->
     <dimen name="status_chip_padding_h">10dp</dimen>
     <dimen name="status_chip_padding_v">4dp</dimen>
