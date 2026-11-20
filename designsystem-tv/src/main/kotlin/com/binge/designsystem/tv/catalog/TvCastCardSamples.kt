@@ -19,6 +19,7 @@ import androidx.tv.material3.MaterialTheme
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.preview.WithPreviewImage
 import com.binge.designsystem.tv.R
+import com.binge.designsystem.tv.component.TvCardGrid
 import com.binge.designsystem.tv.component.TvCastCard
 import com.binge.designsystem.tv.component.TvCastCardPlate
 import com.binge.designsystem.tv.component.TvImageKind
@@ -138,5 +139,29 @@ fun TvImagePlaceholderPersonCircleSample() {
         Box(Modifier.width(dimensionResource(R.dimen.tv_cast_card_width)).aspectRatio(1f).clip(CircleShape)) {
             TvImagePlaceholder(kind = TvImageKind.Person, title = null)
         }
+    }
+}
+
+private const val CARD_GRID_COLUMNS = 6
+private const val CARD_GRID_CELLS = 12
+
+/** A grid of cast cells the caller draws, the second one focused: the grid owns the entry focus and the ring, the cell is the caller's. */
+@Composable
+fun TvCardGridSample() {
+    TvCardGrid(
+        itemCount = CARD_GRID_CELLS,
+        itemKey = { it },
+        columns = CARD_GRID_COLUMNS,
+        initialFocusedIndex = 1,
+    ) { index, isFocused, onFocusChanged, cellModifier ->
+        TvCastCard(
+            name = "Person ${index + 1}",
+            role = "Role ${index + 1}",
+            profileUrl = null,
+            isFocused = isFocused,
+            onFocusChanged = onFocusChanged,
+            onClick = {},
+            modifier = cellModifier,
+        )
     }
 }

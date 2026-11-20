@@ -31,7 +31,7 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * What a TV image slot paints when there is no image: a type glyph over the [title]. TV cards are
- * poster-only (no caption), so a card with no artwork otherwise identifies nothing at all (#1497).
+ * poster-only (no caption), so a card with no artwork otherwise identifies nothing at all.
  *
  * @need paint a type glyph over a title where a tv image has none
  * @group tv
@@ -47,9 +47,9 @@ fun TvImagePlaceholder(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            // The card owns the content description (#1335), so a placeholder that published its own title
+            // The card owns the content description, so a placeholder that published its own title
             // would make every artwork-less card announce twice — and would give two nodes the same title,
-            // which broke TvGridPaneFocusMemoryTest's title-matching backdrop assertions.
+            // which breaks title-matching assertions.
             .clearAndSetSemantics { },
         contentAlignment = Alignment.Center,
     ) {
@@ -99,7 +99,7 @@ private fun TvImageKind.glyph(): ImageVector =
  *
  * Shared rather than inlined because one slot draws this glyph twice — [TvCastCardPlate] is the cast
  * avatar's loading state and [TvImagePlaceholder] its error state, and the two are meant to match. Holding
- * the rule in two places is how they stopped matching in the first place (#2558).
+ * the rule in two places is how they stopped matching in the first place.
  */
 @Composable
 @ReadOnlyComposable

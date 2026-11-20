@@ -29,10 +29,7 @@ import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.tv.R as TvR
 
-/**
- * Columns of posters across the content pane.
- *
- */
+/** Columns of posters across the content pane. */
 internal const val TV_MEDIA_GRID_COLUMNS = 5
 
 /**
@@ -43,11 +40,11 @@ internal const val TV_MEDIA_GRID_COLUMNS = 5
  */
 private const val SKELETON_ROWS = 2
 
-/** A poster's 2:3, matching TvMediaCard so a plate and a resolved card occupy identical space. */
+/** A poster's 2:3, so a plate and a resolved poster card occupy identical space. */
 private const val TV_MEDIA_GRID_PLATE_ASPECT_RATIO = 2f / 3f
 
 /**
- * A D-pad grid of posters: what a "see all" tile opens onto, and what the Discover destination is.
+ * A D-pad grid of cells the caller draws, with entry focus that remembers the cell last focused: entering the grid lands on that cell, or the first on a fresh grid, rather than a geometric pick.
  *
  * @need lay out a d-pad grid of cells that remembers the cell last focused on a tv screen
  * @group tv
@@ -62,7 +59,7 @@ fun TvCardGrid(
     state: LazyGridState = rememberLazyGridState(),
     initialFocusedIndex: Int? = null,
     contentPadding: PaddingValues = tvMediaGridPadding(),
-    // The *index*, unlike TvMediaRow's equivalent, because the caller's job with it is arithmetic: a grid's
+    // The *index*, unlike a row's id, because the caller's job with it is arithmetic: a grid's
     // anchor row is `index / columns`, and there is no way back from an id to an index through a paged
     // accessor without scanning it.
     onItemFocused: (Int) -> Unit = {},
@@ -71,15 +68,15 @@ fun TvCardGrid(
     cell: @Composable (index: Int, isFocused: Boolean, onFocusChanged: (Boolean) -> Unit, cellModifier: Modifier) -> Unit,
 ) {
     // The cell the group's entry redirects to: the remembered one, or the **first** before anything has been
-    // focused (#1727). Falling back to 0 rather than leaving the requester unattached is what makes a fresh
-    // entry land on cell one — see the entry-cell note in the KDoc.
+    // focused. Falling back to 0 rather than leaving the requester unattached is what makes a fresh
+    // entry land on cell one.
     val entryIndex = rememberedIndex ?: 0
     // Only meaningful while [entryIndex] names a cell that is currently composed, which is why the request is
     // wrapped — an absent cell falls through to the directional search.
     val rememberedCell = remember { FocusRequester() }
     // Nulled on blur so a grid that has lost focus does not keep a ring lit; the selected-but-unfocused
-    // treatment is #1331's problem, not this component's. Seeded so a baseline can render a focused cell
-    // *inside* the grid, which is the only way to prove the padding above protects the ring.
+    // treatment is the caller's problem, not this component's. Seeded so a baseline can render a focused cell
+    // *inside* the grid, which is the only way to prove the content padding protects the ring.
     var focusedIndex by remember { mutableStateOf(initialFocusedIndex) }
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
@@ -122,7 +119,7 @@ fun TvCardGrid(
  * The four-sided insets every TV grid shares.
  */
 @Composable
-fun tvMediaGridPadding(): PaddingValues =
+internal fun tvMediaGridPadding(): PaddingValues =
     PaddingValues(
         start = tvContentGutterStart(),
         end = dimensionResource(TvR.dimen.tv_overscan_horizontal),
@@ -132,18 +129,14 @@ fun tvMediaGridPadding(): PaddingValues =
 
 /**
  * The grid's own loading state: plates in the geometry the results will occupy.
- *
- * @need show plates where a tv grid's cells will be while it loads
- * @group tv
- * @replaces a hand-built tv grid skeleton
  */
 @Composable
-fun TvMediaGridSkeleton(
+internal fun TvMediaGridSkeleton(
     modifier: Modifier = Modifier,
     columns: Int = TV_MEDIA_GRID_COLUMNS,
     contentPadding: PaddingValues = tvMediaGridPadding(),
     // The plate itself, so a grid whose cell is not a 2:3 poster reserves *its* shape — the gallery's
-    // format aspect, the cast list's circle over a two-line caption (#1682). Default is the poster plate,
+    // format aspect, the cast list's circle over a two-line caption. Default is the poster plate,
     // which is what the poster grids want.
     plate: @Composable () -> Unit = { TvMediaGridPlate() },
 ) {
@@ -165,12 +158,9 @@ fun TvMediaGridSkeleton(
     }
 }
 
-/** One empty cell, at the poster shape the real card will take. *
- * @need draw one empty poster-shaped plate in a tv grid skeleton
- * @group tv
- */
+/** One empty cell, at the poster shape the real card will take. */
 @Composable
-fun TvMediaGridPlate() {
+internal fun TvMediaGridPlate() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -181,10 +171,11 @@ fun TvMediaGridPlate() {
 }
 
 /**
- * Marks a media grid's first cell as the layout anchor its loading skeleton is measured against (#1598).
+ * Marks a media grid's first cell as the layout anchor its loading skeleton is measured against.
  *
  * The first cell is the only one worth anchoring: every grid inset the skeleton has to reproduce lands above
  * it, and the rest follow from the arrangement. It is the design system's grid anchor, so this grid, its skeleton
- * and [TvGridPane]'s cells cannot name it differently.
+ * and its cells cannot name it differently.
  */
-fun Modifier.tvGridFirstCellAnchor(isFirst: Boolean): Modifier = if (isFirst) tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else this
+internal fun Modifier.tvGridFirstCellAnchor(isFirst: Boolean): Modifier =
+    if (isFirst) tvLayoutAnchor(TvLayoutAnchors.GRID_FIRST_CELL) else this

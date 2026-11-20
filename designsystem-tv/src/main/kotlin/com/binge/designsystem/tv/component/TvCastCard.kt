@@ -31,10 +31,10 @@ import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.R as TvR
 
 /**
- * One person in a TV cast row: a circular profile image with the name and role beneath (#1431, #1434).
+ * One person in a TV cast row: a circular profile image with the name and role beneath.
  *
  * The circle alone is the focus target: the ring is a border treatment ([tvFocusIndicator], `CircleShape`)
- * because a fill would bury a headshot (§8). [name] is the focusable's content description, so the
+ * because a fill would bury a headshot. [name] is the focusable's content description, so the
  * announcement never depends on the image arriving.
  *
  * Focus is a parameter. [avatar] is a composition slot.
@@ -61,7 +61,7 @@ fun TvCastCard(
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 // Ring before clip — it draws outside the circle's bounds, so a clip earlier in the
-                // chain would cut it. Same order as TvMediaCard.
+                // chain would cut it. Same order as the poster card.
                 .tvFocusIndicator(isFocused = isFocused, shape = CircleShape)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -82,7 +82,7 @@ fun TvCastCard(
                 .fillMaxWidth()
                 .padding(top = dimensionResource(TvR.dimen.tv_card_caption_gap)),
         )
-        // The role slot is always reserved, even when empty (#1536): a `role?.let` left a card without one
+        // The role slot is always reserved, even when empty: a `role?.let` left a card without one
         // a line shorter than its neighbours, leaving a ragged gap in the row.
         Text(
             text = role.orEmpty(),
@@ -102,12 +102,9 @@ fun TvCastCard(
  *
  * Loading keeps a bare plate; error routes to the shared [TvImagePlaceholder] glyph — a blank circle beside
  * filled ones reads as broken, where a blank plate reads as loading.
- *
- * @need draw a headshot, or a person glyph where there is none
- * @group tv
  */
 @Composable
-fun TvCastCardAvatar(profileUrl: String?) {
+internal fun TvCastCardAvatar(profileUrl: String?) {
     SubcomposeAsyncImage(
         model = profileUrl,
         // Null: the card owns the description, so labelling the image too would announce twice.
@@ -122,7 +119,7 @@ fun TvCastCardAvatar(profileUrl: String?) {
 /**
  * The loading plate for [TvCastCardAvatar]. Sized by [tvPlaceholderGlyphSize] and tinted off [GLYPH_ALPHA]
  * rather than its own copies of either, so the glyph a card shows while loading matches the one it shows on
- * error — the parity [TvCastCardAvatar]'s doc calls for (#2558).
+ * error — the parity [TvCastCardAvatar]'s doc calls for.
  *
  * Internal rather than private so the screenshot suite can render it directly, beside the error plate —
  * `SubcomposeAsyncImage`'s `loading` slot has no preview-reachable trigger of its own.
@@ -139,6 +136,6 @@ internal fun TvCastCardPlate() {
     }
 }
 
-/** Fixed rather than capped (#1536): a cap lets a card's height depend on its text, which makes a row ragged. */
+/** Fixed rather than capped: a cap lets a card's height depend on its text, which makes a row ragged. */
 private const val NAME_LINES = 1
 private const val ROLE_LINES = 1

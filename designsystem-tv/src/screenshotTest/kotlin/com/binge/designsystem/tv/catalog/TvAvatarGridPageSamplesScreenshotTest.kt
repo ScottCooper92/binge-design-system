@@ -78,6 +78,11 @@ class TvAvatarGridPageSamplesScreenshotTest {
     @Composable
     fun placeholderPersonCircleNoTitle() = TvScreenshotTheme(modifier = Modifier.fillMaxSize()) { TvImagePlaceholderPersonCircleSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun cardGridWithFocusedCell() = TvScreenshotTheme(modifier = Modifier.fillMaxSize()) { TvCardGridSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         content()
