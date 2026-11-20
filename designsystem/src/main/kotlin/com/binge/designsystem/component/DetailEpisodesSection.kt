@@ -37,7 +37,7 @@ class EpisodeRow(
  * [onSeasonClick] opens the picker; with either null there is no dropdown, as a show with one season has nothing to choose), a [subtitle]
  * line ("Season 1 · 9 episodes · 2022"), then the first [shown] of [episodes] as display-only [EpisodeListRow]s and, when there are more
  * and [onViewAll] is given, a button labelled [viewAllLabel] for the rest. While the season loads or has failed, [stateContent] is drawn in
- * place of the rows, so the caller's own loading and error views stay in place. The header, the subtitle and the rows start at the page's
+ * place of the rows, so the caller's own loading and error views stay in place; it is drawn inside the same inset, so a skeleton row lines up with the row it stands for. The header, the subtitle and the rows start at the page's
  * reading inset, so they line up with the sections around them.
  *
  * @need list a series' episodes under a season dropdown, the first few with a button for the rest
@@ -78,9 +78,9 @@ fun DetailEpisodesSection(
             )
         }
         if (stateContent != null) {
-            stateContent()
+            Box(Modifier.padding(horizontal = inset)) { stateContent() }
         } else {
-            episodes.take(shown).forEach { episode ->
+            episodes.take(shown.coerceAtLeast(0)).forEach { episode ->
                 EpisodeListRow(
                     episodeNumber = episode.number,
                     name = episode.name,
@@ -91,7 +91,7 @@ fun DetailEpisodesSection(
                     airDate = episode.airDate,
                 )
             }
-            if (episodes.size > shown && onViewAll != null && viewAllLabel != null) {
+            if (episodes.size > shown.coerceAtLeast(0) && onViewAll != null && viewAllLabel != null) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     TextButton(onClick = onViewAll) {
                         Text(viewAllLabel, color = MaterialTheme.colorScheme.primary)
