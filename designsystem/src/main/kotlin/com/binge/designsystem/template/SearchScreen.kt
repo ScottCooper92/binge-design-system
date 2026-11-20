@@ -60,8 +60,8 @@ import com.binge.designsystem.component.BingeConfirmDialog
 import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.component.FilterChipItem
-import com.binge.designsystem.component.FilterPager
 import com.binge.designsystem.component.FilterChipRowSkeleton
+import com.binge.designsystem.component.FilterPager
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultRow
 import com.binge.designsystem.component.MediaResultRowSkeleton
