@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.component.MediaCarousel
 import com.binge.designsystem.component.PersonCard
 import com.binge.designsystem.component.PersonCardSkeleton
+import com.binge.designsystem.component.PersonCardStyle
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.preview.WithPreviewImage
 
@@ -141,5 +142,79 @@ fun PersonCardRowEndTileSample() {
 fun PersonCardSkeletonSample() {
     ScreenshotTheme {
         LooseFrame { PersonCardSkeleton() }
+    }
+}
+
+/** The compact cast tile, as a detail page's cast row draws it: a round photo at the cast avatar size, the name on one line and the role on one. */
+@Composable
+fun PersonCardCompactSample() {
+    ScreenshotTheme {
+        var taps by remember { mutableStateOf(0) }
+        Column {
+            WithPreviewImage(PHOTO_SIZE_PX, PHOTO_SIZE_PX) {
+                PersonCard(
+                    name = "Amara Okafor",
+                    subtitle = "Lead",
+                    photoUrl = PHOTO_URL,
+                    onClick = { taps++ },
+                    style = PersonCardStyle.Compact,
+                )
+            }
+            if (taps > 0) Text("Tapped $taps")
+        }
+    }
+}
+
+/** A name and a role too long for the compact tile: each stays on one line and ellipsizes. */
+@Composable
+fun PersonCardCompactLongNameSample() {
+    ScreenshotTheme {
+        LooseFrame {
+            WithPreviewImage(PHOTO_SIZE_PX, PHOTO_SIZE_PX) {
+                PersonCard(
+                    name = "Maria Fernanda de los Angeles Rodriguez Hernandez",
+                    subtitle = "Supervising sound editor and re-recording mixer",
+                    photoUrl = PHOTO_URL,
+                    onClick = {},
+                    style = PersonCardStyle.Compact,
+                )
+            }
+        }
+    }
+}
+
+/** No photo: the person's initials on a neutral surface, in the compact tile. */
+@Composable
+fun PersonCardCompactNoPhotoSample() {
+    ScreenshotTheme {
+        LooseFrame {
+            PersonCard(name = "Amara Okafor", subtitle = "Lead", photoUrl = null, onClick = {}, style = PersonCardStyle.Compact)
+        }
+    }
+}
+
+/** A cast row of compact tiles in a [MediaCarousel]: some with a photo, some on their initials. See the worst-case frames at 1.3x and 2x. */
+@Composable
+fun PersonCardCompactRowSample() {
+    ScreenshotTheme {
+        WithPreviewImage(PHOTO_SIZE_PX, PHOTO_SIZE_PX) {
+            MediaCarousel(title = "Cast", items = cast, itemKey = { it.first }) { _, (name, subtitle, hasPhoto) ->
+                PersonCard(
+                    name = name,
+                    subtitle = subtitle,
+                    photoUrl = if (hasPhoto) PHOTO_URL else null,
+                    onClick = {},
+                    style = PersonCardStyle.Compact,
+                )
+            }
+        }
+    }
+}
+
+/** The compact tile's loading stand-in: a round plate at the cast avatar size and a two-line caption, the tile's own room. */
+@Composable
+fun PersonCardCompactSkeletonSample() {
+    ScreenshotTheme {
+        LooseFrame { PersonCardSkeleton(style = PersonCardStyle.Compact) }
     }
 }

@@ -170,6 +170,7 @@ private fun DetailPageBody(
                 person = { it.person },
                 onOpen = { callbacks.onOpenPerson(it.key) },
                 onSeeAll = if (rail.seeAll) ({ callbacks.onSeeAllPeople(index) }) else null,
+                cardStyle = rail.cardStyle,
             )
         }
         afterPeople?.invoke()

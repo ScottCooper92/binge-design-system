@@ -8,4 +8,5 @@
          phone reads as a row of thumbnails on a tablet, where the carousel has width to spare and the
          faces are what the section is for. The detail skeleton's plates follow it. -->
     <dimen name="cast_avatar_size">112dp</dimen>
+    <dimen name="person_card_compact_width">128dp</dimen>
 </resources>

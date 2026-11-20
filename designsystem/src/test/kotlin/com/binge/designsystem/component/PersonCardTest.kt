@@ -1,13 +1,17 @@
 package com.binge.designsystem.component
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Density
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -84,7 +88,115 @@ class PersonCardTest {
         assertEquals(card, skeleton)
     }
 
+    private fun compactSkeletonMatchesCard(fontScale: Float) {
+        rule.setContent {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
+                TestTheme {
+                    PersonCard(
+                        name = "Amara Okafor",
+                        subtitle = "Lead",
+                        photoUrl = null,
+                        onClick = {},
+                        style = PersonCardStyle.Compact,
+                        modifier = Modifier.testTag(CARD),
+                    )
+                    PersonCardSkeleton(style = PersonCardStyle.Compact, modifier = Modifier.testTag(SKELETON))
+                }
+            }
+        }
+
+        val card = rule.onNodeWithTag(CARD).fetchSemanticsNode().size
+        val skeleton = rule.onNodeWithTag(SKELETON).fetchSemanticsNode().size
+        assertEquals(card, skeleton)
+    }
+
+    @Test
+    fun `the compact skeleton takes exactly the room the compact card does at 1x font`() = compactSkeletonMatchesCard(1f)
+
+    @Test
+    fun `the compact skeleton takes exactly the room the compact card does at 2x font`() = compactSkeletonMatchesCard(2f)
+
+    @Test
+    fun `a compact card's long text ellipsizes to the size of a short one`() {
+        rule.setContent {
+            TestTheme {
+                PersonCard(
+                    name = "Maria Fernanda de los Angeles Rodriguez Hernandez",
+                    subtitle = "Supervising sound editor and re-recording mixer",
+                    photoUrl = null,
+                    onClick = {},
+                    style = PersonCardStyle.Compact,
+                    modifier = Modifier.testTag(CARD),
+                )
+                PersonCard(
+                    name = "Amara Okafor",
+                    subtitle = "Lead",
+                    photoUrl = null,
+                    onClick = {},
+                    style = PersonCardStyle.Compact,
+                    modifier = Modifier.testTag(SHORT),
+                )
+            }
+        }
+
+        // Each line ellipsizes rather than wrapping to a taller tile.
+        assertEquals(rule.onNodeWithTag(SHORT).fetchSemanticsNode().size, rule.onNodeWithTag(CARD).fetchSemanticsNode().size)
+    }
+
+    @Test
+    fun `a compact card is 96dp wide and a default one 104dp`() {
+        rule.setContent {
+            TestTheme {
+                PersonCard(
+                    name = "Amara Okafor",
+                    subtitle = "Lead",
+                    photoUrl = null,
+                    onClick = {},
+                    style = PersonCardStyle.Compact,
+                    modifier = Modifier.testTag(CARD),
+                )
+                PersonCard(name = "Amara Okafor", subtitle = "Lead", photoUrl = null, onClick = {}, modifier = Modifier.testTag(SHORT))
+            }
+        }
+
+        assertEquals(96f, widthOf(CARD), 0.5f)
+        assertEquals(104f, widthOf(SHORT), 0.5f)
+    }
+
+    @Test
+    fun `a people rail passes its card style to the cards`() {
+        fun widthWith(style: PersonCardStyle): Float {
+            rule.setContent {
+                TestTheme {
+                    DetailPeopleRail(
+                        title = "Cast",
+                        people = listOf("a"),
+                        itemKey = { it },
+                        person = { DetailPerson("Amara Okafor", "Lead", null) },
+                        onOpen = {},
+                        cardStyle = style,
+                    )
+                }
+            }
+            return rule
+                .onNode(hasClickAction())
+                .getBoundsInRoot()
+                .let { it.right.value - it.left.value }
+        }
+
+        // The compact tile is narrower than the default one: 96dp against 104dp on a phone.
+        assertEquals(96f, widthWith(PersonCardStyle.Compact), 0.5f)
+    }
+
+    private fun widthOf(tag: String) =
+        rule
+            .onNodeWithTag(tag)
+            .getBoundsInRoot()
+            .let { it.right.value - it.left.value }
+
     private companion object {
+        const val SHORT = "short"
         const val CARD = "card"
         const val SKELETON = "skeleton"
     }

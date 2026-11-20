@@ -63,4 +63,42 @@ class PersonCardSamplesScreenshotTest {
     fun Skeleton() {
         PersonCardSkeletonSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun CompactDefault() {
+        PersonCardCompactSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun CompactLongName() {
+        PersonCardCompactLongNameSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun CompactNoPhoto() {
+        PersonCardCompactNoPhotoSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun CompactRow() {
+        PersonCardCompactRowSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun CompactSkeleton() {
+        PersonCardCompactSkeletonSample()
+    }
 }

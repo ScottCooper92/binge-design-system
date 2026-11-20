@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import coil3.compose.SubcomposeAsyncImage
 import com.binge.designsystem.R
@@ -40,6 +41,13 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.toInitials
 
 /**
+ * How a [PersonCard] is drawn. [Default] is the tile that sits beside a [MediaCard]: an 88dp photo over a caption of three lines. [Compact]
+ * is the cast tile: a round photo at the cast avatar size (80dp, 112dp on a wide screen) over the name on one line and the subtitle on one,
+ * in a narrower tile, for a detail page's cast row.
+ */
+enum class PersonCardStyle { Default, Compact }
+
+/**
  * A carousel tile for a person, such as a cast or crew member: a round photo, the [name], and an optional one-line [subtitle] (a character,
  * a job). It sits beside a [MediaCard] in a [MediaCarousel] and gives the same press feedback.
  *
@@ -47,6 +55,9 @@ import com.binge.designsystem.toInitials
  * The tile is a fixed width, and its caption always takes the same room, three lines: the name wraps to two lines and then ellipsizes, and
  * the subtitle under it is one line that ellipsizes. A row of people is the same height whatever each one's text, and [PersonCardSkeleton] holds
  * exactly that space.
+ *
+ * With [style] [PersonCardStyle.Compact] the photo is the cast avatar size and the caption is two lines, the name and the subtitle each on one
+ * line that ellipsizes, still the same room whatever the text; [PersonCardSkeleton] takes the same style to hold it.
  *
  * The tile is one click target and one accessibility item announcing [description], or the [name] and [subtitle] when [description] is
  * null. The caller owns all the words.
@@ -63,12 +74,13 @@ fun PersonCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     description: String? = null,
+    style: PersonCardStyle = PersonCardStyle.Default,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val label = description ?: listOf(name, subtitle).filterNot { it.isNullOrBlank() }.joinToString(", ")
     Column(
         modifier = modifier
-            .width(dimensionResource(R.dimen.person_card_width))
+            .width(style.tileWidth())
             .pressScale(interactionSource)
             .clip(BingeShapes.Medium)
             .clickable(
@@ -82,8 +94,8 @@ fun PersonCard(
             },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        PersonPhoto(name = name, photoUrl = photoUrl)
-        PersonCardCaption(name = name, subtitle = subtitle)
+        PersonPhoto(name = name, photoUrl = photoUrl, size = style.photoSize())
+        PersonCardCaption(name = name, subtitle = subtitle, nameLines = style.nameLines())
     }
 }
 
@@ -95,23 +107,40 @@ fun PersonCard(
  * @group feedback
  */
 @Composable
-fun PersonCardSkeleton(modifier: Modifier = Modifier, description: String? = null) {
+fun PersonCardSkeleton(
+    modifier: Modifier = Modifier,
+    description: String? = null,
+    style: PersonCardStyle = PersonCardStyle.Default,
+) {
     Column(
-        modifier = modifier.width(dimensionResource(R.dimen.person_card_width)).describedAs(description),
+        modifier = modifier.width(style.tileWidth()).describedAs(description),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
             modifier = Modifier
-                .size(dimensionResource(R.dimen.person_card_photo_size))
+                .size(style.photoSize())
                 .skeleton(visible = true, shape = BingeShapes.Pill),
         )
-        PersonCardCaption(name = null, subtitle = null)
+        PersonCardCaption(name = null, subtitle = null, nameLines = style.nameLines())
     }
 }
 
 @Composable
-private fun PersonPhoto(name: String, photoUrl: String?) {
-    val size = dimensionResource(R.dimen.person_card_photo_size)
+private fun PersonCardStyle.tileWidth() =
+    dimensionResource(if (this == PersonCardStyle.Compact) R.dimen.person_card_compact_width else R.dimen.person_card_width)
+
+@Composable
+private fun PersonCardStyle.photoSize() =
+    dimensionResource(if (this == PersonCardStyle.Compact) R.dimen.cast_avatar_size else R.dimen.person_card_photo_size)
+
+private fun PersonCardStyle.nameLines() = if (this == PersonCardStyle.Compact) 1 else NAME_LINES
+
+@Composable
+private fun PersonPhoto(
+    name: String,
+    photoUrl: String?,
+    size: Dp,
+) {
     Box(
         modifier = Modifier
             .size(size)
@@ -167,7 +196,11 @@ private fun PersonInitials(name: String) {
  * there, so the placeholder cannot drift from the room the card takes.
  */
 @Composable
-private fun PersonCardCaption(name: String?, subtitle: String?) {
+private fun PersonCardCaption(
+    name: String?,
+    subtitle: String?,
+    nameLines: Int,
+) {
     val style = MaterialTheme.typography.bodySmall
     val nameStyle = style.copy(fontWeight = FontWeight.Medium)
     Box(
@@ -176,14 +209,14 @@ private fun PersonCardCaption(name: String?, subtitle: String?) {
             .padding(top = dimensionResource(R.dimen.padding_s))
             .padding(horizontal = dimensionResource(R.dimen.padding_xs)),
     ) {
-        // Three lines of the caption's own style, drawn in nothing: the height comes from the same text layout the real lines use, so it
+        // One line more than the name's, of the caption's own style, drawn in nothing: the height comes from the same text layout the real lines use, so it
         // cannot come out shorter than they do at any font scale, as a height worked out from the line height can.
         Text(
             text = " ",
             style = nameStyle,
             color = Color.Transparent,
-            minLines = CAPTION_LINES,
-            maxLines = CAPTION_LINES,
+            minLines = nameLines + 1,
+            maxLines = nameLines + 1,
             modifier = Modifier.fillMaxWidth(),
         )
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -193,7 +226,7 @@ private fun PersonCardCaption(name: String?, subtitle: String?) {
                     style = nameStyle,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
-                    maxLines = NAME_LINES,
+                    maxLines = nameLines,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -214,4 +247,3 @@ private fun PersonCardCaption(name: String?, subtitle: String?) {
 }
 
 private const val NAME_LINES = 2
-private const val CAPTION_LINES = NAME_LINES + 1
