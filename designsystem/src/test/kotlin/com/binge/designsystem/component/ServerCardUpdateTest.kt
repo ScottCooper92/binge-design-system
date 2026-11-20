@@ -7,12 +7,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.TestTheme
@@ -140,4 +143,50 @@ class ServerCardUpdateClippingTest {
             ServerCardUpdate("Update available: 2.6.0", "Release notes", onClick = {
             }),
         )
+
+    private fun show(fontScale: Float, update: ServerCardUpdate) {
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, fontScale)) {
+                TestTheme { ServerCard(title = "Home", logo = rememberVectorPainter(Icons.Filled.Tv), update = update) }
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    private val update = ServerCardUpdate("Update available: 2.6.0", "Release notes", onClick = {})
+
+    private fun labelLayout(): TextLayoutResult {
+        val layouts = mutableListOf<TextLayoutResult>()
+        rule
+            .onNodeWithText("Update available: 2.6.0", useUnmergedTree = true)
+            .fetchSemanticsNode()
+            .config[SemanticsActions.GetTextLayoutResult]
+            .action
+            ?.invoke(layouts)
+        return layouts.single()
+    }
+
+    @Test
+    fun `at 2_0 the label breaks only between words and the action wraps under it`() {
+        show(fontScale = 2f, update)
+
+        val label = rule.onNodeWithText("Update available: 2.6.0", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val action = rule.onNodeWithText("Release notes", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val layout = labelLayout()
+        val text = layout.layoutInput.text.text
+        for (line in 1 until layout.lineCount) {
+            assertEquals("the label breaks inside a word at line $line", ' ', text[layout.getLineStart(line) - 1])
+        }
+        assertTrue("the action is not under the label: ${action.top} vs ${label.bottom}", action.top >= label.bottom)
+    }
+
+    @Test
+    fun `at the normal font the action stays on the label's line`() {
+        show(fontScale = 1f, update)
+
+        val label = rule.onNodeWithText("Update available: 2.6.0", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val action = rule.onNodeWithText("Release notes", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("the action dropped under the label", action.top < label.bottom)
+        assertTrue("the action is not after the label", action.left >= label.right)
+    }
 }

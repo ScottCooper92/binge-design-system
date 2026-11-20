@@ -241,7 +241,11 @@ private fun ServerCardHeader(
     }
 }
 
-/** The update row: a tonal caution wash, an arrow, the label and, at the end, the action. One button, the whole width. */
+/**
+ * The update row: a tonal caution wash, an arrow, the label and, at the end, the action. One button, the whole width. Where the label and
+ * the action do not fit on one line, the action wraps under the label.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ServerCardUpdateRow(update: ServerCardUpdate) {
     val accent = BingeSentiment.Caution.accent()
@@ -270,18 +274,27 @@ private fun ServerCardUpdateRow(update: ServerCardUpdate) {
                 contentDescription = null,
                 modifier = Modifier.size(dimensionResource(R.dimen.server_card_update_icon)),
             )
-            Text(text = update.label, style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+            // The label and the action share a line while they fit, with the action at the end. When they do not (a large font, a long
+            // action), the action drops under the label instead of squeezing it into one-word lines.
+            FlowRow(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+                itemVerticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = update.actionLabel, style = MaterialTheme.typography.labelMedium)
-                update.actionTrailingIcon?.let { mark ->
-                    Icon(
-                        imageVector = mark,
-                        contentDescription = update.actionTrailingContentDescription,
-                        modifier = Modifier.size(dimensionResource(R.dimen.server_card_update_trailing_icon)),
-                    )
+                Text(text = update.label, style = MaterialTheme.typography.labelLarge)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+                ) {
+                    Text(text = update.actionLabel, style = MaterialTheme.typography.labelMedium)
+                    update.actionTrailingIcon?.let { mark ->
+                        Icon(
+                            imageVector = mark,
+                            contentDescription = update.actionTrailingContentDescription,
+                            modifier = Modifier.size(dimensionResource(R.dimen.server_card_update_trailing_icon)),
+                        )
+                    }
                 }
             }
         }
