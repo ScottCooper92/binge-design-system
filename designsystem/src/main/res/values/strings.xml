@@ -48,6 +48,7 @@
     <string name="list_separator">", "</string>
     <!-- Announced with a poster card that is a favourite; the heart that marks it is never drawn with words. -->
     <string name="media_card_favourite">Favourite</string>
+    <!-- Announced with a poster card the viewer has finished; the tick that marks it is never drawn with words. -->
     <string name="media_card_watched">Watched</string>
     <plurals name="media_card_unwatched_count">
         <item quantity="one">%1$d unwatched</item>
