@@ -2,6 +2,7 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.PreviewSystemBarInsets
 import com.binge.designsystem.preview.ScreenWidthPreviews
 import com.binge.designsystem.preview.WorstCaseFontPreviews
 
@@ -59,6 +60,18 @@ class SearchScreenSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun noResults() = SearchScreenNoResultsSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun noResultsExtras() = SearchScreenNoResultsExtrasSample()
+
+    /** [noResultsExtras] under system bars: the next step must clear the navigation bar, which a preview reports as 0dp without this. */
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun noResultsExtrasUnderSystemBars() = PreviewSystemBarInsets { SearchScreenNoResultsExtrasSample() }
 
     @PreviewTest
     @ScreenWidthPreviews
