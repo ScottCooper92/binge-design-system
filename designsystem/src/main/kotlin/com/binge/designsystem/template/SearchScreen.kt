@@ -156,7 +156,7 @@ class SearchCallbacks(
 
 /**
  * A search screen on the large collapsing bar: the title gives way as results scroll, and the field and the type chips stay pinned under
- * it. Below is whichever of the idle offer (recent searches, then the app's own rails), a spinner, a grid of [MediaResultRow]s that loads
+ * it. Below is whichever of the idle offer (recent searches, then the app's own rails), rows of loading plates, a grid of [MediaResultRow]s that loads
  * more near its end, a no-results plate or a failure the state calls for. The grid is capped at the search width and folds into
  * columns on wider windows.
  *
@@ -265,6 +265,8 @@ private fun SearchBody(
     noResultsExtras: (@Composable () -> Unit)?,
     failedContent: (@Composable (Modifier) -> Unit)?,
 ) {
+    // The plates (no results, failed, a type with nothing in it) clear the navigation bar and the floating pill as the lists do.
+    val platePadding = navOverlayPadding(PaddingValues(top = top, bottom = bottom))
     when (state) {
         is SearchState.Idle ->
             IdleBody(
@@ -289,10 +291,11 @@ private fun SearchBody(
                     contentPadding = resultsPadding(top, bottom),
                     moreFailedLabel = moreFailedLabel,
                     resultTrailing = resultTrailing,
+                    platePadding = platePadding,
                 )
             }
         is SearchState.NoResults ->
-            Column(Modifier.fillMaxSize().padding(top = top)) {
+            Column(Modifier.fillMaxSize().padding(platePadding)) {
                 EmptyScreen(
                     message = state.message,
                     modifier = Modifier.weight(1f),
@@ -302,12 +305,12 @@ private fun SearchBody(
             }
         is SearchState.Failed ->
             if (failedContent != null) {
-                failedContent(Modifier.fillMaxSize().padding(top = top))
+                failedContent(Modifier.fillMaxSize().padding(platePadding))
             } else {
                 ErrorScreen(
                     kind = state.kind,
                     onRetry = callbacks.onRetry.takeIf { state.retryable },
-                    modifier = Modifier.fillMaxSize().padding(top = top),
+                    modifier = Modifier.fillMaxSize().padding(platePadding),
                     title = state.title,
                     message = state.message,
                 )
@@ -487,6 +490,7 @@ private fun ResultsList(
     contentPadding: PaddingValues,
     moreFailedLabel: String,
     resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)?,
+    platePadding: PaddingValues,
 ) {
     val gridState = rememberLazyGridState()
     val nearEnd by remember {
@@ -501,7 +505,11 @@ private fun ResultsList(
     val empty = state.results.isEmpty()
     val settled = !state.hasMore && !state.appending && !state.appendFailed
     if (empty && settled) {
-        EmptyScreen(message = state.emptyMessage, title = state.emptyTitle ?: stringResource(R.string.empty_screen_title))
+        EmptyScreen(
+            message = state.emptyMessage,
+            modifier = Modifier.fillMaxSize().padding(platePadding),
+            title = state.emptyTitle ?: stringResource(R.string.empty_screen_title),
+        )
         return
     }
     // One column on a phone; wider windows fold the results into columns rather than running a row the width of a tablet.

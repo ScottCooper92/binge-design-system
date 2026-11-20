@@ -4,9 +4,14 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -74,6 +79,7 @@ private fun SampleSearch(
     initialType: String = "all",
     withTrailing: Boolean = true,
     idleExtras: (LazyListScope.() -> Unit)? = null,
+    noResultsExtras: (@Composable () -> Unit)? = null,
 ) {
     var text by remember { mutableStateOf(initialText) }
     var selected by remember { mutableStateOf(initialType) }
@@ -113,6 +119,7 @@ private fun SampleSearch(
                     null
                 },
             idleExtras = idleExtras,
+            noResultsExtras = noResultsExtras,
         )
         opened?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { opened = null }) }
     }
@@ -141,7 +148,7 @@ fun SearchScreenIdleExtrasSample() =
         },
     )
 
-/** A search under way: a spinner under the field. */
+/** A search under way: rows of loading plates under the field. */
 @Composable
 fun SearchScreenLoadingSample() = SampleSearch({ _, _ -> SearchState.Loading }, initialText = "past")
 
@@ -220,6 +227,26 @@ fun SearchScreenNoResultsSample() =
             )
         },
         initialText = "zzz",
+    )
+
+/** The same plate with the app's own next step under it, here a Browse all row: it sits clear of the navigation bar and the floating pill. */
+@Composable
+fun SearchScreenNoResultsExtrasSample() =
+    SampleSearch(
+        { selected, _ ->
+            SearchState.NoResults(
+                message = "Check the spelling or try fewer words.",
+                title = "Nothing for \"zzz\"",
+                types = types(selected, counts = true),
+            )
+        },
+        initialText = "zzz",
+        noResultsExtras = {
+            TextButton(onClick = {}, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Filled.Search, contentDescription = null)
+                Text("Browse all", modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_s)))
+            }
+        },
     )
 
 /** A chosen type with nothing in it, once every page has arrived. */
