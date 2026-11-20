@@ -30,9 +30,9 @@ import com.binge.designsystem.tv.template.TvHubItem
 import com.binge.designsystem.tv.template.TvHubRow
 import com.binge.designsystem.tv.template.TvTitleExtras
 
-private const val LongCount = 10
-private const val ShortCount = 4
-private const val LoopMin = 8
+private const val LONG_COUNT = 10
+private const val SHORT_COUNT = 4
+private const val LOOP_MIN = 8
 
 private val Extras = TvTitleExtras(
     logoUrl = "https://preview.invalid/logo.png",
@@ -63,7 +63,7 @@ private fun hubItem(index: Int) =
     )
 
 private val PopularThenPending = listOf(
-    TvHubRow(key = "popular", title = "Popular movies", items = List(LongCount) { hubItem(it) }),
+    TvHubRow(key = "popular", title = "Popular movies", items = List(LONG_COUNT) { hubItem(it) }),
     TvHubRow(key = "services", title = "On your services", items = emptyList<TvHubItem>(), isLoading = true),
 )
 
@@ -73,11 +73,11 @@ private fun Row(
     expanded: Boolean,
     isFocused: Boolean,
     extras: TvTitleExtras? = null,
-    count: Int = LongCount,
+    count: Int = LONG_COUNT,
     failure: String? = null,
 ) {
     val items = List(count) { hubItem(it) }
-    val titles = TvExpandingTitles(count = count, at = { items.getOrNull(it) }, loops = count >= LoopMin)
+    val titles = TvExpandingTitles(count = count, at = { items.getOrNull(it) }, loops = count >= LOOP_MIN)
     TvExpandingRowBody(
         title = "Popular movies",
         titles = titles,
@@ -91,8 +91,8 @@ private fun Row(
 
 @Composable
 private fun SeeAllRow(position: Int) {
-    val items = List(LongCount) { hubItem(it) }
-    val titles = TvExpandingTitles(count = LongCount, at = { items.getOrNull(it) }, loops = false, trailing = true)
+    val items = List(LONG_COUNT) { hubItem(it) }
+    val titles = TvExpandingTitles(count = LONG_COUNT, at = { items.getOrNull(it) }, loops = false, trailing = true)
     TvExpandingRowBody(
         title = "",
         titles = titles,
@@ -149,7 +149,7 @@ fun TvExpandingRowWithoutLogoSample() {
 /** A short row: the posters stop at its last title and the trailing spacer leaves room for them to slide to the slot. */
 @Composable
 fun TvExpandingShortRowAtLastTitleSample() {
-    SampleColumn { Row(position = ShortCount - 1, expanded = true, isFocused = true, count = ShortCount, extras = Extras) }
+    SampleColumn { Row(position = SHORT_COUNT - 1, expanded = true, isFocused = true, count = SHORT_COUNT, extras = Extras) }
 }
 
 /** The focused row mirrored: the slot, the strip's start and the previous poster's offset all swap sides. */
@@ -303,11 +303,11 @@ fun TvExpandingHubRowsOnlySample() {
 /** A row that ends in a See all card, on its last title: the card waits beside the slot, poster-sized, where the next title would be. */
 @Composable
 fun TvExpandingSeeAllLastTitleSample() {
-    SampleColumn { SeeAllRow(position = LongCount - 1) }
+    SampleColumn { SeeAllRow(position = LONG_COUNT - 1) }
 }
 
 /** One step right: the slot keeps the last title, unringed, and the ring and scale go to the card beside it. */
 @Composable
 fun TvExpandingSeeAllFocusedSample() {
-    SampleColumn { SeeAllRow(position = LongCount) }
+    SampleColumn { SeeAllRow(position = LONG_COUNT) }
 }
