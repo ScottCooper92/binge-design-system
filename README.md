@@ -227,6 +227,13 @@ A submodule pins a commit, so a consumer updates deliberately — `git submodule
 rather than being moved by whatever landed here today. That is the property that makes source-level
 sharing survivable across four repositories.
 
+## Lazy list keys
+
+A lazy list crashes on a duplicate key. Where a component adds an item of its own beside the items an app
+supplies (a carousel's end tile, a screen's footer, the TV hub's hero), that item's key starts with
+`binge:`. The prefix is reserved for the library. Do not start your own item keys with `binge:`, so they
+can never equal one of ours.
+
 ## Test fixtures
 
 Both modules ship `testFixtures` for a consumer's Robolectric tests. Depend on them with
