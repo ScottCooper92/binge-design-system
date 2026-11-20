@@ -25,6 +25,13 @@ import com.binge.designsystem.tv.R as TvR
 /** The pane's first category row, which the skeleton's first row reserves. */
 internal const val TV_FILTER_ANCHOR_FIRST_CATEGORY = "filter-first-category"
 
+/** The results grid's first cell, which the loading grid's first plate reserves. */
+internal const val TV_FILTER_ANCHOR_FIRST_CELL = "filter-first-cell"
+
+/** The anchor on the grid cell at [index]: the first only, in the resolved grid and its loading plates alike. */
+internal fun tvFilterCellModifier(index: Int): Modifier =
+    if (index == 0) Modifier.tvLayoutAnchor(TvLayoutAnchors.entry(TV_FILTER_ANCHOR_FIRST_CELL)) else Modifier
+
 /** Enough category rows to run off the pane, as the real list does. */
 private const val SKELETON_CATEGORY_ROWS = 10
 

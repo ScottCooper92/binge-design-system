@@ -44,11 +44,21 @@ import com.binge.designsystem.tv.R as TvR
 /** Posters across the poster grid. */
 const val TV_POSTER_GRID_COLUMNS = 4
 
-/** One poster of a [TvPosterGrid]: its art, the name that stands in for it when there is none, and what OK does. */
+/**
+ * One poster of a [TvPosterGrid]: its art, the name that stands in for it when there is none, and what OK does.
+ *
+ * The marks are for a grid of titles the viewer has a relationship with, and each draws nothing by default: [watched] a tick,
+ * [unwatchedCount] a count badge for a show with episodes left (zero or less draws none), [favourite] a heart, and [progress]
+ * a bar along the foot for how far through it they are, a fraction from 0 to 1 (null draws none).
+ */
 class TvPosterCell(
     val imageUrl: String?,
     val title: String,
     val onClick: () -> Unit,
+    val watched: Boolean = false,
+    val unwatchedCount: Int = 0,
+    val favourite: Boolean = false,
+    val progress: Float? = null,
 )
 
 /**
@@ -202,6 +212,7 @@ private fun TvPosterGridCell(
                 },
             )
         }
+        if (poster != null) TvPosterMarks(poster)
         if (focused) PosterFocusRing()
     }
 }
