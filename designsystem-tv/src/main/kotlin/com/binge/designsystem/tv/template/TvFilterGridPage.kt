@@ -44,6 +44,14 @@ import com.binge.designsystem.tv.R as TvR
  *
  * The page draws no copy of its own: [paneCopy] and [gridCopy] carry every word. The rest of the parameters are [TvFilterPaneHost]'s.
  *
+ * The results side and the range scale are internal, so a host's test cannot drive them directly. Their paths are covered here, by the
+ * design system's own tests, which a host can rely on and need not copy: `TvFilterResultsRetryFocusTest` (Try again's hand-off of focus
+ * to the first title, a failure retried again, and the wording by error kind), `TvFilterGridPageStaleResultsTest` (the stale line, its
+ * retry and the claim of focus, with a reload through the shell), `TvFilterGridPageFocusTest` (arrival, each side's remembered position,
+ * the visit depth), `TvFilterGridPageGeometryTest` (the shell lands where the page does) and, for the range pick rules,
+ * `TvFilterRangeLogicTest` and `TvFilterPaneFocusTest`. A host's own test finds the page's first category and first cell by
+ * [TV_FILTER_ANCHOR_FIRST_CATEGORY] and [TV_FILTER_ANCHOR_FIRST_CELL].
+ *
  * @need lay out a tv filter pane beside a grid of results that follow it
  * @group tv
  * @replaces a hand-built tv discover page with its own pane, grid and focus hand-offs

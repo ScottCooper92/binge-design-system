@@ -22,11 +22,17 @@ import com.binge.designsystem.tv.layout.tvLayoutAnchor
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
-/** The pane's first category row, which the skeleton's first row reserves. */
-internal const val TV_FILTER_ANCHOR_FIRST_CATEGORY = "filter-first-category"
+/**
+ * The layout anchor on the pane's first category row, which the loading shell's first row reserves. It is the tag a host's test
+ * finds the row by (`TvLayoutAnchors.entry(TV_FILTER_ANCHOR_FIRST_CATEGORY)`), so it is public for those tests and for nothing else.
+ */
+const val TV_FILTER_ANCHOR_FIRST_CATEGORY = "filter-first-category"
 
-/** The results grid's first cell, which the loading grid's first plate reserves. */
-internal const val TV_FILTER_ANCHOR_FIRST_CELL = "filter-first-cell"
+/**
+ * The layout anchor on the results grid's first cell, which the loading grid's first plate reserves. It is the tag a host's test finds
+ * the cell by (`TvLayoutAnchors.entry(TV_FILTER_ANCHOR_FIRST_CELL)`), so it is public for those tests and for nothing else.
+ */
+const val TV_FILTER_ANCHOR_FIRST_CELL = "filter-first-cell"
 
 /** The anchor on the grid cell at [index]: the first only, in the resolved grid and its loading plates alike. */
 internal fun tvFilterCellModifier(index: Int): Modifier =
