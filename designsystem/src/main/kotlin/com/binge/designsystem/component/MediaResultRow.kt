@@ -49,7 +49,8 @@ enum class MediaResultKind {
  * One result of a search, as plain values. [key] is the app's identity for it as text, so a lazy list can save it.
  * [subtitle] is a line the app has already worded (a kind and a year, a role); [meta] is a second muted line, such as genres. [favourite] and
  * [watched] draw a heart and a tick beside the name, the same marks a poster card draws, so an app words a mark one way across the grid and
- * the search; the `trailing` slot of the row stays for anything else.
+ * the search; the `trailing` slot of the row stays for anything else. [blurb] is a short passage (an overview), drawn last in up to three lines
+ * and ellipsized; a result with none takes no room for it.
  */
 @Immutable
 class MediaResult(
@@ -62,6 +63,7 @@ class MediaResult(
     val meta: String? = null,
     val favourite: Boolean = false,
     val watched: Boolean = false,
+    val blurb: String? = null,
 )
 
 /**
@@ -135,6 +137,16 @@ fun MediaResultRow(
                         )
                     }
                 }
+            }
+            result.blurb?.let {
+                Spacer(Modifier.height(gap))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = BLURB_MAX_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }
@@ -220,6 +232,7 @@ private fun SkeletonPicture(kind: MediaResultKind) {
     }
 }
 
+private const val BLURB_MAX_LINES = 3
 private const val NAME_PLATE_FRACTION = 0.6f
 private const val SUBTITLE_PLATE_FRACTION = 0.4f
 private const val STILL_ASPECT_RATIO = 16f / 9f
