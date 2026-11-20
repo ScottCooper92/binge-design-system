@@ -48,6 +48,10 @@ private const val TV_MEDIA_GRID_PLATE_ASPECT_RATIO = 2f / 3f
 
 /**
  * A D-pad grid of posters: what a "see all" tile opens onto, and what the Discover destination is.
+ *
+ * @need lay out a d-pad grid of cells that remembers the cell last focused on a tv screen
+ * @group tv
+ * @replaces a hand-built tv LazyVerticalGrid with its own entry focus
  */
 @Composable
 fun TvCardGrid(
@@ -128,6 +132,10 @@ fun tvMediaGridPadding(): PaddingValues =
 
 /**
  * The grid's own loading state: plates in the geometry the results will occupy.
+ *
+ * @need show plates where a tv grid's cells will be while it loads
+ * @group tv
+ * @replaces a hand-built tv grid skeleton
  */
 @Composable
 fun TvMediaGridSkeleton(
@@ -157,7 +165,10 @@ fun TvMediaGridSkeleton(
     }
 }
 
-/** One empty cell, at the poster shape the real card will take. */
+/** One empty cell, at the poster shape the real card will take. *
+ * @need draw one empty poster-shaped plate in a tv grid skeleton
+ * @group tv
+ */
 @Composable
 fun TvMediaGridPlate() {
     Box(

@@ -15,6 +15,9 @@ import com.binge.designsystem.theme.BingeShapes
 
 /**
  * One line of copy, as a loading skeleton draws it: a plate of [widthFraction] × [height]. [color] is for a plate on a card.
+ *
+ * @need draw one line of copy as a loading plate on a tv screen
+ * @group tv
  */
 @Composable
 fun TvSkeletonPlate(

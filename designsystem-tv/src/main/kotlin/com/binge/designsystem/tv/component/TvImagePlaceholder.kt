@@ -32,6 +32,10 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * What a TV image slot paints when there is no image: a type glyph over the [title]. TV cards are
  * poster-only (no caption), so a card with no artwork otherwise identifies nothing at all (#1497).
+ *
+ * @need paint a type glyph over a title where a tv image has none
+ * @group tv
+ * @replaces a hand-built tv missing-image plate
  */
 @Composable
 fun TvImagePlaceholder(

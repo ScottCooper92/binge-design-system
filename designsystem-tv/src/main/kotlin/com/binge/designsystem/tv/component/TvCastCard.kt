@@ -39,6 +39,10 @@ import com.binge.designsystem.tv.R as TvR
  *
  * Focus is a parameter. [avatar] is a composition slot.
  * Aspect is fixed (1:1) but width is not — the row decides that, so a grid cell can size it differently.
+ *
+ * @need show a person as a circular picture with a name and role on a tv screen
+ * @group tv
+ * @replaces a hand-built tv cast cell
  */
 @Composable
 fun TvCastCard(
@@ -98,6 +102,9 @@ fun TvCastCard(
  *
  * Loading keeps a bare plate; error routes to the shared [TvImagePlaceholder] glyph — a blank circle beside
  * filled ones reads as broken, where a blank plate reads as loading.
+ *
+ * @need draw a headshot, or a person glyph where there is none
+ * @group tv
  */
 @Composable
 fun TvCastCardAvatar(profileUrl: String?) {
