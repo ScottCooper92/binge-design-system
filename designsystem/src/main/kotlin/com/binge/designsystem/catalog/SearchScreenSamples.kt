@@ -25,6 +25,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.SearchCallbacks
 import com.binge.designsystem.template.SearchScreen
 import com.binge.designsystem.template.SearchState
+import com.binge.designsystem.template.SearchTypeChip
 import com.binge.designsystem.template.SearchTypes
 import com.binge.designsystem.theme.BingeSentiment
 import kotlinx.coroutines.delay
