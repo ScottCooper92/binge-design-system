@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,20 +78,27 @@ private val LongTitleItem = SampleGridItem(
 private fun gridResults(items: List<SampleGridItem>): TvGridResults<SampleGridItem> =
     TvGridResults.Items(items.size, { items[it].id }, { items[it] })
 
+/**
+ * The catalog's grid page keeps its own results, seeded with the ones the frame shows. Try again and Clear filters move a failure or
+ * an empty result to the items, as a real source does: a retry must leave the failure state, or the focus hold would never end.
+ */
 @Composable
 private fun SampleGrid(
     results: TvGridResults<SampleGridItem>,
     modifier: Modifier = Modifier,
     heading: String = "Horror",
     initialFocused: TvGridFocus<SampleGridItem>? = null,
-    emptyAction: TvGridAction? = null,
+    withEmptyAction: Boolean = false,
     retryHolding: Boolean = false,
 ) {
+    var current by remember { mutableStateOf(results) }
+    val toItems = { current = gridResults(GridItems) }
+    val emptyAction = TvGridAction(label = "Clear filters", onClick = toItems).takeIf { withEmptyAction }
     TvGridPage(
         heading = heading,
-        results = results,
+        results = current,
         onItemClick = {},
-        onRetry = {},
+        onRetry = toItems,
         emptyMessage = "No movies match",
         artwork = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) },
         copy = { item ->
@@ -172,11 +181,7 @@ fun TvGridPageFailedSample() {
 /** An empty result with its one action: message and button sit as one centred block, with no backdrop. */
 @Composable
 fun TvGridPageEmptySample() {
-    SampleGrid(
-        results = TvGridResults.Empty,
-        heading = "Science Fiction",
-        emptyAction = TvGridAction(label = "Clear filters") {},
-    )
+    SampleGrid(results = TvGridResults.Empty, heading = "Science Fiction", withEmptyAction = true)
 }
 
 /** An empty result with nothing to press: the plate takes focus so the remote has somewhere to be. */
