@@ -226,7 +226,7 @@ fun HeroDetailLazyScreen(
                 ) {
                     item(key = HERO_ITEM_KEY) { MeasuredHero(measured, hero) }
                     content()
-                    item(key = FILL_ITEM_KEY) { Spacer(Modifier.height(fill.value)) }
+                    item(key = FILL_ITEM_KEY) { Spacer(Modifier.height(with(LocalDensity.current) { fill.value.toDp() })) }
                 }
             }
         }
@@ -316,31 +316,37 @@ private const val HERO_ITEM_KEY = "hero-detail-hero"
 private const val FILL_ITEM_KEY = "hero-detail-fill"
 
 /**
- * The height of the spacer item that ends a lazy hero page, as the eager page's `heightIn(min = viewport)` does: the items under
+ * The height, in px, of the spacer item that ends a lazy hero page, as the eager page's `heightIn(min = viewport)` does: the items under
  * the hero (the list's items less the hero and the spacer) are kept at least a viewport tall, so a short page can scroll the whole
  * hero away and the bar's hand-over finishes. It is the viewport less those items' laid-out extent, from the first of them to the
  * last, which takes in the spacing between them. The hero is left out of the sum, so it leaving the visible items on a scroll does
- * not change the size; the spacer is left out, so it does not feed back into its own height. When any item under the hero is not
- * laid out the list is long, and the spacer is zero.
+ * not change the size; the spacer is left out, so it does not feed back into its own height.
+ *
+ * Only an item below the viewport makes the page long, and then the spacer is zero. An item that has scrolled off the top does not:
+ * at the end of a short page the first items can sit above the viewport (the fill puts the end of the content at the viewport's
+ * bottom, so a small first item is pushed up past the spacing and the bottom padding). The size is then kept as it was, since it
+ * was already in effect, rather than worked out again from the items still visible, which would shrink it and snap the list back.
  */
 @Composable
-private fun rememberShortPageFill(listState: LazyListState): State<Dp> {
-    val density = LocalDensity.current
-    return remember(listState, density) {
+private fun rememberShortPageFill(listState: LazyListState): State<Int> =
+    remember(listState) {
+        var last = 0
         derivedStateOf {
             val info = listState.layoutInfo
             val spacerIndex = info.totalItemsCount - 1
             val under = info.visibleItemsInfo.filter { it.index in 1 until spacerIndex }
-            val allLaidOut = under.size == spacerIndex - 1
-            if (!allLaidOut) {
-                0.dp
-            } else {
-                val extent = if (under.isEmpty()) 0 else under.maxOf { it.offset + it.size } - under.minOf { it.offset }
-                with(density) { (info.viewportSize.height - extent).coerceAtLeast(0).toDp() }
-            }
+            val first = under.minOfOrNull { it.index }
+            last =
+                when {
+                    spacerIndex < 1 -> last
+                    spacerIndex == 1 -> info.viewportSize.height
+                    first == null || first > 1 -> last
+                    under.none { it.index == spacerIndex - 1 } -> 0
+                    else -> (info.viewportSize.height - (under.maxOf { it.offset + it.size } - under.minOf { it.offset })).coerceAtLeast(0)
+                }
+            last
         }
     }
-}
 
 /**
  * The outer frame both forms share: no bar of the Scaffold's own, since the overlay bar clears the status bar

@@ -2,7 +2,9 @@ package com.binge.designsystem.template
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListState
@@ -44,7 +46,13 @@ class HeroDetailLazyShortPageTest {
     private var state: LazyListState? = null
     private var heroPx = 0
 
-    private fun show(items: Int, itemHeight: Int = 40) {
+    private fun show(
+        items: Int,
+        itemHeight: Int = 40,
+        spacing: Int = 0,
+        bottomPadding: Int = 0,
+        leading: Int? = null,
+    ) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
                 val listState = rememberLazyListState()
@@ -55,8 +63,11 @@ class HeroDetailLazyShortPageTest {
                     onBack = {},
                     listState = listState,
                     heroHeight = HERO_HEIGHT,
+                    verticalArrangement = Arrangement.spacedBy(spacing.dp),
+                    contentPadding = PaddingValues(bottom = bottomPadding.dp),
                     hero = { Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(Color.DarkGray)) },
                 ) {
+                    leading?.let { item { Box(Modifier.fillMaxWidth().height(it.dp)) } }
                     items(items) { Box(Modifier.fillMaxWidth().height(itemHeight.dp)) { Text("Item $it") } }
                 }
             }
@@ -101,6 +112,21 @@ class HeroDetailLazyShortPageTest {
         assertEquals(offset, state!!.firstVisibleItemScrollOffset)
         assertTrue(heroScrolledOut())
         assertTrue(!state!!.canScrollForward)
+    }
+
+    @Test
+    fun `a small first item pushed above the viewport does not collapse the fill`() {
+        show(items = 1, spacing = 16, bottomPadding = 24, leading = 8)
+        scrollToEnd()
+        val index = state!!.firstVisibleItemIndex
+        val offset = state!!.firstVisibleItemScrollOffset
+
+        rule.mainClock.advanceTimeByFrame()
+        rule.waitForIdle()
+
+        assertTrue("the hero rests at $index/$offset of $heroPx px", heroScrolledOut())
+        assertEquals(index, state!!.firstVisibleItemIndex)
+        assertEquals(offset, state!!.firstVisibleItemScrollOffset)
     }
 
     @Test
