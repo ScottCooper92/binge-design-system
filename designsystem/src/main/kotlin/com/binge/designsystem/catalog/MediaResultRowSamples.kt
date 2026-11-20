@@ -113,3 +113,16 @@ fun MediaResultRowSkeletonSample() =
             MediaResultRowSkeleton(kind = MediaResultKind.Logo)
         }
     }
+
+/** A list whose rows carry a blurb of up to three lines, as a collection's parts do: the placeholder holds the same room, so the rows below do not shift when the list loads. */
+@Composable
+fun MediaResultRowSkeletonBlurbSample() =
+    ScreenshotTheme {
+        Column(
+            Modifier.padding(dimensionResource(R.dimen.screen_content_inset)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            MediaResultRowSkeleton(blurbLines = 3)
+            MediaResultRowSkeleton(blurbLines = 3)
+        }
+    }

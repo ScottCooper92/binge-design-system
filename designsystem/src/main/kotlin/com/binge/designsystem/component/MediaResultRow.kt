@@ -179,7 +179,9 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
 /**
  * What a search draws in a [MediaResultRow]'s place while it loads: the row's own chrome with a plate for the picture and two for the
  * name and the subtitle, at the picture's size, so the loading to content swap does not jump. [kind] picks the picture's shape, its box and the text's alignment as the row does.
- * [description] names the loading state for a screen reader; without one it stays silent.
+ * [description] names the loading state for a screen reader; without one it stays silent. [blurbLines] is for a list whose rows carry a blurb, which
+ * runs up to three lines: the plates then follow the row's own text (the name, the status line and that many blurb lines, each at its own
+ * font size), so the rows below do not shift down when the list loads.
  *
  * @need show a loading placeholder for a search result row
  * @group feedback
@@ -189,6 +191,7 @@ fun MediaResultRowSkeleton(
     modifier: Modifier = Modifier,
     kind: MediaResultKind = MediaResultKind.Poster,
     description: String? = null,
+    blurbLines: Int = 0,
 ) {
     val topAligned = kind == MediaResultKind.Poster || kind == MediaResultKind.Still
     ListRow(
@@ -197,16 +200,42 @@ fun MediaResultRowSkeleton(
         verticalAlignment = if (topAligned) Alignment.Top else Alignment.CenterVertically,
         leading = { SkeletonPicture(kind) },
     ) { contentModifier ->
+        val top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero)
+        if (blurbLines > 0) {
+            BlurbRowPlates(blurbLines, contentModifier.padding(top = top))
+            return@ListRow
+        }
         Column(
-            modifier = contentModifier.padding(
-                top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero),
-            ),
+            modifier = contentModifier.padding(top = top),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
             SkeletonPlate(Modifier.fillMaxWidth(NAME_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_name_height)))
             SkeletonPlate(
                 Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_subtitle_height)),
             )
+        }
+    }
+}
+
+/**
+ * The plates of a row that carries a blurb, laid out as [MediaResultRow] lays out its text: the name, the status line and [lines] lines
+ * of the blurb, each a line of its own style and the gaps the row has, so the height is the loaded row's at any font size. The fixed-height
+ * plates of a row with no blurb would stay as they are at a large font while the row's text grows, and the rows below would shift down.
+ */
+@Composable
+private fun BlurbRowPlates(lines: Int, modifier: Modifier) {
+    val gap = dimensionResource(R.dimen.detail_cast_avatar_label_spacing)
+    Column(modifier = modifier) {
+        TextPlate(MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(NAME_PLATE_FRACTION))
+        Spacer(Modifier.height(gap))
+        // The status line: a rating chip is a line of its label style with its own vertical padding.
+        TextPlate(
+            MaterialTheme.typography.labelMedium,
+            Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).padding(vertical = dimensionResource(R.dimen.rating_chip_padding_v)),
+        )
+        Spacer(Modifier.height(gap))
+        repeat(lines) { line ->
+            TextPlate(MaterialTheme.typography.bodyMedium, Modifier.fillMaxWidth(if (line == lines - 1) SUBTITLE_PLATE_FRACTION else 1f))
         }
     }
 }

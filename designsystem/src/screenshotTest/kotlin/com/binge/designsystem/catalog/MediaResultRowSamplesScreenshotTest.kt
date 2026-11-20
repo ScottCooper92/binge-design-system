@@ -45,4 +45,10 @@ class MediaResultRowSamplesScreenshotTest {
     @ComponentPreviews
     @Composable
     fun skeleton() = MediaResultRowSkeletonSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun skeletonBlurb() = MediaResultRowSkeletonBlurbSample()
 }
