@@ -51,7 +51,8 @@ const val PEOPLE_GRID_SKELETON_ROWS: Int = 4
 
 /**
  * One person in a [PeopleGridScreen]. [key] is the app's identity for them, text so a lazy grid can save it, and is handed back to
- * `onOpenPerson`. [role] is the line under the name (a character, a job); [description] replaces the spoken "name, role" when the app words it itself.
+ * `onOpenPerson`. It must be unique within its [PeopleGridSection]: a person who holds two jobs in one department is one entry there, with the jobs
+ * merged into [role], because a lazy grid throws on a duplicate key. The same person may appear in two sections. [role] is the line under the name (a character, a job); [description] replaces the spoken "name, role" when the app words it itself.
  */
 @Immutable
 class PeopleGridPerson(
