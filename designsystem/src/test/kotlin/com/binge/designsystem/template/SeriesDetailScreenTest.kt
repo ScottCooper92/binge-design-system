@@ -41,6 +41,7 @@ class SeriesDetailScreenTest {
         episodes: EpisodesState,
         seasons: List<SeasonRow> = this.seasons,
         callbacks: SeriesDetailCallbacks = SeriesDetailCallbacks(onSelectSeason = {}),
+        shown: Int? = null,
     ) {
         rule.setContent {
             ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
@@ -53,6 +54,7 @@ class SeriesDetailScreenTest {
                         episodesTitle = "Episodes",
                         seasonSubtitle = "Season One · 7 episodes",
                         viewAllLabel = "View all",
+                        shown = shown,
                     ),
                     callbacks = MediaDetailCallbacks(onBack = {}),
                     seriesCallbacks = callbacks,
@@ -105,5 +107,33 @@ class SeriesDetailScreenTest {
         show(EpisodesState.Failed("Gone.", retryable = false))
 
         rule.onAllNodesWithText("Try again").assertCountEquals(0)
+    }
+
+    private fun eight() = EpisodesState.Ready((1..8).map { EpisodeRow(it, "Episode $it", null) })
+
+    @Test
+    fun `with no shown count five episodes are drawn and View all offers the rest`() {
+        show(eight())
+
+        rule.onNodeWithText("Episode 5").assertExists()
+        rule.onNodeWithText("Episode 6").assertDoesNotExist()
+        rule.onNodeWithText("View all").assertExists()
+    }
+
+    @Test
+    fun `a shown count draws that many episodes`() {
+        show(eight(), shown = 7)
+
+        rule.onNodeWithText("Episode 7").assertExists()
+        rule.onNodeWithText("Episode 8").assertDoesNotExist()
+        rule.onNodeWithText("View all").assertExists()
+    }
+
+    @Test
+    fun `with every episode shown there is no View all`() {
+        show(eight(), shown = 8)
+
+        rule.onNodeWithText("Episode 8").assertExists()
+        rule.onNodeWithText("View all").assertDoesNotExist()
     }
 }

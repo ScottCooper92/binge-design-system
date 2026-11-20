@@ -20,7 +20,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.template.readingInset
 
 /** How many episodes a [DetailEpisodesSection] shows before it offers the rest. */
-private const val EPISODES_SHOWN = 5
+internal const val EPISODES_SHOWN = 5
 
 /**
  * One episode in a [DetailEpisodesSection]: its [number], [name], the [stillUrl], already built, its [rating] (null or zero draws none) and
