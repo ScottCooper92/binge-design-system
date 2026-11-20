@@ -7,7 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.tv.preview.TvPreviews
 import com.binge.designsystem.tv.preview.TvScreenshotTheme
 
-/** The destructive switch checked, focused above and unfocused below, so the pair reads as one colour (#911). */
+/** The destructive switch checked, focused above and unfocused below, so the pair reads as one colour. */
 class TvSwitchScreenshotTest {
     @PreviewTest
     @TvPreviews

@@ -12,7 +12,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 
 /**
  * [androidx.compose.ui.test.junit4.StateRestorationTester] without the `Bundle` and `Parcel` round-trip, for a test of what a
- * configuration change keeps (#1106).
+ * configuration change keeps.
  *
  * The framework's tester encodes the saved state into a `Bundle`, writes it to a `Parcel`, and reads it back. On Android 14,
  * which Robolectric runs as written, a `Bundle` read from a `Parcel` holds a value that needs class loading (a `Serializable`,

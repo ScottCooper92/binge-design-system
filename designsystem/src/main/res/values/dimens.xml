@@ -85,7 +85,7 @@
     <dimen name="provider_tile_check_badge_size">20dp</dimen>
     <dimen name="provider_tile_check_inset">5dp</dimen>
     <dimen name="provider_tile_check_icon">13dp</dimen>
-    <!-- The width the catalog samples pin a provider tile to, a typical grid cell. Not see_all_tile_width: that is the poster cell, and only matches by coincidence (#248). -->
+    <!-- The width the catalog samples pin a provider tile to, a typical grid cell. Not see_all_tile_width: that is the poster cell, and only matches by coincidence. -->
     <dimen name="provider_tile_sample_width">120dp</dimen>
     <!-- Selected-services summary, with a provider-picking grid -->
     <dimen name="services_summary_logo">24dp</dimen>
@@ -161,8 +161,8 @@
     -->
     <dimen name="pane_spacer">8dp</dimen>
     <!--
-      Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it
-      (#819). Below this the crease is close enough to the bottom edge that honouring it would leave a
+      Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it. Below
+      this the crease is close enough to the bottom edge that honouring it would leave a
       sheet too short to use, so it is ignored and the sheet keeps its own height.
     -->
     <dimen name="fold_safe_bottom_min_height">200dp</dimen>

@@ -65,7 +65,7 @@ fun StepFlowScreenInPaneSample() {
 }
 
 /**
- * A decision as one step of a flow, split-aware (#638): the hero in the flow's aside, the heading in its heading slot
+ * A decision as one step of a flow, split-aware: the hero in the flow's aside, the heading in its heading slot
  * and the points in its content, so a space wider than tall puts the hero and heading beside the points.
  */
 @Composable

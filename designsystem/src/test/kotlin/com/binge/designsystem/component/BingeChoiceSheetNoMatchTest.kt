@@ -19,7 +19,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
-/** A filter that matches nothing says so, in the single- and the multi-choice list (ephyra #579). */
+/** A filter that matches nothing says so, in the single- and the multi-choice list. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeChoiceSheetNoMatchTest {

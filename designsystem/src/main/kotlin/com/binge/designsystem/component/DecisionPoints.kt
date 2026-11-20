@@ -79,7 +79,7 @@ private fun DecisionPointRow(point: DecisionPoint) {
 /**
  * The decorative plate that heads a decision: [icon] in a hero-shaped plate, with [badge] on its corner. Public so a
  * decision that is one step of a `StepFlowScreen` can put it in the flow's aside, where a split step keeps it beside
- * the heading rather than in the content's scroll (#638).
+ * the heading rather than in the content's scroll.
  *
  * @need head a decision screen with an icon and a badge
  * @group media

@@ -331,7 +331,7 @@ private class SelectPress {
  *
  * Only a whole press starts it: the key-up must follow a key-down the frame saw while not editing. A hardware Enter
  * that submits does so on its key-down, inside the input, and focus is back on the frame before its key-up arrives;
- * that key-up belongs to the submit, and acting on it would raise the keyboard straight after it (#598).
+ * that key-up belongs to the submit, and acting on it would raise the keyboard straight after it.
  */
 private fun Modifier.editOnSelect(
     enabled: Boolean,

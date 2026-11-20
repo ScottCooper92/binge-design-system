@@ -15,7 +15,7 @@ import org.robolectric.annotation.Config
 
 private const val SYNOPSIS = "Batman raises the stakes in his war on crime with the help of Lt. Jim Gordon."
 
-/** The cinematic header's full-synopsis sheet stays open across a recreation, as [ExpandableOverview]'s expansion does (#377). */
+/** The cinematic header's full-synopsis sheet stays open across a recreation, as [ExpandableOverview]'s expansion does. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class DetailCinematicHeaderSynopsisTest {

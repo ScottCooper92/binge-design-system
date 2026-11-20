@@ -26,7 +26,7 @@ private const val ROOT = "Root page"
 private const val DETAIL = "Detail page"
 
 /**
- * A task sheet's pages transition (#1272): a pushed page slides in from the end edge as the old one eases away, a popped one the
+ * A task sheet's pages transition: a pushed page slides in from the end edge as the old one eases away, a popped one the
  * reverse, mirrored in a right-to-left layout; under reduced motion nothing slides and the swap is a short fade. A page that is popped
  * is reported to `onPageBack` once it has finished leaving, not while it is still on screen. The clock is paused so a frame part-way
  * through can be read.

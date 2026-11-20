@@ -19,7 +19,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
-/** The overview's toggle, which frames show only seeded (#394): it flips, and reports the expand alone. */
+/** The overview's toggle, which frames show only seeded: it flips, and reports the expand alone. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class ExpandableOverviewTest {

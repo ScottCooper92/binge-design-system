@@ -33,7 +33,7 @@ private val Cutout = 32.dp
 
 /**
  * A bar mounted under a custom rail that overlays its start edge, with no pane beside it, starts past the rail: the
- * title and the back button both, as the body below it does (#605).
+ * title and the back button both, as the body below it does.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w800dp-h400dp")
