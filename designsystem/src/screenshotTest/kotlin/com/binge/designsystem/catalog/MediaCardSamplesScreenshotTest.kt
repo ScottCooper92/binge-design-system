@@ -144,4 +144,20 @@ class MediaCardSamplesScreenshotTest {
     fun FavouriteWide() {
         MediaCardFavouriteWideSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun Watched() {
+        MediaCardWatchedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun UnwatchedCount() {
+        MediaCardUnwatchedCountSample()
+    }
 }
