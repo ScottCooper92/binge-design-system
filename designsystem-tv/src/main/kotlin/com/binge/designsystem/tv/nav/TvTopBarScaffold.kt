@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -104,7 +105,10 @@ class TvTopBarSlots(
  * tab off [homeKey] goes home. Entering the bar focuses the tab it was last left on.
  *
  * The avatar's menu is [accountRows], built by the app (the menu's rows are the app's own words and destinations); a signed-out
- * header, with no display name, is a plain tab. [iconOnlyKeys] are the tabs drawn as an icon alone. [rootModifier] is applied to
+ * header, with no display name, is a plain tab. [accountDetail] is a line under the name, [accountTag] a label beside it (a demo
+ * account's "Demo"), [accountExtraContent] a slot under the header (a quota line) and [accountInitiallyOpen] opens the menu for a
+ * frame. [pendingKeys] are tabs the host has not yet resolved (which the account gets, from a server): hidden and unfocusable, with the
+ * selection kept. All of these default to the behaviour without them. [iconOnlyKeys] are the tabs drawn as an icon alone. [rootModifier] is applied to
  * the scaffold's root after the shell's own key handling, for an app's debug hook. [gearReturnEpoch] moving puts focus on the end
  * button once, for the sheet it opened closing.
  *
@@ -126,7 +130,12 @@ fun TvTopBarScaffold(
     contentFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
     accountRows: List<TvAccountMenuRow> = emptyList(),
+    accountDetail: String? = null,
+    accountTag: String? = null,
+    accountExtraContent: (@Composable ColumnScope.() -> Unit)? = null,
+    accountInitiallyOpen: Boolean = false,
     iconOnlyKeys: Set<Any> = emptySet(),
+    pendingKeys: Set<Any> = emptySet(),
     rootModifier: Modifier = Modifier,
     gearReturnEpoch: Int = 0,
     content: @Composable () -> Unit,
@@ -155,7 +164,14 @@ fun TvTopBarScaffold(
     GearReturnEffect(gearReturnEpoch, slots.footer.key) { barEntryOverride = it }
     BarEntryEffect(barEntryOverride, requesters, barHasFocus = { barHasFocus }) { barEntryOverride = null }
 
-    val account = TvTopBarAccount(rows = accountRows, onOpenChange = { menuOpen = it })
+    val account = TvTopBarAccount(
+        rows = accountRows,
+        onOpenChange = { menuOpen = it },
+        detail = accountDetail,
+        tag = accountTag,
+        extraContent = accountExtraContent,
+        initiallyOpen = accountInitiallyOpen,
+    )
 
     Box(
         modifier = modifier
@@ -175,6 +191,7 @@ fun TvTopBarScaffold(
                 entryOverride = barEntryOverride,
                 account = account,
                 iconOnlyKeys = iconOnlyKeys,
+                pendingKeys = pendingKeys,
             )
             Box(
                 modifier = Modifier

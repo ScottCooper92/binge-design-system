@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Report
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tv
@@ -22,9 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.R
 import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.nav.TvAccountMenuRow
 import com.binge.designsystem.tv.nav.TvNavItem
 import com.binge.designsystem.tv.nav.TvTopBarAvatarSurface
 import com.binge.designsystem.tv.nav.TvTopBarScaffold
@@ -32,6 +37,18 @@ import com.binge.designsystem.tv.nav.TvTopBarSlots
 
 private const val SEARCH = "search"
 private const val MOVIES = "movies"
+
+private val PendingSlots = TvTopBarSlots(
+    header = TvNavItem(key = "account", label = "Account", icon = Icons.Filled.Person, displayName = "Scott Cooper"),
+    items = listOf(
+        TvNavItem(key = SEARCH, label = "Search", icon = Icons.Filled.Search),
+        TvNavItem(key = MOVIES, label = "Movies", icon = Icons.Filled.Movie),
+        TvNavItem(key = "tv", label = "TV shows", icon = Icons.Filled.Tv),
+        TvNavItem(key = "requests", label = "Requests", icon = Icons.Filled.Bookmark),
+        TvNavItem(key = "issues", label = "Issues", icon = Icons.Filled.Report),
+    ),
+    footer = TvNavItem(key = "settings", label = "Settings", icon = Icons.Filled.Settings),
+)
 
 private val ScaffoldSlots = TvTopBarSlots(
     header = TvNavItem(key = "account", label = "Account", icon = Icons.Filled.Person, displayName = "Scott Cooper"),
@@ -61,6 +78,52 @@ fun TvTopBarScaffoldSample() {
         overlayOpen = false,
         contentFocusRequester = content,
         iconOnlyKeys = setOf(SEARCH),
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            TvButton(label = "Page content", onClick = {}, modifier = Modifier.focusRequester(content))
+        }
+    }
+}
+
+/** The scaffold with the avatar's menu open, showing its detail line, a "Demo" tag beside the name and an extra line under the header. */
+@Composable
+fun TvTopBarScaffoldAccountMenuSample() {
+    val content = remember { FocusRequester() }
+    TvTopBarScaffold(
+        slots = ScaffoldSlots,
+        selectedKey = MOVIES,
+        homeKey = MOVIES,
+        onSelect = {},
+        contentDepth = 0,
+        onGoHome = {},
+        overlayOpen = false,
+        contentFocusRequester = content,
+        accountRows = listOf(TvAccountMenuRow(key = "account", label = "Account", icon = Icons.Filled.Person, onClick = {})),
+        accountDetail = "Server: home.example",
+        accountTag = "Demo",
+        accountExtraContent = { Text(text = "12 of 20 requests used", style = MaterialTheme.typography.bodyMedium) },
+        accountInitiallyOpen = true,
+        iconOnlyKeys = setOf(SEARCH),
+    ) {
+        Box(Modifier.fillMaxSize())
+    }
+}
+
+/** Tabs the server has not yet resolved are hidden: Requests and Issues are pending, the selected Movies tab is kept. */
+@Composable
+fun TvTopBarScaffoldPendingTabsSample() {
+    val content = remember { FocusRequester() }
+    TvTopBarScaffold(
+        slots = PendingSlots,
+        selectedKey = MOVIES,
+        homeKey = MOVIES,
+        onSelect = {},
+        contentDepth = 0,
+        onGoHome = {},
+        overlayOpen = false,
+        contentFocusRequester = content,
+        iconOnlyKeys = setOf(SEARCH),
+        pendingKeys = setOf("requests", "issues"),
     ) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             TvButton(label = "Page content", onClick = {}, modifier = Modifier.focusRequester(content))

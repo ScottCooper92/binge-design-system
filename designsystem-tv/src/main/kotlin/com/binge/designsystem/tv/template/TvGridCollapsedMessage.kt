@@ -38,7 +38,6 @@ private val DEFAULT_EMPTY_ICON = Icons.Outlined.Inbox
  * What a grid shows in place of its cells when the load failed or came back empty: one message plate with a standard
  * button, and focus moved to it as the state arrives. A failure carries Try again; an empty result carries
  * [emptyAction] if there is one, and otherwise the plate itself takes focus so the remote has somewhere to be.
- *
  */
 @Composable
 internal fun BoxScope.TvGridCollapsedMessage(

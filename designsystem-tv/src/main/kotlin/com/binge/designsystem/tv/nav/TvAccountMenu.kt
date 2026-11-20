@@ -81,7 +81,7 @@ enum class TvAccountMenuAnchor { Start, End }
  * The menu is open while the avatar is focused or focus is inside it. It drops down below the avatar, level with its end (or its
  * start, for [TvAccountMenuAnchor.Start]), over the page and not over the bar, and it does not change the size the avatar
  * reports, so the bar does not move. The panel has round corners, a thin outline and a soft shadow. Its header is the
- * avatar and the [name], with the [detail] under it; [extraContent] sits under the header, for a line such as a quota. The [rows]
+ * avatar and the [name], with the [detail] under it and an optional [tag] beside the name (a demo account's "Demo"); [extraContent] sits under the header, for a line such as a quota. The [rows]
  * follow: a plain icon and a label, with a white pill for the focused one and the error colour for a destructive one (its focused pill is the destructive fill).
  *
  * Keys. Down from the avatar enters the first row while the menu is open; while it is closed Down goes to [down], the
@@ -120,6 +120,7 @@ fun TvAccountMenu(
     modifier: Modifier = Modifier,
     avatarUrl: String? = null,
     detail: String? = null,
+    tag: String? = null,
     anchor: TvAccountMenuAnchor = TvAccountMenuAnchor.End,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
     initiallyOpen: Boolean = false,
@@ -135,6 +136,7 @@ fun TvAccountMenu(
         modifier = modifier,
         avatarUrl = avatarUrl,
         detail = detail,
+        tag = tag,
         anchor = anchor,
         extraContent = extraContent,
         initiallyOpen = initiallyOpen,
@@ -157,6 +159,7 @@ internal fun TvAccountMenuContent(
     modifier: Modifier = Modifier,
     avatarUrl: String? = null,
     detail: String? = null,
+    tag: String? = null,
     anchor: TvAccountMenuAnchor = TvAccountMenuAnchor.End,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
     initiallyOpen: Boolean = false,
@@ -228,6 +231,7 @@ internal fun TvAccountMenuContent(
                     name = name,
                     avatarUrl = avatarUrl,
                     detail = detail,
+                    tag = tag,
                     selected = selected,
                     rows = ordered,
                     requesterFor = { key -> rowRequesters.getOrPut(key) { FocusRequester() } },
@@ -325,6 +329,7 @@ private fun AccountPanel(
     name: String,
     avatarUrl: String?,
     detail: String?,
+    tag: String?,
     selected: Boolean,
     rows: List<TvAccountMenuRow>,
     requesterFor: (Any) -> FocusRequester,
@@ -361,7 +366,7 @@ private fun AccountPanel(
             Box(Modifier.size(avatarSize).then(selectedRing).padding(ring)) {
                 BingeTvInitialsAvatar(name = name, size = avatarSize - ring * 2, avatarUrl = avatarUrl)
             }
-            AccountWords(name, detail)
+            AccountWords(name, detail, tag)
         }
         extraContent?.invoke(this)
         rows.forEachIndexed { index, row ->
@@ -433,15 +438,26 @@ private fun AccountRow(
 }
 
 @Composable
-private fun RowScope.AccountWords(name: String, detail: String?) {
+private fun RowScope.AccountWords(
+    name: String,
+    detail: String?,
+    tag: String?,
+) {
     Column(Modifier.weight(1f)) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
+        ) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            if (tag != null) AccountTag(tag)
+        }
         if (detail != null) {
             Text(
                 text = detail,
@@ -452,4 +468,19 @@ private fun RowScope.AccountWords(name: String, detail: String?) {
             )
         }
     }
+}
+
+/** A short label beside the name, such as a demo account's "Demo": a small pill in the menu's own colours. */
+@Composable
+private fun AccountTag(tag: String) {
+    Text(
+        text = tag,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        modifier = Modifier
+            .clip(BingeShapes.Pill)
+            .border(dimensionResource(TvR.dimen.tv_account_menu_outline), MaterialTheme.colorScheme.borderVariant, BingeShapes.Pill)
+            .padding(horizontal = dimensionResource(DesR.dimen.padding_s), vertical = dimensionResource(DesR.dimen.padding_xs)),
+    )
 }
