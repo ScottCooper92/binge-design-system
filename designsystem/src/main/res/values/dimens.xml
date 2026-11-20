@@ -485,6 +485,8 @@
     <!-- Person card (PersonCard): a round photo over the name and a subtitle, a row sibling of the poster card -->
     <dimen name="person_card_width">104dp</dimen>
     <dimen name="person_card_photo_size">88dp</dimen>
+    <!-- The compact person card (PersonCardStyle.Compact): the cast avatar plus a little room each side for a one-line name -->
+    <dimen name="person_card_compact_width">96dp</dimen>
     <!-- Labelled icon button (LabelledIconButton): the width of the tappable column, a little wider than the button_tonal_size circle so a short label has room under it -->
     <dimen name="labelled_icon_button_width">72dp</dimen>
     <!-- The widest a labelled icon button grows for a long label or a large font; past it the label wraps to two lines. -->

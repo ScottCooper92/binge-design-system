@@ -7,6 +7,7 @@ import com.binge.designsystem.component.DetailPerson
 import com.binge.designsystem.component.DetailPoster
 import com.binge.designsystem.component.DetailStat
 import com.binge.designsystem.component.ExternalScore
+import com.binge.designsystem.component.PersonCardStyle
 
 /**
  * One person in a [PeopleRail]. [key] is the app's own identity for the item, handed back when it is tapped. It is a String because a lazy
@@ -19,12 +20,13 @@ class PersonItem(
     val person: DetailPerson,
 )
 
-/** A titled row of people, such as a cast or a crew. [seeAll] makes the heading a link to the full list. */
+/** A titled row of people, such as a cast or a crew. [seeAll] makes the heading a link to the full list. [cardStyle] is how each person is drawn. */
 @Immutable
 class PeopleRail(
     val title: String,
     val people: List<PersonItem>,
     val seeAll: Boolean = false,
+    val cardStyle: PersonCardStyle = PersonCardStyle.Default,
 )
 
 /** One title in a [PosterRail]. [key] is the app's own identity for the item, handed back when it is tapped; a String, for the reason given on [PersonItem]. */

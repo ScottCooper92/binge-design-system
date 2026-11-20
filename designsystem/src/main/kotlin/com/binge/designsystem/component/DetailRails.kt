@@ -50,7 +50,8 @@ class DetailPoster(
 /**
  * A detail page's row of people (a cast, a crew): a titled [MediaCarousel] of [PersonCard]s, drawn from [people] by [person]. [itemKey] is
  * each person's stable key, [onOpen] is handed the tapped item, and [onSeeAll], when given, makes the heading a link to the full list. The
- * row's side inset is the page's reading inset, so its first card lines up with the page's copy. Draws nothing for an empty list.
+ * row's side inset is the page's reading inset, so its first card lines up with the page's copy. [cardStyle] is how each person is drawn:
+ * the default tile, or [PersonCardStyle.Compact] for a cast row. Draws nothing for an empty list.
  *
  * @need show a detail page's cast or crew as a titled row of people
  * @group detail
@@ -67,6 +68,7 @@ fun <T> DetailPeopleRail(
     modifier: Modifier = Modifier,
     onSeeAll: (() -> Unit)? = null,
     horizontalPadding: Dp = readingInset(),
+    cardStyle: PersonCardStyle = PersonCardStyle.Default,
 ) {
     if (people.isEmpty()) return
     MediaCarousel(
@@ -79,7 +81,13 @@ fun <T> DetailPeopleRail(
         horizontalPadding = horizontalPadding,
     ) { _, item ->
         val shown = person(item)
-        PersonCard(name = shown.name, subtitle = shown.subtitle, photoUrl = shown.photoUrl, onClick = { onOpen(item) })
+        PersonCard(
+            name = shown.name,
+            subtitle = shown.subtitle,
+            photoUrl = shown.photoUrl,
+            onClick = { onOpen(item) },
+            style = cardStyle,
+        )
     }
 }
 
