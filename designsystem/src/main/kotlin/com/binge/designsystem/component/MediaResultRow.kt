@@ -223,7 +223,8 @@ private fun BlurbRowPlates(lines: Int, modifier: Modifier) {
             MaterialTheme.typography.labelMedium,
             Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).padding(vertical = dimensionResource(R.dimen.rating_chip_padding_v)),
         )
-        Spacer(Modifier.height(gap))
+        // The loaded row draws this gap only before a blurb, so a row without one ends on its status line.
+        if (lines > 0) Spacer(Modifier.height(gap))
         repeat(lines) { line ->
             TextPlate(MaterialTheme.typography.bodyMedium, Modifier.fillMaxWidth(if (line == lines - 1) SUBTITLE_PLATE_FRACTION else 1f))
         }
