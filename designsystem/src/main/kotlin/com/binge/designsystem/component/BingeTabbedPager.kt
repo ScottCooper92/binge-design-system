@@ -44,11 +44,12 @@ fun BingeTabbedPager(
     beyondViewportPageCount: Int = 0,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
-    val pagerState = rememberFilterPagerState(
+    val pager = rememberFilterPager(
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
         pageCount = tabs.size,
     )
+    val pagerState = pager.state
     OverlaidHeaderContent(
         modifier = modifier,
         headerBackground = headerBackground,
@@ -58,7 +59,7 @@ fun BingeTabbedPager(
             header?.invoke()
             BingeTabRow(
                 tabs = tabs,
-                selectedIndex = pagerState.currentPage,
+                selectedIndex = pager.shownIndex,
                 onSelect = onSelectedIndexChange,
             )
         },
