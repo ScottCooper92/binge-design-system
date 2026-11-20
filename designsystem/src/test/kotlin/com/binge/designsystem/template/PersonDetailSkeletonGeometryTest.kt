@@ -1,6 +1,7 @@
 package com.binge.designsystem.template
 
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import com.binge.designsystem.catalog.PersonDetailLoadingHintedSample
 import com.binge.designsystem.catalog.PersonDetailLoadingSample
 import com.binge.designsystem.catalog.PersonDetailReadySample
 import com.binge.designsystem.layout.LayoutAnchors
@@ -20,8 +21,9 @@ import org.robolectric.annotation.GraphicsMode
  *
  * At a larger font the profile's own name and facts wrap, over as many lines as that person's words need, and a plate cannot know how many
  * that is: at 1.3 the sample's profile is 30dp taller than its skeleton and at 2.0 it is 132dp taller, and everything under it moves by the
- * same amount. So the large-font cases hold only what the words do not decide, the profile's own top, and the remainder is tracked in an issue
- * rather than tuned to this one sample.
+ * same amount. With no hint the large-font cases hold only what the words do not decide, the profile's own top. With the hints the loading
+ * state takes (`expectedName`, `expectedFacts`), the skeleton holds the whole page at every scale: that proves the mechanism, and an app's hints
+ * are its own to choose.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(
@@ -38,9 +40,17 @@ class PersonDetailSkeletonGeometryTest {
     private val anchors =
         listOf(LayoutAnchors.Detail.PROFILE, LayoutAnchors.Detail.OVERVIEW, LayoutAnchors.Detail.CREDITS).map(LayoutAnchors::section)
 
-    private fun check(anchors: List<String>, checkSize: Boolean) {
+    private fun check(
+        anchors: List<String>,
+        checkSize: Boolean,
+        hinted: Boolean = false,
+    ) {
         rule.assertSkeletonReservesGeometry(anchors, checkSize = checkSize) { resolved ->
-            if (resolved) PersonDetailReadySample() else PersonDetailLoadingSample()
+            when {
+                resolved -> PersonDetailReadySample()
+                hinted -> PersonDetailLoadingHintedSample()
+                else -> PersonDetailLoadingSample()
+            }
         }
     }
 
@@ -56,4 +66,17 @@ class PersonDetailSkeletonGeometryTest {
     @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 2f)
     fun `the skeleton holds the profile's top at a font scale of 2`() =
         check(listOf(LayoutAnchors.section(LayoutAnchors.Detail.PROFILE)), checkSize = false)
+
+    @Test
+    fun `a hinted skeleton holds the page at the default font`() = check(anchors, checkSize = true, hinted = true)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `a hinted skeleton holds the profile, the biography and the credits at a font scale of 1 point 3`() =
+        check(anchors, checkSize = true, hinted = true)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 2f)
+    fun `a hinted skeleton holds the profile, the biography and the credits at a font scale of 2`() =
+        check(anchors, checkSize = true, hinted = true)
 }
