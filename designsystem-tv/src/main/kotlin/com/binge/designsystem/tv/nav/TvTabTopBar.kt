@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -45,10 +46,17 @@ private const val TAB_RESTING_SCALE = 0.8f
 private const val TAB_SCALE_MILLIS = 150
 private const val CURRENT_TAB_ALPHA = 0.2f
 
-/** The signed-in avatar's menu: its [rows], and [onOpenChange] to tell the scaffold when it opens or closes. */
+/**
+ * The signed-in avatar's menu: its [rows], and [onOpenChange] to tell the scaffold when it opens or closes. [detail], [tag] and
+ * [extraContent] are the menu's own, and [initiallyOpen] opens it for a frame.
+ */
 internal class TvTopBarAccount(
     val rows: List<TvAccountMenuRow>,
     val onOpenChange: (Boolean) -> Unit,
+    val detail: String? = null,
+    val tag: String? = null,
+    val extraContent: (@Composable ColumnScope.() -> Unit)? = null,
+    val initiallyOpen: Boolean = false,
 )
 
 /**
@@ -56,7 +64,8 @@ internal class TvTopBarAccount(
  * A tab commits on click, not on focus. Entering the bar returns to the tab focus last left, [entryOverride] naming another
  * once. [holdOpen] keeps the tabs at full size and the bar above the page while the avatar's menu is open. Every key in
  * [iconOnlyKeys] draws its icon without a label. Down from any item lands on [down]. A signed-in header needs at least one
- * item in [slots], since Right out of the avatar goes to the first.
+ * shown item, since Right out of the avatar goes to the first. A key in [pendingKeys] is a tab the host has not yet resolved:
+ * it is neither drawn nor focusable, and the selection is not changed meanwhile.
  */
 @Composable
 internal fun TvTabTopBar(
@@ -70,7 +79,10 @@ internal fun TvTabTopBar(
     entryOverride: Any?,
     account: TvTopBarAccount?,
     iconOnlyKeys: Set<Any> = emptySet(),
+    pendingKeys: Set<Any> = emptySet(),
 ) {
+    // The tabs not yet known to be the account's are neither drawn nor focusable, and the selected one is kept while they are.
+    val shownItems = slots.items.filter { it.key !in pendingKeys }
     var barFocused by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (barFocused || holdOpen) 1f else TAB_RESTING_SCALE,
@@ -79,7 +91,8 @@ internal fun TvTabTopBar(
     )
     // Entering the bar returns to the tab focus last left: the selected one, unless the user left on another without opening it.
     var lastFocusedKey by remember(selectedKey) { mutableStateOf(selectedKey) }
-    val entryKey = listOfNotNull(entryOverride, lastFocusedKey, selectedKey).firstOrNull { it in requesters } ?: slots.header.key
+    val entryKey =
+        listOfNotNull(entryOverride, lastFocusedKey, selectedKey).firstOrNull { it in requesters && it !in pendingKeys } ?: slots.header.key
     val item = { entry: TvNavItem ->
         Modifier
             .onFocusChanged { if (it.hasFocus) lastFocusedKey = entry.key }
@@ -109,6 +122,10 @@ internal fun TvTabTopBar(
                 name = header.displayName.orEmpty(),
                 avatarUrl = header.avatarUrl,
                 rows = account.rows,
+                detail = account.detail,
+                tag = account.tag,
+                extraContent = account.extraContent,
+                initiallyOpen = account.initiallyOpen,
                 down = down,
                 anchor = TvAccountMenuAnchor.Start,
                 avatarFocusRequester = requesters.getValue(header.key),
@@ -119,7 +136,7 @@ internal fun TvTabTopBar(
                     .reportingSize(dimensionResource(TvR.dimen.tv_top_bar_avatar_size))
                     .onFocusChanged { if (it.hasFocus) lastFocusedKey = header.key }
                     // Right out of the menu goes to the first tab, from the avatar and from every row alike.
-                    .focusProperties { right = requesters.getValue(slots.items.first().key) },
+                    .focusProperties { right = requesters.getValue(shownItems.first().key) },
             )
         } else {
             TopBarAvatar(
@@ -137,7 +154,7 @@ internal fun TvTabTopBar(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            slots.items.forEach { entry ->
+            shownItems.forEach { entry ->
                 TopBarItem(
                     entry = entry,
                     selected = entry.key == selectedKey,

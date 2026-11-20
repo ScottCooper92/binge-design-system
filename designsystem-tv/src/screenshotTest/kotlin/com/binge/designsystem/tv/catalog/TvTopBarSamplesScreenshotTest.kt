@@ -132,6 +132,18 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun tabAvatarSignedOut() = Frame { TvTopBarAvatarSignedOutSample() }
 
+    /** The avatar's menu open with its detail line, a Demo tag beside the name and an extra line under the header. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun tabScaffoldAccountMenu() = Frame { TvTopBarScaffoldAccountMenuSample() }
+
+    /** Tabs the server has not resolved yet are hidden, and the selected tab is kept. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun tabScaffoldPendingTabs() = Frame { TvTopBarScaffoldPendingTabsSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
