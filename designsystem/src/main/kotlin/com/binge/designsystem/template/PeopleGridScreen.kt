@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -181,13 +182,13 @@ fun PeopleGridScreen(
             )
         }
         if (tabs.size == 1) {
-            page(PaddingValues(top = padding.calculateTopPadding()), 0)
+            ScreenBody(padding) { page(PaddingValues(top = it.calculateTopPadding()), 0) }
         } else {
             BingeTabbedPager(
                 tabs = tabs.map { it.label },
                 selectedIndex = selectedTab.coerceIn(0, tabs.lastIndex),
                 onSelectedIndexChange = onTabChange,
-                modifier = Modifier.fillMaxSize().padding(padding.screenOuterPadding()),
+                modifier = Modifier.fillMaxSize().padding(padding.screenOuterPadding()).consumeWindowInsets(padding.screenOuterPadding()),
                 // The bar's height joins the pager's header, so the grids reach the top of the window and pass under both.
                 header = { Spacer(Modifier.height(padding.calculateTopPadding())) },
                 headerBackground = Color.Transparent,
