@@ -30,7 +30,7 @@ private const val FAILED_DECLINE = "Couldn't decline"
 private val FONT_SCALES = listOf(1f, 1.3f, 2f)
 
 /**
- * #4345: a "Waiting for approval" card marked as failed reads its failure in the meta line's own slot, so the details under the card
+ * A "Waiting for approval" card marked as failed reads its failure in the meta line's own slot, so the details under the card
  * are as tall with the mark as without it at every font size, and nothing below them moves when the mark comes or goes.
  */
 @RunWith(RobolectricTestRunner::class)

@@ -34,8 +34,8 @@ private const val BAR = "bar"
 
 /**
  * A pop rebuilds the shell, and a rebuilt shell arms an arrival, which the hub's entry then claims. The hub is rebuilt under its
- * saved state, as the back stack does, and the card the user opened must still win over the row's first: the class of bug #4346 was on
- * Companions, here for the hub every Movies, TV shows and Account page is built on.
+ * saved state, as the back stack does, and the card the user opened must still win over the row's first: the class of bug a companion screen once had,
+ * here for the hub every Movies, TV shows and Account page is built on.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
