@@ -11,6 +11,7 @@ import com.binge.designsystem.component.BingeSheetNav
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +31,7 @@ class FilterSheetSecondLevelTest {
     private val rowClicks = mutableListOf<String>()
     private val left = mutableListOf<String>()
     private var nav: BingeSheetNav? = null
+    private var backHanded: (() -> Unit)? = null
     private var back: OnBackPressedDispatcherOwner? = null
 
     private fun show(withDetail: Boolean) {
@@ -47,8 +49,9 @@ class FilterSheetSecondLevelTest {
                     onRowClick = { rowClicks += it },
                     detail =
                         if (withDetail) {
-                            { rowId, handle ->
+                            { rowId, handle, onBack ->
                                 nav = handle
+                                backHanded = onBack
                                 back = LocalOnBackPressedDispatcherOwner.current
                                 Text("$DETAIL: $rowId")
                             }
@@ -102,6 +105,15 @@ class FilterSheetSecondLevelTest {
     }
 
     @Test
+    fun `in the side sheet the page is given no back of its own, since the sheet draws a Back bar`() {
+        show(withDetail = true)
+        rule.onNodeWithText(ROW).performClick()
+        rule.waitForIdle()
+
+        assertNull("a second arrow would sit under the sheet's Back bar", backHanded)
+    }
+
+    @Test
     fun `without a detail the row only reports the tap, as it always did`() {
         show(withDetail = false)
 
@@ -111,5 +123,53 @@ class FilterSheetSecondLevelTest {
         rule.onNodeWithText("Show results").assertExists()
         assertEquals(listOf("years"), rowClicks)
         assertEquals(emptyList<String>(), left)
+    }
+}
+
+/** On a phone the bottom sheet has no Back bar, so the page is handed the sheet's own back to draw. */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = android.app.Application::class, qualifiers = "w360dp-h900dp")
+class FilterSheetSecondLevelCompactTest {
+    @get:Rule
+    val rule = createTakeDownComposeRule()
+
+    private val left = mutableListOf<String>()
+    private var backHanded: (() -> Unit)? = null
+
+    private fun show() {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                FilterSheet(
+                    title = "Filters",
+                    clearAllLabel = "Clear all",
+                    showResultsLabel = "Show results",
+                    sections = emptyList(),
+                    rows = listOf(FilterRowUi("years", ROW, "Any", Icons.Filled.CalendarMonth)),
+                    onDismiss = {},
+                    onApply = {},
+                    onClearAll = {},
+                    detail = { rowId, _, onBack ->
+                        backHanded = onBack
+                        Text("$DETAIL: $rowId")
+                    },
+                    onDetailBack = { left += it },
+                )
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    @Test
+    fun `a phone page is handed a back that returns to the sheet and reports the row`() {
+        show()
+        rule.onNodeWithText(ROW).performClick()
+        rule.waitForIdle()
+
+        rule.onNodeWithText("$DETAIL: years").assertExists()
+        rule.runOnUiThread { checkNotNull(backHanded)() }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Show results").assertExists()
+        assertEquals(listOf("years"), left)
     }
 }

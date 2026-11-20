@@ -43,9 +43,11 @@ import java.time.LocalDate
  *
  * A row can open a second level: with [detail] set, a tap on a row calls [onRowClick] and then opens [detail] for that row as a page
  * of the sheet, on a phone and in the side sheet alike, with the sheet's own slide, Back and state. It is for a filter with too
- * many options for the body (a library's years): draw [FilterSectionContent] in it, with its `onBack` set to the nav's `pop` and a
- * `search` to find an option, and the user lands back on the sheet where they left it. [onDetailBack] is told which row's page was
- * left, however (the arrow, system Back, a swipe). Without [detail] the sheet is as it was, and the caller stacks its own.
+ * many options for the body (a library's years): draw [FilterSectionContent] in it, with its `onBack` set to the `onBack` it is given and
+ * a `search` to find an option, and the user lands back on the sheet where they left it. `onBack` is null in the side sheet, which
+ * draws a Back bar of its own above a pushed page, so passing it on never leaves two arrows; on a phone it is the sheet's `pop`, since
+ * the bottom form has none. `nav.pop()` is there for a Done button. [onDetailBack] is told which row's page was left, however (the
+ * arrow, system Back, a swipe). Without [detail] the sheet is as it was, and the caller stacks its own.
  *
  * @need let the user narrow a catalogue by several filters in one sheet
  * @group sheets
@@ -71,7 +73,7 @@ fun FilterSheet(
     onRangeChange: (sectionId: String, values: ClosedFloatingPointRange<Float>) -> Unit = { _, _ -> },
     onDateBoundChange: (sectionId: String, isEnd: Boolean, date: LocalDate?) -> Unit = { _, _, _ -> },
     onRowClick: (rowId: String) -> Unit = {},
-    detail: (@Composable ColumnScope.(rowId: String, nav: BingeSheetNav) -> Unit)? = null,
+    detail: (@Composable ColumnScope.(rowId: String, nav: BingeSheetNav, onBack: (() -> Unit)?) -> Unit)? = null,
     onDetailBack: (rowId: String) -> Unit = {},
 ) {
     BingeAdaptiveSheet(
@@ -85,7 +87,8 @@ fun FilterSheet(
         stackPagesWhenCompact = detail != null,
     ) { nav ->
         if (detail != null && nav.page.startsWith(DETAIL_PAGE_PREFIX)) {
-            detail(nav.page.removePrefix(DETAIL_PAGE_PREFIX), nav)
+            // The side sheet draws its own Back bar over a pushed page, so a second arrow in the page would sit right under it.
+            detail(nav.page.removePrefix(DETAIL_PAGE_PREFIX), nav, if (nav.inSideSheet) null else nav::pop)
         } else {
             FilterSheetContent(
                 title = title,

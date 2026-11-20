@@ -103,7 +103,7 @@ fun FilterSectionLongListNoResultsSample() {
 
 /**
  * The filter sheet with a second level, opened for real: tap "Release year" and it slides in as a page of the sheet with a search field
- * over the eighty years; the back arrow, system Back and a swipe go back to the sheet where it was left, and Show results closes it. It
+ * over the eighty years; the back arrow (a phone draws it, and the side sheet has a Back bar of its own), system Back and a swipe go back to the sheet where it was left, and Show results closes it. It
  * opens part-way on a phone and is a side sheet in a window 840dp wide or more.
  */
 @Composable
@@ -135,7 +135,7 @@ fun FilterSheetSecondLevelDemo() {
                 onApply = { open = false },
                 onClearAll = { included = emptySet() },
                 onDetailBack = { query = "" },
-                detail = { _, nav ->
+                detail = { _, nav, onBack ->
                     FilterSectionContent(
                         section =
                             FilterSectionUi(
@@ -157,7 +157,7 @@ fun FilterSheetSecondLevelDemo() {
                             included =
                                 if (id in included) included - id else included + id
                         }),
-                        onBack = { nav.pop() },
+                        onBack = onBack,
                         search =
                             FilterSearchUi(
                                 query = query,
