@@ -45,4 +45,31 @@ class FilterSectionSheetSamplesScreenshotTest {
     fun Accessory() {
         FilterSectionAccessorySample()
     }
+
+    @PreviewTest
+    @Preview(name = "phone", widthDp = STANDARD_PHONE_WIDTH_DP)
+    @Preview(name = "phone-dark", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "phone-font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun LongList() {
+        FilterSectionLongListSample()
+    }
+
+    @PreviewTest
+    @Preview(name = "phone", widthDp = STANDARD_PHONE_WIDTH_DP)
+    @Preview(name = "phone-dark", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "phone-font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun LongListQuery() {
+        FilterSectionLongListQuerySample()
+    }
+
+    @PreviewTest
+    @Preview(name = "phone", widthDp = STANDARD_PHONE_WIDTH_DP)
+    @Preview(name = "phone-dark", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "phone-font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun LongListNoResults() {
+        FilterSectionLongListNoResultsSample()
+    }
 }

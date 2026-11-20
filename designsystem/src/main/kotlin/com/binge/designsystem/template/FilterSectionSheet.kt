@@ -66,7 +66,8 @@ fun FilterSectionSheet(
 
 /**
  * The body of [FilterSectionSheet] without its host, for the side sheet's in-place detail or a frame. A non-null [onBack]
- * draws the back arrow a detail shown in place of the rows needs.
+ * draws the back arrow a detail shown in place of the rows needs. A non-null [search] puts a search field above a list of options,
+ * for a filter with too many to scan (a library's years): the caller holds the query, and only the options that match are drawn.
  *
  * @need show one filter's detail inside a host the caller already has
  * @group sheets
@@ -83,6 +84,7 @@ fun ColumnScope.FilterSectionContent(
     handlers: FilterControlHandlers = FilterControlHandlers(),
     onBack: (() -> Unit)? = null,
     footerAccessory: (@Composable RowScope.() -> Unit)? = null,
+    search: FilterSearchUi? = null,
 ) {
     SectionSheetHeader(
         title = section.title,
@@ -105,7 +107,7 @@ fun ColumnScope.FilterSectionContent(
         if (hint != null) {
             HintCard(text = hint, modifier = Modifier.padding(bottom = dimensionResource(R.dimen.filter_sheet_section_title_gap)))
         }
-        FilterSectionControl(section = section, callbacks = handlers)
+        FilterSectionControlWithSearch(section = section, callbacks = handlers, search = search)
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     Row(

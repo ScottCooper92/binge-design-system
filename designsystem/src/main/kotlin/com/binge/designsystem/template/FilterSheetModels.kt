@@ -89,3 +89,17 @@ data class FilterRowUi(
     val summary: String,
     val icon: ImageVector,
 )
+
+/**
+ * A search over the options of a filter section, for a list too long to scan (a library's years, its genres). [query] is what the
+ * caller holds and [onQueryChange] is how the field reports an edit, since the template keeps no state. The section then shows only
+ * the options whose label contains the query, ignoring case, and [noResultsLabel] when none do. [placeholder] is the field's hint.
+ * It applies to a single-choice or multi-choice section and is ignored for a range or a date range, which have no options to search.
+ */
+@Immutable
+data class FilterSearchUi(
+    val query: String,
+    val onQueryChange: (String) -> Unit,
+    val placeholder: String,
+    val noResultsLabel: String,
+)
