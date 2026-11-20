@@ -36,5 +36,10 @@ class CollectionDetailScreenSamplesScreenshotTest {
     @PreviewTest
     @ScreenWidthPreviews
     @Composable
+    fun posterOnly() = CollectionDetailPosterOnlySample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
     fun plain() = CollectionDetailPlainSample()
 }

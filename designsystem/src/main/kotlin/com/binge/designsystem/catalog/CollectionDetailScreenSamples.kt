@@ -44,16 +44,20 @@ private fun parts(blurbs: Boolean = true) =
         )
     }
 
-private fun sampleCollection(overview: String? = OVERVIEW, parts: List<MediaResult> = parts()) =
-    CollectionDetail(
-        title = "The Lighthouse Collection",
-        metaText = "3 movies",
-        overview = overview,
-        partsHeading = "Movies",
-        parts = parts,
-        emptyTitle = "No movies yet",
-        emptyMessage = "This collection has no titles to show.",
-    )
+private fun sampleCollection(
+    overview: String? = OVERVIEW,
+    parts: List<MediaResult> = parts(),
+    posterUrl: String? = null,
+) = CollectionDetail(
+    title = "The Lighthouse Collection",
+    posterUrl = posterUrl,
+    metaText = "3 movies",
+    overview = overview,
+    partsHeading = "Movies",
+    parts = parts,
+    emptyTitle = "No movies yet",
+    emptyMessage = "This collection has no titles to show.",
+)
 
 @Composable
 private fun SampleScreen(state: CollectionDetailState, withFooter: Boolean = false) {
@@ -102,6 +106,10 @@ fun CollectionDetailFailedSample() = SampleScreen(CollectionDetailState.Failed(E
 /** A collection with no titles: the app's own words over the back control. */
 @Composable
 fun CollectionDetailEmptySample() = SampleScreen(CollectionDetailState.Content(sampleCollection(parts = emptyList())))
+
+/** A collection with a poster and no backdrop, as a hand-made box set often is: the poster is the picture behind the hero, and beside the title at an expanded width. */
+@Composable
+fun CollectionDetailPosterOnlySample() = SampleScreen(CollectionDetailState.Content(sampleCollection(posterUrl = "sample-poster")))
 
 /** A collection with no overview and no blurbs: those blocks take no room, and the rows stay as short as their text. */
 @Composable

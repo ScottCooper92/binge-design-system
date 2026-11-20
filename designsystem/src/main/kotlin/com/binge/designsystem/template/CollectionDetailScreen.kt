@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
+import com.binge.designsystem.component.DetailCinematicHeader
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.DetailHeroSkeleton
 import com.binge.designsystem.component.DetailOverviewSection
@@ -30,15 +31,19 @@ import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.MediaResultRow
 import com.binge.designsystem.component.MediaResultRowSkeleton
 import com.binge.designsystem.component.SectionHeader
+import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.resolvedContentInset
 
 /**
  * What a collection's page shows, as plain values: a series of titles that belong together, such as a film franchise. Every word is already in
- * the user's language, including [metaText] (a count the app words for the plural). A part the app has nothing for is left out.
+ * the user's language. A part the app has nothing for is left out.
  *
- * @property backdropUrl the image behind the hero; with none the hero is the plain scrim
+ * @property backdropUrl the image behind the hero
+ * @property posterUrl the collection's poster. At an expanded width the hero draws it beside the title, as the movie page does; and where there is no
+ * [backdropUrl] it is the picture behind the hero at any width, since a hand-made box set often has only a poster. With neither, the hero is the plain wash.
+ * @property metaText the line under the title: a runtime or a genre line, or a count the app words for the plural
  * @property overviewHeading the heading over [overview]; null uses this library's word for it
  * @property partsHeading the heading over the parts; null draws no heading
  * @property parts the titles, in the order they are drawn. With none the page is [emptyTitle] and [emptyMessage] over the back control.
@@ -47,6 +52,7 @@ import com.binge.designsystem.resolvedContentInset
 class CollectionDetail(
     val title: String,
     val backdropUrl: String? = null,
+    val posterUrl: String? = null,
     val metaText: String = "",
     val overview: String? = null,
     val overviewHeading: String? = null,
@@ -58,11 +64,12 @@ class CollectionDetail(
 
 /** The three states of a collection's page. [Failed] keeps the back control, so the user is never stranded. */
 sealed interface CollectionDetailState {
-    /** A block of prose when [hasOverview], and [parts] rows of placeholders, in the loaded page's own room. */
+    /** A block of prose when [hasOverview], and [parts] rows of placeholders, in the loaded page's own room. [hasPoster] says the loaded hero will have a poster beside the title at an expanded width, so the placeholder is that taller header. */
     @Immutable
     class Loading(
         val hasOverview: Boolean = true,
         val parts: Int = 4,
+        val hasPoster: Boolean = false,
     ) : CollectionDetailState
 
     @Immutable
@@ -145,18 +152,30 @@ fun CollectionDetailScreen(
                 actions = topBarActions,
                 footer = footer,
                 hero = {
-                    if (collection != null) {
+                    // The expanded header is the one with a poster beside the title; a collection with no poster keeps the plain hero.
+                    val wide = isExpandedLayout()
+                    if (collection == null) {
+                        val hasPoster = (state as? CollectionDetailState.Loading)?.hasPoster == true
+                        DetailHeroSkeleton(cinematic = wide && hasPoster, tagline = null, genres = emptyList(), metaText = " ")
+                    } else if (wide && collection.posterUrl != null) {
+                        DetailCinematicHeader(
+                            title = collection.title,
+                            genres = listOfNotNull(collection.metaText.takeIf { it.isNotBlank() }),
+                            synopsis = null,
+                            stats = emptyList(),
+                            backdropUrl = collection.backdropUrl,
+                            posterUrl = collection.posterUrl,
+                        )
+                    } else {
                         DetailHero(
                             title = collection.title,
-                            backdropUrl = collection.backdropUrl,
+                            backdropUrl = collection.backdropUrl ?: collection.posterUrl,
                             tagline = null,
                             metaText = collection.metaText,
                             onBack = {},
                             showChrome = false,
                             richBackdrop = true,
                         )
-                    } else {
-                        DetailHeroSkeleton(cinematic = false, tagline = null, genres = emptyList(), metaText = " ")
                     }
                 },
             ) {
