@@ -5,15 +5,16 @@ name: CI
 # one, and author-conflicts on one completing against main. They match it by NAME,
 # so renaming this workflow silently unhooks all three.
 #
-# One build job, deliberately, beside the small `actionlint` and `nightly-report` jobs.
-# `./gradlew build` already runs the Kotlin compile, the unit
-# tests, ktlintCheck and Android lint, because the ktlint plugin and AGP both wire
-# themselves into `check` and `build` depends on `check`. The screenshot suite is the
-# one task named on top of it: the screenshot plugin does not hook `check`, and a
-# component library whose only visible contract is how it renders needs the baselines
-# compared on every run. Splitting the build into separate jobs would buy parallelism
-# this build is far too small to need, and would cost a second required status check
-# to keep in sync with branch protection.
+# Three jobs make up the gate, with `build` as the one required check. `check` runs
+# `./gradlew build`, which is the Kotlin compile, the unit tests, ktlintCheck and Android lint, because
+# the ktlint plugin and AGP both wire themselves into `check` and `build` depends on `check`. The
+# screenshot suite is named on top of it: the screenshot plugin does not hook `check`, and a component
+# library whose only visible contract is how it renders needs the baselines compared on every run.
+# `screenshots` runs that suite in SHARDS of the same classes, because one JVM took about 11 minutes
+# and sometimes reached the 30-minute timeout, which shows as a cancelled run that needs a re-run by
+# hand. `build` is the summary: it needs both, fails unless both succeeded, and keeps the job id and
+# name `build`, so the required status check is unchanged and branch protection needs no edit. The
+# split buys wall time, not a second check to keep in sync, because only `build` is required.
 #
 # Deliberately NO paths-ignore, matching binge-companions. bot-review requires a
 # SUCCESSFUL run of this workflow against the head, so a skipped run means a PR that
@@ -45,7 +46,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  # Compile, unit tests, ktlint and Android lint. Everything but the screenshot comparison.
+  check:
     # Skip while a PR is a draft, so a stack can be opened as drafts and promoted one
     # at a time without each queued run preempting the last. Push events to main always
     # run — `pull_request` is null there. A draft therefore reports conclusion
@@ -80,15 +82,15 @@ jobs:
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .gradle/configuration-cache
-          key: gradle-config-cache-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
-          restore-keys: gradle-config-cache-${{ runner.os }}-
+          key: gradle-config-cache-check-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
+          restore-keys: gradle-config-cache-check-${{ runner.os }}-
 
       # --continue surfaces every failure in one run rather than stopping at the first,
       # which matters most to author-ci-fix: it gets exactly one repair attempt per
       # commit, and a log showing only the first of three failures spends that attempt
       # fixing a third of the problem.
-      - name: Build, test, lint and validate screenshots
-        run: ./gradlew build validateDebugScreenshotTest --continue
+      - name: Build, test and lint
+        run: ./gradlew build --continue
 
       # Reports for triaging a red run. Listed explicitly rather than globbing
       # **/build/reports/ — the greedy glob is fail-OPEN, so every new report type
@@ -107,18 +109,97 @@ jobs:
           if-no-files-found: ignore
           retention-days: ${{ github.event_name == 'schedule' && 7 || 1 }}
 
+  # The screenshot comparison, in SHARDS. scripts/screenshot-shard.sh gives shard N every third
+  # `@PreviewTest` class by sorted name, the same selection for validate and for a local
+  # update, so each class is compared exactly once. `fail-fast: false` lets every shard finish
+  # and report its own diffs, because a repair attempt needs all of them, not the first.
+  screenshots:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6
+        with:
+          cache-cleanup: on-success
+
+      # Its own key per shard: the entry depends on the tasks asked for, and every shard asks for
+      # different ones, so sharing one key would have three jobs racing to save different entries.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .gradle/configuration-cache
+          key: gradle-config-cache-screenshots-${{ matrix.shard }}-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
+          restore-keys: gradle-config-cache-screenshots-${{ matrix.shard }}-${{ runner.os }}-
+
+      - name: Validate screenshots (shard ${{ matrix.shard }} of 3)
+        run: |
+          args="$(scripts/screenshot-shard.sh validate "${{ matrix.shard }}" 3)"
+          if [ -z "$args" ]; then
+            echo "Shard ${{ matrix.shard }} has no screenshot classes."
+            exit 0
+          fi
+          # Word splitting is the point: the script prints one argument list.
+          # shellcheck disable=SC2086
+          ./gradlew $args --continue
+
       # Only the diff images, not the HTML screenshot report: that report inlines the
       # reference, actual and diff of every frame as base64 and reached ~485 MB in Binge.
       # The references are committed and the actual render is one updateDebugScreenshotTest
       # away. An empty match means the failure was not a comparison mismatch, so ignore it
-      # rather than fail the upload and hide the real error.
+      # rather than fail the upload and hide the real error. One artifact per shard, because an
+      # artifact name cannot be shared across jobs; `build` merges them back into `screenshot-diffs`.
       - name: Upload screenshot diffs
         if: ${{ failure() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          name: screenshot-diffs
+          name: screenshot-diffs-${{ matrix.shard }}
           path: '**/build/outputs/screenshotTest-results/**/diffs/**'
           if-no-files-found: ignore
+          retention-days: ${{ github.event_name == 'schedule' && 7 || 1 }}
+
+  # The required check, with the id and name it has always had: `build`. It runs no build of its
+  # own. It is red unless `check` and every shard succeeded, and skipped for a draft, as the job
+  # it replaces was. `!cancelled()` is what makes it report when a shard fails, instead of being
+  # skipped with its needs, while a run superseded by a newer push, which GitHub cancels, runs
+  # nothing here: `always()` would run it after the cancel and report a red `build` on a commit nobody is waiting on.
+  build:
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
+    needs: [check, screenshots]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every part to have succeeded
+        env:
+          CHECK: ${{ needs.check.result }}
+          SCREENSHOTS: ${{ needs.screenshots.result }}
+        run: |
+          echo "check: $CHECK"
+          echo "screenshots: $SCREENSHOTS"
+          if [ "$CHECK" != "success" ] || [ "$SCREENSHOTS" != "success" ]; then
+            echo "A part of the build did not succeed." >&2
+            exit 1
+          fi
+
+      # The shards' diffs under the one name they had before sharding, for whatever reads it. Only
+      # when a shard failed; with no diff artifact to merge, there is nothing to do.
+      - name: Merge screenshot diffs
+        if: ${{ !cancelled() && needs.screenshots.result == 'failure' }}
+        continue-on-error: true
+        uses: actions/upload-artifact/merge@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: screenshot-diffs
+          pattern: screenshot-diffs-*
+          delete-merged: true
           retention-days: ${{ github.event_name == 'schedule' && 7 || 1 }}
 
   # The caller files here are thin shims, where a mistake can become a silent startup_failure
