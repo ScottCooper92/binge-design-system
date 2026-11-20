@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,12 +21,9 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -62,7 +58,6 @@ import com.binge.designsystem.component.MediaResultRowSkeleton
 import com.binge.designsystem.component.OnTabReselect
 import com.binge.designsystem.component.TrendingSearchChip
 import com.binge.designsystem.component.WrappingRow
-import com.binge.designsystem.component.rememberPaneTopBarScrollBehavior
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.navOverlayPadding
@@ -155,101 +150,6 @@ class SearchCallbacks(
     val onClearRecents: () -> Unit = {},
     val onBack: (() -> Unit)? = null,
 )
-
-/** Whether the last visible result is within [ahead] of the end. */
-fun isSearchNearEnd(
-    lastVisibleIndex: Int,
-    totalCount: Int,
-    ahead: Int = SEARCH_LOAD_MORE_AHEAD,
-): Boolean = lastVisibleIndex >= totalCount - ahead
-
-/**
- * A search screen on the large collapsing bar: the title gives way as results scroll, and the field and the type chips stay pinned under
- * it. Below is whichever of the idle offer (recent searches, then the app's own rails), a spinner, a grid of [MediaResultRow]s that loads
- * more near its end, a no-results plate or a failure the state calls for. The grid is capped at the search width and folds into
- * columns on wider windows.
- *
- * Nothing here is an app's type: results are [MediaResult]s with a text key, each result's status is the [resultTrailing] slot, and the
- * app owns the query, the history and the paging. [titleTrailing] and [barActions] are told how far the bar has collapsed (they
- * switch at [BAR_HANDOVER_COLLAPSE]). [idleExtras] adds items under the recents, [noResultsExtras] sits under the no-results plate, and
- * [failedContent] replaces the default failure plate.
- *
- * @param idleTitle the plate shown while idle with nothing to offer, which the app words; the defaults say "Search" and "Type a title or a name."
- * @param loadingLabel what a screen reader says of the first loading row.
- * @param reselectKey the tab this screen is the root of, as the shell emits it on the reselect signal (compared by equality, so pass
- *   the same value); tapping it again focuses the field. Null for a screen with no tab.
- * @param resultTrailing decides each result's status: it returns the status to draw, or null for a result with none, so a row with
- *   no status has no gap where one would go.
- *
- * @need search with a field, type chips, recent searches and a grid of results
- * @group screens
- * @replaces a hand-built scaffold with a search field, chips and a paged results list
- */
-@Composable
-fun SearchScreen(
-    title: String,
-    text: String,
-    state: SearchState,
-    callbacks: SearchCallbacks,
-    placeholder: String,
-    modifier: Modifier = Modifier,
-    idleTitle: String = stringResource(R.string.search_idle_title),
-    idleMessage: String = stringResource(R.string.search_idle_message),
-    loadingLabel: String = stringResource(R.string.search_loading),
-    reselectKey: Any? = null,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    recentsTitle: String = stringResource(R.string.search_recents_title),
-    clearLabel: String = stringResource(R.string.search_recents_clear),
-    clearTitle: String = stringResource(R.string.search_recents_clear_title),
-    clearMessage: String = stringResource(R.string.search_recents_clear_message),
-    moreFailedLabel: String = stringResource(R.string.search_more_failed),
-    titleTrailing: (@Composable (pillInteractive: Boolean) -> Unit)? = null,
-    barActions: @Composable RowScope.(handedOver: Boolean, collapsedFraction: Float) -> Unit = { _, _ -> },
-    resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)? = null,
-    idleExtras: (LazyListScope.() -> Unit)? = null,
-    noResultsExtras: (@Composable () -> Unit)? = null,
-    failedContent: (@Composable (Modifier) -> Unit)? = null,
-    overlays: @Composable () -> Unit = {},
-) {
-    val scrollBehavior = rememberPaneTopBarScrollBehavior()
-    val collapsed = scrollBehavior.state.collapsedFraction
-    val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE
-    BingeScreenScaffold(
-        title = title,
-        modifier = modifier,
-        onBack = callbacks.onBack,
-        bar = ScreenBar.Large,
-        snackbarHostState = snackbarHostState,
-        scrollBehavior = scrollBehavior,
-        titleTrailing = titleTrailing?.let { { it(titleRowShows) } },
-        actions = { barActions(!titleRowShows, collapsed) },
-        header = { SearchControls(text, state, callbacks, placeholder, reselectKey) },
-    ) { padding ->
-        ScreenBody(padding) { body ->
-            val top = body.calculateTopPadding()
-            CenteredContent(maxWidth = dimensionResource(R.dimen.search_content_max_width)) { capped ->
-                Box(capped.fillMaxSize()) {
-                    SearchBody(
-                        state = state,
-                        callbacks = callbacks,
-                        top = top,
-                        bottom = body.calculateBottomPadding(),
-                        idleTitle = idleTitle,
-                        idleMessage = idleMessage,
-                        loadingLabel = loadingLabel,
-                        recents = RecentsCopy(recentsTitle, clearLabel, clearTitle, clearMessage),
-                        moreFailedLabel = moreFailedLabel,
-                        resultTrailing = resultTrailing,
-                        idleExtras = idleExtras,
-                        noResultsExtras = noResultsExtras,
-                        failedContent = failedContent,
-                    )
-                }
-            }
-        }
-    }
-    overlays()
-}
 
 private class RecentsCopy(
     val title: String,
@@ -501,7 +401,7 @@ private fun ResultsList(
     val nearEnd by remember {
         derivedStateOf {
             val info = gridState.layoutInfo
-            isSearchNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount)
+            isNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount, ahead = SEARCH_LOAD_MORE_AHEAD)
         }
     }
     LaunchedEffect(gridState, state.hasMore, state.loaded) {
@@ -532,31 +432,9 @@ private fun ResultsList(
             }
             if (state.appending || state.appendFailed || empty) {
                 item(key = FOOTER_KEY, span = { GridItemSpan(maxLineSpan) }) {
-                    SearchFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
+                    AppendFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun SearchFooter(
-    failed: Boolean,
-    failedLabel: String,
-    onRetry: () -> Unit,
-) {
-    Box(Modifier.fillMaxWidth().padding(vertical = dimensionResource(R.dimen.padding_m)), contentAlignment = Alignment.Center) {
-        if (failed) {
-            TextButton(onClick = onRetry) {
-                Icon(Icons.Filled.Refresh, contentDescription = null)
-                Text(
-                    failedLabel,
-                    modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_s)),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        } else {
-            CircularProgressIndicator()
         }
     }
 }

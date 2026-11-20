@@ -157,7 +157,6 @@
     <string name="detail_episode_label">E%1$d</string>
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="paged_grid_loading">Cargando</string>
-    <string name="paged_grid_more_failed">No se pudo cargar más. Toca para reintentar.</string>
     <string name="search_recents_title">Búsquedas recientes</string>
     <string name="search_recents_clear">Borrar</string>
     <string name="search_recents_clear_title">¿Borrar las búsquedas recientes?</string>
@@ -165,7 +164,7 @@
     <string name="search_idle_title">Buscar</string>
     <string name="search_idle_message">Escribe un título o un nombre.</string>
     <string name="search_loading">Buscando</string>
-    <string name="search_more_failed">No se pudo cargar más. Toca para reintentar.</string>
+    <string name="list_more_failed">No se pudo cargar más. Toca para reintentar.</string>
     <!-- The heading over a detail page's synopsis, when the app gives none of its own -->
     <string name="detail_overview_heading">Sinopsis</string>
 </resources>

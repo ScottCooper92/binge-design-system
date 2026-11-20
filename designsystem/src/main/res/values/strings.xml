@@ -48,6 +48,7 @@
     <string name="list_separator">", "</string>
     <!-- Announced with a poster card that is a favourite; the heart that marks it is never drawn with words. -->
     <string name="media_card_favourite">Favourite</string>
+    <!-- Announced with a poster card the viewer has finished; the tick that marks it is never drawn with words. -->
     <string name="media_card_watched">Watched</string>
     <plurals name="media_card_unwatched_count">
         <item quantity="one">%1$d unwatched</item>
@@ -178,7 +179,6 @@
     <string name="detail_runtime_minutes">%1$d min</string>
     <!-- Paged grid screen -->
     <string name="paged_grid_loading">Loading</string>
-    <string name="paged_grid_more_failed">Couldn\'t load more. Tap to retry.</string>
     <!-- Search screen -->
     <string name="search_recents_title">Recent searches</string>
     <string name="search_recents_clear">Clear</string>
@@ -187,7 +187,7 @@
     <string name="search_idle_title">Search</string>
     <string name="search_idle_message">Type a title or a name.</string>
     <string name="search_loading">Searching</string>
-    <string name="search_more_failed">Couldn\'t load more. Tap to retry.</string>
+    <string name="list_more_failed">Couldn\'t load more. Tap to retry.</string>
     <!-- The heading over a detail page's synopsis, when the app gives none of its own -->
     <string name="detail_overview_heading">Overview</string>
 </resources>

@@ -1,7 +1,6 @@
 package com.binge.designsystem.template
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -18,14 +17,8 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SearchOff
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -198,7 +191,7 @@ fun PagedGridScreen(
     reselectKey: Any? = null,
     firstVisibleIndex: Int = 0,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    moreFailedLabel: String = stringResource(R.string.paged_grid_more_failed),
+    moreFailedLabel: String = stringResource(R.string.list_more_failed),
     loadingLabel: String = stringResource(R.string.paged_grid_loading),
     titleTrailing: (@Composable (pillInteractive: Boolean) -> Unit)? = null,
     barActions: @Composable RowScope.(handedOver: Boolean, collapsedFraction: Float) -> Unit = { _, _ -> },
@@ -410,27 +403,5 @@ private fun ReadyGrid(
         BingePullToRefresh(isRefreshing = refreshing, onRefresh = onRefresh, indicatorTopInset = indicatorTopInset) { grid() }
     } else {
         grid()
-    }
-}
-
-@Composable
-private fun AppendFooter(
-    failed: Boolean,
-    failedLabel: String,
-    onRetry: () -> Unit,
-) {
-    Box(Modifier.fillMaxWidth().padding(vertical = dimensionResource(R.dimen.padding_m)), contentAlignment = Alignment.Center) {
-        if (failed) {
-            TextButton(onClick = onRetry) {
-                Icon(Icons.Filled.Refresh, contentDescription = null)
-                Text(
-                    failedLabel,
-                    modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_s)),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        } else {
-            CircularProgressIndicator()
-        }
     }
 }

@@ -90,8 +90,8 @@ class SearchScreenTest {
 
     @Test
     fun `the near-end rule fires within three of the end`() {
-        assertTrue(isSearchNearEnd(lastVisibleIndex = 7, totalCount = 10))
-        assertFalse(isSearchNearEnd(lastVisibleIndex = 6, totalCount = 10))
+        assertTrue(isNearEnd(lastVisibleIndex = 7, totalCount = 10, ahead = SEARCH_LOAD_MORE_AHEAD))
+        assertFalse(isNearEnd(lastVisibleIndex = 6, totalCount = 10, ahead = SEARCH_LOAD_MORE_AHEAD))
     }
 
     @Test

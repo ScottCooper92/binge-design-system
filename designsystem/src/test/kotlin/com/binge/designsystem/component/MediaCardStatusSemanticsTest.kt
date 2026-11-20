@@ -19,6 +19,7 @@ import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeSentiment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,8 @@ class MediaCardStatusSemanticsTest {
 
     private var status by mutableStateOf<MediaCardStatus?>(null)
     private var favourite by mutableStateOf(false)
+    private var watched by mutableStateOf(false)
+    private var unwatchedCount by mutableStateOf<Int?>(null)
 
     private fun show(initial: MediaCardStatus?) {
         status = initial
@@ -49,6 +52,8 @@ class MediaCardStatusSemanticsTest {
                     onClick = {},
                     status = status,
                     favourite = favourite,
+                    watched = watched,
+                    unwatchedCount = unwatchedCount,
                     modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
                 )
             }
@@ -118,5 +123,67 @@ class MediaCardStatusSemanticsTest {
         rule.waitForIdle()
 
         assertEquals("Available", stateDescriptionOfCard())
+    }
+
+    private fun textOfCard(): List<String> =
+        rule
+            .onNode(hasClickAction())
+            .fetchSemanticsNode()
+            .config
+            .getOrNull(SemanticsProperties.Text)
+            .orEmpty()
+            .map { it.text }
+
+    @Test
+    fun `a watched card announces it first, and is still one target`() {
+        show(MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive))
+        watched = true
+        favourite = true
+        rule.waitForIdle()
+
+        assertEquals("Watched, Favourite, Available", stateDescriptionOfCard())
+        rule.onAllNodes(hasClickAction()).assertCountEquals(1)
+    }
+
+    @Test
+    fun `an unwatched count is announced once, in words, and its digits are not read again`() {
+        show(null)
+        unwatchedCount = 3
+        rule.waitForIdle()
+
+        assertEquals("3 unwatched", stateDescriptionOfCard())
+        assertEquals(
+            listOf("Arrival"),
+            textOfCard()
+                .filter { it.isNotBlank() }
+                .filter { it != "" }
+                .distinct()
+                .filter { it == "Arrival" },
+        )
+        assertTrue("the badge's digits leaked into the card's text: ${textOfCard()}", textOfCard().none { it == "3" })
+        rule.onAllNodes(hasClickAction()).assertCountEquals(1)
+    }
+
+    @Test
+    fun `a count above 99 does not read 99 plus, and a count of zero says nothing`() {
+        show(null)
+        unwatchedCount = 120
+        rule.waitForIdle()
+        assertEquals("120 unwatched", stateDescriptionOfCard())
+        assertTrue(textOfCard().none { it.contains("99") })
+
+        unwatchedCount = 0
+        rule.waitForIdle()
+        assertNull(stateDescriptionOfCard())
+    }
+
+    @Test
+    fun `a watched card draws the tick alone, so an unwatched count is not announced beside it`() {
+        show(null)
+        watched = true
+        unwatchedCount = 3
+        rule.waitForIdle()
+
+        assertEquals("Watched", stateDescriptionOfCard())
     }
 }
