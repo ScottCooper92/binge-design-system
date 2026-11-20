@@ -14,11 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -34,14 +36,11 @@ internal fun TvPosterMarks(poster: TvPosterCell) {
     val inset = dimensionResource(DesR.dimen.padding_xs)
     Box(Modifier.fillMaxSize()) {
         if (poster.watched) {
-            Icon(
-                imageVector = Icons.Filled.CheckCircle,
-                contentDescription = stringResource(DesR.string.media_card_watched),
+            TvWatchedMark(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(inset)
-                    .size(dimensionResource(TvR.dimen.tv_poster_mark_size)),
+                    .padding(inset),
             )
         } else if (poster.unwatchedCount > 0) {
             val label = pluralStringResource(DesR.plurals.media_card_unwatched_count, poster.unwatchedCount, poster.unwatchedCount)
@@ -69,21 +68,39 @@ internal fun TvPosterMarks(poster: TvPosterCell) {
                     .size(dimensionResource(TvR.dimen.tv_poster_mark_size)),
             )
         }
-        poster.progress?.let { fraction ->
-            Box(
-                Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .height(dimensionResource(TvR.dimen.tv_poster_progress_height))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-            ) {
-                Box(
-                    Modifier
-                        .fillMaxWidth(fraction.coerceIn(0f, 1f))
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.primary),
-                )
-            }
-        }
+        poster.progress?.let { fraction -> TvProgressBar(fraction, Modifier.align(Alignment.BottomStart)) }
+    }
+}
+
+/** The tick that says a title is watched, announced by the phone's own words; [tint] is the caller's, so it reads on the surface it sits on. */
+@Composable
+internal fun TvWatchedMark(
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = dimensionResource(TvR.dimen.tv_poster_mark_size),
+) {
+    Icon(
+        imageVector = Icons.Filled.CheckCircle,
+        contentDescription = stringResource(DesR.string.media_card_watched),
+        tint = tint,
+        modifier = modifier.size(size),
+    )
+}
+
+/** A bar along the foot of a card, [fraction] of the way across (clamped to 0..1), for how far through a title the viewer is. */
+@Composable
+internal fun TvProgressBar(fraction: Float, modifier: Modifier = Modifier) {
+    Box(
+        modifier
+            .fillMaxWidth()
+            .height(dimensionResource(TvR.dimen.tv_poster_progress_height))
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Box(
+            Modifier
+                .fillMaxWidth(fraction.coerceIn(0f, 1f))
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primary),
+        )
     }
 }

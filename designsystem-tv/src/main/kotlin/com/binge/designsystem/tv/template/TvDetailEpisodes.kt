@@ -25,22 +25,32 @@ import com.binge.designsystem.tv.R as TvR
 /**
  * A season pill: its name, and its episode count beneath once it is the selected one. [key] is the app's identity for the season, text, the one
  * [TvDetailEpisode.seasonKey], [TvDetailEpisodes]' `currentSeason` and `onSeasonChange` carry. It is never shown: [name] is the pill's words, so a
- * specials season is just a name.
+ * specials season is just a name. Both marks draw nothing by default: [watched] a tick beside the name for a season the viewer has finished, and
+ * [unwatchedCount] the number of episodes left, as a count badge (zero or less draws none; a [watched] season shows the tick instead).
  */
 class TvDetailSeason(
     val key: String,
     val name: String,
     val episodeCount: String,
+    val watched: Boolean = false,
+    val unwatchedCount: Int = 0,
 ) {
     /** For a season identified by a number: its [key] is the number as text. */
-    constructor(number: Int, name: String, episodeCount: String) : this(number.toString(), name, episodeCount)
+    constructor(
+        number: Int,
+        name: String,
+        episodeCount: String,
+        watched: Boolean = false,
+        unwatchedCount: Int = 0,
+    ) : this(number.toString(), name, episodeCount, watched, unwatchedCount)
 }
 
 /**
  * An episode card: its still, the [badge] drawn on it, and the title and synopsis shown under the strip while it is the one in focus.
  * [focusedBadge] is the badge while focused, the season and episode rather than the bare number. [facts] are the air year, runtime
  * and the like, already formatted, shown after the rating. [key] is the app's identity for the episode, text, which the strip's focus memory
- * is kept by; [seasonKey] is its season's [TvDetailSeason.key].
+ * is kept by; [seasonKey] is its season's [TvDetailSeason.key]. Both marks draw nothing by default: [watched] a tick on the still, and [progress] a
+ * bar along its foot for how far through it the viewer is, a fraction from 0 to 1 (null draws none).
  */
 class TvDetailEpisode(
     val key: String,
@@ -53,6 +63,8 @@ class TvDetailEpisode(
     val overview: String,
     val rating: Float? = null,
     val facts: List<String> = emptyList(),
+    val watched: Boolean = false,
+    val progress: Float? = null,
 ) {
     /** For an episode and a season identified by numbers: their keys are the numbers as text. */
     constructor(
@@ -66,7 +78,22 @@ class TvDetailEpisode(
         overview: String,
         rating: Float? = null,
         facts: List<String> = emptyList(),
-    ) : this(key.toString(), seasonNumber.toString(), episodeNumber, stillUrl, badge, focusedBadge, title, overview, rating, facts)
+        watched: Boolean = false,
+        progress: Float? = null,
+    ) : this(
+        key.toString(),
+        seasonNumber.toString(),
+        episodeNumber,
+        stillUrl,
+        badge,
+        focusedBadge,
+        title,
+        overview,
+        rating,
+        facts,
+        watched,
+        progress,
+    )
 }
 
 /**
