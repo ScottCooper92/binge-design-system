@@ -3,9 +3,12 @@ package com.binge.designsystem.template
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithText
+import com.binge.designsystem.catalog.MEDIA_PAGE_OVERVIEW
+import com.binge.designsystem.catalog.MediaPageStats
 import com.binge.designsystem.catalog.MovieDetailScreenLoadingSample
 import com.binge.designsystem.catalog.MovieDetailScreenSample
 import com.binge.designsystem.layout.LayoutAnchors
+import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
 import com.binge.designsystem.testing.createTakeDownComposeRule
@@ -64,6 +67,25 @@ class MovieDetailScreenTest {
         val wide = listOf(LayoutAnchors.Detail.HERO, LayoutAnchors.Detail.ACTIONS).map(LayoutAnchors::section)
         rule.assertSkeletonReservesGeometry(wide, checkSize = true) { resolved ->
             if (resolved) MovieDetailScreenSample() else MovieDetailScreenLoadingSample()
+        }
+    }
+
+    /** A title with no actions draws no action row, loaded or loading, so the overview does not move when the page arrives. */
+    @Test
+    fun `the bare skeleton holds the overview of a page with no actions`() {
+        val bare = listOf(LayoutAnchors.Detail.STATS, LayoutAnchors.Detail.OVERVIEW).map(LayoutAnchors::section)
+        val stats = MediaPageStats.take(2)
+        rule.assertSkeletonReservesGeometry(bare, checkSize = true) { resolved ->
+            ScreenshotTheme {
+                MovieDetailScreen(
+                    state = if (resolved) {
+                        DetailState.Content(MediaDetail(title = "Title", stats = stats, overview = MEDIA_PAGE_OVERVIEW))
+                    } else {
+                        DetailState.Loading(stats = stats.size, roundActions = 0, hasPrimary = false)
+                    },
+                    callbacks = MediaDetailCallbacks(onBack = {}),
+                )
+            }
         }
     }
 

@@ -193,11 +193,13 @@ private fun DetailPageSkeleton(
             if (!cinematic) {
                 DetailStatsRowsSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)), count = state.stats)
             }
-            DetailActionsSkeleton(
-                Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
-                buttons = state.roundActions,
-                primary = state.hasPrimary,
-            )
+            if (state.hasPrimary || state.roundActions > 0) {
+                DetailActionsSkeleton(
+                    Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
+                    buttons = state.roundActions,
+                    primary = state.hasPrimary,
+                )
+            }
             if (!cinematic) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
             repeat(state.rails) { CarouselSkeleton() }
         }
