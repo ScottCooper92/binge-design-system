@@ -49,8 +49,6 @@ private val LOADING_ROWS =
  * With [loading] the hero is its plate and the rows are placeholders, in the same list: the plate takes focus like the hero, so
  * focus placed on it stays on the same node when the slides arrive. [takeFocusOnEntry] is for a hub mounted over the plate that held
  * focus (an error or empty plate a retry replaced): it puts focus on the entry once.
- *
- * Design notes: `docs/notes/core-designsystem-tv.md#tvexpandingrowshub`.
  */
 @Composable
 internal fun TvExpandingRowsHubContent(
@@ -269,6 +267,10 @@ private fun HeroSlot(
  * @param overlayOpen true while a sheet the caller opened over the hub is up; when it goes, focus returns to the hub's entry.
  * @param initialFocusedKey seeds focus onto one row for a screenshot, which dispatches no focus events; null in production.
  *
+ * A row's [TvHubRow.onSeeAll], [TvHubRow.seeAllLabel] and [TvHubRow.seeAllPeek] are not read here: this hub draws no See-all card.
+ * For one, use [TvExpandingSingleRow].
+ *
+ * @sample TvExpandingHubWithHeroSample
  * @need show titles as rows that expand under focus into a backdrop slot, with a hero above, on a tv screen
  * @group tv
  * @replaces a hand-built tv home hub with its own expanding rows, hero and focus hand-off

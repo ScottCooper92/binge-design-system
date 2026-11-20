@@ -3,7 +3,7 @@ package com.binge.designsystem.tv.template
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 
 /**
- * The layout anchors on the expanding hub's open row and row headings, which [TvExpandingHubLoadingSkeleton] and the hub's loading rows reserve (#1598).
+ * The layout anchors on the expanding hub's open row and row headings, which [TvExpandingHubLoadingSkeleton] and the hub's loading rows reserve.
  * Both the real row and its skeleton tag the same point, so a test measures that resolving moves nothing.
  */
 object TvExpandingAnchors {

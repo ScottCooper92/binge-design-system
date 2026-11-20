@@ -24,6 +24,7 @@ import com.binge.designsystem.tv.template.TvExpandingPendingRow
 import com.binge.designsystem.tv.template.TvExpandingRowBody
 import com.binge.designsystem.tv.template.TvExpandingRowState
 import com.binge.designsystem.tv.template.TvExpandingRowsHub
+import com.binge.designsystem.tv.template.TvExpandingSingleRow
 import com.binge.designsystem.tv.template.TvExpandingSlot
 import com.binge.designsystem.tv.template.TvExpandingTitles
 import com.binge.designsystem.tv.template.TvHubItem
@@ -33,6 +34,8 @@ import com.binge.designsystem.tv.template.TvTitleExtras
 private const val LONG_COUNT = 10
 private const val SHORT_COUNT = 4
 private const val LOOP_MIN = 8
+private const val SEE_ALL_COUNT = 24
+private const val SEE_ALL_ITEMS = 2
 
 private val Extras = TvTitleExtras(
     logoUrl = "https://preview.invalid/logo.png",
@@ -310,4 +313,34 @@ fun TvExpandingSeeAllLastTitleSample() {
 @Composable
 fun TvExpandingSeeAllFocusedSample() {
     SampleColumn { SeeAllRow(position = LONG_COUNT) }
+}
+
+/** One set of titles as a single row, already open at the detail page's height, with the logo and certification loaded for the first title. */
+@Composable
+fun TvExpandingSingleRowSample() {
+    SampleColumn {
+        TvExpandingSingleRow(
+            title = "More like this",
+            items = List(SHORT_COUNT) { hubItem(it) },
+            item = { it },
+            onItemClick = { _, _ -> },
+            titleExtras = { Extras },
+        )
+    }
+}
+
+/** The single row of a set whose full list is another screen: its See-all card reads "All 24" once the caller knows the count. */
+@Composable
+fun TvExpandingSingleRowSeeAllSample() {
+    SampleColumn {
+        TvExpandingSingleRow(
+            title = "Collection",
+            items = List(SEE_ALL_ITEMS) { hubItem(it) },
+            item = { it },
+            onItemClick = { _, _ -> },
+            titleExtras = { Extras },
+            onSeeAll = {},
+            seeAllCount = SEE_ALL_COUNT,
+        )
+    }
 }

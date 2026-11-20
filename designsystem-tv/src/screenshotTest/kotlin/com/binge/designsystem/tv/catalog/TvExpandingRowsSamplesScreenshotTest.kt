@@ -128,6 +128,16 @@ class TvExpandingRowsSamplesScreenshotTest {
     @Composable
     fun seeAllFocused() = Frame { TvExpandingSeeAllFocusedSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun singleRow() = Frame { TvExpandingSingleRowSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun singleRowSeeAll() = Frame { TvExpandingSingleRowSeeAllSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) { Box(Modifier.fillMaxSize()) { content() } }

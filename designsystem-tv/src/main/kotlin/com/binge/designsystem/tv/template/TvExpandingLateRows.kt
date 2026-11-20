@@ -10,8 +10,6 @@ import com.binge.designsystem.tv.template.TvHubRow
  * the last composition and would land above it (a "Continue watching" answering late) is held out, and a pending row that gives up
  * keeps its empty slot rather than collapsing, so nothing below it moves. Both last until the hub leaves composition, the next visit.
  * Whether focus is on a row is read from where [TvExpandingHubFocus.savedKey] is now: the index goes stale as rows come and go.
- *
- * Design notes: `docs/notes/core-designsystem-tv.md#tvexpandingrowshub`.
  */
 @Composable
 internal fun rememberTvExpandingLateRowGuard(rows: List<TvHubRow<TvHubItem>>, focus: TvExpandingHubFocus): List<TvHubRow<TvHubItem>> {
