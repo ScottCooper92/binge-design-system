@@ -84,11 +84,8 @@ class MediaResultRowTest {
     private fun heightOf(content: @androidx.compose.runtime.Composable () -> Unit): Int {
         rule.setContent { TestTheme { Box(Modifier.width(412.dp)) { content() } } }
         rule.waitForIdle()
-        return rule
-            .onRoot()
-            .getBoundsInRoot()
-            .height.value
-            .toInt()
+        val bounds = rule.onRoot().getBoundsInRoot()
+        return (bounds.bottom - bounds.top).value.toInt()
     }
 
     @Test
