@@ -273,7 +273,9 @@ fun TvMessagePlateTopStartSample() {
 /** A failure drawn from its kind, centred as a full-screen state is, with Try again focused. */
 @Composable
 fun TvErrorPlateSample() {
-    TvErrorPlate(kind = ErrorKind.Server, onRetry = {}, alignment = Alignment.Center, retryInitiallyFocused = true)
+    RetryableSample { onRetry ->
+        TvErrorPlate(kind = ErrorKind.Server, onRetry = onRetry, alignment = Alignment.Center, retryInitiallyFocused = true)
+    }
 }
 
 /** A failure nothing can be done about here: no button, so nothing dead to land on. */
@@ -285,13 +287,15 @@ fun TvErrorPlateNoRetrySample() {
 /** A failure in the app's own words: its title and message over the configuration kind's glyph, with Try again. */
 @Composable
 fun TvErrorPlateTitledSample() {
-    TvErrorPlate(
-        kind = ErrorKind.Configuration,
-        onRetry = {},
-        title = "No API key",
-        message = "Add an API key in Settings, then try again.",
-        alignment = Alignment.Center,
-    )
+    RetryableSample { onRetry ->
+        TvErrorPlate(
+            kind = ErrorKind.Configuration,
+            onRetry = onRetry,
+            title = "No API key",
+            message = "Add an API key in Settings, then try again.",
+            alignment = Alignment.Center,
+        )
+    }
 }
 
 /** The focus ring, the lift and the overscan margin at TV scale, with focus as a flag. */

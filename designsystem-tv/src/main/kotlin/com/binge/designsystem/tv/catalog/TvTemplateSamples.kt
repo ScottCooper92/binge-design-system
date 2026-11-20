@@ -391,13 +391,13 @@ fun TvMessagePageNoActionSample() {
 /** A failure as a whole page: the kind's glyph and copy, and Try again, announced as one. */
 @Composable
 fun TvErrorPageSample() {
-    TvErrorPage(kind = ErrorKind.Server, onRetry = {}, hosting = TvPageHosting.Overlay)
+    RetryableSample { onRetry -> TvErrorPage(kind = ErrorKind.Server, onRetry = onRetry, hosting = TvPageHosting.Overlay) }
 }
 
 /** A failure whose cause is unknown: the generic kind's glyph claims nothing specific, and Try again. */
 @Composable
 fun TvErrorPageGenericSample() {
-    TvErrorPage(kind = ErrorKind.Generic, onRetry = {}, hosting = TvPageHosting.Overlay)
+    RetryableSample { onRetry -> TvErrorPage(kind = ErrorKind.Generic, onRetry = onRetry, hosting = TvPageHosting.Overlay) }
 }
 
 /** A failure the caller cannot retry, in the caller's own words: no button, so the page holds focus itself. */
