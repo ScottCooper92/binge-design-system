@@ -259,9 +259,7 @@ private fun ColumnScope.PersonContent(
                 if (section.items.isNotEmpty()) {
                     CreditRail(
                         section,
-                        headerModifier = if (index ==
-                            firstRail
-                        ) {
+                        headerModifier = if (index == firstRail) {
                             Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.CREDITS))
                         } else {
                             Modifier

@@ -36,8 +36,8 @@ private const val SKELETON_CHIP_COUNT = 3
  * the whole grid shunted down on resolve. This is the plate that reserves it, shared so the two
  * cannot drift apart again.
  *
- * The pill's height is a dimen rather than a derived value because a chip is a composed component with its
- * own padding and label, not a line of text; the geometry checks on both screens are what keep it honest.
+ * The pill's height is derived, not a dimen: the chip's vertical padding around one invisible line of its label
+ * style, so the plate grows with the font as the chip does. Only the width is a dimen.
  *
  * [description] names the loading state for a screen reader; without one it stays silent.
  *

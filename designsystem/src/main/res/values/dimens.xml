@@ -187,10 +187,8 @@
     <dimen name="list_row_poster_width">72dp</dimen>
     <!-- The width of a 16:9 still leading a media result row, so an episode row is about as tall as a poster row. -->
     <dimen name="media_result_still_width">112dp</dimen>
-    <!-- The heart and the tick beside a result row's name, and the two plates of the row's loading skeleton. -->
+    <!-- The heart and the tick beside a result row's name. -->
     <dimen name="media_result_mark_size">16dp</dimen>
-    <dimen name="media_result_skeleton_name_height">18dp</dimen>
-    <dimen name="media_result_skeleton_subtitle_height">12dp</dimen>
     <dimen name="list_row_logo_padding">10dp</dimen>
     <dimen name="list_row_spacing">10dp</dimen>
     <dimen name="list_row_skeleton_height">128dp</dimen>
@@ -312,9 +310,7 @@
     <!-- HintCard's dismissible form: end inset so wrapped text clears the close IconButton in the
          top-right corner, sized to the button's own default touch target. -->
     <dimen name="hint_card_dismiss_end_inset">48dp</dimen>
-    <!-- FilterChipRowSkeleton's pill: the chip's own height, so the pill plus BingeFilterChipRow's vertical
-         content padding is the band the resolved page puts above its grid (its first tile is reserved where
-         it lands, not a chip row too high). -->
+    <!-- FilterChipRowSkeleton's pill width. Its height is derived from the chip's padding and label style. -->
     <dimen name="skeleton_filter_chip_width">88dp</dimen>
     <!-- Rating chip -->
     <dimen name="rating_chip_padding_h">8dp</dimen>

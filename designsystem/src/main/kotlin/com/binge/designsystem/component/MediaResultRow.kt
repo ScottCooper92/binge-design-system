@@ -177,11 +177,11 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
 }
 
 /**
- * What a search draws in a [MediaResultRow]'s place while it loads: the row's own chrome with a plate for the picture and two for the
- * name and the subtitle, at the picture's size, so the loading to content swap does not jump. [kind] picks the picture's shape, its box and the text's alignment as the row does.
- * [description] names the loading state for a screen reader; without one it stays silent. [blurbLines] is for a list whose rows carry a blurb, which
- * runs up to three lines: the plates then follow the row's own text (the name, the status line and that many blurb lines, each at its own
- * font size), so the rows below do not shift down when the list loads.
+ * What a search draws in a [MediaResultRow]'s place while it loads: the row's own chrome with a plate for the picture and plates for the
+ * name and the status line, at the picture's size, so the loading to content swap does not jump. [kind] picks the picture's shape, its box and the text's alignment as the row does.
+ * [description] names the loading state for a screen reader; without one it stays silent. The text plates always follow the row's own text (the name and the
+ * status line, each at its own font size), so the rows below do not shift down when the list loads. [blurbLines] is for a list whose rows
+ * carry a blurb, which runs up to three lines: it adds that many blurb lines.
  *
  * @need show a loading placeholder for a search result row
  * @group feedback
@@ -208,9 +208,9 @@ fun MediaResultRowSkeleton(
 }
 
 /**
- * The plates of a row that carries a blurb, laid out as [MediaResultRow] lays out its text: the name, the status line and [lines] lines
- * of the blurb, each a line of its own style and the gaps the row has, so the height is the loaded row's at any font size. The fixed-height
- * plates of a row with no blurb would stay as they are at a large font while the row's text grows, and the rows below would shift down.
+ * The text plates of a row, laid out as [MediaResultRow] lays out its text: the name, the status line and [lines] lines
+ * of the blurb (none for a row without one), each a line of its own style and the gaps the row has, so the height is the loaded row's at
+ * any font size.
  */
 @Composable
 private fun BlurbRowPlates(lines: Int, modifier: Modifier) {
