@@ -167,7 +167,9 @@ fun showsGridFooter(ready: PagedGridState.Ready): Boolean = ready.appending || r
  * collapsed (both change at [BAR_HANDOVER_COLLAPSE]). [failedContent] replaces the default failure plate.
  *
  * @param refreshing whether a pull-to-refresh is in flight; used only when [PagedGridCallbacks.onRefresh] is set.
- * @param reselectKey the tab this grid is the root of; tapping it again scrolls to the top. Null for a grid with no tab.
+ * @param reselectKey the tab this grid is the root of, as the shell emits it on the reselect signal (compared by equality, so
+ *   pass the same value); tapping it again scrolls to the top. Null for a grid with no tab.
+ * @param loadingLabel what a screen reader says of the first loading plate; the app words it ("Loading titles").
  * @param firstVisibleIndex scrolls the grid to a cell, for a frame of the grid mid-list.
  * @param filterSheet the sheet the pill opens, given a dismiss callback; the screen keeps whether it is open.
  *
@@ -184,10 +186,11 @@ fun PagedGridScreen(
     subtitle: String? = null,
     filterBar: GridFilterBar? = null,
     refreshing: Boolean = false,
-    reselectKey: String? = null,
+    reselectKey: Any? = null,
     firstVisibleIndex: Int = 0,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     moreFailedLabel: String = stringResource(R.string.paged_grid_more_failed),
+    loadingLabel: String = stringResource(R.string.paged_grid_loading),
     titleTrailing: (@Composable (pillInteractive: Boolean) -> Unit)? = null,
     barActions: @Composable RowScope.(handedOver: Boolean, collapsedFraction: Float) -> Unit = { _, _ -> },
     failedContent: (@Composable (Modifier) -> Unit)? = null,
@@ -259,7 +262,7 @@ fun PagedGridScreen(
                     ),
                 )
             when (state) {
-                PagedGridState.Loading -> PagedGridSkeleton(inner)
+                PagedGridState.Loading -> PagedGridSkeleton(inner, loadingLabel)
                 is PagedGridState.Empty ->
                     EmptyScreen(
                         message = state.message,
@@ -338,8 +341,10 @@ private fun firstCellAnchor(index: Int): Modifier =
 fun pagedGridSkeletonCells(): Int = mediaGridColumns() * PAGED_GRID_SKELETON_ROWS
 
 @Composable
-private fun PagedGridSkeleton(contentPadding: PaddingValues) {
-    val loading = stringResource(R.string.paged_grid_loading)
+private fun PagedGridSkeleton(
+    contentPadding: PaddingValues,
+    loading: String,
+) {
     val cells = pagedGridSkeletonCells()
     GridFrame(contentPadding) {
         items(cells) { index ->
@@ -355,7 +360,7 @@ private fun ReadyGrid(
     callbacks: PagedGridCallbacks,
     refreshing: Boolean,
     indicatorTopInset: Dp,
-    reselectKey: String?,
+    reselectKey: Any?,
     firstVisibleIndex: Int,
     moreFailedLabel: String,
 ) {
