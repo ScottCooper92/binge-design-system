@@ -59,7 +59,8 @@ internal fun FilterSectionControl(section: FilterSectionUi, callbacks: FilterCon
                         state =
                             when (option.id) {
                                 in control.includedIds -> IncludeExcludeState.Include
-                                in control.excludedIds -> if (control.includeOnly) IncludeExcludeState.Neutral else IncludeExcludeState.Exclude
+                                in control.excludedIds ->
+                                    if (control.includeOnly) IncludeExcludeState.Neutral else IncludeExcludeState.Exclude
                                 else -> IncludeExcludeState.Neutral
                             },
                         onClick = { callbacks.onOptionClick(section.id, option.id) },
