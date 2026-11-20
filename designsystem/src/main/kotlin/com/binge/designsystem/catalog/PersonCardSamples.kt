@@ -150,7 +150,7 @@ fun PersonCardSkeletonSample() {
 fun PersonCardCompactSample() {
     ScreenshotTheme {
         var taps by remember { mutableStateOf(0) }
-        LooseFrame {
+        Column {
             WithPreviewImage(PHOTO_SIZE_PX, PHOTO_SIZE_PX) {
                 PersonCard(
                     name = "Amara Okafor",
@@ -160,7 +160,7 @@ fun PersonCardCompactSample() {
                     style = PersonCardStyle.Compact,
                 )
             }
-            Text("Taps: $taps")
+            if (taps > 0) Text("Tapped $taps")
         }
     }
 }

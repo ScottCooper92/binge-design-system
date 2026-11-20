@@ -209,7 +209,7 @@ private fun PersonCardCaption(
             .padding(top = dimensionResource(R.dimen.padding_s))
             .padding(horizontal = dimensionResource(R.dimen.padding_xs)),
     ) {
-        // Three lines of the caption's own style, drawn in nothing: the height comes from the same text layout the real lines use, so it
+        // One line more than the name's, of the caption's own style, drawn in nothing: the height comes from the same text layout the real lines use, so it
         // cannot come out shorter than they do at any font scale, as a height worked out from the line height can.
         Text(
             text = " ",

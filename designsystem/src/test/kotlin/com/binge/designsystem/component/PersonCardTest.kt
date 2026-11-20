@@ -118,7 +118,7 @@ class PersonCardTest {
     fun `the compact skeleton takes exactly the room the compact card does at 2x font`() = compactSkeletonMatchesCard(2f)
 
     @Test
-    fun `the compact card is the cast avatar wide and its caption is one line each`() {
+    fun `a compact card's long text ellipsizes to the size of a short one`() {
         rule.setContent {
             TestTheme {
                 PersonCard(
@@ -140,27 +140,28 @@ class PersonCardTest {
             }
         }
 
-        // Long text and short text take the same room: each line ellipsizes rather than wrapping to a taller tile.
+        // Each line ellipsizes rather than wrapping to a taller tile.
         assertEquals(rule.onNodeWithTag(SHORT).fetchSemanticsNode().size, rule.onNodeWithTag(CARD).fetchSemanticsNode().size)
     }
 
     @Test
-    fun `the default style is unchanged by the compact one`() {
+    fun `a compact card is 96dp wide and a default one 104dp`() {
         rule.setContent {
             TestTheme {
-                PersonCard(name = "Amara Okafor", subtitle = "Lead", photoUrl = null, onClick = {}, modifier = Modifier.testTag(CARD))
                 PersonCard(
                     name = "Amara Okafor",
                     subtitle = "Lead",
                     photoUrl = null,
                     onClick = {},
-                    style = PersonCardStyle.Default,
-                    modifier = Modifier.testTag(SHORT),
+                    style = PersonCardStyle.Compact,
+                    modifier = Modifier.testTag(CARD),
                 )
+                PersonCard(name = "Amara Okafor", subtitle = "Lead", photoUrl = null, onClick = {}, modifier = Modifier.testTag(SHORT))
             }
         }
 
-        assertEquals(rule.onNodeWithTag(CARD).fetchSemanticsNode().size, rule.onNodeWithTag(SHORT).fetchSemanticsNode().size)
+        assertEquals(96f, widthOf(CARD), 0.5f)
+        assertEquals(104f, widthOf(SHORT), 0.5f)
     }
 
     @Test
@@ -187,6 +188,12 @@ class PersonCardTest {
         // The compact tile is narrower than the default one: 96dp against 104dp on a phone.
         assertEquals(96f, widthWith(PersonCardStyle.Compact), 0.5f)
     }
+
+    private fun widthOf(tag: String) =
+        rule
+            .onNodeWithTag(tag)
+            .getBoundsInRoot()
+            .let { it.right.value - it.left.value }
 
     private companion object {
         const val SHORT = "short"
