@@ -233,3 +233,29 @@ annotation class LandscapePanesPreview
     locale = SOURCE_LOCALE,
 )
 annotation class TallComponentPreviews
+
+/**
+ * [WorstCaseFontPreviews] on a tall window, for a frame whose content at 1.3x and 2x runs past the standard phone's height: a skeleton over the
+ * content it becomes, say. Same fonts, width and theme, with room for both.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(
+    name = "font13-tall-dark",
+    widthDp = STANDARD_PHONE_WIDTH_DP,
+    heightDp = TALL_PHONE_HEIGHT_DP,
+    fontScale = 1.3f,
+    uiMode = UI_MODE_NIGHT_YES,
+    locale = SOURCE_LOCALE,
+)
+@Preview(
+    name = "font20-tall-dark",
+    widthDp = STANDARD_PHONE_WIDTH_DP,
+    heightDp = TALL_PHONE_HEIGHT_DP,
+    fontScale = 2.0f,
+    uiMode = UI_MODE_NIGHT_YES,
+    locale = SOURCE_LOCALE,
+)
+annotation class TallWorstCaseFontPreviews
+
+/** The height of the tall window [TallWorstCaseFontPreviews] draws in. */
+const val TALL_PHONE_HEIGHT_DP = 1150

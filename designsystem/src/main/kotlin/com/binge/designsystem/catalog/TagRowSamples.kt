@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
+import com.binge.designsystem.component.SectionHeader
 import com.binge.designsystem.component.TagRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -45,6 +46,45 @@ fun TagRowSample() {
                     style = MaterialTheme.typography.labelMedium,
                 )
             }
+        }
+    }
+}
+
+private val KeywordTags = listOf(
+    "alaska",
+    "dog",
+    "special forces",
+    "military",
+    "american wilderness",
+    "survival",
+    "rescue",
+    "snow",
+    "friendship",
+    "journey",
+)
+
+/**
+ * A detail page's keywords: the section header over compact, tappable tags of very different lengths. The tags are 8dp apart both ways,
+ * short or long, and the heading sits as close to them as it does to any other section's content, because a tag takes only its own size
+ * in the layout and its 48dp touch target reaches into the space around it.
+ */
+@Composable
+fun TagRowKeywordsSample() {
+    ScreenshotTheme {
+        var tapped by remember { mutableStateOf<Int?>(null) }
+        Column {
+            SectionHeader("Keywords", horizontalPadding = dimensionResource(R.dimen.padding_m))
+            TagRow(
+                tags = KeywordTags,
+                compact = true,
+                onTagClick = { tapped = it },
+                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_m)),
+            )
+            Text(
+                text = tapped?.let { "Tapped: ${KeywordTags[it]}" } ?: "Tap a keyword",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
+            )
         }
     }
 }

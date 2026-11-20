@@ -26,7 +26,7 @@ private const val SYNOPSIS_LINES = 3
 @Composable
 internal fun TvDetailCopy(title: TvDetailTitle, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.width(dimensionResource(TvR.dimen.tv_detail_v2_copy_width)),
+        modifier = modifier.width(dimensionResource(TvR.dimen.tv_detail_copy_width)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
         TvDetailLogo(title)
@@ -62,8 +62,8 @@ internal fun TvDetailLogo(
 ) {
     val logo = title.logoUrl
     if (logo != null) {
-        val width = dimensionResource(if (compact) TvR.dimen.tv_detail_v2_logo_compact_width else TvR.dimen.tv_detail_v2_logo_width)
-        val height = dimensionResource(if (compact) TvR.dimen.tv_detail_v2_logo_compact_height else TvR.dimen.tv_detail_v2_logo_height)
+        val width = dimensionResource(if (compact) TvR.dimen.tv_detail_logo_compact_width else TvR.dimen.tv_detail_logo_width)
+        val height = dimensionResource(if (compact) TvR.dimen.tv_detail_logo_compact_height else TvR.dimen.tv_detail_logo_height)
         AsyncImage(
             model = logo,
             contentDescription = title.title,

@@ -31,7 +31,7 @@ import com.binge.designsystem.tv.template.TvDetailTitle
 import com.binge.designsystem.tv.template.TvTitleDetailPage
 import com.binge.designsystem.tv.template.tvDetailLoadingTabs
 
-private val DetailSampleTitle = TvDetailTitle(
+internal val DetailSampleTitle = TvDetailTitle(
     title = "The Long Way Home",
     logoUrl = null,
     backdropUrl = null,

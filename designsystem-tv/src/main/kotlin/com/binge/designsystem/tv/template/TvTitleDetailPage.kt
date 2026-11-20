@@ -100,9 +100,11 @@ fun tvDetailLoadingTabs(vararg keyedLabels: Pair<String, String>): List<TvDetail
 val TV_DETAIL_LOADING_TITLE = TvDetailTitle("", null, null, "", emptyList(), emptyList(), null, null)
 
 /**
- * A title's page: at rest the backdrop fills the screen and the copy sits bottom-left
- * with the [actions] row and the [tabs] along the foot; ↓ or OK on a tab expands the page, moving the tabs to the top over that
- * tab's content (reported through [onTabShown]). ↑ from the top tabs, or Back, folds it. [initialExpanded] and [initialTabKey] seed the saved state, for a frame.
+ * A title's page: the backdrop, the copy, an action row and tabs that expand over it.
+ *
+ * At rest the copy sits bottom-left with the [actions] row and the [tabs] along the foot. ↓ or OK on a tab expands the page, moving
+ * the tabs to the top over that tab's content (reported through [onTabShown]). ↑ from the top tabs, or Back, folds it.
+ * [initialExpanded] and [initialTabKey] seed the saved state, for a frame.
  * Focus is offered once, as the page mounts: to the open tab's content when expanded, else the actions' primary slot (the real
  * primary, drawn busy while [loading]), else the tabs. Nothing offers it again.
  *
@@ -113,9 +115,10 @@ val TV_DETAIL_LOADING_TITLE = TvDetailTitle("", null, null, "", emptyList(), emp
  *
  * @param initialFocusedTabKey draws the tab with this key focused, for a frame: a frame fires no focus events.
  * @param loadingHasActions false for a page with no action row, so its loading state rests on the tabs, not on action placeholders.
- * @param backdropModel maps the title's backdrop URL to what the image loader is given: an app that wants a larger size for the
- *   10-foot screen resizes it here. The default uses the URL as it is.
- * @param portraitFallbackUrl a smaller form of the portrait to try when it fails to load, or null for none.
+ * @param backdropModel maps the title's backdrop URL to what the image loader is given. It defaults to the identity, so the page draws
+ *   the URL exactly as the title carries it; an app that wants a larger size on the 10-foot screen, as Binge does, must pass it.
+ * @param portraitFallbackUrl maps the portrait URL to a smaller form to try when it fails to load. It defaults to none, so a portrait
+ *   that fails shows no image; an app whose portrait can fail at its full size must pass it.
  */
 @Composable
 fun TvTitleDetailPage(
