@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -35,7 +36,7 @@ internal fun TvPosterMarks(poster: TvPosterCell) {
         if (poster.watched) {
             Icon(
                 imageVector = Icons.Filled.CheckCircle,
-                contentDescription = stringResource(TvR.string.tv_poster_watched),
+                contentDescription = stringResource(DesR.string.media_card_watched),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -43,7 +44,7 @@ internal fun TvPosterMarks(poster: TvPosterCell) {
                     .size(dimensionResource(TvR.dimen.tv_poster_mark_size)),
             )
         } else if (poster.unwatchedCount > 0) {
-            val label = stringResource(TvR.string.tv_poster_unwatched_count, poster.unwatchedCount)
+            val label = pluralStringResource(DesR.plurals.media_card_unwatched_count, poster.unwatchedCount, poster.unwatchedCount)
             Text(
                 text = poster.unwatchedCount.toString(),
                 style = MaterialTheme.typography.labelMedium,
@@ -60,7 +61,7 @@ internal fun TvPosterMarks(poster: TvPosterCell) {
         if (poster.favourite) {
             Icon(
                 imageVector = Icons.Filled.Favorite,
-                contentDescription = stringResource(TvR.string.tv_poster_favourite),
+                contentDescription = stringResource(DesR.string.media_card_favourite),
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier
                     .align(Alignment.TopStart)

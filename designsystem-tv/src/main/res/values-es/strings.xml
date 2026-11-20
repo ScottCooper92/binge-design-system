@@ -8,7 +8,4 @@
     <string name="tv_pane_row_badge_alert">Requiere atención</string>
     <string name="tv_see_all_count">Todos (%1$d)</string>
     <string name="tv_text_field_hidden">Oculto</string>
-    <string name="tv_poster_watched">Vista</string>
-    <string name="tv_poster_favourite">Favorita</string>
-    <string name="tv_poster_unwatched_count">%1$d sin ver</string>
 </resources>
