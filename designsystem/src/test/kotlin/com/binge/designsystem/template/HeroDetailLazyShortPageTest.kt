@@ -213,6 +213,32 @@ class HeroDetailLazyShortPageTest {
     }
 
     @Test
+    fun `a long list first laid out away from the top ends flush`() {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                val listState = rememberLazyListState(initialFirstVisibleItemIndex = 20)
+                state = listState
+                HeroDetailLazyScreen(
+                    title = "A title",
+                    onBack = {},
+                    listState = listState,
+                    heroHeight = HERO_HEIGHT,
+                    hero = { Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(Color.DarkGray)) },
+                ) {
+                    items(40) { Box(Modifier.fillMaxWidth().height(200.dp)) { Text("Item $it") } }
+                }
+            }
+        }
+        rule.waitForIdle()
+        scrollToEnd()
+
+        val info = state!!.layoutInfo
+        val last = info.visibleItemsInfo.last()
+        assertEquals(40, last.index)
+        assertEquals("the last item ends flush with the viewport", info.viewportEndOffset, last.offset + last.size)
+    }
+
+    @Test
     fun `a long list is not given extra room`() {
         show(items = 40, itemHeight = 200)
         scrollToEnd()

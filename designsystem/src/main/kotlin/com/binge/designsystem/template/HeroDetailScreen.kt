@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -336,7 +335,9 @@ private const val HERO_ITEM_KEY = "hero-detail-hero"
 private fun rememberUnderHeroExtent(listState: LazyListState): State<Int> {
     // Saved with the list's own position, so a restore (a rotation, a recreated process) lays out its first frame with the room the
     // restored offset needs. Only the extent is saved, not a size worked out for a viewport: the fill follows the current viewport.
-    val extent = rememberSaveable { mutableIntStateOf(0) }
+    // It starts as a long page, which has no fill: an unmeasured extent must not read as a short page, or a list first laid out away
+    // from the top (an initial index, a list state that outlived the screen) would keep a viewport of blank room under its last item.
+    val extent = rememberSaveable { mutableIntStateOf(LONG_PAGE) }
     LaunchedEffect(listState) {
         snapshotFlow { underHeroExtent(listState.layoutInfo) }.collect { measured -> if (measured != null) extent.intValue = measured }
     }
