@@ -24,6 +24,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.BingeIcons
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
@@ -93,7 +94,14 @@ fun FilterPill(
             modifier = Modifier.size(dimensionResource(R.dimen.filter_pill_icon)),
             tint = content,
         )
-        Text(text = label, style = MaterialTheme.typography.labelLargeEmphasis, color = content)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLargeEmphasis,
+            color = content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
         if (active) CountBadge(count = activeCount, containerColor = colors.onPrimary, contentColor = colors.primary)
     }
 }

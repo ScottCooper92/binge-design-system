@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -102,6 +103,24 @@ class FilterPillTest {
             }
         }
         assertTrue("no text node was checked", rule.assertNoTextClipped() >= 2)
+    }
+
+    @Test
+    fun `a pill in a narrow slot at 2_0 keeps its badge`() {
+        show(fontScale = 2f) {
+            Row(Modifier.width(130.dp)) {
+                FilterPill(
+                    activeCount = 12,
+                    enabled = true,
+                    onClick = {},
+                    label = "Filters",
+                    contentDescription = "Filters, 12 applied",
+                )
+            }
+        }
+        val badge = rule.onNodeWithText("12", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("badge has no width", badge.width > 0.dp)
+        assertTrue("badge is outside the slot", badge.right <= 130.dp)
     }
 
     private fun assertBadgeIsTwentyDp(fontScale: Float) {
