@@ -100,11 +100,13 @@ fun tvDetailLoadingTabs(vararg keyedLabels: Pair<String, String>): List<TvDetail
 val TV_DETAIL_LOADING_TITLE = TvDetailTitle("", null, null, "", emptyList(), emptyList(), null, null)
 
 /**
- * A title's page: at rest the backdrop fills the screen and the copy sits bottom-left
- * with the [actions] row and the [tabs] along the foot; ↓ or OK on a tab expands the page, moving the tabs to the top over that
- * tab's content (reported through [onTabShown]). ↑ from the top tabs, or Back, folds it. [initialExpanded] and [initialTabKey] seed the saved state, for a frame.
- * Focus is offered once, as the page mounts: to the open tab's content when expanded, else the actions' primary slot (a placeholder
- * while [loading], the same node as the real button), else the tabs. Nothing offers it again.
+ * A title's page: the backdrop, the copy, an action row and tabs that expand over it.
+ *
+ * At rest the copy sits bottom-left with the [actions] row and the [tabs] along the foot. ↓ or OK on a tab expands the page, moving
+ * the tabs to the top over that tab's content (reported through [onTabShown]). ↑ from the top tabs, or Back, folds it.
+ * [initialExpanded] and [initialTabKey] seed the saved state, for a frame.
+ * Focus is offered once, as the page mounts: to the open tab's content when expanded, else the actions' primary slot (the real
+ * primary, drawn busy while [loading]), else the tabs. Nothing offers it again.
  *
  * @need show a title's page with its copy, an action row and tabs that expand over the backdrop on a tv screen
  * @group tv

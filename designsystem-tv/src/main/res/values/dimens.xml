@@ -88,11 +88,18 @@
     <!-- Under a top bar, how far the copy may start inside the bar's height, into the faded foot of its scrim. -->
     <dimen name="tv_immersive_top_bar_copy_overlap">8dp</dimen>
     <dimen name="tv_immersive_rows_bottom">120dp</dimen>
-    <dimen name="tv_detail_v2_copy_width">560dp</dimen>
-    <dimen name="tv_detail_v2_logo_width">380dp</dimen>
-    <dimen name="tv_detail_v2_logo_height">120dp</dimen>
-    <dimen name="tv_detail_v2_logo_compact_width">200dp</dimen>
-    <dimen name="tv_detail_v2_logo_compact_height">48dp</dimen>
+    <dimen name="tv_detail_copy_width">560dp</dimen>
+    <dimen name="tv_detail_logo_width">380dp</dimen>
+    <dimen name="tv_detail_logo_height">120dp</dimen>
+    <dimen name="tv_detail_logo_compact_width">200dp</dimen>
+    <dimen name="tv_detail_logo_compact_height">48dp</dimen>
+    <dimen name="tv_detail_column_gap">32dp</dimen>
+    <dimen name="tv_detail_scroll_step">120dp</dimen>
+    <dimen name="tv_detail_cast_slot_height">340dp</dimen>
+    <dimen name="tv_detail_cast_strip_height">240dp</dimen>
+    <dimen name="tv_detail_gallery_row_height">150dp</dimen>
+    <dimen name="tv_detail_wide_slot_height">290dp</dimen>
+    <dimen name="tv_detail_wide_strip_height">150dp</dimen>
     <dimen name="tv_detail_tab_item_padding_horizontal">14dp</dimen>
     <dimen name="tv_detail_meta_gap">10dp</dimen>
     <dimen name="tv_meta_line_gap">10dp</dimen>
