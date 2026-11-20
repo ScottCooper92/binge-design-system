@@ -469,4 +469,6 @@
     <dimen name="labelled_icon_button_width">72dp</dimen>
     <!-- The widest a labelled icon button grows for a long label or a large font; past it the label wraps to two lines. -->
     <dimen name="labelled_icon_button_max_width">104dp</dimen>
+    <!-- The "opens outside the app" mark at the end of a labelled icon button's label. -->
+    <dimen name="labelled_icon_button_trailing_icon_size">12dp</dimen>
 </resources>
