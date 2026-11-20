@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
@@ -57,7 +58,11 @@ import com.binge.designsystem.theme.fill
  * [favourite] marks the title as a favourite with a small filled heart at the poster's top-end corner, as [status] marks where a request stands
  * with a dot: drawn, not tappable, with no ripple and no focus target of its own. The card announces "Favourite" in its merged state description,
  * ahead of the [status] label ("Arrival, Favourite, Available"). When the corner holds more than one mark they sit side by side
- * and never overlap, in this order from the start: the favourite heart, the status dot, then the [topEndAction].
+ * and never overlap, in this order from the start: the watched mark or the unwatched count, the favourite heart, the status dot, then the [topEndAction].
+ *
+ * [watched] draws a tick on a scrim disc and [unwatchedCount] a count badge (above 99 it reads "99+"), for a title or a series the user has or has
+ * not finished. They stand for one fact, so a watched card draws the tick alone, and a count of zero draws nothing. Like the heart they are drawn, not
+ * tappable; the card announces "Watched" or "3 unwatched" first in its merged state description ("Arrival, Watched, Favourite, Available").
  *
  * @need show a poster tile with a title and rating
  * @group media
@@ -77,12 +82,20 @@ fun MediaCard(
     progress: Float? = null,
     subtitle: String? = null,
     favourite: Boolean = false,
+    watched: Boolean = false,
+    unwatchedCount: Int? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    // The marks are drawn, so what they mean is in the card's own announcement: the favourite first, then the status.
+    // The marks are drawn, so what they mean is in the card's own announcement: the watched state first, then the favourite, then the status.
     val favouriteLabel = stringResource(R.string.media_card_favourite)
     val separator = stringResource(R.string.list_separator)
-    val announcedState = listOfNotNull(favouriteLabel.takeIf { favourite }, status?.label).joinToString(separator).ifEmpty { null }
+    val watchedLabel = stringResource(R.string.media_card_watched)
+    val unwatched = unwatchedCount?.takeIf { it > 0 && !watched }
+    val unwatchedLabel = unwatched?.let { pluralStringResource(R.plurals.media_card_unwatched_count, it, it) }
+    val announcedState =
+        listOfNotNull(watchedLabel.takeIf { watched }, unwatchedLabel, favouriteLabel.takeIf { favourite }, status?.label)
+            .joinToString(separator)
+            .ifEmpty { null }
 
     Column(
         modifier = modifier
@@ -124,6 +137,8 @@ fun MediaCard(
                     typeBadge = typeBadge,
                     status = status,
                     favourite = favourite,
+                    watched = watched,
+                    unwatchedCount = unwatched,
                     topEndAction = topEndAction,
                     liftChips = progress != null,
                 )
@@ -256,6 +271,8 @@ private fun MediaCardOverlays(
     typeBadge: MediaTypeTagType?,
     status: MediaCardStatus?,
     favourite: Boolean,
+    watched: Boolean,
+    unwatchedCount: Int?,
     topEndAction: MediaCardAction?,
     liftChips: Boolean,
 ) {
@@ -297,8 +314,8 @@ private fun MediaCardOverlays(
                     .padding(badgeInset),
             )
         }
-        if (status != null || favourite || topEndAction != null) {
-            // The favourite heart, the status dot and the action share the top-end corner: each sits to the start of the next, never under it.
+        if (status != null || favourite || watched || unwatchedCount != null || topEndAction != null) {
+            // The watched mark or the unwatched count, the favourite heart, the status dot and the action share the top-end corner: each sits to the start of the next, never under it.
             Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -310,6 +327,11 @@ private fun MediaCardOverlays(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (watched) {
+                    WatchedMark()
+                } else if (unwatchedCount != null) {
+                    UnwatchedCountMark(unwatchedCount)
+                }
                 if (favourite) FavouriteMark()
                 if (status != null) {
                     // The chip's dot, a little larger, on a thin scrim so it holds 3:1 over a bright poster. The label is in the card's semantics.

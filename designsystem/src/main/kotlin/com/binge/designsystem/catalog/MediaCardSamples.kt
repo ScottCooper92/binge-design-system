@@ -1,6 +1,7 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -326,6 +327,75 @@ private fun FavouriteSentimentsRow(posterUrl: String?) {
                 favourite = true,
                 status = MediaCardStatus(label = sentiment.name, sentiment = sentiment),
                 modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+/** A watched title: a tick top-end, alone and then beside a favourite heart and a status dot; they sit side by side, never over one another. */
+@Composable
+fun MediaCardWatchedSample() {
+    ScreenshotTheme {
+        Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            MediaCard(
+                posterUrl = null,
+                title = "Arrival",
+                rating = 7.9f,
+                onClick = {},
+                watched = true,
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+            MediaCard(
+                posterUrl = null,
+                title = "Arrival",
+                rating = 7.9f,
+                onClick = {},
+                watched = true,
+                favourite = true,
+                status = MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive),
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+            )
+        }
+    }
+}
+
+/**
+ * A series with episodes left: a count badge top-end. Three episodes, then a count above 99 that reads "99+", then, on a second row, the
+ * badge beside a favourite heart, a status dot and an action.
+ */
+@Composable
+fun MediaCardUnwatchedCountSample() {
+    ScreenshotTheme {
+        // Two cards a row, so each is the width it has in an app and the four-mark corner of the last one is shown at its real size.
+        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
+                MediaCard(
+                    posterUrl = null,
+                    title = "Severance",
+                    rating = 8.7f,
+                    onClick = {},
+                    unwatchedCount = 3,
+                    modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+                )
+                MediaCard(
+                    posterUrl = null,
+                    title = "Doctor Who",
+                    rating = 8.0f,
+                    onClick = {},
+                    unwatchedCount = 120,
+                    modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
+                )
+            }
+            MediaCard(
+                posterUrl = null,
+                title = "Severance",
+                rating = 8.7f,
+                onClick = {},
+                unwatchedCount = 3,
+                favourite = true,
+                status = MediaCardStatus(label = "Available", sentiment = BingeSentiment.Positive),
+                topEndAction = MediaCardAction(icon = Icons.Filled.Close, contentDescription = "Remove", onClick = {}),
+                modifier = Modifier.width(dimensionResource(R.dimen.card_width)),
             )
         }
     }

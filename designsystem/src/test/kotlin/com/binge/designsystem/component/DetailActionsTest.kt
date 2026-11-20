@@ -3,6 +3,7 @@ package com.binge.designsystem.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
@@ -11,6 +12,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Density
@@ -115,4 +117,24 @@ class DetailActionsTest {
 
     @Test
     fun `the skeleton is the loaded row's height stacked over three round actions at the largest font`() = skeletonMatchesLoaded(2f, 3)
+
+    @Test
+    fun `a round action's trailing mark is announced after its name`() {
+        show {
+            DetailActions(
+                primary = { Text("Primary", it) },
+                roundActions = listOf(
+                    DetailRoundAction(
+                        Icons.Filled.PlayArrow,
+                        "Trailer",
+                        onClick = {},
+                        trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                        trailingContentDescription = "Opens outside the app",
+                    ),
+                ),
+            )
+        }
+
+        rule.onNode(hasContentDescription("Opens outside the app", substring = true)).assertExists()
+    }
 }
