@@ -206,6 +206,7 @@ fun SearchScreen(
     noResultsExtras: (@Composable () -> Unit)? = null,
     failedContent: (@Composable (Modifier) -> Unit)? = null,
     reserveTypeChipsWhileLoading: Boolean = false,
+    expectedResultName: String? = null,
     overlays: @Composable () -> Unit = {},
 ) {
     val scrollBehavior = rememberPaneTopBarScrollBehavior()
@@ -240,6 +241,7 @@ fun SearchScreen(
                         idleExtras = idleExtras,
                         noResultsExtras = noResultsExtras,
                         failedContent = failedContent,
+                        expectedResultName = expectedResultName,
                     )
                 }
             }
@@ -270,6 +272,7 @@ private fun SearchBody(
     idleExtras: (LazyListScope.() -> Unit)?,
     noResultsExtras: (@Composable () -> Unit)?,
     failedContent: (@Composable (Modifier) -> Unit)?,
+    expectedResultName: String?,
 ) {
     // The plates (no results, failed, a type with nothing in it) clear the navigation bar and the floating pill as the lists do.
     val platePadding = navOverlayPadding(PaddingValues(top = top, bottom = bottom))
@@ -288,6 +291,7 @@ private fun SearchBody(
             ResultsSkeleton(
                 contentPadding = resultsPadding(top, bottom),
                 loadingLabel = loadingLabel,
+                expectedResultName = expectedResultName,
             )
         is SearchState.Ready ->
             key(state.types?.selectedKey) {
@@ -339,7 +343,11 @@ private fun resultsPadding(top: Dp, bottom: Dp): PaddingValues =
 
 /** What a search draws while it loads: result rows' plates in the results grid's own columns, so the grid does not jump when they arrive. */
 @Composable
-private fun ResultsSkeleton(contentPadding: PaddingValues, loadingLabel: String) {
+private fun ResultsSkeleton(
+    contentPadding: PaddingValues,
+    loadingLabel: String,
+    expectedResultName: String?,
+) {
     val columns = searchResultColumns()
     CenteredContent(maxWidth = dimensionResource(R.dimen.search_content_max_width)) { capped ->
         LazyVerticalGrid(
@@ -354,6 +362,7 @@ private fun ResultsSkeleton(contentPadding: PaddingValues, loadingLabel: String)
                 MediaResultRowSkeleton(
                     modifier = Modifier.layoutAnchorIf(index == 0, LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)),
                     description = if (index == 0) loadingLabel else null,
+                    expectedName = expectedResultName,
                 )
             }
         }
