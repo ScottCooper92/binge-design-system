@@ -171,4 +171,6 @@
     <string name="time_input_invalid">Enter a valid time.</string>
     <string name="detail_episode_label">E%1$d</string>
     <string name="detail_runtime_minutes">%1$d min</string>
+    <!-- The heading over a detail page's synopsis, when the app gives none of its own -->
+    <string name="detail_overview_heading">Overview</string>
 </resources>
