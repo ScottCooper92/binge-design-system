@@ -24,6 +24,9 @@ import org.robolectric.annotation.GraphicsMode
 
 private const val ITEMS = 12
 
+/** Few enough that the grid's end is on screen, so the load-more trigger is already within its look-ahead. */
+private const val SHORT = 4
+
 private fun items(count: Int = ITEMS) = List(count) { GridItem(key = "k$it", posterUrl = null, title = "Title $it", rating = 7f) }
 
 private val bar =
@@ -82,7 +85,7 @@ class PagedGridScreenTest {
     fun `a short list that has more asks for the next page once`() {
         var asked = 0
         show(
-            PagedGridState.Ready(items(), hasMore = true),
+            PagedGridState.Ready(items(SHORT), hasMore = true),
             PagedGridCallbacks(onOpenItem = {}, onLoadMore = { asked++ }, onRetry = {}),
         )
         assertEquals(1, asked)
