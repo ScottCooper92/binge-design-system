@@ -5,13 +5,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
-import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
+import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.assertNoTextClipped
 import com.binge.designsystem.testing.createTakeDownComposeRule
@@ -28,7 +29,11 @@ import org.robolectric.annotation.GraphicsMode
 private fun results(count: Int) =
     List(count) { MediaResult("k$it", MediaResultKind.Poster, null, "Result $it", "Movie · 2020", rating = 7f, meta = "Drama") }
 
-private val types = SearchTypes(listOf(FilterChipItem("All"), FilterChipItem("Movies"), FilterChipItem("People")), selected = 0)
+private val types =
+    SearchTypes(
+        listOf(SearchTypeChip("all", "All"), SearchTypeChip("movies", "Movies"), SearchTypeChip("people", "People")),
+        selectedKey = "all",
+    )
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w412dp-h900dp")
@@ -41,7 +46,7 @@ class SearchScreenTest {
         onLoadMore: () -> Unit = {},
         onPickRecent: (String) -> Unit = {},
         onOpenResult: (String) -> Unit = {},
-        onType: (Int) -> Unit = {},
+        onType: (String) -> Unit = {},
     ) = SearchCallbacks(
         onQueryChange = {},
         onClear = {},
@@ -57,21 +62,26 @@ class SearchScreenTest {
         callbacks: SearchCallbacks = callbacks(),
         fontScale: Float = 1f,
         failedContent: (@Composable (Modifier) -> Unit)? = null,
+        idleDefaults: Boolean = false,
     ) {
         rule.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
                 TestTheme {
-                    SearchScreen(
-                        title = "Search",
-                        text = "past",
-                        state = state,
-                        callbacks = callbacks,
-                        placeholder = "Search here",
-                        idleTitle = "Idle title",
-                        idleMessage = "Idle message",
-                        failedContent = failedContent,
-                    )
+                    if (idleDefaults) {
+                        SearchScreen(title = "Search", text = "", state = state, callbacks = callbacks, placeholder = "Search here")
+                    } else {
+                        SearchScreen(
+                            title = "Search",
+                            text = "past",
+                            state = state,
+                            callbacks = callbacks,
+                            placeholder = "Search here",
+                            idleTitle = "Idle title",
+                            idleMessage = "Idle message",
+                            failedContent = failedContent,
+                        )
+                    }
                 }
             }
         }
@@ -120,9 +130,9 @@ class SearchScreenTest {
     }
 
     @Test
-    fun `tapping a result hands back its key and a chip its index`() {
+    fun `tapping a result hands back its key and a chip its key`() {
         var opened: String? = null
-        var type = -1
+        var type: String? = null
         show(
             SearchState.Ready(results(3), loaded = 3, hasMore = false, types = types),
             callbacks(onOpenResult = { opened = it }, onType = { type = it }),
@@ -130,7 +140,19 @@ class SearchScreenTest {
         rule.onNodeWithText("Result 1").performClick()
         rule.onNodeWithText("People").performClick()
         assertEquals("k1", opened)
-        assertEquals(2, type)
+        assertEquals("people", type)
+    }
+
+    @Test
+    fun `the default idle plate says what to do`() {
+        show(SearchState.Idle(emptyList()), idleDefaults = true)
+        rule.onNodeWithText("Type a title or a name.").assertIsDisplayed()
+    }
+
+    @Test
+    fun `loading draws the first plate with its anchor and no results`() {
+        show(SearchState.Loading)
+        rule.onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM))).assertIsDisplayed()
     }
 
     @Test

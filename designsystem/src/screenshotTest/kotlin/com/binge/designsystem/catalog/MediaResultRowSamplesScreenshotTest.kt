@@ -34,4 +34,15 @@ class MediaResultRowSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun longText() = MediaResultRowLongTextSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun marks() = MediaResultRowMarksSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun skeleton() = MediaResultRowSkeletonSample()
 }

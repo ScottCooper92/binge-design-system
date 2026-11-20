@@ -12,6 +12,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.MediaResultRow
+import com.binge.designsystem.component.MediaResultRowSkeleton
 import com.binge.designsystem.component.StatusChip
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
@@ -75,5 +76,35 @@ fun MediaResultRowLongTextSample() =
                 onClick = {},
                 trailing = { StatusChip(label = "Partially available", sentiment = BingeSentiment.Caution) },
             )
+        }
+    }
+
+/** A result the user has marked: a heart and a tick beside the name, the same marks a poster card draws. */
+@Composable
+fun MediaResultRowMarksSample() =
+    SampleRow(
+        MediaResult(
+            "m3",
+            MediaResultKind.Poster,
+            null,
+            "Arrival",
+            "Movie · 2016",
+            rating = 7.9f,
+            meta = "Drama, Sci-Fi",
+            favourite = true,
+            watched = true,
+        ),
+    )
+
+/** What a search draws while it loads: a plate for the picture and two for the name and the subtitle, for a poster and then for an episode still. */
+@Composable
+fun MediaResultRowSkeletonSample() =
+    ScreenshotTheme {
+        Column(
+            Modifier.padding(dimensionResource(R.dimen.screen_content_inset)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            MediaResultRowSkeleton()
+            MediaResultRowSkeleton(kind = MediaResultKind.Still)
         }
     }

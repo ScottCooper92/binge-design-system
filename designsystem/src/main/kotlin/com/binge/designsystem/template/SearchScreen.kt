@@ -58,10 +58,13 @@ import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultRow
+import com.binge.designsystem.component.MediaResultRowSkeleton
 import com.binge.designsystem.component.OnTabReselect
 import com.binge.designsystem.component.TrendingSearchChip
 import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.component.rememberPaneTopBarScrollBehavior
+import com.binge.designsystem.layout.LayoutAnchors
+import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.navOverlayPadding
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.searchResultColumns
@@ -71,14 +74,25 @@ import kotlinx.coroutines.flow.filter
 /** The lazy key of the append footer; an app's own keys are text too, so it is namespaced. */
 private const val FOOTER_KEY = "search-footer"
 
+/** How many rows of plates the loading skeleton draws. */
+const val SEARCH_SKELETON_ROWS: Int = 6
+
 /** How many results from the end the list asks for the next page. */
 const val SEARCH_LOAD_MORE_AHEAD: Int = 3
 
-/** The type chips under the field. A chip's count is optional, so an app with none passes none. */
+/** One type chip under the field. [key] is the app's identity for the type, text; [count] is optional, so an app with none passes none. */
+@Immutable
+class SearchTypeChip(
+    val key: String,
+    val label: String,
+    val count: Int? = null,
+)
+
+/** The type chips under the field, and the [selectedKey] of the one chosen. `onType` hands a chip's key back, never its position. */
 @Immutable
 class SearchTypes(
-    val chips: List<FilterChipItem>,
-    val selected: Int,
+    val chips: List<SearchTypeChip>,
+    val selectedKey: String,
 )
 
 /** What a [SearchScreen] draws. The type chips show only in [Ready] and [NoResults], where there is something to narrow. */
@@ -136,7 +150,7 @@ class SearchCallbacks(
     val onLoadMore: () -> Unit,
     val onRetry: () -> Unit,
     val onSubmit: () -> Unit = {},
-    val onType: (index: Int) -> Unit = {},
+    val onType: (key: String) -> Unit = {},
     val onPickRecent: (query: String) -> Unit = {},
     val onClearRecents: () -> Unit = {},
     val onBack: (() -> Unit)? = null,
@@ -160,6 +174,8 @@ fun isSearchNearEnd(
  * switch at [BAR_HANDOVER_COLLAPSE]). [idleExtras] adds items under the recents, [noResultsExtras] sits under the no-results plate, and
  * [failedContent] replaces the default failure plate.
  *
+ * @param idleTitle the plate shown while idle with nothing to offer, which the app words; the defaults say "Search" and "Type a title or a name."
+ * @param loadingLabel what a screen reader says of the first loading row.
  * @param reselectKey the tab this screen is the root of, as the shell emits it on the reselect signal (compared by equality, so pass
  *   the same value); tapping it again focuses the field. Null for a screen with no tab.
  * @param resultTrailing decides each result's status: it returns the status to draw, or null for a result with none, so a row with
@@ -176,9 +192,10 @@ fun SearchScreen(
     state: SearchState,
     callbacks: SearchCallbacks,
     placeholder: String,
-    idleTitle: String,
-    idleMessage: String,
     modifier: Modifier = Modifier,
+    idleTitle: String = stringResource(R.string.search_idle_title),
+    idleMessage: String = stringResource(R.string.search_idle_message),
+    loadingLabel: String = stringResource(R.string.search_loading),
     reselectKey: Any? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     recentsTitle: String = stringResource(R.string.search_recents_title),
@@ -219,6 +236,7 @@ fun SearchScreen(
                         bottom = body.calculateBottomPadding(),
                         idleTitle = idleTitle,
                         idleMessage = idleMessage,
+                        loadingLabel = loadingLabel,
                         recents = RecentsCopy(recentsTitle, clearLabel, clearTitle, clearMessage),
                         moreFailedLabel = moreFailedLabel,
                         resultTrailing = resultTrailing,
@@ -248,6 +266,7 @@ private fun SearchBody(
     bottom: Dp,
     idleTitle: String,
     idleMessage: String,
+    loadingLabel: String,
     recents: RecentsCopy,
     moreFailedLabel: String,
     resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)?,
@@ -266,21 +285,17 @@ private fun SearchBody(
                 recents = recents,
                 idleExtras = idleExtras,
             )
-        SearchState.Loading -> LoadingMessageScreen(Modifier.padding(top = top))
+        SearchState.Loading ->
+            ResultsSkeleton(
+                contentPadding = resultsPadding(top, bottom),
+                loadingLabel = loadingLabel,
+            )
         is SearchState.Ready ->
-            key(state.types?.selected) {
+            key(state.types?.selectedKey) {
                 ResultsList(
                     state = state,
                     callbacks = callbacks,
-                    contentPadding =
-                        navOverlayPadding(
-                            PaddingValues(
-                                start = dimensionResource(R.dimen.screen_content_inset),
-                                top = top + dimensionResource(R.dimen.padding_s),
-                                end = dimensionResource(R.dimen.screen_content_inset),
-                                bottom = bottom + dimensionResource(R.dimen.padding_m),
-                            ),
-                        ),
+                    contentPadding = resultsPadding(top, bottom),
                     moreFailedLabel = moreFailedLabel,
                     resultTrailing = resultTrailing,
                 )
@@ -306,6 +321,41 @@ private fun SearchBody(
                     message = state.message,
                 )
             }
+    }
+}
+
+/** The content padding of the results grid and of its skeleton, so the one is laid out exactly as the other. */
+@Composable
+private fun resultsPadding(top: Dp, bottom: Dp): PaddingValues =
+    navOverlayPadding(
+        PaddingValues(
+            start = dimensionResource(R.dimen.screen_content_inset),
+            top = top + dimensionResource(R.dimen.padding_s),
+            end = dimensionResource(R.dimen.screen_content_inset),
+            bottom = bottom + dimensionResource(R.dimen.padding_m),
+        ),
+    )
+
+/** What a search draws while it loads: result rows' plates in the results grid's own columns, so the grid does not jump when they arrive. */
+@Composable
+private fun ResultsSkeleton(contentPadding: PaddingValues, loadingLabel: String) {
+    val columns = searchResultColumns()
+    CenteredContent(maxWidth = dimensionResource(R.dimen.search_content_max_width)) { capped ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(columns),
+            modifier = capped,
+            contentPadding = contentPadding,
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+            userScrollEnabled = false,
+        ) {
+            items(columns * SEARCH_SKELETON_ROWS) { index ->
+                MediaResultRowSkeleton(
+                    modifier = Modifier.layoutAnchorIf(index == 0, LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)),
+                    description = if (index == 0) loadingLabel else null,
+                )
+            }
+        }
     }
 }
 
@@ -350,7 +400,11 @@ private fun SearchControls(
                 )
             }
             if (types != null && types.chips.isNotEmpty()) {
-                BingeFilterChipRow(items = types.chips, selectedIndex = types.selected, onSelect = callbacks.onType)
+                BingeFilterChipRow(
+                    items = types.chips.map { FilterChipItem(label = it.label, count = it.count) },
+                    selectedIndex = types.chips.indexOfFirst { it.key == types.selectedKey }.coerceAtLeast(0),
+                    onSelect = { callbacks.onType(types.chips[it].key) },
+                )
             }
         }
     }

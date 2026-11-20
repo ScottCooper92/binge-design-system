@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -19,7 +18,6 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeMessageDialog
-import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.StatusChip
@@ -34,7 +32,7 @@ import kotlinx.coroutines.delay
 private const val SAMPLE_RESULTS = 8
 
 /** Few enough that the footer sits on screen in a frame of the unscrolled list. */
-private const val FEW_RESULTS = 3
+private const val FEW_RESULTS = 1
 private const val PAGE_RESULTS = 6
 private const val LOAD_MILLIS = 900L
 
@@ -69,14 +67,15 @@ private val SampleRecents = listOf("severance", "past lives", "greta lee", "heat
 
 @Composable
 private fun SampleSearch(
-    state: (selectedType: Int, recents: List<String>) -> SearchState,
+    state: (selectedType: String, recents: List<String>) -> SearchState,
     modifier: Modifier = Modifier,
     initialText: String = "",
+    initialType: String = "all",
     withTrailing: Boolean = true,
     idleExtras: (LazyListScope.() -> Unit)? = null,
 ) {
     var text by remember { mutableStateOf(initialText) }
-    var selected by remember { mutableIntStateOf(0) }
+    var selected by remember { mutableStateOf(initialType) }
     var recents by remember { mutableStateOf(SampleRecents) }
     var opened by remember { mutableStateOf<String?>(null) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
@@ -237,6 +236,7 @@ fun SearchScreenTypeEmptySample() =
             )
         },
         initialText = "past",
+        initialType = "people",
     )
 
 /** The search failed: the default failure plate with Try again under the field. */
@@ -247,7 +247,7 @@ fun SearchScreenFailedSample() = SampleSearch({ _, _ -> SearchState.Failed(Error
 @Composable
 fun SearchScreenDemo() {
     var text by remember { mutableStateOf("") }
-    var selected by remember { mutableIntStateOf(0) }
+    var selected by remember { mutableStateOf("all") }
     var results by remember { mutableStateOf<List<MediaResult>?>(null) }
     var appending by remember { mutableStateOf(false) }
     var recents by remember { mutableStateOf(SampleRecents) }
