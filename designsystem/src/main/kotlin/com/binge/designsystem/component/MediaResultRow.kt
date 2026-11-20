@@ -16,16 +16,16 @@ import com.binge.designsystem.R
 
 /** What a [MediaResult] shows beside its text. */
 enum class MediaResultKind {
-    /** A portrait poster, the text top-aligned beside it. */
+    /** A portrait poster. */
     Poster,
 
-    /** A round portrait of a person, the text centred beside it. */
+    /** A round portrait of a person. */
     Avatar,
 
-    /** A company or network logo on a tonal tile, the text centred beside it. */
+    /** A company or network logo on a tonal tile. */
     Logo,
 
-    /** A 16:9 still, for an episode; the text is top-aligned beside it. */
+    /** A 16:9 still, for an episode. */
     Still,
 }
 

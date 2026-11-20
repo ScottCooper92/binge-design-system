@@ -37,11 +37,11 @@ fun MediaResultRowPosterSample() =
         status = true,
     )
 
-/** A person: a round portrait, the text centred beside it, and no status line. */
+/** A person: a round portrait, a name and a role, and no status line. */
 @Composable
 fun MediaResultRowAvatarSample() = SampleRow(MediaResult("p1", MediaResultKind.Avatar, null, "Greta Lee", "Actor"))
 
-/** A studio or network: its logo on a tonal tile, centred, with a name and nothing else. */
+/** A studio or network: its logo on a tonal tile, with a name and nothing else. */
 @Composable
 fun MediaResultRowLogoSample() = SampleRow(MediaResult("s1", MediaResultKind.Logo, null, "A24", null))
 

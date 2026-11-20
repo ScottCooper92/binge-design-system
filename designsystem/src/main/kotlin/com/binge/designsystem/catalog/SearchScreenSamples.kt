@@ -39,6 +39,8 @@ private const val PAGE_RESULTS = 6
 private const val LOAD_MILLIS = 900L
 
 private val SampleNames = listOf("Past Lives", "Paddington 2", "Heat", "Arrival", "Drive", "Aliens", "Her", "Tár")
+private val SamplePeople =
+    listOf("Greta Lee", "Hugh Grant", "Tilda Swinton", "Amy Adams", "Ryan Gosling", "Sigourney Weaver", "Joaquin Phoenix", "Cate Blanchett")
 
 private fun sampleResults(
     kind: MediaResultKind = MediaResultKind.Poster,
@@ -51,7 +53,7 @@ private fun sampleResults(
             key = "r$n",
             kind = kind,
             imageUrl = null,
-            name = SampleNames[n % SampleNames.size],
+            name = (if (kind == MediaResultKind.Avatar) SamplePeople else SampleNames)[n % SampleNames.size],
             subtitle = if (kind == MediaResultKind.Avatar) "Actor" else "Movie · ${1990 + n}",
             rating = if (kind == MediaResultKind.Poster && n % 3 != 2) 6f + n % 4 else null,
             meta = if (kind == MediaResultKind.Poster && n % 2 == 0) "Drama, Romance" else null,
