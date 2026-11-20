@@ -189,6 +189,7 @@ private fun DetailPageBody(
                 TagRow(
                     tags = section.tags.map { it.label },
                     modifier = Modifier.padding(horizontal = readingInset()),
+                    compact = true,
                     onTagClick = if (section.tappable) ({ index -> callbacks.onOpenTag(section.tags[index].key) }) else null,
                 )
             }
