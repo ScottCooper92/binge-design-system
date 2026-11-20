@@ -46,7 +46,8 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * One titled row of an immersive hub. [key] is the row's stable identity (the list and every piece of focus
- * memory are keyed on it, never on [title], which is localised and reworded).
+ * memory are keyed on it, never on [title], which is localised and reworded). A key must not start with `binge:`: that prefix is
+ * reserved for the library's own lazy items, such as the hero.
  */
 data class TvHubRow<T>(
     val key: String,
@@ -90,6 +91,9 @@ data class TvHubRowFailure(
     val retryLabel: String,
     val onRetry: () -> Unit,
 )
+
+/** The lazy key of the hero item. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
+private const val HERO_KEY = "binge:tv-immersive-hero"
 
 /** Enough placeholder cards to run a pending row off the edge, as a loaded row does. */
 private const val PENDING_ROW_CARDS = 8
@@ -253,7 +257,7 @@ fun <T : Any> TvImmersiveHub(
                 // Lets the last row scroll up to the anchor.
                 contentPadding = PaddingValues(bottom = dimensionResource(TvR.dimen.tv_immersive_rows_bottom)),
             ) {
-                item(key = "tv-immersive-hero") {
+                item(key = HERO_KEY) {
                     if (hero != null) {
                         Box(
                             modifier =
