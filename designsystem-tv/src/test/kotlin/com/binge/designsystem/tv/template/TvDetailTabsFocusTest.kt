@@ -91,6 +91,25 @@ class TvDetailTabsFocusTest {
     }
 
     @Test
+    fun `the single row opens already expanded on its first title and steps along`() {
+        val items = List(TITLES) { TvHubItem(key = "movie_$it", posterUrl = null, title = "Title $it", rating = null) }
+        setContent {
+            TvExpandingSingleRow(
+                title = "",
+                items = items,
+                item = { it },
+                onItemClick = { _, item -> opened += item.key.removePrefix("movie_").toInt() },
+            )
+        }
+        enter()
+        press(Key.DirectionCenter)
+        press(Key.DirectionRight)
+        press(Key.DirectionCenter)
+
+        assertEquals(listOf(0, 1), opened)
+    }
+
+    @Test
     fun `the cast's See all card follows the last person, and OK opens it`() {
         val people = List(2) { TvCastCell(key = "cast-$it", name = "Actor $it", role = "Role $it", profileUrl = null) }
         var seeAll = 0
@@ -149,5 +168,6 @@ class TvDetailTabsFocusTest {
         val SLOT = 120.dp
         val STRIP = 80.dp
         const val IMAGES = 6
+        const val TITLES = 4
     }
 }
