@@ -23,9 +23,14 @@ sealed interface TvGridResults<out T : Any> {
 
     data object Empty : TvGridResults<Nothing>
 
+    /**
+     * The cells. [stale] says they are the earlier query's: the new one failed to load and these are what is left, so a page that
+     * offers it draws its own line with Try again above them. A grid that does not offer it ignores the flag.
+     */
     class Items<out T : Any>(
         val count: Int,
         val key: (Int) -> Any,
         val at: (Int) -> T?,
+        val stale: Boolean = false,
     ) : TvGridResults<T>
 }
