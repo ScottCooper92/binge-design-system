@@ -41,10 +41,7 @@ internal fun WatchedMark(modifier: Modifier = Modifier) {
  * its merged state description, so the badge says nothing of its own.
  */
 @Composable
-internal fun UnwatchedCountMark(
-    count: Int,
-    modifier: Modifier = Modifier,
-) {
+internal fun UnwatchedCountMark(count: Int, modifier: Modifier = Modifier) {
     CountBadge(
         count = count,
         containerColor = MaterialTheme.colorScheme.primary,
