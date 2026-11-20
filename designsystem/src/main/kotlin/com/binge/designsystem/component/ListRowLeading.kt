@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,8 +27,10 @@ import com.binge.designsystem.theme.BingeShapes
 /**
  * The [ListRow] leading visual for a person: their photo cropped into a circle [width] across, centred in a box as
  * tall as a [ListRowPoster] of the same width. A person row is then as tall as a title row beside it in a list or
- * grid. A tonal surface shows behind the photo, and an [ImagePlaceholder] stands in while it loads and when it fails.
- * The photo is decorative: the row's own text names the person.
+ * grid. A tonal surface shows behind the photo. While it loads, when it fails and when there is none, the person's
+ * initials stand in, drawn as [BingeInitialsAvatar] draws them. With no [name] a person glyph stands in instead, never
+ * the generic image glyph, so a person without a photo does not read as a broken image. The photo is decorative: the
+ * row's own text names the person.
  *
  * @need lead a list row with a person's photo
  * @group rows
@@ -37,7 +42,11 @@ fun ListRowAvatar(
     imageUrl: String?,
     modifier: Modifier = Modifier,
     width: Dp = dimensionResource(R.dimen.list_row_poster_width),
+    name: String? = null,
 ) {
+    val fallback = @Composable {
+        if (name.isNullOrBlank()) PersonGlyph(width) else InitialsAvatar(name = name, size = width)
+    }
     Box(
         modifier = modifier
             .width(width)
@@ -55,12 +64,27 @@ fun ListRowAvatar(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                loading = { ImagePlaceholder(Modifier.fillMaxSize()) },
-                error = { ImagePlaceholder(Modifier.fillMaxSize()) },
+                loading = { fallback() },
+                error = { fallback() },
             )
         }
     }
 }
+
+/** The no-name stand-in for a person's photo: a person glyph centred on the tonal surface of the circle. */
+@Composable
+private fun PersonGlyph(size: Dp) {
+    Box(Modifier.size(size), contentAlignment = Alignment.Center) {
+        Icon(
+            imageVector = Icons.Filled.Person,
+            contentDescription = null,
+            modifier = Modifier.size(size * PERSON_GLYPH_FRACTION),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+        )
+    }
+}
+
+private const val PERSON_GLYPH_FRACTION = 0.5f
 
 /**
  * The [ListRow] leading visual for a company: its logo fitted, never cropped, inside a rounded tile as wide and as

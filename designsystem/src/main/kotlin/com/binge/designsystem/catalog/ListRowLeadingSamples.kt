@@ -16,7 +16,8 @@ import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
  * A person row led by a [ListRowAvatar], under a title row led by a poster, so the two can be seen as tall as each
- * other. The image is a placeholder, because a frame cannot load one.
+ * other. The person has no photo, because a frame cannot load one, so the avatar draws initials; a second person with
+ * no name draws the person glyph.
  */
 @Composable
 fun ListRowAvatarSample() {
@@ -25,7 +26,8 @@ fun ListRowAvatarSample() {
             LeadingSampleRow(title = "Severance", subtitle = "TV show · 2022") {
                 ListRowPoster(imageUrl = null, contentDescription = null)
             }
-            LeadingSampleRow(title = "Adam Scott", subtitle = "Actor") { ListRowAvatar(imageUrl = null) }
+            LeadingSampleRow(title = "Adam Scott", subtitle = "Actor") { ListRowAvatar(imageUrl = null, name = "Adam Scott") }
+            LeadingSampleRow(title = "Unknown cast member", subtitle = "Actor") { ListRowAvatar(imageUrl = null) }
         }
     }
 }

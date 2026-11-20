@@ -92,7 +92,7 @@ fun MediaResultRow(
         leading = {
             when (result.kind) {
                 MediaResultKind.Poster -> ListRowPoster(imageUrl = result.imageUrl, contentDescription = null)
-                MediaResultKind.Avatar -> ListRowAvatar(imageUrl = result.imageUrl)
+                MediaResultKind.Avatar -> ListRowAvatar(imageUrl = result.imageUrl, name = result.name)
                 MediaResultKind.Logo -> ListRowLogo(logoUrl = result.imageUrl)
                 MediaResultKind.Still ->
                     ListRowPoster(
