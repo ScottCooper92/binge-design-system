@@ -1,7 +1,9 @@
 package com.binge.designsystem.component
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
@@ -32,7 +34,12 @@ class LabelledIconButtonTest {
 
     private var clicks = 0
 
-    private fun show(enabled: Boolean = true, contentDescription: String? = null) {
+    private fun show(
+        enabled: Boolean = true,
+        contentDescription: String? = null,
+        trailingIcon: ImageVector? = null,
+        trailingContentDescription: String? = null,
+    ) {
         rule.setContent {
             BingeExpressiveTheme(dynamicColor = false) {
                 LabelledIconButton(
@@ -41,6 +48,8 @@ class LabelledIconButtonTest {
                     onClick = { clicks++ },
                     enabled = enabled,
                     contentDescription = contentDescription,
+                    trailingIcon = trailingIcon,
+                    trailingContentDescription = trailingContentDescription,
                 )
             }
         }
@@ -84,5 +93,47 @@ class LabelledIconButtonTest {
         rule.onNodeWithContentDescription("Share").assertIsNotEnabled().performClick()
 
         assertEquals(0, clicks)
+    }
+
+    @Test
+    fun `a trailing mark is announced after the name`() {
+        show(trailingIcon = Icons.AutoMirrored.Filled.OpenInNew, trailingContentDescription = "Opens outside the app")
+
+        val node = rule.onNodeWithContentDescription("Share, Opens outside the app").fetchSemanticsNode()
+        assertEquals(listOf("Share, Opens outside the app"), node.config.getOrNull(SemanticsProperties.ContentDescription))
+    }
+
+    @Test
+    fun `a trailing mark is announced after the description, which replaces the label`() {
+        show(
+            contentDescription = "Share this title",
+            trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+            trailingContentDescription = "Opens outside the app",
+        )
+
+        rule.onNodeWithContentDescription("Share this title, Opens outside the app").assertExists()
+    }
+
+    @Test
+    fun `a mark with no words of its own adds none, so the description has to say it`() {
+        show(contentDescription = "Share, opens outside the app", trailingIcon = Icons.AutoMirrored.Filled.OpenInNew)
+
+        rule.onNodeWithContentDescription("Share, opens outside the app").assertExists()
+    }
+
+    @Test
+    fun `words for a mark that is not drawn are not announced`() {
+        show(trailingContentDescription = "Opens outside the app")
+
+        rule.onNodeWithContentDescription("Share").assertExists()
+    }
+
+    @Test
+    fun `a button with a mark is still one node taking one click`() {
+        show(trailingIcon = Icons.AutoMirrored.Filled.OpenInNew, trailingContentDescription = "Opens outside the app")
+
+        rule.onNodeWithContentDescription("Share, Opens outside the app").performClick()
+
+        assertEquals(1, clicks)
     }
 }

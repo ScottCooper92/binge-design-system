@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -24,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -52,6 +55,12 @@ import com.binge.designsystem.theme.BingeShapes
  * label at a normal font keeps the floor's width. The button is a plain column, so it can sit in a row sized with `IntrinsicSize`, and a caller
  * that stretches it gets the circle and label centred. The caller owns the words, and the spacing between buttons.
  *
+ * [trailingIcon] marks a button that leaves the app, such as a trailer that opens a video: a small icon at the **end of the label**, on the
+ * same line as its last word, centred against the label's lines. Pass `Icons.AutoMirrored.Filled.OpenInNew`, as other external links do. It is
+ * drawn only, so [trailingContentDescription] says what it means ("Opens outside the app") and is announced after the name; with a
+ * [trailingIcon] and no [trailingContentDescription], the [contentDescription] has to say it. A label wider than the room the mark leaves ellipsizes
+ * beside it, whole. With no [trailingIcon] the button draws and announces as it always has.
+ *
  * The whole column is one click target: a tap on the label presses the button too. It is one accessibility item with the button role,
  * announcing [contentDescription], or the [label] when that is null, so the label is not a focus stop of its own. Pressing scales the
  * column as the carousel tiles do and ripples the circle. A button that is not [enabled] takes no taps, and its circle and label dim by
@@ -69,16 +78,31 @@ fun LabelledIconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentDescription: String? = null,
+    trailingIcon: ImageVector? = null,
+    trailingContentDescription: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val announced = contentDescription ?: label
+    val separator = stringResource(R.string.list_separator)
+    // The mark is drawn, so what it means is in the announcement: after the name, ", Opens outside the app".
+    val announced = listOfNotNull(
+        contentDescription ?: label,
+        trailingContentDescription.takeIf {
+            trailingIcon != null
+        },
+    ).joinToString(separator)
     val labelStyle = MaterialTheme.typography.labelMedium
     // The cap grows with the font, so the width that held a word at the normal size still holds it at a large one: a cap in dp would
     // stay put while the word widened, and one word would be cut at 2x that fits at 1x. The parent's width bounds it on its own.
     val cap = dimensionResource(R.dimen.labelled_icon_button_max_width) * LocalDensity.current.fontScale
     // Only a label of several words ever wraps, and only when every word fits the cap, so no word is split. One word stays on one line, whole,
     // and takes the ellipsis if it is too wide. Nothing here reads the parent's width, so the button can still be measured for intrinsics.
-    val wraps = label.trim().contains(' ') && labelWordsFit(label, labelStyle, cap)
+    // The mark takes some of the line beside the last word, so the words are measured against what it leaves.
+    val markWidth = if (trailingIcon != null) {
+        dimensionResource(R.dimen.labelled_icon_button_trailing_icon_size) + dimensionResource(R.dimen.padding_xs)
+    } else {
+        dimensionResource(R.dimen.zero)
+    }
+    val wraps = label.trim().contains(' ') && labelWordsFit(label, labelStyle, cap - markWidth)
     Column(
         modifier = modifier
             .widthIn(min = dimensionResource(R.dimen.labelled_icon_button_width), max = cap)
@@ -112,16 +136,31 @@ fun LabelledIconButton(
                 tint = MaterialTheme.colorScheme.onSurface,
             )
         }
-        Text(
-            text = label,
-            style = labelStyle,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-            maxLines = if (wraps) 2 else 1,
-            softWrap = wraps,
-            overflow = TextOverflow.Ellipsis,
+        Row(
             modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xs)),
-        )
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                style = labelStyle,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                maxLines = if (wraps) 2 else 1,
+                softWrap = wraps,
+                overflow = TextOverflow.Ellipsis,
+                // Takes the width the mark leaves, so a label that is too wide ellipsizes beside it and does not push it out.
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            if (trailingIcon != null) {
+                Icon(
+                    imageVector = trailingIcon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(dimensionResource(R.dimen.labelled_icon_button_trailing_icon_size)),
+                )
+            }
+        }
     }
 }
 
