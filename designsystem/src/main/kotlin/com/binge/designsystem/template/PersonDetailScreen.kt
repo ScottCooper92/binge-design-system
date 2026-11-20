@@ -173,6 +173,7 @@ class PersonDetailCallbacks(
  * @need build a person's page with a profile, a biography and rows of credits
  * @group screens
  * @replaces a hand-built hero page of a portrait, text and credit rows
+ * @sample PersonDetailReadySample
  */
 @Composable
 fun PersonDetailScreen(
