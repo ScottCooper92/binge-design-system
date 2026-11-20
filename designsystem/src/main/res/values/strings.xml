@@ -179,7 +179,7 @@
     <string name="detail_runtime_minutes">%1$d min</string>
     <!-- Paged grid screen -->
     <string name="paged_grid_loading">Loading</string>
-    <string name="paged_grid_more_failed">Couldn\'t load more. Tap to retry.</string>
+    <string name="list_more_failed">Couldn\'t load more. Tap to retry.</string>
     <!-- The heading over a detail page's synopsis, when the app gives none of its own -->
     <string name="detail_overview_heading">Overview</string>
 </resources>
