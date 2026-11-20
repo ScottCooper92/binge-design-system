@@ -35,4 +35,12 @@ class EpisodeListRowSamplesScreenshotTest {
     fun marks() {
         EpisodeListRowMarksSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun special() {
+        EpisodeListRowSpecialSample()
+    }
 }

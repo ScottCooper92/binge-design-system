@@ -6,12 +6,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -67,5 +72,45 @@ class DetailEpisodesSectionTest {
         rule.waitForIdle()
 
         rule.onAllNodesWithText("Pilot", useUnmergedTree = true).assertCountEquals(0)
+    }
+
+    @Test
+    fun `a tapped episode with a key is handed its key and one without is not tapped`() {
+        var opened: String? = null
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                DetailEpisodesSection(
+                    title = "Episodes",
+                    episodes = listOf(
+                        EpisodeRow(1, "Keyed", null, key = "ep-1"),
+                        EpisodeRow(2, "Keyless", null),
+                    ),
+                    onOpenEpisode = { opened = it },
+                )
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Keyed").assertHasClickAction()
+        rule.onNodeWithText("Keyless").assertHasNoClickAction()
+        rule.onNodeWithText("Keyed").performClick()
+
+        assertEquals("ep-1", opened)
+    }
+
+    @Test
+    fun `a special draws no overline and a supporting fact follows the date`() {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                DetailEpisodesSection(
+                    title = "Episodes",
+                    episodes = listOf(EpisodeRow(null, "Behind the scenes", null, airDate = "Mar 1", supporting = "45 min")),
+                )
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onAllNodesWithText("EP", substring = true).assertCountEquals(0)
+        rule.onNodeWithText("45 min").assertExists()
     }
 }

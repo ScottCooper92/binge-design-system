@@ -72,7 +72,7 @@ private fun SeriesPage(episodes: EpisodesState, seasonCount: Int = seasons.size)
                 selectedSeason = selected,
                 episodes = episodes,
                 episodesTitle = "Episodes",
-                seasonSubtitle = "Season $selected · 7 episodes · 2008",
+                seasonSubtitle = seasons.first { it.number == selected }.let { "${it.label} · ${it.subtitle}" },
                 viewAllLabel = "View all episodes",
             ),
             callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),

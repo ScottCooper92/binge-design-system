@@ -39,7 +39,9 @@ import com.binge.designsystem.theme.BingeTheme
  * semantics, no ripple and no focus target. For an app that lists episodes to be read, not opened.
  *
  * [progress], from 0 to 1, draws a thin bar along the foot of the row for an episode part way through; null draws none. [trailingContent] is
- * a slot at the end of the row, for a mark or a toggle the caller owns (a watched mark, say); with none the row is as it was.
+ * a slot at the end of the row, for a mark or a toggle the caller owns (a watched mark, say); with none the row is as it was. A null
+ * [episodeNumber], a special that has none, draws the row without its "EP" overline. [supporting] is one more short fact (a runtime) at the end of
+ * the rating and date line, worded by the caller.
  *
  * The still has no content description: it sits beside the episode's name, so a screen reader would say the name twice.
  *
@@ -49,7 +51,7 @@ import com.binge.designsystem.theme.BingeTheme
  */
 @Composable
 fun EpisodeListRow(
-    episodeNumber: Int,
+    episodeNumber: Int?,
     name: String,
     stillUrl: String?,
     onClick: (() -> Unit)?,
@@ -58,6 +60,7 @@ fun EpisodeListRow(
     airDate: String? = null,
     progress: Float? = null,
     trailingContent: (@Composable () -> Unit)? = null,
+    supporting: String? = null,
 ) {
     ListRow(
         modifier = modifier,
@@ -71,6 +74,7 @@ fun EpisodeListRow(
             name = name,
             rating = rating,
             airDate = airDate,
+            supporting = supporting,
             modifier = contentModifier,
         )
     }
@@ -101,19 +105,22 @@ private fun EpisodeStill(stillUrl: String?) {
 
 @Composable
 private fun EpisodeRowMeta(
-    episodeNumber: Int,
+    episodeNumber: Int?,
     name: String,
     rating: Float,
     airDate: String?,
+    supporting: String?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.episode_row_overline, episodeNumber),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(Modifier.size(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)))
+        if (episodeNumber != null) {
+            Text(
+                text = stringResource(R.string.episode_row_overline, episodeNumber),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.size(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)))
+        }
         Text(
             text = name,
             style = MaterialTheme.typography.titleSmall,
@@ -121,16 +128,21 @@ private fun EpisodeRowMeta(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        EpisodeRowSubtitle(rating = rating, airDate = airDate)
+        EpisodeRowSubtitle(rating = rating, airDate = airDate, supporting = supporting)
     }
 }
 
-/** The optional rating · air-date line; renders nothing when neither is present. */
+/** The optional rating · air-date · supporting line; renders nothing when none is present. */
 @Composable
-private fun EpisodeRowSubtitle(rating: Float, airDate: String?) {
+private fun EpisodeRowSubtitle(
+    rating: Float,
+    airDate: String?,
+    supporting: String?,
+) {
     val hasRating = rating > 0f
     val date = airDate?.takeIf { it.isNotBlank() }
-    if (!hasRating && date == null) return
+    val extra = supporting?.takeIf { it.isNotBlank() }
+    if (!hasRating && date == null && extra == null) return
     Spacer(Modifier.size(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)))
     Row(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.detail_cast_avatar_label_spacing)),
@@ -149,8 +161,8 @@ private fun EpisodeRowSubtitle(rating: Float, airDate: String?) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        if (date != null) {
-            if (hasRating) {
+        listOfNotNull(date, extra).forEachIndexed { index, text ->
+            if (hasRating || index > 0) {
                 Text(
                     text = stringResource(R.string.list_row_meta_separator),
                     style = MaterialTheme.typography.labelSmall,
@@ -158,7 +170,7 @@ private fun EpisodeRowSubtitle(rating: Float, airDate: String?) {
                 )
             }
             Text(
-                text = date,
+                text = text,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

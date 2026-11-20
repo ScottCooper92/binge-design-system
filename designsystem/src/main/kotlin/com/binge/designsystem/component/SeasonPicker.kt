@@ -29,13 +29,15 @@ import com.binge.designsystem.theme.BingeShapes
 
 /**
  * One season in a [SeasonPickerSheet]: its [number] (the key [onSelect][SeasonPickerSheet] is handed), its [label] ("Season 2", "Specials")
- * and the [subtitle] under it (its episode count, its year, where it stands). The caller owns the words.
+ * and the [subtitle] under it (its episode count, its year, where it stands). [key] is the same season as text, for an app that identifies its
+ * seasons by a string (two seasons can share a number, or have none); it defaults to the number. The caller owns the words.
  */
 @Immutable
 class SeasonRow(
     val number: Int,
     val label: String,
     val subtitle: String,
+    val key: String = number.toString(),
 )
 
 /**
@@ -82,7 +84,8 @@ fun SeasonDropdown(
 
 /**
  * Every season of a series as a task sheet: a row for each of [rows] with its label and subtitle, the [selected] one marked with a check.
- * [onSelect] is handed the tapped row's number, and [onDismiss] is called when the sheet is dismissed. The sheet itself is a modal, so its
+ * [onSelect] is handed the tapped row's number, and [onDismiss] is called when the sheet is dismissed. An app that keys its seasons by text passes
+ * [selectedKey], which then decides which row is marked, and [onSelectKey], which is handed the tapped row's key along with [onSelect]. The sheet itself is a modal, so its
  * rows are [SeasonPickerContent], which a screenshot can render.
  *
  * @need let a person choose a season of a series from a sheet
@@ -97,10 +100,12 @@ fun SeasonPickerSheet(
     onSelect: (Int) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    selectedKey: String? = null,
+    onSelectKey: ((key: String) -> Unit)? = null,
 ) {
     BingeAdaptiveSheet(kind = BingeSheetKind.Task, onDismissRequest = onDismiss, modifier = modifier) { nav ->
         TaskSheetTopClearance(nav)
-        SeasonPickerContent(rows, selected, onSelect)
+        SeasonPickerContent(rows, selected, onSelect, selectedKey = selectedKey, onSelectKey = onSelectKey)
     }
 }
 
@@ -119,18 +124,23 @@ fun SeasonPickerContent(
     selected: Int,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    selectedKey: String? = null,
+    onSelectKey: ((key: String) -> Unit)? = null,
 ) {
     ItemGroup(
         title = null,
         rows = rows.map { season ->
-            val isSelected = season.number == selected
+            val isSelected = if (selectedKey != null) season.key == selectedKey else season.number == selected
             ListItem(
                 icon = Icons.Filled.Tv,
                 label = season.label,
                 detail = season.subtitle,
                 supportingMaxLines = 3,
                 selected = isSelected,
-                onClick = { onSelect(season.number) },
+                onClick = {
+                    onSelect(season.number)
+                    onSelectKey?.invoke(season.key)
+                },
                 trailingContent = if (isSelected) {
                     { Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary) }
                 } else {

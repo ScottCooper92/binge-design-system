@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,7 +47,8 @@ sealed interface EpisodesState {
 /**
  * What a series page adds to a [MediaDetail]: its [seasons] and which is [selectedSeason], the [episodes] of that season, and the words
  * around them. [episodesTitle] heads the section, [seasonSubtitle] is the line under it ("Season 1 · 9 episodes · 2022") and [viewAllLabel] is
- * the button that offers the rest of the season. A show with one season has nothing to choose, so it draws no dropdown. The caller owns every word.
+ * the button that offers the rest of the season. An app that keys its seasons by text sets [selectedSeasonKey], which then decides which season is
+ * shown, in place of [selectedSeason]. A show with one season has nothing to choose, so it draws no dropdown. The caller owns every word.
  */
 @Immutable
 class SeriesDetail(
@@ -56,14 +58,21 @@ class SeriesDetail(
     val episodesTitle: String,
     val seasonSubtitle: String? = null,
     val viewAllLabel: String? = null,
+    val selectedSeasonKey: String? = null,
 )
 
-/** The taps a series page adds: choosing a season, reading the season's episodes again, and opening all of the season's episodes. */
+/**
+ * The taps a series page adds: choosing a season, reading the season's episodes again, and opening all of the season's episodes. An app that
+ * keys its seasons by text takes the season's key in [onSelectSeasonKey], which is called along with [onSelectSeason]. [onOpenEpisode] is handed the
+ * key of a tapped episode; an episode with no key, or no callback, is not tapped.
+ */
 @Immutable
 class SeriesDetailCallbacks(
     val onSelectSeason: (number: Int) -> Unit,
     val onRetryEpisodes: () -> Unit = {},
     val onViewAllEpisodes: () -> Unit = {},
+    val onSelectSeasonKey: ((key: String) -> Unit)? = null,
+    val onOpenEpisode: ((key: String) -> Unit)? = null,
 )
 
 /**
@@ -120,6 +129,8 @@ fun SeriesDetailScreen(
                 seriesCallbacks.onSelectSeason(it)
             },
             onDismiss = { picking = false },
+            selectedKey = series.selectedSeasonKey,
+            onSelectKey = seriesCallbacks.onSelectSeasonKey,
         )
     }
 }
@@ -131,7 +142,9 @@ private fun SeriesEpisodes(
     callbacks: SeriesDetailCallbacks,
     onPick: () -> Unit,
 ) {
-    val season = series.seasons.firstOrNull { it.number == series.selectedSeason }
+    val season = series.seasons.firstOrNull { row ->
+        if (series.selectedSeasonKey != null) row.key == series.selectedSeasonKey else row.number == series.selectedSeason
+    }
     val ready = series.episodes as? EpisodesState.Ready
     DetailEpisodesSection(
         title = series.episodesTitle,
@@ -141,6 +154,7 @@ private fun SeriesEpisodes(
         onSeasonClick = onPick.takeIf { series.seasons.size > 1 },
         viewAllLabel = series.viewAllLabel,
         onViewAll = callbacks.onViewAllEpisodes,
+        onOpenEpisode = callbacks.onOpenEpisode,
         stateContent = when (val episodes = series.episodes) {
             EpisodesState.Loading -> ({ repeat(PLACEHOLDER_EPISODES) { EpisodeListRowSkeleton() } })
             is EpisodesState.Failed -> ({ EpisodesFailure(episodes, callbacks.onRetryEpisodes) })
@@ -153,7 +167,7 @@ private fun SeriesEpisodes(
 @Composable
 private fun EpisodesFailure(state: EpisodesState.Failed, onRetry: () -> Unit) {
     Column(Modifier.padding(vertical = dimensionResource(R.dimen.padding_s))) {
-        Text(state.message)
+        Text(state.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (state.retryable) {
             TextButton(onClick = onRetry) { Text(stringResource(R.string.error_kind_retry)) }
         }
