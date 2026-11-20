@@ -181,6 +181,7 @@ fun showsGridFooter(ready: PagedGridState.Ready): Boolean = ready.appending || r
  * @need list posters in a paged grid with filters, load more, empty and failed states
  * @group screens
  * @replaces a hand-built scaffold with a pill, filter chips and a lazy poster grid
+ * @sample PagedGridReadySample
  */
 @Composable
 fun PagedGridScreen(
