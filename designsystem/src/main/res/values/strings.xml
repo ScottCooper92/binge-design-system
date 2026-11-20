@@ -174,4 +174,10 @@
     <!-- Paged grid screen -->
     <string name="paged_grid_loading">Loading</string>
     <string name="paged_grid_more_failed">Couldn\'t load more. Tap to retry.</string>
+    <!-- Search screen -->
+    <string name="search_recents_title">Recent searches</string>
+    <string name="search_recents_clear">Clear</string>
+    <string name="search_recents_clear_title">Clear recent searches?</string>
+    <string name="search_recents_clear_message">This removes every search you have made here.</string>
+    <string name="search_more_failed">Couldn\'t load more. Tap to retry.</string>
 </resources>

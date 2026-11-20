@@ -152,4 +152,9 @@
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="paged_grid_loading">Cargando</string>
     <string name="paged_grid_more_failed">No se pudo cargar más. Toca para reintentar.</string>
+    <string name="search_recents_title">Búsquedas recientes</string>
+    <string name="search_recents_clear">Borrar</string>
+    <string name="search_recents_clear_title">¿Borrar las búsquedas recientes?</string>
+    <string name="search_recents_clear_message">Esto elimina todas las búsquedas que hayas hecho aquí.</string>
+    <string name="search_more_failed">No se pudo cargar más. Toca para reintentar.</string>
 </resources>
