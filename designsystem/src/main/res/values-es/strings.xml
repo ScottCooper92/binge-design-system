@@ -157,6 +157,8 @@
     <string name="detail_episode_label">E%1$d</string>
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="paged_grid_loading">Cargando</string>
+    <string name="person_biography_heading">Biografía</string>
+    <string name="person_credits_failed">No se pudieron cargar sus créditos.</string>
     <string name="search_recents_title">Búsquedas recientes</string>
     <string name="search_recents_clear">Borrar</string>
     <string name="search_recents_clear_title">¿Borrar las búsquedas recientes?</string>

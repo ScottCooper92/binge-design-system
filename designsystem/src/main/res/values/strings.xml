@@ -179,6 +179,8 @@
     <string name="detail_runtime_minutes">%1$d min</string>
     <!-- Paged grid screen -->
     <string name="paged_grid_loading">Loading</string>
+    <string name="person_biography_heading">Biography</string>
+    <string name="person_credits_failed">Couldn\'t load their credits.</string>
     <!-- Search screen -->
     <string name="search_recents_title">Recent searches</string>
     <string name="search_recents_clear">Clear</string>
