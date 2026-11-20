@@ -23,6 +23,11 @@ class TvTitleDetailPageSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun pageTabFocused() = Frame { TvTitleDetailPageTabFocusedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun pageLoading() = Frame { TvTitleDetailPageLoadingSample() }
 
     @PreviewTest

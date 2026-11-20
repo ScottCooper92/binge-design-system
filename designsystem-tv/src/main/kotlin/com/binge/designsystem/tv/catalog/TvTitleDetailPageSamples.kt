@@ -22,7 +22,9 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.R
 import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.component.TvIconButton
 import com.binge.designsystem.tv.template.TV_DETAIL_LOADING_TITLE
+import com.binge.designsystem.tv.template.TvDetailIconPlate
 import com.binge.designsystem.tv.template.TvDetailLoading
 import com.binge.designsystem.tv.template.TvDetailTab
 import com.binge.designsystem.tv.template.TvDetailTitle
@@ -56,6 +58,7 @@ private fun TabBody(text: String) {
 private fun SamplePage(
     initialExpanded: Boolean,
     initialTab: String? = null,
+    initialFocusedTab: String? = null,
     loading: Boolean = false,
 ) {
     val actionsFocus = remember { FocusRequester() }
@@ -75,19 +78,27 @@ private fun SamplePage(
         hasActions = true,
         initialExpanded = initialExpanded,
         initialTabKey = initialTab,
+        initialFocusedTabKey = initialFocusedTab,
         loading = TvDetailLoading.takeIf { loading },
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.tv_media_row_card_gap)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // While loading, the primary is the real button drawn busy, so the node the user is on is the node that becomes the real
+            // one; the secondary is a plate until its button replaces it.
             TvButton(
                 label = "Play trailer",
                 onClick = {},
                 leadingIcon = Icons.Filled.PlayArrow,
+                loading = loading,
                 modifier = Modifier.focusRequester(actionsFocus),
             )
-            TvButton(label = "Rate", onClick = {}, leadingIcon = Icons.Filled.StarBorder)
+            if (loading) {
+                TvDetailIconPlate(compact = false)
+            } else {
+                TvIconButton(icon = Icons.Filled.StarBorder, label = "Rate", onClick = {})
+            }
         }
     }
 }
@@ -104,8 +115,14 @@ fun TvTitleDetailPageExpandedSample() {
     SamplePage(initialExpanded = true, initialTab = CAST)
 }
 
-/** The page while its title loads: the copy as plates, the action row as placeholders, and the tabs the loaded page reuses. */
+/** The page while its title loads: the copy as plates, the primary busy and the other action a plate, and the tabs the loaded page reuses. */
 @Composable
 fun TvTitleDetailPageLoadingSample() {
     SamplePage(initialExpanded = false, loading = true)
+}
+
+/** The page expanded onto a tab with another tab focused, as the tab strip draws it: the focused tab filled, the open tab tinted. */
+@Composable
+fun TvTitleDetailPageTabFocusedSample() {
+    SamplePage(initialExpanded = true, initialTab = CAST, initialFocusedTab = VIDEOS)
 }

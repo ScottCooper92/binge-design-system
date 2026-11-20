@@ -3,7 +3,7 @@ package com.binge.designsystem.tv.template
 import com.binge.designsystem.tv.layout.TvLayoutAnchors
 
 /**
- * The layout anchors on the detail page, which its loading state reserves (#1598). The loading page and the loaded one tag
+ * The layout anchors on the detail page, which its loading state reserves. The loading page and the loaded one tag
  * the same points, so a test measures that resolving moves none of them.
  */
 object TvDetailAnchors {

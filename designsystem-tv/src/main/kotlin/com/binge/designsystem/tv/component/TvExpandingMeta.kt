@@ -3,22 +3,14 @@ package com.binge.designsystem.tv.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.layout.SubcomposeMeasureScope
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.TextMeasurer
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
-import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.tv.R as TvR
@@ -41,7 +33,6 @@ internal fun TvExpandingMeta(
     rating: Float?,
     certification: String?,
     modifier: Modifier = Modifier,
-    failure: String? = null,
 ) {
     val style = MaterialTheme.typography.titleMedium
     val color = MaterialTheme.colorScheme.onSurface
@@ -49,7 +40,6 @@ internal fun TvExpandingMeta(
     val measurer = rememberTextMeasurer()
     val shownGenres = genres.take(MAX_META_GENRES)
     SubcomposeLayout(modifier) { constraints ->
-        if (failure != null) return@SubcomposeLayout placeFailure(failure, style, measurer, constraints)
         val gapPx = gap.roundToPx()
         val badges = subcompose("badges") {
             Row(horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
@@ -82,42 +72,6 @@ internal fun TvExpandingMeta(
             val badgesX = if (factsWidth > 0) factsWidth + gapPx else 0
             badges.forEach { it.placeRelative(badgesX, (height - it.height) / 2) }
         }
-    }
-}
-
-/**
- * The line a marked card shows in place of its facts: an alert and the failure, in the error colour. It takes the height the
- * badge line holds, so a marked card is no taller than an unmarked one at any font size.
- */
-private fun SubcomposeMeasureScope.placeFailure(
-    failure: String,
-    style: TextStyle,
-    measurer: TextMeasurer,
-    constraints: Constraints,
-): MeasureResult {
-    val line = subcompose(
-        "failure",
-    ) { TvDecisionFailureLine(failure, style) }.map { it.measure(constraints.copy(minWidth = 0, minHeight = 0)) }
-    val reserved = subcompose("reserve") { TvRatingBadge(rating = RESERVE_RATING) }.maxOfOrNull { it.measure(Constraints()).height } ?: 0
-    val text = measurer.measure(failure, style).size.height
-    val height = maxOf(reserved, text)
-    return layout(constraints.maxWidth, height) { line.forEach { it.placeRelative(0, (height - it.height) / 2) } }
-}
-
-@Composable
-private fun TvDecisionFailureLine(failure: String, style: TextStyle) {
-    val color = MaterialTheme.colorScheme.error
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_detail_meta_gap)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = Icons.Filled.ErrorOutline,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(with(LocalDensity.current) { style.fontSize.toDp() }),
-        )
-        Text(text = failure, style = style, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

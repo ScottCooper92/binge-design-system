@@ -76,7 +76,7 @@ fun TvRatingBadge(
 /**
  * A metadata line that opens with the rating badge: `[★ 8.6]  2026 · 2h 14m · Action`. The one presentation
  * step shared by every surface that writes such a line, so the badge cannot drift a size or gap apart; the lines
- * themselves stay plain testable strings from `tvMediaMetaLine` and no longer carry the rating.
+ * themselves stay plain strings the caller builds and no longer carry the rating.
  *
  * Renders [text] alone when there is no rating, the badge alone when there is no text, nothing when it has
  * neither — so a caller can place it in a `spacedBy` column without guarding it first.

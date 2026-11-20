@@ -44,11 +44,17 @@ internal fun TvDetailCopyPlates() {
 }
 
 /**
- * One icon action's plate, as `TvMediaDetailActionRow` draws it while the page waits: a square at the buttons' height, with small
- * corners compact or round otherwise, matching `TvCompactIconButton` and `TvIconButton`. Not focusable; the real button replaces it.
+ * One icon action's plate, for the action row of a [TvTitleDetailPage] that is still loading: a square at the buttons' height, with
+ * small corners compact or round otherwise, matching the compact and the round icon buttons. Not focusable; the real button
+ * replaces it. The row's primary is not a plate: it is the real button, drawn `loading`, so the node the user is on is the node
+ * that becomes the real one.
+ *
+ * @need stand in for an icon action while a title's page loads
+ * @group tv
+ * @sample TvTitleDetailPageLoadingSample
  */
 @Composable
-internal fun TvDetailIconPlate(compact: Boolean, modifier: Modifier = Modifier) {
+fun TvDetailIconPlate(compact: Boolean, modifier: Modifier = Modifier) {
     val height = dimensionResource(if (compact) TvR.dimen.tv_compact_button_height else TvR.dimen.tv_button_height)
     Box(
         modifier

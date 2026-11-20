@@ -100,18 +100,18 @@ fun tvDetailLoadingTabs(vararg keyedLabels: Pair<String, String>): List<TvDetail
 val TV_DETAIL_LOADING_TITLE = TvDetailTitle("", null, null, "", emptyList(), emptyList(), null, null)
 
 /**
- * A title's page as Netflix draws it. At rest the backdrop fills the screen and the copy sits bottom-left
+ * A title's page: at rest the backdrop fills the screen and the copy sits bottom-left
  * with the [actions] row and the [tabs] along the foot; ↓ or OK on a tab expands the page, moving the tabs to the top over that
  * tab's content (reported through [onTabShown]). ↑ from the top tabs, or Back, folds it. [initialExpanded] and [initialTabKey] seed the saved state, for a frame.
  * Focus is offered once, as the page mounts: to the open tab's content when expanded, else the actions' primary slot (a placeholder
  * while [loading], the same node as the real button), else the tabs. Nothing offers it again.
- *
  *
  * @need show a title's page with its copy, an action row and tabs that expand over the backdrop on a tv screen
  * @group tv
  * @replaces a hand-built tv detail page with its own expand, fold and focus rules
  * @sample TvTitleDetailPageSample
  *
+ * @param initialFocusedTabKey draws the tab with this key focused, for a frame: a frame fires no focus events.
  * @param loadingHasActions false for a page with no action row, so its loading state rests on the tabs, not on action placeholders.
  * @param backdropModel maps the title's backdrop URL to what the image loader is given: an app that wants a larger size for the
  *   10-foot screen resizes it here. The default uses the URL as it is.
@@ -126,6 +126,7 @@ fun TvTitleDetailPage(
     modifier: Modifier = Modifier,
     initialExpanded: Boolean = false,
     initialTabKey: String? = null,
+    initialFocusedTabKey: String? = null,
     onTabShown: (key: String) -> Unit = {},
     loading: TvDetailLoading? = null,
     loadingHasActions: Boolean = true,
@@ -192,6 +193,7 @@ fun TvTitleDetailPage(
                 },
                 onFocusTab = { key -> if (expandedState) selectedKey = key },
                 onUpFromTop = { fold() },
+                focusedKey = initialFocusedTabKey,
             )
         }
     }

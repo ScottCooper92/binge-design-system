@@ -18,9 +18,6 @@ import androidx.tv.material3.Text
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.R as DesR
 
-/** How opaque a plate drawn on a card that is itself a skeleton plate is, so it reads against that card's `surfaceVariant`. */
-internal const val ON_CARD_PLATE_ALPHA = 0.12f
-
 /**
  * One line of text as a bar of [widthFraction]. The line's height comes from an empty `Text` at [style], so it is what the
  * real text measures rather than a dimen that drifts from the type scale; the bar is inset within it, so stacked lines read as lines.
