@@ -88,6 +88,24 @@
     <!-- Under a top bar, how far the copy may start inside the bar's height, into the faded foot of its scrim. -->
     <dimen name="tv_immersive_top_bar_copy_overlap">8dp</dimen>
     <dimen name="tv_immersive_rows_bottom">120dp</dimen>
+    <dimen name="tv_detail_v2_copy_width">560dp</dimen>
+    <dimen name="tv_detail_v2_logo_width">380dp</dimen>
+    <dimen name="tv_detail_v2_logo_height">120dp</dimen>
+    <dimen name="tv_detail_v2_logo_compact_width">200dp</dimen>
+    <dimen name="tv_detail_v2_logo_compact_height">48dp</dimen>
+    <dimen name="tv_detail_tab_item_padding_horizontal">14dp</dimen>
+    <dimen name="tv_detail_meta_gap">10dp</dimen>
+    <dimen name="tv_meta_line_gap">10dp</dimen>
+    <dimen name="tv_rating_badge_meta_icon">20dp</dimen>
+    <dimen name="tv_rating_badge_meta_padding_horizontal">10dp</dimen>
+    <dimen name="tv_rating_badge_meta_padding_vertical">3dp</dimen>
+    <dimen name="tv_rating_badge_meta_gap">6dp</dimen>
+    <dimen name="tv_rating_badge_card_icon">13dp</dimen>
+    <dimen name="tv_rating_badge_card_padding_horizontal">6dp</dimen>
+    <dimen name="tv_rating_badge_card_padding_vertical">2dp</dimen>
+    <dimen name="tv_rating_badge_card_gap">3dp</dimen>
+    <dimen name="tv_detail_certification_padding_horizontal">5dp</dimen>
+    <dimen name="tv_detail_certification_padding_vertical">1dp</dimen>
     <dimen name="tv_cast_card_width">96dp</dimen>
     <dimen name="tv_thumbnail_card_width">200dp</dimen>
     <dimen name="tv_media_grid_row_gap">16dp</dimen>
