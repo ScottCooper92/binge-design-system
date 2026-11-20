@@ -1,9 +1,16 @@
 package com.binge.designsystem.template
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.onNodeWithText
+import com.binge.designsystem.catalog.MEDIA_PAGE_OVERVIEW
+import com.binge.designsystem.catalog.MediaPageStats
 import com.binge.designsystem.catalog.MovieDetailScreenLoadingSample
 import com.binge.designsystem.catalog.MovieDetailScreenSample
 import com.binge.designsystem.layout.LayoutAnchors
+import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
 import com.binge.designsystem.testing.createTakeDownComposeRule
@@ -62,6 +69,41 @@ class MovieDetailScreenTest {
         val wide = listOf(LayoutAnchors.Detail.HERO, LayoutAnchors.Detail.ACTIONS).map(LayoutAnchors::section)
         rule.assertSkeletonReservesGeometry(wide, checkSize = true) { resolved ->
             if (resolved) MovieDetailScreenSample() else MovieDetailScreenLoadingSample()
+        }
+    }
+
+    /** The rails' keys are kept across a configuration change, so a page with rails must survive being saved and restored. */
+    @Test
+    @Config(qualifiers = "w411dp-h2400dp-xhdpi")
+    fun `a page with rails survives a configuration change`() {
+        val restoration = StateRestorationTester(rule)
+        restoration.setContent { MovieDetailScreenSample() }
+        rule.waitForIdle()
+
+        restoration.emulateSavedInstanceStateRestore()
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Cast").assertExists()
+    }
+
+    /** A title with no primary and no round actions has no action row, so its skeleton has none, and the overview does not move on arrival. */
+    @Test
+    fun `a title with no actions holds the overview where it lands`() {
+        val bare = listOf(LayoutAnchors.Detail.HERO, LayoutAnchors.Detail.STATS, LayoutAnchors.Detail.OVERVIEW).map(LayoutAnchors::section)
+        rule.assertSkeletonReservesGeometry(bare, checkSize = true) { resolved ->
+            ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+                val detail = MediaDetail(title = "A title", stats = MediaPageStats, overview = MEDIA_PAGE_OVERVIEW)
+                MovieDetailScreen(
+                    state = if (resolved) {
+                        DetailState.Content(
+                            detail,
+                        )
+                    } else {
+                        DetailState.Loading(stats = MediaPageStats.size, roundActions = 0, hasPrimary = false)
+                    },
+                    callbacks = MediaDetailCallbacks(onBack = {}),
+                )
+            }
         }
     }
 }

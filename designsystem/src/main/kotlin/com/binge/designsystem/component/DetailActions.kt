@@ -28,7 +28,9 @@ private const val STACK_FROM = 2
 /**
  * One round, labelled action beside a detail page's primary: a Trailer, a Watchlist, a Report. [icon] is the glyph and [label] the
  * caption under it. [contentDescription] is what a screen reader announces in place of the [label], which a toggle uses to say what a
- * tap does now ("Remove from watchlist"); null announces the [label].
+ * tap does now ("Remove from watchlist"); null announces the [label]. [trailingIcon] marks an action that leaves the app, such as a trailer
+ * that opens a video: a small icon at the end of the label, as [LabelledIconButton] draws it, and [trailingContentDescription] says what the
+ * mark means ("Opens outside the app"). With neither, the button is as it always was.
  */
 @Immutable
 class DetailRoundAction(
@@ -36,6 +38,8 @@ class DetailRoundAction(
     val label: String,
     val onClick: () -> Unit,
     val contentDescription: String? = null,
+    val trailingIcon: ImageVector? = null,
+    val trailingContentDescription: String? = null,
 )
 
 /**
@@ -44,7 +48,7 @@ class DetailRoundAction(
  * stacked); the caller applies it to its outermost node and draws whatever button its page needs, so nothing here knows what the
  * primary means. On a phone, from two round actions up the primary takes a row of its own and the round buttons sit centred in a row
  * under it, so the primary's label keeps its room at a large font; at the expanded width, and with fewer round actions, they sit in one row
- * with the primary taking the rest. The row is inset by the screen's content inset (16, 24 or 32dp by width) on both sides, and the gaps between its buttons are `padding_m`. A page adds the reading margin through `modifier.readingMargin()`.
+ * with the primary taking the rest. With no [primary] the round actions sit alone, centred in one row. The row is inset by the screen's content inset (16, 24 or 32dp by width) on both sides, and the gaps between its buttons are `padding_m`. A page adds the reading margin through `modifier.readingMargin()`.
  *
  * @need lay out a detail page's primary action beside its round secondary actions
  * @group detail
@@ -53,13 +57,21 @@ class DetailRoundAction(
  */
 @Composable
 fun DetailActions(
-    primary: @Composable (Modifier) -> Unit,
+    primary: (@Composable (Modifier) -> Unit)?,
     roundActions: List<DetailRoundAction>,
     modifier: Modifier = Modifier,
 ) {
     val gap = dimensionResource(R.dimen.padding_m)
     val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
-    if (roundActions.size >= STACK_FROM && !isExpandedLayout()) {
+    if (primary == null) {
+        Row(
+            modifier = edge,
+            horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.Top,
+        ) {
+            RoundActions(roundActions)
+        }
+    } else if (roundActions.size >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             primary(Modifier.fillMaxWidth())
             Row(
@@ -86,6 +98,8 @@ private fun RowScope.RoundActions(actions: List<DetailRoundAction>) {
             label = action.label,
             onClick = action.onClick,
             contentDescription = action.contentDescription,
+            trailingIcon = action.trailingIcon,
+            trailingContentDescription = action.trailingContentDescription,
         )
     }
 }
@@ -93,18 +107,30 @@ private fun RowScope.RoundActions(actions: List<DetailRoundAction>) {
 /**
  * The action row of [DetailActions] while the page loads: a plate where the primary goes, and [buttons] round plates with a caption
  * line under each where the round actions go, laid out as the loaded row is (stacked from two up on a phone), so the row is the loaded
- * row's height. With no [buttons] it is the primary's plate alone.
+ * row's height. With no [buttons] it is the primary's plate alone, and with [primary] false it is the round plates alone, as [DetailActions] draws them with no primary.
  *
  * @need hold a detail page's action row at its loaded height while the page loads
  * @group detail
  * @replaces a hand-built shimmer plate for a row of actions
  */
 @Composable
-fun DetailActionsSkeleton(modifier: Modifier = Modifier, buttons: Int = 0) {
+fun DetailActionsSkeleton(
+    modifier: Modifier = Modifier,
+    buttons: Int = 0,
+    primary: Boolean = true,
+) {
     val gap = dimensionResource(R.dimen.padding_m)
     val plate = Modifier.height(dimensionResource(R.dimen.button_filled_height))
     val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
-    if (buttons >= STACK_FROM && !isExpandedLayout()) {
+    if (!primary) {
+        Row(
+            modifier = edge,
+            horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.Top,
+        ) {
+            repeat(buttons) { RoundPlate() }
+        }
+    } else if (buttons >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             SkeletonPlate(plate.fillMaxWidth())
             Row(

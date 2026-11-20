@@ -146,6 +146,23 @@ class BingeAdaptiveSheetExpandedTest {
     }
 
     @Test
+    fun `a quick second tap on the control that opened a page does not push it twice`() {
+        show()
+        rule.mainClock.autoAdvance = false
+
+        // Both taps land while the page is still sliding in, and the control that opened it is still on screen.
+        rule.onNodeWithText(OPEN).performClick()
+        rule.onNodeWithText(OPEN).performClick()
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+        pressBack()
+
+        rule.onNodeWithText(ROOT_TEXT).assertExists()
+        assertEquals("the page was pushed twice", listOf("detail"), leftPages)
+        assertEquals(0, dismissals)
+    }
+
+    @Test
     fun `a page left by Back is reported, and closing from the root is not a page`() {
         show()
         rule.onNodeWithText(OPEN).performClick()

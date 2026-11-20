@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,7 +24,9 @@ private const val EPISODES_SHOWN = 5
 
 /**
  * One episode in a [DetailEpisodesSection]: its [number], [name], the [stillUrl], already built, its [rating] (null or zero draws none) and
- * its [airDate], already formatted. The caller owns the words and the date format.
+ * its [airDate], already formatted. An episode part way through has a [progress] bar, from 0 to 1. A [played] episode draws a check at the end of its row,
+ * announced as [playedLabel], which the caller words. [trailing] is a slot at the end of the row for a mark or a toggle the caller owns, and replaces the check.
+ * The caller owns the words and the date format.
  */
 @Immutable
 class EpisodeRow(
@@ -30,6 +35,10 @@ class EpisodeRow(
     val stillUrl: String?,
     val rating: Float? = null,
     val airDate: String? = null,
+    val progress: Float? = null,
+    val played: Boolean = false,
+    val playedLabel: String? = null,
+    val trailing: (@Composable () -> Unit)? = null,
 )
 
 /**
@@ -92,6 +101,10 @@ fun DetailEpisodesSection(
                     modifier = Modifier.padding(horizontal = inset),
                     rating = episode.rating ?: 0f,
                     airDate = episode.airDate,
+                    progress = episode.progress,
+                    trailingContent = episode.trailing ?: episode.played.takeIf { it }?.let {
+                        { PlayedMark(episode.playedLabel) }
+                    },
                 )
             }
             if (episodes.size > shown.coerceAtLeast(0) && onViewAll != null && viewAllLabel != null) {
@@ -103,4 +116,14 @@ fun DetailEpisodesSection(
             }
         }
     }
+}
+
+/** The check at the end of a played episode's row, announced as [label] when there is one. */
+@Composable
+private fun PlayedMark(label: String?) {
+    Icon(
+        imageVector = Icons.Filled.CheckCircle,
+        contentDescription = label,
+        tint = MaterialTheme.colorScheme.primary,
+    )
 }

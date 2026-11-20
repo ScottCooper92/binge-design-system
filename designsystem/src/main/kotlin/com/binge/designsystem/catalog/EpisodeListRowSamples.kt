@@ -1,5 +1,10 @@
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.component.EpisodeListRow
 import com.binge.designsystem.component.EpisodeListRowSkeleton
@@ -43,5 +48,41 @@ fun EpisodeListRowDisplayOnlySample() {
 fun EpisodeListRowSkeletonSample() {
     ScreenshotTheme {
         EpisodeListRowSkeleton()
+    }
+}
+
+/**
+ * An episode part way through, with a bar along the foot of the row, and a mark at the end of the row the caller owns, here a check for a
+ * watched episode. The row is display-only, so neither is a button.
+ */
+@Composable
+fun EpisodeListRowMarksSample() {
+    ScreenshotTheme {
+        Column {
+            EpisodeListRow(
+                episodeNumber = 5,
+                name = "Gray Matter",
+                stillUrl = null,
+                rating = 8.1f,
+                airDate = "Mar 19, 2023",
+                onClick = null,
+                progress = 0.4f,
+            )
+            EpisodeListRow(
+                episodeNumber = 6,
+                name = "Crazy Handful of Nothin'",
+                stillUrl = null,
+                rating = 9.2f,
+                airDate = "Mar 26, 2023",
+                onClick = null,
+                trailingContent = {
+                    Icon(
+                        Icons.Filled.CheckCircle,
+                        contentDescription = "Watched",
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                },
+            )
+        }
     }
 }
