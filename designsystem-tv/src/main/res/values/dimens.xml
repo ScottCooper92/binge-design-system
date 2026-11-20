@@ -90,6 +90,12 @@
     <!-- Under a top bar, how far the copy may start inside the bar's height, into the faded foot of its scrim. -->
     <dimen name="tv_immersive_top_bar_copy_overlap">8dp</dimen>
     <dimen name="tv_immersive_rows_bottom">120dp</dimen>
+    <dimen name="tv_cast_card_width">96dp</dimen>
+    <dimen name="tv_thumbnail_card_width">200dp</dimen>
+    <dimen name="tv_media_grid_row_gap">16dp</dimen>
+    <dimen name="tv_card_caption_gap">16dp</dimen>
+    <dimen name="tv_skeleton_caption_line_height">28dp</dimen>
+    <dimen name="tv_placeholder_glyph_max">56dp</dimen>
     <dimen name="tv_immersive_row_gap">24dp</dimen>
     <dimen name="tv_immersive_grid_row_gap">16dp</dimen>
     <dimen name="tv_see_all_icon">32dp</dimen>
