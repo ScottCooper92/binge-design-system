@@ -39,4 +39,9 @@ class SeriesDetailScreenSamplesScreenshotTest {
     @Preview(name = "tall", device = TALL_PHONE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
     @Composable
     fun singleSeason() = SeriesDetailScreenSingleSeasonSample()
+
+    @PreviewTest
+    @Preview(name = "tall", device = TALL_PHONE_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+    @Composable
+    fun allEpisodes() = SeriesDetailScreenAllEpisodesSample()
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.DetailEpisodesSection
 import com.binge.designsystem.component.DetailRoundAction
+import com.binge.designsystem.component.EPISODES_SHOWN
 import com.binge.designsystem.component.EpisodeListRowSkeleton
 import com.binge.designsystem.component.EpisodeRow
 import com.binge.designsystem.component.SeasonPickerSheet
@@ -48,7 +49,8 @@ sealed interface EpisodesState {
  * What a series page adds to a [MediaDetail]: its [seasons] and which is [selectedSeason], the [episodes] of that season, and the words
  * around them. [episodesTitle] heads the section, [seasonSubtitle] is the line under it ("Season 1 · 9 episodes · 2022") and [viewAllLabel] is
  * the button that offers the rest of the season. An app that keys its seasons by text sets [selectedSeasonKey], which then decides which season is
- * shown, in place of [selectedSeason]. A show with one season has nothing to choose, so it draws no dropdown. The caller owns every word.
+ * shown, in place of [selectedSeason]. [shown] is how many episodes are listed before [viewAllLabel] takes over: null keeps five, and with every
+ * episode shown there is no button. A show with one season has nothing to choose, so it draws no dropdown. The caller owns every word.
  */
 @Immutable
 class SeriesDetail(
@@ -59,6 +61,7 @@ class SeriesDetail(
     val seasonSubtitle: String? = null,
     val viewAllLabel: String? = null,
     val selectedSeasonKey: String? = null,
+    val shown: Int? = null,
 )
 
 /**
@@ -153,6 +156,7 @@ private fun SeriesEpisodes(
         seasonLabel = season?.label.takeIf { series.seasons.size > 1 },
         onSeasonClick = onPick.takeIf { series.seasons.size > 1 },
         viewAllLabel = series.viewAllLabel,
+        shown = series.shown ?: EPISODES_SHOWN,
         onViewAll = callbacks.onViewAllEpisodes,
         onOpenEpisode = callbacks.onOpenEpisode,
         stateContent = when (val episodes = series.episodes) {

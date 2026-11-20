@@ -62,7 +62,11 @@ private fun series() =
     MediaDetail(title = MEDIA_PAGE_TITLE, genres = MEDIA_PAGE_GENRES, stats = MediaPageStats, overview = MEDIA_PAGE_OVERVIEW)
 
 @Composable
-private fun SeriesPage(episodes: EpisodesState, seasonCount: Int = seasons.size) {
+private fun SeriesPage(
+    episodes: EpisodesState,
+    seasonCount: Int = seasons.size,
+    shown: Int? = null,
+) {
     var selected by remember { mutableIntStateOf(1) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         SeriesDetailScreen(
@@ -74,6 +78,7 @@ private fun SeriesPage(episodes: EpisodesState, seasonCount: Int = seasons.size)
                 episodesTitle = "Episodes",
                 seasonSubtitle = seasons.first { it.number == selected }.let { "${it.label} · ${it.subtitle}" },
                 viewAllLabel = "View all episodes",
+                shown = shown,
             ),
             callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
             seriesCallbacks = SeriesDetailCallbacks(onSelectSeason = { selected = it }),
@@ -117,4 +122,10 @@ fun SeriesDetailScreenEpisodesFailedSample() {
 @Composable
 fun SeriesDetailScreenSingleSeasonSample() {
     SeriesPage(EpisodesState.Ready(episodes()), seasonCount = 1)
+}
+
+/** A season that lists every episode, as an app's own season page does: all seven rows and no View all button. */
+@Composable
+fun SeriesDetailScreenAllEpisodesSample() {
+    SeriesPage(EpisodesState.Ready(episodes()), shown = episodes().size)
 }
