@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import com.binge.designsystem.component.BingeStatusButton
 import com.binge.designsystem.component.BingeStatusButtonEmphasis
 import com.binge.designsystem.component.DetailActions
@@ -24,7 +25,7 @@ import com.binge.designsystem.theme.BingeSentiment
 
 /**
  * A detail page's action row with a Request primary and three round actions: on a phone the primary takes a row of its own and the round
- * buttons sit centred under it, and at the expanded width they share one row. The Watchlist button flips between its filled and its outlined
+ * buttons spread evenly across a row under it, each in an equal share of the width, and at the expanded width they share one row. The Watchlist button flips between its filled and its outlined
  * bookmark when tapped in the catalog, as the page's does.
  */
 @Composable
@@ -50,6 +51,48 @@ fun DetailActionsSample() {
                     onClick = { onList = !onList },
                     contentDescription = if (onList) "Remove from watchlist" else "Add to watchlist",
                 ),
+                DetailRoundAction(Icons.Filled.ReportProblem, "Report", onClick = {}),
+            ),
+        )
+    }
+}
+
+private fun requestPrimary(): @Composable (Modifier) -> Unit =
+    { modifier ->
+        BingeStatusButton(
+            label = "Request",
+            onClick = {},
+            sentiment = BingeSentiment.Neutral,
+            modifier = modifier,
+            icon = Icons.Filled.Add,
+            emphasis = BingeStatusButtonEmphasis.Filled,
+        )
+    }
+
+/** The action row with two round actions: stacked under the primary, the two spread across the row, each centred in half of it. */
+@Composable
+fun DetailActionsTwoSample() {
+    ScreenshotTheme {
+        DetailActions(
+            primary = requestPrimary(),
+            roundActions = listOf(
+                DetailRoundAction(Icons.Filled.PlayArrow, "Trailer", onClick = {}),
+                DetailRoundAction(Icons.Filled.Bookmark, "Watchlist", onClick = {}),
+            ),
+        )
+    }
+}
+
+/** The action row with four round actions: stacked under the primary, the four spread across the row in quarters. */
+@Composable
+fun DetailActionsFourSample() {
+    ScreenshotTheme {
+        DetailActions(
+            primary = requestPrimary(),
+            roundActions = listOf(
+                DetailRoundAction(Icons.Filled.PlayArrow, "Trailer", onClick = {}),
+                DetailRoundAction(Icons.Filled.Bookmark, "Watchlist", onClick = {}),
+                DetailRoundAction(Icons.Filled.Add, "Request", onClick = {}),
                 DetailRoundAction(Icons.Filled.ReportProblem, "Report", onClick = {}),
             ),
         )
