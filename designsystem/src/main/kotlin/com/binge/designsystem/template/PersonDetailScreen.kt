@@ -378,7 +378,7 @@ private fun CreditRail(
                 )
             }
             if (section.appending || section.appendFailed) {
-                item(key = "append") {
+                item(key = "binge:person-append") {
                     Box(
                         Modifier.width(dimensionResource(R.dimen.see_all_tile_width)).height(dimensionResource(R.dimen.card_height)),
                         contentAlignment = Alignment.Center,
@@ -395,7 +395,7 @@ private fun CreditRail(
                 }
             }
             if (onSeeAll != null) {
-                item(key = "see-all") {
+                item(key = "binge:person-see-all") {
                     SeeAllTile(
                         label = stringResource(R.string.gallery_see_all),
                         onClick = onSeeAll,

@@ -57,8 +57,8 @@ import kotlinx.coroutines.flow.filter
 /** How many cells from the end the grid asks for the next page. */
 const val PAGED_GRID_LOAD_MORE_AHEAD: Int = 6
 
-/** The lazy key of the append footer; an app's own keys are text too, so it is namespaced. */
-private const val FOOTER_KEY = "paged-grid-footer"
+/** The lazy key of the append footer. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
+private const val FOOTER_KEY = "binge:paged-grid-footer"
 
 /** How many rows of plates the loading skeleton draws. */
 const val PAGED_GRID_SKELETON_ROWS: Int = 8
@@ -377,8 +377,16 @@ private fun ReadyGrid(
             isNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount)
         }
     }
-    LaunchedEffect(gridState, state.hasMore, state.items.size) {
-        if (state.hasMore) snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { callbacks.onLoadMore() }
+    // Keyed on the paging flags as well as the size: a page that added nothing leaves the size as it was, and only the flags' fall from
+    // appending back to idle restarts the watch so the grid asks again while the app says there is more. No ask while a page is in flight
+    // or after one failed (Retry asks then).
+    LaunchedEffect(gridState, state.hasMore, state.items.size, state.appending, state.appendFailed) {
+        if (state.hasMore &&
+            !state.appending &&
+            !state.appendFailed
+        ) {
+            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { callbacks.onLoadMore() }
+        }
     }
     val grid: @Composable () -> Unit = {
         GridFrame(contentPadding, gridState) {
