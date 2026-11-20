@@ -50,7 +50,7 @@ import com.binge.designsystem.layout.layoutAnchor
  * bar with the same Back control, with Try again when the failure is retryable.
  *
  * What differs between apps comes in through slots, each optional and taking no space when empty: [primary] is the wide action (a
- * request in one app, Play in another) and [roundActions] the round buttons beside or under it, which need a [primary] to be drawn; [topBarActions] are the bar's actions;
+ * request in one app, Play in another) and [roundActions] the round buttons beside or under it (with no [primary] they sit alone, centred in one row); [topBarActions] are the bar's actions;
  * [afterPeople], [afterRails] and [atEnd] are an app's own sections at three named places (where to watch after the people, links
  * after the rails and tags, media information at the end); [overlays] hosts the app's sheets, in the loaded
  * page only: none is hosted while it loads or after it fails. [snackbarHostState] shows the app's messages.

@@ -98,7 +98,7 @@ sealed interface DetailState {
      * page will have, [hasPrimary] whether it has a primary action, [roundActions] how many round actions, and [rails] how many rails of people
      * or posters follow the overview (each a carousel placeholder; the default, none, leaves the rest of the page to grow). The round actions
      * stack under the primary at the same height from two up on a phone, but beside it at the expanded width two and three buttons can differ,
-     * so give the count the loaded page will have.
+     * so give the count the loaded page will have. The overview plates are always drawn, so a title that arrives with no synopsis moves up.
      */
     class Loading(
         val stats: Int = 3,
