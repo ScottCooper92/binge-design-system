@@ -37,6 +37,12 @@ class DetailActionsRailsSamplesScreenshotTest {
     @ComponentPreviews
     @WorstCaseFontPreviews
     @Composable
+    fun actionsTrailingMark() = DetailActionsTrailingMarkSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
     fun actionsSkeleton() = DetailActionsSkeletonSample()
 
     @PreviewTest
