@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextDecoration
@@ -34,6 +35,10 @@ import com.binge.designsystem.theme.BingeShapes
 /**
  * A filter chip with three states: neutral, include and exclude. A tap and a long press move between them.
  *
+ * A null [onLongClick] makes it a two-state chip for a filter that can only include: it takes no long press, so exclude is
+ * unreachable, and it is announced as a selected or unselected button, not as "Included" or "Not set". Pass the state as
+ * [IncludeExcludeState.Include] or [IncludeExcludeState.Neutral]; an exclude state is drawn if given, but nothing reaches it.
+ *
  * @need filter by including or excluding a value
  * @group cards
  * @replaces a hand-built three-state filter chip
@@ -44,7 +49,7 @@ fun IncludeExcludeChip(
     label: String,
     state: IncludeExcludeState,
     onClick: () -> Unit,
-    onLongClick: () -> Unit,
+    onLongClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     onLongClickLabel: String? = null,
 ) {
@@ -87,9 +92,15 @@ fun IncludeExcludeChip(
             .clip(shape)
             .background(chipColors.background)
             .border(BorderStroke(dimensionResource(R.dimen.hairline_thickness), chipColors.border), shape)
-            .combinedClickable(role = Role.Button, onLongClickLabel = onLongClickLabel, onClick = onClick, onLongClick = onLongClick)
-            .semantics { stateDescription = stateLabel }
-            .padding(
+            .combinedClickable(
+                role = Role.Button,
+                onLongClickLabel = if (onLongClick != null) onLongClickLabel else null,
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ).semantics {
+                // Two states read as a toggle, as every other chip does; three need the words.
+                if (onLongClick == null) selected = state == IncludeExcludeState.Include else stateDescription = stateLabel
+            }.padding(
                 horizontal = dimensionResource(R.dimen.discover_filter_chip_padding_h),
                 vertical = dimensionResource(R.dimen.discover_filter_chip_padding_v),
             ),
