@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -312,6 +313,9 @@ private fun SearchBody(
             )
         is SearchState.Ready ->
             if (paged != null) {
+                // One saved grid state per page, held above the pager: a page the pager disposes, a page whose entry goes missing while
+                // its type reloads and a recreated activity all come back where the list was left.
+                val gridStates = paged.chips.associate { chip -> chip.key to rememberPageGridState(chip.key) }
                 HorizontalPager(
                     state = pager.state,
                     modifier = Modifier.fillMaxSize(),
@@ -329,6 +333,7 @@ private fun SearchBody(
                             moreFailedLabel = moreFailedLabel,
                             resultTrailing = resultTrailing,
                             platePadding = platePadding,
+                            gridState = gridStates.getValue(paged.chips[page].key),
                         )
                     }
                 }
@@ -386,6 +391,11 @@ private fun NoResultsBody(
         noResultsExtras?.invoke()
     }
 }
+
+/** A page's grid state, saved under the page's own chip key so it outlives the page's composition. */
+@Composable
+private fun rememberPageGridState(chipKey: String): LazyGridState =
+    key(chipKey) { rememberSaveable(saver = LazyGridState.Saver, key = SEARCH_PAGE_KEY_PREFIX + chipKey) { LazyGridState() } }
 
 /** The chips a paged body swipes between, the one chosen, and each chip's results; null when the state does not page. */
 @Immutable
@@ -584,8 +594,8 @@ private fun ResultsList(
     moreFailedLabel: String,
     resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)?,
     platePadding: PaddingValues,
+    gridState: LazyGridState = rememberLazyGridState(),
 ) {
-    val gridState = rememberLazyGridState()
     val nearEnd by remember {
         derivedStateOf {
             val info = gridState.layoutInfo

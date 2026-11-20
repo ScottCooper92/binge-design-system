@@ -11,9 +11,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.component.MediaResult
@@ -313,5 +315,73 @@ class SearchScreenTest {
         rule.waitForIdle()
 
         assertTrue(asked.isEmpty())
+    }
+
+    private fun showLongPaged(asked: MutableList<String>) {
+        val pages = mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40))
+        showPaged("all", asked, pages = pages)
+    }
+
+    private fun assertScrolledAway(label: String) {
+        rule.onNodeWithText(label).assertDoesNotExist()
+    }
+
+    @Test
+    fun `a page keeps its scroll when a chip tap takes the pager two pages away and back`() {
+        val asked = mutableListOf<String>()
+        showLongPaged(asked)
+        repeat(3) {
+            rule.onNodeWithText("a title 0").takeIf { _ -> true }
+            rule.onRoot().performTouchInput { swipeUp() }
+        }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        rule.onNodeWithText("People").performClick()
+        rule.waitForIdle()
+        rule.onNodeWithText("p title 0").assertIsDisplayed()
+        rule.onNodeWithText("All").performClick()
+        rule.waitForIdle()
+
+        assertScrolledAway("a title 0")
+    }
+
+    @Test
+    fun `a page keeps its scroll through a moment with no entry, as while its type reloads`() {
+        val asked = mutableListOf<String>()
+        var pages by mutableStateOf(mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40)))
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "past",
+                    state = SearchState.Ready(
+                        named("a"),
+                        loaded = 3,
+                        hasMore = false,
+                        types = SearchTypes(types.chips, selected),
+                        pages = pages,
+                    ),
+                    callbacks = callbacks(onType = {
+                        asked += it
+                        selected = it
+                    }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        val all = pages.getValue("all")
+        pages = pages - "all"
+        rule.waitForIdle()
+        pages = pages + ("all" to all)
+        rule.waitForIdle()
+
+        assertScrolledAway("a title 0")
     }
 }
