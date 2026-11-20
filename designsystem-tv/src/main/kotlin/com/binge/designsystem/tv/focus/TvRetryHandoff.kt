@@ -100,6 +100,9 @@ fun rememberTvRetryHandoff(
 /**
  * The node that holds focus through the hand-off, with no size and not drawn. It is composed always, so its requester has a node
  * when [TvRetryHandoff.begin] asks, and takes focus only while the hand-off is held.
+ *
+ * @need keep focus on a node that is never removed while a retry replaces the plate that held it
+ * @group tv
  */
 @Composable
 fun TvRetryHold(handoff: TvRetryHandoff, modifier: Modifier = Modifier) {
