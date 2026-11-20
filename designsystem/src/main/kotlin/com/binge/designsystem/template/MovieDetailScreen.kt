@@ -193,11 +193,15 @@ private fun DetailPageSkeleton(
             if (!cinematic) {
                 DetailStatsRowsSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)), count = state.stats)
             }
-            DetailActionsSkeleton(
-                Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
-                buttons = state.roundActions,
-                primary = state.hasPrimary,
-            )
+            // The loaded page draws its action row only when it has something to put in it, so the skeleton does too: an empty row still
+            // takes a gap from the column's spacing, and the overview would move up when the page arrives.
+            if (state.hasPrimary || state.roundActions > 0) {
+                DetailActionsSkeleton(
+                    Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
+                    buttons = state.roundActions,
+                    primary = state.hasPrimary,
+                )
+            }
             if (!cinematic) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
             repeat(state.rails) { CarouselSkeleton() }
         }
