@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config
 private val ITEMS = List(3) { GridItem(id = 100 + it, title = "Title $it") }
 
 /**
- * The pane reports the deepest cell focus reached, once, as it leaves (#2269, #2356) — the wiring
+ * The pane reports the deepest cell focus reached, once, as it leaves — the wiring
  * counterpart to the design system's `TvVisitDepthTest`, which pins the bare class. What is only true here is that
  * [TvGridPage] actually hands the template's visit depth its own `onItemFocused` stream and reports on
  * dispose, mirroring `ScrollDepthEffectTest`'s attached-toggle leave pattern for the phone detector.

@@ -18,7 +18,7 @@ import com.binge.designsystem.tv.theme.TvButtonStyle
 private const val DECISION_STEPS = 3
 
 /**
- * A decision as one step of a TV step flow (#638): the flow's read-out above, the copy beside the points card in
+ * A decision as one step of a TV step flow: the flow's read-out above, the copy beside the points card in
  * [TvDecisionBody], and the two answers in the flow's own footer, accept focused.
  */
 @Composable

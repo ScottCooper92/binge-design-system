@@ -31,7 +31,7 @@ private const val MOVIES_TAG = "nav-movies"
 
 private val Keyboard = 300.dp
 
-/** The floating pill hides under the keyboard, as the docked bar does, and its overlay inset does not grow (#376). */
+/** The floating pill hides under the keyboard, as the docked bar does, and its overlay inset does not grow. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w411dp-h891dp-xhdpi")
 class BingeNavFloatingBarKeyboardTest {

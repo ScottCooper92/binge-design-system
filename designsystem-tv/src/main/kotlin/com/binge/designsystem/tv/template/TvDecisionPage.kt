@@ -57,7 +57,7 @@ import com.binge.designsystem.tv.R as TvR
  * arrival (see [TvPageHosting]). [acceptInitiallyFocused] draws accept focused, for a frame. The phone's hero has no
  * TV twin: the board's two panes leave no room for one.
  *
- * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour (#673). It sits
+ * [noteContent] replaces `copy.note`, for a note of more than one paragraph or more than one colour. It sits
  * where the note does, under the heading with the copy's gap, and its paragraphs are spaced as the heading's lines are.
  * A bare `Text` in it reads as the note would: the slot provides the note's style and colour, so only a paragraph that
  * differs names its own.
@@ -94,7 +94,7 @@ fun TvDecisionPage(
 }
 
 /**
- * [TvDecisionPage]'s content without the page around it (#638): the [copy] beside the read-out card of the [points],
+ * [TvDecisionPage]'s content without the page around it: the [copy] beside the read-out card of the [points],
  * for a decision that is one step of a [TvStepFlow]. The flow supplies the chrome, the hosting and the footer that
  * carries the answers. The points scroll on their own side, and each takes focus, so ↑ from the footer walks a card
  * taller than the space into view. [noteContent] replaces `copy.note`, as [TvDecisionPage] says.

@@ -158,7 +158,7 @@ fun BingeScreenScaffold(
     val rowFocus = LocalRowFocus.current
     val back = onBack?.let { paneBackOrNull(it) }
     var bottomBarHeight by remember { mutableIntStateOf(0) }
-    // What an ancestor already reserved, such as the custom rail's start inset, is not reserved again (#372).
+    // What an ancestor already reserved, such as the custom rail's start inset, is not reserved again.
     var consumed by remember { mutableStateOf(WindowInsets(0, 0, 0, 0)) }
     Scaffold(
         modifier = (behavior?.let { modifier.nestedScroll(barConnection(bar, it, rowFocus)) } ?: modifier)
@@ -231,7 +231,7 @@ fun BingeScreenScaffold(
                         Spacer(Modifier.height(padding.calculateTopPadding()))
                         header()
                     },
-                    // Consumed as well as padded, so a header's chip row does not add the side insets again (#371).
+                    // Consumed as well as padded, so a header's chip row does not add the side insets again.
                     modifier = Modifier.padding(padding.screenOuterPadding()).consumeWindowInsets(padding.screenOuterPadding()),
                     headerBackground = Color.Transparent,
                     scrimFraction = scrim,

@@ -43,7 +43,7 @@ private data class KeyboardFrame(
 )
 
 /**
- * The held split, composed (#558). A portrait foldable's flow stacks, and a keyboard cutting its height below its
+ * The held split, composed. A portrait foldable's flow stacks, and a keyboard cutting its height below its
  * width would measure it as split, disposing the focused field. Each frame of the show and hide is dispatched in turn,
  * including the hide's first frames, where the keyboard no longer reports itself visible but its inset has not gone.
  */

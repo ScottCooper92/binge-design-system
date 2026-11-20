@@ -12,7 +12,7 @@ import com.binge.designsystem.R
 /**
  * One weight of Outfit, from the variable font bundled in `res/font` (its licence is `assets/fonts/Outfit-OFL.txt`).
  * Bundled rather than downloaded so a device without Play services, or before the download lands, draws Outfit and
- * not the system fallback (#3530).
+ * not the system fallback.
  */
 private fun outfit(weight: FontWeight) =
     Font(

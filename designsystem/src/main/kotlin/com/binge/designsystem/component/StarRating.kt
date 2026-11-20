@@ -93,7 +93,7 @@ fun StarRating(
  * Every tie falls on an x.5 rating (7.5 sits exactly between 3.5 and 4 stars), so ties go down to make
  * the star row never read higher than the number beside it. The tie is judged on that number, the
  * rating rounded to one decimal as [formatRating] prints it, not on the raw value: 7.52 prints "7.5",
- * so it draws three and a half stars too (#232). Out-of-range values clamp to 0 and 10, and NaN draws
+ * so it draws three and a half stars too. Out-of-range values clamp to 0 and 10, and NaN draws
  * no stars.
  */
 internal fun ratingToHalves(rating: Float): Int {
