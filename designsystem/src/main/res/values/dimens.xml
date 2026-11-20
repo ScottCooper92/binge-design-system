@@ -219,6 +219,12 @@
     <!-- BingeTag compact form, for a TagRow of many tags -->
     <dimen name="tag_compact_padding_h">6dp</dimen>
     <dimen name="tag_compact_padding_v">2dp</dimen>
+    <!-- FilterPill: the pill's horizontal padding (its vertical padding is padding_s), the gap between its parts, and the compass glyph -->
+    <dimen name="filter_pill_padding_h">14dp</dimen>
+    <dimen name="filter_pill_spacing">6dp</dimen>
+    <dimen name="filter_pill_icon">16dp</dimen>
+    <!-- CollapsedFilterAction: how far the count badge is drawn in from the icon button's corner, onto the icon's -->
+    <dimen name="filter_action_badge_inset">8dp</dimen>
     <!-- StatusChip: the pill's padding, the solid dot, its halo, and the gap before the label -->
     <dimen name="status_chip_padding_h">10dp</dimen>
     <dimen name="status_chip_padding_v">4dp</dimen>
@@ -473,4 +479,6 @@
     <dimen name="labelled_icon_button_max_width">104dp</dimen>
     <!-- The "opens outside the app" mark at the end of a labelled icon button's label. -->
     <dimen name="labelled_icon_button_trailing_icon_size">12dp</dimen>
+    <!-- ServerCardUpdate: the open-in-new mark after the action text, sized to its labelMedium text -->
+    <dimen name="server_card_update_trailing_icon">12dp</dimen>
 </resources>

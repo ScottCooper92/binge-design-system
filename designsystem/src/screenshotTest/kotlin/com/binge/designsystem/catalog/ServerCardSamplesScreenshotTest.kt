@@ -39,6 +39,14 @@ class ServerCardSamplesScreenshotTest {
     @ComponentPreviews
     @WorstCaseFontPreviews
     @Composable
+    fun UpdateExternal() {
+        ServerCardUpdateExternalSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
     fun Plain() {
         ServerCardPlainSample()
     }
