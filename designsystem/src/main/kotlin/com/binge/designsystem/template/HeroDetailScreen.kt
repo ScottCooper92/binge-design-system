@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,14 +37,23 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingePullToRefresh
@@ -207,14 +217,18 @@ fun HeroDetailLazyScreen(
     content: LazyListScope.() -> Unit,
 ) {
     val measured = rememberMeasuredHeroHeight()
+    val underHero = rememberUnderHeroExtent(listState)
+    val viewport = remember { ViewportHeight() }
+    val density = LocalDensity.current
+    val paddingWithFill = remember(contentPadding, density) { PaddingWithFill(contentPadding, density, viewport, underHero) }
     val bottomInset = if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         HeroDetailPull(onRefresh, isRefreshing, pullState, pullIndicator) {
             ProvideHeroReadingMargin(Modifier.fillMaxSize()) {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize().then(bottomInset),
-                    contentPadding = contentPadding,
+                    modifier = Modifier.fillMaxSize().then(bottomInset).reportViewportHeight(viewport),
+                    contentPadding = paddingWithFill,
                     verticalArrangement = verticalArrangement,
                     horizontalAlignment = horizontalAlignment,
                 ) {
@@ -306,6 +320,82 @@ private fun MeasuredHero(measured: MeasuredHeroHeight, hero: @Composable () -> U
 }
 
 private const val HERO_ITEM_KEY = "hero-detail-hero"
+
+/**
+ * The extent, in px, of the items under the hero (the list's items less the hero), from the first of them to the last, which takes
+ * in the spacing between them; [LONG_PAGE] where an item lies below the viewport. The hero is left out of the sum, so it leaving
+ * the visible items on a scroll does not change it. [PaddingWithFill] turns it into the room under the last item.
+ *
+ * Only an item below the viewport makes the page long. An item that has scrolled off the top does not: at the end of a short page
+ * the first items can sit above the viewport (the fill puts the end of the content at the viewport's bottom, so a small first item
+ * is pushed up past the spacing and the bottom padding). The extent is then kept as it was, rather than worked out again from the
+ * items still visible, which would shrink it and snap the list back.
+ */
+@Composable
+private fun rememberUnderHeroExtent(listState: LazyListState): State<Int> {
+    // Saved with the list's own position, so a restore (a rotation, a recreated process) lays out its first frame with the room the
+    // restored offset needs. Only the extent is saved, not a size worked out for a viewport: the fill follows the current viewport.
+    // It starts as a long page, which has no fill: an unmeasured extent must not read as a short page, or a list first laid out away
+    // from the top (an initial index, a list state that outlived the screen) would keep a viewport of blank room under its last item.
+    val extent = rememberSaveable { mutableIntStateOf(LONG_PAGE) }
+    LaunchedEffect(listState) {
+        snapshotFlow { underHeroExtent(listState.layoutInfo) }.collect { measured -> if (measured != null) extent.intValue = measured }
+    }
+    return extent
+}
+
+/** The extent [rememberUnderHeroExtent] holds for [info], or null where the extent already in effect stands. */
+private fun underHeroExtent(info: LazyListLayoutInfo): Int? {
+    val last = info.totalItemsCount - 1
+    val under = info.visibleItemsInfo.filter { it.index >= 1 }
+    val first = under.minOfOrNull { it.index }
+    return when {
+        last < 1 -> 0
+        first == null || first > 1 -> null
+        under.none { it.index == last } -> LONG_PAGE
+        else -> under.maxOf { it.offset + it.size } - under.minOf { it.offset }
+    }
+}
+
+private const val LONG_PAGE = Int.MAX_VALUE
+
+/** The height the list is given, written as the list is measured: a plain field, read by the list's own measure in the same pass. */
+private class ViewportHeight {
+    var px = 0
+}
+
+/** Writes the height the list is given to [viewport], before the list measures its padding. */
+private fun Modifier.reportViewportHeight(viewport: ViewportHeight): Modifier =
+    layout { measurable, constraints ->
+        viewport.px = constraints.maxHeight
+        val placeable = measurable.measure(constraints)
+        layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+    }
+
+/**
+ * [base] with room added under the last item, as the eager page's `heightIn(min = viewport)` does: the viewport less [extent], so the
+ * items under the hero are kept at least a viewport tall, a short page can scroll the whole hero away and the bar's hand-over can
+ * finish. The list reads it in its own measure, with the viewport of that same pass, so a viewport that grows (a rotation, a resize)
+ * has its room at once. A spacer item would be sized in composition or from an item's layout, a frame behind: the list would clamp
+ * back first and bring the hero in.
+ */
+private class PaddingWithFill(
+    private val base: PaddingValues,
+    private val density: Density,
+    private val viewport: ViewportHeight,
+    private val extent: State<Int>,
+) : PaddingValues {
+    override fun calculateLeftPadding(layoutDirection: LayoutDirection) = base.calculateLeftPadding(layoutDirection)
+
+    override fun calculateTopPadding() = base.calculateTopPadding()
+
+    override fun calculateRightPadding(layoutDirection: LayoutDirection) = base.calculateRightPadding(layoutDirection)
+
+    override fun calculateBottomPadding(): Dp {
+        val fill = (viewport.px - extent.value).coerceAtLeast(0)
+        return base.calculateBottomPadding() + with(density) { fill.toDp() }
+    }
+}
 
 /**
  * The outer frame both forms share: no bar of the Scaffold's own, since the overlay bar clears the status bar
