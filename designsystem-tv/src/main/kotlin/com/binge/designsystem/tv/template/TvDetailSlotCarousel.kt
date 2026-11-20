@@ -100,6 +100,8 @@ fun <T : Any> TvDetailSlotCarousel(
     val shown = if (atSeeAll) items.lastIndex else current
     val item = items[shown]
     var focused by remember { mutableStateOf(initialFocused) }
+    // The attach-time callback reports "not focused"; it must not wipe a seeded ring before the node has held focus.
+    var hasHeldFocus by remember { mutableStateOf(false) }
     val gap = dimensionResource(TvR.dimen.tv_media_row_card_gap)
     // Starts one past the slot's item, so nothing shows twice.
     val strip = rememberLazyListState(initialFirstVisibleItemIndex = shown + 1)
@@ -122,7 +124,8 @@ fun <T : Any> TvDetailSlotCarousel(
                     canStepLeft = current > 0,
                     onStep = { delta -> position = current + delta },
                 ).tvClickable(role = Role.Button, onFocusChanged = {
-                    focused = it
+                    if (it) hasHeldFocus = true
+                    if (it || hasHeldFocus) focused = it
                 }, onClick = { if (atSeeAll) seeAll?.onClick?.invoke() else onClick(current) })
                 // On the card the carousel reads as it, not as the last item the slot keeps.
                 .readAs(seeAll?.label.takeIf { atSeeAll }),
