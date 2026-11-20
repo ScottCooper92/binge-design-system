@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewWrapperProvider
 import com.binge.designsystem.theme.BingeBrand
+import com.binge.designsystem.tv.theme.TvStyle
 import com.binge.designsystem.tv.theme.toTvColorScheme
 
 /*
@@ -17,7 +18,8 @@ import com.binge.designsystem.tv.theme.toTvColorScheme
  *
  * Both are open, as the phone's `ScreenshotThemeWrapper` is, so an app with its own brand subclasses one, overrides
  * `brand`, and binds the subclass on annotations of its own built from [TV_PREVIEW_SPEC]. The TV theme is dark-only,
- * so a brand reaches it as its dark scheme, projected the same way `BingeTvColorScheme` is.
+ * so a brand reaches it as its dark scheme, projected the same way `BingeTvColorScheme` is. An app that previews in a
+ * different [TvStyle] overrides `style` the same way, or takes the monochrome pair this file already holds.
  */
 
 /** Applies [TvScreenshotTheme] — the theme's `background` canvas — to every cell of [TvPreviews]. */
@@ -25,9 +27,12 @@ open class TvScreenshotThemeWrapper : PreviewWrapperProvider {
     /** The brand every cell renders in. Binge's by default. */
     open val brand: BingeBrand get() = BingeBrand.Binge
 
+    /** The TV style every cell draws in: how focus, switches and sheet panels look. [TvStyle.Accent], the theme's default, unless overridden. */
+    open val style: TvStyle get() = TvStyle.Accent
+
     @Composable
     override fun Wrap(content: @Composable () -> Unit) {
-        TvScreenshotTheme(modifier = Modifier.fillMaxSize(), colorScheme = brand.dark.toTvColorScheme()) {
+        TvScreenshotTheme(modifier = Modifier.fillMaxSize(), colorScheme = brand.dark.toTvColorScheme(), style = style) {
             content()
         }
     }
@@ -38,10 +43,18 @@ open class TvScreenshotThemeOnBlackWrapper : PreviewWrapperProvider {
     /** The brand every cell renders in. Binge's by default. */
     open val brand: BingeBrand get() = BingeBrand.Binge
 
+    /** The TV style every cell draws in: how focus, switches and sheet panels look. [TvStyle.Accent], the theme's default, unless overridden. */
+    open val style: TvStyle get() = TvStyle.Accent
+
     @Composable
     override fun Wrap(content: @Composable () -> Unit) {
-        TvScreenshotThemeOnBlack(modifier = Modifier.fillMaxSize(), colorScheme = brand.dark.toTvColorScheme()) {
+        TvScreenshotThemeOnBlack(modifier = Modifier.fillMaxSize(), colorScheme = brand.dark.toTvColorScheme(), style = style) {
             content()
         }
     }
+}
+
+/** [TvScreenshotThemeOnBlackWrapper] in [TvStyle.Monochrome]: white focus on the window's black. Baked into [TvPreviewsOnBlackMonochrome]. */
+open class TvScreenshotThemeOnBlackMonochromeWrapper : TvScreenshotThemeOnBlackWrapper() {
+    override val style: TvStyle get() = TvStyle.Monochrome
 }

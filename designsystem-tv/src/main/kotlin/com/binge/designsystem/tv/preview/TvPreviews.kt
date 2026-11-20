@@ -105,6 +105,21 @@ annotation class TvRtlPreviews
 annotation class TvPreviewsOnBlack
 
 /**
+ * [TvPreviewsOnBlack] drawn in [TvStyle.Monochrome]: the window's black canvas, with focus in white as Google TV draws it. For a
+ * screen-root frame of an app that sets that style on its theme, so a frame shows what the television shows. The canvas, the size,
+ * the locale and the reduced motion are [TvPreviewsOnBlack]'s; only the style differs. An app with another style, or a brand of its
+ * own, subclasses [TvScreenshotThemeOnBlackWrapper] and overrides `style` or `brand`.
+ */
+@PreviewWrapper(TvScreenshotThemeOnBlackMonochromeWrapper::class)
+@Preview(
+    name = "tvmono",
+    device = TV_PREVIEW_SPEC,
+    locale = SOURCE_LOCALE,
+    uiMode = UI_MODE_NIGHT_YES,
+)
+annotation class TvPreviewsOnBlackMonochrome
+
+/**
  * Theme wrapper for TV previews and screenshot tests — the TV counterpart of `ScreenshotTheme`.
  *
  * `reduceMotion = true` collapses the focus-scale animation to a snap so a captured frame is
