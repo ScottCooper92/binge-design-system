@@ -26,7 +26,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34], application = android.app.Application::class, qualifiers = "w412dp-h900dp")
+@Config(sdk = [34], application = android.app.Application::class, qualifiers = "w412dp-h8000dp")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class MediaResultRowTest {
     @get:Rule
