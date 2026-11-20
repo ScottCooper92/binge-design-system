@@ -189,6 +189,9 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
  * the row's own styles, with the status as one line. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
  * not something a plate can measure: a row whose status wraps still moves. With no hint the plates are as they were.
  *
+ * The hint applies to a row with a blurb ([blurbLines]) too. The name plate takes the row's full content width: a loaded row with a favourite or
+ * watched mark narrows its title by the marks, which a hint does not account for, so a title that just fits one line here can wrap in a row that carries a mark.
+ *
  * @need show a loading placeholder for a search result row
  * @group feedback
  */
@@ -209,7 +212,7 @@ fun MediaResultRowSkeleton(
     ) { contentModifier ->
         val top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero)
         if (blurbLines > 0) {
-            BlurbRowPlates(blurbLines, contentModifier.padding(top = top))
+            BlurbRowPlates(blurbLines, contentModifier.padding(top = top), expectedName)
             return@ListRow
         }
         if (expectedName != null) {
@@ -234,10 +237,19 @@ fun MediaResultRowSkeleton(
  * plates of a row with no blurb would stay as they are at a large font while the row's text grows, and the rows below would shift down.
  */
 @Composable
-private fun BlurbRowPlates(lines: Int, modifier: Modifier) {
+private fun BlurbRowPlates(
+    lines: Int,
+    modifier: Modifier,
+    expectedName: String? = null,
+) {
     val gap = dimensionResource(R.dimen.detail_cast_avatar_label_spacing)
     Column(modifier = modifier) {
-        TextPlate(MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(NAME_PLATE_FRACTION))
+        TextPlate(
+            MaterialTheme.typography.titleMedium,
+            Modifier.fillMaxWidth(if (expectedName == null) NAME_PLATE_FRACTION else 1f),
+            text = expectedName,
+            maxLines = 2,
+        )
         Spacer(Modifier.height(gap))
         // The status line: a rating chip is a line of its label style with its own vertical padding.
         TextPlate(

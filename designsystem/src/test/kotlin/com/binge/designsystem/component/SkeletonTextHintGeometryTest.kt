@@ -104,4 +104,23 @@ class SkeletonTextHintGeometryTest {
 
     @Test
     fun `a hinted result row skeleton reserves the row at 2_0`() = row(FONT_20)
+
+    private fun blurbRow(fontScale: Float) {
+        rule.assertSkeletonReservesGeometry(anchors = listOf(rowAnchor), checkSize = true) { resolved ->
+            scaled(fontScale) {
+                val result = MediaResult("k", MediaResultKind.Poster, null, title, null, rating = 8.4f, blurb = "A short blurb.")
+                if (resolved) {
+                    MediaResultRow(result, onClick = {}, modifier = Modifier.layoutAnchor(rowAnchor))
+                } else {
+                    MediaResultRowSkeleton(modifier = Modifier.layoutAnchor(rowAnchor), blurbLines = 1, expectedName = title)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `a hinted name is honoured in a row with a blurb at 1_3`() = blurbRow(FONT_13)
+
+    @Test
+    fun `a hinted name is honoured in a row with a blurb at 2_0`() = blurbRow(FONT_20)
 }
