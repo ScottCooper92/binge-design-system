@@ -159,20 +159,31 @@ private fun EpisodeRowSubtitle(
                 text = rating.formatRatingForPage(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                softWrap = false,
             )
         }
+        // One line, never wrapped: the row is measured at its minimum intrinsic height, which would clip a wrapped line.
+        // The pieces are measured in order, so the supporting text, last, is the one that gives way to an ellipsis.
+        val lastIndex = listOfNotNull(date, extra).lastIndex
         listOfNotNull(date, extra).forEachIndexed { index, text ->
             if (hasRating || index > 0) {
                 Text(
                     text = stringResource(R.string.list_row_meta_separator),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false,
                 )
             }
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+                modifier = if (index == lastIndex && index > 0) Modifier.weight(1f, fill = false) else Modifier,
             )
         }
     }
