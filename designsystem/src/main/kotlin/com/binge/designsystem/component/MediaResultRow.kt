@@ -185,12 +185,11 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
  *
  * What the name takes depends on its words, which a loading state does not have, so it is one line unless the caller hints. [expectedName] is a string
  * the loaded name is expected to look like (the longest typical title): the plate lays it out invisibly in the row's own style and width, up to the
- * row's two lines, so it takes what the name takes at every font size, wrapping included. A hint gives the row the name, subtitle and status plates in
+ * row's two lines, so it takes what the name takes at every font size, wrapping included. The width is the row's whole text column: the favourite
+ * and watched marks a loaded row puts beside its name are not reserved, so a title that only just fits on one line here can wrap in a marked row.
+ * The hint applies to a [blurbLines] row too, as its name plate. A hint gives the row the name, subtitle and status plates in
  * the row's own styles, with the status as one line. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
  * not something a plate can measure: a row whose status wraps still moves. With no hint the plates are as they were.
- *
- * The hint applies to a row with a blurb ([blurbLines]) too. The name plate takes the row's full content width: a loaded row with a favourite or
- * watched mark narrows its title by the marks, which a hint does not account for, so a title that just fits one line here can wrap in a row that carries a mark.
  *
  * @need show a loading placeholder for a search result row
  * @group feedback
