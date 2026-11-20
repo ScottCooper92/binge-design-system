@@ -50,6 +50,46 @@ class TvTitleDetailPageSamplesScreenshotTest {
     @Composable
     fun skeletonLines() = Frame { TvSkeletonLineSample() }
 
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun overview() = Frame { TvDetailOverviewSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun castUnfocused() = Frame { TvDetailCastSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun castFocusedSecond() = Frame { TvDetailCastFocusedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun castSeeAllFocused() = Frame { TvDetailCastSeeAllFocusedSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun castSeeAllOnly() = Frame { TvDetailCastSeeAllOnlySample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun wideCarouselFocused() = Frame { TvDetailSlotCarouselSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun galleryGridFocused() = Frame { TvDetailGalleryGridSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun pageExpandedOnCast() = Frame { TvTitleDetailPageTabsSample() }
+
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) { Box(Modifier.fillMaxSize()) { content() } }

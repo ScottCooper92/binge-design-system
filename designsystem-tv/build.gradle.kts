@@ -187,4 +187,6 @@ dependencies {
     testFixturesImplementation(libs.compose.ui.test.junit4)
     // LeanbackRule sets a system feature through Robolectric's package-manager shadow.
     testFixturesImplementation(libs.robolectric)
+    // MainThreadImageLoaderRule replaces Coil's singleton loader.
+    testFixturesImplementation(libs.coil.compose)
 }

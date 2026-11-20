@@ -29,12 +29,12 @@ private const val SYNOPSIS_LINES = 3
 @Composable
 internal fun TvDetailCopyPlates() {
     Column(
-        modifier = Modifier.width(dimensionResource(TvR.dimen.tv_detail_v2_copy_width)),
+        modifier = Modifier.width(dimensionResource(TvR.dimen.tv_detail_copy_width)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
     ) {
         Box(
             Modifier
-                .size(dimensionResource(TvR.dimen.tv_detail_v2_logo_width), dimensionResource(TvR.dimen.tv_detail_v2_logo_height))
+                .size(dimensionResource(TvR.dimen.tv_detail_logo_width), dimensionResource(TvR.dimen.tv_detail_logo_height))
                 .clip(BingeShapes.Tag)
                 .background(MaterialTheme.colorScheme.surfaceVariant),
         )
