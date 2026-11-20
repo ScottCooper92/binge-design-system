@@ -121,6 +121,12 @@ class TvTopBarSamplesScreenshotTest {
     @Composable
     fun tabScaffold() = Frame { TvTopBarScaffoldSample() }
 
+    /** `contentBehindBar`: a full-bleed backdrop runs behind the bar, which draws over it on a scrim; the page clears it by the inset. */
+    @PreviewTest
+    @TvPreviews
+    @Composable
+    fun tabScaffoldBehindBar() = Frame { TvTopBarScaffoldBehindBarSample() }
+
     /** The tab scaffold's account avatar signed in, as the current destination, and focused. */
     @PreviewTest
     @TvPreviews

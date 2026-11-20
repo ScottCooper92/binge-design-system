@@ -1,7 +1,6 @@
 package com.binge.designsystem.tv.template
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,18 +16,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.ErrorKind
+import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.component.TvCardGrid
 import com.binge.designsystem.tv.component.TvCastCard
 import com.binge.designsystem.tv.component.TvErrorPlate
 import com.binge.designsystem.tv.component.TvMediaGridSkeleton
-import com.binge.designsystem.tv.component.TvSkeletonPlate
 import com.binge.designsystem.tv.focus.rememberTvRowEntry
-import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 /** One face in a [TvAvatarGridPage]: [key] names it stably, and [role] is the caption line under the [name]. */
@@ -158,14 +158,15 @@ private fun <K : Any> AvatarGrid(
     }
 }
 
-/** Circle plates, and the caption block beneath each: a bare circle left every row after the first ~44dp too high. */
+/**
+ * A circle plate, and beneath it the caption block the cast card draws: the same gap, then a line in each of the card's two text
+ * styles. The plates take their height from those lines rather than from a number of their own, so a row of plates and the row of
+ * cards that replaces it have the same height (a bare circle left every row after the first too high, and fixed plates too low).
+ */
 @Composable
 private fun AvatarGridSkeleton() {
     TvMediaGridSkeleton(columns = AVATAR_GRID_COLUMNS, contentPadding = avatarGridPadding()) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -173,13 +174,27 @@ private fun AvatarGridSkeleton() {
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
             )
-            repeat(SKELETON_CAPTION_LINES) {
-                TvSkeletonPlate(
-                    widthFraction = SKELETON_CAPTION_WIDTH_FRACTION,
-                    height = dimensionResource(TvR.dimen.tv_skeleton_caption_line_height),
-                )
-            }
+            SkeletonCaptionLine(
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(top = dimensionResource(TvR.dimen.tv_card_caption_gap)),
+            )
+            SkeletonCaptionLine(style = MaterialTheme.typography.labelMedium)
         }
+    }
+}
+
+/** One caption line's slot: an invisible line of [style] fixes the height, and a plate sits inside it, inset so two lines do not run together. */
+@Composable
+private fun SkeletonCaptionLine(style: TextStyle, modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxWidth(SKELETON_CAPTION_WIDTH_FRACTION)) {
+        Text(text = " ", style = style, maxLines = 1, color = Color.Transparent)
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .padding(vertical = dimensionResource(TvR.dimen.tv_skeleton_caption_plate_inset))
+                .clip(BingeShapes.Tag)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+        )
     }
 }
 
@@ -208,9 +223,6 @@ private fun avatarGridPadding() =
 
 /** Six columns, not a poster grid's five: a face is a ~120dp circle plus two caption lines; at five they read outsized, at seven the captions truncate. */
 private const val AVATAR_GRID_COLUMNS = 6
-
-/** The name and role lines a cast card fixes beneath every circle. */
-private const val SKELETON_CAPTION_LINES = 2
 
 /** Narrower than the cell, so the caption plates read as text rather than as a second tile. */
 private const val SKELETON_CAPTION_WIDTH_FRACTION = 0.7f

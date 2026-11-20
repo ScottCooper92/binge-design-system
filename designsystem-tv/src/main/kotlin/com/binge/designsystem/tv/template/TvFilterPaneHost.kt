@@ -21,7 +21,7 @@ import com.binge.designsystem.tv.focus.tvEntryFocusGroup
  * category is open, where focus was last in the pane (saved, so Back from a title returns there), and the swap that carries focus
  * between the category list and a category's values (see `TvPaneSwap`) with its hold node.
  *
- * Back leaves an open category in one press, onto its row in the list. A category that empties itself, a seeded company cleared,
+ * Back leaves an open category in one press, onto its row in the list. A category that disappears while open
  * leaves the list the way Back does, so focus goes to the list rather than to recovery. [entry] is the requester the pane's entry row
  * takes; the page routes entry to it. [onClearAll] runs after the header's Clear so the page can empty its filters; focus then goes
  * to the first category.
@@ -63,7 +63,7 @@ fun TvFilterPaneHost(
         valueKey = null
         openKey = key
     }
-    // A category that empties itself, a seeded company cleared, leaves the list: leave its view the way Back does, so focus
+    // A category that empties itself, a category the app removes, leaves the list: leave its view the way Back does, so focus
     // goes to the list rather than to recovery.
     LaunchedEffect(openKey, open) {
         if (openKey != null && open == null) drill(null)

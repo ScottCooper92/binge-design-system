@@ -4,34 +4,26 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.text
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.Constraints
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
+import kotlin.math.floor
 
 /** Which review source an [ExternalScore] comes from, and so which glyph it wears. */
 enum class ExternalScoreKind {
@@ -122,15 +114,12 @@ private fun ExternalScoreGlyph(kind: ExternalScoreKind) {
 
 /** One item of a [MetaFlow] line. */
 internal sealed interface MetaEntry {
-    /** An item that draws itself and stays whole, such as a score or a status. Its dot follows it on its own line. */
+    /** An item that draws itself and stays whole, such as a score or a status. */
     class Content(
         val content: @Composable () -> Unit,
     ) : MetaEntry
 
-    /**
-     * Text that may wrap over several lines, such as a list of genres. Its dot is drawn inline after its last word, so
-     * it sits on the line the text ends on rather than at the far edge beside the middle of a wrapped block.
-     */
+    /** Text that may wrap over several lines, such as a list of genres, set in the meta line's style and [color]. */
     class WrappingText(
         val text: String,
         val color: Color,
@@ -138,76 +127,110 @@ internal sealed interface MetaEntry {
 }
 
 /**
- * A meta line: [entries] side by side, each followed by the meta dot except the last, so a line that wraps at a large
- * font ends on a dot rather than starting on one.
+ * A meta line: [entries] side by side with the meta dot between neighbours on the same line, wrapping when they do not fit. A dot is drawn only
+ * between two entries on one line, never at a break, so no line ends or starts on a separator. Every meta line, the hero's, the detail header's
+ * scores and its genres, is this one layout ([BreakableMetaLine]), so they all wrap the same way.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun MetaFlow(entries: List<MetaEntry>, modifier: Modifier = Modifier) {
-    val gap = dimensionResource(R.dimen.hero_meta_gap)
-    FlowRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(gap),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.meta_flow_line_gap)),
-        itemVerticalAlignment = Alignment.CenterVertically,
-    ) {
-        entries.forEachIndexed { index, entry ->
-            val last = index == entries.lastIndex
+    BreakableMetaLine(
+        entries = entries.map { entry ->
             when (entry) {
-                is MetaEntry.Content ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
-                        // The entry takes what the dot leaves, so an item as wide as the line still ends on its dot.
-                        Box(Modifier.weight(1f, fill = false)) { entry.content() }
-                        if (!last) HeroMetaDot()
+                is MetaEntry.Content -> entry.content
+                is MetaEntry.WrappingText -> {
+                    {
+                        Text(text = entry.text, style = MaterialTheme.typography.labelLarge, color = entry.color)
                     }
-                is MetaEntry.WrappingText -> WrappingMetaText(entry, withDot = !last)
+                }
+            }
+        },
+        modifier = modifier,
+    )
+}
+
+/**
+ * A meta line that wraps without ever ending a line on a separator: [entries] side by side with the meta dot between neighbours on the same
+ * line, and none at a line break, so a wrapped line neither ends nor starts on a dot. An entry that does not fit what is left of a line starts
+ * the next one, whole.
+ */
+@Composable
+internal fun BreakableMetaLine(entries: List<@Composable () -> Unit>, modifier: Modifier = Modifier) {
+    val gap = dimensionResource(R.dimen.hero_meta_gap)
+    val lineGap = dimensionResource(R.dimen.meta_flow_line_gap)
+    Layout(
+        content = {
+            entries.forEachIndexed { index, entry ->
+                if (index > 0) HeroMetaDot()
+                Box { entry() }
+            }
+        },
+        modifier = modifier,
+    ) { measurables, constraints ->
+        if (entries.isEmpty()) return@Layout layout(0, 0) {}
+        val gapPx = gap.roundToPx()
+        val lineGapPx = lineGap.roundToPx()
+        val maxWidth = constraints.maxWidth
+        val loose = Constraints(maxWidth = maxWidth)
+        // The children alternate: the first entry, then a dot and an entry for each one after it.
+        val entryPlaceables = entries.indices.map { measurables[if (it == 0) 0 else 2 * it].measure(loose) }
+        val dotPlaceables = (1 until entries.size).map { measurables[2 * it - 1].measure(Constraints()) }
+
+        // An item is placed at its x on a line, and centred on the line the way a flow of rows centres them: a dot is centred in the row it ends,
+        // which is as tall as the entry before it, and that row is centred on the line. Two steps, not one, so the pixels land where they did.
+        class Placed(
+            val placeable: androidx.compose.ui.layout.Placeable,
+            val x: Int,
+            val line: Int,
+            val rowHeight: Int,
+            val dot: Boolean,
+        )
+        val placed = mutableListOf<Placed>()
+        var line = 0
+        var x = 0
+        entryPlaceables.forEachIndexed { index, entry ->
+            val dotWidth = if (index == 0) 0 else dotPlaceables[index - 1].width
+            val withDot = if (index == 0) 0 else gapPx + dotWidth + gapPx
+            if (index > 0 && x + withDot + entry.width > maxWidth) {
+                // The previous entry ends its line with no dot after it, so its row is only the entry.
+                line++
+                placed += Placed(entry, 0, line, entry.height, dot = false)
+                x = entry.width
+            } else {
+                if (index > 0) {
+                    val before = entryPlaceables[index - 1]
+                    placed +=
+                        Placed(dotPlaceables[index - 1], x + gapPx, line, maxOf(before.height, dotPlaceables[index - 1].height), dot = true)
+                }
+                placed += Placed(entry, x + withDot, line, entry.height, dot = false)
+                x += withDot + entry.width
+            }
+        }
+        val lineHeights = (0..line).map { l -> placed.filter { it.line == l }.maxOf { it.rowHeight } }
+        val tops = lineHeights.runningFold(0) { top, height -> top + height + lineGapPx }
+        // The width the lines fill, as the flow it replaces took it: a line hugs its content unless the parent asks for more (a minimum width), and
+        // never overflows. A cinematic header's scrim reads the width, so a line must not claim the column's whole width on its own.
+        val width = placed.maxOf { it.x + it.placeable.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
+
+        fun centred(space: Int, size: Int) = floor((space - size) / 2f + 0.5f).toInt()
+        layout(width, lineHeights.sum() + lineGapPx * line) {
+            placed.forEachIndexed { index, item ->
+                val y = if (item.dot) {
+                    // The dot is centred in the row of the entry before it, and that row on the line.
+                    val before = placed[index - 1]
+                    tops[item.line] + centred(lineHeights[item.line], before.rowHeight) + centred(item.rowHeight, item.placeable.height)
+                } else {
+                    tops[item.line] + centred(lineHeights[item.line], item.rowHeight) + centred(item.rowHeight, item.placeable.height)
+                }
+                item.placeable.placeRelative(item.x, y)
             }
         }
     }
 }
 
-private const val META_DOT_ID = "meta-dot"
-
-/** The word joiner keeps the inline dot on the line of the word before it. */
-private const val WORD_JOINER = "\u2060"
-
-@Composable
-private fun WrappingMetaText(entry: MetaEntry.WrappingText, withDot: Boolean) {
-    val density = LocalDensity.current
-    // The gap before the dot and the dot itself; the flow's own gap follows it, as it follows any entry.
-    val dotSlot = with(density) { (dimensionResource(R.dimen.hero_meta_gap) + dimensionResource(R.dimen.hero_meta_dot_size)).toSp() }
-    val text = buildAnnotatedString {
-        append(entry.text)
-        if (withDot) {
-            append(WORD_JOINER)
-            appendInlineContent(META_DOT_ID)
-        }
-    }
-    val inline = if (withDot) {
-        mapOf(
-            META_DOT_ID to InlineTextContent(
-                Placeholder(width = dotSlot, height = 1.em, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
-            ) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) { HeroMetaDot() }
-            },
-        )
-    } else {
-        emptyMap()
-    }
-    Text(
-        text = text,
-        inlineContent = inline,
-        // The inline dot's alternate text must not reach a screen reader: it reads the words alone.
-        modifier = if (withDot) Modifier.clearAndSetSemantics { this.text = AnnotatedString(entry.text) } else Modifier,
-        style = MaterialTheme.typography.labelLarge,
-        color = entry.color,
-    )
-}
-
 /**
  * A row of [scores], each a glyph and its value, separated by the meta dot, for a screen's own meta line. It wraps
- * between scores when they do not fit, and a screen reader reads each as its [ExternalScore.contentDescription].
- * [color] is the values' ink.
+ * between scores when they do not fit, and the dot is drawn only between two scores on one line, so no line ends or starts on a separator.
+ * A screen reader reads each score as its [ExternalScore.contentDescription]. [color] is the values' ink.
  *
  * @need show review scores from other sources (critics, audience, IMDb) next to a title, each with its icon
  * @group rows

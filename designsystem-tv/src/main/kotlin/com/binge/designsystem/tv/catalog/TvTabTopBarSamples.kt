@@ -2,10 +2,13 @@
 
 package com.binge.designsystem.tv.catalog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Movie
@@ -23,17 +26,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.dimensionResource
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.catalog.SelfDescribing
 import com.binge.designsystem.tv.R
 import com.binge.designsystem.tv.component.TvButton
+import com.binge.designsystem.tv.nav.LocalTvTopInset
 import com.binge.designsystem.tv.nav.TvAccountMenuRow
 import com.binge.designsystem.tv.nav.TvNavItem
 import com.binge.designsystem.tv.nav.TvTopBarAvatarSurface
 import com.binge.designsystem.tv.nav.TvTopBarScaffold
 import com.binge.designsystem.tv.nav.TvTopBarSlots
+import com.binge.designsystem.tv.nav.tvContentGutterStart
 
 private const val SEARCH = "search"
 private const val MOVIES = "movies"
@@ -153,6 +159,43 @@ fun TvTopBarAvatarSignedOutSample() {
             TvTopBarAvatarSurface(entry, selected = false, isFocused = false)
             TvTopBarAvatarSurface(entry, selected = true, isFocused = false)
             TvTopBarAvatarSurface(entry, selected = false, isFocused = true)
+        }
+    }
+}
+
+/**
+ * The scaffold with `contentBehindBar`: a full-bleed backdrop runs behind the bar, which draws over it on its scrim, and the page
+ * pads its own content by the bar's height, read from `LocalTvTopInset`. Focus is as in the default scaffold.
+ */
+@Composable
+fun TvTopBarScaffoldBehindBarSample() {
+    val content = remember { FocusRequester() }
+    TvTopBarScaffold(
+        slots = ScaffoldSlots,
+        selectedKey = MOVIES,
+        homeKey = MOVIES,
+        onSelect = {},
+        contentDepth = 0,
+        onGoHome = {},
+        overlayOpen = false,
+        contentFocusRequester = content,
+        iconOnlyKeys = setOf(SEARCH),
+        contentBehindBar = true,
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.surfaceVariant))),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(top = LocalTvTopInset.current)
+                    .padding(start = tvContentGutterStart()),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.tv_media_row_card_gap)),
+            ) {
+                Text(text = "Requests", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
+                TvButton(label = "Page content", onClick = {}, modifier = Modifier.focusRequester(content))
+            }
         }
     }
 }

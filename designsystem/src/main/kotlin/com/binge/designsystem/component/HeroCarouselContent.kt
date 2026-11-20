@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowOverflow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -229,29 +233,63 @@ private fun HeroMetaRow(item: HeroItem) {
     }
     if (item.rating == null && parts.isEmpty() && item.externalScores.isEmpty() && item.status == null) return
     val ink = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
-    val entries = buildList<MetaEntry> {
-        item.rating?.let { add(MetaEntry.Content { HeroRating(it) }) }
+    // With external scores the rating joins them on the score line below. With none, it stays first on this line, as it always was.
+    val ratingOnScoreLine = item.externalScores.isNotEmpty()
+    val entries = buildList<@Composable () -> Unit> {
+        if (!ratingOnScoreLine) item.rating?.let { add { HeroRating(it) } }
         parts.forEach { part ->
-            add(
-                MetaEntry.Content {
-                    Text(
-                        text = part.text,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-            )
+            add {
+                Text(
+                    text = part.text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
-        item.status?.let { status -> add(MetaEntry.Content { HeroStatus(status) }) }
+        item.status?.let { status -> add { HeroStatus(status) } }
     }
     Column(modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s))) {
-        if (entries.isNotEmpty()) MetaFlow(entries = entries)
-        // The scores sit on a line of their own, last, so a wrap never changes the rating and genre line above.
-        if (item.externalScores.isNotEmpty()) {
+        if (entries.isNotEmpty()) BreakableMetaLine(entries = entries)
+        // With external scores, the rating and every score share the line below, last. It never wraps: a line that cannot hold them all drops the
+        // trailing scores, so the meta line above keeps its place and the hero does not grow a third line at a large font.
+        if (ratingOnScoreLine) {
             if (entries.isNotEmpty()) Spacer(Modifier.height(dimensionResource(R.dimen.padding_xs)))
-            ExternalScoreLine(scores = item.externalScores, color = ink)
+            HeroScoreLine(rating = item.rating, scores = item.externalScores, color = ink)
+        }
+    }
+}
+
+/**
+ * The hero's score line: the TMDB [rating] first, then each of [scores], on one line. Each entry after the first is led by the meta dot, so a
+ * score that does not fit is dropped whole with its dot and no dot is left at the end. A single-line flow does the dropping: what does not
+ * fit is not placed. The copy column carries no semantics of its own (the hero is announced by [heroContentDescription]), so a dropped score
+ * is not voiced separately from the rest.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun HeroScoreLine(
+    rating: Float?,
+    scores: List<ExternalScore>,
+    color: Color,
+) {
+    val gap = dimensionResource(R.dimen.hero_meta_gap)
+    val entries = buildList<@Composable () -> Unit> {
+        rating?.let { add { HeroRating(it) } }
+        scores.forEach { score -> add { ExternalScoreItem(score, color) } }
+    }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(gap),
+        itemVerticalAlignment = Alignment.CenterVertically,
+        maxLines = 1,
+        overflow = FlowRowOverflow.Clip,
+    ) {
+        entries.forEachIndexed { index, entry ->
+            Row(horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
+                if (index > 0) HeroMetaDot()
+                entry()
+            }
         }
     }
 }
