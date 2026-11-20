@@ -42,4 +42,15 @@ class PersonDetailScreenSamplesScreenshotTest {
     @ScreenWidthPreviews
     @Composable
     fun plain() = PersonDetailPlainSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun creditsEmpty() = PersonDetailCreditsEmptySample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun seeAll() = PersonDetailSeeAllSample()
 }

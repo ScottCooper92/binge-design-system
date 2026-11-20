@@ -10,6 +10,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
@@ -106,6 +107,55 @@ class PersonDetailScreenTest {
             PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {}, onLoadMoreCredits = { asked += it }),
         )
         assertEquals(listOf(0), asked)
+    }
+
+    @Test
+    fun `a page that added nothing asks again while the row still has more`() {
+        val asked = mutableListOf<Int>()
+        var section by mutableStateOf(CreditSection("a", "Acting", cards("a", 3), hasMore = true))
+        rule.setContent {
+            TestTheme {
+                PersonDetailScreen(
+                    state = PersonDetailState.Content(person(CreditsState.Ready(listOf(section)))),
+                    callbacks = PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {}, onLoadMoreCredits = { asked += it }),
+                )
+            }
+        }
+        rule.waitForIdle()
+        assertEquals(listOf(0), asked)
+        section = CreditSection("a", "Acting", cards("a", 3), hasMore = true, appending = true)
+        rule.waitForIdle()
+        assertEquals(listOf(0), asked)
+        section = CreditSection("a", "Acting", cards("a", 3), hasMore = true)
+        rule.waitForIdle()
+        assertEquals(listOf(0, 0), asked)
+    }
+
+    @Test
+    fun `no See all tile by default, and one that hands back the section's key when asked for`() {
+        show(PersonDetailState.Content(person(CreditsState.Ready(listOf(CreditSection("a", "Acting", cards("a", 2)))))))
+        rule.onAllNodesWithText("See all").assertCountEquals(0)
+    }
+
+    @Test
+    fun `See all draws a tile and links the heading`() {
+        var seen: String? = null
+        show(
+            PersonDetailState.Content(person(CreditsState.Ready(listOf(CreditSection("a", "Acting", cards("a", 2)))))),
+            PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {}, onSeeAll = { seen = it }),
+        )
+        rule.onAllNodesWithText("See all").assertCountEquals(2)
+        rule.onAllNodesWithText("See all").onFirst().performClick()
+        assertEquals("a", seen)
+        seen = null
+        rule.onAllNodesWithText("See all").onLast().performClick()
+        assertEquals("a", seen)
+    }
+
+    @Test
+    fun `a person with no titles shows the app's message and no rows`() {
+        show(PersonDetailState.Content(person(CreditsState.Empty("No titles yet."))))
+        rule.onNodeWithText("No titles yet.").assertIsDisplayed()
     }
 
     @Test

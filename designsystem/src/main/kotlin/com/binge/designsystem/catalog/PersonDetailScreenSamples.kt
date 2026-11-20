@@ -78,12 +78,18 @@ private fun samplePerson(credits: CreditsState = CreditsState.Ready(sampleSectio
     )
 
 @Composable
-private fun SampleScreen(state: PersonDetailState) {
+private fun SampleScreen(state: PersonDetailState, seeAll: Boolean = false) {
     var info by remember { mutableStateOf<String?>(null) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         PersonDetailScreen(
             state = state,
-            callbacks = PersonDetailCallbacks(onBack = LocalDemoBack.current, onRetry = {}, onOpenCredit = { info = it }),
+            callbacks =
+                PersonDetailCallbacks(
+                    onBack = LocalDemoBack.current,
+                    onRetry = {},
+                    onOpenCredit = { info = it },
+                    onSeeAll = if (seeAll) ({ info = "See all: $it" }) else null,
+                ),
         )
         info?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { info = null }) }
     }
@@ -112,6 +118,15 @@ fun PersonDetailCreditsFailedSample() = SampleScreen(PersonDetailState.Content(s
 /** A person with no biography and no photo: the section is left out and the initials stand in for the portrait. */
 @Composable
 fun PersonDetailPlainSample() = SampleScreen(PersonDetailState.Content(samplePerson(biography = null)))
+
+/** A person with no titles: the app's own words stand where the rows would, under the profile and the biography. */
+@Composable
+fun PersonDetailCreditsEmptySample() =
+    SampleScreen(PersonDetailState.Content(samplePerson(CreditsState.Empty("No titles to show for Maya yet."))))
+
+/** A long filmography: each row ends in a See all tile and its heading is a link, so the app can open the whole list. The default draws neither. */
+@Composable
+fun PersonDetailSeeAllSample() = SampleScreen(PersonDetailState.Content(samplePerson()), seeAll = true)
 
 /** Live: scroll the acting row to its end and the next page loads after a short wait; pull the page down to refresh it. */
 @Composable

@@ -47,6 +47,7 @@ import com.binge.designsystem.component.PersonFact
 import com.binge.designsystem.component.PersonProfileHeader
 import com.binge.designsystem.component.PersonProfileSkeleton
 import com.binge.designsystem.component.SectionHeader
+import com.binge.designsystem.component.SeeAllTile
 import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.resolvedContentInset
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -57,7 +58,7 @@ const val PERSON_CREDITS_LOAD_MORE_AHEAD: Int = 3
 
 /**
  * One row of a person's credits, such as "Acting" or "Crew". [items] are the same [GridItem]s a poster grid takes, with the person's role as the
- * subtitle. With [hasMore] the row asks for its next page near its end; [appending] and [appendFailed] draw a spinner or a retry tile after the last card.
+ * subtitle (a short line: a role, a year). With [hasMore] the row asks for its next page near its end; [appending] and [appendFailed] draw a spinner or a retry tile after the last card.
  * A section with no items is not drawn. [key] is stable for the section.
  */
 @Immutable
@@ -75,11 +76,21 @@ sealed interface CreditsState {
     /** The credits are on their way: two placeholder rows. */
     data object Loading : CreditsState
 
-    /** The credits failed; the page stays. [message] defaults to this library's words; [retryable] shows a Try again button. */
+    /**
+     * The first load of the credits failed: the message and Try again replace the rows, and the page above stays. [message] defaults to this
+     * library's words; [retryable] shows a Try again button. A later page that fails is not this: it is [CreditSection.appendFailed], which
+     * keeps the rows and ends the row in a retry tile.
+     */
     @Immutable
     class Failed(
         val message: String? = null,
         val retryable: Boolean = true,
+    ) : CreditsState
+
+    /** The person has no titles: [message], in the app's words, stands where the rows would. */
+    @Immutable
+    class Empty(
+        val message: String,
     ) : CreditsState
 
     /** The credits, as rows. */
@@ -137,7 +148,8 @@ sealed interface PersonDetailState {
 /**
  * What the page does with what the user does. [onOpenCredit] is handed the tapped card's [GridItem.key]; [onLoadMoreCredits] the index of the
  * [CreditSection] that wants a page; [onRetryCredits] the credits' Try again; [onRetry] the whole page's. A non-null [onRefresh] lets the
- * page be pulled down.
+ * page be pulled down. A non-null [onSeeAll] adds a See all tile at the end of each row and makes its heading a link,
+ * handed the [CreditSection.key]; the default, null, draws neither, so a row ends at its last card.
  */
 @Immutable
 class PersonDetailCallbacks(
@@ -147,6 +159,7 @@ class PersonDetailCallbacks(
     val onLoadMoreCredits: (sectionIndex: Int) -> Unit = {},
     val onRetryCredits: () -> Unit = {},
     val onRefresh: (() -> Unit)? = null,
+    val onSeeAll: ((sectionKey: String) -> Unit)? = null,
 )
 
 /**
@@ -238,10 +251,16 @@ private fun ColumnScope.PersonContent(
     when (val credits = person.credits) {
         CreditsState.Loading -> CreditsPlaceholder()
         is CreditsState.Failed -> CreditsFailed(credits, callbacks.onRetryCredits)
+        is CreditsState.Empty -> CreditsEmpty(credits.message)
         is CreditsState.Ready ->
             credits.sections.forEachIndexed { index, section ->
                 if (section.items.isNotEmpty()) {
-                    CreditRail(section, onOpen = callbacks.onOpenCredit, onLoadMore = { callbacks.onLoadMoreCredits(index) })
+                    CreditRail(
+                        section,
+                        onOpen = callbacks.onOpenCredit,
+                        onLoadMore = { callbacks.onLoadMoreCredits(index) },
+                        onSeeAll = callbacks.onSeeAll?.let { seeAll -> { seeAll(section.key) } },
+                    )
                 }
             }
     }
@@ -261,6 +280,19 @@ private fun ColumnScope.PersonPlaceholder(state: PersonDetailState.Loading) {
 @Composable
 private fun CreditsPlaceholder() {
     repeat(2) { CarouselSkeleton(Modifier.padding(top = dimensionResource(R.dimen.padding_m))) }
+}
+
+@Composable
+private fun CreditsEmpty(message: String) {
+    Text(
+        text = message,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.fillMaxWidth().readingMargin().padding(
+            horizontal = resolvedContentInset(),
+            vertical = dimensionResource(R.dimen.padding_m),
+        ),
+    )
 }
 
 @Composable
@@ -295,6 +327,7 @@ private fun CreditRail(
     section: CreditSection,
     onOpen: (String) -> Unit,
     onLoadMore: () -> Unit,
+    onSeeAll: (() -> Unit)?,
 ) {
     val inset = readingInset()
     val listState = rememberLazyListState()
@@ -304,11 +337,25 @@ private fun CreditRail(
             isNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount, PERSON_CREDITS_LOAD_MORE_AHEAD)
         }
     }
-    LaunchedEffect(listState, section.hasMore, section.items.size) {
-        if (section.hasMore) snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { onLoadMore() }
+    // Keyed on the paging flags as well as the size: a page that added nothing to this row leaves its size as it was, and only the
+    // flags' fall from appending back to idle restarts the watch so the row asks again while the app says there is more.
+    LaunchedEffect(listState, section.hasMore, section.items.size, section.appending, section.appendFailed) {
+        if (section.hasMore &&
+            !section.appending &&
+            !section.appendFailed
+        ) {
+            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { onLoadMore() }
+        }
     }
     Column(Modifier.fillMaxWidth()) {
-        SectionHeader(title = section.title, horizontalPadding = inset, startPadding = inset, endPadding = inset + navOverlayEnd())
+        SectionHeader(
+            title = section.title,
+            onMoreClick = onSeeAll,
+            horizontalPadding = inset,
+            startPadding = inset,
+            endPadding =
+                inset + navOverlayEnd(),
+        )
         LazyRow(
             state = listState,
             contentPadding = PaddingValues(start = inset, end = inset + navOverlayEnd()),
@@ -328,6 +375,18 @@ private fun CreditRail(
                     watched = item.watched,
                     unwatchedCount = item.unwatchedCount,
                 )
+            }
+            if (onSeeAll != null) {
+                item(key = "see-all") {
+                    SeeAllTile(
+                        label = stringResource(R.string.gallery_see_all),
+                        onClick = onSeeAll,
+                        modifier = Modifier
+                            .width(
+                                dimensionResource(R.dimen.see_all_tile_width),
+                            ).height(dimensionResource(R.dimen.card_height)),
+                    )
+                }
             }
             if (section.appending || section.appendFailed) {
                 item(key = "append") {
