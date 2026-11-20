@@ -47,3 +47,23 @@ fun PersonProfileSkeletonSample() {
         Column { PersonProfileSkeleton() }
     }
 }
+
+/**
+ * The loading stand-in hinted at the text it stands in for, over the header it becomes: an eyebrow, a name that wraps at a large font and three
+ * facts. The plates take the room the text takes at every font size, so the two are the same height.
+ */
+@Composable
+fun PersonProfileSkeletonHintedSample() {
+    val facts =
+        listOf(
+            PersonFact("Santiago de Compostela, Galicia, Spain", "Place of birth"),
+            PersonFact("14 March 1971", "Born"),
+            PersonFact("Actress, Producer", "Known for"),
+        )
+    ScreenshotTheme {
+        Column {
+            PersonProfileSkeleton(expectedEyebrow = "Acting", expectedName = "Maria Fernanda Rodriguez", expectedFacts = facts)
+            PersonProfileHeader(name = "Maria Fernanda Rodriguez", photoUrl = null, eyebrow = "Acting", facts = facts)
+        }
+    }
+}

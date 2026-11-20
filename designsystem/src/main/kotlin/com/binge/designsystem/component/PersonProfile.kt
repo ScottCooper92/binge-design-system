@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -91,11 +92,23 @@ fun PersonProfileHeader(
  * The loading stand-in for [PersonProfileHeader]: a portrait plate, a name plate and [facts] short lines, in the header's own room and under the
  * same anchor, so the page does not move when the person arrives.
  *
+ * What a line of text takes depends on its words, which a loading state does not have, so each plate is one line unless the caller hints at its
+ * text. [expectedEyebrow], [expectedName] and [expectedFacts] are strings the loaded text is expected to look like (the longest typical name, the
+ * usual facts). The plate lays that string out invisibly in the real style and the column's own width, so it takes what the text takes at every font
+ * size, wrapping included, and a page whose text is that long does not move. A hint sets the count of facts in place of [facts]. With no hint the
+ * plates are as they were.
+ *
  * @need show a loading placeholder for the top of a person's page
  * @group feedback
  */
 @Composable
-fun PersonProfileSkeleton(modifier: Modifier = Modifier, facts: Int = 3) {
+fun PersonProfileSkeleton(
+    modifier: Modifier = Modifier,
+    facts: Int = 3,
+    expectedEyebrow: String? = null,
+    expectedName: String? = null,
+    expectedFacts: List<PersonFact> = emptyList(),
+) {
     ProfileRow(modifier) {
         Box(
             Modifier
@@ -104,11 +117,37 @@ fun PersonProfileSkeleton(modifier: Modifier = Modifier, facts: Int = 3) {
                 .skeleton(visible = true, shape = BingeShapes.ProfilePoster),
         )
         Column(Modifier.weight(1f)) {
-            TextPlate(MaterialTheme.typography.headlineMedium, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
-            repeat(facts) {
-                Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
-                TextPlate(MaterialTheme.typography.labelSmall, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
-                TextPlate(MaterialTheme.typography.bodyLarge, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
+            val plateWidth = Modifier.width(dimensionResource(R.dimen.skeleton_header_width))
+            expectedEyebrow?.let {
+                TextPlate(
+                    MaterialTheme.typography.labelSmall,
+                    Modifier.fillMaxWidth(),
+                    text = it.uppercase(LocalConfiguration.current.locales[0]),
+                )
+            }
+            if (expectedName != null) {
+                TextPlate(MaterialTheme.typography.headlineMedium, Modifier.fillMaxWidth(), text = expectedName)
+            } else {
+                TextPlate(MaterialTheme.typography.headlineMedium, plateWidth)
+            }
+            if (expectedFacts.isNotEmpty()) {
+                expectedFacts.forEach { fact ->
+                    Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+                    fact.label?.let {
+                        TextPlate(
+                            MaterialTheme.typography.labelSmall,
+                            Modifier.fillMaxWidth(),
+                            text = it.uppercase(LocalConfiguration.current.locales[0]),
+                        )
+                    }
+                    TextPlate(MaterialTheme.typography.bodyLarge, Modifier.fillMaxWidth(), text = fact.value)
+                }
+            } else {
+                repeat(facts) {
+                    Spacer(Modifier.height(dimensionResource(R.dimen.padding_s)))
+                    TextPlate(MaterialTheme.typography.labelSmall, plateWidth)
+                    TextPlate(MaterialTheme.typography.bodyLarge, plateWidth)
+                }
             }
         }
     }

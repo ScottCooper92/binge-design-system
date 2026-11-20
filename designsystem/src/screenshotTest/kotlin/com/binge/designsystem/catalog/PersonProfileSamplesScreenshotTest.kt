@@ -23,4 +23,10 @@ class PersonProfileSamplesScreenshotTest {
     @ComponentPreviews
     @Composable
     fun skeleton() = PersonProfileSkeletonSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun skeletonHinted() = PersonProfileSkeletonHintedSample()
 }
