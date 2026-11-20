@@ -31,7 +31,7 @@ private const val TITLE_TAG = "title"
 private const val LIST_TAG = "list"
 
 /**
- * The title collapsing under a real scroll (#394): [CollapsingTitleState.nestedScrollConnection] on an ancestor of a
+ * The title collapsing under a real scroll: [CollapsingTitleState.nestedScrollConnection] on an ancestor of a
  * list and [collapsingTitle] on the title, driven by touch swipes. The arithmetic is pinned in
  * [CollapsingTitleStateTest]; this checks the wiring that feeds it.
  */

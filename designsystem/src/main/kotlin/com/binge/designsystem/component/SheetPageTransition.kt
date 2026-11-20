@@ -28,7 +28,7 @@ internal data class SheetPageState(
 )
 
 /**
- * Swaps a task sheet's page with a transition (#1272): a pushed page slides in from the end edge as the old one slides a little the
+ * Swaps a task sheet's page with a transition: a pushed page slides in from the end edge as the old one slides a little the
  * other way, a popped one the reverse, mirrored in a right-to-left layout, and both cross-fade. The slide and the height follow the
  * theme's spatial spring. Under reduced motion nothing slides and the swap is a short cross-fade.
  *

@@ -12,7 +12,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * A side sheet that was open when the activity is recreated comes back open, rather than replaying its slide (#442).
+ * A side sheet that was open when the activity is recreated comes back open, rather than replaying its slide.
  * The sheet starts its slide from the flag's value on its first composition, so that is the value checked.
  */
 @RunWith(RobolectricTestRunner::class)

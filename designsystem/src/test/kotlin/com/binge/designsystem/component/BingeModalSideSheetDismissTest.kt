@@ -27,7 +27,7 @@ private const val PANEL_TEXT = "Filters"
 private const val SCRIM_TOUCH_FRACTION = 0.1f
 
 /**
- * Back and a touch on the scrim dismiss the side sheet, and a tap on the panel does not (#394). The window is wide
+ * Back and a touch on the scrim dismiss the side sheet, and a tap on the panel does not. The window is wide
  * enough that the scrim shows beside the panel, so the scrim can be touched rather than reached by its semantics.
  */
 @RunWith(RobolectricTestRunner::class)

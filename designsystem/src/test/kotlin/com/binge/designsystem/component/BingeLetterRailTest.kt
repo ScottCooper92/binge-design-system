@@ -67,7 +67,7 @@ class BingeLetterRailTest {
 
     /**
      * Each letter fires once per drag, the first included: the press that picked it is cancelled when the drag
-     * takes over, and that cancel must not clear the drag's dedupe (#466).
+     * takes over, and that cancel must not clear the drag's dedupe.
      */
     private fun assertEachOnce(order: List<Char>, drags: Int = 1) {
         assertEquals(List(drags) { order }.flatten(), picked)

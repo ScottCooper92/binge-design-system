@@ -18,7 +18,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * A rotation mid-visit is not a leave, so it reports nothing (#401). That a leave reports once, with its depth, is
+ * A rotation mid-visit is not a leave, so it reports nothing. That a leave reports once, with its depth, is
  * [ScrollDepthEffectTest]'s. This asks only whether the recreation reported at all, so it waits on no layout.
  */
 @RunWith(RobolectricTestRunner::class)

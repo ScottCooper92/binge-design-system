@@ -33,7 +33,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /**
- * A message page's actions are always on screen (#1134): with a long body at a large font the headline and body scroll above the
+ * A message page's actions are always on screen: with a long body at a large font the headline and body scroll above the
  * actions, which stay inside the window. Judged by bounds, at 1.3x and 2x, and never by `hasVisualOverflow`.
  */
 @RunWith(RobolectricTestRunner::class)

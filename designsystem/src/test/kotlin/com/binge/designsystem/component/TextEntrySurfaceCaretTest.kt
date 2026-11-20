@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** Where the caret sits in a pre-filled [TextEntrySurface] (#1151): at the end of the value once focused, not before it. */
+/** Where the caret sits in a pre-filled [TextEntrySurface]: at the end of the value once focused, not before it. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class TextEntrySurfaceCaretTest {

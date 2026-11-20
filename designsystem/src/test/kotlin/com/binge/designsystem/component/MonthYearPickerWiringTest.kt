@@ -19,7 +19,7 @@ import java.time.Month
 import java.util.Locale
 
 /**
- * The picker's controls reach the selection it confirms: the year stepper, the year grid and a month cell (#394). The
+ * The picker's controls reach the selection it confirms: the year stepper, the year grid and a month cell. The
  * body is hosted as [MonthYearPickerDialog] hosts it, without the modal window, which Robolectric does not route
  * touches into. The screen is tall enough that the actions under the grid are on it, where a click can land.
  */

@@ -261,7 +261,7 @@ class BingeChoiceSheetTest {
         assertEquals(1, opened)
     }
 
-    /** The restored sheet state was saved under the decision it opened with, so a recreation keeps it (#441). */
+    /** The restored sheet state was saved under the decision it opened with, so a recreation keeps it. */
     @Test
     fun `the part-way decision survives a recreation after the list changes length`() {
         val restoration = InMemoryStateRestorationTester(rule)
