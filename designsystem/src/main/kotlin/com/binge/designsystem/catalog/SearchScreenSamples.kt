@@ -58,10 +58,10 @@ private fun sampleResults(
         )
     }
 
-private val TypeLabels = listOf("All", "Movies", "Series", "People")
+private val TypeLabels = listOf("all" to "All", "movies" to "Movies", "series" to "Series", "people" to "People")
 
-private fun types(selected: Int, counts: Boolean) =
-    SearchTypes(TypeLabels.mapIndexed { i, label -> FilterChipItem(label, if (counts) 12 * (i + 1) else null) }, selected)
+private fun types(selectedKey: String, counts: Boolean) =
+    SearchTypes(TypeLabels.mapIndexed { i, (key, label) -> SearchTypeChip(key, label, if (counts) 12 * (i + 1) else null) }, selectedKey)
 
 private val SampleRecents = listOf("severance", "past lives", "greta lee", "heat")
 
