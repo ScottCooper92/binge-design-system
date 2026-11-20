@@ -60,10 +60,8 @@ private fun sampleResults(
 
 private val TypeLabels = listOf("All", "Movies", "Series", "People")
 
-private fun types(
-    selected: Int,
-    counts: Boolean,
-) = SearchTypes(TypeLabels.mapIndexed { i, label -> FilterChipItem(label, if (counts) 12 * (i + 1) else null) }, selected)
+private fun types(selected: Int, counts: Boolean) =
+    SearchTypes(TypeLabels.mapIndexed { i, label -> FilterChipItem(label, if (counts) 12 * (i + 1) else null) }, selected)
 
 private val SampleRecents = listOf("severance", "past lives", "greta lee", "heat")
 
@@ -145,7 +143,14 @@ fun SearchScreenLoadingSample() = SampleSearch({ _, _ -> SearchState.Loading }, 
 @Composable
 fun SearchScreenReadySample() =
     SampleSearch(
-        { selected, _ -> SearchState.Ready(sampleResults(), loaded = SAMPLE_RESULTS, hasMore = true, types = types(selected, counts = true)) },
+        { selected, _ ->
+            SearchState.Ready(
+                sampleResults(),
+                loaded = SAMPLE_RESULTS,
+                hasMore = true,
+                types = types(selected, counts = true),
+            )
+        },
         initialText = "past",
     )
 
@@ -170,7 +175,13 @@ fun SearchScreenPeopleSample() =
 fun SearchScreenAppendingSample() =
     SampleSearch(
         { selected, _ ->
-            SearchState.Ready(sampleResults(count = FEW_RESULTS), FEW_RESULTS, hasMore = true, appending = true, types = types(selected, counts = true))
+            SearchState.Ready(
+                sampleResults(count = FEW_RESULTS),
+                FEW_RESULTS,
+                hasMore = true,
+                appending = true,
+                types = types(selected, counts = true),
+            )
         },
         initialText = "past",
     )
@@ -180,7 +191,13 @@ fun SearchScreenAppendingSample() =
 fun SearchScreenAppendFailedSample() =
     SampleSearch(
         { selected, _ ->
-            SearchState.Ready(sampleResults(count = FEW_RESULTS), FEW_RESULTS, hasMore = true, appendFailed = true, types = types(selected, counts = true))
+            SearchState.Ready(
+                sampleResults(count = FEW_RESULTS),
+                FEW_RESULTS,
+                hasMore = true,
+                appendFailed = true,
+                types = types(selected, counts = true),
+            )
         },
         initialText = "past",
     )
@@ -189,7 +206,13 @@ fun SearchScreenAppendFailedSample() =
 @Composable
 fun SearchScreenNoResultsSample() =
     SampleSearch(
-        { selected, _ -> SearchState.NoResults("Nothing for \"zzz\"", "Check the spelling or try fewer words.", types(selected, counts = true)) },
+        { selected, _ ->
+            SearchState.NoResults(
+                "Nothing for \"zzz\"",
+                "Check the spelling or try fewer words.",
+                types(selected, counts = true),
+            )
+        },
         initialText = "zzz",
     )
 

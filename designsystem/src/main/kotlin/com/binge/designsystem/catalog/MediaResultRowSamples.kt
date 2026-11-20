@@ -17,10 +17,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
 
 @Composable
-private fun SampleRow(
-    result: MediaResult,
-    status: Boolean = false,
-) {
+private fun SampleRow(result: MediaResult, status: Boolean = false) {
     ScreenshotTheme {
         Column(Modifier.padding(dimensionResource(R.dimen.screen_content_inset))) {
             MediaResultRow(
