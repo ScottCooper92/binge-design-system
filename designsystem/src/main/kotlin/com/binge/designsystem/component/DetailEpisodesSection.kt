@@ -78,7 +78,10 @@ fun DetailEpisodesSection(
             )
         }
         if (stateContent != null) {
-            Box(Modifier.padding(horizontal = inset)) { stateContent() }
+            Column(
+                Modifier.padding(horizontal = inset),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+            ) { stateContent() }
         } else {
             episodes.take(shown.coerceAtLeast(0)).forEach { episode ->
                 EpisodeListRow(
