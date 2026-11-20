@@ -29,6 +29,9 @@ import kotlinx.coroutines.delay
 
 private const val SAMPLE_ITEMS = 18
 private const val PAGE_ITEMS = 12
+
+/** A cell near the end of the sample's list, so a frame that starts there shows the footer. */
+private const val SCROLLED_TO_END = 14
 private const val LOAD_MILLIS = 900L
 
 private val SampleTitles =
@@ -65,6 +68,7 @@ private fun SampleGrid(
     modifier: Modifier = Modifier,
     withFilters: Boolean = true,
     onBack: (() -> Unit)? = LocalDemoBack.current,
+    firstVisibleIndex: Int = 0,
 ) {
     var chips by remember { mutableStateOf(SampleChips) }
     var info by remember { mutableStateOf<String?>(null) }
@@ -75,6 +79,7 @@ private fun SampleGrid(
             state = state,
             modifier = modifier,
             filterBar = if (withFilters) sampleBar(chips) else null,
+            firstVisibleIndex = firstVisibleIndex,
             callbacks =
                 PagedGridCallbacks(
                     onOpenItem = { info = it },
@@ -99,13 +104,15 @@ fun PagedGridReadySample() = SampleGrid(PagedGridState.Ready(sampleItems(), hasM
 @Composable
 fun PagedGridLoadingSample() = SampleGrid(PagedGridState.Loading)
 
-/** The next page loading: a spinner under the last row. */
+/** The next page loading: the list scrolled to its end, with a spinner under the last row. */
 @Composable
-fun PagedGridAppendingSample() = SampleGrid(PagedGridState.Ready(sampleItems(), hasMore = true, appending = true))
+fun PagedGridAppendingSample() =
+    SampleGrid(PagedGridState.Ready(sampleItems(), hasMore = true, appending = true), firstVisibleIndex = SCROLLED_TO_END)
 
-/** The next page failed: the footer is a Retry button. */
+/** The next page failed: the list scrolled to its end, where the footer is a Retry button. */
 @Composable
-fun PagedGridAppendFailedSample() = SampleGrid(PagedGridState.Ready(sampleItems(), hasMore = true, appendFailed = true))
+fun PagedGridAppendFailedSample() =
+    SampleGrid(PagedGridState.Ready(sampleItems(), hasMore = true, appendFailed = true), firstVisibleIndex = SCROLLED_TO_END)
 
 /** Nothing matched the filters: an empty plate with its own icon and an action. */
 @Composable
