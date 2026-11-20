@@ -150,4 +150,6 @@
     <string name="time_input_invalid">Introduce una hora válida.</string>
     <string name="detail_episode_label">E%1$d</string>
     <string name="detail_runtime_minutes">%1$d min</string>
+    <string name="paged_grid_loading">Cargando</string>
+    <string name="paged_grid_more_failed">No se pudo cargar más. Toca para reintentar.</string>
 </resources>
