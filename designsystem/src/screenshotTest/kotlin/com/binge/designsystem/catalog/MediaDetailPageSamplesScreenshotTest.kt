@@ -68,4 +68,10 @@ class MediaDetailPageSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun info() = DetailInfoSectionSample()
+
+    /** The heading in the reading column on a tablet: it starts where the facts do. */
+    @PreviewTest
+    @TabletScreenPreview
+    @Composable
+    fun infoWide() = DetailInfoSectionWideSample()
 }
