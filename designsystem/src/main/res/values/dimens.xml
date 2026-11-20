@@ -352,6 +352,8 @@
     <dimen name="detail_meta_icon_size">16dp</dimen>
     <dimen name="detail_cast_avatar_label_spacing">4dp</dimen>
     <dimen name="detail_meta_spacing">8dp</dimen>
+    <!-- EpisodeListRow: the bar along the foot of an episode that is part way through -->
+    <dimen name="episode_row_progress_height">3dp</dimen>
     <!-- The widest the season dropdown in a detail page's Episodes header grows before its label is cut -->
     <dimen name="season_dropdown_max_width">180dp</dimen>
     <!-- Cinematic detail header (expanded width): immersive backdrop + inline poster + copy column. -->

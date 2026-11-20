@@ -16,6 +16,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeChoiceChip
 import com.binge.designsystem.component.BingeDateBoundFields
 import com.binge.designsystem.component.BingeRangeSlider
+import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.component.DateBoundFieldStyle
 import com.binge.designsystem.component.IncludeExcludeChip
 import com.binge.designsystem.component.IncludeExcludeState
@@ -34,6 +35,60 @@ class FilterControlHandlers(
     val onRangeChange: (sectionId: String, values: ClosedFloatingPointRange<Float>) -> Unit = { _, _ -> },
     val onDateBoundChange: (sectionId: String, isEnd: Boolean, date: LocalDate?) -> Unit = { _, _, _ -> },
 )
+
+/**
+ * [FilterSectionControl] under a search field, when the section has options to search and a [search] is given. The options shown are
+ * the ones whose label contains the query, and [FilterSearchUi.noResultsLabel] stands in when none do. Anything else is drawn as it is.
+ */
+@Composable
+internal fun FilterSectionControlWithSearch(
+    section: FilterSectionUi,
+    callbacks: FilterControlHandlers,
+    search: FilterSearchUi?,
+) {
+    if (search == null || section.control !is FilterControlUi.SingleChoice && section.control !is FilterControlUi.MultiChoice) {
+        FilterSectionControl(section = section, callbacks = callbacks)
+        return
+    }
+    val shown = section.matching(search.query)
+    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.filter_sheet_chip_spacing))) {
+        BingeSearchField(
+            query = search.query,
+            onQueryChange = search.onQueryChange,
+            onClear = { search.onQueryChange("") },
+            placeholder = search.placeholder,
+        )
+        if (shown.hasNoOptions()) {
+            Text(
+                text = search.noResultsLabel,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            FilterSectionControl(section = shown, callbacks = callbacks)
+        }
+    }
+}
+
+/** This section with only the options whose label contains [query], ignoring case. A blank query keeps them all. */
+internal fun FilterSectionUi.matching(query: String): FilterSectionUi {
+    val needle = query.trim()
+    if (needle.isEmpty()) return this
+
+    fun List<FilterOptionUi>.keep() = filter { it.label.contains(needle, ignoreCase = true) }
+    return when (val control = control) {
+        is FilterControlUi.SingleChoice -> copy(control = control.copy(options = control.options.keep()))
+        is FilterControlUi.MultiChoice -> copy(control = control.copy(options = control.options.keep()))
+        else -> this
+    }
+}
+
+private fun FilterSectionUi.hasNoOptions(): Boolean =
+    when (val control = control) {
+        is FilterControlUi.SingleChoice -> control.options.isEmpty()
+        is FilterControlUi.MultiChoice -> control.options.isEmpty()
+        else -> false
+    }
 
 /** The control a [FilterSectionUi] carries, drawn the same inline in the sheet's body and alone in a section sheet. */
 @Composable
@@ -59,11 +114,12 @@ internal fun FilterSectionControl(section: FilterSectionUi, callbacks: FilterCon
                         state =
                             when (option.id) {
                                 in control.includedIds -> IncludeExcludeState.Include
-                                in control.excludedIds -> IncludeExcludeState.Exclude
+                                in control.excludedIds ->
+                                    if (control.includeOnly) IncludeExcludeState.Neutral else IncludeExcludeState.Exclude
                                 else -> IncludeExcludeState.Neutral
                             },
                         onClick = { callbacks.onOptionClick(section.id, option.id) },
-                        onLongClick = { callbacks.onOptionLongClick(section.id, option.id) },
+                        onLongClick = if (control.includeOnly) null else ({ callbacks.onOptionLongClick(section.id, option.id) }),
                         onLongClickLabel = callbacks.optionLongClickLabel,
                     )
                 }

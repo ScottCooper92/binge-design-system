@@ -47,6 +47,7 @@ import com.binge.designsystem.theme.BingeSentiment
 private const val PHOTO_URL = "sample://photo"
 private const val PHOTO_SIZE_PX = 352
 private const val SAMPLE_ROUND_ACTIONS = 2
+private const val SAMPLE_RAILS = 2
 
 private val cast = listOf(
     "Amara Okafor" to "Lead",
@@ -145,13 +146,16 @@ fun MovieDetailScreenSample() {
 fun MovieDetailScreenLoadingSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         MovieDetailScreen(
-            state = DetailState.Loading(stats = MediaPageStats.size, roundActions = SAMPLE_ROUND_ACTIONS),
+            state = DetailState.Loading(stats = MediaPageStats.size, roundActions = SAMPLE_ROUND_ACTIONS, rails = SAMPLE_RAILS),
             callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
         )
     }
 }
 
-/** The page's failure in place of the page, under a bar with Back: the app's own message, and Try again because another attempt can help. */
+/**
+ * The page's failure in place of the page, on the loading page's own frame so the Back control does not move between them: the app's own
+ * message, and Try again because another attempt can help.
+ */
 @Composable
 fun MovieDetailScreenFailedSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
@@ -162,7 +166,10 @@ fun MovieDetailScreenFailedSample() {
     }
 }
 
-/** A failure another attempt cannot help, such as a film that no longer exists: the same frame with no Try again. */
+/**
+ * A failure another attempt cannot help, such as a film that no longer exists: the same frame with no Try again, and no message of the
+ * app's own, so the kind's glyph, headline and words are used.
+ */
 @Composable
 fun MovieDetailScreenNotFoundSample() {
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
@@ -173,6 +180,37 @@ fun MovieDetailScreenNotFoundSample() {
                 kind = ErrorKind.NotFound,
             ),
             callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
+        )
+    }
+}
+
+/**
+ * The page while it loads for a title that promises little: two stats and no primary action, no round actions and no rails. The skeleton
+ * holds only the hero, the stats and the overview, with no carousel placeholder, so a page with no cast or similar titles does not jump.
+ */
+@Composable
+fun MovieDetailScreenLoadingBareSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        MovieDetailScreen(
+            state = DetailState.Loading(stats = 2, roundActions = 0, hasPrimary = false),
+            callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
+        )
+    }
+}
+
+/** A title with nothing to play but Watched and Favourite: with no primary the round actions are still drawn, centred in a row of their own. */
+@Composable
+fun MovieDetailScreenRoundActionsOnlySample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        MovieDetailScreen(
+            state = DetailState.Content(
+                MediaDetail(title = MEDIA_PAGE_TITLE, genres = MEDIA_PAGE_GENRES, stats = MediaPageStats, overview = MEDIA_PAGE_OVERVIEW),
+            ),
+            callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
+            roundActions = listOf(
+                DetailRoundAction(Icons.Outlined.CheckCircleOutline, "Watched", onClick = {}),
+                DetailRoundAction(Icons.Filled.FavoriteBorder, "Favourite", onClick = {}),
+            ),
         )
     }
 }
