@@ -96,7 +96,10 @@ fun MediaResultRowMarksSample() =
         ),
     )
 
-/** What a search draws while it loads: a plate for the picture and two for the name and the subtitle, for a poster and then for an episode still. */
+/**
+ * What a search draws while it loads: a plate for the picture and two for the name and the subtitle, in each kind's own shape and alignment: a
+ * poster, an episode still, a round portrait and a logo tile.
+ */
 @Composable
 fun MediaResultRowSkeletonSample() =
     ScreenshotTheme {
@@ -106,5 +109,7 @@ fun MediaResultRowSkeletonSample() =
         ) {
             MediaResultRowSkeleton()
             MediaResultRowSkeleton(kind = MediaResultKind.Still)
+            MediaResultRowSkeleton(kind = MediaResultKind.Avatar)
+            MediaResultRowSkeleton(kind = MediaResultKind.Logo)
         }
     }

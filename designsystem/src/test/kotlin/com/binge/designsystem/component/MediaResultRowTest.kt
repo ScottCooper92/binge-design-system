@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -77,5 +79,24 @@ class MediaResultRowTest {
     fun `a result with only a name draws no status line`() {
         show(MediaResult("k", MediaResultKind.Avatar, null, "Greta Lee"))
         rule.onNodeWithText("Greta Lee").assertExists()
+    }
+
+    private fun heightOf(content: @androidx.compose.runtime.Composable () -> Unit): Int {
+        rule.setContent { TestTheme { Box(Modifier.width(412.dp)) { content() } } }
+        rule.waitForIdle()
+        return rule
+            .onRoot()
+            .getBoundsInRoot()
+            .height.value
+            .toInt()
+    }
+
+    @Test
+    fun `a skeleton is as tall as the row it stands in for, for every kind`() {
+        MediaResultKind.entries.forEach { kind ->
+            val row = heightOf { MediaResultRow(MediaResult("k", kind, null, "Name", "Subtitle"), onClick = {}) }
+            val skeleton = heightOf { MediaResultRowSkeleton(kind = kind) }
+            assertEquals("$kind", row, skeleton)
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -165,7 +166,7 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
 
 /**
  * What a search draws in a [MediaResultRow]'s place while it loads: the row's own chrome with a plate for the picture and two for the
- * name and the subtitle, at the picture's size, so the loading to content swap does not jump. [kind] picks the picture's shape as the row does.
+ * name and the subtitle, at the picture's size, so the loading to content swap does not jump. [kind] picks the picture's shape, its box and the text's alignment as the row does.
  * [description] names the loading state for a screen reader; without one it stays silent.
  *
  * @need show a loading placeholder for a search result row
@@ -177,20 +178,17 @@ fun MediaResultRowSkeleton(
     kind: MediaResultKind = MediaResultKind.Poster,
     description: String? = null,
 ) {
-    val still = kind == MediaResultKind.Still
+    val topAligned = kind == MediaResultKind.Poster || kind == MediaResultKind.Still
     ListRow(
         modifier = modifier.describedAs(description),
-        leading = {
-            SkeletonPlate(
-                modifier = Modifier
-                    .width(dimensionResource(if (still) R.dimen.media_result_still_width else R.dimen.list_row_poster_width))
-                    .aspectRatio(if (still) STILL_ASPECT_RATIO else CARD_ASPECT_RATIO),
-                shape = BingeShapes.ListRowPoster,
-            )
-        },
+        // The same alignment as the row, so the plates sit where the text will.
+        verticalAlignment = if (topAligned) Alignment.Top else Alignment.CenterVertically,
+        leading = { SkeletonPicture(kind) },
     ) { contentModifier ->
         Column(
-            modifier = contentModifier.padding(top = dimensionResource(R.dimen.detail_meta_spacing)),
+            modifier = contentModifier.padding(
+                top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero),
+            ),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
             SkeletonPlate(Modifier.fillMaxWidth(NAME_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_name_height)))
@@ -198,6 +196,27 @@ fun MediaResultRowSkeleton(
                 Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_subtitle_height)),
             )
         }
+    }
+}
+
+/** The plate for a row's picture, in the shape and the box the row draws it in: a poster, a circle in a poster-height box, a tile or a still. */
+@Composable
+private fun SkeletonPicture(kind: MediaResultKind) {
+    val posterWidth = dimensionResource(R.dimen.list_row_poster_width)
+    when (kind) {
+        MediaResultKind.Poster ->
+            SkeletonPlate(Modifier.width(posterWidth).aspectRatio(CARD_ASPECT_RATIO), BingeShapes.ListRowPoster)
+        MediaResultKind.Still ->
+            SkeletonPlate(
+                Modifier.width(dimensionResource(R.dimen.media_result_still_width)).aspectRatio(STILL_ASPECT_RATIO),
+                BingeShapes.ListRowPoster,
+            )
+        MediaResultKind.Avatar ->
+            Box(Modifier.width(posterWidth).aspectRatio(CARD_ASPECT_RATIO), contentAlignment = Alignment.Center) {
+                SkeletonPlate(Modifier.size(posterWidth), BingeShapes.Pill)
+            }
+        MediaResultKind.Logo ->
+            SkeletonPlate(Modifier.width(posterWidth).aspectRatio(CARD_ASPECT_RATIO), MaterialTheme.shapes.small)
     }
 }
 
