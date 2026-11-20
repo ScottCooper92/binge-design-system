@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -38,12 +39,15 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -328,25 +332,29 @@ private const val FILL_ITEM_KEY = "hero-detail-fill"
  * was already in effect, rather than worked out again from the items still visible, which would shrink it and snap the list back.
  */
 @Composable
-private fun rememberShortPageFill(listState: LazyListState): State<Int> =
-    remember(listState) {
-        var last = 0
-        derivedStateOf {
-            val info = listState.layoutInfo
-            val spacerIndex = info.totalItemsCount - 1
-            val under = info.visibleItemsInfo.filter { it.index in 1 until spacerIndex }
-            val first = under.minOfOrNull { it.index }
-            last =
-                when {
-                    spacerIndex < 1 -> last
-                    spacerIndex == 1 -> info.viewportSize.height
-                    first == null || first > 1 -> last
-                    under.none { it.index == spacerIndex - 1 } -> 0
-                    else -> (info.viewportSize.height - (under.maxOf { it.offset + it.size } - under.minOf { it.offset })).coerceAtLeast(0)
-                }
-            last
-        }
+private fun rememberShortPageFill(listState: LazyListState): State<Int> {
+    // Saved with the list's own position, so a restore (a rotation, a recreated process) lays out its first frame with the room the
+    // restored offset needs. A fill that restarted at zero would clamp the list back to the top and bring the hero in again.
+    val fill = rememberSaveable { mutableIntStateOf(0) }
+    LaunchedEffect(listState) {
+        snapshotFlow { shortPageFill(listState.layoutInfo) }.collect { measured -> if (measured != null) fill.intValue = measured }
     }
+    return fill
+}
+
+/** The fill [rememberShortPageFill] holds for [info], or null where the size already in effect stands. */
+private fun shortPageFill(info: LazyListLayoutInfo): Int? {
+    val spacerIndex = info.totalItemsCount - 1
+    val under = info.visibleItemsInfo.filter { it.index in 1 until spacerIndex }
+    val first = under.minOfOrNull { it.index }
+    return when {
+        spacerIndex < 1 -> null
+        spacerIndex == 1 -> info.viewportSize.height
+        first == null || first > 1 -> null
+        under.none { it.index == spacerIndex - 1 } -> 0
+        else -> (info.viewportSize.height - (under.maxOf { it.offset + it.size } - under.minOf { it.offset })).coerceAtLeast(0)
+    }
+}
 
 /**
  * The outer frame both forms share: no bar of the Scaffold's own, since the overlay bar clears the status bar

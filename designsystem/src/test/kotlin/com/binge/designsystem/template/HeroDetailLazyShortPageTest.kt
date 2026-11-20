@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.InMemoryStateRestorationTester
 import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
@@ -127,6 +128,35 @@ class HeroDetailLazyShortPageTest {
         assertTrue("the hero rests at $index/$offset of $heroPx px", heroScrolledOut())
         assertEquals(index, state!!.firstVisibleItemIndex)
         assertEquals(offset, state!!.firstVisibleItemScrollOffset)
+    }
+
+    @Test
+    fun `a page scrolled to its end keeps the hero away across a saved state restore`() {
+        val restoration = InMemoryStateRestorationTester(rule)
+        restoration.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                val listState = rememberLazyListState()
+                state = listState
+                heroPx = with(LocalDensity.current) { HERO_HEIGHT.toPx() }.toInt()
+                HeroDetailLazyScreen(
+                    title = "A title",
+                    onBack = {},
+                    listState = listState,
+                    heroHeight = HERO_HEIGHT,
+                    hero = { Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(Color.DarkGray)) },
+                ) {
+                    item { Box(Modifier.fillMaxWidth().height(40.dp)) { Text("Item") } }
+                }
+            }
+        }
+        rule.waitForIdle()
+        scrollToEnd()
+        assertTrue(heroScrolledOut())
+
+        restoration.emulateSavedInstanceStateRestore()
+        rule.waitForIdle()
+
+        assertTrue("the hero is back at ${state!!.firstVisibleItemIndex}/${state!!.firstVisibleItemScrollOffset}", heroScrolledOut())
     }
 
     @Test
