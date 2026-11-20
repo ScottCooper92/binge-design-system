@@ -84,6 +84,12 @@ class MediaResultRowTest {
     }
 
     @Test
+    fun `a person result with no photo shows initials from the result's name`() {
+        show(MediaResult("k", MediaResultKind.Avatar, null, "Greta Lee", "Actor"))
+        rule.onNodeWithText("GL").assertExists()
+    }
+
+    @Test
     fun `a skeleton is as tall as the row it stands in for, for every kind`() {
         rule.setContent {
             TestTheme {

@@ -66,7 +66,7 @@ fun BingeInitialsAvatar(
 }
 
 @Composable
-private fun InitialsAvatar(name: String, size: Dp) {
+internal fun InitialsAvatar(name: String, size: Dp) {
     val palette = BingeTheme.colors.avatarPalette
     // Stable index from the name's hash; floor-mod keeps it in range for negative hashes.
     val tone = palette[((name.hashCode() % palette.size) + palette.size) % palette.size]
