@@ -3,7 +3,10 @@
 How CI goes red here, and what the correct fix is. `author-ci-fix` gets **one** repair attempt per
 commit, so the point of this table is to spend it on the right thing.
 
-CI has three jobs, and `build` is the gate: `./gradlew build validateDebugScreenshotTest --continue`. The others are `actionlint` and `nightly-report`. `--continue` means a red run usually shows more
+CI has these jobs, and `build` is the gate: it is a summary, red unless `check` and every `screenshots` shard succeeded. `check` runs `./gradlew build --continue`
+(compile, unit tests, ktlint, lint). `screenshots` runs `validateDebugScreenshotTest` in three shards, each a third of the `@PreviewTest` classes by sorted name; its job
+log shows which classes it ran, and `scripts/screenshot-shard.sh update <shard> 3` prints the same classes to re-record locally. The others are `actionlint` and `nightly-report`.
+Look in the failed part, not in `build`: its log only says which part was red. `--continue` means a red run usually shows more
 than one failure — fix them all, or say which you did not.
 
 | Symptom | What it means | Correct fix |

@@ -210,9 +210,9 @@ fun SearchScreenNoResultsSample() =
     SampleSearch(
         { selected, _ ->
             SearchState.NoResults(
-                "Nothing for \"zzz\"",
-                "Check the spelling or try fewer words.",
-                types(selected, counts = true),
+                message = "Check the spelling or try fewer words.",
+                title = "Nothing for \"zzz\"",
+                types = types(selected, counts = true),
             )
         },
         initialText = "zzz",

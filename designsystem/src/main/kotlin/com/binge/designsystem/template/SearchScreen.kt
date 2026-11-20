@@ -68,6 +68,9 @@ import com.binge.designsystem.searchResultColumns
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
+/** The lazy key of the append footer; an app's own keys are text too, so it is namespaced. */
+private const val FOOTER_KEY = "search-footer"
+
 /** How many results from the end the list asks for the next page. */
 const val SEARCH_LOAD_MORE_AHEAD: Int = 3
 
@@ -95,7 +98,7 @@ sealed interface SearchState {
 
     /**
      * Results. [loaded] is how many have arrived across every type, so a page that adds nothing to the chosen type still re-arms
-     * load-more. A settled list with no results shows [emptyTitle] and [emptyMessage].
+     * load-more. A settled list with no results shows [emptyTitle] (null says "Nothing here yet") and [emptyMessage].
      */
     class Ready(
         val results: List<MediaResult>,
@@ -104,14 +107,14 @@ sealed interface SearchState {
         val appending: Boolean = false,
         val appendFailed: Boolean = false,
         val types: SearchTypes? = null,
-        val emptyTitle: String = "",
+        val emptyTitle: String? = null,
         val emptyMessage: String = "",
     ) : SearchState
 
-    /** The query found nothing; [types] keeps the chips, with whatever counts the app gives them. */
+    /** The query found nothing; [types] keeps the chips, with whatever counts the app gives them. [title] null says "Nothing here yet". */
     class NoResults(
-        val title: String,
         val message: String,
+        val title: String? = null,
         val types: SearchTypes? = null,
     ) : SearchState
 
@@ -281,7 +284,11 @@ private fun SearchBody(
             }
         is SearchState.NoResults ->
             Column(Modifier.fillMaxSize().padding(top = top)) {
-                EmptyScreen(message = state.message, modifier = Modifier.weight(1f), title = state.title)
+                EmptyScreen(
+                    message = state.message,
+                    modifier = Modifier.weight(1f),
+                    title = state.title ?: stringResource(R.string.empty_screen_title),
+                )
                 noResultsExtras?.invoke()
             }
         is SearchState.Failed ->
@@ -446,7 +453,7 @@ private fun ResultsList(
     val empty = state.results.isEmpty()
     val settled = !state.hasMore && !state.appending && !state.appendFailed
     if (empty && settled) {
-        EmptyScreen(message = state.emptyMessage, title = state.emptyTitle)
+        EmptyScreen(message = state.emptyMessage, title = state.emptyTitle ?: stringResource(R.string.empty_screen_title))
         return
     }
     // One column on a phone; wider windows fold the results into columns rather than running a row the width of a tablet.
@@ -467,7 +474,7 @@ private fun ResultsList(
                 )
             }
             if (state.appending || state.appendFailed || empty) {
-                item(key = "footer", span = { GridItemSpan(maxLineSpan) }) {
+                item(key = FOOTER_KEY, span = { GridItemSpan(maxLineSpan) }) {
                     SearchFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
                 }
             }
