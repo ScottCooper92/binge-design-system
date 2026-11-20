@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import com.binge.designsystem.catalog.MEDIA_PAGE_OVERVIEW
 import com.binge.designsystem.catalog.MediaPageStats
 import com.binge.designsystem.catalog.MovieDetailScreenLoadingSample
@@ -14,6 +15,7 @@ import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.assertSkeletonReservesGeometry
 import com.binge.designsystem.testing.createTakeDownComposeRule
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -105,5 +107,22 @@ class MovieDetailScreenTest {
                 )
             }
         }
+    }
+
+    @Test
+    fun `a failed page draws its secondary action and a tap reports it`() {
+        var allowed = 0
+        rule.setContent {
+            ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+                MovieDetailScreen(
+                    state = DetailState.Failed(secondary = ScreenAction("Allow", { allowed++ })),
+                    callbacks = MediaDetailCallbacks(onBack = {}),
+                )
+            }
+        }
+        rule.waitForIdle()
+        rule.onNodeWithText("Try again").assertExists()
+        rule.onNodeWithText("Allow").performClick()
+        assertEquals(1, allowed)
     }
 }

@@ -130,12 +130,13 @@ sealed interface SearchState {
         val types: SearchTypes? = null,
     ) : SearchState
 
-    /** The search failed. [title] and [message] default to [kind]'s own words; Try again shows only when [retryable]. */
+    /** The search failed. [title] and [message] default to [kind]'s own words; Try again shows only when [retryable], and [secondary] is a second action beside it. */
     class Failed(
         val kind: ErrorKind,
         val title: String? = null,
         val message: String? = null,
         val retryable: Boolean = true,
+        val secondary: ScreenAction? = null,
     ) : SearchState
 }
 
@@ -313,6 +314,7 @@ private fun SearchBody(
                     modifier = Modifier.fillMaxSize().padding(platePadding),
                     title = state.title,
                     message = state.message,
+                    secondary = state.secondary,
                 )
             }
     }
