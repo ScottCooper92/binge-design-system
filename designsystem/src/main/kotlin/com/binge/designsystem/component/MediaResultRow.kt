@@ -187,7 +187,7 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
  * the loaded name is expected to look like (the longest typical title): the plate lays it out invisibly in the row's own style and width, up to the
  * row's two lines, so it takes what the name takes at every font size, wrapping included. The width is the row's whole text column: the favourite
  * and watched marks a loaded row puts beside its name are not reserved, so a title that only just fits on one line here can wrap in a marked row.
- * The hint applies to a [blurbLines] row too, as its name plate. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
+ * The hint applies to a [blurbLines] row too, as its name plate; on a row with no blurb it also reserves the subtitle line. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
  * not something a plate can measure: a row whose status wraps still moves.
  *
  * @need show a loading placeholder for a search result row
@@ -235,6 +235,11 @@ private fun BlurbRowPlates(
             maxLines = 2,
         )
         Spacer(Modifier.height(gap))
+        // A hinted row with no blurb is a title that has a subtitle line too, as the hint's own row does, so the plates reserve it.
+        if (expectedName != null && lines == 0) {
+            TextPlate(MaterialTheme.typography.labelMedium, Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION))
+            Spacer(Modifier.height(gap))
+        }
         // The status line: a rating chip is a line of its label style with its own vertical padding.
         TextPlate(
             MaterialTheme.typography.labelMedium,
