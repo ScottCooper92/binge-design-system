@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeStatusButton
 import com.binge.designsystem.component.BingeStatusButtonEmphasis
@@ -176,7 +177,7 @@ fun MovieDetailScreenNotFoundSample() {
             state = DetailState.Failed(
                 "This film is no longer listed.",
                 retryable = false,
-                kind = com.binge.designsystem.ErrorKind.NotFound,
+                kind = ErrorKind.NotFound,
             ),
             callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
         )
