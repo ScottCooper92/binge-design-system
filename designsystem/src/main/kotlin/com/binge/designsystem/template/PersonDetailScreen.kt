@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,14 +41,16 @@ import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeLoadingIndicator
 import com.binge.designsystem.component.CarouselSkeleton
+import com.binge.designsystem.component.DetailOverviewSection
 import com.binge.designsystem.component.DetailOverviewSkeleton
-import com.binge.designsystem.component.ExpandableOverview
 import com.binge.designsystem.component.MediaCard
 import com.binge.designsystem.component.PersonFact
 import com.binge.designsystem.component.PersonProfileHeader
 import com.binge.designsystem.component.PersonProfileSkeleton
 import com.binge.designsystem.component.SectionHeader
 import com.binge.designsystem.component.SeeAllTile
+import com.binge.designsystem.layout.LayoutAnchors
+import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.resolvedContentInset
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -217,12 +220,10 @@ fun PersonDetailScreen(
                     )
                 },
             ) {
-                if (person !=
-                    null
-                ) {
-                    PersonContent(person, callbacks, afterCredits)
-                } else {
-                    PersonPlaceholder(state as PersonDetailState.Loading)
+                when (state) {
+                    is PersonDetailState.Content -> PersonContent(state.person, callbacks, afterCredits)
+                    is PersonDetailState.Loading -> PersonPlaceholder(state)
+                    is PersonDetailState.Failed -> Unit
                 }
                 Spacer(Modifier.height(dimensionResource(R.dimen.padding_l)))
             }
@@ -238,16 +239,12 @@ private fun ColumnScope.PersonContent(
     afterCredits: @Composable ColumnScope.() -> Unit,
 ) {
     PersonProfileHeader(name = person.name, photoUrl = person.photoUrl, eyebrow = person.eyebrow, facts = person.facts)
-    person.biography?.let { biography ->
+    if (person.biography != null) {
         Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
-        Column(Modifier.readingMargin().padding(horizontal = resolvedContentInset())) {
-            Text(
-                text = person.biographyHeading ?: stringResource(R.string.person_biography_heading),
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = dimensionResource(R.dimen.padding_s)),
-            )
-            ExpandableOverview(text = biography)
-        }
+        DetailOverviewSection(
+            heading = person.biographyHeading ?: stringResource(R.string.person_biography_heading),
+            text = person.biography,
+        )
     }
     when (val credits = person.credits) {
         CreditsState.Loading -> CreditsPlaceholder()
@@ -273,14 +270,14 @@ private fun ColumnScope.PersonPlaceholder(state: PersonDetailState.Loading) {
     PersonProfileSkeleton(facts = state.facts)
     if (state.hasBiography) {
         Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
-        DetailOverviewSkeleton()
+        DetailOverviewSkeleton(Modifier.fillMaxWidth().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
     }
-    repeat(state.creditRails) { CarouselSkeleton(Modifier.padding(top = dimensionResource(R.dimen.padding_m))) }
+    repeat(state.creditRails) { CarouselSkeleton() }
 }
 
 @Composable
 private fun CreditsPlaceholder() {
-    repeat(2) { CarouselSkeleton(Modifier.padding(top = dimensionResource(R.dimen.padding_m))) }
+    repeat(2) { CarouselSkeleton() }
 }
 
 @Composable
@@ -332,6 +329,7 @@ private fun CreditRail(
 ) {
     val inset = readingInset()
     val listState = rememberLazyListState()
+    val currentOnLoadMore by rememberUpdatedState(onLoadMore)
     val nearEnd by remember(listState) {
         derivedStateOf {
             val info = listState.layoutInfo
@@ -345,7 +343,7 @@ private fun CreditRail(
             !section.appending &&
             !section.appendFailed
         ) {
-            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { onLoadMore() }
+            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { currentOnLoadMore() }
         }
     }
     Column(Modifier.fillMaxWidth()) {

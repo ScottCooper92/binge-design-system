@@ -133,7 +133,7 @@ class PersonDetailScreenTest {
     }
 
     @Test
-    fun `no See all tile by default, and one that hands back the section's key when asked for`() {
+    fun `no See all tile is drawn by default`() {
         show(PersonDetailState.Content(person(CreditsState.Ready(listOf(CreditSection("a", "Acting", cards("a", 2)))))))
         rule.onAllNodesWithText("See all").assertCountEquals(0)
     }
@@ -232,6 +232,22 @@ class PersonDetailScreenTest {
         rule.waitForIdle()
         val loaded = rule.onNode(anchor).fetchSemanticsNode().boundsInRoot
         assertEquals(loaded, loading)
+    }
+
+    @Test
+    fun `the biography stands where its placeholder did`() {
+        var state by mutableStateOf<PersonDetailState>(PersonDetailState.Loading(facts = 2))
+        rule.setContent {
+            TestTheme { PersonDetailScreen(state = state, callbacks = PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {})) }
+        }
+        rule.waitForIdle()
+        val anchor = hasTestTag(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW))
+        val loading = rule.onNode(anchor).fetchSemanticsNode().boundsInRoot
+        state = PersonDetailState.Content(person(CreditsState.Loading))
+        rule.waitForIdle()
+        val loaded = rule.onNode(anchor).fetchSemanticsNode().boundsInRoot
+        assertEquals(loaded.left, loading.left, 0.5f)
+        assertEquals(loaded.top, loading.top, 0.5f)
     }
 
     private fun assertUnclippedAt(scale: Float) {
