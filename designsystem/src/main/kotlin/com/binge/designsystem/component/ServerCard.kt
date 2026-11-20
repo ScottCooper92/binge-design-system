@@ -86,11 +86,17 @@ data class ServerCardStat(
  * The full-width row a [ServerCard] shows under its header when the server has an update: [label] says so ("Update
  * available: 2.8.0") and [actionLabel] names what a tap opens ("Release notes"). The whole row is one button that runs
  * [onClick], with a touch target of at least `min_touch_target`.
+ *
+ * An action that leaves the app (release notes on a web page) can say so: [actionTrailingIcon] draws a small mark after
+ * [actionLabel] (pass `Icons.AutoMirrored.Filled.OpenInNew`), and [actionTrailingContentDescription] is its words, read after the
+ * label and the action ("Opens outside the app"). The caller owns the words. Both are null by default, and the row is as it was.
  */
 data class ServerCardUpdate(
     val label: String,
     val actionLabel: String,
     val onClick: () -> Unit,
+    val actionTrailingIcon: ImageVector? = null,
+    val actionTrailingContentDescription: String? = null,
 )
 
 /**
@@ -265,7 +271,19 @@ private fun ServerCardUpdateRow(update: ServerCardUpdate) {
                 modifier = Modifier.size(dimensionResource(R.dimen.server_card_update_icon)),
             )
             Text(text = update.label, style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
-            Text(text = update.actionLabel, style = MaterialTheme.typography.labelMedium)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs)),
+            ) {
+                Text(text = update.actionLabel, style = MaterialTheme.typography.labelMedium)
+                update.actionTrailingIcon?.let { mark ->
+                    Icon(
+                        imageVector = mark,
+                        contentDescription = update.actionTrailingContentDescription,
+                        modifier = Modifier.size(dimensionResource(R.dimen.server_card_update_trailing_icon)),
+                    )
+                }
+            }
         }
     }
 }

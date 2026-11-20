@@ -1,6 +1,7 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.People
@@ -87,6 +88,33 @@ fun ServerCardUpdateSample() {
                     ServerCardStat(Icons.Filled.People, "9", "Users"),
                     ServerCardStat(Icons.Filled.HourglassEmpty, "7", "Pending", BingeSentiment.Caution),
                 ),
+        )
+    }
+}
+
+/**
+ * The update row whose action leaves the app: a small open-in-new mark after "Release notes", announced with the row ("Opens outside the
+ * app"). The words are the sample's own, since the caller owns them.
+ */
+@Composable
+fun ServerCardUpdateExternalSample() {
+    ScreenshotTheme {
+        ServerCard(
+            title = "Home server",
+            logo = logo(),
+            subtitle = "Jellyseerr 2.5.2",
+            address = "https://requests.example.com",
+            chips = listOf(ServerCardChip("Demo", BingeSentiment.Caution)),
+            statusChip = health,
+            update =
+                ServerCardUpdate(
+                    label = "Update available: 2.6.0",
+                    actionLabel = "Release notes",
+                    onClick = {},
+                    actionTrailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                    actionTrailingContentDescription = "Opens outside the app",
+                ),
+            stats = threeStats,
         )
     }
 }
