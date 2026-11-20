@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -29,9 +30,11 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.em
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
+import kotlin.math.floor
 
 /** Which review source an [ExternalScore] comes from, and so which glyph it wears. */
 enum class ExternalScoreKind {
@@ -161,6 +164,82 @@ internal fun MetaFlow(entries: List<MetaEntry>, modifier: Modifier = Modifier) {
                         if (!last) HeroMetaDot()
                     }
                 is MetaEntry.WrappingText -> WrappingMetaText(entry, withDot = !last)
+            }
+        }
+    }
+}
+
+/**
+ * A meta line that wraps without ever ending a line on a separator: [entries] side by side with the meta dot between neighbours on the same
+ * line, and none at a line break, so a wrapped line neither ends nor starts on a dot. An entry that does not fit what is left of a line starts
+ * the next one, whole. [MetaFlow] draws each dot after its entry, so a wrapped line ends on one; this is for a line where that reads wrong.
+ */
+@Composable
+internal fun BreakableMetaLine(entries: List<@Composable () -> Unit>, modifier: Modifier = Modifier) {
+    val gap = dimensionResource(R.dimen.hero_meta_gap)
+    val lineGap = dimensionResource(R.dimen.meta_flow_line_gap)
+    Layout(
+        content = {
+            entries.forEachIndexed { index, entry ->
+                if (index > 0) HeroMetaDot()
+                Box { entry() }
+            }
+        },
+        modifier = modifier,
+    ) { measurables, constraints ->
+        val gapPx = gap.roundToPx()
+        val lineGapPx = lineGap.roundToPx()
+        val maxWidth = constraints.maxWidth
+        val loose = Constraints(maxWidth = maxWidth)
+        // The children alternate: the first entry, then a dot and an entry for each one after it.
+        val entryPlaceables = entries.indices.map { measurables[if (it == 0) 0 else 2 * it].measure(loose) }
+        val dotPlaceables = (1 until entries.size).map { measurables[2 * it - 1].measure(Constraints()) }
+
+        // An item is placed at its x on a line, and centred on the line the way a flow of rows centres them: a dot is centred in the row it ends,
+        // which is as tall as the entry before it, and that row is centred on the line. Two steps, not one, so the pixels land where they did.
+        class Placed(
+            val placeable: androidx.compose.ui.layout.Placeable,
+            val x: Int,
+            val line: Int,
+            val rowHeight: Int,
+            val dot: Boolean,
+        )
+        val placed = mutableListOf<Placed>()
+        var line = 0
+        var x = 0
+        entryPlaceables.forEachIndexed { index, entry ->
+            val dotWidth = if (index == 0) 0 else dotPlaceables[index - 1].width
+            val withDot = if (index == 0) 0 else gapPx + dotWidth + gapPx
+            if (index > 0 && x + withDot + entry.width > maxWidth) {
+                // The previous entry ends its line with no dot after it, so its row is only the entry.
+                line++
+                placed += Placed(entry, 0, line, entry.height, dot = false)
+                x = entry.width
+            } else {
+                if (index > 0) {
+                    val before = entryPlaceables[index - 1]
+                    placed +=
+                        Placed(dotPlaceables[index - 1], x + gapPx, line, maxOf(before.height, dotPlaceables[index - 1].height), dot = true)
+                }
+                placed += Placed(entry, x + withDot, line, entry.height, dot = false)
+                x += withDot + entry.width
+            }
+        }
+        val lineHeights = (0..line).map { l -> placed.filter { it.line == l }.maxOf { it.rowHeight } }
+        val tops = lineHeights.runningFold(0) { top, height -> top + height + lineGapPx }
+        val width = placed.maxOf { it.x + it.placeable.width }
+
+        fun centred(space: Int, size: Int) = floor((space - size) / 2f + 0.5f).toInt()
+        layout(width, lineHeights.sum() + lineGapPx * line) {
+            placed.forEachIndexed { index, item ->
+                val y = if (item.dot) {
+                    // The dot is centred in the row of the entry before it, and that row on the line.
+                    val before = placed[index - 1]
+                    tops[item.line] + centred(lineHeights[item.line], before.rowHeight) + centred(item.rowHeight, item.placeable.height)
+                } else {
+                    tops[item.line] + centred(lineHeights[item.line], item.rowHeight) + centred(item.rowHeight, item.placeable.height)
+                }
+                item.placeable.placeRelative(item.x, y)
             }
         }
     }
