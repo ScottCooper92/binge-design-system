@@ -87,6 +87,7 @@
     <dimen name="provider_tile_check_icon">13dp</dimen>
     <!-- The width the catalog samples pin a provider tile to, a typical grid cell. Not see_all_tile_width: that is the poster cell, and only matches by coincidence. -->
     <dimen name="provider_tile_sample_width">120dp</dimen>
+    <dimen name="person_grid_card_sample_width">112dp</dimen>
     <!-- Selected-services summary, with a provider-picking grid -->
     <dimen name="services_summary_logo">24dp</dimen>
     <!-- Fixed min height for the summary slot so the empty-hint and the lead+logos
@@ -187,10 +188,8 @@
     <dimen name="list_row_poster_width">72dp</dimen>
     <!-- The width of a 16:9 still leading a media result row, so an episode row is about as tall as a poster row. -->
     <dimen name="media_result_still_width">112dp</dimen>
-    <!-- The heart and the tick beside a result row's name, and the two plates of the row's loading skeleton. -->
+    <!-- The heart and the tick beside a result row's name. -->
     <dimen name="media_result_mark_size">16dp</dimen>
-    <dimen name="media_result_skeleton_name_height">18dp</dimen>
-    <dimen name="media_result_skeleton_subtitle_height">12dp</dimen>
     <dimen name="list_row_logo_padding">10dp</dimen>
     <dimen name="list_row_spacing">10dp</dimen>
     <dimen name="list_row_skeleton_height">128dp</dimen>
@@ -312,10 +311,7 @@
     <!-- HintCard's dismissible form: end inset so wrapped text clears the close IconButton in the
          top-right corner, sized to the button's own default touch target. -->
     <dimen name="hint_card_dismiss_end_inset">48dp</dimen>
-    <!-- FilterChipRowSkeleton's pill: the chip's own height, so the pill plus BingeFilterChipRow's vertical
-         content padding is the band the resolved page puts above its grid (its first tile is reserved where
-         it lands, not a chip row too high). -->
-    <dimen name="skeleton_filter_chip_height">44dp</dimen>
+    <!-- FilterChipRowSkeleton's pill width. Its height is derived from the chip's padding and label style. -->
     <dimen name="skeleton_filter_chip_width">88dp</dimen>
     <!-- Rating chip -->
     <dimen name="rating_chip_padding_h">8dp</dimen>

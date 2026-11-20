@@ -10,6 +10,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithText
@@ -257,8 +258,11 @@ class PersonDetailScreenTest {
             TestTheme { PersonDetailScreen(state = state, callbacks = PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {})) }
         }
         rule.waitForIdle()
+        // The anchor is the heading's row, which fills the width; the plate is the row's own child, and it is what starts at the reading inset.
         val plate = rule
-            .onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Detail.CREDITS)))
+            .onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Detail.CREDITS)), useUnmergedTree = true)
+            .onChildren()
+            .onFirst()
             .getBoundsInRoot()
             .left.value
         state =
