@@ -20,6 +20,7 @@ import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.assertNoTextClipped
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -150,6 +151,26 @@ class PersonDetailScreenTest {
         seen = null
         rule.onAllNodesWithText("See all").onLast().performClick()
         assertEquals("a", seen)
+    }
+
+    @Test
+    fun `a retry tile comes before the See all tile`() {
+        show(
+            PersonDetailState.Content(
+                person(CreditsState.Ready(listOf(CreditSection("a", "Acting", cards("a", 2), hasMore = true, appendFailed = true)))),
+            ),
+            PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {}, onSeeAll = {}),
+        )
+        val retry = rule
+            .onNodeWithText("Couldn't load more. Tap to retry.")
+            .fetchSemanticsNode()
+            .boundsInRoot.left
+        val seeAll = rule
+            .onAllNodesWithText("See all")
+            .onLast()
+            .fetchSemanticsNode()
+            .boundsInRoot.left
+        assertTrue("retry at $retry should be before See all at $seeAll", retry < seeAll)
     }
 
     @Test

@@ -148,8 +148,8 @@ sealed interface PersonDetailState {
 /**
  * What the page does with what the user does. [onOpenCredit] is handed the tapped card's [GridItem.key]; [onLoadMoreCredits] the index of the
  * [CreditSection] that wants a page; [onRetryCredits] the credits' Try again; [onRetry] the whole page's. A non-null [onRefresh] lets the
- * page be pulled down. A non-null [onSeeAll] adds a See all tile at the end of each row and makes its heading a link,
- * handed the [CreditSection.key]; the default, null, draws neither, so a row ends at its last card.
+ * page be pulled down. A non-null [onSeeAll] adds a See all tile at the end of each row, after any loading or retry tile, and makes its heading a link.
+ * It applies per section: it is handed the [CreditSection.key] of the row that was asked, so the app opens that row's full list; the default, null, draws neither, so a row ends at its last card.
  */
 @Immutable
 class PersonDetailCallbacks(
@@ -376,18 +376,6 @@ private fun CreditRail(
                     unwatchedCount = item.unwatchedCount,
                 )
             }
-            if (onSeeAll != null) {
-                item(key = "see-all") {
-                    SeeAllTile(
-                        label = stringResource(R.string.gallery_see_all),
-                        onClick = onSeeAll,
-                        modifier = Modifier
-                            .width(
-                                dimensionResource(R.dimen.see_all_tile_width),
-                            ).height(dimensionResource(R.dimen.card_height)),
-                    )
-                }
-            }
             if (section.appending || section.appendFailed) {
                 item(key = "append") {
                     Box(
@@ -403,6 +391,18 @@ private fun CreditRail(
                             BingeLoadingIndicator()
                         }
                     }
+                }
+            }
+            if (onSeeAll != null) {
+                item(key = "see-all") {
+                    SeeAllTile(
+                        label = stringResource(R.string.gallery_see_all),
+                        onClick = onSeeAll,
+                        modifier = Modifier
+                            .width(
+                                dimensionResource(R.dimen.see_all_tile_width),
+                            ).height(dimensionResource(R.dimen.card_height)),
+                    )
                 }
             }
         }
