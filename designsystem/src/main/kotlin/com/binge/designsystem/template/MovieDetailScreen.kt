@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -49,7 +50,7 @@ import com.binge.designsystem.layout.layoutAnchor
  * bar with the same Back control, with Try again when the failure is retryable.
  *
  * What differs between apps comes in through slots, each optional and taking no space when empty: [primary] is the wide action (a
- * request in one app, Play in another) and [roundActions] the round buttons beside or under it, which need a [primary] to be drawn; [topBarActions] are the bar's actions;
+ * request in one app, Play in another) and [roundActions] the round buttons beside or under it (with no [primary] they sit alone, centred in one row); [topBarActions] are the bar's actions;
  * [afterPeople], [afterRails] and [atEnd] are an app's own sections at three named places (where to watch after the people, links
  * after the rails and tags, media information at the end); [overlays] hosts the app's sheets, in the loaded
  * page only: none is hosted while it loads or after it fails. [snackbarHostState] shows the app's messages.
@@ -75,7 +76,7 @@ fun MovieDetailScreen(
     scrollState: ScrollState = rememberScrollState(),
 ) {
     when (state) {
-        is DetailState.Loading -> DetailPageSkeleton(state, callbacks.onBack, modifier)
+        is DetailState.Loading -> DetailPageSkeleton(state, callbacks.onBack, snackbarHostState, modifier)
         is DetailState.Failed -> DetailPageFailure(state, callbacks, snackbarHostState, modifier)
         is DetailState.Content -> {
             val detail = state.detail
@@ -116,7 +117,7 @@ private fun DetailPageBody(
         // The expanded header already shows the stats and the synopsis.
         val expanded = isExpandedLayout()
         if (!expanded && detail.stats.isNotEmpty()) DetailStatsRows(detail.stats)
-        if (primary != null) {
+        if (primary != null || roundActions.isNotEmpty()) {
             DetailActions(
                 primary = primary,
                 roundActions = roundActions,
@@ -172,12 +173,14 @@ private fun DetailPageBody(
 private fun DetailPageSkeleton(
     state: DetailState.Loading,
     onBack: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier,
 ) {
     val cinematic = isExpandedLayout()
     HeroDetailScreen(
         title = "",
         onBack = onBack,
+        snackbarHostState = snackbarHostState,
         modifier = modifier.background(MaterialTheme.colorScheme.background),
         heroHeight = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_height else R.dimen.detail_hero_height),
         horizontalInset = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_padding else R.dimen.padding_m),
@@ -190,19 +193,25 @@ private fun DetailPageSkeleton(
             if (!cinematic) {
                 DetailStatsRowsSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)), count = state.stats)
             }
-            if (state.primary) {
+            // The loaded page draws its action row only when it has something to put in it, so the skeleton does too: an empty row still
+            // takes a gap from the column's spacing, and the overview would move up when the page arrives.
+            if (state.hasPrimary || state.roundActions > 0) {
                 DetailActionsSkeleton(
                     Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
                     buttons = state.roundActions,
+                    primary = state.hasPrimary,
                 )
             }
             if (!cinematic) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
-            CarouselSkeleton()
+            repeat(state.rails) { CarouselSkeleton() }
         }
     }
 }
 
-/** The failure in place of the page, under a bar with Back, announcing the whole message, with Try again where another attempt can help. */
+/**
+ * The failure in place of the page, on the same frame as the loading page so the back control stays where it was, announcing the whole
+ * message, with Try again where another attempt can help.
+ */
 @Composable
 private fun DetailPageFailure(
     state: DetailState.Failed,
@@ -210,16 +219,17 @@ private fun DetailPageFailure(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier,
 ) {
-    BingeScreenScaffold(
-        title = "",
-        modifier = modifier,
+    val cinematic = isExpandedLayout()
+    HeroDetailStateScreen(
         onBack = callbacks.onBack,
+        modifier = modifier,
         snackbarHostState = snackbarHostState,
-    ) { padding ->
+        horizontalInset = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_padding else R.dimen.padding_m),
+    ) {
         ErrorScreen(
             kind = state.kind,
             onRetry = callbacks.onRetry.takeIf { state.retryable },
-            modifier = Modifier.padding(padding),
+            modifier = Modifier.fillMaxSize(),
             message = state.message,
         )
     }

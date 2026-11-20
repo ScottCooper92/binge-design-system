@@ -8,10 +8,14 @@ import com.binge.designsystem.component.DetailPoster
 import com.binge.designsystem.component.DetailStat
 import com.binge.designsystem.component.ExternalScore
 
-/** One person in a [PeopleRail]. [key] is the app's own identity for the item, handed back when it is tapped; it need not be unique to the person, so one person can be an actor and a director. */
+/**
+ * One person in a [PeopleRail]. [key] is the app's own identity for the item, handed back when it is tapped. It is a String because a lazy
+ * list keeps its items' keys across a configuration change, which needs a value that can be saved; the app can always find the item from a
+ * text key. It need not be one person's id, so one person can be an actor and a director under two keys.
+ */
 @Immutable
 class PersonItem(
-    val key: Any,
+    val key: String,
     val person: DetailPerson,
 )
 
@@ -23,10 +27,10 @@ class PeopleRail(
     val seeAll: Boolean = false,
 )
 
-/** One title in a [PosterRail]. [key] is the app's own identity for the item, handed back when it is tapped. */
+/** One title in a [PosterRail]. [key] is the app's own identity for the item, handed back when it is tapped; a String, for the reason given on [PersonItem]. */
 @Immutable
 class PosterItem(
-    val key: Any,
+    val key: String,
     val poster: DetailPoster,
 )
 
@@ -41,7 +45,7 @@ class PosterRail(
 /** One tag in a [TagsSection]. [key] is handed back when it is tapped. */
 @Immutable
 class TagItem(
-    val key: Any,
+    val key: String,
     val label: String,
 )
 
@@ -90,15 +94,17 @@ class MediaDetail(
 /** The three things a detail page can be: loading, showing, or failed. [MovieDetailScreen] draws each in the same frame. */
 sealed interface DetailState {
     /**
-     * Loading. [stats] and [roundActions] are how many the loaded page will have, and [primary] whether it will have a primary action, so
-     * the skeleton holds the same height and the page does not jump when it arrives. Round actions are drawn beside the primary, so
-     * they need one: with [primary] false the skeleton draws no action row. The overview plates are always drawn, so a title that
-     * arrives with no synopsis moves up.
+     * Loading. The skeleton holds only what the loaded page promises, so it does not jump when the page arrives: [stats] is how many stats the
+     * page will have, [hasPrimary] whether it has a primary action, [roundActions] how many round actions, and [rails] how many rails of people
+     * or posters follow the overview (each a carousel placeholder; the default, none, leaves the rest of the page to grow). The round actions
+     * stack under the primary at the same height from two up on a phone, but beside it at the expanded width two and three buttons can differ,
+     * so give the count the loaded page will have. Where it cannot be known before the load (a film shows two round actions, or three when it has several files), pass the most likely count: at the expanded width the page can then shift a little when the other count arrives. The overview plates are always drawn, so a title that arrives with no synopsis moves up.
      */
     class Loading(
         val stats: Int = 3,
         val roundActions: Int = 0,
-        val primary: Boolean = true,
+        val hasPrimary: Boolean = true,
+        val rails: Int = 0,
     ) : DetailState
 
     /** Showing [detail]. */
@@ -107,11 +113,12 @@ sealed interface DetailState {
     ) : DetailState
 
     /**
-     * Failed, with the app's own [message]. The failure replaces the page under the same back control. Try again is offered only when
-     * [retryable], where another attempt can help. [kind] picks the glyph and headline.
+     * Failed. The failure replaces the page on the same frame as the loading page, so the back control does not move. [kind] picks the glyph,
+     * the headline and, when [message] is null, the words; give a [message] where the app can say more than the kind does. Try again is
+     * offered only when [retryable], where another attempt can help.
      */
     class Failed(
-        val message: String,
+        val message: String? = null,
         val retryable: Boolean = true,
         val kind: ErrorKind = ErrorKind.Generic,
     ) : DetailState
@@ -125,9 +132,9 @@ sealed interface DetailState {
 class MediaDetailCallbacks(
     val onBack: () -> Unit,
     val onRetry: () -> Unit = {},
-    val onOpenPerson: (key: Any) -> Unit = {},
-    val onOpenPoster: (key: Any) -> Unit = {},
-    val onOpenTag: (key: Any) -> Unit = {},
+    val onOpenPerson: (key: String) -> Unit = {},
+    val onOpenPoster: (key: String) -> Unit = {},
+    val onOpenTag: (key: String) -> Unit = {},
     val onSeeAllPeople: (railIndex: Int) -> Unit = {},
     val onSeeAllPosters: (railIndex: Int) -> Unit = {},
 )
