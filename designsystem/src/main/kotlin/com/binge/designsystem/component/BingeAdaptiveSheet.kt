@@ -154,9 +154,13 @@ fun BingeAdaptiveSheet(
     DisposableEffect(Unit) { onDispose { latestFlush() } }
     // A page pushed again before its exit has ended is heard going back now, before the push lands, so the caller sees pop then push
     // and is never told a page left while it is the one showing. Its saved state is kept, as the exit is still drawing it.
+    // A page already on top is not pushed again: a quick second tap on the control that opened it, while it is still sliding in, would
+    // otherwise stack it twice, and one Back would leave the user on the same page.
     val pushPage: (String) -> Unit = { page ->
-        if (leaving.remove(page)) latestOnPageBack(page)
-        pages.add(page)
+        if (pages.lastOrNull() != page) {
+            if (leaving.remove(page)) latestOnPageBack(page)
+            pages.add(page)
+        }
     }
     val popPage: () -> Unit = {
         if (pages.size > 1) {
