@@ -64,6 +64,9 @@ import kotlinx.coroutines.flow.filter
 /** How many cells from the end the grid asks for the next page. */
 const val PAGED_GRID_LOAD_MORE_AHEAD: Int = 6
 
+/** The lazy key of the append footer; an app's own keys are text too, so it is namespaced. */
+private const val FOOTER_KEY = "paged-grid-footer"
+
 /** How many rows of plates the loading skeleton draws. */
 const val PAGED_GRID_SKELETON_ROWS: Int = 8
 
@@ -113,10 +116,10 @@ sealed interface PagedGridState {
         val appendFailed: Boolean = false,
     ) : PagedGridState
 
-    /** Nothing to list, said under its [icon] with an optional [action]. */
+    /** Nothing to list, said under its [icon] with an optional [action]. [title] null says "Nothing here yet". */
     class Empty(
-        val title: String,
         val message: String,
+        val title: String? = null,
         val icon: ImageVector = Icons.Filled.SearchOff,
         val action: ScreenAction? = null,
     ) : PagedGridState
@@ -158,7 +161,8 @@ fun showsGridFooter(ready: PagedGridState.Ready): Boolean = ready.appending || r
  * more near its end and ends in a spinner or Retry. The bar and back control stay put across all four states.
  *
  * Nothing here is an app's type: items are [GridItem]s with a text key, the sheet behind the pill is the [filterSheet] slot, and
- * the app owns its paging, sorting and filter state. [filterBar] null shows neither the pill nor the bar action. [titleTrailing]
+ * the app owns its paging, sorting and filter state. [filterBar] null shows neither the pill nor the bar action; pass it in every state,
+ * loading and failed included, so the pill and chip row do not appear or vanish as the page changes. [titleTrailing]
  * sits after the pill and is told whether the title row is still interactive; [barActions] is told the same and how far the bar has
  * collapsed (both change at [BAR_HANDOVER_COLLAPSE]). [failedContent] replaces the default failure plate.
  *
@@ -260,7 +264,7 @@ fun PagedGridScreen(
                     EmptyScreen(
                         message = state.message,
                         modifier = Modifier.padding(inner),
-                        title = state.title,
+                        title = state.title ?: stringResource(R.string.empty_screen_title),
                         icon = state.icon,
                         action = state.action,
                     )
@@ -382,7 +386,7 @@ private fun ReadyGrid(
                 )
             }
             if (showsGridFooter(state)) {
-                item(key = "footer", span = { GridItemSpan(maxLineSpan) }) {
+                item(key = FOOTER_KEY, span = { GridItemSpan(maxLineSpan) }) {
                     AppendFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
                 }
             }
