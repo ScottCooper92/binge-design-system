@@ -103,6 +103,14 @@ fun PersonDetailReadySample() = SampleScreen(PersonDetailState.Content(samplePer
 @Composable
 fun PersonDetailLoadingSample() = SampleScreen(PersonDetailState.Loading())
 
+/**
+ * The loading page with hints at what the profile will say, so its name and facts are as tall as the loaded ones at any font size, wrapping included. The
+ * hints are the loaded sample's own strings; an app hints with the longest typical ones.
+ */
+@Composable
+fun PersonDetailLoadingHintedSample() =
+    SampleScreen(PersonDetailState.Loading(expectedEyebrow = "Acting", expectedName = "Maya Rodrigues", expectedFacts = sampleFacts()))
+
 /** The page failed: the message over the back control, with Try again. */
 @Composable
 fun PersonDetailFailedSample() = SampleScreen(PersonDetailState.Failed(ErrorKind.Network))
