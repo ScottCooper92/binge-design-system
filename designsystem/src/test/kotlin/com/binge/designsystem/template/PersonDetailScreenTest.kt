@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
@@ -249,6 +250,35 @@ class PersonDetailScreenTest {
         assertEquals(loaded.left, loading.left, 0.5f)
         assertEquals(loaded.top, loading.top, 0.5f)
     }
+
+    private fun assertSkeletonRailStartsWhereTheLoadedRailDoes() {
+        var state by mutableStateOf<PersonDetailState>(PersonDetailState.Loading(facts = 2, hasBiography = false, creditRails = 1))
+        rule.setContent {
+            TestTheme { PersonDetailScreen(state = state, callbacks = PersonDetailCallbacks(onBack = {}, onRetry = {}, onOpenCredit = {})) }
+        }
+        rule.waitForIdle()
+        val plate = rule
+            .onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Detail.CREDITS)))
+            .getBoundsInRoot()
+            .left.value
+        state =
+            PersonDetailState.Content(
+                person(CreditsState.Ready(listOf(CreditSection("a", "Credit rail", cards("a", 3)))), biography = null),
+            )
+        rule.waitForIdle()
+        val heading = rule
+            .onNodeWithText("Credit rail")
+            .getBoundsInRoot()
+            .left.value
+        assertEquals(heading, plate, 0.5f)
+    }
+
+    @Test
+    fun `the loading credit rail starts where the loaded rail does on a phone`() = assertSkeletonRailStartsWhereTheLoadedRailDoes()
+
+    @Test
+    @Config(qualifiers = "w1000dp-h800dp")
+    fun `the loading credit rail starts where the loaded rail does on a wide window`() = assertSkeletonRailStartsWhereTheLoadedRailDoes()
 
     private fun assertUnclippedAt(scale: Float) {
         show(

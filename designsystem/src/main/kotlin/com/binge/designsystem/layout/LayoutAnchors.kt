@@ -68,6 +68,9 @@ object LayoutAnchors {
 
         /** A person page's profile card, which stands where a media page puts its hero. */
         const val PROFILE: String = "detail-profile"
+
+        /** The plate standing where a person page's first credit rail heading will be, while the credits load. */
+        const val CREDITS: String = "detail-credits"
     }
 
     /** The hub screens' shared section keys — the home tabs' hero-plus-carousels body. */
