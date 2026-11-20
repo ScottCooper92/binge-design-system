@@ -1,6 +1,7 @@
 package com.binge.designsystem.template
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
@@ -10,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -31,9 +34,11 @@ import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.MediaResultRow
 import com.binge.designsystem.component.MediaResultRowSkeleton
 import com.binge.designsystem.component.SectionHeader
+import com.binge.designsystem.component.SkeletonPlate
 import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
+import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.resolvedContentInset
 
 /**
@@ -64,12 +69,17 @@ class CollectionDetail(
 
 /** The three states of a collection's page. [Failed] keeps the back control, so the user is never stranded. */
 sealed interface CollectionDetailState {
-    /** A block of prose when [hasOverview], and [parts] rows of placeholders, in the loaded page's own room. [hasPoster] says the loaded hero will have a poster beside the title at an expanded width, so the placeholder is that taller header. */
+    /**
+     * A block of prose when [hasOverview], a heading row when [hasPartsHeading], and [parts] rows of placeholders, in the loaded page's own room. [hasPoster] says the
+     * loaded hero will have a poster beside the title at an expanded width, so the placeholder is that taller header. [hasPartsHeading] says the loaded page will draw
+     * a heading over its parts ([CollectionDetail.partsHeading]); the heading is a row of its own, so without it the parts would arrive that much lower.
+     */
     @Immutable
     class Loading(
         val hasOverview: Boolean = true,
         val parts: Int = 4,
         val hasPoster: Boolean = false,
+        val hasPartsHeading: Boolean = false,
     ) : CollectionDetailState
 
     @Immutable
@@ -223,7 +233,13 @@ private fun ColumnScope.CollectionContent(
 
 @Composable
 private fun ColumnScope.CollectionPlaceholder(state: CollectionDetailState.Loading) {
-    if (state.hasOverview) DetailOverviewSkeleton()
+    if (state.hasOverview) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+    if (state.hasPartsHeading) {
+        PartsHeadingPlate()
+    } else if (state.hasOverview) {
+        // As the loaded page's own: without a heading, the first row sits one gap under the overview.
+        Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
+    }
     Column(
         Modifier.fillMaxWidth().readingMargin().padding(horizontal = resolvedContentInset()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
@@ -235,6 +251,25 @@ private fun ColumnScope.CollectionPlaceholder(state: CollectionDetailState.Loadi
                 blurbLines = PART_BLURB_LINES,
             )
         }
+    }
+}
+
+/** The loading stand-in for the parts' [SectionHeader]: its row, at its padding and its touch-target height, with a plate where the heading's words go. */
+@Composable
+private fun PartsHeadingPlate() {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .padding(start = readingInset(), end = readingInset() + navOverlayEnd())
+            .padding(vertical = dimensionResource(R.dimen.section_header_padding_v))
+            .height(dimensionResource(R.dimen.min_touch_target)),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        SkeletonPlate(
+            Modifier
+                .width(dimensionResource(R.dimen.skeleton_header_width))
+                .height(dimensionResource(R.dimen.skeleton_header_height)),
+        )
     }
 }
 

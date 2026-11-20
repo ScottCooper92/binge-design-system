@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
@@ -54,6 +55,7 @@ import com.binge.designsystem.component.BingeConfirmDialog
 import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.component.FilterChipItem
+import com.binge.designsystem.component.FilterChipRowSkeleton
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultRow
 import com.binge.designsystem.component.MediaResultRowSkeleton
@@ -172,6 +174,8 @@ class SearchCallbacks(
  *   the same value); tapping it again focuses the field. Null for a screen with no tab.
  * @param resultTrailing decides each result's status: it returns the status to draw, or null for a result with none, so a row with
  *   no status has no gap where one would go.
+ * @param reserveTypeChipsWhileLoading true when the results will bring type chips ([SearchState.Ready] carries them): the loading state then
+ *   holds a row of chip plates under the field, so the first result does not drop by that row when the chips arrive. False, the default, draws none.
  *
  * @need search with a field, type chips, recent searches and a grid of results
  * @group screens
@@ -201,6 +205,7 @@ fun SearchScreen(
     idleExtras: (LazyListScope.() -> Unit)? = null,
     noResultsExtras: (@Composable () -> Unit)? = null,
     failedContent: (@Composable (Modifier) -> Unit)? = null,
+    reserveTypeChipsWhileLoading: Boolean = false,
     overlays: @Composable () -> Unit = {},
 ) {
     val scrollBehavior = rememberPaneTopBarScrollBehavior()
@@ -215,7 +220,7 @@ fun SearchScreen(
         scrollBehavior = scrollBehavior,
         titleTrailing = titleTrailing?.let { { it(titleRowShows) } },
         actions = { barActions(!titleRowShows, collapsed) },
-        header = { SearchControls(text, state, callbacks, placeholder, reselectKey) },
+        header = { SearchControls(text, state, callbacks, placeholder, reselectKey, reserveTypeChipsWhileLoading) },
     ) { padding ->
         ScreenBody(padding) { body ->
             val top = body.calculateTopPadding()
@@ -363,6 +368,7 @@ private fun SearchControls(
     callbacks: SearchCallbacks,
     placeholder: String,
     reselectKey: Any?,
+    reserveTypeChips: Boolean,
 ) {
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -395,7 +401,10 @@ private fun SearchControls(
                     focusRequester = focus,
                 )
             }
-            if (types != null && types.chips.isNotEmpty()) {
+            if (reserveTypeChips && state is SearchState.Loading) {
+                // The results will bring their type chips, so the row is held while they load and the first result does not drop when they arrive.
+                FilterChipRowSkeleton()
+            } else if (types != null && types.chips.isNotEmpty()) {
                 BingeFilterChipRow(
                     items = types.chips.map { FilterChipItem(label = it.label, count = it.count) },
                     selectedIndex = types.chips.indexOfFirst { it.key == types.selectedKey }.coerceAtLeast(0),
@@ -530,10 +539,11 @@ private fun ResultsList(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
-            items(state.results, key = { it.key }) { result ->
+            itemsIndexed(state.results, key = { _, result -> result.key }) { index, result ->
                 MediaResultRow(
                     result = result,
                     onClick = { callbacks.onOpenResult(result.key) },
+                    modifier = Modifier.layoutAnchorIf(index == 0, LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)),
                     trailing = resultTrailing?.invoke(result),
                 )
             }

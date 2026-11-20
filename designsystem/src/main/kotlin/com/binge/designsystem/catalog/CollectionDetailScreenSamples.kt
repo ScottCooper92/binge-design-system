@@ -99,9 +99,9 @@ private fun SampleScreen(state: CollectionDetailState, withFooter: Boolean = fal
 @Composable
 fun CollectionDetailReadySample() = SampleScreen(CollectionDetailState.Content(sampleCollection()), withFooter = true)
 
-/** The page on its way: the hero's plate, a block of prose and four placeholder rows in the loaded page's own room. */
+/** The page on its way: the hero's plate, a block of prose, a heading row and four placeholder rows in the loaded page's own room. */
 @Composable
-fun CollectionDetailLoadingSample() = SampleScreen(CollectionDetailState.Loading())
+fun CollectionDetailLoadingSample() = SampleScreen(CollectionDetailState.Loading(hasPartsHeading = true))
 
 /** The page failed: the message over the back control, with Try again. */
 @Composable
