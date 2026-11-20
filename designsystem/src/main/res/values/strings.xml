@@ -181,6 +181,14 @@
     <string name="paged_grid_loading">Loading</string>
     <string name="person_biography_heading">Biography</string>
     <string name="person_credits_failed">Couldn\'t load their credits.</string>
+    <!-- Search screen -->
+    <string name="search_recents_title">Recent searches</string>
+    <string name="search_recents_clear">Clear</string>
+    <string name="search_recents_clear_title">Clear recent searches?</string>
+    <string name="search_recents_clear_message">This removes every search you have made here.</string>
+    <string name="search_idle_title">Search</string>
+    <string name="search_idle_message">Type a title or a name.</string>
+    <string name="search_loading">Searching</string>
     <string name="list_more_failed">Couldn\'t load more. Tap to retry.</string>
     <!-- The heading over a detail page's synopsis, when the app gives none of its own -->
     <string name="detail_overview_heading">Overview</string>
