@@ -1,6 +1,8 @@
 package com.binge.designsystem.template
 
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.onNodeWithText
 import com.binge.designsystem.catalog.MovieDetailScreenLoadingSample
 import com.binge.designsystem.catalog.MovieDetailScreenSample
 import com.binge.designsystem.layout.LayoutAnchors
@@ -63,5 +65,19 @@ class MovieDetailScreenTest {
         rule.assertSkeletonReservesGeometry(wide, checkSize = true) { resolved ->
             if (resolved) MovieDetailScreenSample() else MovieDetailScreenLoadingSample()
         }
+    }
+
+    /** The rails' keys are kept across a configuration change, so a page with rails must survive being saved and restored. */
+    @Test
+    @Config(qualifiers = "w411dp-h2400dp-xhdpi")
+    fun `a page with rails survives a configuration change`() {
+        val restoration = StateRestorationTester(rule)
+        restoration.setContent { MovieDetailScreenSample() }
+        rule.waitForIdle()
+
+        restoration.emulateSavedInstanceStateRestore()
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Cast").assertExists()
     }
 }

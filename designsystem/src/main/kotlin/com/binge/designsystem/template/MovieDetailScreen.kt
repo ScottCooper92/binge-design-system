@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -74,7 +75,7 @@ fun MovieDetailScreen(
     scrollState: ScrollState = rememberScrollState(),
 ) {
     when (state) {
-        is DetailState.Loading -> DetailPageSkeleton(state, callbacks.onBack, modifier)
+        is DetailState.Loading -> DetailPageSkeleton(state, callbacks.onBack, snackbarHostState, modifier)
         is DetailState.Failed -> DetailPageFailure(state, callbacks, snackbarHostState, modifier)
         is DetailState.Content -> {
             val detail = state.detail
@@ -115,7 +116,7 @@ private fun DetailPageBody(
         // The expanded header already shows the stats and the synopsis.
         val expanded = isExpandedLayout()
         if (!expanded && detail.stats.isNotEmpty()) DetailStatsRows(detail.stats)
-        if (primary != null) {
+        if (primary != null || roundActions.isNotEmpty()) {
             DetailActions(
                 primary = primary,
                 roundActions = roundActions,
@@ -171,12 +172,14 @@ private fun DetailPageBody(
 private fun DetailPageSkeleton(
     state: DetailState.Loading,
     onBack: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier,
 ) {
     val cinematic = isExpandedLayout()
     HeroDetailScreen(
         title = "",
         onBack = onBack,
+        snackbarHostState = snackbarHostState,
         modifier = modifier.background(MaterialTheme.colorScheme.background),
         heroHeight = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_height else R.dimen.detail_hero_height),
         horizontalInset = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_padding else R.dimen.padding_m),
@@ -192,14 +195,18 @@ private fun DetailPageSkeleton(
             DetailActionsSkeleton(
                 Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
                 buttons = state.roundActions,
+                primary = state.hasPrimary,
             )
             if (!cinematic) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
-            CarouselSkeleton()
+            repeat(state.rails) { CarouselSkeleton() }
         }
     }
 }
 
-/** The failure in place of the page, under a bar with Back, announcing the whole message, with Try again where another attempt can help. */
+/**
+ * The failure in place of the page, on the same frame as the loading page so the back control stays where it was, announcing the whole
+ * message, with Try again where another attempt can help.
+ */
 @Composable
 private fun DetailPageFailure(
     state: DetailState.Failed,
@@ -207,16 +214,17 @@ private fun DetailPageFailure(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier,
 ) {
-    BingeScreenScaffold(
-        title = "",
-        modifier = modifier,
+    val cinematic = isExpandedLayout()
+    HeroDetailStateScreen(
         onBack = callbacks.onBack,
+        modifier = modifier,
         snackbarHostState = snackbarHostState,
-    ) { padding ->
+        horizontalInset = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_padding else R.dimen.padding_m),
+    ) {
         ErrorScreen(
             kind = state.kind,
             onRetry = callbacks.onRetry.takeIf { state.retryable },
-            modifier = Modifier.padding(padding),
+            modifier = Modifier.fillMaxSize(),
             message = state.message,
         )
     }
