@@ -74,7 +74,7 @@ internal fun TvExpandingRowsHubContent(
     val depth = rememberTvVisitDepth(onVisitEnded)
     val hero = heroItems.takeIf { it.isNotEmpty() }
     val hasHeroSlot = hero != null || loading
-    val extras = remember { TvTitleExtrasCache { titleExtras(it) } }
+    val extras = rememberTvTitleExtrasCache(titleExtras)
     // A loading row keeps its slot, so a row arriving late cannot push in above the one focus already took.
     val candidateRows = hubVisibleRows(rows, loading)
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex(initialFocusedKey, candidateRows, hasHeroSlot))
@@ -391,7 +391,7 @@ internal fun TvExpandingSingleRowContent(
     seeAllCount: Int? = null,
 ) {
     if (items.isEmpty()) return
-    val extras = remember { TvTitleExtrasCache { titleExtras(it) } }
+    val extras = rememberTvTitleExtrasCache(titleExtras)
     val seeAllLabel = seeAllCount?.let { stringResource(TvR.string.tv_see_all_count, it) } ?: stringResource(DesR.string.gallery_see_all)
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart) {
         TvExpandingRow(
