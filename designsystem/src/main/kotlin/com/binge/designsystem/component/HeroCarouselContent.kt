@@ -235,25 +235,23 @@ private fun HeroMetaRow(item: HeroItem) {
     val ink = MaterialTheme.colorScheme.onBackground.copy(alpha = HERO_META_ALPHA)
     // With external scores the rating joins them on the score line below. With none, it stays first on this line, as it always was.
     val ratingOnScoreLine = item.externalScores.isNotEmpty()
-    val entries = buildList<MetaEntry> {
-        if (!ratingOnScoreLine) item.rating?.let { add(MetaEntry.Content { HeroRating(it) }) }
+    val entries = buildList<@Composable () -> Unit> {
+        if (!ratingOnScoreLine) item.rating?.let { add { HeroRating(it) } }
         parts.forEach { part ->
-            add(
-                MetaEntry.Content {
-                    Text(
-                        text = part.text,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-            )
+            add {
+                Text(
+                    text = part.text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (part.isGenre) MaterialTheme.colorScheme.primary else ink,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
-        item.status?.let { status -> add(MetaEntry.Content { HeroStatus(status) }) }
+        item.status?.let { status -> add { HeroStatus(status) } }
     }
     Column(modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_s))) {
-        if (entries.isNotEmpty()) MetaFlow(entries = entries)
+        if (entries.isNotEmpty()) BreakableMetaLine(entries = entries)
         // With external scores, the rating and every score share the line below, last. It never wraps: a line that cannot hold them all drops the
         // trailing scores, so the meta line above keeps its place and the hero does not grow a third line at a large font.
         if (ratingOnScoreLine) {
