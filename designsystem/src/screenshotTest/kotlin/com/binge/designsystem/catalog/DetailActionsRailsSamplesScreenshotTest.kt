@@ -31,6 +31,18 @@ class DetailActionsRailsSamplesScreenshotTest {
     @ComponentPreviews
     @WorstCaseFontPreviews
     @Composable
+    fun actionsTwo() = DetailActionsTwoSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun actionsFour() = DetailActionsFourSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
     fun actionsSingle() = DetailActionsSingleSample()
 
     @PreviewTest

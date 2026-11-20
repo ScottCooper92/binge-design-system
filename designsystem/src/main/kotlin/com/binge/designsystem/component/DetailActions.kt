@@ -16,11 +16,15 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.isExpandedLayout
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeShapes
+
+/** The cell a spread round action, or its plate, sits in, so a test can compare the loaded row's cells with the skeleton's. */
+internal const val DETAIL_ACTION_CELL_TAG = "detail-action-cell"
 
 /** From this many round actions the primary takes a row of its own, so its label keeps the room it needs at a large font. */
 private const val STACK_FROM = 2
@@ -46,9 +50,12 @@ class DetailRoundAction(
  * The actions under a detail page's stats: the [primary], there in every state, then a round [LabelledIconButton] for each of
  * [roundActions]. [primary] is a slot that is handed the modifier that sizes it (the row's remaining width, or the whole width when
  * stacked); the caller applies it to its outermost node and draws whatever button its page needs, so nothing here knows what the
- * primary means. On a phone, from two round actions up the primary takes a row of its own and the round buttons sit centred in a row
+ * primary means. On a phone, from two round actions up the primary takes a row of its own and the round buttons spread across a row
  * under it, so the primary's label keeps its room at a large font; at the expanded width, and with fewer round actions, they sit in one row
- * with the primary taking the rest. With no [primary] the round actions sit alone, centred in one row. The row is inset by the screen's content inset (16, 24 or 32dp by width) on both sides, and the gaps between its buttons are `padding_m`. A page adds the reading margin through `modifier.readingMargin()`.
+ * with the primary taking the rest, the round buttons side by side. With no [primary] the round actions spread alone across one row. Where they
+ * spread, each takes an equal share of the row, its button centred in it, with `detail_action_row_spacing` between the shares, so two, three
+ * or four buttons fill the row evenly. The row is inset by the screen's content inset (16, 24 or 32dp by width) on both sides. A page adds the
+ * reading margin through `modifier.readingMargin()`.
  *
  * @need lay out a detail page's primary action beside its round secondary actions
  * @group detail
@@ -62,24 +69,21 @@ fun DetailActions(
     modifier: Modifier = Modifier,
 ) {
     val gap = dimensionResource(R.dimen.padding_m)
+    val cellSpacing = dimensionResource(R.dimen.detail_action_row_spacing)
     val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
     if (primary == null) {
-        Row(
-            modifier = edge,
-            horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.Top,
-        ) {
-            RoundActions(roundActions)
+        Row(modifier = edge, horizontalArrangement = Arrangement.spacedBy(cellSpacing), verticalAlignment = Alignment.Top) {
+            RoundActionCells(roundActions)
         }
     } else if (roundActions.size >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             primary(Modifier.fillMaxWidth())
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(cellSpacing),
                 verticalAlignment = Alignment.Top,
             ) {
-                RoundActions(roundActions)
+                RoundActionCells(roundActions)
             }
         }
     } else {
@@ -90,18 +94,30 @@ fun DetailActions(
     }
 }
 
+/** The round actions side by side at their own width, beside the primary in a single row. */
 @Composable
 private fun RowScope.RoundActions(actions: List<DetailRoundAction>) {
+    actions.forEach { action -> RoundAction(action) }
+}
+
+/** The round actions spread across the row: each in an equal-weight cell, its button centred at the top of it. */
+@Composable
+private fun RowScope.RoundActionCells(actions: List<DetailRoundAction>) {
     actions.forEach { action ->
-        LabelledIconButton(
-            icon = action.icon,
-            label = action.label,
-            onClick = action.onClick,
-            contentDescription = action.contentDescription,
-            trailingIcon = action.trailingIcon,
-            trailingContentDescription = action.trailingContentDescription,
-        )
+        Box(Modifier.weight(1f).testTag(DETAIL_ACTION_CELL_TAG), contentAlignment = Alignment.TopCenter) { RoundAction(action) }
     }
+}
+
+@Composable
+private fun RoundAction(action: DetailRoundAction) {
+    LabelledIconButton(
+        icon = action.icon,
+        label = action.label,
+        onClick = action.onClick,
+        contentDescription = action.contentDescription,
+        trailingIcon = action.trailingIcon,
+        trailingContentDescription = action.trailingContentDescription,
+    )
 }
 
 /**
@@ -120,25 +136,26 @@ fun DetailActionsSkeleton(
     primary: Boolean = true,
 ) {
     val gap = dimensionResource(R.dimen.padding_m)
+    val cellSpacing = dimensionResource(R.dimen.detail_action_row_spacing)
     val plate = Modifier.height(dimensionResource(R.dimen.button_filled_height))
     val edge = modifier.fillMaxWidth().padding(horizontal = resolvedContentInset())
     if (!primary) {
-        Row(
-            modifier = edge,
-            horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.Top,
-        ) {
-            repeat(buttons) { RoundPlate() }
+        Row(modifier = edge, horizontalArrangement = Arrangement.spacedBy(cellSpacing), verticalAlignment = Alignment.Top) {
+            repeat(
+                buttons,
+            ) { Box(Modifier.weight(1f).testTag(DETAIL_ACTION_CELL_TAG), contentAlignment = Alignment.TopCenter) { RoundPlate() } }
         }
     } else if (buttons >= STACK_FROM && !isExpandedLayout()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             SkeletonPlate(plate.fillMaxWidth())
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(cellSpacing),
                 verticalAlignment = Alignment.Top,
             ) {
-                repeat(buttons) { RoundPlate() }
+                repeat(
+                    buttons,
+                ) { Box(Modifier.weight(1f).testTag(DETAIL_ACTION_CELL_TAG), contentAlignment = Alignment.TopCenter) { RoundPlate() } }
             }
         }
     } else {
