@@ -161,7 +161,8 @@
     -->
     <dimen name="pane_spacer">8dp</dimen>
     <!--
-      Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it. Below this the crease is close enough to the bottom edge that honouring it would leave a
+      Floor for the space below a tabletop fold before a bottom-anchored surface will cap itself to it. Below
+      this the crease is close enough to the bottom edge that honouring it would leave a
       sheet too short to use, so it is ignored and the sheet keeps its own height.
     -->
     <dimen name="fold_safe_bottom_min_height">200dp</dimen>
