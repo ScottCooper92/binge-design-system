@@ -19,6 +19,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 
 /**
  * A horizontally-scrolling row of [BingeFilterChip]s — the selected one filled in the primary accent,
@@ -129,9 +131,25 @@ internal fun filterChipRowPadding(consumed: WindowInsets): PaddingValues {
 /** The consumed insets a chip row starts from, before an ancestor reports any. */
 internal val NoInsets = WindowInsets(0, 0, 0, 0)
 
-/** Where a pager is moving to for a selection change, held so a settle in the middle of the move is not mistaken for a swipe. */
-private class FilterPagerMove {
-    var page: Int? = null
+/**
+ * Where a pager is moving to for a selection change, held so a settle in the middle of the move is not mistaken for a swipe. It is state, so
+ * the chips can read it: a tap shows as selected at once, not once the scroll passes the midpoint.
+ */
+@Stable
+internal class FilterPagerMove {
+    var page: Int? by mutableStateOf(null)
+
+    /** Set when a reader's finger lands on the pager, cleared when a move starts. A reader's drag is theirs to settle, not ours to correct. */
+    var takenOver: Boolean = false
+}
+
+/** A [PagerState] kept in sync with the caller's selection, and the move it is making, so the chips can show where it is going. */
+internal class FilterPager(
+    val state: PagerState,
+    val move: FilterPagerMove,
+) {
+    /** The chip to show as selected: where the pager is going, or the page it is on. */
+    val shownIndex: Int get() = move.page ?: state.currentPage
 }
 
 /**
@@ -148,7 +166,15 @@ fun rememberFilterPagerState(
     selectedIndex: Int,
     onSelectedIndexChange: (Int) -> Unit,
     pageCount: Int,
-): PagerState {
+): PagerState = rememberFilterPager(selectedIndex, onSelectedIndexChange, pageCount).state
+
+/** [rememberFilterPagerState] with the move it is making, for the chips that follow it. */
+@Composable
+internal fun rememberFilterPager(
+    selectedIndex: Int,
+    onSelectedIndexChange: (Int) -> Unit,
+    pageCount: Int,
+): FilterPager {
     val pagerState = rememberPagerState(
         initialPage = selectedIndex.coerceIn(0, (pageCount - 1).coerceAtLeast(0)),
     ) { pageCount }
@@ -159,18 +185,31 @@ fun rememberFilterPagerState(
     // A chip tap (or any external selection change) animates the pager to that page. It also re-runs when the page count changes, because a
     // selection made while the pages were not there yet (an empty list that fills) has nowhere to go until they are, and the pager starts on page 0.
     LaunchedEffect(selectedIndex, pageCount) {
-        if (selectedIndex in 0 until pageCount && selectedIndex != pagerState.currentPage) {
+        moveTarget.takenOver = false
+        if (selectedIndex !in 0 until pageCount) {
+            moveTarget.page = null
+            return@LaunchedEffect
+        }
+        if (selectedIndex != pagerState.currentPage) {
             moveTarget.page = selectedIndex
             pagerState.animateScrollToPage(selectedIndex)
-            // Cleared on arrival only. A move cancelled by the next one keeps the record, so the gap before the next move starts is covered.
-            moveTarget.page = null
-        } else {
-            moveTarget.page = null
         }
+        // Cleared on arrival only. A move cancelled by the next one keeps the record, so the gap before the next move starts is covered.
+        moveTarget.page = null
+        // A move that the next one replaced can leave the pager part-way between pages, or settled on a page the caller did not choose, and
+        // nothing else would ever bring it back. When it is still and the reader has not taken it over, put it on the selection.
+        snapshotFlow { pagerState.isScrollInProgress }.first { !it }
+        val misplaced = pagerState.settledPage != selectedIndex || pagerState.currentPageOffsetFraction != 0f
+        if (!moveTarget.takenOver && misplaced) pagerState.scrollToPage(selectedIndex)
     }
     // A reader who puts a finger on the pager takes it over from any move in flight, and the settle that follows is theirs.
     LaunchedEffect(pagerState) {
-        pagerState.interactionSource.interactions.collect { if (it is DragInteraction.Start) moveTarget.page = null }
+        pagerState.interactionSource.interactions.collect {
+            if (it is DragInteraction.Start) {
+                moveTarget.page = null
+                moveTarget.takenOver = true
+            }
+        }
     }
     // A settled swipe reports the new page back up. The collect lambda outlives its composition (the
     // effect is keyed only on pagerState), so read selectedIndex + callback through rememberUpdatedState;
@@ -188,7 +227,7 @@ fun rememberFilterPagerState(
                 if (pagerState.pageCount > 0 && page != latestSelectedIndex) latestOnSelectedIndexChange(page)
             }
     }
-    return pagerState
+    return remember(pagerState, moveTarget) { FilterPager(pagerState, moveTarget) }
 }
 
 /**
@@ -233,11 +272,12 @@ fun BingeFilterChipPager(
     beyondViewportPageCount: Int = 0,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
-    val pagerState = rememberFilterPagerState(
+    val pager = rememberFilterPager(
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
         pageCount = items.size,
     )
+    val pagerState = pager.state
     OverlaidHeaderContent(
         modifier = modifier,
         headerBackground = headerBackground,
@@ -247,7 +287,7 @@ fun BingeFilterChipPager(
             header?.invoke()
             BingeFilterChipRow(
                 items = items,
-                selectedIndex = pagerState.currentPage,
+                selectedIndex = pager.shownIndex,
                 onSelect = onSelectedIndexChange,
             )
         },
