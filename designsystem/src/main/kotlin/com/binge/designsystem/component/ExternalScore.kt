@@ -207,8 +207,9 @@ internal fun BreakableMetaLine(entries: List<@Composable () -> Unit>, modifier: 
         }
         val lineHeights = (0..line).map { l -> placed.filter { it.line == l }.maxOf { it.rowHeight } }
         val tops = lineHeights.runningFold(0) { top, height -> top + height + lineGapPx }
-        // As the flow it replaces: the whole width on offer, so a parent that centres or aligns it sees the same box as before.
-        val width = if (constraints.hasBoundedWidth) maxWidth else placed.maxOf { it.x + it.placeable.width }
+        // The width the lines fill, as the flow it replaces took it: a line hugs its content unless the parent asks for more (a minimum width), and
+        // never overflows. A cinematic header's scrim reads the width, so a line must not claim the column's whole width on its own.
+        val width = placed.maxOf { it.x + it.placeable.width }.coerceIn(constraints.minWidth, constraints.maxWidth)
 
         fun centred(space: Int, size: Int) = floor((space - size) / 2f + 0.5f).toInt()
         layout(width, lineHeights.sum() + lineGapPx * line) {

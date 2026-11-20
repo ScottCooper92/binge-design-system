@@ -171,6 +171,26 @@ class MetaFlowSeparatorTest {
         assertTrue("the text and the next entry share a line at 2.0, so the test proved nothing", checkWrappingText(2f) > 1)
     }
 
+    @Test
+    fun `a short line on a wide column is as wide as its content, not the column`() {
+        show(1f) {
+            MetaFlow(listOf(MetaEntry.Content { Text("2008") }, MetaEntry.Content { Text("2h 32m") }), modifier = Modifier.testTag("line"))
+        }
+        val line = rule
+            .onAllNodes(hasTestTag("line"))
+            .fetchSemanticsNodes()
+            .single()
+            .boundsInRoot
+        assertTrue(
+            "the line is ${line.width}px wide, as wide as the ${WIDTH}dp column",
+            line.width < rule
+                .onAllNodes(hasTestTag("flow"))
+                .fetchSemanticsNodes()
+                .single()
+                .boundsInRoot.width,
+        )
+    }
+
     private companion object {
         const val WIDTH = 200
         const val SAME_LINE_PX = 6f
