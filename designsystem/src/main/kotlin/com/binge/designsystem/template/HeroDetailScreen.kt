@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -36,12 +38,15 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -207,6 +212,7 @@ fun HeroDetailLazyScreen(
     content: LazyListScope.() -> Unit,
 ) {
     val measured = rememberMeasuredHeroHeight()
+    val fill = rememberShortPageFill(listState)
     val bottomInset = if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         HeroDetailPull(onRefresh, isRefreshing, pullState, pullIndicator) {
@@ -220,6 +226,7 @@ fun HeroDetailLazyScreen(
                 ) {
                     item(key = HERO_ITEM_KEY) { MeasuredHero(measured, hero) }
                     content()
+                    item(key = FILL_ITEM_KEY) { Spacer(Modifier.height(fill.value)) }
                 }
             }
         }
@@ -306,6 +313,34 @@ private fun MeasuredHero(measured: MeasuredHeroHeight, hero: @Composable () -> U
 }
 
 private const val HERO_ITEM_KEY = "hero-detail-hero"
+private const val FILL_ITEM_KEY = "hero-detail-fill"
+
+/**
+ * The height of the spacer item that ends a lazy hero page, as the eager page's `heightIn(min = viewport)` does: the items under
+ * the hero (the list's items less the hero and the spacer) are kept at least a viewport tall, so a short page can scroll the whole
+ * hero away and the bar's hand-over finishes. It is the viewport less those items' laid-out extent, from the first of them to the
+ * last, which takes in the spacing between them. The hero is left out of the sum, so it leaving the visible items on a scroll does
+ * not change the size; the spacer is left out, so it does not feed back into its own height. When any item under the hero is not
+ * laid out the list is long, and the spacer is zero.
+ */
+@Composable
+private fun rememberShortPageFill(listState: LazyListState): State<Dp> {
+    val density = LocalDensity.current
+    return remember(listState, density) {
+        derivedStateOf {
+            val info = listState.layoutInfo
+            val spacerIndex = info.totalItemsCount - 1
+            val under = info.visibleItemsInfo.filter { it.index in 1 until spacerIndex }
+            val allLaidOut = under.size == spacerIndex - 1
+            if (!allLaidOut) {
+                0.dp
+            } else {
+                val extent = if (under.isEmpty()) 0 else under.maxOf { it.offset + it.size } - under.minOf { it.offset }
+                with(density) { (info.viewportSize.height - extent).coerceAtLeast(0).toDp() }
+            }
+        }
+    }
+}
 
 /**
  * The outer frame both forms share: no bar of the Scaffold's own, since the overlay bar clears the status bar

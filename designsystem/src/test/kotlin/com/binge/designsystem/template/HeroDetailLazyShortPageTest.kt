@@ -1,0 +1,120 @@
+package com.binge.designsystem.template
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import com.binge.designsystem.testing.ShadowMeshSpecification
+import com.binge.designsystem.testing.createTakeDownComposeRule
+import com.binge.designsystem.theme.BingeExpressiveTheme
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
+
+/**
+ * The lazy form of [HeroDetailShortPageTest]: a lazy hero page with little under its hero can still scroll the whole hero away, so the
+ * bar's hand-over can finish, and it holds there once the hero has left the list's visible items.
+ */
+@RunWith(RobolectricTestRunner::class)
+@Config(
+    sdk = [34],
+    application = android.app.Application::class,
+    shadows = [ShadowMeshSpecification::class],
+    qualifiers = "w411dp-h891dp-xhdpi",
+)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+class HeroDetailLazyShortPageTest {
+    @get:Rule
+    val rule = createTakeDownComposeRule()
+
+    private var state: LazyListState? = null
+    private var heroPx = 0
+
+    private fun show(items: Int, itemHeight: Int = 40) {
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false) {
+                val listState = rememberLazyListState()
+                state = listState
+                heroPx = with(LocalDensity.current) { HERO_HEIGHT.toPx() }.toInt()
+                HeroDetailLazyScreen(
+                    title = "A title",
+                    onBack = {},
+                    listState = listState,
+                    heroHeight = HERO_HEIGHT,
+                    hero = { Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).background(Color.DarkGray)) },
+                ) {
+                    items(items) { Box(Modifier.fillMaxWidth().height(itemHeight.dp)) { Text("Item $it") } }
+                }
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    private fun scrollToEnd() {
+        repeat(3) { rule.runOnIdle { runBlocking { state!!.scrollBy(100_000f) } } }
+        rule.waitForIdle()
+    }
+
+    private fun heroScrolledOut() = state!!.firstVisibleItemIndex > 0 || state!!.firstVisibleItemScrollOffset >= heroPx
+
+    @Test
+    fun `a lazy page with one short item can scroll the whole hero away`() {
+        show(items = 1)
+        scrollToEnd()
+
+        assertTrue("the hero rests at ${state!!.firstVisibleItemScrollOffset} of $heroPx px", heroScrolledOut())
+    }
+
+    @Test
+    fun `a lazy page with no items can scroll the whole hero away`() {
+        show(items = 0)
+        scrollToEnd()
+
+        assertTrue(heroScrolledOut())
+    }
+
+    @Test
+    fun `the offset holds after the hero has left the visible items and the page recomposes`() {
+        show(items = 1)
+        scrollToEnd()
+        val index = state!!.firstVisibleItemIndex
+        val offset = state!!.firstVisibleItemScrollOffset
+
+        rule.mainClock.advanceTimeByFrame()
+        rule.waitForIdle()
+
+        assertEquals(index, state!!.firstVisibleItemIndex)
+        assertEquals(offset, state!!.firstVisibleItemScrollOffset)
+        assertTrue(heroScrolledOut())
+        assertTrue(!state!!.canScrollForward)
+    }
+
+    @Test
+    fun `a long list is not given extra room`() {
+        show(items = 40, itemHeight = 200)
+        scrollToEnd()
+
+        val last = state!!.layoutInfo.visibleItemsInfo.last()
+        val spacer = state!!.layoutInfo.totalItemsCount - 1
+        assertTrue("the page ends at item ${last.index}", last.index == spacer - 1 || (last.index == spacer && last.size == 0))
+        assertTrue(!state!!.canScrollForward)
+    }
+
+    private companion object {
+        val HERO_HEIGHT = 300.dp
+    }
+}
