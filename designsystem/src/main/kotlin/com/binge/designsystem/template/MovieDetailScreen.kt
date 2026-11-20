@@ -45,9 +45,9 @@ import com.binge.designsystem.layout.layoutAnchor
  * out. The page takes plain values ([DetailState], [MediaDetail]) and reports every tap through [callbacks], so it holds no navigation,
  * and the app maps its own state to the model.
  *
- * [DetailState.Loading] draws the page's own skeleton, parameterised by how many stats and round actions the loaded page will have, so
- * the hero, the stats, the actions and the overview land where the loaded page puts them. [DetailState.Failed] replaces the page under a
- * bar with the same Back control, with Try again when the failure is retryable.
+ * [DetailState.Loading] draws the page's own skeleton, parameterised by how many stats, round actions and rails the loaded page will have and whether it has a primary action, so
+ * the hero, the stats, the actions and the overview land where the loaded page puts them. [DetailState.Failed] replaces the page on the
+ * loading page's own frame, so the Back control does not move, with Try again when the failure is retryable.
  *
  * What differs between apps comes in through slots, each optional and taking no space when empty: [primary] is the wide action (a
  * request in one app, Play in another) and [roundActions] the round buttons beside or under it (with no [primary] they sit alone, centred in one row); [topBarActions] are the bar's actions;
@@ -75,6 +75,39 @@ fun MovieDetailScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrollState: ScrollState = rememberScrollState(),
 ) {
+    MediaDetailScreen(
+        state,
+        callbacks,
+        modifier,
+        primary,
+        roundActions,
+        topBarActions,
+        afterPeople,
+        afterRails,
+        atEnd,
+        overlays,
+        snackbarHostState,
+        scrollState,
+    )
+}
+
+/** The page every title kind shares: a movie passes no [episodes], a series passes its episodes section, drawn after the people and the first named slot. */
+@Composable
+internal fun MediaDetailScreen(
+    state: DetailState,
+    callbacks: MediaDetailCallbacks,
+    modifier: Modifier = Modifier,
+    primary: (@Composable (Modifier) -> Unit)? = null,
+    roundActions: List<DetailRoundAction> = emptyList(),
+    topBarActions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
+    afterPeople: (@Composable () -> Unit)? = null,
+    afterRails: (@Composable () -> Unit)? = null,
+    atEnd: (@Composable () -> Unit)? = null,
+    overlays: (@Composable () -> Unit)? = null,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    scrollState: ScrollState = rememberScrollState(),
+    episodes: (@Composable () -> Unit)? = null,
+) {
     when (state) {
         is DetailState.Loading -> DetailPageSkeleton(state, callbacks.onBack, snackbarHostState, modifier)
         is DetailState.Failed -> DetailPageFailure(state, callbacks, snackbarHostState, modifier)
@@ -95,7 +128,7 @@ fun MovieDetailScreen(
                 externalScores = detail.scores,
             ) {
                 Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
-                DetailPageBody(detail, callbacks, primary, roundActions, afterPeople, afterRails, atEnd)
+                DetailPageBody(detail, callbacks, primary, roundActions, afterPeople, afterRails, atEnd, episodes)
             }
             overlays?.invoke()
         }
@@ -112,6 +145,7 @@ private fun DetailPageBody(
     afterPeople: (@Composable () -> Unit)?,
     afterRails: (@Composable () -> Unit)?,
     atEnd: (@Composable () -> Unit)?,
+    episodes: (@Composable () -> Unit)?,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
         // The expanded header already shows the stats and the synopsis.
@@ -138,6 +172,7 @@ private fun DetailPageBody(
             )
         }
         afterPeople?.invoke()
+        episodes?.invoke()
         detail.posterRails.forEachIndexed { index, rail ->
             DetailPosterRail(
                 title = rail.title,

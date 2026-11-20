@@ -114,11 +114,12 @@ internal fun FilterSectionControl(section: FilterSectionUi, callbacks: FilterCon
                         state =
                             when (option.id) {
                                 in control.includedIds -> IncludeExcludeState.Include
-                                in control.excludedIds -> IncludeExcludeState.Exclude
+                                in control.excludedIds ->
+                                    if (control.includeOnly) IncludeExcludeState.Neutral else IncludeExcludeState.Exclude
                                 else -> IncludeExcludeState.Neutral
                             },
                         onClick = { callbacks.onOptionClick(section.id, option.id) },
-                        onLongClick = { callbacks.onOptionLongClick(section.id, option.id) },
+                        onLongClick = if (control.includeOnly) null else ({ callbacks.onOptionLongClick(section.id, option.id) }),
                         onLongClickLabel = callbacks.optionLongClickLabel,
                     )
                 }

@@ -72,4 +72,22 @@ class FilterSectionSheetSamplesScreenshotTest {
     fun LongListNoResults() {
         FilterSectionLongListNoResultsSample()
     }
+
+    @PreviewTest
+    @Preview(name = "phone", widthDp = STANDARD_PHONE_WIDTH_DP)
+    @Preview(name = "phone-dark", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "phone-font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun IncludeOnlySection() {
+        FilterSectionIncludeOnlySample()
+    }
+
+    @PreviewTest
+    @Preview(name = "phone", widthDp = STANDARD_PHONE_WIDTH_DP)
+    @Preview(name = "phone-dark", widthDp = STANDARD_PHONE_WIDTH_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Preview(name = "phone-font20-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun IncludeOnlySheet() {
+        FilterSheetIncludeOnlySample()
+    }
 }

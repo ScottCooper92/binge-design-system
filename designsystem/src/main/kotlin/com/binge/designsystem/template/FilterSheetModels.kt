@@ -21,12 +21,19 @@ sealed interface FilterControlUi {
         val selectedId: String?,
     ) : FilterControlUi
 
-    /** Any of [options] can be included or excluded, as include/exclude chips. An id in neither set is off. */
+    /**
+     * Any of [options] can be included or excluded, as include/exclude chips. An id in neither set is off.
+     *
+     * With [includeOnly] the filter can only include (a server that has no "not this genre"): the chips have two states, a tap
+     * toggles one, there is no long press and no exclude look or words, and a screen reader hears each as selected or not.
+     * [excludedIds] is ignored then, and an id in it reads as off.
+     */
     @Immutable
     data class MultiChoice(
         val options: List<FilterOptionUi>,
         val includedIds: Set<String>,
         val excludedIds: Set<String>,
+        val includeOnly: Boolean = false,
     ) : FilterControlUi
 
     /**
