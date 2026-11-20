@@ -25,7 +25,7 @@ import com.binge.designsystem.tv.R as TvR
 private const val PORTRAIT_ASPECT = 2f / 3f
 
 /** One person in the Cast tab: what the card draws, the [key] that keeps it stable across a reorder, and their photo if there is one. */
-class TvCastCell(
+data class TvCastCell(
     val key: String,
     val name: String,
     val role: String?,

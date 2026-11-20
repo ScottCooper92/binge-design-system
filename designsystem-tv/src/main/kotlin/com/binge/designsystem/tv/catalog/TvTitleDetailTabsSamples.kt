@@ -55,7 +55,7 @@ fun TvDetailCastFocusedSample() {
     TvDetailCast(people = Cast, onCastClick = {}, initialPosition = 1, initialFocused = true)
 }
 
-/** The Cast tab stepped past the last person onto the See all card, which takes the ring while the slot keeps the last person. */
+/** The Cast tab stepped past the last person onto the See all card: the slot keeps the last person, and the card in the strip is the focus stop. */
 @Composable
 fun TvDetailCastSeeAllFocusedSample() {
     TvDetailCast(people = Cast, onCastClick = {}, onSeeAll = {}, initialPosition = SEE_ALL_POSITION, initialFocused = true)
