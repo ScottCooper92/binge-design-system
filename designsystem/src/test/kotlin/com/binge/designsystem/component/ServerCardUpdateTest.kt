@@ -1,16 +1,22 @@
 package com.binge.designsystem.component
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.TestTheme
+import com.binge.designsystem.testing.assertNoTextClipped
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -19,6 +25,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 
 private const val MIN_TOUCH_DP = 48
 
@@ -61,10 +68,76 @@ class ServerCardUpdateTest {
     }
 
     @Test
+    fun `the row announces the mark's words after the label and the action`() {
+        show(
+            ServerCardUpdate(
+                label = "Update available: 2.6.0",
+                actionLabel = "Release notes",
+                onClick = {},
+                actionTrailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                actionTrailingContentDescription = "Opens outside the app",
+            ),
+        )
+
+        val node = rule.onNode(isButton).fetchSemanticsNode()
+        val texts = node.config[SemanticsProperties.Text].map { it.text }
+        val described = node.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty()
+        assertEquals(listOf("Update available: 2.6.0", "Release notes"), texts)
+        assertEquals(listOf("Opens outside the app"), described)
+    }
+
+    @Test
+    fun `without a mark the row announces only its label and action`() {
+        show(ServerCardUpdate("Update available: 2.6.0", "Release notes", onClick = {}))
+
+        val node = rule.onNode(isButton).fetchSemanticsNode()
+        assertEquals(emptyList<String>(), node.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty())
+    }
+
+    @Test
     fun `no update shows no row`() {
         show(null)
 
         rule.onNodeWithText("Release notes").assertDoesNotExist()
         rule.onNode(isButton).assertDoesNotExist()
     }
+}
+
+/** The update row keeps its text whole at a large font, with and without the mark: no text clipped by its parent at 2x. */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], application = android.app.Application::class, qualifiers = "w360dp-h800dp")
+// Native graphics, because legacy graphics measures text at a pixel a character: nothing wraps and nothing is cut.
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+class ServerCardUpdateClippingTest {
+    @get:Rule
+    val rule = createTakeDownComposeRule()
+
+    private fun assertNothingClipped(update: ServerCardUpdate) {
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, fontScale = 2f)) {
+                TestTheme { ServerCard(title = "Home", logo = rememberVectorPainter(Icons.Filled.Tv), update = update) }
+            }
+        }
+        rule.waitForIdle()
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 2)
+    }
+
+    @Test
+    fun `no text is clipped at 2_0 with the mark`() =
+        assertNothingClipped(
+            ServerCardUpdate(
+                "Update available: 2.6.0",
+                "Release notes",
+                onClick = {},
+                actionTrailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                actionTrailingContentDescription = "Opens outside the app",
+            ),
+        )
+
+    @Test
+    fun `no text is clipped at 2_0 without the mark`() =
+        assertNothingClipped(
+            ServerCardUpdate("Update available: 2.6.0", "Release notes", onClick = {
+            }),
+        )
 }
