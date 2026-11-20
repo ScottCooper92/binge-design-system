@@ -466,6 +466,17 @@
     <dimen name="letter_rail_dot">10dp</dimen>
     <dimen name="letter_rail_dot_mark">3dp</dimen>
     <dimen name="letter_rail_short_sample_height">300dp</dimen>
+    <!-- BingeFastScrollbar: the draggable end strip, the thin track and thumb drawn in it, the thumb's least length, and the bubble beside it -->
+    <dimen name="fast_scrollbar_touch_width">48dp</dimen>
+    <dimen name="fast_scrollbar_track_width">4dp</dimen>
+    <dimen name="fast_scrollbar_min_thumb_height">48dp</dimen>
+    <dimen name="fast_scrollbar_bubble_gap">8dp</dimen>
+    <dimen name="fast_scrollbar_bubble_max_width">160dp</dimen>
+    <dimen name="fast_scrollbar_bubble_padding_h">12dp</dimen>
+    <dimen name="fast_scrollbar_bubble_padding_v">6dp</dimen>
+    <!-- BingeFastScrollbar samples: the bounded height of the grid or list the scrollbar sits on, and one cell's height -->
+    <dimen name="fast_scrollbar_sample_height">480dp</dimen>
+    <dimen name="fast_scrollbar_sample_cell_height">96dp</dimen>
     <!-- TextEntrySurface expanded sample: a phone-sized bounded height for the expanded mode to fill -->
     <dimen name="text_entry_surface_sample_expanded_height">720dp</dimen>
     <!-- DecisionScreen: the hero plate and its badge, a point's icon plate, and the landscape points' drop -->
