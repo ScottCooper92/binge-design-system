@@ -41,6 +41,11 @@ class DetailRailsAlignmentTest {
                         primary = { Text("Primary", it.testTag("primary")) },
                         roundActions = emptyList(),
                     )
+                    DetailEpisodesSection(
+                        title = "Episodes",
+                        episodes = listOf(EpisodeRow(1, "Pilot", null)),
+                        subtitle = "Subtitle line",
+                    )
                     DetailPeopleLine("Line", listOf("c"), { it }, { DetailPerson("Cy", null, null) }, {})
                 }
             }
@@ -60,14 +65,14 @@ class DetailRailsAlignmentTest {
     }
 
     @Test
-    @Config(qualifiers = "w411dp-h891dp-xhdpi")
+    @Config(qualifiers = "w411dp-h1800dp-xhdpi")
     fun `at a phone width the rails start where a section header does`() = assertAligned()
 
     @Test
-    @Config(qualifiers = "w700dp-h1000dp-xhdpi")
+    @Config(qualifiers = "w700dp-h1800dp-xhdpi")
     fun `at a medium width the rails and the action row start where a section header does`() = assertAligned()
 
     @Test
-    @Config(qualifiers = "w1000dp-h800dp-xhdpi")
+    @Config(qualifiers = "w1000dp-h1800dp-xhdpi")
     fun `at an expanded width the rails start where a section header does`() = assertAligned()
 }
