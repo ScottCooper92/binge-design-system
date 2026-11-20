@@ -135,7 +135,6 @@ class PagedGridScreenTest {
         rule.onNodeWithText("Filters").assertDoesNotExist()
     }
 
-
     private fun clipping(fontScale: Float) {
         show(PagedGridState.Ready(items(), hasMore = false), fontScale = fontScale)
         val checked = rule.assertNoTextClipped()

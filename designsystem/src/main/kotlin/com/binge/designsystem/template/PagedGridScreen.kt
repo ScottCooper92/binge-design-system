@@ -44,10 +44,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingePullToRefresh
 import com.binge.designsystem.component.CollapsedFilterAction
 import com.binge.designsystem.component.DiscoverQuickClearChip
 import com.binge.designsystem.component.FilterPill
-import com.binge.designsystem.component.BingePullToRefresh
 import com.binge.designsystem.component.MediaCard
 import com.binge.designsystem.component.MediaCardSkeleton
 import com.binge.designsystem.component.MediaCardStatus
@@ -296,10 +296,7 @@ fun PagedGridScreen(
 
 /** The filters in force, each removable, in one scrolling row under the bar. */
 @Composable
-private fun ActiveFilterChips(
-    chips: List<GridFilterChip>,
-    onClear: (String) -> Unit,
-) {
+private fun ActiveFilterChips(chips: List<GridFilterChip>, onClear: (String) -> Unit) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.screen_content_inset)),
