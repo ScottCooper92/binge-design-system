@@ -38,7 +38,6 @@ data class TvFilterCategory(
  * genre keeps its tick while the focus fill passes over it. An [action] opens something rather than being chosen
  * (a pinned shortcut to a settings screen): it announces as a button, with no tick, and ignores [logoUrl],
  * [excluded][TvFilterValueState.Excluded] state and any leading slot, since the button row takes only a label and icon.
-
  */
 data class TvFilterValue(
     val key: String,
