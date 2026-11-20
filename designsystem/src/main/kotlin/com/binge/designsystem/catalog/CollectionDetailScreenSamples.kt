@@ -51,12 +51,13 @@ private fun sampleCollection(
     overview: String? = OVERVIEW,
     parts: List<MediaResult> = parts(),
     posterUrl: String? = null,
+    partsHeading: String? = "Movies",
 ) = CollectionDetail(
     title = "The Lighthouse Collection",
     posterUrl = posterUrl,
     metaText = "3 movies",
     overview = overview,
-    partsHeading = "Movies",
+    partsHeading = partsHeading,
     parts = parts,
     emptyTitle = "No movies yet",
     emptyMessage = "This collection has no titles to show.",
@@ -116,6 +117,10 @@ fun CollectionDetailPosterOnlySample() =
     WithPreviewImage(POSTER_WIDTH_PX, POSTER_HEIGHT_PX) {
         SampleScreen(CollectionDetailState.Content(sampleCollection(posterUrl = "sample://poster")))
     }
+
+/** A collection with an overview and no parts heading: the rows start a gap under the overview rather than hard against it. */
+@Composable
+fun CollectionDetailNoHeadingSample() = SampleScreen(CollectionDetailState.Content(sampleCollection(partsHeading = null)))
 
 /** A collection with no overview and no blurbs: those blocks take no room, and the rows stay as short as their text. */
 @Composable
