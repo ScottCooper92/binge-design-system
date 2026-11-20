@@ -100,6 +100,8 @@
     <dimen name="tv_detail_gallery_row_height">150dp</dimen>
     <dimen name="tv_detail_wide_slot_height">290dp</dimen>
     <dimen name="tv_detail_wide_strip_height">150dp</dimen>
+    <dimen name="tv_detail_episode_height">124dp</dimen>
+    <dimen name="tv_detail_episode_copy_width">520dp</dimen>
     <dimen name="tv_detail_tab_item_padding_horizontal">14dp</dimen>
     <dimen name="tv_detail_meta_gap">10dp</dimen>
     <dimen name="tv_meta_line_gap">10dp</dimen>
