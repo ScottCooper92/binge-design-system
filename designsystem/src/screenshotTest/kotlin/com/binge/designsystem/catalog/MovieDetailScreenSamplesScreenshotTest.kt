@@ -28,7 +28,6 @@ class MovieDetailScreenSamplesScreenshotTest {
     fun pageLargeFont() = MovieDetailScreenSample()
 
     @PreviewTest
-    @TabletScreenPreview
     @Preview(name = "foldable", device = FOLDABLE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
     @Composable
     fun pageWide() = MovieDetailScreenSample()

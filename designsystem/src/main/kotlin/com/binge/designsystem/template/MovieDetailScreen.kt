@@ -49,9 +49,10 @@ import com.binge.designsystem.layout.layoutAnchor
  * bar with the same Back control, with Try again when the failure is retryable.
  *
  * What differs between apps comes in through slots, each optional and taking no space when empty: [primary] is the wide action (a
- * request in one app, Play in another) and [roundActions] the round buttons beside or under it; [topBarActions] are the bar's actions;
+ * request in one app, Play in another) and [roundActions] the round buttons beside or under it, which need a [primary] to be drawn; [topBarActions] are the bar's actions;
  * [afterPeople], [afterRails] and [atEnd] are an app's own sections at three named places (where to watch after the people, links
- * after the rails and tags, media information at the end); [overlays] hosts the app's sheets. [snackbarHostState] shows the app's messages.
+ * after the rails and tags, media information at the end); [overlays] hosts the app's sheets, in the loaded
+ * page only: none is hosted while it loads or after it fails. [snackbarHostState] shows the app's messages.
  *
  * @need assemble a movie's detail page from plain values, with its loading and failed states
  * @group detail
@@ -164,8 +165,8 @@ private fun DetailPageBody(
 
 /**
  * The page while it loads, on the same frame as the loaded page: the bar with its Back control is there from the first frame, and the
- * hero, the stats, the actions and the overview land where the page puts them. Only those are held to the page; what is below the
- * overview depends on what the app returns, so it grows on arrival.
+ * hero, the stats, the actions and the overview land where the page puts them. Only those are held to the page; the overview plates are drawn even
+ * for a title that arrives with no synopsis, and what is below the overview depends on what the app returns, so it grows on arrival.
  */
 @Composable
 private fun DetailPageSkeleton(
@@ -189,10 +190,12 @@ private fun DetailPageSkeleton(
             if (!cinematic) {
                 DetailStatsRowsSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.STATS)), count = state.stats)
             }
-            DetailActionsSkeleton(
-                Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
-                buttons = state.roundActions,
-            )
+            if (state.primary) {
+                DetailActionsSkeleton(
+                    Modifier.readingMargin().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.ACTIONS)),
+                    buttons = state.roundActions,
+                )
+            }
             if (!cinematic) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
             CarouselSkeleton()
         }

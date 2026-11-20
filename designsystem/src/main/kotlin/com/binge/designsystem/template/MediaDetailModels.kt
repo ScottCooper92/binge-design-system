@@ -90,11 +90,15 @@ class MediaDetail(
 /** The three things a detail page can be: loading, showing, or failed. [MovieDetailScreen] draws each in the same frame. */
 sealed interface DetailState {
     /**
-     * Loading. [stats] and [roundActions] are how many the loaded page will have, so the skeleton holds the same height and the page does not jump when it arrives.
+     * Loading. [stats] and [roundActions] are how many the loaded page will have, and [primary] whether it will have a primary action, so
+     * the skeleton holds the same height and the page does not jump when it arrives. Round actions are drawn beside the primary, so
+     * they need one: with [primary] false the skeleton draws no action row. The overview plates are always drawn, so a title that
+     * arrives with no synopsis moves up.
      */
     class Loading(
         val stats: Int = 3,
         val roundActions: Int = 0,
+        val primary: Boolean = true,
     ) : DetailState
 
     /** Showing [detail]. */
