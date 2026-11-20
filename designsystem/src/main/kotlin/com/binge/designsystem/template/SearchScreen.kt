@@ -160,7 +160,10 @@ fun isSearchNearEnd(
  * switch at [BAR_HANDOVER_COLLAPSE]). [idleExtras] adds items under the recents, [noResultsExtras] sits under the no-results plate, and
  * [failedContent] replaces the default failure plate.
  *
- * @param reselectKey the tab this screen is the root of; tapping it again focuses the field. Null for a screen with no tab.
+ * @param reselectKey the tab this screen is the root of, as the shell emits it on the reselect signal (compared by equality, so pass
+ *   the same value); tapping it again focuses the field. Null for a screen with no tab.
+ * @param resultTrailing decides each result's status: it returns the status to draw, or null for a result with none, so a row with
+ *   no status has no gap where one would go.
  *
  * @need search with a field, type chips, recent searches and a grid of results
  * @group screens
@@ -176,7 +179,7 @@ fun SearchScreen(
     idleTitle: String,
     idleMessage: String,
     modifier: Modifier = Modifier,
-    reselectKey: String? = null,
+    reselectKey: Any? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     recentsTitle: String = stringResource(R.string.search_recents_title),
     clearLabel: String = stringResource(R.string.search_recents_clear),
@@ -185,7 +188,7 @@ fun SearchScreen(
     moreFailedLabel: String = stringResource(R.string.search_more_failed),
     titleTrailing: (@Composable (pillInteractive: Boolean) -> Unit)? = null,
     barActions: @Composable RowScope.(handedOver: Boolean, collapsedFraction: Float) -> Unit = { _, _ -> },
-    resultTrailing: (@Composable (MediaResult) -> Unit)? = null,
+    resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)? = null,
     idleExtras: (LazyListScope.() -> Unit)? = null,
     noResultsExtras: (@Composable () -> Unit)? = null,
     failedContent: (@Composable (Modifier) -> Unit)? = null,
@@ -247,7 +250,7 @@ private fun SearchBody(
     idleMessage: String,
     recents: RecentsCopy,
     moreFailedLabel: String,
-    resultTrailing: (@Composable (MediaResult) -> Unit)?,
+    resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)?,
     idleExtras: (LazyListScope.() -> Unit)?,
     noResultsExtras: (@Composable () -> Unit)?,
     failedContent: (@Composable (Modifier) -> Unit)?,
@@ -313,7 +316,7 @@ private fun SearchControls(
     state: SearchState,
     callbacks: SearchCallbacks,
     placeholder: String,
-    reselectKey: String?,
+    reselectKey: Any?,
 ) {
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
@@ -438,7 +441,7 @@ private fun ResultsList(
     callbacks: SearchCallbacks,
     contentPadding: PaddingValues,
     moreFailedLabel: String,
-    resultTrailing: (@Composable (MediaResult) -> Unit)?,
+    resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)?,
 ) {
     val gridState = rememberLazyGridState()
     val nearEnd by remember {
@@ -470,7 +473,7 @@ private fun ResultsList(
                 MediaResultRow(
                     result = result,
                     onClick = { callbacks.onOpenResult(result.key) },
-                    trailing = resultTrailing?.let { slot -> { slot(result) } },
+                    trailing = resultTrailing?.invoke(result),
                 )
             }
             if (state.appending || state.appendFailed || empty) {

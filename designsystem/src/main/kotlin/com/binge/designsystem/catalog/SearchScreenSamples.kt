@@ -103,7 +103,11 @@ private fun SampleSearch(
             resultTrailing =
                 if (withTrailing) {
                     { result ->
-                        if (result.key.removePrefix("r").toInt() % 2 == 0) StatusChip("Available", BingeSentiment.Positive)
+                        if (result.key.removePrefix("r").toInt() % 2 == 0) {
+                            { StatusChip("Available", BingeSentiment.Positive) }
+                        } else {
+                            null
+                        }
                     }
                 } else {
                     null

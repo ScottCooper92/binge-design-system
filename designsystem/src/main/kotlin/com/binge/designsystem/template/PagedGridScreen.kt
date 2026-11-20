@@ -341,10 +341,7 @@ private fun firstCellAnchor(index: Int): Modifier =
 fun pagedGridSkeletonCells(): Int = mediaGridColumns() * PAGED_GRID_SKELETON_ROWS
 
 @Composable
-private fun PagedGridSkeleton(
-    contentPadding: PaddingValues,
-    loading: String,
-) {
+private fun PagedGridSkeleton(contentPadding: PaddingValues, loading: String) {
     val cells = pagedGridSkeletonCells()
     GridFrame(contentPadding) {
         items(cells) { index ->
