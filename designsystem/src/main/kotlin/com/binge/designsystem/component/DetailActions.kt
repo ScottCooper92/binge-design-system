@@ -28,7 +28,9 @@ private const val STACK_FROM = 2
 /**
  * One round, labelled action beside a detail page's primary: a Trailer, a Watchlist, a Report. [icon] is the glyph and [label] the
  * caption under it. [contentDescription] is what a screen reader announces in place of the [label], which a toggle uses to say what a
- * tap does now ("Remove from watchlist"); null announces the [label].
+ * tap does now ("Remove from watchlist"); null announces the [label]. [trailingIcon] marks an action that leaves the app, such as a trailer
+ * that opens a video: a small icon at the end of the label, as [LabelledIconButton] draws it, and [trailingContentDescription] says what the
+ * mark means ("Opens outside the app"). With neither, the button is as it always was.
  */
 @Immutable
 class DetailRoundAction(
@@ -36,6 +38,8 @@ class DetailRoundAction(
     val label: String,
     val onClick: () -> Unit,
     val contentDescription: String? = null,
+    val trailingIcon: ImageVector? = null,
+    val trailingContentDescription: String? = null,
 )
 
 /**
@@ -94,6 +98,8 @@ private fun RowScope.RoundActions(actions: List<DetailRoundAction>) {
             label = action.label,
             onClick = action.onClick,
             contentDescription = action.contentDescription,
+            trailingIcon = action.trailingIcon,
+            trailingContentDescription = action.trailingContentDescription,
         )
     }
 }

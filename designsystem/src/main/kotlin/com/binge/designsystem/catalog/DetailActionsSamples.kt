@@ -3,6 +3,7 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.PlayArrow
@@ -78,4 +79,36 @@ fun DetailActionsSingleSample() {
 @Composable
 fun DetailActionsSkeletonSample() {
     ScreenshotTheme { DetailActionsSkeleton(buttons = 3) }
+}
+
+/**
+ * The action row with a Trailer that opens a video outside the app: its label ends in the open-in-new mark, which a screen reader announces
+ * after the name as "Opens outside the app". The other round actions are as they were.
+ */
+@Composable
+fun DetailActionsTrailingMarkSample() {
+    ScreenshotTheme {
+        DetailActions(
+            primary = { modifier ->
+                BingeStatusButton(
+                    label = "Play",
+                    onClick = {},
+                    sentiment = BingeSentiment.Neutral,
+                    modifier = modifier,
+                    icon = Icons.Filled.PlayArrow,
+                    emphasis = BingeStatusButtonEmphasis.Filled,
+                )
+            },
+            roundActions = listOf(
+                DetailRoundAction(
+                    icon = Icons.Filled.PlayArrow,
+                    label = "Trailer",
+                    onClick = {},
+                    trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                    trailingContentDescription = "Opens outside the app",
+                ),
+                DetailRoundAction(Icons.Outlined.BookmarkBorder, "Watchlist", onClick = {}),
+            ),
+        )
+    }
 }
