@@ -31,7 +31,7 @@ import com.binge.designsystem.tv.template.TvGridResults
 
 private const val POSTER_ASPECT = 2f / 3f
 private const val COPY_MAX_LINES = 2
-private const val LAST_ROW_CELL = 11
+private const val THIRD_ROW_CELL = 11
 
 /** What the samples draw: a title and a year the page's copy shows, and a rating the cell shows. */
 internal data class SampleGridItem(
@@ -147,7 +147,7 @@ fun TvGridPageFocusedSample() {
 /** A cell in the third row focused, so the two rows above it are scrolled away rather than covered. */
 @Composable
 fun TvGridPageAnchoredSample() {
-    SampleGrid(results = gridResults(GridItems), initialFocused = TvGridFocus(index = LAST_ROW_CELL, item = GridItems[LAST_ROW_CELL]))
+    SampleGrid(results = gridResults(GridItems), initialFocused = TvGridFocus(index = THIRD_ROW_CELL, item = GridItems[THIRD_ROW_CELL]))
 }
 
 /** A focused title long enough to wrap to two lines, under a long heading: the copy must clear the heading. */

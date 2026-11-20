@@ -38,7 +38,6 @@ private val DEFAULT_EMPTY_ICON = Icons.Outlined.Inbox
  * What a grid shows in place of its cells when the load failed or came back empty: one message plate with a standard
  * button, and focus moved to it as the state arrives. A failure carries Try again; an empty result carries
  * [emptyAction] if there is one, and otherwise the plate itself takes focus so the remote has somewhere to be.
- *
  */
 @Composable
 internal fun BoxScope.TvGridCollapsedMessage(
@@ -79,12 +78,9 @@ internal fun BoxScope.TvGridCollapsedMessage(
 /**
  * An empty plate with nothing to press: focusable, with the focus ring around the plate itself (sized to its content and
  * centred in the pane, not the pane), and its text announced as the one focused node.
- *
- * @need show an empty message with nothing to press that still takes focus on a TV screen
- * @group tv
  */
 @Composable
-fun FocusableMessagePlate(
+internal fun FocusableMessagePlate(
     body: String,
     focus: FocusRequester,
     modifier: Modifier = Modifier,
