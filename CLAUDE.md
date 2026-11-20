@@ -104,7 +104,7 @@ verb, never an icon alone; a destructive action sits in an overflow menu or behi
 
 ## Gates
 
-CI runs `./gradlew build validateDebugScreenshotTest`. `build` is the Kotlin compile, the unit
+CI runs `./gradlew build validateDebugScreenshotTest`, the screenshot half in three shards of the classes (`scripts/screenshot-shard.sh`), and the CI job named `build` summarises them as the one required check. The Gradle `build` task is the Kotlin compile, the unit
 tests, `ktlintCheck` and Android lint — the ktlint plugin and AGP both wire themselves into `check`,
 and `build` depends on it. The screenshot task is named on top because the screenshot plugin does
 not hook `check`.
