@@ -17,7 +17,7 @@
     <dimen name="tv_account_menu_outline">1dp</dimen>
     <dimen name="tv_account_menu_shadow">12dp</dimen>
     <dimen name="tv_account_menu_icon_size">24dp</dimen>
-    <dimen name="tv_top_bar_item_padding_horizontal">23dp</dimen>
+    <dimen name="tv_top_bar_item_padding_horizontal">14dp</dimen>
     <!-- Focus ring -->
     <dimen name="tv_focus_ring_width">3dp</dimen>
     <dimen name="tv_focus_ring_offset">4dp</dimen>
