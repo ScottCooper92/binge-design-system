@@ -21,12 +21,19 @@ sealed interface FilterControlUi {
         val selectedId: String?,
     ) : FilterControlUi
 
-    /** Any of [options] can be included or excluded, as include/exclude chips. An id in neither set is off. */
+    /**
+     * Any of [options] can be included or excluded, as include/exclude chips. An id in neither set is off.
+     *
+     * With [includeOnly] the filter can only include (a server that has no "not this genre"): the chips have two states, a tap
+     * toggles one, there is no long press and no exclude look or words, and a screen reader hears each as selected or not.
+     * [excludedIds] is ignored then, and an id in it reads as off.
+     */
     @Immutable
     data class MultiChoice(
         val options: List<FilterOptionUi>,
         val includedIds: Set<String>,
         val excludedIds: Set<String>,
+        val includeOnly: Boolean = false,
     ) : FilterControlUi
 
     /**
@@ -88,4 +95,18 @@ data class FilterRowUi(
     val title: String,
     val summary: String,
     val icon: ImageVector,
+)
+
+/**
+ * A search over the options of a filter section, for a list too long to scan (a library's years, its genres). [query] is what the
+ * caller holds and [onQueryChange] is how the field reports an edit, since the template keeps no state. The section then shows only
+ * the options whose label contains the query, ignoring case, and [noResultsLabel] when none do. [placeholder] is the field's hint.
+ * It applies to a single-choice or multi-choice section and is ignored for a range or a date range, which have no options to search.
+ */
+@Immutable
+data class FilterSearchUi(
+    val query: String,
+    val onQueryChange: (String) -> Unit,
+    val placeholder: String,
+    val noResultsLabel: String,
 )

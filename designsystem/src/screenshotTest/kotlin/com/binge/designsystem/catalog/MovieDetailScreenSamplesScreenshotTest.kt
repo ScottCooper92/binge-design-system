@@ -61,4 +61,21 @@ class MovieDetailScreenSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun notFound() = MovieDetailScreenNotFoundSample()
+
+    /** The failure at the expanded width: the Back control sits where the loading page's does, at the cinematic header's inset. */
+    @PreviewTest
+    @TabletScreenPreview
+    @Composable
+    fun failedWide() = MovieDetailScreenFailedSample()
+
+    /** The skeleton of a title that promises little: no primary, no rails, so no carousel placeholder. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun loadingBare() = MovieDetailScreenLoadingBareSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun roundActionsOnly() = MovieDetailScreenRoundActionsOnlySample()
 }
