@@ -510,4 +510,38 @@ class SearchScreenTest {
 
         assertScrolledAway("a title 0")
     }
+
+    @Test
+    fun `a new query opens each page at the top, not where the old query's list was scrolled`() {
+        var query by mutableStateOf("past")
+        var prefix by mutableStateOf("a")
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = query,
+                    state = SearchState.Ready(
+                        named(prefix),
+                        loaded = 3,
+                        hasMore = false,
+                        types = SearchTypes(types.chips, selected),
+                        pages = mapOf("all" to named(prefix, 40), "movies" to named("m$prefix", 40), "people" to named("p$prefix", 40)),
+                    ),
+                    callbacks = callbacks(onType = { selected = it }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        query = "heat"
+        prefix = "h"
+        rule.waitForIdle()
+
+        rule.onNodeWithText("h title 0").assertIsDisplayed()
+    }
 }

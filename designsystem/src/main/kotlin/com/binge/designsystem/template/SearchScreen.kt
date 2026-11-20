@@ -227,7 +227,8 @@ fun SearchScreen(
     val collapsed = if (bar == ScreenBar.Small) 0f else scrollBehavior?.state?.collapsedFraction ?: 0f
     val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE
     val paged = state.pagedTypes()
-    val pageStates = rememberSaveable(saver = SearchPageStates.Saver) { SearchPageStates() }
+    // Keyed on the query: a new query's results open at the top of every page, as the unpaged list does, while a type tap keeps each page's place.
+    val pageStates = rememberSaveable(text, saver = SearchPageStates.Saver) { SearchPageStates() }
     val pager = rememberFilterPager(
         selectedIndex = paged?.selectedIndex ?: 0,
         onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },
@@ -398,7 +399,7 @@ private fun NoResultsBody(
 /**
  * The grid state of each page, by the page's chip key and nothing else. It is held by [SearchScreen] itself, above everything that follows the state,
  * so a page the pager disposes, another state shown in between (loading, say), a new state or types or map on every tap and a recreated activity all
- * leave a page where its list was. Saved as the first visible item and its offset, so it outlives the process too.
+ * leave a page where its list was. A new query starts every page afresh. Saved as the first visible item and its offset, so it outlives the process too.
  */
 @Stable
 private class SearchPageStates {
