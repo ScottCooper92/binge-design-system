@@ -53,7 +53,7 @@ private val BAND_CONTROL_SIZE = 48.dp
 
 /**
  * **The grid pane's focus memory survives every load-state change and resets only on a query change
- * (#1485/#1482/#1443).**
+ *.**
  *
  * The memory used to be cleared on any non-`Items` state — the wrong signal from both directions: a pop's
  * cached `Loading` pass-through wiped the cell the user was returning to, while an `Items` → `Items`
@@ -98,8 +98,8 @@ class TvGridPageFocusMemoryTest {
     }
 
     /**
-     * The other half of the same wrong signal: an actual query change must reset the memory (#1482's
-     * back-to-the-top). The re-query passes through `Loading` and resolves to a result set holding the
+     * The other half of the same wrong signal: an actual query change must reset the memory
+     * (back-to-the-top). The re-query passes through `Loading` and resolves to a result set holding the
      * *same items* — the case only the query key can tell apart from the pop pass-through above, since the
      * id check re-validates against identical ids. Focus is placed on a real cell first, so the reset is
      * distinguishable from the memory never having been written. (While a cell genuinely holds focus the
@@ -177,7 +177,7 @@ class TvGridPageFocusMemoryTest {
 
     /**
      * **Entry still lands on the first cell when a pop restores a scroll offset but invalidates the focus
-     * memory (#1732).** #1730 fixed the case where `rememberedIndex` is null and the grid is at the top; this
+     * memory.** An earlier fix covered the case where `rememberedIndex` is null and the grid is at the top; this
      * is the residual one where it is null *and* scrolled.
      *
      * The seed writes both halves the way a pop's `rememberSaveable` restore does — a deep remembered cell
@@ -208,7 +208,7 @@ class TvGridPageFocusMemoryTest {
         composeTestRule.onNodeWithContentDescription(SCROLL_CELLS[0].title).assertIsNotDisplayed()
 
         // Same query key, different ids: the memory fails its id check and derives null, but gridState keeps
-        // its offset — the #1732 combination. Loading between, as a pop's cached pass-through delivers it.
+        // its offset — that combination. Loading between, as a pop's cached pass-through delivers it.
         results = TvGridResults.Loading
         composeTestRule.waitForIdle()
         results = gridItems(SCROLL_CELLS_B)
@@ -220,19 +220,19 @@ class TvGridPageFocusMemoryTest {
         composeTestRule.settle(SETTLE_PAST_FOCUS_DEBOUNCE_MILLIS)
 
         composeTestRule.onNodeWithContentDescription(SCROLL_CELLS_B[0].title).assertIsFocused()
-        // The scroll contract's stale-pop case (#2520): retiring the memory must reset the scroll to the
+        // The scroll contract's stale-pop case: retiring the memory must reset the scroll to the
         // top too, not just fall back to cell 0's focus while leaving the grid scrolled past it.
         composeTestRule.onNodeWithContentDescription(SCROLL_CELLS_B[0].title).assertIsDisplayed()
     }
 
     /**
-     * **A paged deep restore keeps its scroll while the page is still in flight (#1732 review).**
+     * **A paged deep restore keeps its scroll while the page is still in flight.**
      *
      * The case that forces the reset above to be gated on *provable* staleness rather than on null focus.
      * the grid template's focus memory yields null for two different situations and only one is a retired memory: the
      * paged callers pass `at = { items[index] }` over `LazyPagingItems`, which is null for a cell whose page has
      * **not landed yet** (`get`, not `peek`, because reading is what triggers the fetch). Resetting there would
-     * yank a paged pop-restore to the top before paging could reach the remembered cell — #1485's deep-scroll
+     * yank a paged pop-restore to the top before paging could reach the remembered cell — the deep-scroll
      * restore, on exactly the drill-down grids that carry an `entryFocusRequester`.
      *
      * The seed puts the memory and the grid deep with that cell loaded; the flip then drops it back to a
@@ -320,8 +320,8 @@ class TvGridPageFocusMemoryTest {
     }
 
     /**
-     * A pop rebuilds the shell, and since #4320 a rebuilt shell arms an arrival that the pane claims. The cell the user opened must
-     * still win over the first (the class of bug #4346 was on Companions): focus, not only the backdrop, is on the remembered cell.
+     * A pop rebuilds the shell, and a rebuilt shell arms an arrival that the pane claims. The cell the user opened must
+     * still win over the first (the class of bug a companion screen once had): focus, not only the backdrop, is on the remembered cell.
      */
     @Test
     fun `a disposal and recomposition lands focus on the remembered cell even though the pop arms the shell's arrival`() {
@@ -352,7 +352,7 @@ class TvGridPageFocusMemoryTest {
     }
 
     /**
-     * **A first entry lands on the first cell, not on whatever the beam is pointing at (#1727).**
+     * **A first entry lands on the first cell, not on whatever the beam is pointing at.**
      *
      * The band's control sits at the row's **trailing** edge, which is what makes this discriminating: a
      * geometric ↓ from there lands on the last column, so the assertion fails on the old behaviour rather
@@ -381,7 +381,7 @@ class TvGridPageFocusMemoryTest {
     }
 
     /**
-     * **The scroll contract's fresh-push case (#2520): a grid with no memory rests at the top.** [SCROLL_CELLS]
+     * **The scroll contract's fresh-push case: a grid with no memory rests at the top.** [SCROLL_CELLS]
      * rather than [CELLS] so the assertion is discriminating — every cell of the smaller set fits the
      * viewport, where "not scrolled" would pass trivially.
      */
@@ -405,7 +405,7 @@ class TvGridPageFocusMemoryTest {
     }
 
     /**
-     * **The scroll contract's pop case (#2520): a saved-state restore keeps the remembered cell's scroll rest,
+     * **The scroll contract's pop case: a saved-state restore keeps the remembered cell's scroll rest,
      * not the top.** `StateRestorationTester` is the closest JVM analogue to the nav teardown a real pop causes
      * (see `GalleryGridRestoreTest`'s own caveat on the same harness) — a stronger round trip than the
      * `SaveableStateHolder` toggle the other memory tests in this file use, since it exercises the actual
@@ -483,7 +483,7 @@ class TvGridPageFocusMemoryTest {
     /**
      * Puts real focus on cell 1 by **entering the grid and stepping right**, not by requesting that cell.
      *
-     * Since #1727 the entry group's `onEnter` always resolves — to the remembered cell, or the first one — so
+     * The entry group's `onEnter` always resolves — to the remembered cell, or the first one — so
      * a `requestFocus()` aimed at any other cell is an entry into the group and gets redirected to the entry
      * cell. Production never targets a cell directly (the only per-cell requester is the entry one), so that
      * redirect is the point rather than a defect; it just means a test writing the memory has to walk there

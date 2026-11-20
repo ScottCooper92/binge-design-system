@@ -2,7 +2,7 @@
 <resources>
     <!-- Tablets (smallest-width >=600dp) are tall enough for the cinematic hero to breathe:
          lift it to the taller standard value. The expanded/"tall" treatment is the tablet default
-         (see issue #770); landscape phones never reach this bucket and keep the computed compact cap. -->
+        ; landscape phones never reach this bucket and keep the computed compact cap. -->
     <dimen name="hero_height">446dp</dimen>
     <!-- The cast row scales with the same width that earns the taller hero: an 80dp face sized for a
          phone reads as a row of thumbnails on a tablet, where the carousel has width to spare and the

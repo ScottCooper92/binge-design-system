@@ -29,7 +29,7 @@ private val OverlayEnd = 24.dp
 
 /**
  * The carousel skeleton, the filter chip row and the discover entry row clear an end inset a shell or hub publishes, as MediaCarousel and
- * SectionHeader do (#512). Read from the padding functions both call, because the end term shows only once a row is
+ * SectionHeader do. Read from the padding functions both call, because the end term shows only once a row is
  * scrolled to its end.
  */
 @RunWith(RobolectricTestRunner::class)

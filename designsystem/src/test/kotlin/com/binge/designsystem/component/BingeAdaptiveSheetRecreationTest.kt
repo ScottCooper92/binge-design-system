@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 import java.time.Duration
 
 /**
- * What a sheet's content saves must come back when the activity is recreated, however the sheet is drawn (jellyfin #301).
+ * What a sheet's content saves must come back when the activity is recreated, however the sheet is drawn.
  * The sheet sits open above `rememberSaveable`d state of the test's own; one value inside its content is changed; the activity is
  * recreated for real, so a window's saved state is the thing under test and not a composition restorer.
  *

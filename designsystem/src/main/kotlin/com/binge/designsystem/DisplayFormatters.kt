@@ -119,14 +119,14 @@ fun formatRelativeOrAbsolute(
     // The future reads the same way as the past ("in 3 hours", "tomorrow"), so a scheduled time sits beside a past one.
     if (age < 0 && -age <= RELATIVE_DATE_WINDOW_MILLIS) return relativeFuture(now, -age)
     return if (age in 0 until DateUtils.MINUTE_IN_MILLIS) {
-        // DateUtils counts whole minutes, so under one it says "0 minutes ago" (#240).
+        // DateUtils counts whole minutes, so under one it says "0 minutes ago".
         RelativeDateTimeFormatter.getInstance().format(
             RelativeDateTimeFormatter.Direction.PLAIN,
             RelativeDateTimeFormatter.AbsoluteUnit.NOW,
         )
     } else if (age in 0..RELATIVE_DATE_WINDOW_MILLIS) {
         // DateUtils stops counting at a week unless asked for weeks: at minute resolution it falls back
-        // to its own short absolute date, a second date style beside the long one below (#219).
+        // to its own short absolute date, a second date style beside the long one below.
         val resolution = if (age < DateUtils.WEEK_IN_MILLIS) DateUtils.MINUTE_IN_MILLIS else DateUtils.WEEK_IN_MILLIS
         DateUtils.getRelativeTimeSpanString(timeMillis, now, resolution).toString()
     } else {

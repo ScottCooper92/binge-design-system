@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 private const val LABEL = "Save"
 private const val TOLERANCE = 1f
 
-/** A footer given the edge-aware padding lines its button up with a body beside another pane (#354). */
+/** A footer given the edge-aware padding lines its button up with a body beside another pane. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeActionFooterSidePaddingTest {

@@ -37,7 +37,7 @@ private val Window = 800.dp
 private val Keyboard = 300.dp
 private val Overlay = 400.dp
 
-/** A footer pinned under a form or a step rides above the keyboard rather than behind it (#375). */
+/** A footer pinned under a form or a step rides above the keyboard rather than behind it. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w400dp-h800dp")
 class FooterAboveKeyboardTest {

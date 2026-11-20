@@ -11,7 +11,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * Under the dark-only TV theme, [BingeTheme.isDark] is true (#828). It once fell back to Material 3's theme, which
+ * Under the dark-only TV theme, [BingeTheme.isDark] is true. It once fell back to Material 3's theme, which
  * this tree does not provide, and read the baseline light surface as "not dark".
  */
 @RunWith(RobolectricTestRunner::class)

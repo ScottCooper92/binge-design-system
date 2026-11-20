@@ -20,7 +20,7 @@ import org.robolectric.annotation.GraphicsMode
 
 /**
  * At a large font the rail's letters fit their slots, so it draws fewer of them with dots between rather than cutting
- * them off top and bottom (#1088).
+ * them off top and bottom.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w412dp-h1000dp")

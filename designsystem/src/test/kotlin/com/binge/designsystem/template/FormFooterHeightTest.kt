@@ -26,7 +26,7 @@ private const val PRIMARY = "Send"
 private const val TOLERANCE_DP = 1f
 
 /**
- * A footer's two buttons are the same height when their labels wrap differently (#840).
+ * A footer's two buttons are the same height when their labels wrap differently.
  *
  * Measured from the buttons' bounds against each other, and each label's against its own button's, rather than through
  * `hasVisualOverflow`: nothing here overflows, the shorter button is simply drawn short, with its label off-centre.

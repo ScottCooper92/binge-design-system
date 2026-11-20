@@ -35,7 +35,7 @@ private const val PLACEHOLDER = "Search films"
 /** Inside the pill's start padding, clear of the icon and the text field. */
 private const val PILL_EDGE_PX = 4f
 
-/** The search field's behaviour a frame cannot show (#394): the clear button, the keyboard's submit, a caller's focus. */
+/** The search field's behaviour a frame cannot show: the clear button, the keyboard's submit, a caller's focus. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
 class BingeSearchFieldBehaviourTest {

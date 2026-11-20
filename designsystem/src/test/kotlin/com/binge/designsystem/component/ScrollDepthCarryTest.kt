@@ -17,8 +17,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The deepest index survives a configuration change and nothing else (#449), including one that reaches an activity
- * that is already stopped (#503). The configuration-change check is passed in, so a test chooses whether a disposal is a
+ * The deepest index survives a configuration change and nothing else, including one that reaches an activity
+ * that is already stopped. The configuration-change check is passed in, so a test chooses whether a disposal is a
  * leave or a relaunch.
  */
 @RunWith(RobolectricTestRunner::class)
