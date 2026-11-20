@@ -173,5 +173,5 @@
     <string name="detail_runtime_minutes">%1$d min</string>
     <!-- Paged grid screen -->
     <string name="paged_grid_loading">Loading</string>
-    <string name="paged_grid_more_failed">Couldn't load more. Tap to retry.</string>
+    <string name="paged_grid_more_failed">Couldn\'t load more. Tap to retry.</string>
 </resources>
