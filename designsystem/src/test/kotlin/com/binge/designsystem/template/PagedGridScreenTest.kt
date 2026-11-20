@@ -25,6 +25,9 @@ import org.robolectric.annotation.GraphicsMode
 
 private const val ITEMS = 12
 
+/** A first page far longer than the window, so the end of the list is nowhere near the screen. */
+private const val LONG = 60
+
 /** Few enough that the grid's end is on screen, so the load-more trigger is already within its look-ahead. */
 private const val SHORT = 4
 
@@ -73,6 +76,21 @@ class PagedGridScreenTest {
     fun `the near-end rule fires within the look-ahead and not before`() {
         assertTrue(isNearEnd(lastVisibleIndex = 6, totalCount = 12))
         assertFalse(isNearEnd(lastVisibleIndex = 5, totalCount = 12))
+    }
+
+    @Test
+    fun `a grid that has not been laid out is not near its end`() {
+        assertFalse(isNearEnd(lastVisibleIndex = 0, totalCount = 0))
+    }
+
+    @Test
+    fun `a full first page with more to come does not ask for the next before a scroll`() {
+        var asked = 0
+        show(
+            PagedGridState.Ready(items(LONG), hasMore = true),
+            PagedGridCallbacks(onOpenItem = {}, onLoadMore = { asked++ }, onRetry = {}),
+        )
+        assertEquals(0, asked)
     }
 
     @Test

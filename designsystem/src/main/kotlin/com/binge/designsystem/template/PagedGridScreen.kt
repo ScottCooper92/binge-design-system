@@ -147,12 +147,15 @@ class PagedGridCallbacks(
     val onRefresh: (() -> Unit)? = null,
 )
 
-/** Whether the last visible cell is within [ahead] of the end. */
+/**
+ * Whether the last visible cell is within [ahead] of the end. With nothing laid out yet ([totalCount] 0) it is not: a grid that has not been
+ * measured is not near anything, and asking for the next page then would load one before the user has scrolled.
+ */
 fun isNearEnd(
     lastVisibleIndex: Int,
     totalCount: Int,
     ahead: Int = PAGED_GRID_LOAD_MORE_AHEAD,
-): Boolean = lastVisibleIndex >= totalCount - ahead
+): Boolean = totalCount > 0 && lastVisibleIndex >= totalCount - ahead
 
 /** Whether the grid's footer (a spinner, or Retry) is drawn. */
 fun showsGridFooter(ready: PagedGridState.Ready): Boolean = ready.appending || ready.appendFailed
