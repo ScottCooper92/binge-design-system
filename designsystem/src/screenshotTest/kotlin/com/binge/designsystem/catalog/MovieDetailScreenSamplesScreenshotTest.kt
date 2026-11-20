@@ -78,4 +78,10 @@ class MovieDetailScreenSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun roundActionsOnly() = MovieDetailScreenRoundActionsOnlySample()
+
+    /** A short page scrolled to its end: the bar has its surface and its title, and nothing is drawn over the content. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun sparseCollapsed() = MovieDetailScreenSparseSample()
 }

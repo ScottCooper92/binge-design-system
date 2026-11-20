@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -99,15 +100,21 @@ fun HeroDetailScreen(
     val measured = rememberMeasuredHeroHeight()
     HeroDetailFrame(snackbarHostState = snackbarHostState, darkStatusBar = darkStatusBar, modifier = modifier, footer = footer) {
         HeroDetailPull(onRefresh, isRefreshing, pullState, pullIndicator) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
-            ) {
-                MeasuredHero(measured, hero)
-                HeroDetailContent(contentMaxWidth, content)
+            // The page's content is at least as tall as the window, so the page can always scroll the whole height of the hero and the
+            // bar's hand-over (its surface and its title) can always finish. A page with little to show would otherwise stop part way,
+            // leaving the bar's title half in over the content with no surface behind it.
+            BoxWithConstraints(Modifier.fillMaxSize()) {
+                val viewportHeight = maxHeight
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState)
+                            .then(if (footer == null) Modifier.windowInsetsPadding(pageBottomInset()) else Modifier),
+                ) {
+                    MeasuredHero(measured, hero)
+                    HeroDetailContent(contentMaxWidth, minHeight = viewportHeight, content)
+                }
             }
         }
         HeroDetailBar(title, onBack, measured.height(heroHeight), horizontalInset, inFlight, actions) { scrollState.value.toFloat() }
@@ -131,12 +138,16 @@ enum class HeroPullIndicator { BelowBar, InBar }
 val LocalHeroReadingMargin = compositionLocalOf { 0.dp }
 
 /**
- * [content] at [contentMaxWidth], centred. Unbounded, it fills the width rather than wrapping its widest child, so
+ * [content] at [contentMaxWidth], centred, in a block at least [minHeight] tall. Unbounded, it fills the width rather than wrapping its widest child, so
  * narrow sections start at the edge instead of centring. Either way it provides [LocalHeroReadingMargin].
  */
 @Composable
-private fun HeroDetailContent(contentMaxWidth: Dp, content: @Composable ColumnScope.() -> Unit) {
-    ProvideHeroReadingMargin(Modifier.fillMaxWidth()) {
+private fun HeroDetailContent(
+    contentMaxWidth: Dp,
+    minHeight: Dp,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    ProvideHeroReadingMargin(Modifier.fillMaxWidth().heightIn(min = minHeight)) {
         Column(
             modifier =
                 if (contentMaxWidth == Dp.Infinity) {
