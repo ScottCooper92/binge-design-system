@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -174,5 +175,74 @@ class LabelledIconButtonLabelTest {
         val label = rule.onNodeWithText("Subscribe", useUnmergedTree = true).getUnclippedBoundsInRoot()
         assertEquals("the slot's width is the button's", WEIGHTED_ROW.value, button.width.value, 0.5f)
         assertEquals("the label is centred in the slot", (button.left + button.width / 2).value, (label.left + label.width / 2).value, 1f)
+    }
+
+    private fun showMarked(label: String, fontScale: Float) {
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, fontScale)) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    LabelledIconButton(
+                        icon = Icons.Filled.PlayArrow,
+                        label = label,
+                        onClick = {},
+                        trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                        trailingContentDescription = "Opens outside the app",
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    private fun assertMarkedReadsInFull(label: String, fontScale: Float) {
+        showMarked(label, fontScale)
+
+        val layout = layoutOf(label)
+        assertEquals("$label wrapped at $fontScale", 1, layout.lineCount)
+        assertFalse("$label was cut at $fontScale", layout.isLineEllipsized(0))
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
+    }
+
+    @Test fun `a marked Trailer reads in full at 1_0`() = assertMarkedReadsInFull("Trailer", 1.0f)
+
+    @Test fun `a marked Trailer reads in full at 1_3`() = assertMarkedReadsInFull("Trailer", 1.3f)
+
+    @Test fun `a marked Trailer reads in full at 2_0, and nothing is clipped`() = assertMarkedReadsInFull("Trailer", 2.0f)
+
+    @Test fun `a marked Tráiler reads in full at 2_0`() = assertMarkedReadsInFull("Tráiler", 2.0f)
+
+    @Test
+    fun `a marked word too wide for the room the mark leaves is cut whole beside it, not broken`() {
+        val word = "Unsubscribefromeverything"
+        showMarked(word, 2.0f)
+
+        val layout = layoutOf(word)
+        assertEquals("the word was broken across lines", 1, layout.lineCount)
+        assertTrue(layout.isLineEllipsized(0))
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 1)
+    }
+
+    @Test
+    fun `a marked button can be measured for intrinsics`() {
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 2.0f)) {
+                BingeExpressiveTheme(dynamicColor = false) {
+                    Row(Modifier.height(IntrinsicSize.Min)) {
+                        LabelledIconButton(
+                            icon = Icons.Filled.PlayArrow,
+                            label = "Trailer",
+                            onClick = {},
+                            trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                            trailingContentDescription = "Opens outside the app",
+                        )
+                        LabelledIconButton(icon = Icons.Filled.PlayArrow, label = "Share", onClick = {})
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        assertEquals(1, layoutOf("Trailer").lineCount)
+        assertTrue("no text node was checked", rule.assertNoTextClipped() >= 2)
     }
 }

@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,7 +18,8 @@ import com.binge.designsystem.theme.BingeShapes
  * The labels are shown as given, not upper-cased, since they are free text.
  *
  * With [onTagClick] set, each tag is its own button: one focus and click target, announced by its label, and the callback gets the tag's
- * index in [tags]. Without it the tags are plain text and take no taps.
+ * index in [tags]. Each tappable tag keeps its visual size but is at least [R.dimen.min_touch_target] square to touch, as Material's own
+ * controls are, so its row is that tall. Without it the tags are plain text, take no taps, and are as small as they look.
  *
  * @param tags the labels, in display order.
  * @param compact the smaller tag and tighter gaps.
@@ -45,7 +47,10 @@ fun TagRow(
                     if (onTagClick == null) {
                         Modifier
                     } else {
-                        Modifier.clip(BingeShapes.Tag).clickable(role = Role.Button) { onTagClick(index) }
+                        Modifier
+                            .minimumInteractiveComponentSize()
+                            .clip(BingeShapes.Tag)
+                            .clickable(role = Role.Button) { onTagClick(index) }
                     },
             )
         }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
@@ -46,6 +47,49 @@ fun LabelledIconButtonLongWordSample() {
 @Composable
 fun LabelledIconButtonSpanishLongWordSample() {
     LabelledIconButtonRow(trailer = "Tráiler", share = "Compartir", longLabel = "Suscribirse")
+}
+
+/**
+ * A row whose first button leaves the app: a small open-in-new mark at the end of its label, announced with the button ("Trailer, Opens
+ * outside the app"). The other two draw as they always have, so the row shows the marked button beside plain ones.
+ */
+@Composable
+fun LabelledIconButtonTrailingMarkSample() {
+    ScreenshotTheme {
+        Column {
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
+                LabelledIconButton(
+                    icon = Icons.Filled.PlayArrow,
+                    label = "Trailer",
+                    onClick = {},
+                    trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                    trailingContentDescription = "Opens outside the app",
+                )
+                LabelledIconButton(icon = Icons.Filled.Share, label = "Share", onClick = {})
+                LabelledIconButton(icon = Icons.Filled.Add, label = "Add to a list with friends", onClick = {})
+            }
+        }
+    }
+}
+
+/** The same in Spanish, whose longer word still reads whole beside the mark. */
+@Composable
+fun LabelledIconButtonSpanishTrailingMarkSample() {
+    ScreenshotTheme {
+        Column {
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
+                LabelledIconButton(
+                    icon = Icons.Filled.PlayArrow,
+                    label = "Tráiler",
+                    onClick = {},
+                    trailingIcon = Icons.AutoMirrored.Filled.OpenInNew,
+                    trailingContentDescription = "Se abre fuera de la app",
+                )
+                LabelledIconButton(icon = Icons.Filled.Share, label = "Compartir", onClick = {})
+                LabelledIconButton(icon = Icons.Filled.Add, label = "Añadir a una lista con amigos", onClick = {})
+            }
+        }
+    }
 }
 
 /** The row with every button disabled: the circles and labels dim, and nothing takes a tap. */
