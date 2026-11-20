@@ -157,6 +157,8 @@
     <string name="detail_episode_label">E%1$d</string>
     <string name="detail_runtime_minutes">%1$d min</string>
     <string name="paged_grid_loading">Cargando</string>
+    <string name="person_biography_heading">Biografía</string>
+    <string name="person_credits_failed">No se pudieron cargar sus créditos.</string>
     <string name="list_more_failed">No se pudo cargar más. Toca para reintentar.</string>
     <!-- The heading over a detail page's synopsis, when the app gives none of its own -->
     <string name="detail_overview_heading">Sinopsis</string>
