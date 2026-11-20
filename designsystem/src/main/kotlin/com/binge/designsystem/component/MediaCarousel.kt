@@ -51,6 +51,8 @@ private const val END_TILE_KEY = "binge:media-carousel-end-tile"
  * The row's side inset ([horizontalPadding]) is the screen's content inset, which widens with the window (16, 24, then 32dp), so its first
  * card lines up with the headers and chip rows around it on a tablet or a foldable; a caller may pass its own.
  *
+ * [itemKey] must not return a string starting with `binge:`. That prefix is reserved for the library's own lazy items, such as the trailing tile.
+ *
  * @need show a titled row of posters with a see-all tile
  * @group media
  * @replaces a hand-built LazyRow with a section title

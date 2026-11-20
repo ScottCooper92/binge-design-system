@@ -106,6 +106,10 @@ generated: each public composable's KDoc carries `@need` (the need, in the reade
 is the description. `./gradlew generateComponentIndex` writes the file; `checkComponentIndex` runs in `check` and fails when the
 file is stale or a public composable has no tag.
 
+## Reserved lazy keys
+
+Lazy keys that start with `binge:` are reserved for the library's own items, such as the carousel's end tile and the immersive hub's hero. An app must not use that prefix in the keys it passes in.
+
 ## The catalog app
 
 `catalog-app` is a debug-only Android app that lists every sample and demo in the catalog and shows

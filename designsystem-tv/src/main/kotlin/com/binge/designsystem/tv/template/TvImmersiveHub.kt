@@ -46,7 +46,8 @@ import com.binge.designsystem.tv.R as TvR
 
 /**
  * One titled row of an immersive hub. [key] is the row's stable identity (the list and every piece of focus
- * memory are keyed on it, never on [title], which is localised and reworded).
+ * memory are keyed on it, never on [title], which is localised and reworded). A key must not start with `binge:`: that prefix is
+ * reserved for the library's own lazy items, such as the hero.
  */
 data class TvHubRow<T>(
     val key: String,
