@@ -1,5 +1,6 @@
 package com.binge.designsystem.template
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
@@ -125,10 +126,20 @@ class PagedGridScreenTest {
     }
 
     @Test
-    fun `a failure without a retry draws no Try again, and a failedContent slot replaces the plate`() {
+    fun `a failure that cannot be retried draws no Try again`() {
         show(PagedGridState.Failed(ErrorKind.Network, retryable = false))
         rule.onNodeWithText("Try again").assertDoesNotExist()
         rule.onNodeWithText("Discover").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a failedContent slot replaces the failure plate`() {
+        show(
+            PagedGridState.Failed(ErrorKind.Network),
+            failedContent = { Text("Custom failure") },
+        )
+        rule.onNodeWithText("Custom failure").assertIsDisplayed()
+        rule.onNodeWithText("Try again").assertDoesNotExist()
     }
 
     @Test

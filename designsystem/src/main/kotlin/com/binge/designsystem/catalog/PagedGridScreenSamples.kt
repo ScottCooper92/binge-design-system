@@ -49,6 +49,8 @@ private fun sampleItems(count: Int = SAMPLE_ITEMS, from: Int = 0): List<GridItem
             favourite = n % 5 == 1,
             progress = if (n % 6 == 2) 0.4f else null,
             subtitle = if (n % 2 == 0) (1990 + n).toString() else null,
+            watched = n % 4 == 3,
+            unwatchedCount = if (n % 3 == 1) 1 + n % 5 else null,
         )
     }
 

@@ -39,6 +39,12 @@
     <string name="hero_trending_today">N.º %1$d en tendencia hoy</string>
     <string name="list_separator">", "</string>
     <string name="media_card_favourite">Favorito</string>
+    <string name="media_card_watched">Visto</string>
+    <plurals name="media_card_unwatched_count">
+        <item quantity="one">%1$d sin ver</item>
+        <item quantity="many">%1$d sin ver</item>
+        <item quantity="other">%1$d sin ver</item>
+    </plurals>
     <string name="hero_meta_runtime">%1$d h %2$d min</string>
     <plurals name="hero_meta_seasons">
         <item quantity="one">%1$d temporada</item>

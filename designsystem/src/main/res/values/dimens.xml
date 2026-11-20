@@ -4,11 +4,11 @@
     <dimen name="padding_xxs">2dp</dimen>
     <dimen name="padding_xs">4dp</dimen>
     <dimen name="padding_s">8dp</dimen>
-    <!-- The gap between poster cells in a paged media grid, both ways. -->
-    <dimen name="media_grid_gap">14dp</dimen>
     <dimen name="padding_sm">12dp</dimen>
     <dimen name="padding_m">16dp</dimen>
     <dimen name="padding_l">24dp</dimen>
+    <!-- The gap between poster cells in a paged media grid, both ways. -->
+    <dimen name="media_grid_gap">14dp</dimen>
     <!-- Media card -->
     <dimen name="card_width">144dp</dimen>
     <!-- Carousels (MediaCarousel + CarouselSkeleton) -->
