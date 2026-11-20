@@ -48,6 +48,10 @@ private const val SYNOPSIS_LINES = 3
  * [TvExpandingRowsHub]'s `loading`, whose hero plate and rows can take focus.
  *
  * Non-focusable: while it is up the only place focus can be is the top bar.
+ *
+ * @need hold the place of a tv page of expanding rows with no hero while it loads
+ * @group tv
+ * @replaces a hand-built tv rows skeleton
  */
 @Composable
 fun TvExpandingHubLoadingSkeleton(modifier: Modifier = Modifier) {
