@@ -5,7 +5,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
 import com.binge.designsystem.preview.WorstCaseFontPreviews
 
-/** Screenshot coverage for the season dropdown and the season picker's rows. */
+/** Screenshot coverage for the season dropdown, the season picker's rows and the episodes section. */
 class SeasonPickerSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
@@ -24,4 +24,16 @@ class SeasonPickerSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun picker() = SeasonPickerContentSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun episodes() = DetailEpisodesSectionSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun episodesLoading() = DetailEpisodesSectionLoadingSample()
 }
