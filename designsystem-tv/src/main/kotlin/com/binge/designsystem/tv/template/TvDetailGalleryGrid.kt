@@ -24,7 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.tv.material3.MaterialTheme
 import coil3.compose.AsyncImage
@@ -39,11 +42,15 @@ private const val TALL = 2f / 3f
 private const val ROWS = 2
 private const val LANDSCAPE_PER_PORTRAIT = 4
 
-/** One image in the gallery grid: where it loads from, whether it is portrait, and its [index] in the title's whole gallery. */
+/**
+ * One image in the gallery grid: where it loads from, whether it is portrait, and its [index] in the title's whole gallery.
+ * [description] is what a screen reader says for the image; left null, the grid says "Image 3 of 12".
+ */
 class TvDetailGalleryImage(
     val url: String,
     val portrait: Boolean,
     val index: Int,
+    val description: String? = null,
 )
 
 /**
@@ -68,7 +75,8 @@ fun List<TvDetailGalleryImage>.mixedForGrid(): List<TvDetailGalleryImage> {
 /**
  * The Gallery tab as a horizontal strip two rows high. Landscape images take one row each, so they pair up; a portrait one spans
  * both rows as a single tall card. Focus is a ring and nothing else; OK calls [onOpen] with the image's index in the title's whole
- * gallery. Entry lands on the first image, then on the last one focused. [initialFocusedIndex] seeds a frame.
+ * gallery. Entry lands on the first image, then on the last one focused. [initialFocusedIndex] seeds a frame. [totalCount] is the
+ * size of the whole gallery, for the default "Image 3 of 12" label of an image with no description of its own.
  *
  * @need show a title's images as a two-row strip with tall images spanning both rows
  * @group tv
@@ -80,6 +88,7 @@ fun TvDetailGalleryGrid(
     onOpen: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
     initialFocusedIndex: Int? = null,
+    totalCount: Int = images.size,
 ) {
     val rowHeight = dimensionResource(TvR.dimen.tv_detail_gallery_row_height)
     val gap = dimensionResource(TvR.dimen.tv_media_row_card_gap)
@@ -102,6 +111,7 @@ fun TvDetailGalleryGrid(
                 val height = if (image.portrait) rowHeight * ROWS + gap else rowHeight
                 TvGalleryGridCell(
                     image = image,
+                    label = image.description ?: stringResource(TvR.string.tv_detail_gallery_image, image.index + 1, totalCount),
                     width = height * (if (image.portrait) TALL else WIDE),
                     height = height,
                     isFocused = focusedIndex == image.index,
@@ -124,6 +134,7 @@ fun TvDetailGalleryGrid(
 @Composable
 private fun TvGalleryGridCell(
     image: TvDetailGalleryImage,
+    label: String,
     width: Dp,
     height: Dp,
     isFocused: Boolean,
@@ -136,6 +147,7 @@ private fun TvGalleryGridCell(
         modifier = modifier
             .size(width, height)
             .clip(shape)
+            .semantics { contentDescription = label }
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .border(
                 dimensionResource(TvR.dimen.tv_focus_ring_width),
