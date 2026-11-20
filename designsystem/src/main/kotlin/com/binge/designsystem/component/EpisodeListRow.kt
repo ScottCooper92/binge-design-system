@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +38,9 @@ import com.binge.designsystem.theme.BingeTheme
  * A null [onClick] makes the row display-only: the layout is the same, but it is not a button, so it has no click
  * semantics, no ripple and no focus target. For an app that lists episodes to be read, not opened.
  *
+ * [progress], from 0 to 1, draws a thin bar along the foot of the row for an episode part way through; null draws none. [trailingContent] is
+ * a slot at the end of the row, for a mark or a toggle the caller owns (a watched mark, say); with none the row is as it was.
+ *
  * The still has no content description: it sits beside the episode's name, so a screen reader would say the name twice.
  *
  * @need show an episode in a list with its still and details
@@ -50,11 +56,15 @@ fun EpisodeListRow(
     modifier: Modifier = Modifier,
     rating: Float = 0f,
     airDate: String? = null,
+    progress: Float? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
 ) {
     ListRow(
         modifier = modifier,
         onClick = onClick,
         leading = { EpisodeStill(stillUrl = stillUrl) },
+        trailingContent = trailingContent,
+        footer = progress?.let { fraction -> { EpisodeProgress(fraction) } },
     ) { contentModifier ->
         EpisodeRowMeta(
             episodeNumber = episodeNumber,
@@ -64,6 +74,18 @@ fun EpisodeListRow(
             modifier = contentModifier,
         )
     }
+}
+
+/** The thin bar along the foot of a row for an episode that is part way through. */
+@Composable
+private fun EpisodeProgress(fraction: Float) {
+    LinearProgressIndicator(
+        progress = { fraction.coerceIn(0f, 1f) },
+        modifier = Modifier.fillMaxWidth().height(dimensionResource(R.dimen.episode_row_progress_height)),
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        drawStopIndicator = {},
+    )
 }
 
 /** The still is decorative beside the episode's name, which the row's text already carries, so it has no description of its own. */

@@ -75,6 +75,28 @@ fun MovieDetailScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrollState: ScrollState = rememberScrollState(),
 ) {
+    MediaDetailScreen(
+        state, callbacks, modifier, primary, roundActions, topBarActions, afterPeople, afterRails, atEnd, overlays, snackbarHostState, scrollState,
+    )
+}
+
+/** The page every title kind shares: a movie passes no [episodes], a series passes its episodes section, drawn after the people and the first named slot. */
+@Composable
+internal fun MediaDetailScreen(
+    state: DetailState,
+    callbacks: MediaDetailCallbacks,
+    modifier: Modifier = Modifier,
+    primary: (@Composable (Modifier) -> Unit)? = null,
+    roundActions: List<DetailRoundAction> = emptyList(),
+    topBarActions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
+    afterPeople: (@Composable () -> Unit)? = null,
+    afterRails: (@Composable () -> Unit)? = null,
+    atEnd: (@Composable () -> Unit)? = null,
+    overlays: (@Composable () -> Unit)? = null,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    scrollState: ScrollState = rememberScrollState(),
+    episodes: (@Composable () -> Unit)? = null,
+) {
     when (state) {
         is DetailState.Loading -> DetailPageSkeleton(state, callbacks.onBack, snackbarHostState, modifier)
         is DetailState.Failed -> DetailPageFailure(state, callbacks, snackbarHostState, modifier)
@@ -95,7 +117,7 @@ fun MovieDetailScreen(
                 externalScores = detail.scores,
             ) {
                 Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
-                DetailPageBody(detail, callbacks, primary, roundActions, afterPeople, afterRails, atEnd)
+                DetailPageBody(detail, callbacks, primary, roundActions, afterPeople, afterRails, atEnd, episodes)
             }
             overlays?.invoke()
         }
@@ -112,6 +134,7 @@ private fun DetailPageBody(
     afterPeople: (@Composable () -> Unit)?,
     afterRails: (@Composable () -> Unit)?,
     atEnd: (@Composable () -> Unit)?,
+    episodes: (@Composable () -> Unit)?,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
         // The expanded header already shows the stats and the synopsis.
@@ -138,6 +161,7 @@ private fun DetailPageBody(
             )
         }
         afterPeople?.invoke()
+        episodes?.invoke()
         detail.posterRails.forEachIndexed { index, rail ->
             DetailPosterRail(
                 title = rail.title,
