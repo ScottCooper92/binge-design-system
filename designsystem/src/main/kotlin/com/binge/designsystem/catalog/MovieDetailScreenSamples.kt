@@ -4,6 +4,7 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -211,6 +212,32 @@ fun MovieDetailScreenRoundActionsOnlySample() {
                 DetailRoundAction(Icons.Outlined.CheckCircleOutline, "Watched", onClick = {}),
                 DetailRoundAction(Icons.Filled.FavoriteBorder, "Favourite", onClick = {}),
             ),
+        )
+    }
+}
+
+/**
+ * A page with little under its hero (the stats, one poster rail and the facts: no cast and no overview), scrolled to its end. The page is
+ * kept at least a window tall, so it can scroll the whole hero away and the bar's hand-over finishes: the bar has its solid surface and its
+ * title, the hero's own title is gone, and nothing is drawn over the content. Scroll it in the catalog to see the hand-over.
+ */
+@Composable
+fun MovieDetailScreenSparseSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        // An initial value past the end is brought back to the end once the page is laid out, so the frame rests where a scroll to the end does.
+        val scrollState = rememberScrollState(initial = Int.MAX_VALUE)
+        MovieDetailScreen(
+            state = DetailState.Content(
+                MediaDetail(
+                    title = MEDIA_PAGE_TITLE,
+                    genres = MEDIA_PAGE_GENRES,
+                    stats = MediaPageStats,
+                    posterRails = listOf(PosterRail("Similar titles", similar.map { PosterItem(it, DetailPoster(null, it, 8.0f)) })),
+                    info = DetailInfo("Details", listOf(DetailInfoEntry(Icons.Filled.CalendarMonth, "Released", "31 July 2026"))),
+                ),
+            ),
+            callbacks = MediaDetailCallbacks(onBack = LocalDemoBack.current),
+            scrollState = scrollState,
         )
     }
 }
