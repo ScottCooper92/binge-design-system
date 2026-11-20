@@ -70,7 +70,11 @@ private const val FOOTER_KEY = "paged-grid-footer"
 /** How many rows of plates the loading skeleton draws. */
 const val PAGED_GRID_SKELETON_ROWS: Int = 8
 
-/** One poster in a [PagedGridScreen]. [key] is the app's identity for it, text so a lazy grid can save it. */
+/**
+ * One poster in a [PagedGridScreen]. [key] is the app's identity for it, text so a lazy grid can save it; a list that mixes kinds (movies and series)
+ * encodes the kind in the key, since the screen hands the key back to `onOpenItem` and knows nothing else about the item. [watched] draws a tick and
+ * [unwatchedCount] a count badge on the card, as [favourite] draws a heart.
+ */
 @Immutable
 class GridItem(
     val key: String,
@@ -81,6 +85,8 @@ class GridItem(
     val favourite: Boolean = false,
     val progress: Float? = null,
     val subtitle: String? = null,
+    val watched: Boolean = false,
+    val unwatchedCount: Int? = null,
 )
 
 /** One filter in force, shown as a chip the user can tap to remove. [key] is handed back to `onClearChip`. */
@@ -133,7 +139,10 @@ sealed interface PagedGridState {
     ) : PagedGridState
 }
 
-/** What the screen reports. [onBack] null draws no back control; [onRefresh] null draws no pull-to-refresh. */
+/**
+ * What the screen reports. [onOpenItem] gets the opened [GridItem.key], so a mixed list encodes the kind in the key. [onBack] null draws no back
+ * control; [onRefresh] null draws no pull-to-refresh.
+ */
 @Immutable
 class PagedGridCallbacks(
     val onOpenItem: (key: String) -> Unit,
@@ -385,6 +394,8 @@ private fun ReadyGrid(
                     progress = item.progress,
                     subtitle = item.subtitle,
                     favourite = item.favourite,
+                    watched = item.watched,
+                    unwatchedCount = item.unwatchedCount,
                 )
             }
             if (showsGridFooter(state)) {
