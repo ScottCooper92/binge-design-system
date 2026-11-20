@@ -176,6 +176,9 @@ class SearchCallbacks(
  *   no status has no gap where one would go.
  * @param reserveTypeChipsWhileLoading true when the results will bring type chips ([SearchState.Ready] carries them): the loading state then
  *   holds a row of chip plates under the field, so the first result does not drop by that row when the chips arrive. False, the default, draws none.
+ * @param expectedResultName a string the loaded result names are expected to look like, the longest typical title: each loading row lays it out invisibly
+ *   in the row's own style and width, so its name plate takes what the name takes at every font size, wrapping included. Null, the default, is one line.
+ *   The status chips are the app's own and are not part of the hint.
  *
  * @need search with a field, type chips, recent searches and a grid of results
  * @group screens
