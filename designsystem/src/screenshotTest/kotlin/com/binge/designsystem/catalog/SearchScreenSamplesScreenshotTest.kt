@@ -2,6 +2,7 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.PhoneAndFont13Previews
 import com.binge.designsystem.preview.PreviewSystemBarInsets
 import com.binge.designsystem.preview.ScreenWidthPreviews
 import com.binge.designsystem.preview.WorstCaseFontPreviews
@@ -11,6 +12,41 @@ import com.binge.designsystem.preview.WorstCaseFontPreviews
  * states that carry copy at 1.3x and 2x font as well.
  */
 class SearchScreenSamplesScreenshotTest {
+    @PreviewTest
+    @PhoneAndFont13Previews
+    @Composable
+    fun paged() = SearchScreenPagedSample()
+
+    @PreviewTest
+    @PhoneAndFont13Previews
+    @Composable
+    fun pagedLoadingPage() = SearchScreenPagedLoadingPageSample()
+
+    @PreviewTest
+    @PhoneAndFont13Previews
+    @Composable
+    fun pagedNoResults() = SearchScreenPagedNoResultsSample()
+
+    @PreviewTest
+    @PhoneAndFont13Previews
+    @Composable
+    fun smallIdle() = SearchScreenSmallIdleSample()
+
+    @PreviewTest
+    @PhoneAndFont13Previews
+    @Composable
+    fun smallReady() = SearchScreenSmallReadySample()
+
+    @PreviewTest
+    @PhoneAndFont13Previews
+    @Composable
+    fun smallNoResults() = SearchScreenSmallNoResultsSample()
+
+    @PreviewTest
+    @PhoneAndFont13Previews
+    @Composable
+    fun smallFailed() = SearchScreenSmallFailedSample()
+
     @PreviewTest
     @ScreenWidthPreviews
     @WorstCaseFontPreviews

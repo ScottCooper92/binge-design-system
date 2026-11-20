@@ -11,6 +11,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.component.MediaResult
@@ -213,5 +215,102 @@ class SearchScreenTest {
         val odd = MediaResult("search-footer", MediaResultKind.Poster, null, "Odd key", "Movie", rating = 7f)
         show(SearchState.Ready(listOf(odd) + results(2), loaded = 3, hasMore = true, appending = true, types = types))
         rule.onNodeWithText("Odd key").assertIsDisplayed()
+    }
+
+    private fun named(prefix: String, count: Int = 3) =
+        List(count) { MediaResult("$prefix$it", MediaResultKind.Poster, null, "$prefix title $it", "Movie · 2020", rating = 7f) }
+
+    private val pagedResults = mapOf("all" to named("a"), "movies" to named("m"), "people" to named("p"))
+
+    private fun showPaged(
+        selectedKey: String,
+        asked: MutableList<String>,
+        pages: Map<String, List<MediaResult>> = pagedResults,
+    ) {
+        rule.setContent {
+            var selected by mutableStateOf(selectedKey)
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "past",
+                    state = SearchState.Ready(
+                        named("a"),
+                        loaded = 3,
+                        hasMore = false,
+                        types = SearchTypes(types.chips, selected),
+                        pages = pages,
+                    ),
+                    callbacks = callbacks(onType = {
+                        asked += it
+                        selected = it
+                    }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    @Test
+    fun `a settled swipe reports the next type's key once, and that page shows`() {
+        val asked = mutableListOf<String>()
+        showPaged("all", asked)
+        rule.onNodeWithText("a title 0").assertIsDisplayed()
+
+        rule.onNodeWithText("a title 0").performTouchInput { swipeLeft() }
+        rule.waitForIdle()
+
+        assertEquals(listOf("movies"), asked)
+        rule.onNodeWithText("m title 0").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a chip tap moves to that type's page and reports its key`() {
+        val asked = mutableListOf<String>()
+        showPaged("all", asked)
+
+        rule.onNodeWithText("People").performClick()
+        rule.waitForIdle()
+
+        assertEquals(listOf("people"), asked)
+        rule.onNodeWithText("p title 0").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a type with no entry shows loading rows, not another type's results`() {
+        val asked = mutableListOf<String>()
+        showPaged("movies", asked, pages = pagedResults - "movies")
+
+        rule.onNodeWithText("m title 0").assertDoesNotExist()
+        rule.onNodeWithText("a title 0").assertDoesNotExist()
+        rule.onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM))).assertIsDisplayed()
+    }
+
+    @Test
+    fun `one type does not page, so a swipe reports nothing`() {
+        val asked = mutableListOf<String>()
+        rule.setContent {
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "past",
+                    state = SearchState.Ready(
+                        named("a"),
+                        loaded = 3,
+                        hasMore = false,
+                        types = SearchTypes(listOf(SearchTypeChip("all", "All")), "all"),
+                        pages = mapOf("all" to named("a")),
+                    ),
+                    callbacks = callbacks(onType = { asked += it }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onNodeWithText("a title 0").performTouchInput { swipeLeft() }
+        rule.waitForIdle()
+
+        assertTrue(asked.isEmpty())
     }
 }
