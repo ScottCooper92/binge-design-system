@@ -30,8 +30,8 @@ import kotlinx.coroutines.delay
 private const val SAMPLE_ITEMS = 18
 private const val PAGE_ITEMS = 12
 
-/** A cell near the end of the sample's list, so a frame that starts there shows the footer. */
-private const val SCROLLED_TO_END = 14
+/** Past the last cell, so the grid clamps to its end and a frame that starts there shows the footer. */
+private const val SCROLLED_TO_END = 100
 private const val LOAD_MILLIS = 900L
 
 private val SampleTitles =
