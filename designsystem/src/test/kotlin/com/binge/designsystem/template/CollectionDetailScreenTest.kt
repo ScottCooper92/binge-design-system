@@ -105,6 +105,12 @@ class CollectionDetailScreenTest {
     @Test
     fun `the loading rows stand where the loaded parts do`() = loadingRowsStandWhereLoadedPartsDo()
 
+    @Test
+    fun `the loading rows are as tall as parts with a three line blurb at 1x font`() = loadingRowsMatchLoadedPartsWithBlurbs(1f)
+
+    @Test
+    fun `the loading rows are as tall as parts with a three line blurb at 2x font`() = loadingRowsMatchLoadedPartsWithBlurbs(2f)
+
     private fun loadingRowsStandWhereLoadedPartsDo() {
         var state by mutableStateOf<CollectionDetailState>(CollectionDetailState.Loading(hasOverview = false, parts = 2))
         rule.setContent {
@@ -124,6 +130,38 @@ class CollectionDetailScreenTest {
         assertEquals(loaded.left, loading.left, 0.5f)
         assertEquals(loaded.top, loading.top, 0.5f)
         assertEquals(loaded.width, loading.width, 0.5f)
+    }
+
+    /** The first two rows keep their position and their height across the swap, so nothing under them shifts when the parts arrive. */
+    private fun loadingRowsMatchLoadedPartsWithBlurbs(fontScale: Float) {
+        val blurb = "A long blurb that runs over the three lines a part row gives it, so the row is as tall as a row ever is. " +
+            "It keeps going: the story picks up after the last film, and the people who lived through it come back."
+        var state by mutableStateOf<CollectionDetailState>(CollectionDetailState.Loading(hasOverview = false, parts = 2))
+        rule.setContent {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
+                TestTheme {
+                    CollectionDetailScreen(
+                        state = state,
+                        callbacks = CollectionDetailCallbacks(onBack = {}, onRetry = {}, onOpenPart = {}),
+                        partTrailing = { null },
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+        val first = hasTestTag(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM))
+        val second = hasTestTag(LayoutAnchors.section(LayoutAnchors.Collection.SECOND_ITEM))
+        val loading = listOf(first, second).map { rule.onNode(it).fetchSemanticsNode().boundsInRoot }
+        state = CollectionDetailState.Content(
+            collection(listOf(part(1, blurb = blurb), part(2, blurb = blurb)), overview = null),
+        )
+        rule.waitForIdle()
+        val loaded = listOf(first, second).map { rule.onNode(it).fetchSemanticsNode().boundsInRoot }
+        loaded.zip(loading).forEachIndexed { index, (shown, plate) ->
+            assertEquals("row $index top", shown.top, plate.top, 0.5f)
+            assertEquals("row $index height", shown.height, plate.height, 0.5f)
+        }
     }
 
     private fun assertUnclippedAt(scale: Float) {

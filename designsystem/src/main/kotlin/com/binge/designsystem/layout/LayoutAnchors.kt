@@ -96,6 +96,9 @@ object LayoutAnchors {
     object Collection {
         /** The first cell of the grid, or the first row of the list. */
         const val FIRST_ITEM: String = "collection-first-item"
+
+        /** The second row of the list, so a geometry test can check the rows' size as well as where the first one starts. */
+        const val SECOND_ITEM: String = "collection-second-item"
     }
 
     private const val PREFIX = "anchor:"

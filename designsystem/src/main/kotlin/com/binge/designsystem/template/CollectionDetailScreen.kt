@@ -212,7 +212,7 @@ private fun ColumnScope.CollectionContent(
             MediaResultRow(
                 result = part,
                 onClick = { onOpen(part.key) },
-                modifier = if (index == 0) Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)) else Modifier,
+                modifier = rowAnchor(index),
                 trailing = partTrailing?.invoke(part),
             )
         }
@@ -228,9 +228,21 @@ private fun ColumnScope.CollectionPlaceholder(state: CollectionDetailState.Loadi
     ) {
         repeat(state.parts) { index ->
             MediaResultRowSkeleton(
-                modifier = if (index == 0) Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)) else Modifier,
+                modifier = rowAnchor(index),
                 kind = MediaResultKind.Poster,
+                blurbLines = PART_BLURB_LINES,
             )
         }
     }
 }
+
+/** A part row's blurb runs up to this many lines, so its placeholder holds as many. */
+private const val PART_BLURB_LINES = 3
+
+/** The anchors on the first two rows, loaded or loading, so a test can compare where they stand and how tall they are. */
+private fun rowAnchor(index: Int): Modifier =
+    when (index) {
+        0 -> Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM))
+        1 -> Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Collection.SECOND_ITEM))
+        else -> Modifier
+    }
