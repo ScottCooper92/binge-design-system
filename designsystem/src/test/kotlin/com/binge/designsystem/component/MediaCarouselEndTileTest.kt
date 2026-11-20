@@ -55,4 +55,22 @@ class MediaCarouselEndTileTest {
         val density = rule.density.density
         assertEquals(100f, endTileHeightPx() / density, 1f)
     }
+
+    @Test
+    fun `an item keyed like the old end tile key renders beside the tile without crashing`() {
+        rule.setContent {
+            TestTheme {
+                MediaCarousel(
+                    title = "Row",
+                    items = listOf("media_carousel_end_tile"),
+                    itemKey = { it },
+                    onMoreClick = {},
+                ) { _, _ -> Box { Text("item") } }
+            }
+        }
+        rule.waitForIdle()
+
+        assertEquals(1, rule.onAllNodesWithText("item").fetchSemanticsNodes().size)
+        assertEquals(2, rule.onAllNodesWithText("See all").fetchSemanticsNodes().size)
+    }
 }

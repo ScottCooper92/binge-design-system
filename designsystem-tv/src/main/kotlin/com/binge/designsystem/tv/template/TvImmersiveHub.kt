@@ -91,6 +91,9 @@ data class TvHubRowFailure(
     val onRetry: () -> Unit,
 )
 
+/** The lazy key of the hero item. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
+private const val HERO_KEY = "binge:tv-immersive-hero"
+
 /** Enough placeholder cards to run a pending row off the edge, as a loaded row does. */
 private const val PENDING_ROW_CARDS = 8
 
@@ -253,7 +256,7 @@ fun <T : Any> TvImmersiveHub(
                 // Lets the last row scroll up to the anchor.
                 contentPadding = PaddingValues(bottom = dimensionResource(TvR.dimen.tv_immersive_rows_bottom)),
             ) {
-                item(key = "tv-immersive-hero") {
+                item(key = HERO_KEY) {
                     if (hero != null) {
                         Box(
                             modifier =

@@ -30,6 +30,9 @@ import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeExpressiveTheme
 
+/** The lazy key of the trailing tile. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
+private const val END_TILE_KEY = "binge:media-carousel-end-tile"
+
 /**
  * A titled horizontal row of media items, with an optional trailing "see all" tile.
  *
@@ -97,7 +100,7 @@ fun <T> MediaCarousel(
                 }
             }
             if (onEndTileClick != null) {
-                item(key = "media_carousel_end_tile") {
+                item(key = END_TILE_KEY) {
                     SeeAllTile(
                         label = endTileLabel,
                         onClick = onEndTileClick,
