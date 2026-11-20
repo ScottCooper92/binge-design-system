@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.layout.LayoutAnchors
@@ -20,6 +21,7 @@ import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.assertNoTextClipped
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -162,6 +164,16 @@ class CollectionDetailScreenTest {
             assertEquals("row $index top", shown.top, plate.top, 0.5f)
             assertEquals("row $index height", shown.height, plate.height, 0.5f)
         }
+    }
+
+    @Test
+    fun `with no parts heading the first part starts a gap under the overview`() {
+        show(CollectionDetailState.Content(collection(listOf(part(1), part(2)))))
+        val overview = rule.onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW))).fetchSemanticsNode().boundsInRoot
+        val first = rule.onNode(hasTestTag(LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM))).fetchSemanticsNode().boundsInRoot
+        val gap = first.top - overview.bottom
+        val expected = with(rule.density) { 16.dp.toPx() }
+        assertTrue("gap $gap should be at least $expected", gap >= expected - 1f)
     }
 
     private fun assertUnclippedAt(scale: Float) {
