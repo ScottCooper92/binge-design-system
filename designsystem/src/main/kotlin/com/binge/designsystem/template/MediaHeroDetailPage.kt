@@ -77,7 +77,8 @@ fun MediaHeroDetailPage(
         heroHeight = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_height else R.dimen.detail_hero_height),
         horizontalInset = dimensionResource(if (cinematic) R.dimen.detail_cinematic_header_padding else R.dimen.padding_m),
         contentMaxWidth = Dp.Infinity,
-        darkStatusBar = false,
+        // The hero, or the cinematic header at the expanded width, is under the bar: the icons stay light over it until the bar hands them to the theme.
+        darkStatusBar = true,
         inFlight = inFlight,
         actions = topBarActions,
         footer = footer,
