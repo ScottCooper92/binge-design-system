@@ -73,6 +73,9 @@ sealed interface CollectionDetailState {
      * A block of prose when [hasOverview], a heading row when [hasPartsHeading], and [parts] rows of placeholders, in the loaded page's own room. [hasPoster] says the
      * loaded hero will have a poster beside the title at an expanded width, so the placeholder is that taller header. [hasPartsHeading] says the loaded page will draw
      * a heading over its parts ([CollectionDetail.partsHeading]); the heading is a row of its own, so without it the parts would arrive that much lower.
+     * [hasOverviewToggle] says the loaded overview is long enough to collapse behind a "Read more" toggle, which is a row of its own too: false, for an
+     * overview that fits its collapsed lines, leaves it out so the parts do not arrive that much higher. True, the default, keeps the row, because a skeleton cannot
+     * know how long the overview will be; an app that does know sets it.
      */
     @Immutable
     class Loading(
@@ -80,6 +83,7 @@ sealed interface CollectionDetailState {
         val parts: Int = 4,
         val hasPoster: Boolean = false,
         val hasPartsHeading: Boolean = false,
+        val hasOverviewToggle: Boolean = true,
     ) : CollectionDetailState
 
     @Immutable
@@ -233,7 +237,12 @@ private fun ColumnScope.CollectionContent(
 
 @Composable
 private fun ColumnScope.CollectionPlaceholder(state: CollectionDetailState.Loading) {
-    if (state.hasOverview) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+    if (state.hasOverview) {
+        DetailOverviewSkeleton(
+            Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)),
+            withToggle = state.hasOverviewToggle,
+        )
+    }
     if (state.hasPartsHeading) {
         PartsHeadingPlate()
     } else if (state.hasOverview) {
