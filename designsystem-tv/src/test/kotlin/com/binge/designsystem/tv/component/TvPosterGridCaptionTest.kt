@@ -5,6 +5,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isFocusable
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
@@ -58,7 +59,23 @@ class TvPosterGridCaptionTest {
     fun `a subtitle is drawn under the poster`() {
         setGrid(listOf(cell("Heat", subtitle = "Crime · 1995")))
 
-        composeTestRule.onNodeWithText("Crime · 1995").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Crime · 1995", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `a captioned cell with no art draws its title once, and a screen reader hears it once`() {
+        setGrid(listOf(cell("Heat", subtitle = "Crime · 1995")))
+
+        composeTestRule.onAllNodesWithText("Heat", useUnmergedTree = true).assertCountEquals(1)
+        composeTestRule.onAllNodesWithContentDescription("Heat, Crime · 1995", useUnmergedTree = true).assertCountEquals(1)
+        composeTestRule.onAllNodesWithText("Crime · 1995").assertCountEquals(0)
+    }
+
+    @Test
+    fun `a cell with no subtitle still names itself in the plate when it has no art`() {
+        setGrid(listOf(cell("Heat")))
+
+        composeTestRule.onAllNodesWithText("Heat", useUnmergedTree = true).assertCountEquals(1)
     }
 
     @Test

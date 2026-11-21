@@ -31,6 +31,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -208,7 +211,7 @@ private fun TvPosterGridCell(
         TvPosterPlate(
             modifier = modifier,
             aspect = poster?.shape?.aspect ?: CARD_ASPECT_RATIO,
-            interaction = Modifier.tvClickable(
+            interaction = Modifier.posterName(poster).tvClickable(
                 onFocusChanged = {
                     focused = it
                     if (it) onFocused() else onBlurred()
@@ -219,18 +222,20 @@ private fun TvPosterGridCell(
             if (poster != null) {
                 SubcomposeAsyncImage(
                     model = poster.imageUrl,
-                    contentDescription = poster.title,
+                    contentDescription = poster.title.takeIf { poster.subtitle == null },
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                     loading = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) },
-                    // No poster: the name stands in, so a title without art is still something to pick.
+                    // No poster: the name stands in, so a title without art is still something to pick. A caption already names it.
                     error = {
                         Box(Modifier.fillMaxSize().padding(dimensionResource(DesR.dimen.padding_s)), contentAlignment = Alignment.Center) {
-                            Text(
-                                text = poster.title,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
+                            if (poster.subtitle == null) {
+                                Text(
+                                    text = poster.title,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
                         }
                     },
                 )
@@ -242,10 +247,17 @@ private fun TvPosterGridCell(
     }
 }
 
-/** The caption under a poster: its title, then the [subtitle] in the quieter colour, each held to one line. */
+/**
+ * A captioned poster is named on the plate itself, title then subtitle, because the visible caption is hidden from a screen reader
+ * so it is not heard twice. A poster without a caption is named by its image, or by its title when it has no art.
+ */
+private fun Modifier.posterName(poster: TvPosterCell?): Modifier =
+    if (poster?.subtitle == null) this else semantics { contentDescription = "${poster.title}, ${poster.subtitle}" }
+
+/** The caption under a poster: its title, then the [subtitle] in the quieter colour, each held to one line. Its words are on the poster's own description. */
 @Composable
 private fun TvPosterCaption(title: String, subtitle: String) {
-    Column(Modifier.padding(top = dimensionResource(DesR.dimen.padding_s))) {
+    Column(Modifier.clearAndSetSemantics {}.padding(top = dimensionResource(DesR.dimen.padding_s))) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
