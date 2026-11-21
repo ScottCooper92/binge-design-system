@@ -65,7 +65,7 @@ enum class ScreenBar {
     /** A medium bar whose title collapses as the body scrolls, and a two-row bar beside another pane. */
     Collapsing,
 
-    /** A single-line bar that slides away as the body scrolls down and returns as it scrolls up. */
+    /** A single-line bar that slides away as the body scrolls down and returns as it scrolls up, or stays put when the scaffold is `pinned`. */
     Small,
 
     /** A large collapsing bar whose expanded heading carries a subtitle line and a trailing control. */
@@ -95,6 +95,10 @@ enum class ScreenBarChrome {
  * the two-row pane bar when another pane sits beside it, and [onBack] is dropped where that pane already
  * offers the way back. A [header] (a search field, filter chips) is drawn over the body below the bar, and one
  * scrim spans both. [barScrim] is false only where something under the bar draws the scrim for it.
+ *
+ * [pinned] keeps a [ScreenBar.Small] in place while the body scrolls, as a search screen's bar stays over its field: the body still passes
+ * under it and the scrim still follows how far it has, but the bar never slides away. It is false by default, so a small bar slides as it
+ * always has, and is ignored for the other bars.
  *
  * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state; it
  * is ignored for [ScreenBar.None]. [subtitle] and [titleTrailing] are [ScreenBar.Large]'s, and show while it is
@@ -134,6 +138,7 @@ fun BingeScreenScaffold(
     bar: ScreenBar = ScreenBar.Collapsing,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     barScrim: Boolean = true,
+    pinned: Boolean = false,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     subtitle: String? = null,
     titleTrailing: (@Composable () -> Unit)? = null,
@@ -147,7 +152,7 @@ fun BingeScreenScaffold(
     content: @Composable (padding: PaddingValues) -> Unit,
 ) {
     val barColor = if (barChrome == ScreenBarChrome.Plain) Color.Unspecified else Color.Transparent
-    val ownBehavior = rememberScreenBarScrollBehavior(bar)
+    val ownBehavior = rememberScreenBarScrollBehavior(bar, pinned)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
     val scrim = screenBarScrim(bar, behavior)
     val bodyTouch = if (behavior != null && listState != null && bar.collapses()) {
@@ -324,10 +329,10 @@ internal fun screenBarScrim(bar: ScreenBar, behavior: TopAppBarScrollBehavior?):
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun rememberScreenBarScrollBehavior(bar: ScreenBar): TopAppBarScrollBehavior? =
+internal fun rememberScreenBarScrollBehavior(bar: ScreenBar, pinned: Boolean = false): TopAppBarScrollBehavior? =
     when (bar) {
         ScreenBar.Collapsing, ScreenBar.Large -> TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-        ScreenBar.Small -> TopAppBarDefaults.enterAlwaysScrollBehavior()
+        ScreenBar.Small -> if (pinned) TopAppBarDefaults.pinnedScrollBehavior() else TopAppBarDefaults.enterAlwaysScrollBehavior()
         ScreenBar.None -> null
     }
 

@@ -207,6 +207,8 @@ class SearchCallbacks(
  *   The status chips are the app's own and are not part of the hint.
  *
  * @param bar the top bar: the large collapsing one by default, or `Small`, whose title row never collapses so nothing is handed over.
+ * @param pinned keeps a `Small` bar, with the field and chips under it, in place while the results scroll under them, as the scaffold's `pinned`. False, the
+ *   default, lets the small bar slide away as it always has; it has no effect on the other bars.
  * @param fastScrollbar draws a [com.binge.designsystem.component.BingeFastScrollbar] over the results grid (over each page's own grid when the
  *   body pages), at the end edge and inside the bar's and the navigation bar's room, with the options' bubble text. Null, the default, draws none.
  *
@@ -239,12 +241,13 @@ fun SearchScreen(
     noResultsExtras: (@Composable () -> Unit)? = null,
     failedContent: (@Composable (Modifier) -> Unit)? = null,
     bar: ScreenBar = ScreenBar.Large,
+    pinned: Boolean = false,
     reserveTypeChipsWhileLoading: Boolean = false,
     expectedResultName: String? = null,
     fastScrollbar: FastScrollbarOptions? = null,
     overlays: @Composable () -> Unit = {},
 ) {
-    val scrollBehavior = rememberScreenBarScrollBehavior(bar)
+    val scrollBehavior = rememberScreenBarScrollBehavior(bar, pinned)
     // A small bar's title row never collapses, so nothing is ever handed over on it.
     val collapsed = if (bar == ScreenBar.Small) 0f else scrollBehavior?.state?.collapsedFraction ?: 0f
     val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE

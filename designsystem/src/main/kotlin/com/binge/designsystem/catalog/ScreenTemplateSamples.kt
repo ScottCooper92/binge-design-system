@@ -133,6 +133,21 @@ fun BingeScreenScaffoldSmallBarSample() {
 }
 
 /**
+ * The small bar pinned: it stays where it is while the list scrolls under it, and its scrim fades in behind it as rows pass. A frame cannot show the
+ * bar not moving, so the demo runs live and no screenshot renders it.
+ */
+@Composable
+fun BingeScreenScaffoldPinnedSmallBarDemo() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "Users", onBack = LocalDemoBack.current, bar = ScreenBar.Small, pinned = true) { padding ->
+            SampleRows(padding, rows = PINNED_DEMO_ROWS)
+        }
+    }
+}
+
+private const val PINNED_DEMO_ROWS = 40
+
+/**
  * No bar at all: the scaffold switches off the top bar and its scroll behaviour, and the body reserves the status
  * bar's inset itself so its first row does not sit under the clock.
  */
