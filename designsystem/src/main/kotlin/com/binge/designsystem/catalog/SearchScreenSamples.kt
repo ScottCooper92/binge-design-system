@@ -27,6 +27,7 @@ import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.StatusChip
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.template.FastScrollbarOptions
 import com.binge.designsystem.template.ScreenBar
 import com.binge.designsystem.template.SearchCallbacks
 import com.binge.designsystem.template.SearchScreen
@@ -375,7 +376,10 @@ fun SearchScreenTypeEmptySample() =
 @Composable
 fun SearchScreenFailedSample() = SampleSearch({ _, _ -> SearchState.Failed(ErrorKind.Network) }, initialText = "past")
 
-/** The screen live: typing searches after a pause, results page in near the end, and a type chip narrows them. */
+/**
+ * The screen live: typing searches after a pause, results page in near the end, and a type chip narrows them. Scroll the results and a fast
+ * scrollbar appears at the end edge; hold its thumb and drag, and a bubble names the result you are over.
+ */
 @Composable
 fun SearchScreenDemo() {
     var text by remember { mutableStateOf("") }
@@ -432,6 +436,7 @@ fun SearchScreenDemo() {
                     onClearRecents = { recents = emptyList() },
                     onBack = LocalDemoBack.current,
                 ),
+            fastScrollbar = FastScrollbarOptions(bubbleText = { index -> "Result ${index + 1}" }),
         )
         opened?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { opened = null }) }
     }

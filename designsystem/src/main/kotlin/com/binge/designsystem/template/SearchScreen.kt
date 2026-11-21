@@ -199,6 +199,8 @@ class SearchCallbacks(
  *   holds a row of chip plates under the field, so the first result does not drop by that row when the chips arrive. False, the default, draws none.
  *
  * @param bar the top bar: the large collapsing one by default, or `Small`, whose title row never collapses so nothing is handed over.
+ * @param fastScrollbar draws a [com.binge.designsystem.component.BingeFastScrollbar] over the results grid (over each page's own grid when the
+ *   body pages), at the end edge and inside the bar's and the navigation bar's room, with the options' bubble text. Null, the default, draws none.
  *
  * @need search with a field, type chips, recent searches and a grid of results
  * @group screens
@@ -231,6 +233,7 @@ fun SearchScreen(
     bar: ScreenBar = ScreenBar.Large,
     reserveTypeChipsWhileLoading: Boolean = false,
     expectedResultName: String? = null,
+    fastScrollbar: FastScrollbarOptions? = null,
     overlays: @Composable () -> Unit = {},
 ) {
     val scrollBehavior = rememberScreenBarScrollBehavior(bar)
@@ -281,6 +284,7 @@ fun SearchScreen(
                         pager = pager,
                         pageStates = pageStates,
                         expectedResultName = expectedResultName,
+                        fastScrollbar = fastScrollbar,
                     )
                 }
             }
@@ -315,6 +319,7 @@ private fun SearchBody(
     pager: FilterPager,
     pageStates: SearchPageStates,
     expectedResultName: String?,
+    fastScrollbar: FastScrollbarOptions?,
 ) {
     // The plates (no results, failed, a type with nothing in it) clear the navigation bar and the floating pill as the lists do.
     val platePadding = navOverlayPadding(PaddingValues(top = top, bottom = bottom))
@@ -358,6 +363,7 @@ private fun SearchBody(
                             moreFailedLabel = moreFailedLabel,
                             resultTrailing = resultTrailing,
                             platePadding = platePadding,
+                            fastScrollbar = fastScrollbar,
                             gridState = pageStates.stateFor(paged.chips[page].key),
                         )
                     }
@@ -372,6 +378,7 @@ private fun SearchBody(
                         moreFailedLabel = moreFailedLabel,
                         resultTrailing = resultTrailing,
                         platePadding = platePadding,
+                        fastScrollbar = fastScrollbar,
                     )
                 }
             }
@@ -653,6 +660,7 @@ private fun ResultsList(
     moreFailedLabel: String,
     resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)?,
     platePadding: PaddingValues,
+    fastScrollbar: FastScrollbarOptions?,
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
     val nearEnd by remember {
@@ -682,25 +690,27 @@ private fun ResultsList(
     }
     // One column on a phone; wider windows fold the results into columns rather than running a row the width of a tablet.
     CenteredContent(maxWidth = dimensionResource(R.dimen.search_content_max_width)) { capped ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(searchResultColumns()),
-            state = gridState,
-            modifier = capped,
-            contentPadding = contentPadding,
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
-            itemsIndexed(results, key = { _, result -> result.key }) { index, result ->
-                MediaResultRow(
-                    result = result,
-                    onClick = { callbacks.onOpenResult(result.key) },
-                    modifier = Modifier.layoutAnchorIf(index == 0, LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)),
-                    trailing = resultTrailing?.invoke(result),
-                )
-            }
-            if (state.appending || state.appendFailed || empty) {
-                item(key = FOOTER_KEY, span = { GridItemSpan(maxLineSpan) }) {
-                    AppendFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
+        FastScrollbarOverlay(fastScrollbar, gridState, contentPadding, capped) { gridModifier ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(searchResultColumns()),
+                state = gridState,
+                modifier = gridModifier,
+                contentPadding = contentPadding,
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+            ) {
+                itemsIndexed(results, key = { _, result -> result.key }) { index, result ->
+                    MediaResultRow(
+                        result = result,
+                        onClick = { callbacks.onOpenResult(result.key) },
+                        modifier = Modifier.layoutAnchorIf(index == 0, LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)),
+                        trailing = resultTrailing?.invoke(result),
+                    )
+                }
+                if (state.appending || state.appendFailed || empty) {
+                    item(key = FOOTER_KEY, span = { GridItemSpan(maxLineSpan) }) {
+                        AppendFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
+                    }
                 }
             }
         }
