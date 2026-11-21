@@ -126,7 +126,7 @@ sealed interface SearchState {
      * The paging flags stay shared by every page, and each page asks for more near its own end.
      *
      * [query] is the query these results answer. An app that debounces and keeps the old results on screen while the field changes sets it, so
-     * the pages keep their place until the new results arrive and then start at the top. Null reads the live `text` instead. A state that carries no results (loading, idle, failed) keeps the last query answered.
+     * the pages keep their place until the new results arrive and then start at the top. Null reads the live `text` instead. While loading or after a failure the last query answered is kept; idle forgets it.
      */
     class Ready(
         val results: List<MediaResult>,
@@ -244,8 +244,13 @@ fun SearchScreen(
     // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
     val answered = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query
     val lastAnswered = remember { AnsweredQuery() }
-    if (answered != null) lastAnswered.value = answered
-    // A state with no results (loading, idle, failed) keeps the last answered query, so the key does not fall to the live text and back.
+    if (answered != null) {
+        lastAnswered.value = answered
+    } else if (state is SearchState.Idle) {
+        lastAnswered.value = null
+    }
+    // Loading and failed keep the last answered query, so the key does not fall to the live text and back. Idle searched nothing: a search
+    // of the same query after it is a new one and opens at the top.
     val shownQuery = answered ?: lastAnswered.value ?: text
     val pageStates = rememberSaveable(shownQuery, saver = SearchPageStates.Saver) { SearchPageStates() }
     val pager = rememberFilterPager(
