@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -23,10 +25,43 @@ import com.binge.designsystem.theme.BingeShapes
 private const val DEFAULT_LIST_ROW_SKELETON_COUNT = 8
 
 /**
+ * A row's measured height at one font scale: the loaded row was [height] tall at [fontScale]. A row whose text wraps in steps as the
+ * font grows has no one height, so a skeleton is given a few of these and follows them.
+ */
+@Immutable
+class FontScaleHeight(
+    val fontScale: Float,
+    val height: Dp,
+)
+
+/**
+ * The height for [fontScale] from [points]: a point's own height at a scale it names, a straight line between the two points either
+ * side of it, and the nearest point's height beyond the first and last. [fallback] when there are no points.
+ */
+internal fun resolveRowHeight(
+    points: List<FontScaleHeight>,
+    fontScale: Float,
+    fallback: Dp,
+): Dp {
+    if (points.isEmpty()) return fallback
+    val sorted = points.sortedBy { it.fontScale }
+    val first = sorted.first()
+    val last = sorted.last()
+    if (fontScale <= first.fontScale) return first.height
+    if (fontScale >= last.fontScale) return last.height
+    val lower = sorted.last { it.fontScale <= fontScale }
+    val upper = sorted.first { it.fontScale >= fontScale }
+    if (upper.fontScale == lower.fontScale) return lower.height
+    val along = (fontScale - lower.fontScale) / (upper.fontScale - lower.fontScale)
+    return lower.height + (upper.height - lower.height) * along
+}
+
+/**
  * Loading placeholder for the shared full-width [ListRow] — a shimmer clipped to the row's `large`
  * corner. [height] defaults to a poster-leading row so the loading→content swap doesn't reflow;
- * pass a shorter one for a row shape that resolves shorter, such as an avatar-leading row.
- * [description] names the loading state for a screen reader; without one it stays silent.
+ * pass a shorter one for a row shape that resolves shorter, such as an avatar-leading row. [fontScaleHeights], when given, replace
+ * [height] with the row's measured heights at a few font scales, followed in a straight line between them, for a row whose text
+ * wraps as the font grows. [description] names the loading state for a screen reader; without one it stays silent.
  *
  * @need show a loading placeholder for a list row
  * @group feedback
@@ -36,11 +71,12 @@ fun ListRowSkeleton(
     modifier: Modifier = Modifier,
     height: Dp = dimensionResource(R.dimen.list_row_skeleton_height),
     description: String? = null,
+    fontScaleHeights: List<FontScaleHeight> = emptyList(),
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(height)
+            .height(resolveRowHeight(fontScaleHeights, LocalDensity.current.fontScale, height))
             .skeleton(visible = true, shape = BingeShapes.Large)
             .describedAs(description),
     )
@@ -50,7 +86,7 @@ fun ListRowSkeleton(
  * A non-scrolling column of [count] [ListRowSkeleton] placeholders laid out with [contentPadding] and
  * the standard row spacing, so it stands in for the loaded [LazyColumn] directly.
  *
- * [height] passes through to each [ListRowSkeleton]; match the resolved row's height or the
+ * [height] and [fontScaleHeights] pass through to each [ListRowSkeleton]; match the resolved row's height, at each font scale, or the
  * loading→content swap reflows.
  *
  * [header] is the plate for a leading item the resolved list puts *inside* its own column — the list detail
@@ -72,6 +108,7 @@ fun ListRowSkeletonColumn(
     height: Dp = dimensionResource(R.dimen.list_row_skeleton_height),
     description: String? = null,
     header: (@Composable () -> Unit)? = null,
+    fontScaleHeights: List<FontScaleHeight> = emptyList(),
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize().describedAs(description),
@@ -86,6 +123,7 @@ fun ListRowSkeletonColumn(
             ListRowSkeleton(
                 modifier = Modifier.layoutAnchorIf(index == 0, LayoutAnchors.section(LayoutAnchors.Collection.FIRST_ITEM)),
                 height = height,
+                fontScaleHeights = fontScaleHeights,
             )
         }
     }
