@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.ErrorKind
+import com.binge.designsystem.tv.component.TvPosterShape
 import com.binge.designsystem.tv.component.TvSearchField
 import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.tv.focus.tvShellArrivalTarget
@@ -36,6 +37,10 @@ class TvSearchCell(
     val onClick: () -> Unit,
     /** The rail a recommendation belongs to, handed back through `onCellFocused` for impression reporting; null for a result. */
     val rowId: String? = null,
+    /** A caption line under the poster, after the title; null leaves the poster alone. */
+    val subtitle: String? = null,
+    /** The footprint of the art: a poster by default, [TvPosterShape.Square] for a logo or other square art. */
+    val shape: TvPosterShape = TvPosterShape.Poster,
 )
 
 /** What the results pane is showing, which is also what the page's focus and plates follow. */

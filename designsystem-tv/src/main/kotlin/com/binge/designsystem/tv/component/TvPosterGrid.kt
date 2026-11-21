@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil3.compose.SubcomposeAsyncImage
@@ -44,8 +49,19 @@ import com.binge.designsystem.tv.R as TvR
 /** Posters across the poster grid. */
 const val TV_POSTER_GRID_COLUMNS = 4
 
+/** The footprint a [TvPosterCell] is drawn in: [Poster] is the card's 2:3, [Square] suits art that is not a poster, such as a logo. */
+enum class TvPosterShape(
+    internal val aspect: Float,
+) {
+    Poster(CARD_ASPECT_RATIO),
+    Square(1f),
+}
+
 /**
  * One poster of a [TvPosterGrid]: its art, the name that stands in for it when there is none, and what OK does.
+ *
+ * A [subtitle] adds a caption under the art, the [title] and then the subtitle, each on one line; null leaves the cell as
+ * the art alone. [shape] gives the art its footprint.
  *
  * The marks are for a grid of titles the viewer has a relationship with, and each draws nothing by default: [watched] a tick,
  * [unwatchedCount] a count badge for a show with episodes left (zero or less draws none; a [watched] cell shows the tick instead), [favourite] a heart, and [progress]
@@ -59,6 +75,8 @@ class TvPosterCell(
     val unwatchedCount: Int = 0,
     val favourite: Boolean = false,
     val progress: Float? = null,
+    val subtitle: String? = null,
+    val shape: TvPosterShape = TvPosterShape.Poster,
 )
 
 /**
@@ -154,12 +172,13 @@ private fun entryModifier(entry: FocusRequester, isEntry: Boolean): Modifier = i
 internal fun TvPosterPlate(
     modifier: Modifier = Modifier,
     interaction: Modifier = Modifier,
+    aspect: Float = CARD_ASPECT_RATIO,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(CARD_ASPECT_RATIO)
+            .aspectRatio(aspect)
             .clip(BingeShapes.MediaCard)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .then(interaction),
@@ -187,33 +206,72 @@ private fun TvPosterGridCell(
     val hasPoster = poster != null
     val reportFocused by rememberUpdatedState(onFocused)
     LaunchedEffect(hasPoster) { if (focusablePlate && focused && hasPoster) reportFocused() }
-    TvPosterPlate(
-        modifier = modifier,
-        interaction = Modifier.tvClickable(
-            onFocusChanged = {
-                focused = it
-                if (it) onFocused() else onBlurred()
-            },
-            onClick = { poster?.onClick?.invoke() },
-        ),
-    ) {
-        if (poster != null) {
-            SubcomposeAsyncImage(
-                model = poster.imageUrl,
-                contentDescription = poster.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-                loading = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) },
-                // No poster: the name stands in, so a title without art is still something to pick.
-                error = {
-                    Box(Modifier.fillMaxSize().padding(dimensionResource(DesR.dimen.padding_s)), contentAlignment = Alignment.Center) {
-                        Text(text = poster.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
-                    }
+    // The caption sits beside the plate in a column that is always there, so a plate keeps its node (and focus) when a poster arrives.
+    Column {
+        TvPosterPlate(
+            modifier = modifier,
+            aspect = poster?.shape?.aspect ?: CARD_ASPECT_RATIO,
+            interaction = Modifier.posterName(poster).tvClickable(
+                onFocusChanged = {
+                    focused = it
+                    if (it) onFocused() else onBlurred()
                 },
-            )
+                onClick = { poster?.onClick?.invoke() },
+            ),
+        ) {
+            if (poster != null) {
+                SubcomposeAsyncImage(
+                    model = poster.imageUrl,
+                    contentDescription = poster.title.takeIf { poster.subtitle == null },
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    loading = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) },
+                    // No poster: the name stands in, so a title without art is still something to pick. A caption already names it.
+                    error = {
+                        Box(Modifier.fillMaxSize().padding(dimensionResource(DesR.dimen.padding_s)), contentAlignment = Alignment.Center) {
+                            if (poster.subtitle == null) {
+                                Text(
+                                    text = poster.title,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
+                        }
+                    },
+                )
+            }
+            if (poster != null) TvPosterMarks(poster)
+            if (focused) PosterFocusRing()
         }
-        if (poster != null) TvPosterMarks(poster)
-        if (focused) PosterFocusRing()
+        poster?.subtitle?.let { TvPosterCaption(title = poster.title, subtitle = it) }
+    }
+}
+
+/**
+ * A captioned poster is named on the plate itself, title then subtitle, because the visible caption is hidden from a screen reader
+ * so it is not heard twice. A poster without a caption is named by its image, or by its title when it has no art.
+ */
+private fun Modifier.posterName(poster: TvPosterCell?): Modifier =
+    if (poster?.subtitle == null) this else semantics { contentDescription = "${poster.title}, ${poster.subtitle}" }
+
+/** The caption under a poster: its title, then the [subtitle] in the quieter colour, each held to one line. Its words are on the poster's own description. */
+@Composable
+private fun TvPosterCaption(title: String, subtitle: String) {
+    Column(Modifier.clearAndSetSemantics {}.padding(top = dimensionResource(DesR.dimen.padding_s))) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

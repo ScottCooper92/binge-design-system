@@ -37,6 +37,11 @@ class TvSearchPageSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun resultsCaptioned() = Frame { TvSearchPageCaptionedResultsSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun resultFocusedInSecondRow() = Frame { TvSearchPageResultFocusedSample() }
 
     @PreviewTest
