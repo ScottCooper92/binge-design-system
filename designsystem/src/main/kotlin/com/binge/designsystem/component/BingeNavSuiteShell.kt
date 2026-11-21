@@ -115,6 +115,9 @@ enum class BingeNavPresentation {
  * [BottomBar] is retained as the pre-floating presentation: nothing in production selects it, and the
  * catalog + retention test pin it explicitly so the docked bar stays comparable and testable.
  *
+ * [floatingScrim] draws a [BottomBarScrim] behind the floating pill, so content scrolling under it fades out. It is on by default; a host
+ * that draws its own fade passes false. It applies to [BingeNavPresentation.FloatingBar] only: the docked bar and the side rail have none.
+ *
  * Stateless — the caller supplies [items], [selectedKey], and [onSelect], and renders routed UI in
  * [content]. The nav is always shown: full-screen details live on a root back stack *above* this
  * shell, so there's no `showNavigation` flag and no `movableContentOf`.
@@ -132,6 +135,7 @@ fun BingeNavSuiteShell(
     presentation: BingeNavPresentation = rememberBingeNavPresentation(),
     floatingTone: BingeNavFloatingTone = BingeNavFloatingTone.AlwaysDark,
     floatingStyle: BingeNavFloatingStyle = BingeNavFloatingStyle.IconWithSelectedLabel,
+    floatingScrim: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     when (presentation) {
@@ -140,7 +144,7 @@ fun BingeNavSuiteShell(
         BingeNavPresentation.BottomBar ->
             BottomBarScaffold(items = items, selectedKey = selectedKey, onSelect = onSelect, modifier = modifier, content = content)
         BingeNavPresentation.FloatingBar ->
-            BingeNavFloatingBarScaffold(items, selectedKey, onSelect, floatingTone, floatingStyle, modifier, content)
+            BingeNavFloatingBarScaffold(items, selectedKey, onSelect, floatingTone, floatingStyle, modifier, floatingScrim, content)
     }
 }
 

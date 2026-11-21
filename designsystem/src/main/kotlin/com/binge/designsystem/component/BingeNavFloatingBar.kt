@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -124,6 +126,11 @@ enum class BingeNavFloatingStyle {
  * the pill — which the `ScrolledToEnd` screenshot caught. The container's height is fixed by the
  * toolbar's minimum size, so the strip is known before first layout; the measurement is kept only as
  * an upward correction, should a style's items ever outgrow the default container.
+ *
+ * Behind the pill, [scrim] draws a [BottomBarScrim] over that same strip, from a tail above the pill down to the screen's bottom edge,
+ * navigation-bar inset included, so a list passing under the pill fades out rather than being cut off. It only fades what is under the
+ * pill: the strip content pads by is unchanged, so the last row still clears the pill. It is on by default and hides with the pill under
+ * the keyboard. The landscape tablet's side rail has none, since nothing scrolls under a rail.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -134,6 +141,7 @@ internal fun BingeNavFloatingBarScaffold(
     tone: BingeNavFloatingTone,
     style: BingeNavFloatingStyle,
     modifier: Modifier = Modifier,
+    scrim: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val computed = rememberNavOverlayInsets(BingeNavPresentation.FloatingBar).calculateBottomPadding()
@@ -147,6 +155,18 @@ internal fun BingeNavFloatingBarScaffold(
         }
         val colors = tone.resolve()
         val containerShape = FloatingToolbarDefaults.ContainerShape
+        // The fade behind the pill: content scrolling under it dissolves instead of running sharp to the edge. It covers the strip the
+        // pill and the navigation bar occupy, the same one scrollables pad by, with a tail above that, and it hides with the pill under the keyboard.
+        if (scrim) {
+            AnimatedVisibility(
+                visible = !WindowInsets.isImeVisible,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                Box(Modifier.fillMaxWidth().height(computed + correction)) { BottomBarScrim() }
+            }
+        }
         // Hidden under the keyboard, as the docked bar is: it would otherwise ride up between the field and its results.
         AnimatedVisibility(
             visible = !WindowInsets.isImeVisible,
