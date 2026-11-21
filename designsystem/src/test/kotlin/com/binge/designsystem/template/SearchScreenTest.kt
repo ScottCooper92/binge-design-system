@@ -7,9 +7,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithText
@@ -17,7 +20,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
@@ -36,6 +41,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+
+private const val SHORT_DRAG_START = 300f
+private const val SHORT_DRAG_END = 700f
 
 private fun results(count: Int) =
     List(count) { MediaResult("k$it", MediaResultKind.Poster, null, "Result $it", "Movie · 2020", rating = 7f, meta = "Drama") }
@@ -232,6 +240,7 @@ class SearchScreenTest {
         selectedKey: String,
         asked: MutableList<String>,
         pages: Map<String, List<MediaResult>> = pagedResults,
+        bar: ScreenBar = ScreenBar.Large,
     ) {
         rule.setContent {
             var selected by remember { mutableStateOf(selectedKey) }
@@ -251,6 +260,7 @@ class SearchScreenTest {
                         selected = it
                     }),
                     placeholder = "Search here",
+                    bar = bar,
                 )
             }
         }
@@ -320,9 +330,9 @@ class SearchScreenTest {
         assertTrue(asked.isEmpty())
     }
 
-    private fun showLongPaged(asked: MutableList<String>) {
+    private fun showLongPaged(asked: MutableList<String>, bar: ScreenBar = ScreenBar.Large) {
         val pages = mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40))
-        showPaged("all", asked, pages = pages)
+        showPaged("all", asked, pages = pages, bar = bar)
     }
 
     private fun assertScrolledAway(label: String) {
@@ -746,4 +756,91 @@ class SearchScreenTest {
 
         rule.onNodeWithText("a title 0").assertIsDisplayed()
     }
+
+    private fun chipsBounds() = rule.onNodeWithText("Movies").getBoundsInRoot()
+
+    /**
+     * The large bar collapses as a page scrolls, and a page that arrives already scrolled (or at the top) moves nothing, so the header has to be
+     * set from the page it settles on. The chip row sits under the title, so where it is tells which state the header is in.
+     */
+    private fun assertHeaderFollowsPages(goTo: (String, String) -> Unit) {
+        val asked = mutableListOf<String>()
+        showLongPaged(asked)
+        val expanded = chipsBounds()
+        rule.onNodeWithText("Movies").performClick()
+        rule.waitForIdle()
+        assertEquals(expanded, chipsBounds())
+
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        val collapsed = chipsBounds()
+        assertTrue("scrolling the page should collapse the header", collapsed.top < expanded.top)
+
+        goTo("All", "right")
+        rule.waitForIdle()
+        assertEquals("page 1 is at the top, so the header is expanded", expanded, chipsBounds())
+
+        goTo("Movies", "left")
+        rule.waitForIdle()
+        assertEquals("page 2 is scrolled, so the header is collapsed and no row sits behind an expanded one", collapsed, chipsBounds())
+    }
+
+    @Test
+    fun `a page that arrives scrolled or at the top sets the header, on a swipe`() =
+        assertHeaderFollowsPages { _, direction ->
+            rule.onRoot().performTouchInput { if (direction == "left") swipeLeft() else swipeRight() }
+        }
+
+    @Test
+    fun `a page that arrives scrolled or at the top sets the header, on a chip tap`() =
+        assertHeaderFollowsPages { chip, _ -> rule.onNodeWithText(chip).performClick() }
+
+    /** The page from its top edge to the chips' bottom, as pixels: the scrim hides rows under it, and without one they show through. */
+    private fun headerRegion(): List<Int> {
+        val chips = chipsBounds()
+        val image = rule.onRoot().captureToImage()
+        val height = with(rule.density) { chips.bottom.roundToPx() }
+        val pixels = IntArray(image.width * height)
+        image.asAndroidBitmap().getPixels(pixels, 0, image.width, 0, 0, image.width, height)
+        return pixels.toList()
+    }
+
+    /**
+     * The small bar's header draws a scrim while the page under it is scrolled, driven by how far the content has passed under it, and a page that
+     * arrives already scrolled passes nothing, so it would show the scrim of the page before it. The scrim is the page's own colour at a high alpha,
+     * so a scrolled header looks much like a bare one and what tells them apart is a row showing through; each page's header is compared with how it
+     * looked when the page was left, by the region from the top edge to the chips.
+     */
+    private fun assertSmallHeaderFollowsPages(goTo: (String, String) -> Unit) {
+        showLongPaged(mutableListOf(), bar = ScreenBar.Small)
+        rule.onNodeWithText("Movies").performClick()
+        rule.waitForIdle()
+
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        // A short drag back brings the bar back, which slides away as the page scrolls, with the page still well down.
+        rule.onRoot().performTouchInput { swipeDown(startY = SHORT_DRAG_START, endY = SHORT_DRAG_END) }
+        rule.waitForIdle()
+        val scrolled = headerRegion()
+
+        goTo("All", "right")
+        rule.waitForIdle()
+        // Page 1 is scrolled away and back to its top, which returns the header to how it rests there before page 2 comes back.
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        repeat(6) { rule.onRoot().performTouchInput { swipeDown() } }
+        rule.waitForIdle()
+
+        goTo("Movies", "left")
+        rule.waitForIdle()
+        assertEquals("page 2 is scrolled, so its header draws the scrolled bar's background", scrolled, headerRegion())
+    }
+
+    @Test
+    fun `the small bar's header follows the page it settles on, on a swipe`() =
+        assertSmallHeaderFollowsPages { _, direction ->
+            rule.onRoot().performTouchInput { if (direction == "left") swipeLeft() else swipeRight() }
+        }
+
+    @Test
+    fun `the small bar's header follows the page it settles on, on a chip tap`() =
+        assertSmallHeaderFollowsPages { chip, _ -> rule.onNodeWithText(chip).performClick() }
 }
