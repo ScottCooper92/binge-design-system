@@ -16,10 +16,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.History
@@ -32,11 +34,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -56,13 +61,14 @@ import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.FilterChipRowSkeleton
+import com.binge.designsystem.component.FilterPager
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultRow
 import com.binge.designsystem.component.MediaResultRowSkeleton
 import com.binge.designsystem.component.OnTabReselect
 import com.binge.designsystem.component.TrendingSearchChip
 import com.binge.designsystem.component.WrappingRow
-import com.binge.designsystem.component.rememberPaneTopBarScrollBehavior
+import com.binge.designsystem.component.rememberFilterPager
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.navOverlayPadding
@@ -73,6 +79,7 @@ import kotlinx.coroutines.flow.filter
 
 /** The lazy key of the append footer. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
 private const val FOOTER_KEY = "binge:search-footer"
+private const val SEARCH_PAGE_KEY_PREFIX = "binge:search-page:"
 
 /** How many rows of plates the loading skeleton draws. */
 const val SEARCH_SKELETON_ROWS: Int = 6
@@ -113,6 +120,13 @@ sealed interface SearchState {
     /**
      * Results. [loaded] is how many have arrived across every type, so a page that adds nothing to the chosen type still re-arms
      * load-more. A settled list with no results shows [emptyTitle] (null says "Nothing here yet") and [emptyMessage].
+     *
+     * [pages] turns the body into a pager over [types]' chips: each chip's key holds that type's results, in the order of the chips, and a
+     * type with no entry shows loading rows. It applies only when [types] is set with more than one chip; [results] then plays no part.
+     * The paging flags stay shared by every page, and each page asks for more near its own end.
+     *
+     * [query] is the query these results answer. An app that debounces and keeps the old results on screen while the field changes sets it, so
+     * the pages keep their place until the new results arrive and then start at the top. Null reads the live `text` instead.
      */
     class Ready(
         val results: List<MediaResult>,
@@ -123,13 +137,20 @@ sealed interface SearchState {
         val types: SearchTypes? = null,
         val emptyTitle: String? = null,
         val emptyMessage: String = "",
+        val pages: Map<String, List<MediaResult>>? = null,
+        val query: String? = null,
     ) : SearchState
 
-    /** The query found nothing; [types] keeps the chips, with whatever counts the app gives them. [title] null says "Nothing here yet". */
+    /**
+     * The query found nothing; [types] keeps the chips, with whatever counts the app gives them. [title] null says "Nothing here yet".
+     * With [pages] (see [Ready]) every type still swipes, each to the same plate. [query] is as on [Ready].
+     */
     class NoResults(
         val message: String,
         val title: String? = null,
         val types: SearchTypes? = null,
+        val pages: Map<String, List<MediaResult>>? = null,
+        val query: String? = null,
     ) : SearchState
 
     /** The search failed. [title] and [message] default to [kind]'s own words; Try again shows only when [retryable], and [secondary] is a second action beside it. */
@@ -180,6 +201,8 @@ class SearchCallbacks(
  *   in the row's own style and width, so its name plate takes what the name takes at every font size, wrapping included. Null, the default, is one line.
  *   The status chips are the app's own and are not part of the hint.
  *
+ * @param bar the top bar: the large collapsing one by default, or `Small`, whose title row never collapses so nothing is handed over.
+ *
  * @need search with a field, type chips, recent searches and a grid of results
  * @group screens
  * @replaces a hand-built scaffold with a search field, chips and a paged results list
@@ -208,23 +231,36 @@ fun SearchScreen(
     idleExtras: (LazyListScope.() -> Unit)? = null,
     noResultsExtras: (@Composable () -> Unit)? = null,
     failedContent: (@Composable (Modifier) -> Unit)? = null,
+    bar: ScreenBar = ScreenBar.Large,
     reserveTypeChipsWhileLoading: Boolean = false,
     expectedResultName: String? = null,
     overlays: @Composable () -> Unit = {},
 ) {
-    val scrollBehavior = rememberPaneTopBarScrollBehavior()
-    val collapsed = scrollBehavior.state.collapsedFraction
+    val scrollBehavior = rememberScreenBarScrollBehavior(bar)
+    // A small bar's title row never collapses, so nothing is ever handed over on it.
+    val collapsed = if (bar == ScreenBar.Small) 0f else scrollBehavior?.state?.collapsedFraction ?: 0f
     val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE
+    val paged = state.pagedTypes()
+    // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
+    val shownQuery = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query ?: text
+    val pageStates = rememberSaveable(shownQuery, saver = SearchPageStates.Saver) { SearchPageStates() }
+    val pager = rememberFilterPager(
+        selectedIndex = paged?.selectedIndex ?: 0,
+        onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },
+        pageCount = paged?.chips?.size ?: 0,
+    )
     BingeScreenScaffold(
         title = title,
         modifier = modifier,
         onBack = callbacks.onBack,
-        bar = ScreenBar.Large,
+        bar = bar,
         snackbarHostState = snackbarHostState,
         scrollBehavior = scrollBehavior,
         titleTrailing = titleTrailing?.let { { it(titleRowShows) } },
         actions = { barActions(!titleRowShows, collapsed) },
-        header = { SearchControls(text, state, callbacks, placeholder, reselectKey, reserveTypeChipsWhileLoading) },
+        header = {
+            SearchControls(text, state, callbacks, placeholder, reselectKey, pager.takeIf { paged != null }, reserveTypeChipsWhileLoading)
+        },
     ) { padding ->
         ScreenBody(padding) { body ->
             val top = body.calculateTopPadding()
@@ -244,6 +280,9 @@ fun SearchScreen(
                         idleExtras = idleExtras,
                         noResultsExtras = noResultsExtras,
                         failedContent = failedContent,
+                        paged = paged,
+                        pager = pager,
+                        pageStates = pageStates,
                         expectedResultName = expectedResultName,
                     )
                 }
@@ -275,6 +314,9 @@ private fun SearchBody(
     idleExtras: (LazyListScope.() -> Unit)?,
     noResultsExtras: (@Composable () -> Unit)?,
     failedContent: (@Composable (Modifier) -> Unit)?,
+    paged: PagedTypes?,
+    pager: FilterPager,
+    pageStates: SearchPageStates,
     expectedResultName: String?,
 ) {
     // The plates (no results, failed, a type with nothing in it) clear the navigation bar and the floating pill as the lists do.
@@ -297,24 +339,54 @@ private fun SearchBody(
                 expectedResultName = expectedResultName,
             )
         is SearchState.Ready ->
-            key(state.types?.selectedKey) {
-                ResultsList(
-                    state = state,
-                    callbacks = callbacks,
-                    contentPadding = resultsPadding(top, bottom),
-                    moreFailedLabel = moreFailedLabel,
-                    resultTrailing = resultTrailing,
-                    platePadding = platePadding,
-                )
+            if (paged != null) {
+                HorizontalPager(
+                    state = pager.state,
+                    modifier = Modifier.fillMaxSize(),
+                    key = { paged.pageKey(it) },
+                ) { page ->
+                    val results = paged.pages[paged.chips[page].key]
+                    if (results == null) {
+                        ResultsSkeleton(
+                            contentPadding = resultsPadding(top, bottom),
+                            loadingLabel = loadingLabel,
+                            expectedResultName = expectedResultName,
+                        )
+                    } else {
+                        ResultsList(
+                            state = state,
+                            results = results,
+                            callbacks = callbacks,
+                            contentPadding = resultsPadding(top, bottom),
+                            moreFailedLabel = moreFailedLabel,
+                            resultTrailing = resultTrailing,
+                            platePadding = platePadding,
+                            gridState = pageStates.stateFor(paged.chips[page].key),
+                        )
+                    }
+                }
+            } else {
+                key(state.types?.selectedKey) {
+                    ResultsList(
+                        state = state,
+                        results = state.results,
+                        callbacks = callbacks,
+                        contentPadding = resultsPadding(top, bottom),
+                        moreFailedLabel = moreFailedLabel,
+                        resultTrailing = resultTrailing,
+                        platePadding = platePadding,
+                    )
+                }
             }
         is SearchState.NoResults ->
-            Column(Modifier.fillMaxSize().padding(platePadding)) {
-                EmptyScreen(
-                    message = state.message,
-                    modifier = Modifier.weight(1f),
-                    title = state.title ?: stringResource(R.string.empty_screen_title),
-                )
-                noResultsExtras?.invoke()
+            if (paged != null) {
+                HorizontalPager(
+                    state = pager.state,
+                    modifier = Modifier.fillMaxSize(),
+                    key = { paged.pageKey(it) },
+                ) { NoResultsBody(state, platePadding, noResultsExtras) }
+            } else {
+                NoResultsBody(state, platePadding, noResultsExtras)
             }
         is SearchState.Failed ->
             if (failedContent != null) {
@@ -330,6 +402,74 @@ private fun SearchBody(
                 )
             }
     }
+}
+
+@Composable
+private fun NoResultsBody(
+    state: SearchState.NoResults,
+    platePadding: PaddingValues,
+    noResultsExtras: (@Composable () -> Unit)?,
+) {
+    Column(Modifier.fillMaxSize().padding(platePadding)) {
+        EmptyScreen(
+            message = state.message,
+            modifier = Modifier.weight(1f),
+            title = state.title ?: stringResource(R.string.empty_screen_title),
+        )
+        noResultsExtras?.invoke()
+    }
+}
+
+/**
+ * The grid state of each page, by the page's chip key and nothing else. It is held by [SearchScreen] itself, above everything that follows the state,
+ * so a page the pager disposes, another state shown in between (loading, say), a new state or types or map on every tap and a recreated activity all
+ * leave a page where its list was. A new query starts every page afresh. Saved as the first visible item and its offset, so it outlives the process too.
+ */
+@Stable
+private class SearchPageStates {
+    private val states = mutableMapOf<String, LazyGridState>()
+
+    fun stateFor(chipKey: String): LazyGridState = states.getOrPut(chipKey) { LazyGridState() }
+
+    companion object {
+        val Saver: Saver<SearchPageStates, Any> =
+            listSaver(
+                save = { holder ->
+                    holder.states.flatMap { (key, state) -> listOf(key, state.firstVisibleItemIndex, state.firstVisibleItemScrollOffset) }
+                },
+                restore = { saved ->
+                    SearchPageStates().also { holder ->
+                        saved.chunked(PAGE_STATE_FIELDS).forEach { (key, index, offset) ->
+                            holder.states[key as String] = LazyGridState(index as Int, offset as Int)
+                        }
+                    }
+                },
+            )
+    }
+}
+
+private const val PAGE_STATE_FIELDS = 3
+
+/** The chips a paged body swipes between, the one chosen, and each chip's results; null when the state does not page. */
+@Immutable
+private class PagedTypes(
+    val chips: List<SearchTypeChip>,
+    val selectedIndex: Int,
+    val pages: Map<String, List<MediaResult>>,
+) {
+    /** Under the reserved prefix, so an app's own key can never collide with a page's. */
+    fun pageKey(page: Int): String = SEARCH_PAGE_KEY_PREFIX + chips[page].key
+}
+
+private fun SearchState.pagedTypes(): PagedTypes? {
+    val (types, pages) =
+        when (this) {
+            is SearchState.Ready -> types to this.pages
+            is SearchState.NoResults -> types to this.pages
+            else -> return null
+        }
+    if (types == null || pages == null || types.chips.size < 2) return null
+    return PagedTypes(types.chips, types.chips.indexOfFirst { it.key == types.selectedKey }.coerceAtLeast(0), pages)
 }
 
 /** The content padding of the results grid and of its skeleton, so the one is laid out exactly as the other. */
@@ -380,6 +520,7 @@ private fun SearchControls(
     callbacks: SearchCallbacks,
     placeholder: String,
     reselectKey: Any?,
+    pager: FilterPager?,
     reserveTypeChips: Boolean,
 ) {
     val focus = remember { FocusRequester() }
@@ -419,7 +560,7 @@ private fun SearchControls(
             } else if (types != null && types.chips.isNotEmpty()) {
                 BingeFilterChipRow(
                     items = types.chips.map { FilterChipItem(label = it.label, count = it.count) },
-                    selectedIndex = types.chips.indexOfFirst { it.key == types.selectedKey }.coerceAtLeast(0),
+                    selectedIndex = pager?.shownIndex ?: types.chips.indexOfFirst { it.key == types.selectedKey }.coerceAtLeast(0),
                     onSelect = { callbacks.onType(types.chips[it].key) },
                 )
             }
@@ -509,13 +650,14 @@ private fun RecentSearches(
 @Composable
 private fun ResultsList(
     state: SearchState.Ready,
+    results: List<MediaResult>,
     callbacks: SearchCallbacks,
     contentPadding: PaddingValues,
     moreFailedLabel: String,
     resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)?,
     platePadding: PaddingValues,
+    gridState: LazyGridState = rememberLazyGridState(),
 ) {
-    val gridState = rememberLazyGridState()
     val nearEnd by remember {
         derivedStateOf {
             val info = gridState.layoutInfo
@@ -531,7 +673,7 @@ private fun ResultsList(
             snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { callbacks.onLoadMore() }
         }
     }
-    val empty = state.results.isEmpty()
+    val empty = results.isEmpty()
     val settled = !state.hasMore && !state.appending && !state.appendFailed
     if (empty && settled) {
         EmptyScreen(
@@ -551,7 +693,7 @@ private fun ResultsList(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
         ) {
-            itemsIndexed(state.results, key = { _, result -> result.key }) { index, result ->
+            itemsIndexed(results, key = { _, result -> result.key }) { index, result ->
                 MediaResultRow(
                     result = result,
                     onClick = { callbacks.onOpenResult(result.key) },
