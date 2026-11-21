@@ -4,11 +4,14 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import com.binge.designsystem.component.BingeSearchField
+import com.binge.designsystem.component.BingeSearchFieldButton
+import com.binge.designsystem.component.BingeSearchFieldHeader
 import com.binge.designsystem.preview.ScreenshotTheme
 
 private const val SEARCH_PLACEHOLDER = "Search services"
@@ -59,5 +62,22 @@ fun SearchFieldTransparentContainerSample() {
             placeholder = SEARCH_PLACEHOLDER,
             containerColor = Color.Transparent,
         )
+    }
+}
+
+/**
+ * Read-only form: the same pill as the field above with its placeholder, one tap target and no input. It sits in the header wrapper the Search screen
+ * gives its field. Tapping it counts the taps below, which stands in for opening the search page.
+ */
+@Composable
+fun SearchFieldButtonSample() {
+    var taps by remember { mutableIntStateOf(0) }
+    ScreenshotTheme {
+        BingeSearchFieldHeader {
+            BingeSearchFieldButton(
+                placeholder = if (taps == 0) SEARCH_PLACEHOLDER else "$SEARCH_PLACEHOLDER ($taps taps)",
+                onClick = { taps++ },
+            )
+        }
     }
 }

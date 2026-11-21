@@ -62,6 +62,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeConfirmDialog
 import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.BingeSearchField
+import com.binge.designsystem.component.BingeSearchFieldHeader
 import com.binge.designsystem.component.FilterChipItem
 import com.binge.designsystem.component.FilterChipRowSkeleton
 import com.binge.designsystem.component.FilterPager
@@ -596,12 +597,7 @@ private fun SearchControls(
         }
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = dimensionResource(R.dimen.search_content_max_width)).fillMaxWidth()) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(R.dimen.screen_content_inset))
-                    .padding(bottom = dimensionResource(R.dimen.padding_m)),
-            ) {
+            BingeSearchFieldHeader {
                 BingeSearchField(
                     query = text,
                     onQueryChange = callbacks.onQueryChange,
