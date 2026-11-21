@@ -5,6 +5,7 @@ package com.binge.designsystem.tv.catalog
 import androidx.compose.runtime.Composable
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.catalog.SelfDescribing
+import com.binge.designsystem.tv.component.TvPosterShape
 import com.binge.designsystem.tv.template.TvSearchCell
 import com.binge.designsystem.tv.template.TvSearchPage
 import com.binge.designsystem.tv.template.TvSearchSeededFocus
@@ -32,6 +33,17 @@ private val Recommendations = List(RECOMMENDATION_COUNT) { index ->
 
 private val Results = List(RESULT_COUNT) { index ->
     TvSearchCell(key = "result_${index + 1}", imageUrl = null, title = "Result ${index + 1}", onClick = {})
+}
+
+private val CaptionedResults = List(RESULT_COUNT) { index ->
+    TvSearchCell(
+        key = "captioned_${index + 1}",
+        imageUrl = null,
+        title = "Result ${index + 1}",
+        onClick = {},
+        subtitle = if (index % 3 == 2) "Studio ${index + 1}" else "Film · 20${10 + index}",
+        shape = if (index % 3 == 2) TvPosterShape.Square else TvPosterShape.Poster,
+    )
 }
 
 @Composable
@@ -87,6 +99,12 @@ fun TvSearchPageCellFocusedSample() {
 @Composable
 fun TvSearchPageResultsSample() {
     SamplePage(state = TvSearchState.Results(NOLAN), cells = Results, query = NOLAN)
+}
+
+/** Results with a caption under each poster, a studio's square art among the posters: the footprint follows the cell's shape. */
+@Composable
+fun TvSearchPageCaptionedResultsSample() {
+    SamplePage(state = TvSearchState.Results(NOLAN), cells = CaptionedResults, query = NOLAN)
 }
 
 /** A result in the second row focused. The scroll that pins its row is a runtime effect a static frame does not run. */

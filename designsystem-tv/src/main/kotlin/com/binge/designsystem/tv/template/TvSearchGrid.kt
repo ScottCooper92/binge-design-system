@@ -20,7 +20,18 @@ internal fun TvSearchGrid(
     onCellFocused: (index: Int) -> Unit,
     onEntryPlaced: () -> Unit = {},
 ) {
-    val posters = remember(cells) { cells.map { TvPosterCell(imageUrl = it.imageUrl, title = it.title, onClick = it.onClick) } }
+    val posters =
+        remember(cells) {
+            cells.map {
+                TvPosterCell(
+                    imageUrl = it.imageUrl,
+                    title = it.title,
+                    onClick = it.onClick,
+                    subtitle = it.subtitle,
+                    shape = it.shape,
+                )
+            }
+        }
     val entryIndex = cells.indexOfFirst { it.key == entryKey }.coerceAtLeast(0)
     TvPosterGrid(
         count = cells.size,
