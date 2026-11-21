@@ -41,12 +41,11 @@ fun BoxScope.BottomBarScrim(
     scrimColor: Color = MaterialTheme.colorScheme.background,
 ) {
     if (fraction <= 0f) return
-    val tail = tailHeight
     Box(
         modifier = modifier
             .matchParentSize()
             .drawBehind {
-                val tailPx = tail.toPx()
+                val tailPx = tailHeight.toPx()
                 val paintHeight = size.height + tailPx
                 val barFraction = size.height / paintHeight
                 // The top ramp's stops mirrored: its first stop (strongest) is this one's last.

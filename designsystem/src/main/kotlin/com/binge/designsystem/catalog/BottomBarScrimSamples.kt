@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BottomBarScrim
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeShapes
 
 private const val SCRIM_SAMPLE_ROWS = 30
 
@@ -44,7 +44,7 @@ fun BottomBarScrimSample() {
                             .padding(horizontal = dimensionResource(R.dimen.padding_m), vertical = dimensionResource(R.dimen.padding_xs))
                             .background(
                                 MaterialTheme.colorScheme.primaryContainer,
-                                RoundedCornerShape(dimensionResource(R.dimen.padding_s)),
+                                BingeShapes.ElementSmall,
                             ).padding(dimensionResource(R.dimen.padding_m)),
                     ) {
                         Text(
@@ -64,7 +64,7 @@ fun BottomBarScrimSample() {
                         .height(dimensionResource(R.dimen.catalog_bottom_bar_scrim_bar_height))
                         .background(
                             MaterialTheme.colorScheme.surfaceContainerHigh,
-                            RoundedCornerShape(dimensionResource(R.dimen.padding_m)),
+                            BingeShapes.Medium,
                         ),
                     contentAlignment = Alignment.CenterStart,
                 ) {
