@@ -219,18 +219,21 @@ private fun TvPosterGridCell(
             if (poster != null) {
                 SubcomposeAsyncImage(
                     model = poster.imageUrl,
-                    contentDescription = poster.title,
+                    // A caption already names the title, so the art does not say it a second time.
+                    contentDescription = if (poster.subtitle == null) poster.title else null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                     loading = { Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) },
-                    // No poster: the name stands in, so a title without art is still something to pick.
+                    // No poster: the name stands in, so a title without art is still something to pick. A caption names it already.
                     error = {
                         Box(Modifier.fillMaxSize().padding(dimensionResource(DesR.dimen.padding_s)), contentAlignment = Alignment.Center) {
-                            Text(
-                                text = poster.title,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
+                            if (poster.subtitle == null) {
+                                Text(
+                                    text = poster.title,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
                         }
                     },
                 )
