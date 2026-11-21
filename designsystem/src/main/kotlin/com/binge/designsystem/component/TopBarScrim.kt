@@ -30,6 +30,23 @@ private const val TITLE_SCRIM_SWITCH_FRACTION = 0.75f
 private const val SCRIM_SOLID_START_FRACTION = TITLE_SCRIM_SWITCH_FRACTION
 
 /**
+ * The ramp's stops, top to bottom, over a paint area whose first [barFraction] is the bar's own height: [SCRIM_TOP_ALPHA] at the top,
+ * [SCRIM_MID_ALPHA] and [SCRIM_LATE_ALPHA] at their stops, then transparent at the end. [TopBarScrim] paints it as it is and [BottomBarScrim]
+ * paints it mirrored, so the two cannot disagree about the numbers.
+ */
+internal fun scrimRamp(
+    scrim: Color,
+    fraction: Float,
+    barFraction: Float,
+): List<Pair<Float, Color>> =
+    listOf(
+        0f to scrim.copy(alpha = SCRIM_TOP_ALPHA * fraction),
+        SCRIM_MID_STOP * barFraction to scrim.copy(alpha = SCRIM_MID_ALPHA * fraction),
+        SCRIM_LATE_STOP * barFraction to scrim.copy(alpha = SCRIM_LATE_ALPHA * fraction),
+        1f to Color.Transparent,
+    )
+
+/**
  * The ramp that keeps a transparent top bar legible over whatever scrolls beneath it: opaque at the
  * status bar, thinning as it descends, and only fading fully away *past* [SCRIM_LATE_STOP] — deep
  * enough into the bar that the title and back arrow, which sit around the bar's own lower half, are
@@ -119,14 +136,7 @@ internal fun BoxScope.TopBarScrim(
                     // would (paintHeight == size.height, barFraction == 1f, matching the old behaviour).
                     val barFraction = size.height / paintHeight
                     drawRect(
-                        brush =
-                            Brush.verticalGradient(
-                                0f to scrim.copy(alpha = SCRIM_TOP_ALPHA * fraction),
-                                SCRIM_MID_STOP * barFraction to scrim.copy(alpha = SCRIM_MID_ALPHA * fraction),
-                                SCRIM_LATE_STOP * barFraction to scrim.copy(alpha = SCRIM_LATE_ALPHA * fraction),
-                                1f to Color.Transparent,
-                                endY = paintHeight,
-                            ),
+                        brush = Brush.verticalGradient(*scrimRamp(scrim, fraction, barFraction).toTypedArray(), endY = paintHeight),
                         size = Size(size.width, paintHeight),
                     )
                 },
