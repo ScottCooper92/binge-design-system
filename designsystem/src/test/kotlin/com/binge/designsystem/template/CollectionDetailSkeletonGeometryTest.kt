@@ -44,12 +44,12 @@ class CollectionDetailSkeletonGeometryTest {
 
     // An overview long enough to fill the skeleton's standing lines when collapsed, as the movie page's test uses: a shorter one is shorter than the
     // skeleton by design, since a skeleton cannot know how much prose is coming.
-    private fun loaded(heading: String?) =
+    private fun loaded(heading: String?, overview: String = MEDIA_PAGE_OVERVIEW + " " + MEDIA_PAGE_OVERVIEW) =
         CollectionDetailState.Content(
             CollectionDetail(
                 title = "A collection",
                 metaText = "3 films",
-                overview = MEDIA_PAGE_OVERVIEW + " " + MEDIA_PAGE_OVERVIEW,
+                overview = overview,
                 partsHeading = heading,
                 parts = List(
                     PARTS,
@@ -67,16 +67,17 @@ class CollectionDetailSkeletonGeometryTest {
             ),
         )
 
-    private fun check(heading: String? = "Films") {
+    private fun check(heading: String? = "Films", overview: String? = null) {
         rule.assertSkeletonReservesGeometry(anchors, checkSize = true) { resolved ->
             ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
                 CollectionDetailScreen(
                     state = if (resolved) {
-                        loaded(heading)
+                        loaded(heading, overview ?: LONG_OVERVIEW)
                     } else {
                         CollectionDetailState.Loading(
                             parts = PARTS,
                             hasPartsHeading = !heading.isNullOrBlank(),
+                            hasOverviewToggle = overview == null,
                         )
                     },
                     callbacks = CollectionDetailCallbacks(onBack = {}, onRetry = {}, onOpenPart = {}),
@@ -87,6 +88,14 @@ class CollectionDetailSkeletonGeometryTest {
 
     private companion object {
         const val PARTS = 4
+        val LONG_OVERVIEW = MEDIA_PAGE_OVERVIEW + " " + MEDIA_PAGE_OVERVIEW
+
+        // An overview that fills the three collapsed lines and no more, so the loaded page has no expand toggle. How much text that is depends on the font,
+        // so each scale has its own.
+        const val THREE_LINES_1X =
+            "A heist crew pulls one last job in a city that never sleeps, and finds the plan was never theirs to begin with, " +
+                "and that the only way out is back through."
+        const val THREE_LINES_13X = "A heist crew pulls one last job in a city that never sleeps, and finds the plan was never theirs."
     }
 
     @Test
@@ -113,4 +122,18 @@ class CollectionDetailSkeletonGeometryTest {
     @Test
     @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
     fun `a blank heading is no heading at 1 point 3`() = check(heading = "")
+
+    @Test
+    fun `a short overview has no toggle, and the skeleton for it holds the first part`() = check(overview = THREE_LINES_1X)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `a short overview has no toggle at 1 point 3`() = check(overview = THREE_LINES_13X)
+
+    @Test
+    fun `a short overview and no heading hold the first part`() = check(heading = null, overview = THREE_LINES_1X)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `a short overview and no heading hold the first part at 1 point 3`() = check(heading = null, overview = THREE_LINES_13X)
 }
