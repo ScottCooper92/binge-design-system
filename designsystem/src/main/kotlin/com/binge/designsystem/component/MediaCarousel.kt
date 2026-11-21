@@ -39,7 +39,7 @@ private const val END_TILE_KEY = "binge:media-carousel-end-tile"
  * The trailing tile is [endTileHeight] tall, which defaults to a poster's height ([R.dimen.card_height]): the tile lines up with the posters,
  * not with the captions under them, as it does in Binge. That holds at every font scale, because a poster is an image of fixed size and only its
  * caption grows with the font, so a [MediaCard] row at a large scale has a tile shorter than its cards by design. A row of shorter items, such
- * as the category tiles ([categoryTileHeight]), passes their height so the tile does not stand taller than the row.
+ * as the category tiles ([backdropTileHeight], [categoryTileHeight]), passes their height so the tile does not stand taller than the row.
  *
  * A row that wants the tile to span its whole items, or whose items change height with the font scale, such as [PersonCard]s, passes
  * [Dp.Unspecified]: the tile is then as tall as the tallest item the row has composed now. Each item reports its own height, so the tile follows the items down as well as up, and never sets the
