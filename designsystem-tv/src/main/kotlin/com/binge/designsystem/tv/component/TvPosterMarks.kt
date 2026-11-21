@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -87,13 +88,25 @@ internal fun TvWatchedMark(
     )
 }
 
-/** A bar along the foot of a card, [fraction] of the way across (clamped to 0..1), for how far through a title the viewer is. */
+/** The tag [TvProgressBar]'s track carries, so a test can find it. */
+internal const val TV_PROGRESS_BAR_TAG = "tv-progress-bar"
+
+/**
+ * A bar along the foot of a card, [fraction] of the way across (clamped to 0..1), for how far through a title the viewer is.
+ *
+ * It sits inside the card by `tv_progress_bar_inset` on its start, end and bottom, whether the card is focused or not, so the focus ring, which is
+ * drawn over the card's own edge, never covers it and the bar does not move when focus arrives. The inset is the ring's width plus room for the card's
+ * rounded corner, which the ring follows: a bar flush with the foot would run into the ring's curve at both ends.
+ */
 @Composable
 internal fun TvProgressBar(fraction: Float, modifier: Modifier = Modifier) {
+    val inset = dimensionResource(TvR.dimen.tv_progress_bar_inset)
     Box(
         modifier
+            .padding(start = inset, end = inset, bottom = inset)
             .fillMaxWidth()
             .height(dimensionResource(TvR.dimen.tv_poster_progress_height))
+            .testTag(TV_PROGRESS_BAR_TAG)
             .background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
         Box(
