@@ -195,6 +195,8 @@
     <dimen name="media_result_still_width">112dp</dimen>
     <!-- The heart and the tick beside a result row's name. -->
     <dimen name="media_result_mark_size">16dp</dimen>
+    <!-- The catalog sample's byline avatar: a small circle beside the byline text. -->
+    <dimen name="media_result_byline_avatar_size">20dp</dimen>
     <dimen name="list_row_logo_padding">10dp</dimen>
     <dimen name="list_row_spacing">10dp</dimen>
     <dimen name="list_row_skeleton_height">128dp</dimen>
