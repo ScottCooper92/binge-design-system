@@ -46,7 +46,7 @@ class PeopleGridScreenTest {
             ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
                 PeopleGridScreen(
                     title = "Film",
-                    tabs = List(tabs) { PeopleGridTab(if (it == 0) "Cast" else "Crew", state) },
+                    tabs = List(tabs) { PeopleGridTab(label(it), state) },
                     selectedTab = 0,
                     onTabChange = {},
                     onOpenPerson = {},
@@ -70,24 +70,17 @@ class PeopleGridScreenTest {
     @Config(fontScale = 2f)
     fun `the skeleton holds it at a font scale of 2`() = check(tabs = 2)
 
+    private fun label(index: Int) = if (index == 0) "Cast" else "Crew"
+
+    private val readyState get() = PeopleGridState.Ready(listOf(PeopleGridSection("cast", null, people)))
+
     private fun firstCardLeftUnderSideInset(tabs: Int): Float {
         rule.setContent {
             CompositionLocalProvider(LocalNavOverlayInsets provides PaddingValues(start = SIDE_INSET.dp)) {
                 ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
                     PeopleGridScreen(
                         title = "Film",
-                        tabs = List(tabs) {
-                            PeopleGridTab(
-                                if (it ==
-                                    0
-                                ) {
-                                    "Cast"
-                                } else {
-                                    "Crew"
-                                },
-                                PeopleGridState.Ready(listOf(PeopleGridSection("cast", null, people))),
-                            )
-                        },
+                        tabs = List(tabs) { PeopleGridTab(label(it), readyState) },
                         selectedTab = 0,
                         onTabChange = {},
                         onOpenPerson = {},
