@@ -101,12 +101,16 @@ sealed interface DetailState {
      * or posters follow the overview (each a carousel placeholder; the default, none, leaves the rest of the page to grow). The round actions
      * stack under the primary at the same height from two up on a phone, but beside it at the expanded width two and three buttons can differ,
      * so give the count the loaded page will have. Where it cannot be known before the load (a film shows two round actions, or three when it has several files), pass the most likely count: at the expanded width the page can then shift a little when the other count arrives. The overview plates are always drawn, so a title that arrives with no synopsis moves up.
+     * [hasOverviewToggle] says the loaded synopsis is long enough to collapse behind a "Read more" toggle, which is a row of its own: false, for one that
+     * fits its collapsed lines, leaves it out so what follows does not arrive that much higher. True, the default, keeps the row, because a skeleton cannot
+     * know how long the synopsis will be; an app that does know sets it.
      */
     class Loading(
         val stats: Int = 3,
         val roundActions: Int = 0,
         val hasPrimary: Boolean = true,
         val rails: Int = 0,
+        val hasOverviewToggle: Boolean = true,
     ) : DetailState
 
     /** Showing [detail]. */

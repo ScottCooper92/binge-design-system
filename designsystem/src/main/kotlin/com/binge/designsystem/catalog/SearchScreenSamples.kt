@@ -27,6 +27,8 @@ import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.StatusChip
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.template.FastScrollbarOptions
+import com.binge.designsystem.template.ScreenBar
 import com.binge.designsystem.template.SearchCallbacks
 import com.binge.designsystem.template.SearchScreen
 import com.binge.designsystem.template.SearchState
@@ -80,6 +82,7 @@ private fun SampleSearch(
     withTrailing: Boolean = true,
     idleExtras: (LazyListScope.() -> Unit)? = null,
     noResultsExtras: (@Composable () -> Unit)? = null,
+    bar: ScreenBar = ScreenBar.Large,
 ) {
     var text by remember { mutableStateOf(initialText) }
     var selected by remember { mutableStateOf(initialType) }
@@ -91,6 +94,7 @@ private fun SampleSearch(
             text = text,
             state = state(selected, recents),
             placeholder = "Movies, series and people",
+            reserveTypeChipsWhileLoading = true,
             idleTitle = "Search the library",
             idleMessage = "Type a title or a name.",
             modifier = modifier,
@@ -120,6 +124,7 @@ private fun SampleSearch(
                 },
             idleExtras = idleExtras,
             noResultsExtras = noResultsExtras,
+            bar = bar,
         )
         opened?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { opened = null }) }
     }
@@ -148,7 +153,7 @@ fun SearchScreenIdleExtrasSample() =
         },
     )
 
-/** A search under way: rows of loading plates under the field. */
+/** A search under way: a row of chip plates and rows of loading plates under the field, held where the type chips and the results will land. */
 @Composable
 fun SearchScreenLoadingSample() = SampleSearch({ _, _ -> SearchState.Loading }, initialText = "past")
 
@@ -215,6 +220,106 @@ fun SearchScreenAppendFailedSample() =
         initialText = "past",
     )
 
+private val PagedTypeLabels = listOf("all" to "All", "movies" to "Movies", "tv" to "TV")
+
+private fun pagedTypes(selectedKey: String) = SearchTypes(PagedTypeLabels.map { (key, label) -> SearchTypeChip(key, label) }, selectedKey)
+
+/** One page per chip, each holding a different slice of the same names, so a swipe visibly changes the list. */
+private fun pagedResults(): Map<String, List<MediaResult>> =
+    mapOf(
+        "all" to sampleResults(count = SAMPLE_RESULTS),
+        "movies" to sampleResults(count = PAGE_RESULTS, from = 2),
+        "tv" to sampleResults(count = FEW_RESULTS + 2, from = 5),
+    )
+
+/**
+ * Results with a page for each type chip (All, Movies, TV), resting on Movies, the second. A swipe or a chip tap moves the page, and the
+ * chips follow it.
+ */
+@Composable
+fun SearchScreenPagedSample() =
+    SampleSearch(
+        { selected, _ ->
+            SearchState.Ready(
+                sampleResults(),
+                loaded = SAMPLE_RESULTS,
+                hasMore = false,
+                types = pagedTypes(selected),
+                pages = pagedResults(),
+            )
+        },
+        initialText = "past",
+        initialType = "movies",
+    )
+
+/** The same pages with TV still loading: a type with no entry shows loading rows until its results arrive. */
+@Composable
+fun SearchScreenPagedLoadingPageSample() =
+    SampleSearch(
+        { selected, _ ->
+            SearchState.Ready(
+                sampleResults(),
+                loaded = SAMPLE_RESULTS,
+                hasMore = false,
+                types = pagedTypes(selected),
+                pages = pagedResults() - "tv",
+            )
+        },
+        initialText = "past",
+        initialType = "tv",
+    )
+
+/** A query that matched nothing in any type: the plate, with the chips staying and every type still swipeable. */
+@Composable
+fun SearchScreenPagedNoResultsSample() =
+    SampleSearch(
+        { selected, _ ->
+            SearchState.NoResults(
+                message = "Check the spelling or try fewer words.",
+                title = "Nothing for \"zzz\"",
+                types = pagedTypes(selected),
+                pages = PagedTypeLabels.associate { (key, _) -> key to emptyList() },
+            )
+        },
+        initialText = "zzz",
+        initialType = "movies",
+    )
+
+/** Idle on the small bar: the title stays one line and the field sits under it. */
+@Composable
+fun SearchScreenSmallIdleSample() = SampleSearch({ _, recents -> SearchState.Idle(recents) }, bar = ScreenBar.Small)
+
+/** Results on the small bar, which slides away as the list scrolls and returns as it scrolls up, with the field and chips pinned. */
+@Composable
+fun SearchScreenSmallReadySample() =
+    SampleSearch(
+        { selected, _ ->
+            SearchState.Ready(sampleResults(), loaded = SAMPLE_RESULTS, hasMore = true, types = types(selected, counts = true))
+        },
+        initialText = "past",
+        bar = ScreenBar.Small,
+    )
+
+/** No results on the small bar, with the chips staying. */
+@Composable
+fun SearchScreenSmallNoResultsSample() =
+    SampleSearch(
+        { selected, _ ->
+            SearchState.NoResults(
+                message = "Check the spelling or try fewer words.",
+                title = "Nothing for \"zzz\"",
+                types = types(selected, counts = true),
+            )
+        },
+        initialText = "zzz",
+        bar = ScreenBar.Small,
+    )
+
+/** A failed search on the small bar. */
+@Composable
+fun SearchScreenSmallFailedSample() =
+    SampleSearch({ _, _ -> SearchState.Failed(ErrorKind.Network) }, initialText = "past", bar = ScreenBar.Small)
+
 /** The query matched nothing: a plate with a next step, and the chips stay, each at zero. */
 @Composable
 fun SearchScreenNoResultsSample() =
@@ -271,7 +376,10 @@ fun SearchScreenTypeEmptySample() =
 @Composable
 fun SearchScreenFailedSample() = SampleSearch({ _, _ -> SearchState.Failed(ErrorKind.Network) }, initialText = "past")
 
-/** The screen live: typing searches after a pause, results page in near the end, and a type chip narrows them. */
+/**
+ * The screen live: typing searches after a pause, results page in near the end, and a type chip narrows them. Scroll the results and a fast
+ * scrollbar appears at the end edge; hold its thumb and drag, and a bubble names the result you are over.
+ */
 @Composable
 fun SearchScreenDemo() {
     var text by remember { mutableStateOf("") }
@@ -328,6 +436,7 @@ fun SearchScreenDemo() {
                     onClearRecents = { recents = emptyList() },
                     onBack = LocalDemoBack.current,
                 ),
+            fastScrollbar = FastScrollbarOptions(bubbleText = { index -> "Result ${index + 1}" }),
         )
         opened?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { opened = null }) }
     }

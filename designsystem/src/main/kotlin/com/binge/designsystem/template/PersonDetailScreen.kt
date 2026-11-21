@@ -125,12 +125,24 @@ class PersonDetail(
 
 /** The three states of a person's page. [Failed] keeps the back control, so the user is never stranded. */
 sealed interface PersonDetailState {
-    /** [facts] lines and [creditRails] rows of placeholders, [hasBiography] a block of prose, in the loaded page's own room. */
+    /**
+     * [facts] lines and [creditRails] rows of placeholders, [hasBiography] a block of prose, in the loaded page's own room. How many lines a name or a fact
+     * takes depends on its words, which a loading state does not have, so each is one line unless hinted: [expectedEyebrow], [expectedName] and
+     * [expectedFacts] are strings the loaded profile is expected to look like, laid out invisibly in the profile's own styles and widths (see
+     * [PersonProfileSkeleton]), which is what holds the page's geometry at a large font. [expectedFacts] sets the fact count in place of [facts].
+     * [hasOverviewToggle] says the loaded biography is long enough to collapse behind a "Read more" toggle, which is a row of its own: false, for one that
+     * fits its collapsed lines, leaves it out so the credits do not arrive that much higher. True, the default, keeps the row, because a skeleton cannot
+     * know how long the biography will be; an app that does know sets it. It applies only with [hasBiography].
+     */
     @Immutable
     class Loading(
         val facts: Int = 3,
         val hasBiography: Boolean = true,
         val creditRails: Int = 2,
+        val expectedEyebrow: String? = null,
+        val expectedName: String? = null,
+        val expectedFacts: List<PersonFact> = emptyList(),
+        val hasOverviewToggle: Boolean = true,
     ) : PersonDetailState
 
     @Immutable
@@ -252,27 +264,43 @@ private fun ColumnScope.PersonContent(
         CreditsState.Loading -> CreditsPlaceholder()
         is CreditsState.Failed -> CreditsFailed(credits, callbacks.onRetryCredits)
         is CreditsState.Empty -> CreditsEmpty(credits.message)
-        is CreditsState.Ready ->
+        is CreditsState.Ready -> {
+            // The first rail that is drawn carries the credits anchor the loading rails share, so a test can hold them to the same place.
+            val firstRail = credits.sections.indexOfFirst { it.items.isNotEmpty() }
             credits.sections.forEachIndexed { index, section ->
                 if (section.items.isNotEmpty()) {
                     CreditRail(
                         section,
+                        headerModifier = if (index == firstRail) {
+                            Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.CREDITS))
+                        } else {
+                            Modifier
+                        },
                         onOpen = callbacks.onOpenCredit,
                         onLoadMore = { callbacks.onLoadMoreCredits(index) },
                         onSeeAll = callbacks.onSeeAll?.let { seeAll -> { seeAll(section.key) } },
                     )
                 }
             }
+        }
     }
     afterCredits()
 }
 
 @Composable
 private fun ColumnScope.PersonPlaceholder(state: PersonDetailState.Loading) {
-    PersonProfileSkeleton(facts = state.facts)
+    PersonProfileSkeleton(
+        facts = state.facts,
+        expectedEyebrow = state.expectedEyebrow,
+        expectedName = state.expectedName,
+        expectedFacts = state.expectedFacts,
+    )
     if (state.hasBiography) {
         Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
-        DetailOverviewSkeleton(Modifier.fillMaxWidth().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+        DetailOverviewSkeleton(
+            Modifier.fillMaxWidth().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)),
+            withToggle = state.hasOverviewToggle,
+        )
     }
     CreditRailSkeletons(state.creditRails)
 }
@@ -337,6 +365,7 @@ private fun CreditsFailed(failed: CreditsState.Failed, onRetry: () -> Unit) {
 @Composable
 private fun CreditRail(
     section: CreditSection,
+    headerModifier: Modifier,
     onOpen: (String) -> Unit,
     onLoadMore: () -> Unit,
     onSeeAll: (() -> Unit)?,
@@ -363,6 +392,7 @@ private fun CreditRail(
     Column(Modifier.fillMaxWidth()) {
         SectionHeader(
             title = section.title,
+            modifier = headerModifier,
             onMoreClick = onSeeAll,
             horizontalPadding = inset,
             startPadding = inset,

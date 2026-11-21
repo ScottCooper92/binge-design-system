@@ -178,6 +178,8 @@ fun showsGridFooter(ready: PagedGridState.Ready): Boolean = ready.appending || r
  * @param loadingLabel what a screen reader says of the first loading plate; the app words it ("Loading titles").
  * @param firstVisibleIndex scrolls the grid to a cell, for a frame of the grid mid-list.
  * @param filterSheet the sheet the pill opens, given a dismiss callback; the screen keeps whether it is open.
+ * @param fastScrollbar draws a [com.binge.designsystem.component.BingeFastScrollbar] over the grid, at the end edge and inside the bar's and the
+ *   navigation bar's room, with the options' bubble text. Null, the default, draws none.
  *
  * @need list posters in a paged grid with filters, load more, empty and failed states
  * @group screens
@@ -202,6 +204,7 @@ fun PagedGridScreen(
     barActions: @Composable RowScope.(handedOver: Boolean, collapsedFraction: Float) -> Unit = { _, _ -> },
     failedContent: (@Composable (Modifier) -> Unit)? = null,
     filterSheet: (@Composable (onDismiss: () -> Unit) -> Unit)? = null,
+    fastScrollbar: FastScrollbarOptions? = null,
     overlays: @Composable () -> Unit = {},
 ) {
     val scrollBehavior = rememberPaneTopBarScrollBehavior()
@@ -301,6 +304,7 @@ fun PagedGridScreen(
                         reselectKey = reselectKey,
                         firstVisibleIndex = firstVisibleIndex,
                         moreFailedLabel = moreFailedLabel,
+                        fastScrollbar = fastScrollbar,
                     )
             }
         }
@@ -368,6 +372,7 @@ private fun ReadyGrid(
     reselectKey: Any?,
     firstVisibleIndex: Int,
     moreFailedLabel: String,
+    fastScrollbar: FastScrollbarOptions?,
 ) {
     val gridState = rememberLazyGridState(initialFirstVisibleItemIndex = firstVisibleIndex)
     if (reselectKey != null) ScrollToTopOnTabReselect(reselectKey, gridState)
@@ -389,25 +394,27 @@ private fun ReadyGrid(
         }
     }
     val grid: @Composable () -> Unit = {
-        GridFrame(contentPadding, gridState) {
-            itemsIndexed(state.items, key = { _, item -> item.key }) { index, item ->
-                MediaCard(
-                    posterUrl = item.posterUrl,
-                    title = item.title,
-                    rating = item.rating,
-                    onClick = { callbacks.onOpenItem(item.key) },
-                    modifier = firstCellAnchor(index),
-                    status = item.status,
-                    progress = item.progress,
-                    subtitle = item.subtitle,
-                    favourite = item.favourite,
-                    watched = item.watched,
-                    unwatchedCount = item.unwatchedCount,
-                )
-            }
-            if (showsGridFooter(state)) {
-                item(key = FOOTER_KEY, span = { GridItemSpan(maxLineSpan) }) {
-                    AppendFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
+        FastScrollbarOverlay(fastScrollbar, gridState, contentPadding) {
+            GridFrame(contentPadding, gridState) {
+                itemsIndexed(state.items, key = { _, item -> item.key }) { index, item ->
+                    MediaCard(
+                        posterUrl = item.posterUrl,
+                        title = item.title,
+                        rating = item.rating,
+                        onClick = { callbacks.onOpenItem(item.key) },
+                        modifier = firstCellAnchor(index),
+                        status = item.status,
+                        progress = item.progress,
+                        subtitle = item.subtitle,
+                        favourite = item.favourite,
+                        watched = item.watched,
+                        unwatchedCount = item.unwatchedCount,
+                    )
+                }
+                if (showsGridFooter(state)) {
+                    item(key = FOOTER_KEY, span = { GridItemSpan(maxLineSpan) }) {
+                        AppendFooter(state.appendFailed, moreFailedLabel, callbacks.onLoadMore)
+                    }
                 }
             }
         }

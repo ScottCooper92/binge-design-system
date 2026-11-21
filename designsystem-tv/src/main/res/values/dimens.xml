@@ -259,4 +259,18 @@
     <dimen name="tv_poster_mark_size">24dp</dimen>
     <dimen name="tv_poster_progress_height">4dp</dimen>
     <dimen name="tv_filter_page_gap">32dp</dimen>
+    <!-- The TV search page: the bar to whatever is under it (the field, and the first row of the list or the grid). -->
+    <dimen name="tv_search_header_gap">16dp</dimen>
+    <!-- The gap between rows of the suggestion column. -->
+    <dimen name="tv_search_key_gap">5dp</dimen>
+    <dimen name="tv_search_left_width">240dp</dimen>
+    <dimen name="tv_search_gap">32dp</dimen>
+    <dimen name="tv_search_field_height">40dp</dimen>
+    <!-- A suggestion's text as a loading plate: a bodyMedium line's height. -->
+    <dimen name="tv_search_suggestion_line_height">14dp</dimen>
+    <dimen name="tv_search_empty_icon">48dp</dimen>
+    <!-- The suggestion column. Width comes from the left column it shares with the query bar. -->
+    <dimen name="tv_search_suggestion_height">32dp</dimen>
+    <dimen name="tv_search_suggestion_icon">16dp</dimen>
+    <dimen name="tv_search_suggestion_gap">10dp</dimen>
 </resources>

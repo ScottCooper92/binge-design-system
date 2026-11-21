@@ -177,19 +177,18 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
 }
 
 /**
- * What a search draws in a [MediaResultRow]'s place while it loads: the row's own chrome with a plate for the picture and two for the
- * name and the subtitle, at the picture's size, so the loading to content swap does not jump. [kind] picks the picture's shape, its box and the text's alignment as the row does.
- * [description] names the loading state for a screen reader; without one it stays silent. [blurbLines] is for a list whose rows carry a blurb, which
- * runs up to three lines: the plates then follow the row's own text (the name, the status line and that many blurb lines, each at its own
- * font size), so the rows below do not shift down when the list loads.
+ * What a search draws in a [MediaResultRow]'s place while it loads: the row's own chrome with a plate for the picture and plates for the
+ * name and the status line, at the picture's size, so the loading to content swap does not jump. [kind] picks the picture's shape, its box and the text's alignment as the row does.
+ * [description] names the loading state for a screen reader; without one it stays silent. The text plates always follow the row's own text (the name and the
+ * status line, each at its own font size), so the rows below do not shift down when the list loads. [blurbLines] is for a list whose rows
+ * carry a blurb, which runs up to three lines: it adds that many blurb lines.
  *
  * What the name takes depends on its words, which a loading state does not have, so it is one line unless the caller hints. [expectedName] is a string
  * the loaded name is expected to look like (the longest typical title): the plate lays it out invisibly in the row's own style and width, up to the
  * row's two lines, so it takes what the name takes at every font size, wrapping included. The width is the row's whole text column: the favourite
  * and watched marks a loaded row puts beside its name are not reserved, so a title that only just fits on one line here can wrap in a marked row.
- * The hint applies to a [blurbLines] row too, as its name plate. A hint gives the row the name, subtitle and status plates in
- * the row's own styles, with the status as one line. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
- * not something a plate can measure: a row whose status wraps still moves. With no hint the plates are as they were.
+ * The hint applies to a [blurbLines] row too, as its name plate; on a row with no blurb it also reserves the subtitle line. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
+ * not something a plate can measure: a row whose status wraps still moves.
  *
  * @need show a loading placeholder for a search result row
  * @group feedback
@@ -210,30 +209,16 @@ fun MediaResultRowSkeleton(
         leading = { SkeletonPicture(kind) },
     ) { contentModifier ->
         val top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero)
-        if (blurbLines > 0) {
-            BlurbRowPlates(blurbLines, contentModifier.padding(top = top), expectedName)
-            return@ListRow
-        }
-        if (expectedName != null) {
-            HintedRowPlates(expectedName, contentModifier.padding(top = top))
-            return@ListRow
-        }
-        Column(
-            modifier = contentModifier.padding(top = top),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-        ) {
-            SkeletonPlate(Modifier.fillMaxWidth(NAME_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_name_height)))
-            SkeletonPlate(
-                Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).height(dimensionResource(R.dimen.media_result_skeleton_subtitle_height)),
-            )
-        }
+        // The row's own text at its own font sizes, whether or not it carries a blurb: fixed-height plates stayed as they were at a large font
+        // while the loaded row's text grew, and the rows below shifted down when the list loaded.
+        BlurbRowPlates(blurbLines, contentModifier.padding(top = top), expectedName)
     }
 }
 
 /**
- * The plates of a row that carries a blurb, laid out as [MediaResultRow] lays out its text: the name, the status line and [lines] lines
- * of the blurb, each a line of its own style and the gaps the row has, so the height is the loaded row's at any font size. The fixed-height
- * plates of a row with no blurb would stay as they are at a large font while the row's text grows, and the rows below would shift down.
+ * The text plates of a row, laid out as [MediaResultRow] lays out its text: the name, the status line and [lines] lines
+ * of the blurb (none for a row without one), each a line of its own style and the gaps the row has, so the height is the loaded row's at
+ * any font size.
  */
 @Composable
 private fun BlurbRowPlates(
@@ -250,35 +235,21 @@ private fun BlurbRowPlates(
             maxLines = 2,
         )
         Spacer(Modifier.height(gap))
+        // A hinted row with no blurb is a title that has a subtitle line too, as the hint's own row does, so the plates reserve it.
+        if (expectedName != null && lines == 0) {
+            TextPlate(MaterialTheme.typography.labelMedium, Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION))
+            Spacer(Modifier.height(gap))
+        }
         // The status line: a rating chip is a line of its label style with its own vertical padding.
         TextPlate(
             MaterialTheme.typography.labelMedium,
             Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).padding(vertical = dimensionResource(R.dimen.rating_chip_padding_v)),
         )
-        Spacer(Modifier.height(gap))
+        // The loaded row draws this gap only before a blurb, so a row without one ends on its status line.
+        if (lines > 0) Spacer(Modifier.height(gap))
         repeat(lines) { line ->
             TextPlate(MaterialTheme.typography.bodyMedium, Modifier.fillMaxWidth(if (line == lines - 1) SUBTITLE_PLATE_FRACTION else 1f))
         }
-    }
-}
-
-/**
- * The plates of a row whose name the caller has hinted at, laid out as [MediaResultRow] lays out its text: the name (as much of it as
- * [expectedName] takes, up to the row's two lines), the subtitle and one line of status, each in its own style and the gaps the row has.
- */
-@Composable
-private fun HintedRowPlates(expectedName: String, modifier: Modifier) {
-    val gap = dimensionResource(R.dimen.detail_cast_avatar_label_spacing)
-    Column(modifier = modifier) {
-        TextPlate(MaterialTheme.typography.titleMedium, Modifier.fillMaxWidth(), text = expectedName, maxLines = 2)
-        Spacer(Modifier.height(gap))
-        TextPlate(MaterialTheme.typography.labelMedium, Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION))
-        Spacer(Modifier.height(gap))
-        // A chip is a line of its label style with its own vertical padding.
-        TextPlate(
-            MaterialTheme.typography.labelMedium,
-            Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION).padding(vertical = dimensionResource(R.dimen.rating_chip_padding_v)),
-        )
     }
 }
 
