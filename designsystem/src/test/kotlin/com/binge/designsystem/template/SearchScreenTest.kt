@@ -13,6 +13,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithText
@@ -241,6 +242,7 @@ class SearchScreenTest {
         asked: MutableList<String>,
         pages: Map<String, List<MediaResult>> = pagedResults,
         bar: ScreenBar = ScreenBar.Large,
+        pinned: Boolean = false,
     ) {
         rule.setContent {
             var selected by remember { mutableStateOf(selectedKey) }
@@ -261,6 +263,7 @@ class SearchScreenTest {
                     }),
                     placeholder = "Search here",
                     bar = bar,
+                    pinned = pinned,
                 )
             }
         }
@@ -330,9 +333,13 @@ class SearchScreenTest {
         assertTrue(asked.isEmpty())
     }
 
-    private fun showLongPaged(asked: MutableList<String>, bar: ScreenBar = ScreenBar.Large) {
+    private fun showLongPaged(
+        asked: MutableList<String>,
+        bar: ScreenBar = ScreenBar.Large,
+        pinned: Boolean = false,
+    ) {
         val pages = mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40))
-        showPaged("all", asked, pages = pages, bar = bar)
+        showPaged("all", asked, pages = pages, bar = bar, pinned = pinned)
     }
 
     private fun assertScrolledAway(label: String) {
@@ -811,8 +818,8 @@ class SearchScreenTest {
      * so a scrolled header looks much like a bare one and what tells them apart is a row showing through; each page's header is compared with how it
      * looked when the page was left, by the region from the top edge to the chips.
      */
-    private fun assertSmallHeaderFollowsPages(goTo: (String, String) -> Unit) {
-        showLongPaged(mutableListOf(), bar = ScreenBar.Small)
+    private fun assertSmallHeaderFollowsPages(pinned: Boolean = false, goTo: (String, String) -> Unit) {
+        showLongPaged(mutableListOf(), bar = ScreenBar.Small, pinned = pinned)
         rule.onNodeWithText("Movies").performClick()
         rule.waitForIdle()
 
@@ -843,4 +850,25 @@ class SearchScreenTest {
     @Test
     fun `the small bar's header follows the page it settles on, on a chip tap`() =
         assertSmallHeaderFollowsPages { chip, _ -> rule.onNodeWithText(chip).performClick() }
+
+    @Test
+    fun `the pinned small bar's header follows the page it settles on, on a swipe`() =
+        assertSmallHeaderFollowsPages(pinned = true) { _, direction ->
+            rule.onRoot().performTouchInput { if (direction == "left") swipeLeft() else swipeRight() }
+        }
+
+    @Test
+    fun `the pinned small bar's header follows the page it settles on, on a chip tap`() =
+        assertSmallHeaderFollowsPages(pinned = true) { chip, _ -> rule.onNodeWithText(chip).performClick() }
+
+    @Test
+    fun `a pinned small bar keeps its title, field and chips in place while a page scrolls`() {
+        showLongPaged(mutableListOf(), bar = ScreenBar.Small, pinned = true)
+
+        fun tops() = listOf("Search", "past", "Movies").map { rule.onNodeWithText(it).getUnclippedBoundsInRoot().top }
+        val before = tops()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertEquals(before, tops())
+    }
 }
