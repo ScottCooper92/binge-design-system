@@ -49,7 +49,7 @@ import com.binge.designsystem.tv.R as TvR
 
 private const val BADGE_SCRIM_ALPHA = 0.6f
 private const val BADGE_SCRIM_END = 0.35f
-private const val TAIL_KEY = "tv-episode-row-tail"
+private const val TAIL_KEY = "binge:tv-episode-row-tail"
 private const val COPY_LINES = 3
 
 /**
@@ -66,7 +66,7 @@ internal fun TvDetailEpisodeStrip(
     onEpisodeClick: (TvDetailEpisode) -> Unit,
     onFocused: () -> Unit,
 ) {
-    var focusedKey by remember { mutableStateOf<Int?>(null) }
+    var focusedKey by remember { mutableStateOf<String?>(null) }
     val cardHeight = dimensionResource(TvR.dimen.tv_detail_episode_height)
     val reduceMotion = LocalReduceMotion.current
     // The stable scope stops the default bring-into-view fighting this pin.

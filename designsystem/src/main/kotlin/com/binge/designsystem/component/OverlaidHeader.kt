@@ -1,5 +1,7 @@
 package com.binge.designsystem.component
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -97,3 +101,26 @@ fun OverlaidHeaderContent(
         }
     }
 }
+
+/**
+ * The scrim fraction a pager draws behind its header: [scrimFraction] as it is when the caller passes one, and otherwise a fade that follows
+ * whether the page that is shown is [scrolled] off its top, so the scrim is up on a page that is already scrolled as soon as it is shown.
+ * Shared by [BingeTabbedPager] and [BingeFilterChipPager], so the two fade alike.
+ */
+@Composable
+internal fun rememberPagerScrim(scrimFraction: Float?, scrolled: Boolean): Float {
+    val followed by animateFloatAsState(
+        targetValue = if (scrimFraction == null && scrolled) 1f else 0f,
+        animationSpec = tween(durationMillis = PAGER_SCRIM_FADE_MILLIS),
+        label = "pager scrim",
+    )
+    val scrim = scrimFraction ?: followed
+    LocalPagerScrimProbe.current?.invoke(scrim)
+    return scrim
+}
+
+/** How long the scrim takes to fade in or out as the shown page leaves or returns to its top. */
+private const val PAGER_SCRIM_FADE_MILLIS = 150
+
+/** A test's way to read the scrim fraction a pager is drawing, which is otherwise only a colour in the header; null in production. */
+internal val LocalPagerScrimProbe = compositionLocalOf<((Float) -> Unit)?> { null }

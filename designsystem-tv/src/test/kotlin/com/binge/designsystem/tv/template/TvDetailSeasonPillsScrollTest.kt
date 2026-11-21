@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -38,7 +38,7 @@ class TvDetailSeasonPillsScrollTest {
     @get:Rule
     val composeTestRule = createTakeDownKeyboardComposeRule()
 
-    private var selected by mutableIntStateOf(1)
+    private var selected by mutableStateOf("1")
 
     @Test
     fun `a selection changed off-screen scrolls its pill into view and leaves focus alone`() {
@@ -63,7 +63,7 @@ class TvDetailSeasonPillsScrollTest {
         composeTestRule.onNodeWithTag(STRIP).requestFocus()
         composeTestRule.waitForIdle()
 
-        selected = SEASON_COUNT
+        selected = SEASON_COUNT.toString()
         composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithText("Season $SEASON_COUNT").assertIsDisplayed()

@@ -22,21 +22,29 @@ import com.binge.designsystem.tv.nav.tvContentGutterStart
 import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
-/** A season pill: its name, and its episode count beneath once it is the selected one. */
+/**
+ * A season pill: its name, and its episode count beneath once it is the selected one. [key] is the app's identity for the season, text, the one
+ * [TvDetailEpisode.seasonKey], [TvDetailEpisodes]' `currentSeason` and `onSeasonChange` carry. It is never shown: [name] is the pill's words, so a
+ * specials season is just a name.
+ */
 class TvDetailSeason(
-    val number: Int,
+    val key: String,
     val name: String,
     val episodeCount: String,
-)
+) {
+    /** For a season identified by a number: its [key] is the number as text. */
+    constructor(number: Int, name: String, episodeCount: String) : this(number.toString(), name, episodeCount)
+}
 
 /**
  * An episode card: its still, the [badge] drawn on it, and the title and synopsis shown under the strip while it is the one in focus.
  * [focusedBadge] is the badge while focused, the season and episode rather than the bare number. [facts] are the air year, runtime
- * and the like, already formatted, shown after the rating.
+ * and the like, already formatted, shown after the rating. [key] is the app's identity for the episode, text, which the strip's focus memory
+ * is kept by; [seasonKey] is its season's [TvDetailSeason.key].
  */
 class TvDetailEpisode(
-    val key: Int,
-    val seasonNumber: Int,
+    val key: String,
+    val seasonKey: String,
     val episodeNumber: Int,
     val stillUrl: String?,
     val badge: String,
@@ -45,7 +53,21 @@ class TvDetailEpisode(
     val overview: String,
     val rating: Float? = null,
     val facts: List<String> = emptyList(),
-)
+) {
+    /** For an episode and a season identified by numbers: their keys are the numbers as text. */
+    constructor(
+        key: Int,
+        seasonNumber: Int,
+        episodeNumber: Int,
+        stillUrl: String?,
+        badge: String,
+        focusedBadge: String = badge,
+        title: String,
+        overview: String,
+        rating: Float? = null,
+        facts: List<String> = emptyList(),
+    ) : this(key.toString(), seasonNumber.toString(), episodeNumber, stillUrl, badge, focusedBadge, title, overview, rating, facts)
+}
 
 /**
  * A show's Episodes tab as Netflix draws it: the logo and the show's meta, the season pills, then one strip of episodes running
@@ -61,17 +83,17 @@ class TvDetailEpisode(
 fun TvDetailEpisodes(
     title: TvDetailTitle,
     seasons: List<TvDetailSeason>,
-    currentSeason: Int,
-    onSeasonChange: (Int) -> Unit,
+    currentSeason: String,
+    onSeasonChange: (String) -> Unit,
     episodes: List<TvDetailEpisode>,
     onEpisodeClick: (TvDetailEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    initialEpisodeKey: Int? = null,
+    initialEpisodeKey: String? = null,
 ) {
     // The episode focus last rested on, by id: indices move as seasons load ahead of it, ids do not. Saved for the return from an episode.
     var lastKey by rememberSaveable { mutableStateOf(initialEpisodeKey) }
     val lastIndex = episodes.indexOfFirst { it.key == lastKey }
-    val entryIndex = lastIndex.takeIf { it >= 0 } ?: episodes.indexOfFirst { it.seasonNumber == currentSeason }.coerceAtLeast(0)
+    val entryIndex = lastIndex.takeIf { it >= 0 } ?: episodes.indexOfFirst { it.seasonKey == currentSeason }.coerceAtLeast(0)
     val entry = rememberTvRowEntry(episodes.size, overrideIndex = entryIndex)
     // Not saveable: a saved index outlives the list it indexed, so a return refilled with fewer episodes landed on the tail spacer.
     val rowState = remember { LazyListState(firstVisibleItemIndex = entryIndex) }
@@ -84,8 +106,8 @@ fun TvDetailEpisodes(
     }
     // A pill chosen for another season jumps the strip to that season's first episode; walking the strip into it does not.
     LaunchedEffect(currentSeason, episodes.size) {
-        if (episodes.getOrNull(lastIndex)?.seasonNumber == currentSeason) return@LaunchedEffect
-        val first = episodes.indexOfFirst { it.seasonNumber == currentSeason }
+        if (episodes.getOrNull(lastIndex)?.seasonKey == currentSeason) return@LaunchedEffect
+        val first = episodes.indexOfFirst { it.seasonKey == currentSeason }
         if (first < 0) return@LaunchedEffect
         lastKey = episodes[first].key
         rowState.scrollToItem(first)
@@ -117,7 +139,7 @@ fun TvDetailEpisodes(
             shown = episodes.getOrNull(lastIndex) ?: episodes.getOrNull(entryIndex),
             onEpisodeFocused = { episode ->
                 lastKey = episode.key
-                if (episode.seasonNumber != currentSeason) onSeasonChange(episode.seasonNumber)
+                if (episode.seasonKey != currentSeason) onSeasonChange(episode.seasonKey)
             },
             onEpisodeClick = onEpisodeClick,
         ) { lastInEpisodes = true }
