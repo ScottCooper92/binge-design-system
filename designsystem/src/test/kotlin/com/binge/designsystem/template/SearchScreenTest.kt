@@ -9,8 +9,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
@@ -541,6 +543,125 @@ class SearchScreenTest {
         prefix = "h"
         rule.waitForIdle()
 
+        rule.onNodeWithText("h title 0").assertIsDisplayed()
+    }
+
+    private fun films(count: Int, keyPrefix: String = "film") =
+        List(count) { MediaResult("$keyPrefix$it", MediaResultKind.Poster, null, "Film $it", "Movie · 2020", rating = 7f) }
+
+    /**
+     * The consumer's own emission, one [SearchState.Ready] per tap and nothing else: `results` is the selected type's page, so it changes on every tap,
+     * the films on All and Movies share their keys, and the types after them have empty pages.
+     */
+    private fun showFromAConsumer(onSelect: (String) -> Unit = {}) {
+        val chips =
+            listOf(
+                SearchTypeChip("all", "All"),
+                SearchTypeChip("movies", "Movies"),
+                SearchTypeChip("tv", "TV"),
+                SearchTypeChip("people", "People"),
+            )
+        val pages = mapOf("all" to films(40), "movies" to films(40, "mfilm"), "tv" to emptyList(), "people" to emptyList())
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = "film",
+                    state = SearchState.Ready(
+                        results = pages.getValue(selected),
+                        loaded = 40,
+                        hasMore = false,
+                        types = SearchTypes(chips, selected),
+                        pages = pages,
+                    ),
+                    callbacks = callbacks(onType = {
+                        selected = it
+                        onSelect(it)
+                    }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    /** What the reader sees: the films on All and Movies share their titles, and the page beside the selected one may still be composed off-screen. */
+    private fun assertNoFilmOnScreen() {
+        rule
+            .onAllNodesWithText(
+                "Film 1",
+            ).fetchSemanticsNodes()
+            .indices
+            .forEach { rule.onAllNodesWithText("Film 1")[it].assertIsNotDisplayed() }
+    }
+
+    @Test
+    fun `a page keeps its scroll through a chip tap away and back when the consumer's results follow the selection`() {
+        showFromAConsumer()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertNoFilmOnScreen()
+
+        rule.onNodeWithText("Movies").performClick()
+        rule.waitForIdle()
+        rule.onNodeWithText("All").performClick()
+        rule.waitForIdle()
+
+        assertNoFilmOnScreen()
+    }
+
+    @Test
+    fun `a page keeps its scroll through a tap to an empty type and back when the consumer's results follow the selection`() {
+        showFromAConsumer()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertNoFilmOnScreen()
+
+        rule.onNodeWithText("People").performClick()
+        rule.waitForIdle()
+        rule.onNodeWithText("All").performClick()
+        rule.waitForIdle()
+
+        assertNoFilmOnScreen()
+    }
+
+    @Test
+    fun `typing keeps the old results where they were until the results for the new query arrive`() {
+        var text by mutableStateOf("past")
+        var answered by mutableStateOf("past")
+        var prefix by mutableStateOf("a")
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = text,
+                    state = SearchState.Ready(
+                        named(prefix),
+                        loaded = 3,
+                        hasMore = false,
+                        types = SearchTypes(types.chips, selected),
+                        pages = mapOf("all" to named(prefix, 40), "movies" to named("m$prefix", 40), "people" to named("p$prefix", 40)),
+                        query = answered,
+                    ),
+                    callbacks = callbacks(onType = { selected = it }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        text = "heat"
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        answered = "heat"
+        prefix = "h"
+        rule.waitForIdle()
         rule.onNodeWithText("h title 0").assertIsDisplayed()
     }
 }

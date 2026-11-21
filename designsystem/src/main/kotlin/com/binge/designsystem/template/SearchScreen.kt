@@ -124,6 +124,9 @@ sealed interface SearchState {
      * [pages] turns the body into a pager over [types]' chips: each chip's key holds that type's results, in the order of the chips, and a
      * type with no entry shows loading rows. It applies only when [types] is set with more than one chip; [results] then plays no part.
      * The paging flags stay shared by every page, and each page asks for more near its own end.
+     *
+     * [query] is the query these results answer. An app that debounces and keeps the old results on screen while the field changes sets it, so
+     * the pages keep their place until the new results arrive and then start at the top. Null reads the live `text` instead.
      */
     class Ready(
         val results: List<MediaResult>,
@@ -135,17 +138,19 @@ sealed interface SearchState {
         val emptyTitle: String? = null,
         val emptyMessage: String = "",
         val pages: Map<String, List<MediaResult>>? = null,
+        val query: String? = null,
     ) : SearchState
 
     /**
      * The query found nothing; [types] keeps the chips, with whatever counts the app gives them. [title] null says "Nothing here yet".
-     * With [pages] (see [Ready]) every type still swipes, each to the same plate.
+     * With [pages] (see [Ready]) every type still swipes, each to the same plate. [query] is as on [Ready].
      */
     class NoResults(
         val message: String,
         val title: String? = null,
         val types: SearchTypes? = null,
         val pages: Map<String, List<MediaResult>>? = null,
+        val query: String? = null,
     ) : SearchState
 
     /** The search failed. [title] and [message] default to [kind]'s own words; Try again shows only when [retryable], and [secondary] is a second action beside it. */
@@ -233,8 +238,9 @@ fun SearchScreen(
     val collapsed = if (bar == ScreenBar.Small) 0f else scrollBehavior?.state?.collapsedFraction ?: 0f
     val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE
     val paged = state.pagedTypes()
-    // Keyed on the query: a new query's results open at the top of every page, as the unpaged list does, while a type tap keeps each page's place.
-    val pageStates = rememberSaveable(text, saver = SearchPageStates.Saver) { SearchPageStates() }
+    // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
+    val shownQuery = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query ?: text
+    val pageStates = rememberSaveable(shownQuery, saver = SearchPageStates.Saver) { SearchPageStates() }
     val pager = rememberFilterPager(
         selectedIndex = paged?.selectedIndex ?: 0,
         onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },
