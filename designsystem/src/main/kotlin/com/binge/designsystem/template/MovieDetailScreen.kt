@@ -240,7 +240,12 @@ private fun DetailPageSkeleton(
                     primary = state.hasPrimary,
                 )
             }
-            if (!cinematic) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+            if (!cinematic) {
+                DetailOverviewSkeleton(
+                    Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)),
+                    withToggle = state.hasOverviewToggle,
+                )
+            }
             repeat(state.rails) { CarouselSkeleton(contentPadding = PaddingValues(horizontal = readingInset())) }
         }
     }

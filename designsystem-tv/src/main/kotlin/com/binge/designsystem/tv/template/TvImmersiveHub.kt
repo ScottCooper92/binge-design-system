@@ -200,14 +200,17 @@ fun <T : Any> TvImmersiveHub(
     val bursting = rememberBursting(focusedRowKey)
 
     val contentTop = tvImmersiveContentTop()
-    val contentTopPx = with(LocalDensity.current) { contentTop.roundToPx() }
+    // A focused row is anchored where the first row rests: under the copy band and one row gap below it, so focus arriving
+    // does not lift the row by the gap.
+    val rowGap = dimensionResource(TvR.dimen.tv_immersive_row_gap)
+    val anchorPx = with(LocalDensity.current) { (contentTop + rowGap).roundToPx() }
     // Seeded, not only driven: a static frame runs no coroutines, so a baseline relying on the anchor effect below
     // would capture an unscrolled list.
     val initialIndex = initialFocused?.let { (rowKey, _) -> visibleRows.indexOfFirst { it.key == rowKey }.takeIf { it >= 0 }?.plus(1) } ?: 0
     val listState =
         rememberLazyListState(
             initialFirstVisibleItemIndex = initialIndex,
-            initialFirstVisibleItemScrollOffset = if (initialIndex == 0) 0 else -contentTopPx,
+            initialFirstVisibleItemScrollOffset = if (initialIndex == 0) 0 else -anchorPx,
         )
     // List slot 0 is the hero, or a spacer of the same band so the rows sit under the copy either way.
     val heroSlots = 1
@@ -216,7 +219,7 @@ fun <T : Any> TvImmersiveHub(
     val settledRowIndex = visibleRows.indexOfFirst { it.key == settledRowKey }
     val movingUp = focusedIndex >= 0 && settledRowIndex >= 0 && focusedIndex < settledRowIndex
     val clipTarget = if ((bursting || focusedRowKey != settledRowKey) && movingUp) settledRowIndex + heroSlots else scrollTarget
-    val scrollOffset = if (scrollTarget == 0) 0 else -contentTopPx
+    val scrollOffset = if (scrollTarget == 0) 0 else -anchorPx
     val reportBodyFocus =
         rememberAnchorKeeper(
             scrollTarget,
@@ -253,7 +256,7 @@ fun <T : Any> TvImmersiveHub(
                         .immersiveTopClip(enabled = !showHero, listTopClip(listState) { clipTarget })
                         // Do not set userScrollEnabled = false: focus search reaches off-screen lazy items through the scroll machinery.
                         .then(tvPageArrival(hosting, hubEntry, enabled = visibleRows.isNotEmpty(), key = Unit)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(TvR.dimen.tv_immersive_row_gap)),
+                verticalArrangement = Arrangement.spacedBy(rowGap),
                 // Lets the last row scroll up to the anchor.
                 contentPadding = PaddingValues(bottom = dimensionResource(TvR.dimen.tv_immersive_rows_bottom)),
             ) {

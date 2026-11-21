@@ -235,6 +235,15 @@ annotation class LandscapePanesPreview
 annotation class TallComponentPreviews
 
 /**
+ * The standard phone at the default font and at 1.3x, the two sizes a state is checked at when its copy can wrap. Dark, with the `phone`
+ * cell's own spec at 1x, so a frame on it keeps that baseline.
+ */
+@PreviewWrapper(ScreenshotThemeWrapper::class)
+@Preview(name = "phone", device = PHONE_PORTRAIT_SPEC, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+@Preview(name = "font13-dark", widthDp = STANDARD_PHONE_WIDTH_DP, fontScale = 1.3f, uiMode = UI_MODE_NIGHT_YES, locale = SOURCE_LOCALE)
+annotation class PhoneAndFont13Previews
+
+/**
  * [WorstCaseFontPreviews] on a tall window, for a frame whose content at 1.3x and 2x runs past the standard phone's height: a skeleton over the
  * content it becomes, say. Same fonts, width and theme, with room for both.
  */

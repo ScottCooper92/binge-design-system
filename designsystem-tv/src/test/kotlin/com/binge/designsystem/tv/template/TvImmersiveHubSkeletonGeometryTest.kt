@@ -39,8 +39,8 @@ private val Anchors = listOf(TvLayoutAnchors.HUB_COPY, TvLayoutAnchors.hubRow(0)
 /**
  * [TvImmersiveHubSkeleton] lays its copy band and rows out where [TvImmersiveHub] puts them, so nothing moves when
  * the content arrives. Each hosting gets the start inset its host provides: the rail's width in its pane,
- * nothing above the shell or before it. An overlay and a pre-shell page also place focus at once, which anchors
- * the first row higher than it rests in the pane.
+ * nothing above the shell or before it. An overlay and a pre-shell page also place focus at once, which anchors the
+ * first row where it rests.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = Application::class, qualifiers = "w960dp-h540dp-television-xhdpi")
@@ -71,7 +71,7 @@ class TvImmersiveHubSkeletonGeometryTest {
                     LocalTvHostedAsOverlay provides (hosting == TvPageHosting.Overlay),
                     LocalTvTopInset provides topInset,
                 ) {
-                    if (resolved) Hub(hosting) else Skeleton(hosting)
+                    if (resolved) Hub(hosting) else Skeleton()
                 }
             }
         }
@@ -93,5 +93,4 @@ private fun Hub(hosting: TvPageHosting) {
 }
 
 @Composable
-private fun Skeleton(hosting: TvPageHosting) =
-    TvImmersiveHubSkeleton(hosting = hosting, rows = Rows.size, cardsPerRow = CARDS_PER_ROW, cardWidth = CardWidth)
+private fun Skeleton() = TvImmersiveHubSkeleton(rows = Rows.size, cardsPerRow = CARDS_PER_ROW, cardWidth = CardWidth)

@@ -25,6 +25,12 @@ class PersonDetailScreenSamplesScreenshotTest {
     @ScreenWidthPreviews
     @WorstCaseFontPreviews
     @Composable
+    fun loadingHinted() = PersonDetailLoadingHintedSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @WorstCaseFontPreviews
+    @Composable
     fun failed() = PersonDetailFailedSample()
 
     @PreviewTest
