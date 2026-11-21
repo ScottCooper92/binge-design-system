@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onAllNodesWithText
@@ -18,6 +19,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
@@ -746,4 +748,42 @@ class SearchScreenTest {
 
         rule.onNodeWithText("a title 0").assertIsDisplayed()
     }
+
+    private fun chipsBounds() = rule.onNodeWithText("Movies").getBoundsInRoot()
+
+    /**
+     * The large bar collapses as a page scrolls, and a page that arrives already scrolled (or at the top) moves nothing, so the header has to be
+     * set from the page it settles on. The chip row sits under the title, so where it is tells which state the header is in.
+     */
+    private fun assertHeaderFollowsPages(goTo: (String, String) -> Unit) {
+        val asked = mutableListOf<String>()
+        showLongPaged(asked)
+        val expanded = chipsBounds()
+        rule.onNodeWithText("Movies").performClick()
+        rule.waitForIdle()
+        assertEquals(expanded, chipsBounds())
+
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        val collapsed = chipsBounds()
+        assertTrue("scrolling the page should collapse the header", collapsed.top < expanded.top)
+
+        goTo("All", "right")
+        rule.waitForIdle()
+        assertEquals("page 1 is at the top, so the header is expanded", expanded, chipsBounds())
+
+        goTo("Movies", "left")
+        rule.waitForIdle()
+        assertEquals("page 2 is scrolled, so the header is collapsed and no row sits behind an expanded one", collapsed, chipsBounds())
+    }
+
+    @Test
+    fun `a page that arrives scrolled or at the top sets the header, on a swipe`() =
+        assertHeaderFollowsPages { _, direction ->
+            rule.onRoot().performTouchInput { if (direction == "left") swipeLeft() else swipeRight() }
+        }
+
+    @Test
+    fun `a page that arrives scrolled or at the top sets the header, on a chip tap`() =
+        assertHeaderFollowsPages { chip, _ -> rule.onNodeWithText(chip).performClick() }
 }

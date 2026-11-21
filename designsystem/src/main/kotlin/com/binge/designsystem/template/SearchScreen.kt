@@ -26,11 +26,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -75,6 +78,7 @@ import com.binge.designsystem.navOverlayPadding
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.searchResultColumns
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 
 /** The lazy key of the append footer. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
@@ -261,6 +265,7 @@ fun SearchScreen(
         onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },
         pageCount = paged?.chips?.size ?: 0,
     )
+    HeaderFollowsPages(scrollBehavior?.state.takeIf { bar != ScreenBar.Small }, pager, paged, pageStates)
     BingeScreenScaffold(
         title = title,
         modifier = modifier,
@@ -303,6 +308,35 @@ fun SearchScreen(
         }
     }
     overlays()
+}
+
+/**
+ * The large bar collapses as a page scrolls and a page that arrives already scrolled, or at the top, moves nothing, so a restored page would sit
+ * behind an expanded header, or leave a collapsed one over a list at its top. When the pager settles, the header is set from that page's grid:
+ * expanded at the top, collapsed otherwise. A null [barState] (the small bar, which does not collapse) does nothing.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HeaderFollowsPages(
+    barState: TopAppBarState?,
+    pager: FilterPager,
+    paged: PagedTypes?,
+    pageStates: SearchPageStates,
+) {
+    val latestPaged by rememberUpdatedState(paged)
+    val latestPageStates by rememberUpdatedState(pageStates)
+    LaunchedEffect(barState, pager.state) {
+        if (barState == null) return@LaunchedEffect
+        // The first value is where the pager started, which the header already follows.
+        snapshotFlow { pager.state.settledPage }.drop(1).collect { page ->
+            val chip = latestPaged?.chips?.getOrNull(page) ?: return@collect
+            val grid = latestPageStates.stateFor(chip.key)
+            val atTop = grid.firstVisibleItemIndex == 0 && grid.firstVisibleItemScrollOffset == 0
+            val offset = if (atTop) 0f else barState.heightOffsetLimit
+            barState.heightOffset = offset
+            barState.contentOffset = offset
+        }
+    }
 }
 
 private class RecentsCopy(
