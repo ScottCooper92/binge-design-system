@@ -126,7 +126,7 @@ sealed interface SearchState {
      * The paging flags stay shared by every page, and each page asks for more near its own end.
      *
      * [query] is the query these results answer. An app that debounces and keeps the old results on screen while the field changes sets it, so
-     * the pages keep their place until the new results arrive and then start at the top. Null reads the live `text` instead.
+     * the pages keep their place until the new results arrive and then start at the top. Null reads the live `text` instead. A state that carries no results (loading, idle, failed) keeps the last query answered.
      */
     class Ready(
         val results: List<MediaResult>,
@@ -242,7 +242,11 @@ fun SearchScreen(
     val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE
     val paged = state.pagedTypes()
     // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
-    val shownQuery = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query ?: text
+    val answered = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query
+    val lastAnswered = remember { AnsweredQuery() }
+    if (answered != null) lastAnswered.value = answered
+    // A state with no results (loading, idle, failed) keeps the last answered query, so the key does not fall to the live text and back.
+    val shownQuery = answered ?: lastAnswered.value ?: text
     val pageStates = rememberSaveable(shownQuery, saver = SearchPageStates.Saver) { SearchPageStates() }
     val pager = rememberFilterPager(
         selectedIndex = paged?.selectedIndex ?: 0,
@@ -449,6 +453,11 @@ private class SearchPageStates {
 }
 
 private const val PAGE_STATE_FIELDS = 3
+
+/** The query the last results answered, held across the states that carry none. Written with the same value on every recomposition, so it is not snapshot state. */
+private class AnsweredQuery {
+    var value: String? = null
+}
 
 /** The chips a paged body swipes between, the one chosen, and each chip's results; null when the state does not page. */
 @Immutable
