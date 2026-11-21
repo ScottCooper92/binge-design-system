@@ -29,4 +29,11 @@ class SearchFieldSamplesScreenshotTest {
     fun TransparentContainer() {
         SearchFieldTransparentContainerSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Button() {
+        SearchFieldButtonSample()
+    }
 }
