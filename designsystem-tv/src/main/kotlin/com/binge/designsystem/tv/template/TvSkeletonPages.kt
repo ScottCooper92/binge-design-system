@@ -41,8 +41,8 @@ import com.binge.designsystem.tv.R as TvR
  * It is a page, laid out like the hub: its edges follow the hub's own, the content gutter at the start and rows that
  * run to the end of the screen. Nothing in it is focusable, so while it shows the D-pad has nowhere to go, and focus
  * is placed by the loaded page when it replaces this one. [description] names the state for a screen reader.
- * [hosting] is the loaded hub's: an overlay or a pre-shell page lands focus on the first row at once, and the hub
- * anchors that row at the foot of the copy band rather than a row gap below it, so the skeleton's rows sit there too.
+ * [hosting] is the loaded hub's. It no longer changes the layout: the hub anchors a focused row where the first row rests, a
+ * row gap below the copy band, so the skeleton's rows sit there in every hosting.
  * It stands in for a hub with no hero only: a hero hub lands focus on the hero, so a hero hub shows its own loading state.
  *
  * @need show a loading placeholder for a home hub of poster rows
@@ -92,7 +92,7 @@ fun TvImmersiveHubSkeleton(
                     ).height(dimensionResource(TvR.dimen.tv_skeleton_meta_height)),
             )
         }
-        if (hosting == TvPageHosting.Destination) Spacer(Modifier.height(dimensionResource(TvR.dimen.tv_immersive_row_gap)))
+        Spacer(Modifier.height(dimensionResource(TvR.dimen.tv_immersive_row_gap)))
         // Measured at their own height and clipped by the screen: a loaded hub's rows run off the bottom, and a row
         // squeezed into what is left would draw its heading over its cards.
         Column(
