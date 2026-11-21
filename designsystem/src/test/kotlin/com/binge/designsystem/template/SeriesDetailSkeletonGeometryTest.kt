@@ -48,16 +48,19 @@ class SeriesDetailSkeletonGeometryTest {
             LayoutAnchors.Detail.OVERVIEW,
         ).map(LayoutAnchors::section)
 
-    private fun check() {
+    private fun check(
+        overview: String = MEDIA_PAGE_OVERVIEW,
+        loading: DetailState.Loading = DetailState.Loading(stats = MediaPageStats.size, roundActions = 0, hasPrimary = true),
+    ) {
         rule.assertSkeletonReservesGeometry(anchors, checkSize = true) { resolved ->
             ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
                 SeriesDetailScreen(
                     state = if (resolved) {
                         DetailState.Content(
-                            MediaDetail(title = MEDIA_PAGE_TITLE, stats = MediaPageStats, overview = MEDIA_PAGE_OVERVIEW),
+                            MediaDetail(title = MEDIA_PAGE_TITLE, stats = MediaPageStats, overview = overview),
                         )
                     } else {
-                        DetailState.Loading(stats = MediaPageStats.size, roundActions = 0, hasPrimary = true)
+                        loading
                     },
                     series = null,
                     callbacks = MediaDetailCallbacks(onBack = {}),
@@ -87,4 +90,14 @@ class SeriesDetailSkeletonGeometryTest {
     @Test
     @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 2f)
     fun `the skeleton holds them at a font scale of 2`() = check()
+
+    private val shortLoading =
+        DetailState.Loading(stats = MediaPageStats.size, roundActions = 0, hasPrimary = true, hasOverviewToggle = false)
+
+    @Test
+    fun `an overview that fits its lines holds no toggle`() = check(OVERVIEW_THREE_LINES, shortLoading)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `an overview that fits its lines holds no toggle at a font scale of 1 point 3`() = check(OVERVIEW_THREE_LINES_LARGE, shortLoading)
 }
