@@ -50,7 +50,8 @@ import com.binge.designsystem.resolvedContentInset
  * [backdropUrl] it is the picture behind the hero at any width, since a hand-made box set often has only a poster. With neither, the hero is the plain wash.
  * @property metaText the line under the title: a runtime or a genre line, or a count the app words for the plural
  * @property overviewHeading the heading over [overview]; null uses this library's word for it
- * @property partsHeading the heading over the parts; null draws no heading
+ * @property partsHeading the heading over the parts; null or blank draws no heading, and the loading state's [CollectionDetailState.Loading.hasPartsHeading] is
+ * `!partsHeading.isNullOrBlank()`: the skeleton reserves a heading only when this page will draw one
  * @property parts the titles, in the order they are drawn. With none the page is [emptyTitle] and [emptyMessage] over the back control.
  */
 @Immutable
@@ -72,7 +73,10 @@ sealed interface CollectionDetailState {
     /**
      * A block of prose when [hasOverview], a heading row when [hasPartsHeading], and [parts] rows of placeholders, in the loaded page's own room. [hasPoster] says the
      * loaded hero will have a poster beside the title at an expanded width, so the placeholder is that taller header. [hasPartsHeading] says the loaded page will draw
-     * a heading over its parts ([CollectionDetail.partsHeading]); the heading is a row of its own, so without it the parts would arrive that much lower.
+     * a heading over its parts, which is when [CollectionDetail.partsHeading] has words; the heading is a row of its own, so a skeleton that reserves one for a page that draws none
+     * starts the parts that much too low, and one that does not for a page that does starts them that much too high. Left false, as by default, the skeleton draws none.
+     * [hasOverviewToggle] says the loaded overview will run past its three lines and so carry the expand toggle's row; false for an overview that is short, which has none, so
+     * the parts are not left that much too low. It is true by default, as a long overview is the usual one, and applies only with [hasOverview].
      */
     @Immutable
     class Loading(
@@ -80,6 +84,7 @@ sealed interface CollectionDetailState {
         val parts: Int = 4,
         val hasPoster: Boolean = false,
         val hasPartsHeading: Boolean = false,
+        val hasOverviewToggle: Boolean = true,
     ) : CollectionDetailState
 
     @Immutable
@@ -213,9 +218,12 @@ private fun ColumnScope.CollectionContent(
         heading = collection.overviewHeading ?: stringResource(R.string.detail_overview_heading),
         text = collection.overview,
     )
-    collection.partsHeading?.let { SectionHeader(title = it, horizontalPadding = readingInset(), startPadding = readingInset()) }
+    // A blank heading is no heading, as null is: a row of nothing would only push the parts down, and the skeleton ([CollectionDetailState.Loading.hasPartsHeading])
+    // reserves a heading only for words.
+    val partsHeading = collection.partsHeading?.takeIf { it.isNotBlank() }
+    partsHeading?.let { SectionHeader(title = it, horizontalPadding = readingInset(), startPadding = readingInset()) }
     // A heading brings its own padding; without one the first row would sit hard under the overview.
-    if (collection.partsHeading == null && collection.overview != null) Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
+    if (partsHeading == null && collection.overview != null) Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
     Column(
         Modifier.fillMaxWidth().readingMargin().padding(horizontal = resolvedContentInset()),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
@@ -233,7 +241,12 @@ private fun ColumnScope.CollectionContent(
 
 @Composable
 private fun ColumnScope.CollectionPlaceholder(state: CollectionDetailState.Loading) {
-    if (state.hasOverview) DetailOverviewSkeleton(Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+    if (state.hasOverview) {
+        DetailOverviewSkeleton(
+            Modifier.layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)),
+            withToggle = state.hasOverviewToggle,
+        )
+    }
     if (state.hasPartsHeading) {
         PartsHeadingPlate()
     } else if (state.hasOverview) {
