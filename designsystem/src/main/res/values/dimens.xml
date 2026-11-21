@@ -147,6 +147,11 @@
          margin of visibly untouched background left below it — the room the tail-fade screenshot frames
          need to show the fade completing past the bar's bottom edge rather than cutting off. -->
     <dimen name="top_bar_scrim_tail_preview_height">220dp</dimen>
+    <!-- How far above a floating bottom element the bottom scrim starts, so it thins out instead of cutting in. -->
+    <dimen name="bottom_bar_scrim_tail">32dp</dimen>
+    <!-- Bounds the catalog sample for BottomBarScrim, and the floating element in it. -->
+    <dimen name="catalog_bottom_bar_scrim_height">320dp</dimen>
+    <dimen name="catalog_bottom_bar_scrim_bar_height">56dp</dimen>
     <dimen name="detail_action_row_spacing">10dp</dimen>
     <dimen name="detail_action_button_size">48dp</dimen>
     <!--
