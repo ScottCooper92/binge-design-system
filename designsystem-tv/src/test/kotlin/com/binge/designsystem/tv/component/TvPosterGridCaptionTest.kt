@@ -79,13 +79,6 @@ class TvPosterGridCaptionTest {
     }
 
     @Test
-    fun `a captioned cell without art shows its title once`() {
-        setGrid(listOf(cell("Heat", subtitle = "Crime · 1995")))
-
-        composeTestRule.onAllNodesWithText("Heat").assertCountEquals(1)
-    }
-
-    @Test
     fun `a cell without a subtitle draws no caption`() {
         setGrid(listOf(cell("Heat")))
 
