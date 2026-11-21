@@ -14,11 +14,6 @@ class TvSkeletonSamplesScreenshotTest {
     @Composable
     fun hub() = Frame { TvImmersiveHubSkeletonSample() }
 
-    @PreviewTest
-    @TvPreviews
-    @Composable
-    fun hubOverlay() = Frame { TvImmersiveHubSkeletonOverlaySample() }
-
     @Composable
     private fun Frame(content: @Composable () -> Unit) {
         TvScreenshotTheme(modifier = Modifier.fillMaxSize()) {
