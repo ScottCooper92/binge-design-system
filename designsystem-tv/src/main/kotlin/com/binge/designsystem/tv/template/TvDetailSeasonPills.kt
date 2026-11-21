@@ -44,20 +44,20 @@ private const val SELECTED_PILL_ALPHA = 0.2f
 @Composable
 internal fun TvDetailSeasonPills(
     seasons: List<TvDetailSeason>,
-    selected: Int,
-    onSelect: (Int) -> Unit,
+    selected: String,
+    onSelect: (String) -> Unit,
     down: FocusRequester,
     entry: FocusRequester,
     onFocused: () -> Unit,
 ) {
-    val requesters = remember(seasons.map { it.number }) { seasons.associate { it.number to FocusRequester() } }
+    val requesters = remember(seasons.map { it.key }) { seasons.associate { it.key to FocusRequester() } }
     val selectedPill = requesters[selected] ?: requesters.values.firstOrNull() ?: remember { FocusRequester() }
     // Opens on the selected pill, so its requester exists when entry routes to it.
-    val pillsState = rememberLazyListState(initialFirstVisibleItemIndex = seasons.indexOfFirst { it.number == selected }.coerceAtLeast(0))
+    val pillsState = rememberLazyListState(initialFirstVisibleItemIndex = seasons.indexOfFirst { it.key == selected }.coerceAtLeast(0))
     val reduceMotion = LocalReduceMotion.current
     // The strip walks seasons while focus is in it, so a selection can land off-screen with no pill focused to scroll it in.
     LaunchedEffect(selected, seasons) {
-        val index = seasons.indexOfFirst { it.number == selected }
+        val index = seasons.indexOfFirst { it.key == selected }
         if (index >= 0 && !pillsState.isFullyVisible(index)) {
             if (reduceMotion) pillsState.scrollToItem(index) else pillsState.animateScrollToItem(index)
         }
@@ -73,24 +73,24 @@ internal fun TvDetailSeasonPills(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_s)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        items(seasons, key = { it.number }) { season ->
+        items(seasons, key = { it.key }) { season ->
             var focused by remember { mutableStateOf(false) }
-            val isSelected = season.number == selected
+            val isSelected = season.key == selected
             TvDetailSeasonPill(
                 season = season,
                 selected = isSelected,
                 isFocused = focused,
                 modifier = Modifier
-                    .focusRequester(requesters.getValue(season.number))
+                    .focusRequester(requesters.getValue(season.key))
                     .focusProperties { this.down = down }
                     .clip(MaterialTheme.shapes.small)
                     .tvClickable(
                         role = Role.Tab,
                         onFocusChanged = {
                             focused = it
-                            if (it && !isSelected) onSelect(season.number)
+                            if (it && !isSelected) onSelect(season.key)
                         },
-                        onClick = { onSelect(season.number) },
+                        onClick = { onSelect(season.key) },
                     ),
             )
         }

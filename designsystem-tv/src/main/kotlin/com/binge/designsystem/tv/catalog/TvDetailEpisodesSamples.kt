@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -57,7 +57,7 @@ private val Episodes = listOf(1 to 3, 2 to 3).flatMap { (season, count) ->
 
 @Composable
 private fun EpisodesTab(seedSeason: Int, episodes: List<TvDetailEpisode>) {
-    var season by remember { mutableIntStateOf(seedSeason) }
+    var season by remember { mutableStateOf(seedSeason.toString()) }
     SampleFrame {
         TvDetailEpisodes(
             title = ShowTitle,
