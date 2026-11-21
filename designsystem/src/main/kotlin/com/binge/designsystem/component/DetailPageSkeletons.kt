@@ -102,14 +102,15 @@ fun DetailStatsRowsSkeleton(modifier: Modifier = Modifier, count: Int = STAT_COU
 /**
  * The heading, the collapsed synopsis and the expand toggle's row of an [DetailOverviewSection] while the page loads. Each line is a blank
  * [Text] in the page's own style under a plate, so its height follows the font as the page's does, and the toggle is the touch
- * target the page's button is.
+ * target the page's button is. [withToggle] false leaves the toggle's row out, for a page whose overview fits its collapsed lines and so draws
+ * no toggle; true, the default, keeps it, because a skeleton cannot know how long the overview will be.
  *
  * @need hold a media page's overview at its loaded height while the page loads
  * @group detail
  * @replaces a hand-built shimmer plate for a synopsis
  */
 @Composable
-fun DetailOverviewSkeleton(modifier: Modifier = Modifier) {
+fun DetailOverviewSkeleton(modifier: Modifier = Modifier, withToggle: Boolean = true) {
     Column(modifier = modifier.readingMargin().padding(horizontal = resolvedContentInset())) {
         TextPlate(MaterialTheme.typography.titleMedium, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
         Spacer(Modifier.height(dimensionResource(R.dimen.detail_meta_spacing)))
@@ -119,8 +120,10 @@ fun DetailOverviewSkeleton(modifier: Modifier = Modifier) {
                 Modifier.fillMaxWidth(if (index == OVERVIEW_LINE_COUNT - 1) OVERVIEW_LAST_LINE_FRACTION else 1f),
             )
         }
-        Box(Modifier.minimumInteractiveComponentSize(), contentAlignment = Alignment.CenterStart) {
-            TextPlate(MaterialTheme.typography.labelLarge, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
+        if (withToggle) {
+            Box(Modifier.minimumInteractiveComponentSize(), contentAlignment = Alignment.CenterStart) {
+                TextPlate(MaterialTheme.typography.labelLarge, Modifier.width(dimensionResource(R.dimen.skeleton_header_width)))
+            }
         }
     }
 }

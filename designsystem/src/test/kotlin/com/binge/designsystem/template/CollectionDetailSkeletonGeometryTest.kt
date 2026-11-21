@@ -67,19 +67,40 @@ class CollectionDetailSkeletonGeometryTest {
             ),
         )
 
-    private fun check() {
+    private fun check(
+        content: CollectionDetailState.Content = loaded,
+        loading: CollectionDetailState.Loading = CollectionDetailState.Loading(parts = PARTS, hasPartsHeading = true),
+    ) {
         rule.assertSkeletonReservesGeometry(anchors, checkSize = true) { resolved ->
             ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
                 CollectionDetailScreen(
-                    state = if (resolved) loaded else CollectionDetailState.Loading(parts = PARTS, hasPartsHeading = true),
+                    state = if (resolved) content else loading,
                     callbacks = CollectionDetailCallbacks(onBack = {}, onRetry = {}, onOpenPart = {}),
                 )
             }
         }
     }
 
+    /** A page with no heading over its parts and an overview of [overview], whose first part is where the skeleton's has to be. */
+    private fun withoutHeading(overview: String) =
+        CollectionDetailState.Content(
+            CollectionDetail(
+                title = "A collection",
+                metaText = "3 films",
+                overview = overview,
+                parts = loaded.collection.parts,
+            ),
+        )
+
     private companion object {
         const val PARTS = 4
+
+        // Three lines in the width a phone gives the overview at a font scale of 1, and three at 1.3: the loaded page then draws no toggle.
+        const val THREE_LINES =
+            "Three friends, one lighthouse and a coastline that keeps changing. " +
+                "The films follow what they find there, and what it costs them to leave."
+        const val THREE_LINES_LARGE =
+            "Three friends, one lighthouse and a coastline that keeps changing. The films follow what they find there."
     }
 
     @Test
@@ -92,4 +113,17 @@ class CollectionDetailSkeletonGeometryTest {
     @Test
     @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 2f)
     fun `the skeleton holds them at a font scale of 2`() = check()
+
+    @Test
+    fun `an overview that fits its lines holds no toggle, with no heading over the parts`() =
+        check(withoutHeading(THREE_LINES), CollectionDetailState.Loading(parts = PARTS, hasOverviewToggle = false))
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `an overview that fits its lines holds no toggle at a font scale of 1 point 3`() =
+        check(withoutHeading(THREE_LINES_LARGE), CollectionDetailState.Loading(parts = PARTS, hasOverviewToggle = false))
+
+    @Test
+    fun `a long overview keeps its toggle, with no heading over the parts`() =
+        check(withoutHeading(MEDIA_PAGE_OVERVIEW + " " + MEDIA_PAGE_OVERVIEW), CollectionDetailState.Loading(parts = PARTS))
 }
