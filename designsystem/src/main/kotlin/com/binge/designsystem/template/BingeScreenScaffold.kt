@@ -50,6 +50,7 @@ import com.binge.designsystem.component.BingeLargeTopBar
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.BingeTopBar
+import com.binge.designsystem.component.LocalPagerScrimProbe
 import com.binge.designsystem.component.LocalRowFocus
 import com.binge.designsystem.component.OverlaidHeaderContent
 import com.binge.designsystem.component.RowFocus
@@ -155,6 +156,7 @@ fun BingeScreenScaffold(
     val ownBehavior = rememberScreenBarScrollBehavior(bar, pinned)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
     val scrim = screenBarScrim(bar, behavior)
+    LocalPagerScrimProbe.current?.invoke(scrim)
     val bodyTouch = if (behavior != null && listState != null && bar.collapses()) {
         rememberCollapsedForScrolledList(behavior, listState)
     } else {
