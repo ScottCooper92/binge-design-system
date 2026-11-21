@@ -1,14 +1,10 @@
 package com.binge.designsystem.component
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
@@ -34,6 +30,8 @@ import androidx.compose.ui.graphics.Color
  * The pager follows the page that is shown, so after a swipe or a tab tap to a page that is already scrolled the scrim is already up. Pass
  * [scrimFraction] to drive the scrim from somewhere else instead, such as a collapsing bar's own collapse, and [headerBackground] for a header that
  * should have a ground of its own.
+ * **A caller whose pages scroll must pass [pageScrolled] or its own [scrimFraction]:** with neither, the header has no ground and no scrim, and rows show
+ * through under the tabs.
  *
  * [beyondViewportPageCount] is how many pages either side of the visible one stay composed; see
  * [BingeFilterChipPager] for what raising it costs.
@@ -62,13 +60,7 @@ fun BingeTabbedPager(
         pageCount = tabs.size,
     )
     val pagerState = pager.state
-    val followed by animateFloatAsState(
-        targetValue = if (scrimFraction == null && pageScrolled(pager.shownIndex)) 1f else 0f,
-        animationSpec = tween(durationMillis = SCRIM_FADE_MILLIS),
-        label = "tabbed pager scrim",
-    )
-    val scrim = scrimFraction ?: followed
-    LocalTabbedPagerScrimProbe.current?.invoke(scrim)
+    val scrim = rememberPagerScrim(scrimFraction, scrolled = pageScrolled(pager.shownIndex))
     OverlaidHeaderContent(
         modifier = modifier,
         headerBackground = headerBackground,
@@ -92,9 +84,3 @@ fun BingeTabbedPager(
         }
     }
 }
-
-/** How long the scrim takes to fade in or out as the shown page leaves or returns to its top. */
-private const val SCRIM_FADE_MILLIS = 150
-
-/** A test's way to read the scrim fraction the pager is drawing, which is otherwise only a colour in the header; null in production. */
-internal val LocalTabbedPagerScrimProbe = compositionLocalOf<((Float) -> Unit)?> { null }

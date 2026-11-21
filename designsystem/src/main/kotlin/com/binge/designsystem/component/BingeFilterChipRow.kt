@@ -244,6 +244,14 @@ internal fun rememberFilterPager(
  * `contentPadding`; a page that does not scroll — a loading, empty or error state — applies it as
  * padding, or it sits behind the chips.
  *
+ * The header is **transparent**, with no band of its own, and a translucent scrim fades in behind it once the page that is shown has scrolled off its
+ * top, so content passes under the chips through the scrim and never under an opaque band. [pageScrolled] is how the pager learns that: it is asked
+ * whether page `page` is scrolled off its top, which a caller answers from the state it already holds for each page (`gridState.canScrollBackward`). The
+ * pager follows the page that is shown, so after a swipe or a chip tap to a page that is already scrolled the scrim is already up. Pass [scrimFraction]
+ * to drive the scrim from somewhere else instead, such as a collapsing bar's own collapse, and [headerBackground] for a header that has a ground of its own.
+ * **A caller whose pages scroll must pass [pageScrolled] or its own [scrimFraction]:** with neither, the header has no ground and no scrim, and rows show
+ * through under the chips.
+ *
  * Window insets are deliberately *not* applied here. A screen nested in a scaffold has already had them
  * handled, and one that owns its window puts them in [header]. The chip row is the exception: it clears
  * [paneSideInsets] on its own, less any an ancestor already consumed — see [filterChipRowPadding].
@@ -266,8 +274,9 @@ fun BingeFilterChipPager(
     onSelectedIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     header: (@Composable () -> Unit)? = null,
-    headerBackground: Color = MaterialTheme.colorScheme.background,
-    scrimFraction: Float = 0f,
+    headerBackground: Color = Color.Transparent,
+    scrimFraction: Float? = null,
+    pageScrolled: (page: Int) -> Boolean = { false },
     scrimColor: Color = MaterialTheme.colorScheme.background,
     beyondViewportPageCount: Int = 0,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
@@ -278,10 +287,11 @@ fun BingeFilterChipPager(
         pageCount = items.size,
     )
     val pagerState = pager.state
+    val scrim = rememberPagerScrim(scrimFraction, scrolled = pageScrolled(pager.shownIndex))
     OverlaidHeaderContent(
         modifier = modifier,
         headerBackground = headerBackground,
-        scrimFraction = scrimFraction,
+        scrimFraction = scrim,
         scrimColor = scrimColor,
         header = {
             header?.invoke()
