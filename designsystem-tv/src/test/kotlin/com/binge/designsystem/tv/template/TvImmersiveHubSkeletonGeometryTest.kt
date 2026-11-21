@@ -71,7 +71,7 @@ class TvImmersiveHubSkeletonGeometryTest {
                     LocalTvHostedAsOverlay provides (hosting == TvPageHosting.Overlay),
                     LocalTvTopInset provides topInset,
                 ) {
-                    if (resolved) Hub(hosting) else Skeleton(hosting)
+                    if (resolved) Hub(hosting) else Skeleton()
                 }
             }
         }
@@ -93,5 +93,4 @@ private fun Hub(hosting: TvPageHosting) {
 }
 
 @Composable
-private fun Skeleton(hosting: TvPageHosting) =
-    TvImmersiveHubSkeleton(hosting = hosting, rows = Rows.size, cardsPerRow = CARDS_PER_ROW, cardWidth = CardWidth)
+private fun Skeleton() = TvImmersiveHubSkeleton(rows = Rows.size, cardsPerRow = CARDS_PER_ROW, cardWidth = CardWidth)
