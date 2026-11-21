@@ -18,6 +18,9 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * Stateless — the caller owns [selectedIndex] and reacts to [onSelect]. Kept separate from
  * [BingeTabbedPager] so it can be previewed and screenshot-tested without a pager.
  *
+ * **A screen with tabs uses [BingeTabbedPager], so the tabs swipe between their pages as well as tap.** This row alone is for a host that cannot page, such as
+ * one whose tabs swap a single body in place rather than hold a page each, and its call site says why it cannot.
+ *
  * The row is transparent by default, so it takes the colour of the page behind it. Material's own default is the
  * theme's `surface`, which in a dark scheme is not the scaffold's `background`, and read as a band across the page.
  * Pass [containerColor] for a row that sits on a surface of its own.
