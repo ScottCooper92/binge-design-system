@@ -7,11 +7,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -108,21 +113,37 @@ fun BingeFilterChipPagerSample() {
                 .fillMaxWidth()
                 .height(dimensionResource(R.dimen.catalog_filter_chip_pager_height)),
         ) {
+            val items = listOf(
+                FilterChipItem(label = "All", count = 142),
+                FilterChipItem(label = "Movies", count = 88),
+                FilterChipItem(label = "TV", count = 54),
+            )
+            val listStates = List(items.size) { rememberLazyListState() }
             BingeFilterChipPager(
-                items = listOf(
-                    FilterChipItem(label = "All", count = 142),
-                    FilterChipItem(label = "Movies", count = 88),
-                    FilterChipItem(label = "TV", count = 54),
-                ),
+                items = items,
                 selectedIndex = selected,
                 onSelectedIndexChange = { selected = it },
+                // Each page's own list state answers whether it is scrolled, so the scrim is up under the chips exactly while rows pass beneath them.
+                pageScrolled = { listStates[it].canScrollBackward },
                 modifier = Modifier.fillMaxSize(),
-            ) { _, _ ->
-                Box(
+            ) { contentPadding, page ->
+                LazyColumn(
+                    state = listStates[page],
+                    contentPadding = contentPadding,
                     modifier = Modifier
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.primaryContainer),
-                )
+                ) {
+                    items(PAGER_SAMPLE_ROWS) { row ->
+                        Text(
+                            text = "${items[page].label} ${row + 1}",
+                            modifier = Modifier.padding(
+                                horizontal = dimensionResource(R.dimen.padding_m),
+                                vertical = dimensionResource(R.dimen.padding_s),
+                            ),
+                        )
+                    }
+                }
             }
         }
     }
@@ -173,3 +194,6 @@ private fun ScrimmedPagerSample(scrimFraction: Float) {
         }
     }
 }
+
+/** How many rows each page of the pager sample holds: enough to scroll, so a page can be scrolled and its scrim shown. */
+private const val PAGER_SAMPLE_ROWS = 40

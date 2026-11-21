@@ -40,7 +40,7 @@ class BingeTabbedPagerScrimTest {
 
     private fun show(scrimFraction: Float? = null) {
         composeTestRule.setContent {
-            CompositionLocalProvider(LocalTabbedPagerScrimProbe provides { scrims += it }) {
+            CompositionLocalProvider(LocalPagerScrimProbe provides { scrims += it }) {
                 BingeExpressiveTheme {
                     var selected by remember { mutableStateOf(0) }
                     val listStates = List(2) { rememberLazyListState() }
