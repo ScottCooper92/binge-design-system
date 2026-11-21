@@ -90,18 +90,33 @@ class MovieDetailScreenTest {
 
     /** A title with no primary and no round actions has no action row, so its skeleton has none, and the overview does not move on arrival. */
     @Test
-    fun `a title with no actions holds the overview where it lands`() {
+    fun `a title with no actions holds the overview where it lands`() = checkBareTitle(MEDIA_PAGE_OVERVIEW)
+
+    @Test
+    fun `an overview that fits its lines holds no toggle`() = checkBareTitle(OVERVIEW_THREE_LINES, hasOverviewToggle = false)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `an overview that fits its lines holds no toggle at a font scale of 1 point 3`() =
+        checkBareTitle(OVERVIEW_THREE_LINES_LARGE, hasOverviewToggle = false)
+
+    private fun checkBareTitle(overview: String, hasOverviewToggle: Boolean = true) {
         val bare = listOf(LayoutAnchors.Detail.HERO, LayoutAnchors.Detail.STATS, LayoutAnchors.Detail.OVERVIEW).map(LayoutAnchors::section)
         rule.assertSkeletonReservesGeometry(bare, checkSize = true) { resolved ->
             ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
-                val detail = MediaDetail(title = "A title", stats = MediaPageStats, overview = MEDIA_PAGE_OVERVIEW)
+                val detail = MediaDetail(title = "A title", stats = MediaPageStats, overview = overview)
                 MovieDetailScreen(
                     state = if (resolved) {
                         DetailState.Content(
                             detail,
                         )
                     } else {
-                        DetailState.Loading(stats = MediaPageStats.size, roundActions = 0, hasPrimary = false)
+                        DetailState.Loading(
+                            stats = MediaPageStats.size,
+                            roundActions = 0,
+                            hasPrimary = false,
+                            hasOverviewToggle = hasOverviewToggle,
+                        )
                     },
                     callbacks = MediaDetailCallbacks(onBack = {}),
                 )

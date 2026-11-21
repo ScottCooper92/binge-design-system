@@ -130,6 +130,9 @@ sealed interface PersonDetailState {
      * takes depends on its words, which a loading state does not have, so each is one line unless hinted: [expectedEyebrow], [expectedName] and
      * [expectedFacts] are strings the loaded profile is expected to look like, laid out invisibly in the profile's own styles and widths (see
      * [PersonProfileSkeleton]), which is what holds the page's geometry at a large font. [expectedFacts] sets the fact count in place of [facts].
+     * [hasOverviewToggle] says the loaded biography is long enough to collapse behind a "Read more" toggle, which is a row of its own: false, for one that
+     * fits its collapsed lines, leaves it out so the credits do not arrive that much higher. True, the default, keeps the row, because a skeleton cannot
+     * know how long the biography will be; an app that does know sets it. It applies only with [hasBiography].
      */
     @Immutable
     class Loading(
@@ -139,6 +142,7 @@ sealed interface PersonDetailState {
         val expectedEyebrow: String? = null,
         val expectedName: String? = null,
         val expectedFacts: List<PersonFact> = emptyList(),
+        val hasOverviewToggle: Boolean = true,
     ) : PersonDetailState
 
     @Immutable
@@ -293,7 +297,10 @@ private fun ColumnScope.PersonPlaceholder(state: PersonDetailState.Loading) {
     )
     if (state.hasBiography) {
         Spacer(Modifier.height(dimensionResource(R.dimen.padding_m)))
-        DetailOverviewSkeleton(Modifier.fillMaxWidth().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)))
+        DetailOverviewSkeleton(
+            Modifier.fillMaxWidth().layoutAnchor(LayoutAnchors.section(LayoutAnchors.Detail.OVERVIEW)),
+            withToggle = state.hasOverviewToggle,
+        )
     }
     CreditRailSkeletons(state.creditRails)
 }
