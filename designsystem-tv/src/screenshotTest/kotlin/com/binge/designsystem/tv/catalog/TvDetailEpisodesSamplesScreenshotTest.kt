@@ -23,6 +23,11 @@ class TvDetailEpisodesSamplesScreenshotTest {
     @PreviewTest
     @TvPreviews
     @Composable
+    fun episodeAndSeasonMarks() = Frame { TvDetailEpisodeMarksSample() }
+
+    @PreviewTest
+    @TvPreviews
+    @Composable
     fun tabAcrossSeasons() = Frame { TvDetailEpisodesSample() }
 
     @PreviewTest

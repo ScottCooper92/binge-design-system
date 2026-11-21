@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
@@ -24,11 +25,16 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.theme.LocalReduceMotion
+import com.binge.designsystem.tv.component.TvWatchedMark
 import com.binge.designsystem.tv.focus.tvClickable
 import com.binge.designsystem.tv.focus.tvEntryFocusGroup
 import com.binge.designsystem.R as DesR
@@ -123,7 +129,35 @@ internal fun TvDetailSeasonPill(
             .padding(horizontal = dimensionResource(DesR.dimen.padding_m), vertical = dimensionResource(DesR.dimen.padding_s)),
     ) {
         val text = if (isFocused) MaterialTheme.colorScheme.surface else ink
-        Text(text = season.name, style = MaterialTheme.typography.titleSmall, color = text, maxLines = 1)
+        if (season.watched || season.unwatchedCount > 0) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_xs)),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = season.name, style = MaterialTheme.typography.titleSmall, color = text, maxLines = 1)
+                if (season.watched) {
+                    // As tall as the name's text, so a marked pill is no taller than a plain one.
+                    TvWatchedMark(
+                        tint = text,
+                        size = with(LocalDensity.current) {
+                            MaterialTheme.typography.titleSmall.fontSize
+                                .toDp()
+                        },
+                    )
+                } else {
+                    val unwatched =
+                        pluralStringResource(DesR.plurals.media_card_unwatched_count, season.unwatchedCount, season.unwatchedCount)
+                    Text(
+                        text = season.unwatchedCount.toString(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = text,
+                        modifier = Modifier.semantics { contentDescription = unwatched },
+                    )
+                }
+            }
+        } else {
+            Text(text = season.name, style = MaterialTheme.typography.titleSmall, color = text, maxLines = 1)
+        }
         if (selected) Text(text = season.episodeCount, style = MaterialTheme.typography.labelSmall, color = text, maxLines = 1)
     }
 }

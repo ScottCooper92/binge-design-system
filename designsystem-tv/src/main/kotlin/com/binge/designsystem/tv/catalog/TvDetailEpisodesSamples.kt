@@ -110,3 +110,43 @@ fun TvDetailEpisodeCardSample() {
         }
     }
 }
+
+private fun markedEpisode(
+    number: Int,
+    watched: Boolean = false,
+    progress: Float? = null,
+) = TvDetailEpisode(
+    key = "marked-$number",
+    seasonKey = "1",
+    episodeNumber = number,
+    stillUrl = null,
+    badge = number.toString(),
+    title = "Episode $number",
+    overview = "",
+    watched = watched,
+    progress = progress,
+)
+
+/**
+ * The marks: episode cards that are watched, partly watched and watched with a full bar and the ring, over season pills that are plain, watched, with an
+ * unwatched count, and selected with one. Each draws nothing unless its field is set.
+ */
+@Composable
+fun TvDetailEpisodeMarksSample() {
+    SampleFrame {
+        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.tv_media_row_card_gap))) {
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.tv_media_row_card_gap))) {
+                TvDetailEpisodeCard(markedEpisode(1, watched = true), isFocused = false)
+                TvDetailEpisodeCard(markedEpisode(2, progress = 0.4f), isFocused = false)
+                TvDetailEpisodeCard(markedEpisode(3, watched = true, progress = 1f), isFocused = true)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.tv_media_row_card_gap))) {
+                TvDetailSeasonPill(Seasons[0], selected = false, isFocused = false)
+                TvDetailSeasonPill(TvDetailSeason("s2", "Season 2", "8 episodes", watched = true), selected = false, isFocused = false)
+                TvDetailSeasonPill(TvDetailSeason("s3", "Season 3", "8 episodes", unwatchedCount = 3), selected = false, isFocused = false)
+                TvDetailSeasonPill(TvDetailSeason("s4", "Season 4", "8 episodes", unwatchedCount = 5), selected = true, isFocused = false)
+                TvDetailSeasonPill(TvDetailSeason("s5", "Season 5", "8 episodes", unwatchedCount = 2), selected = false, isFocused = true)
+            }
+        }
+    }
+}
