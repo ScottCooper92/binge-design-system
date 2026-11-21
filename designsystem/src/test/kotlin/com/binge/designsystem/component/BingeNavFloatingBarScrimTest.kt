@@ -34,6 +34,9 @@ import kotlin.math.roundToInt
 private const val STRONGEST_ALPHA = 0.92f
 private const val TOLERANCE = 14
 
+/** The gap `BingeSnackbarHost` leaves above the overlay strip (`padding_s`). */
+private const val SNACKBAR_GAP = 8f
+
 /**
  * The floating pill draws a [BottomBarScrim] behind it, over the strip the pill and the navigation bar occupy plus a tail above it, so a list passing
  * under the pill fades out. It is a fade only: the strip content pads by does not change, so the last row still clears the pill. Read back from
@@ -91,11 +94,13 @@ class BingeNavFloatingBarScrimTest {
         listOf(16, 8, 0).all { abs(((expected shr it) and 0xFF) - ((actual shr it) and 0xFF)) <= TOLERANCE }
 
     @Test
-    fun `the scrim runs to the bottom edge and has faded out a tail above the pill's strip`() {
+    fun `the scrim runs to the bottom edge and leaves what sits just above the strip untouched`() {
         show()
         val strip = overlay.calculateBottomPadding().value
         assertTrue("the bottom edge is the strongest stop over the page", near(blend(STRONGEST_ALPHA), pixel(1f)))
-        assertTrue("well above the strip and its tail the page shows untouched", near(Color.Red.toArgb(), pixel(strip + 80f)))
+        assertTrue("above the strip the page shows untouched", near(Color.Red.toArgb(), pixel(strip + 80f)))
+        // A snackbar sits at the strip plus the small gap, and the scrim must not touch it.
+        assertTrue("where a snackbar sits just above the strip", near(Color.Red.toArgb(), pixel(strip + SNACKBAR_GAP)))
     }
 
     @Test

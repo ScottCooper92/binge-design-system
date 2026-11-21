@@ -127,8 +127,9 @@ enum class BingeNavFloatingStyle {
  * toolbar's minimum size, so the strip is known before first layout; the measurement is kept only as
  * an upward correction, should a style's items ever outgrow the default container.
  *
- * Behind the pill, [scrim] draws a [BottomBarScrim] over that same strip, from a tail above the pill down to the screen's bottom edge,
- * navigation-bar inset included, so a list passing under the pill fades out rather than being cut off. It only fades what is under the
+ * Behind the pill, [scrim] draws a [BottomBarScrim] over that same strip, from the pill's top edge down to the screen's bottom edge,
+ * navigation-bar inset included, so a list passing under the pill fades out rather than being cut off. It stays inside the strip, with no tail
+ * above it: a snackbar sits just above the strip, and the scrim paints over content, so a tail would fade it. It only fades what is under the
  * pill: the strip content pads by is unchanged, so the last row still clears the pill. It is on by default and hides with the pill under
  * the keyboard. The landscape tablet's side rail has none, since nothing scrolls under a rail.
  */
@@ -156,7 +157,8 @@ internal fun BingeNavFloatingBarScaffold(
         val colors = tone.resolve()
         val containerShape = FloatingToolbarDefaults.ContainerShape
         // The fade behind the pill: content scrolling under it dissolves instead of running sharp to the edge. It covers the strip the
-        // pill and the navigation bar occupy, the same one scrollables pad by, with a tail above that, and it hides with the pill under the keyboard.
+        // pill and the navigation bar occupy, the same one scrollables pad by, and hides with the pill under the keyboard. It has no tail above the
+        // strip: a snackbar or anything else a screen pins just above the strip sits there, and the scrim paints over content, so it would wash it out.
         if (scrim) {
             AnimatedVisibility(
                 visible = !WindowInsets.isImeVisible,
@@ -164,7 +166,7 @@ internal fun BingeNavFloatingBarScaffold(
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
-                Box(Modifier.fillMaxWidth().height(computed + correction)) { BottomBarScrim() }
+                Box(Modifier.fillMaxWidth().height(computed + correction)) { BottomBarScrim(tailHeight = dimensionResource(R.dimen.zero)) }
             }
         }
         // Hidden under the keyboard, as the docked bar is: it would otherwise ride up between the field and its results.
