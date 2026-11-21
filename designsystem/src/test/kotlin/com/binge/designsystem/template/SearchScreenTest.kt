@@ -44,6 +44,9 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 private const val SHORT_DRAG_START = 300f
+
+/** How long a header gets to follow the page it settled on, far longer than the frame it takes. */
+private const val SETTLE_TIMEOUT_MILLIS = 3_000L
 private const val SHORT_DRAG_END = 700f
 
 private fun results(count: Int) =
@@ -838,6 +841,9 @@ class SearchScreenTest {
 
         goTo("Movies", "left")
         rule.waitForIdle()
+        // The header is set once the page has settled, one frame after the pager reports it, so a read straight after the tap can still see the
+        // page before. Wait for the header to arrive; a header that never follows the page times out here and fails.
+        rule.waitUntil(SETTLE_TIMEOUT_MILLIS) { headerRegion() == scrolled }
         assertEquals("page 2 is scrolled, so its header draws the scrolled bar's background", scrolled, headerRegion())
     }
 
