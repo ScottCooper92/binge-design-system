@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.resolvedContentInset
 
 /**
  * [BingeTabRow] wired to a [HorizontalPager], so tapping a tab and swiping a page stay in sync — both move
@@ -33,6 +35,9 @@ import androidx.compose.ui.graphics.Color
  * **A caller whose pages scroll must pass [pageScrolled] or its own [scrimFraction]:** with neither, the header has no ground and no scrim, and rows show
  * through under the tabs.
  *
+ * [edgePadding] is handed to the [BingeTabRow]: the room before the first tab and after the last. It defaults to the screen's content inset. A pager
+ * whose content already sits inside the screen's gutter passes zero, so the first tab's cell starts at that content's edge instead of indenting twice.
+ *
  * [beyondViewportPageCount] is how many pages either side of the visible one stay composed; see
  * [BingeFilterChipPager] for what raising it costs.
  *
@@ -51,6 +56,7 @@ fun BingeTabbedPager(
     scrimFraction: Float? = null,
     pageScrolled: (page: Int) -> Boolean = { false },
     scrimColor: Color = MaterialTheme.colorScheme.background,
+    edgePadding: Dp = resolvedContentInset(),
     beyondViewportPageCount: Int = 0,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
@@ -72,6 +78,7 @@ fun BingeTabbedPager(
                 tabs = tabs,
                 selectedIndex = pager.shownIndex,
                 onSelect = onSelectedIndexChange,
+                edgePadding = edgePadding,
             )
         },
     ) { contentPadding ->

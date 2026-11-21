@@ -14,6 +14,14 @@ class BingeTabbedPagerSamplesScreenshotTest {
         BingeTabbedPagerSample()
     }
 
+    /** The pager in an already-padded column with zero edge padding: the first tab lines up with the text. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun FlushPager() {
+        BingeTabbedPagerFlushSample()
+    }
+
     /** Five scrolling tabs at 1.3x and 2x font: the row scrolls and every label stays whole. */
     @PreviewTest
     @WorstCaseFontPreviews

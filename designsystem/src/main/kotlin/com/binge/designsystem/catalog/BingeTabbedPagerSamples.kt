@@ -17,9 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeTabbedPager
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.resolvedContentInset
 
 /**
  * Public sample for [BingeTabbedPager]: [com.binge.designsystem.component.BingeTabRow] wired to a swipeable page per
@@ -42,13 +44,33 @@ fun BingeTabbedPagerManyTabsSample() {
     TabbedPagerBox(tabs = listOf("All (42)", "Pending (4)", "Downloading (5)", "Available (28)", "Declined (2)"))
 }
 
+/**
+ * The pager inside a column that already carries the screen inset, with no edge padding: the first tab's cell starts at the page text's left edge
+ * instead of indenting by the inset a second time.
+ */
 @Composable
-private fun TabbedPagerBox(tabs: List<String>) {
+fun BingeTabbedPagerFlushSample() {
+    TabbedPagerBox(
+        tabs = listOf("Requests", "Library", "Activity"),
+        edgePadding = dimensionResource(R.dimen.catalog_tab_row_flush_padding),
+        columnInset = resolvedContentInset(),
+        pageTextInset = dimensionResource(R.dimen.catalog_tab_row_flush_padding),
+    )
+}
+
+@Composable
+private fun TabbedPagerBox(
+    tabs: List<String>,
+    edgePadding: Dp = resolvedContentInset(),
+    columnInset: Dp = dimensionResource(R.dimen.catalog_tab_row_flush_padding),
+    pageTextInset: Dp = dimensionResource(R.dimen.padding_m),
+) {
     var selected by remember { mutableIntStateOf(0) }
     ScreenshotTheme {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = columnInset)
                 .height(dimensionResource(R.dimen.catalog_tabbed_pager_height)),
         ) {
             BingeTabbedPager(
@@ -56,6 +78,7 @@ private fun TabbedPagerBox(tabs: List<String>) {
                 selectedIndex = selected,
                 onSelectedIndexChange = { selected = it },
                 modifier = Modifier.fillMaxSize(),
+                edgePadding = edgePadding,
             ) { contentPadding, page ->
                 val tone = if (page % 2 == 0) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
                 Box(
@@ -63,7 +86,7 @@ private fun TabbedPagerBox(tabs: List<String>) {
                         .fillMaxSize()
                         .background(tone)
                         .padding(contentPadding)
-                        .padding(horizontal = dimensionResource(R.dimen.padding_m)),
+                        .padding(horizontal = pageTextInset),
                 ) {
                     Text(text = "Page ${page + 1}: ${tabs[page]}", style = MaterialTheme.typography.titleMedium)
                 }
