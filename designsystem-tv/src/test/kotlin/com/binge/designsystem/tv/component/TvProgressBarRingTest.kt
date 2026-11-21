@@ -45,8 +45,6 @@ class TvProgressBarRingTest {
 
     private val entry = FocusRequester()
 
-    private fun DpRect.wide() = right.value - left.value
-
     private fun bar(): DpRect = composeTestRule.onNodeWithTag(TV_PROGRESS_BAR_TAG, useUnmergedTree = true).getBoundsInRoot()
 
     private fun card(tag: String): DpRect = composeTestRule.onNodeWithTag(tag).getBoundsInRoot()
