@@ -17,6 +17,7 @@ import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.component.BingeMessageDialog
 import com.binge.designsystem.component.MediaCardStatus
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.template.FastScrollbarOptions
 import com.binge.designsystem.template.GridFilterBar
 import com.binge.designsystem.template.GridFilterChip
 import com.binge.designsystem.template.GridItem
@@ -138,7 +139,7 @@ fun PagedGridPlainSample() = SampleGrid(PagedGridState.Ready(sampleItems(), hasM
 
 /**
  * The grid live: it pages in more as it nears the end, pulls to refresh, and clears a chip. The pill opens a stand-in sheet. Posters open
- * a message.
+ * a message. Scroll and a fast scrollbar appears at the end edge; hold its thumb and drag, and a bubble names the item you are over.
  */
 @Composable
 fun PagedGridDemo() {
@@ -180,6 +181,7 @@ fun PagedGridDemo() {
             filterSheet = { dismiss ->
                 BingeMessageDialog(title = "Filters", message = "The app's own filter sheet goes here.", onDismiss = dismiss)
             },
+            fastScrollbar = FastScrollbarOptions(bubbleText = { index -> "Item ${index + 1}" }),
         )
         opened?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { opened = null }) }
     }
