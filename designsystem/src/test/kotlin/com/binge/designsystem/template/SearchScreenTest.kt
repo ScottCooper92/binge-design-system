@@ -664,4 +664,86 @@ class SearchScreenTest {
         rule.waitForIdle()
         rule.onNodeWithText("h title 0").assertIsDisplayed()
     }
+
+    @Test
+    fun `a state with no results between two states for the same query keeps each page's scroll`() {
+        var showing by mutableStateOf(true)
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    // The field holds what was typed; the results answer the normalised query, as an app that trims it would.
+                    text = "heat ",
+                    state = if (showing) {
+                        SearchState.Ready(
+                            named("a"),
+                            loaded = 3,
+                            hasMore = false,
+                            types = SearchTypes(types.chips, selected),
+                            pages = mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40)),
+                            query = "heat",
+                        )
+                    } else {
+                        SearchState.Loading
+                    },
+                    callbacks = callbacks(onType = { selected = it }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        showing = false
+        rule.waitForIdle()
+        showing = true
+        rule.waitForIdle()
+
+        assertScrolledAway("a title 0")
+    }
+
+    @Test
+    fun `clearing the field and searching the same query again opens each page at the top`() {
+        var idle by mutableStateOf(false)
+        var text by mutableStateOf("heat")
+        rule.setContent {
+            var selected by remember { mutableStateOf("all") }
+            TestTheme {
+                SearchScreen(
+                    title = "Search",
+                    text = text,
+                    state = if (idle) {
+                        SearchState.Idle(recents = emptyList())
+                    } else {
+                        SearchState.Ready(
+                            named("a"),
+                            loaded = 3,
+                            hasMore = false,
+                            types = SearchTypes(types.chips, selected),
+                            pages = mapOf("all" to named("a", 40), "movies" to named("m", 40), "people" to named("p", 40)),
+                            query = "heat",
+                        )
+                    },
+                    callbacks = callbacks(onType = { selected = it }),
+                    placeholder = "Search here",
+                )
+            }
+        }
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertScrolledAway("a title 0")
+
+        idle = true
+        text = ""
+        rule.waitForIdle()
+        idle = false
+        text = "heat"
+        rule.waitForIdle()
+
+        rule.onNodeWithText("a title 0").assertIsDisplayed()
+    }
 }
