@@ -44,13 +44,13 @@ class CollectionDetailSkeletonGeometryTest {
 
     // An overview long enough to fill the skeleton's standing lines when collapsed, as the movie page's test uses: a shorter one is shorter than the
     // skeleton by design, since a skeleton cannot know how much prose is coming.
-    private val loaded =
+    private fun loaded(heading: String?) =
         CollectionDetailState.Content(
             CollectionDetail(
                 title = "A collection",
                 metaText = "3 films",
                 overview = MEDIA_PAGE_OVERVIEW + " " + MEDIA_PAGE_OVERVIEW,
-                partsHeading = "Films",
+                partsHeading = heading,
                 parts = List(
                     PARTS,
                 ) {
@@ -67,11 +67,18 @@ class CollectionDetailSkeletonGeometryTest {
             ),
         )
 
-    private fun check() {
+    private fun check(heading: String? = "Films") {
         rule.assertSkeletonReservesGeometry(anchors, checkSize = true) { resolved ->
             ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
                 CollectionDetailScreen(
-                    state = if (resolved) loaded else CollectionDetailState.Loading(parts = PARTS, hasPartsHeading = true),
+                    state = if (resolved) {
+                        loaded(heading)
+                    } else {
+                        CollectionDetailState.Loading(
+                            parts = PARTS,
+                            hasPartsHeading = !heading.isNullOrBlank(),
+                        )
+                    },
                     callbacks = CollectionDetailCallbacks(onBack = {}, onRetry = {}, onOpenPart = {}),
                 )
             }
@@ -92,4 +99,18 @@ class CollectionDetailSkeletonGeometryTest {
     @Test
     @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 2f)
     fun `the skeleton holds them at a font scale of 2`() = check()
+
+    @Test
+    fun `with no heading the first part starts where the loaded one does`() = check(heading = null)
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `with no heading the first part starts where the loaded one does at 1 point 3`() = check(heading = null)
+
+    @Test
+    fun `a blank heading is no heading, so the skeleton for none holds the first part`() = check(heading = " ")
+
+    @Test
+    @Config(qualifiers = "w411dp-h891dp-xhdpi", fontScale = 1.3f)
+    fun `a blank heading is no heading at 1 point 3`() = check(heading = "")
 }
