@@ -1,14 +1,20 @@
 package com.binge.designsystem.component
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,5 +78,33 @@ class CategoryTileTest {
         rule.onNode(hasClickAction()).assertContentDescriptionEquals("Example Studio").performClick()
 
         assertEquals(1, clicks)
+    }
+
+    @Test
+    fun `a backdrop tile is wider than a logo tile and each end tile height follows its own tile`() {
+        var backdrop = 0
+        var logo = 0
+        var backdropHeight = 0
+        var logoHeight = 0
+        rule.setContent {
+            TestTheme {
+                val density = LocalDensity.current
+                backdropHeight = with(density) { backdropTileHeight().roundToPx() }
+                logoHeight = with(density) { categoryTileHeight().roundToPx() }
+                Column {
+                    BackdropTile(title = "Action", imageUrl = null, onClick = {}, modifier = Modifier.testTag("backdrop"))
+                    LogoTile(name = "Studio", logoUrl = null, onClick = {}, modifier = Modifier.testTag("logo"))
+                }
+            }
+        }
+        rule.waitForIdle()
+        val backdropSize = rule.onNodeWithTag("backdrop").fetchSemanticsNode().size
+        val logoSize = rule.onNodeWithTag("logo").fetchSemanticsNode().size
+        backdrop = backdropSize.width
+        logo = logoSize.width
+
+        assertTrue("the backdrop tile is the wider", backdrop > logo)
+        assertEquals("backdrop tile height is backdropTileHeight()", backdropHeight.toLong(), backdropSize.height.toLong())
+        assertEquals("logo tile height is categoryTileHeight()", logoHeight.toLong(), logoSize.height.toLong())
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import com.binge.designsystem.component.BackdropTile
 import com.binge.designsystem.component.LogoTile
 import com.binge.designsystem.component.MediaCarousel
+import com.binge.designsystem.component.backdropTileHeight
 import com.binge.designsystem.component.categoryTileHeight
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.preview.WithPreviewImage
@@ -128,7 +129,7 @@ fun CategoryTileRowSample() {
                     items = genres,
                     itemKey = { it },
                     onMoreClick = {},
-                    endTileHeight = categoryTileHeight(),
+                    endTileHeight = backdropTileHeight(),
                 ) { _, genre ->
                     BackdropTile(title = genre, imageUrl = BACKDROP_URL, onClick = {})
                 }
