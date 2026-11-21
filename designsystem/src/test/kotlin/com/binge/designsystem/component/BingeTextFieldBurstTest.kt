@@ -137,6 +137,20 @@ class BingeTextFieldBurstTest {
     }
 
     @Test
+    fun `a caller that takes an earlier text of a burst and then holds it ends the wait`() {
+        show()
+        field().performTextInput("a")
+        frame()
+        field().performTextInput("1")
+        frame()
+        // A view model that took "a" late and rejects "a1" by keeping "a".
+        value = "a"
+        frame(ANSWER_GRACE_FRAMES + FRAMES_AFTER_GRACE)
+
+        assertEquals("a", shownText())
+    }
+
+    @Test
     fun `the search field keeps characters typed between frames while its query lags`() {
         value = ""
         rule.mainClock.autoAdvance = false
@@ -156,5 +170,10 @@ class BingeTextFieldBurstTest {
 
         assertEquals("dun", shownText())
         assertEquals(listOf("d", "du", "dun"), reported)
+    }
+
+    private companion object {
+        /** Frames past the wait, for the give-up and the recomposition it causes to land. */
+        const val FRAMES_AFTER_GRACE = 6
     }
 }

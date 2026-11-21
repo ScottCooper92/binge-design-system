@@ -89,6 +89,9 @@ internal class FieldCaret(
 
     private var late by mutableStateOf<LateEdit?>(null)
 
+    /** The earlier text the caller was last seen on, so a caller that holds one restarts the wait once, when it arrives, and not on every composition. */
+    private var lastEarlier: String? = null
+
     /** Bumped by each edit and each step of the caller toward it, so the wait for an answer starts again. */
     var progress by mutableStateOf(0)
         private set
@@ -108,6 +111,7 @@ internal class FieldCaret(
     fun edit(edited: TextFieldValue, value: String): Boolean {
         val previous = pending
         late = null
+        lastEarlier = null
         field = edited
         val known = previous?.reported ?: value
         if (edited.text == known) return false
@@ -126,11 +130,12 @@ internal class FieldCaret(
         field = value
         pending = null
         late = null
+        lastEarlier = null
     }
 
     /**
      * Called after each composition with the caller's [value]. The caller reaching the last text reported is the answer arriving as expected, and
-     * nothing is pending any more. One of the earlier texts is it still catching up, and the wait goes on. Any other value is its answer to the
+     * nothing is pending any more. One of the earlier texts is it still catching up, and the wait starts again once, when it arrives there. Any other value is its answer to the
      * edit, or a change from outside, and the field takes what it showed for that.
      */
     fun settle(value: String) {
@@ -142,7 +147,11 @@ internal class FieldCaret(
         when {
             value == edit.reported -> pending = null
             value == edit.against -> Unit
-            value in edit.earlier -> progress++
+            value in edit.earlier ->
+                if (value != lastEarlier) {
+                    lastEarlier = value
+                    progress++
+                }
             else -> {
                 field = reconcileCaret(field, value, edit, waiting = false)
                 pending = null
