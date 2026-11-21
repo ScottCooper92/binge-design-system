@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -135,7 +134,7 @@ class TvDetailEpisodesFocusTest {
     @Test
     fun `a return that refills with fewer episodes lands on the episode it left, placed by its key`() {
         var episodes by mutableStateOf(EPISODES + SEASON_3)
-        var current by mutableIntStateOf(1)
+        var current by mutableStateOf("1")
         val restoration = StateRestorationTester(composeTestRule)
         restoration.setContent {
             BingeTvTheme {
@@ -161,7 +160,7 @@ class TvDetailEpisodesFocusTest {
         episodes = emptyList()
         restoration.emulateSavedInstanceStateRestore()
         composeTestRule.waitForIdle()
-        episodes = EPISODES.filter { it.seasonNumber == 2 } + SEASON_3
+        episodes = EPISODES.filter { it.seasonKey == "2" } + SEASON_3
         composeTestRule.waitForIdle()
         // The episode's resting badge: on screen only if the strip came back on it, not on the spacer past the end.
         composeTestRule.onNodeWithText("2").assertIsDisplayed()
@@ -185,7 +184,7 @@ class TvDetailEpisodesFocusTest {
     private fun setTab(initialEpisodeKey: Int? = null) {
         composeTestRule.setContent {
             BingeTvTheme {
-                var current by remember { mutableIntStateOf(1) }
+                var current by remember { mutableStateOf("1") }
                 Column {
                     Box(Modifier.testTag(ENTRY).size(ENTRY_SIZE).focusable())
                     TvDetailEpisodes(
@@ -194,8 +193,8 @@ class TvDetailEpisodesFocusTest {
                         currentSeason = current,
                         onSeasonChange = { current = it },
                         episodes = EPISODES,
-                        onEpisodeClick = { opened += it.seasonNumber to it.episodeNumber },
-                        initialEpisodeKey = initialEpisodeKey,
+                        onEpisodeClick = { opened += it.seasonKey.toInt() to it.episodeNumber },
+                        initialEpisodeKey = initialEpisodeKey?.toString(),
                     )
                 }
             }
