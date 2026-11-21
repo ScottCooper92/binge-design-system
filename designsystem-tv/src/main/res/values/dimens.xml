@@ -258,6 +258,10 @@
     <dimen name="tv_side_sheet_note_icon_size">18dp</dimen>
     <dimen name="tv_poster_mark_size">24dp</dimen>
     <dimen name="tv_poster_progress_height">4dp</dimen>
+    <!-- How far a progress bar sits inside its card on the start, end and bottom. The focus ring (tv_focus_ring_width, 3dp) is drawn over the card's edge and
+         follows the card's corner (20dp on a poster, 12dp on an episode card), so the bar clears the ring and its curve at both ends of the bar: 10dp is the ring's
+         width plus the corner's reach on either card, and is the same focused or not, so the bar never moves when focus arrives. -->
+    <dimen name="tv_progress_bar_inset">10dp</dimen>
     <dimen name="tv_filter_page_gap">32dp</dimen>
     <!-- The TV search page: the bar to whatever is under it (the field, and the first row of the list or the grid). -->
     <dimen name="tv_search_header_gap">16dp</dimen>
