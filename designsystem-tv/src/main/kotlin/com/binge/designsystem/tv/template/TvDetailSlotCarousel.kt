@@ -49,8 +49,10 @@ import com.binge.designsystem.R as DesR
 import com.binge.designsystem.tv.R as TvR
 
 private const val SLOT_CROSSFADE_MILLIS = 200
-private const val TAIL_KEY = "tv-slot-carousel-tail"
-private const val SEE_ALL_KEY = "tv-slot-carousel-see-all"
+
+/** The strip's own lazy keys, under the reserved `binge:` prefix: an app's item keys are text too and must not collide with them. */
+private const val TAIL_KEY = "binge:tv-slot-carousel-tail"
+private const val SEE_ALL_KEY = "binge:tv-slot-carousel-see-all"
 
 /** The carousels' 16:9 shape, for videos and backdrops. */
 const val TV_DETAIL_WIDE_ASPECT = 16f / 9f
