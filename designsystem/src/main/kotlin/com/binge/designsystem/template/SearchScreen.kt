@@ -265,7 +265,7 @@ fun SearchScreen(
         onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },
         pageCount = paged?.chips?.size ?: 0,
     )
-    HeaderFollowsPages(scrollBehavior?.state.takeIf { bar != ScreenBar.Small }, pager, paged, pageStates)
+    HeaderFollowsPages(scrollBehavior?.state, bar, pager, paged, pageStates)
     BingeScreenScaffold(
         title = title,
         modifier = modifier,
@@ -311,30 +311,32 @@ fun SearchScreen(
 }
 
 /**
- * The large bar collapses as a page scrolls and a page that arrives already scrolled, or at the top, moves nothing, so a restored page would sit
- * behind an expanded header, or leave a collapsed one over a list at its top. When the pager settles, the header is set from that page's grid:
- * expanded at the top, collapsed otherwise. A null [barState] (the small bar, which does not collapse) does nothing.
+ * A bar's scroll behaviour moves only when a list scrolls, so a page that arrives already scrolled, or at the top, would show the header of the
+ * page before it. When the pager settles, the header is set from that page's grid. The large bar is expanded at the top and collapsed otherwise.
+ * The small bar does not collapse with the page: it is shown, and the content counts as passing under it, which is what draws its scrim, when the
+ * page is not at its top.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HeaderFollowsPages(
     barState: TopAppBarState?,
+    bar: ScreenBar,
     pager: FilterPager,
     paged: PagedTypes?,
     pageStates: SearchPageStates,
 ) {
     val latestPaged by rememberUpdatedState(paged)
     val latestPageStates by rememberUpdatedState(pageStates)
-    LaunchedEffect(barState, pager.state) {
+    LaunchedEffect(barState, bar, pager.state) {
         if (barState == null) return@LaunchedEffect
         // The first value is where the pager started, which the header already follows.
         snapshotFlow { pager.state.settledPage }.drop(1).collect { page ->
             val chip = latestPaged?.chips?.getOrNull(page) ?: return@collect
             val grid = latestPageStates.stateFor(chip.key)
             val atTop = grid.firstVisibleItemIndex == 0 && grid.firstVisibleItemScrollOffset == 0
-            val offset = if (atTop) 0f else barState.heightOffsetLimit
-            barState.heightOffset = offset
-            barState.contentOffset = offset
+            val scrolledOffset = barState.heightOffsetLimit
+            barState.heightOffset = if (atTop || bar == ScreenBar.Small) 0f else scrolledOffset
+            barState.contentOffset = if (atTop) 0f else scrolledOffset
         }
     }
 }
