@@ -34,7 +34,7 @@ class MediaWideHeader(
  * in over it, and [footer] sits below the scroll. The page owns the hero: [DetailHero] with its chrome off, since the
  * template's bar carries back and [topBarActions] (a share action, say, as a [com.binge.designsystem.component.BingeBarIconAction]),
  * the rich backdrop, and the [LayoutAnchors.Detail.HERO] anchor a page's skeleton is checked against. The body runs full-width,
- * and the status bar is left to the theme.
+ * and the status bar icons stay light over the hero until the bar's scrim hands them to the theme.
  *
  * @param wideHeader at the expanded width, a page that passes this swaps in [DetailCinematicHeader], with the poster, synopsis and
  *   stats beside the title; without it, or on a narrower window, the single-column hero stays.
