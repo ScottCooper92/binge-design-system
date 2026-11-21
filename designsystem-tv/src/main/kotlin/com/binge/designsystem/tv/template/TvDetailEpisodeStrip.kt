@@ -38,7 +38,9 @@ import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
 import com.binge.designsystem.theme.BingeTheme
 import com.binge.designsystem.theme.LocalReduceMotion
+import com.binge.designsystem.tv.component.TvProgressBar
 import com.binge.designsystem.tv.component.TvRatingBadge
+import com.binge.designsystem.tv.component.TvWatchedMark
 import com.binge.designsystem.tv.component.tvExpandingFacts
 import com.binge.designsystem.tv.focus.TvRowEntry
 import com.binge.designsystem.tv.focus.TvStableFocusScroll
@@ -148,6 +150,13 @@ internal fun TvDetailEpisodeCard(
             color = BingeTheme.colors.onScrim,
             modifier = Modifier.padding(dimensionResource(DesR.dimen.padding_s)),
         )
+        if (episode.watched) {
+            TvWatchedMark(
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.align(Alignment.TopEnd).padding(dimensionResource(DesR.dimen.padding_xs)),
+            )
+        }
+        episode.progress?.let { fraction -> TvProgressBar(fraction, Modifier.align(Alignment.BottomStart)) }
     }
 }
 
