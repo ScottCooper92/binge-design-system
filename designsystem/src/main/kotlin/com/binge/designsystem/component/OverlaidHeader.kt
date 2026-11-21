@@ -122,5 +122,5 @@ internal fun rememberPagerScrim(scrimFraction: Float?, scrolled: Boolean): Float
 /** How long the scrim takes to fade in or out as the shown page leaves or returns to its top. */
 private const val PAGER_SCRIM_FADE_MILLIS = 150
 
-/** A test's way to read the scrim fraction a pager is drawing, which is otherwise only a colour in the header; null in production. */
+/** A test's way to read the scrim fraction a pager or a screen scaffold is drawing, which is otherwise only a colour in the header; null in production. */
 internal val LocalPagerScrimProbe = compositionLocalOf<((Float) -> Unit)?> { null }

@@ -7,11 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
@@ -27,6 +25,7 @@ import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
+import com.binge.designsystem.component.LocalPagerScrimProbe
 import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.layout.LayoutAnchors
@@ -46,7 +45,7 @@ import org.robolectric.annotation.GraphicsMode
 private const val SHORT_DRAG_START = 300f
 
 /** How long a header gets to follow the page it settled on, far longer than the frame it takes. */
-private const val SETTLE_TIMEOUT_MILLIS = 3_000L
+private const val SETTLE_MILLIS = 3_000L
 private const val SHORT_DRAG_END = 700f
 
 private fun results(count: Int) =
@@ -240,6 +239,9 @@ class SearchScreenTest {
 
     private val pagedResults = mapOf("all" to named("a"), "movies" to named("m"), "people" to named("p"))
 
+    /** The scrim fraction the screen's scaffold last drew behind its header. */
+    private var scrim = 0f
+
     private fun showPaged(
         selectedKey: String,
         asked: MutableList<String>,
@@ -249,25 +251,27 @@ class SearchScreenTest {
     ) {
         rule.setContent {
             var selected by remember { mutableStateOf(selectedKey) }
-            TestTheme {
-                SearchScreen(
-                    title = "Search",
-                    text = "past",
-                    state = SearchState.Ready(
-                        named("a"),
-                        loaded = 3,
-                        hasMore = false,
-                        types = SearchTypes(types.chips, selected),
-                        pages = pages,
-                    ),
-                    callbacks = callbacks(onType = {
-                        asked += it
-                        selected = it
-                    }),
-                    placeholder = "Search here",
-                    bar = bar,
-                    pinned = pinned,
-                )
+            CompositionLocalProvider(LocalPagerScrimProbe provides { scrim = it }) {
+                TestTheme {
+                    SearchScreen(
+                        title = "Search",
+                        text = "past",
+                        state = SearchState.Ready(
+                            named("a"),
+                            loaded = 3,
+                            hasMore = false,
+                            types = SearchTypes(types.chips, selected),
+                            pages = pages,
+                        ),
+                        callbacks = callbacks(onType = {
+                            asked += it
+                            selected = it
+                        }),
+                        placeholder = "Search here",
+                        bar = bar,
+                        pinned = pinned,
+                    )
+                }
             }
         }
         rule.waitForIdle()
@@ -805,16 +809,6 @@ class SearchScreenTest {
     fun `a page that arrives scrolled or at the top sets the header, on a chip tap`() =
         assertHeaderFollowsPages { chip, _ -> rule.onNodeWithText(chip).performClick() }
 
-    /** The page from its top edge to the chips' bottom, as pixels: the scrim hides rows under it, and without one they show through. */
-    private fun headerRegion(): List<Int> {
-        val chips = chipsBounds()
-        val image = rule.onRoot().captureToImage()
-        val height = with(rule.density) { chips.bottom.roundToPx() }
-        val pixels = IntArray(image.width * height)
-        image.asAndroidBitmap().getPixels(pixels, 0, image.width, 0, 0, image.width, height)
-        return pixels.toList()
-    }
-
     /**
      * The small bar's header draws a scrim while the page under it is scrolled, driven by how far the content has passed under it, and a page that
      * arrives already scrolled passes nothing, so it would show the scrim of the page before it. The scrim is the page's own colour at a high alpha,
@@ -830,21 +824,20 @@ class SearchScreenTest {
         // A short drag back brings the bar back, which slides away as the page scrolls, with the page still well down.
         rule.onRoot().performTouchInput { swipeDown(startY = SHORT_DRAG_START, endY = SHORT_DRAG_END) }
         rule.waitForIdle()
-        val scrolled = headerRegion()
+        val scrolled = scrim
+        assertTrue("page 2 is scrolled, so its scrim is up", scrolled > 0f)
 
         goTo("All", "right")
         rule.waitForIdle()
-        // Page 1 is scrolled away and back to its top, which returns the header to how it rests there before page 2 comes back.
-        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
-        repeat(6) { rule.onRoot().performTouchInput { swipeDown() } }
-        rule.waitForIdle()
+        assertEquals("page 1 is at its top, so there is no scrim", 0f, scrim, 0f)
 
         goTo("Movies", "left")
-        rule.waitForIdle()
-        // The header is set once the page has settled, one frame after the pager reports it, so a read straight after the tap can still see the
-        // page before. Wait for the header to arrive; a header that never follows the page times out here and fails.
-        rule.waitUntil(SETTLE_TIMEOUT_MILLIS) { headerRegion() == scrolled }
-        assertEquals("page 2 is scrolled, so its header draws the scrolled bar's background", scrolled, headerRegion())
+        // The header is set once the page has settled, a frame after the pager reports it. The clock is driven by hand, past every animation the
+        // move starts, so what is read is where the scrim ends and not where it was on a frame that load made late. A header that never follows
+        // the page leaves the scrim at 0 and fails here.
+        rule.mainClock.autoAdvance = false
+        rule.mainClock.advanceTimeBy(SETTLE_MILLIS)
+        assertEquals("page 2 is scrolled, so its header draws the scrim it was left with", scrolled, scrim, 0f)
     }
 
     @Test
