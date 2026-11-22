@@ -85,8 +85,6 @@ fun SampleDetail(
     } else {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.surface,
-            // The page is edge to edge and the frame below reserves the bars itself, so this Scaffold adds no inset.
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             floatingActionButton = { TweaksFab(tweaked, onClick = { showTweaks = true }) },
             // The page draws edge to edge, as it did: the frame inside reserves the bars itself, so this one reserves none.
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
