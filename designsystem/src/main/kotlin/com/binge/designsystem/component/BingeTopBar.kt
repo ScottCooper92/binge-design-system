@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.clearNavRail
 import com.binge.designsystem.hasPaneBeside
@@ -83,22 +82,14 @@ import com.binge.designsystem.theme.BingeTheme
  * supplying its own `tint` reads [LocalTopBarActionTint] rather than re-deriving that lerp, exactly
  * as it reads [LocalTopBarActionTone] for tone.
  *
- * [edgeInset] is the same symmetric leading/trailing inset [BingeMediumTopBar] carries, matching
- * [DetailOverlayTopBar]'s own `horizontalInset` so a transparent bar's controls float the same
- * distance from the edge everywhere.
- *
  * A null [onBack] drops the back button, for a screen in a pane beside the list that already offers the way back.
  *
  * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
  * Both default to absent, so existing titles keep their behaviour and appearance.
- *
- * @need give a screen a standard single-row top bar
- * @group bars
- * @replaces a raw TopAppBar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BingeTopBar(
+internal fun BingeTopBar(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
@@ -108,12 +99,11 @@ fun BingeTopBar(
     foregroundScrimFraction: Float = scrimFraction,
     scrimColor: Color = MaterialTheme.colorScheme.background,
     scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
-    edgeInset: Dp = dimensionResource(R.dimen.medium_top_bar_edge_inset),
     onTitleLongClick: (() -> Unit)? = null,
     onTitleLongClickLabel: String? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
-    val chrome = barChrome(containerColor, foregroundScrimFraction, scrimForegroundColor, edgeInset)
+    val chrome = barChrome(containerColor, foregroundScrimFraction, scrimForegroundColor)
     val titleModifier =
         if (onBack == null && hasPaneBeside()) {
             // Beside another pane, the title starts where the pane's content does, as the two-row bar's does: M3 puts it
