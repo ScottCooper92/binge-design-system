@@ -1,6 +1,5 @@
 package com.binge.designsystem.component
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -11,11 +10,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,15 +19,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TwoRowsTopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -40,7 +33,6 @@ import com.binge.designsystem.hasPaneBeside
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.paneSideInsets
 import com.binge.designsystem.resolvedContentPadding
-import com.binge.designsystem.theme.BingeTheme
 
 /**
  * The scroll behaviour to pair with [BingePaneTopBar]: exit-until-collapsed everywhere, since both of
@@ -155,12 +147,7 @@ internal fun TwoRowTopBar(
     subtitle: String? = null,
     titleTrailing: (@Composable () -> Unit)? = null,
 ) {
-    val transparent = containerColor == Color.Transparent
-    val iconTone = if (transparent) IconButtonTone.Glass else IconButtonTone.Default
-    val titleColor = scrimmedTitleColor(transparent, foregroundScrimFraction, scrimForegroundColor)
-    val glassBackgroundAlpha = 1f - foregroundScrimFraction
-    val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
-    val edgeInset = dimensionResource(R.dimen.medium_top_bar_edge_inset)
+    val chrome = barChrome(containerColor, foregroundScrimFraction, scrimForegroundColor)
     // Beside a pane the title offsets itself past the rail; alone, the bar's own insets do (topBarSideInsets).
     val contentStart =
         resolvedContentPadding().calculateStartPadding(LocalLayoutDirection.current) +
@@ -168,12 +155,7 @@ internal fun TwoRowTopBar(
     val onContentInset = contentStart - dimensionResource(R.dimen.pane_top_bar_title_inset)
     val contentEnd = resolvedContentPadding().calculateEndPadding(LocalLayoutDirection.current)
     val besideBackButton = dimensionResource(R.dimen.padding_s)
-    Box {
-        TopBarScrim(
-            scrimFraction,
-            scrimColor = scrimColor,
-            tailHeight = dimensionResource(R.dimen.top_bar_scrim_tail_height),
-        )
+    BarScrimHost(scrimFraction, scrimColor) {
         TwoRowsTopAppBar(
             title = { expanded ->
                 val titleModifier =
@@ -189,7 +171,7 @@ internal fun TwoRowTopBar(
                         style = if (expanded) MaterialTheme.typography.displaySmall else LocalTextStyle.current,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = titleColor,
+                        color = chrome.titleColor,
                         modifier = titleModifier.titleLongClick(onTitleLongClick, onTitleLongClickLabel),
                     )
                 } else {
@@ -209,7 +191,7 @@ internal fun TwoRowTopBar(
                             style = MaterialTheme.typography.displaySmall,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            color = titleColor,
+                            color = chrome.titleColor,
                             modifier = Modifier.weight(1f).titleLongClick(onTitleLongClick, onTitleLongClickLabel),
                         )
                         trailing()
@@ -232,34 +214,8 @@ internal fun TwoRowTopBar(
                 }
             },
             modifier = modifier.clearNavRail(),
-            navigationIcon = {
-                if (onBack != null) {
-                    Box(modifier = Modifier.padding(start = edgeInset)) {
-                        ExpressiveIconButton(
-                            onClick = onBack,
-                            icon = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.cd_navigate_back),
-                            tint = if (transparent) iconTint else LocalContentColor.current,
-                            tone = iconTone,
-                            size = dimensionResource(R.dimen.top_bar_icon_size),
-                            glassBackgroundAlpha = glassBackgroundAlpha,
-                        )
-                    }
-                }
-            },
-            actions = {
-                CompositionLocalProvider(
-                    LocalTopBarActionTone provides iconTone,
-                    LocalTopBarActionTint provides if (transparent) iconTint else LocalContentColor.current,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(end = edgeInset),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        actions(glassBackgroundAlpha)
-                    }
-                }
-            },
+            navigationIcon = { BarNavigationIcon(chrome, onBack) },
+            actions = { BarActions(chrome, actions) },
             expandedHeight = expandedHeight,
             windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             colors = bingeTopBarColors(containerColor),

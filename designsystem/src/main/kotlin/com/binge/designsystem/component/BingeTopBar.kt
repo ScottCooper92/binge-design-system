@@ -2,7 +2,6 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -12,10 +11,8 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,15 +20,11 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
@@ -120,15 +113,7 @@ fun BingeTopBar(
     onTitleLongClickLabel: String? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
-    val transparent = containerColor == Color.Transparent
-    val iconTone = if (transparent) IconButtonTone.Glass else IconButtonTone.Default
-    val titleColor = scrimmedTitleColor(transparent, foregroundScrimFraction, scrimForegroundColor)
-    // The bar's own scrim takes over legibility as it fades in, so each icon's individual backing
-    // hands off to it rather than the two stacking. The icon's own tint has to travel with that
-    // handoff too, or a hardcoded onScrim goes illegible once the backing (its other half of the
-    // contrast guarantee) has faded away against a theme-following scrimForegroundColor.
-    val glassBackgroundAlpha = 1f - foregroundScrimFraction
-    val iconTint = lerp(BingeTheme.colors.onScrim, scrimForegroundColor, foregroundScrimFraction)
+    val chrome = barChrome(containerColor, foregroundScrimFraction, scrimForegroundColor, edgeInset)
     val titleModifier =
         if (onBack == null && hasPaneBeside()) {
             // Beside another pane, the title starts where the pane's content does, as the two-row bar's does: M3 puts it
@@ -140,51 +125,20 @@ fun BingeTopBar(
             // the title than a bare glyph would; restores a standard-spacing gap.
             Modifier.padding(start = dimensionResource(R.dimen.padding_s))
         }
-    Box {
-        TopBarScrim(
-            scrimFraction,
-            scrimColor = scrimColor,
-            tailHeight = dimensionResource(R.dimen.top_bar_scrim_tail_height),
-        )
+    BarScrimHost(scrimFraction, scrimColor) {
         TopAppBar(
             title = {
                 Text(
                     title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = titleColor,
+                    color = chrome.titleColor,
                     modifier = titleModifier.titleLongClick(onTitleLongClick, onTitleLongClickLabel),
                 )
             },
             modifier = modifier.clearNavRail(),
-            navigationIcon = {
-                if (onBack != null) {
-                    Box(modifier = Modifier.padding(start = edgeInset)) {
-                        ExpressiveIconButton(
-                            onClick = onBack,
-                            icon = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.cd_navigate_back),
-                            tint = if (transparent) iconTint else LocalContentColor.current,
-                            tone = iconTone,
-                            size = dimensionResource(R.dimen.top_bar_icon_size),
-                            glassBackgroundAlpha = glassBackgroundAlpha,
-                        )
-                    }
-                }
-            },
-            actions = {
-                CompositionLocalProvider(
-                    LocalTopBarActionTone provides iconTone,
-                    LocalTopBarActionTint provides if (transparent) iconTint else LocalContentColor.current,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(end = edgeInset),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        actions(glassBackgroundAlpha)
-                    }
-                }
-            },
+            navigationIcon = { BarNavigationIcon(chrome, onBack) },
+            actions = { BarActions(chrome, actions) },
             // The sides the scaffold body clears, cutout included, so the title and actions line up with it.
             windowInsets = TopAppBarDefaults.windowInsets.only(WindowInsetsSides.Top).union(paneSideInsets()),
             colors = bingeTopBarColors(containerColor),
