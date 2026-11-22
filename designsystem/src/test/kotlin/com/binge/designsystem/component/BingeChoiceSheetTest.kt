@@ -188,7 +188,7 @@ class BingeChoiceSheetTest {
         var dock: BingeSheetDock? = null
         var keyboard by mutableStateOf(false)
         rule.setContent {
-            BingeBottomSheet(onDismissRequest = {}, skipPartiallyExpanded = false, dockable = true) {
+            BingeBottomSheet(onDismissRequest = {}, opensPartWay = true) {
                 dock = LocalBingeSheetDock.current
                 MultiChoiceList(
                     choices = many,
