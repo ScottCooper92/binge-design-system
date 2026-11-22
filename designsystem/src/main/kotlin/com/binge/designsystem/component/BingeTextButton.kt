@@ -1,16 +1,11 @@
 package com.binge.designsystem.component
 
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -71,37 +66,14 @@ fun BingeTextButton(
         enabled = enabled,
         colors = colors,
     ) {
-        if (loading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                color = colors.contentColor,
-                strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
-            )
-        } else {
-            if (leadingIcon != null) {
-                Icon(
-                    imageVector = leadingIcon,
-                    // The icon carries the accessible name itself once the label's Text isn't there to.
-                    contentDescription = if (showLabel) null else label,
-                    modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                )
-                if (showLabel) Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
-            }
-            if (showLabel) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                if (trailingIcon != null) {
-                    Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
-                    Icon(
-                        imageVector = trailingIcon,
-                        contentDescription = null,
-                        modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                    )
-                }
-            }
-        }
+        ButtonContent(
+            label = label,
+            loading = loading,
+            contentColor = colors.contentColor,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            showLabel = showLabel,
+        )
     }
 }
 
