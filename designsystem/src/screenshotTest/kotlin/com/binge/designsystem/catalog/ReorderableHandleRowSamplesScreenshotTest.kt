@@ -22,4 +22,11 @@ class ReorderableHandleRowSamplesScreenshotTest {
     fun firstRow() {
         ReorderableHandleRowFirstSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun switchRows() {
+        ReorderableSwitchRowSample()
+    }
 }
