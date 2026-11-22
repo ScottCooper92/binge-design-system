@@ -9,6 +9,7 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithText
+import com.binge.designsystem.testing.advanceFrames
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -55,14 +56,12 @@ class BingeTabbedPagerReconcileTest {
         Snapshot.sendApplyNotifications()
     }
 
-    private fun advanceFrames(count: Int) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
-
     @Test
     fun `a tab tap shows as selected at once, not once the scroll passes the midpoint`() {
         show()
         tap(TABS - 1)
         // The move starts a frame after the tap (the effect that starts it runs after the first recomposition), and the tabs follow on the next.
-        advanceFrames(2)
+        rule.advanceFrames(2)
 
         rule.onNodeWithText("Tab ${TABS - 1}").assertIsSelected()
     }
@@ -71,7 +70,7 @@ class BingeTabbedPagerReconcileTest {
     fun `a tap back to the page the move started from leaves the tab and the page agreeing`() {
         show()
         tap(TABS - 1)
-        advanceFrames(MID_FRAMES)
+        rule.advanceFrames(MID_FRAMES)
         tap(0)
         rule.mainClock.advanceTimeBy(SETTLE_MS)
 

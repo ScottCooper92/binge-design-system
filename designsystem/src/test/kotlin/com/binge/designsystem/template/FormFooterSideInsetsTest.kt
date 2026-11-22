@@ -1,22 +1,17 @@
 package com.binge.designsystem.template
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.Insets
-import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.component.BingeActionFooter
 import com.binge.designsystem.testing.TestTheme
-import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.WithStartCutout
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -92,10 +87,3 @@ class FormFooterSideInsetsTest {
         )
     }
 }
-
-/** Gives the window a display cutout [width] wide down the start side, answering every insets dispatch at the parent. */
-@Composable
-private fun WithStartCutout(width: Dp, content: @Composable () -> Unit) =
-    WithWindowInsets({
-        WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.displayCutout(), Insets.of(width.roundToPx(), 0, 0, 0)).build()
-    }, content)

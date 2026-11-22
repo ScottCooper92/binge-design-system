@@ -35,6 +35,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.R
 import com.binge.designsystem.testing.WithWindowInsets
 import com.binge.designsystem.testing.createTakeDownComposeRule
+import com.binge.designsystem.testing.pressBack
+import com.binge.designsystem.testing.pressBackInDialog
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -43,7 +45,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowDialog
 
 private const val ROOT_TEXT = "Root page"
 private const val DETAIL_TEXT = "Detail page"
@@ -95,11 +96,6 @@ class BingeAdaptiveSheetExpandedTest {
         }
     }
 
-    private fun pressBack() {
-        rule.runOnIdle { checkNotNull(back).onBackPressedDispatcher.onBackPressed() }
-        rule.waitForIdle()
-    }
-
     private fun backBar() = rule.onAllNodes(hasContentDescription(RuntimeEnvironment.getApplication().getString(R.string.cd_navigate_back)))
 
     @Test
@@ -135,12 +131,12 @@ class BingeAdaptiveSheetExpandedTest {
         rule.onNodeWithText(OPEN).performClick()
         rule.waitForIdle()
 
-        pressBack()
+        rule.pressBack(checkNotNull(back))
 
         rule.onNodeWithText(ROOT_TEXT).assertExists()
         assertEquals(0, dismissals)
 
-        pressBack()
+        rule.pressBack(checkNotNull(back))
 
         assertEquals(1, dismissals)
     }
@@ -155,7 +151,7 @@ class BingeAdaptiveSheetExpandedTest {
         rule.onNodeWithText(OPEN).performClick()
         rule.mainClock.autoAdvance = true
         rule.waitForIdle()
-        pressBack()
+        rule.pressBack(checkNotNull(back))
 
         rule.onNodeWithText(ROOT_TEXT).assertExists()
         assertEquals("the page was pushed twice", listOf("detail"), leftPages)
@@ -168,10 +164,10 @@ class BingeAdaptiveSheetExpandedTest {
         rule.onNodeWithText(OPEN).performClick()
         rule.waitForIdle()
 
-        pressBack()
+        rule.pressBack(checkNotNull(back))
         assertEquals(listOf("detail"), leftPages)
 
-        pressBack()
+        rule.pressBack(checkNotNull(back))
         assertEquals(listOf("detail"), leftPages)
         assertEquals(1, dismissals)
     }
@@ -182,7 +178,7 @@ class BingeAdaptiveSheetExpandedTest {
         rule.onNodeWithText(OPEN).performClick()
         rule.waitForIdle()
 
-        pressBack()
+        rule.pressBack(checkNotNull(back))
         backBar().onFirst().performClick()
         rule
             .onNode(hasContentDescription(RuntimeEnvironment.getApplication().getString(R.string.cd_close_sheet)) and hasClickAction())
@@ -324,17 +320,11 @@ class BingeAdaptiveSheetCompactTest {
         rule.onNodeWithText(OPEN).performClick()
         rule.onNodeWithText(DETAIL_TEXT).assertExists()
         assertEquals(true, stacks)
-        pressBack()
+        rule.pressBackInDialog()
         rule.onNodeWithText(ROOT_TEXT).assertExists()
         rule.onNodeWithText("Half typed").assertExists()
         assertEquals(listOf("detail"), leftPages)
         assertEquals(0, dismissals)
-    }
-
-    private fun pressBack() {
-        val dialog = checkNotNull(ShadowDialog.getLatestDialog())
-        rule.runOnUiThread { dialog.onBackPressed() }
-        rule.waitForIdle()
     }
 
     @Test
@@ -343,16 +333,16 @@ class BingeAdaptiveSheetCompactTest {
         rule.onNodeWithText(OPEN).performClick()
         keyboardUp = true
         rule.waitForIdle()
-        pressBack()
+        rule.pressBackInDialog()
         rule.onNodeWithText(DETAIL_TEXT).assertExists()
         assertEquals(emptyList<String>(), leftPages)
         keyboardUp = false
         rule.waitForIdle()
-        pressBack()
+        rule.pressBackInDialog()
         rule.onNodeWithText(ROOT_TEXT).assertExists()
         assertEquals(listOf("detail"), leftPages)
         assertEquals(0, dismissals)
-        pressBack()
+        rule.pressBackInDialog()
         assertEquals(1, dismissals)
     }
 

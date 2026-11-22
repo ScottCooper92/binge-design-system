@@ -14,6 +14,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
+import com.binge.designsystem.testing.advanceFrames
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -55,7 +56,6 @@ class SheetAnimatedColumnTest {
     }
 
     /** The animation starts the frame after the layout change, so a few frames in is part-way through it. */
-    private fun advanceFrames(count: Int) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
 
     private fun hostHeight(): Dp = rule.onNodeWithTag(HOST).getUnclippedBoundsInRoot().height
 
@@ -65,7 +65,7 @@ class SheetAnimatedColumnTest {
         assertEquals(SHORT.value, hostHeight().value, 0.5f)
 
         changeContentHeightTo(TALL)
-        advanceFrames(MIDWAY_FRAMES)
+        rule.advanceFrames(MIDWAY_FRAMES)
         val midway = hostHeight()
         assertTrue("the height should have started to move, was $midway", midway > SHORT)
         assertTrue("the height should not have arrived, was $midway", midway < TALL)
@@ -95,7 +95,7 @@ class SheetAnimatedColumnTest {
         rule.mainClock.autoAdvance = false
 
         changeContentHeightTo(SHORT)
-        advanceFrames(MIDWAY_FRAMES)
+        rule.advanceFrames(MIDWAY_FRAMES)
         val midway = hostHeight()
 
         assertTrue("the height should have started to fall, was $midway", midway < TALL)

@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat
  * when they change, so a test can move a keyboard or a bar by changing the state its builder reads.
  */
 @Composable
-internal fun WithWindowInsets(insets: Density.() -> WindowInsetsCompat, content: @Composable () -> Unit) {
+fun WithWindowInsets(insets: Density.() -> WindowInsetsCompat, content: @Composable () -> Unit) {
     val view = LocalView.current
     val built = with(LocalDensity.current) { insets() }
     // Read first, so Compose's own insets listener is installed on the view before the dispatch below.

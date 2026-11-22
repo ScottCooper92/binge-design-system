@@ -13,13 +13,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
+import com.binge.designsystem.testing.pressBackInDialog
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowDialog
 
 /**
  * A locked sheet holds a draft the user is mid-way through. What dismisses it, and what does not, is a
@@ -59,15 +59,6 @@ class BingeBottomSheetDismissTest {
         rule.waitForIdle()
     }
 
-    private fun pressBack() {
-        val dialog = checkNotNull(ShadowDialog.getLatestDialog()) { "No sheet window was shown" }
-        rule.runOnUiThread {
-            @Suppress("DEPRECATION")
-            dialog.onBackPressed()
-        }
-        rule.waitForIdle()
-    }
-
     /**
      * A tap near the top of the sheet's own window, well clear of the sheet. By position rather than by the
      * scrim's "Close sheet" description, because Material drops that node when the outside tap is blocked, and
@@ -82,7 +73,7 @@ class BingeBottomSheetDismissTest {
     fun `a free sheet is dismissed by Back`() {
         showSheet(gesturesEnabled = true)
 
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(1, dismissed)
     }
@@ -100,7 +91,7 @@ class BingeBottomSheetDismissTest {
     fun `a locked sheet ignores Back`() {
         showSheet(gesturesEnabled = false)
 
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(0, dismissed)
     }
@@ -121,7 +112,7 @@ class BingeBottomSheetDismissTest {
         tapScrim()
         assertEquals(0, dismissed)
 
-        pressBack()
+        rule.pressBackInDialog()
         assertEquals(1, dismissed)
     }
 
@@ -129,7 +120,7 @@ class BingeBottomSheetDismissTest {
     fun `Back on a sheet that opens part way dismisses it`() {
         showSheet(gesturesEnabled = true, skipPartiallyExpanded = false, contentHeight = TALL_CONTENT)
 
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(1, dismissed)
     }
@@ -140,7 +131,7 @@ class BingeBottomSheetDismissTest {
         rule.onAllNodes(isRoot()).onLast().performTouchInput { swipeUp() }
         rule.waitForIdle()
 
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(0, dismissed)
     }
@@ -151,7 +142,7 @@ class BingeBottomSheetDismissTest {
         rule.onAllNodes(isRoot()).onLast().performTouchInput { swipeUp() }
         rule.waitForIdle()
 
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(1, dismissed)
     }

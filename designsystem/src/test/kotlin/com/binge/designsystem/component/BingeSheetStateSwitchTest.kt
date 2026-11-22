@@ -12,6 +12,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import com.binge.designsystem.testing.advanceFrames
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Rule
@@ -52,15 +53,13 @@ class BingeSheetStateSwitchTest {
         Snapshot.sendApplyNotifications()
     }
 
-    private fun advanceFrames(count: Int) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
-
     @Test
     fun `a change of kind has the old and the new content on screen part-way, then only the new`() {
         show(reduceMotion = false)
         rule.onNodeWithText("Loading 0").assertIsDisplayed()
 
         change(Kind.Ready to 0)
-        advanceFrames(MIDWAY_FRAMES)
+        rule.advanceFrames(MIDWAY_FRAMES)
         rule.onAllNodesWithText("Loading 0").assertCountEquals(1)
         rule.onAllNodesWithText("Ready 0").assertCountEquals(1)
 
@@ -90,7 +89,7 @@ class BingeSheetStateSwitchTest {
         rule.mainClock.autoAdvance = false
 
         change(Kind.Ready to 1)
-        advanceFrames(MIDWAY_FRAMES)
+        rule.advanceFrames(MIDWAY_FRAMES)
 
         rule.onAllNodesWithText("Ready 0").assertCountEquals(0)
         rule.onAllNodesWithText("Ready 1").assertCountEquals(1)
