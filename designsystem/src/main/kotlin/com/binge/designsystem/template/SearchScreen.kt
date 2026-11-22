@@ -1,7 +1,5 @@
 package com.binge.designsystem.template
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,6 +70,7 @@ import com.binge.designsystem.component.OnTabReselect
 import com.binge.designsystem.component.TrendingSearchChip
 import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.component.rememberFilterPager
+import com.binge.designsystem.component.rememberScrolledScrim
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.navOverlayPadding
@@ -331,15 +330,8 @@ private fun rememberShownPageScrim(
             grid != null && (grid.firstVisibleItemIndex > 0 || grid.firstVisibleItemScrollOffset > 0)
         }
     }
-    val scrim by animateFloatAsState(
-        targetValue = if (scrolled) 1f else 0f,
-        animationSpec = tween(durationMillis = PAGE_SCRIM_FADE_MILLIS),
-        label = "shown page scrim",
-    )
-    return scrim
+    return rememberScrolledScrim(scrolled)
 }
-
-private const val PAGE_SCRIM_FADE_MILLIS = 150
 
 private class RecentsCopy(
     val title: String,

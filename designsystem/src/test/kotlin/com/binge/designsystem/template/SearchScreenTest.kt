@@ -46,8 +46,6 @@ private const val PAGE_MOVE_FRAMES = 40
 private const val FRAME_MILLIS = 16L
 private const val SWIPE_STEPS = 8
 
-/** How long a header gets to follow the page it settled on, far longer than the frame it takes. */
-
 private fun results(count: Int) =
     List(count) { MediaResult("k$it", MediaResultKind.Poster, null, "Result $it", "Movie · 2020", rating = 7f, meta = "Drama") }
 
