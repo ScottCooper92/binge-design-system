@@ -79,6 +79,14 @@ class WholeWordTextTest {
     }
 
     @Test
+    fun `a kana label with prolonged sound marks wraps rather than going to one line`() {
+        val label = "サーバー".repeat(6)
+        show(width = NARROW, text = label)
+
+        assertTrue("expected several lines, got ${lineCount(label)}", lineCount(label) > 1)
+    }
+
+    @Test
     fun `a hyphenated name the line breaker would split inside a part is held to one ellipsized line`() {
         val text = "Fitzgerald-Montgomery"
         show(width = HYPHEN_ROOM, text = text)

@@ -93,13 +93,23 @@ private fun breaksAWord(layout: TextLayoutResult, text: String): Boolean =
 private fun isMidWord(before: Char, after: Char): Boolean =
     !before.isWhitespace() && !after.isWhitespace() && before !in BREAK_AFTER && !(before.isCjk() && after.isCjk())
 
-private fun Char.isCjk(): Boolean =
-    Character.UnicodeScript.of(code) in
-        setOf(
-            Character.UnicodeScript.HAN,
-            Character.UnicodeScript.HIRAGANA,
-            Character.UnicodeScript.KATAKANA,
-            Character.UnicodeScript.HANGUL,
-        )
+/** CJK by block, not script: `ー`, `、` and `「` have the script Common but sit where the line breaker may break around them. */
+private fun Char.isCjk(): Boolean = Character.UnicodeBlock.of(this) in CJK_BLOCKS
+
+private val CJK_BLOCKS =
+    setOf(
+        Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS,
+        Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A,
+        Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS,
+        Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
+        Character.UnicodeBlock.HIRAGANA,
+        Character.UnicodeBlock.KATAKANA,
+        Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS,
+        Character.UnicodeBlock.HANGUL_SYLLABLES,
+        Character.UnicodeBlock.HANGUL_JAMO,
+        Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO,
+        Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
+        Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
+    )
 
 private val BREAK_AFTER = setOf('-', '/', '\u2013', '\u2014', '\u2010')
