@@ -1,24 +1,13 @@
 package com.binge.designsystem.component
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -33,13 +22,9 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.isExpandedLayout
 
@@ -340,7 +325,7 @@ private fun TaskSheetPanel(
     BingeSideSheetPanel(modifier = modifier, width = dimensionResource(R.dimen.task_sheet_width), wash = wash) {
         CompositionLocalProvider(LocalBingeSheetWash provides wash) {
             Column(modifier = Modifier.fillMaxSize()) {
-                if (pages.size > 1) BingeSheetBackBar(onBack, enabled = backEnabled, label = backLabel)
+                if (pages.size > 1) BingeSheetPageHeader(onBack = onBack, enabled = backEnabled, backLabel = backLabel)
                 AnimatedSheetPages(
                     state = SheetPageState(pages.last(), pages.size),
                     modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -357,50 +342,6 @@ private fun TaskSheetPanel(
                         )
                     Column(modifier = Modifier.fillMaxSize()) { SheetPageWithFooter { content(nav) } }
                 }
-            }
-        }
-    }
-}
-
-/**
- * The bar above a stacked page: Back at the start, as a sheet that is not the first page of its stack has no other way out
- * but the scrim. With a [label], the name of the page Back returns to sits beside the arrow and the pair is one target.
- */
-@Composable
-private fun BingeSheetBackBar(
-    onBack: () -> Unit,
-    enabled: Boolean,
-    label: String?,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.padding_xs)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (label == null) {
-            IconButton(onClick = onBack, enabled = enabled) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_navigate_back))
-            }
-        } else {
-            Row(
-                modifier = Modifier
-                    .clickable(enabled = enabled, role = Role.Button, onClick = onBack)
-                    .minimumInteractiveComponentSize()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_s)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_navigate_back),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
             }
         }
     }
