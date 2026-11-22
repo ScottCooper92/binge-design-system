@@ -25,6 +25,7 @@ import com.binge.designsystem.template.PagedGridCallbacks
 import com.binge.designsystem.template.PagedGridScreen
 import com.binge.designsystem.template.PagedGridState
 import com.binge.designsystem.template.ScreenAction
+import com.binge.designsystem.template.ScreenBar
 import com.binge.designsystem.theme.BingeSentiment
 import kotlinx.coroutines.delay
 
@@ -72,14 +73,17 @@ private fun SampleGrid(
     withFilters: Boolean = true,
     onBack: (() -> Unit)? = LocalDemoBack.current,
     firstVisibleIndex: Int = 0,
+    bar: ScreenBar = ScreenBar.Large,
+    subtitle: String? = "Popular movies, by rating",
 ) {
     var chips by remember { mutableStateOf(SampleChips) }
     var info by remember { mutableStateOf<String?>(null) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         PagedGridScreen(
             title = "Discover",
-            subtitle = "Popular movies, by rating",
+            subtitle = subtitle,
             state = state,
+            bar = bar,
             modifier = modifier,
             filterBar = if (withFilters) sampleBar(chips) else null,
             firstVisibleIndex = firstVisibleIndex,
@@ -186,3 +190,19 @@ fun PagedGridDemo() {
         opened?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { opened = null }) }
     }
 }
+
+/** Posters under the small bar, for a screen with no subtitle: the filter action sits in the bar, where the large bar would have its pill. */
+@Composable
+fun PagedGridSmallBarSample() = SampleGrid(PagedGridState.Ready(sampleItems(), hasMore = true), bar = ScreenBar.Small, subtitle = null)
+
+/** The small bar over a grid that is part way down. The bar hides as the grid is dragged, which a frame does not show. */
+@Composable
+fun PagedGridSmallBarScrolledSample() =
+    SampleGrid(
+        PagedGridState.Ready(sampleItems(), hasMore = true),
+        firstVisibleIndex = SMALL_BAR_SCROLLED_TO,
+        bar = ScreenBar.Small,
+        subtitle = null,
+    )
+
+private const val SMALL_BAR_SCROLLED_TO = 12
