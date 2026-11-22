@@ -28,8 +28,10 @@ import androidx.compose.ui.unit.IntSize
  * - a one-line text needs more width than its node has, by more than [tolerancePx], and is not ellipsized, so the end of the line is cut off;
  * - a word is broken across two lines: a line other than the last ends between two characters that are neither space nor a
  *   place a break is welcome (after a hyphen, a slash or a dash, or between two CJK characters, which have no spaces);
- * - the text's box reaches past the left or right edge of the window, which is [windowWidthPx] wide, the root's width by
- *   default; or it is larger than its parent by more than [tolerancePx] on either axis, which a scroll container may be.
+ * - the text's box reaches past the left or right edge of the window. The window is [windowWidthPx] wide from the left edge
+ *   of the root, or, when it is null, the edges of [root] itself, so a subtree that does not start at the window's left edge is
+ *   held to its own bounds;
+ * - the text's box is larger than its parent's by more than [tolerancePx] on either axis, unless the parent scrolls.
  *
  * It does not use `TextLayoutResult.hasVisualOverflow`. That is true for every `maxLines` with an ellipsis, which
  * is deliberate and not a bug. The layout of an ellipsized text holds only the lines it shows, with the ellipsis
@@ -59,13 +61,14 @@ fun ComposeTestRule.assertNoTextClipped(
 ): Int {
     val rootNode = root.fetchSemanticsNode()
     val viewport = rootNode.boundsInRoot
-    val window = windowWidthPx ?: rootNode.size.width
+    val windowLeft = if (windowWidthPx == null) viewport.left else 0f
+    val windowRight = windowWidthPx?.toFloat() ?: viewport.right
     val clipped = mutableListOf<ClippedText>()
     val checked = intArrayOf(0)
-    collectClipped(rootNode, viewport, null, tolerancePx, window, allowBrokenWords, clipped, checked)
+    collectClipped(rootNode, viewport, null, tolerancePx, windowLeft, windowRight, allowBrokenWords, clipped, checked)
     if (clipped.isNotEmpty()) {
         throw AssertionError(
-            "Text is clipped by a parent (own size vs. visible size, in px):\n" +
+            "Text does not fit (sizes in px):\n" +
                 clipped.joinToString("\n") { it.describe() },
         )
     }
@@ -96,7 +99,8 @@ private fun collectClipped(
     viewport: Rect,
     scrollViewport: Rect?,
     tolerancePx: Int,
-    windowWidthPx: Int,
+    windowLeft: Float,
+    windowRight: Float,
     allowBrokenWords: Boolean,
     out: MutableList<ClippedText>,
     checked: IntArray,
@@ -133,7 +137,7 @@ private fun collectClipped(
         }
     }
     if (!text.isNullOrEmpty() && node.isInside(viewport) && node.isFullyInside(inScroll, tolerancePx)) {
-        node.layoutFaults(windowWidthPx, tolerancePx, allowBrokenWords).forEach { fault ->
+        node.layoutFaults(windowLeft, windowRight, tolerancePx, allowBrokenWords).forEach { fault ->
             out +=
                 ClippedText(
                     text.take(MAX_TEXT_IN_MESSAGE),
@@ -147,12 +151,13 @@ private fun collectClipped(
                 )
         }
     }
-    node.children.forEach { collectClipped(it, viewport, inScroll, tolerancePx, windowWidthPx, allowBrokenWords, out, checked) }
+    node.children.forEach { collectClipped(it, viewport, inScroll, tolerancePx, windowLeft, windowRight, allowBrokenWords, out, checked) }
 }
 
 /** What is wrong with how the node's text sits in its own box, apart from what a parent clips: see [assertNoTextClipped]. */
 private fun SemanticsNode.layoutFaults(
-    windowWidthPx: Int,
+    windowLeft: Float,
+    windowRight: Float,
     tolerancePx: Int,
     allowBrokenWords: Boolean,
 ): List<String> {
@@ -177,8 +182,8 @@ private fun SemanticsNode.layoutFaults(
     }
     val left = positionInRoot.x
     val right = left + size.width
-    if (left < -tolerancePx || right > windowWidthPx + tolerancePx) {
-        faults += "reaches past the window: ${left.toInt()}..${right.toInt()} in a window ${windowWidthPx}px wide"
+    if (left < windowLeft - tolerancePx || right > windowRight + tolerancePx) {
+        faults += "reaches past the window: ${left.toInt()}..${right.toInt()} in a window ${windowLeft.toInt()}..${windowRight.toInt()}"
     }
     val parentNode = parent
     val parentScrolls =
@@ -205,15 +210,11 @@ fun isBrokenWord(before: Char, after: Char): Boolean {
 }
 
 private fun Char.isCjk(): Boolean {
-    val block = Character.UnicodeBlock.of(this)
     val script = Character.UnicodeScript.of(code)
-    return block != null &&
-        (
-            script == Character.UnicodeScript.HAN ||
-                script == Character.UnicodeScript.HIRAGANA ||
-                script == Character.UnicodeScript.KATAKANA ||
-                script == Character.UnicodeScript.HANGUL
-        )
+    return script == Character.UnicodeScript.HAN ||
+        script == Character.UnicodeScript.HIRAGANA ||
+        script == Character.UnicodeScript.KATAKANA ||
+        script == Character.UnicodeScript.HANGUL
 }
 
 /** A hyphen, a slash, an en dash, an em dash and the Unicode hyphen: a line may end after one without breaking a word. */
