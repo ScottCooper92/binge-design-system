@@ -304,6 +304,10 @@ fun <T> BingeMultiChoiceSheet(
  * this call, so a screen lists its rows and nothing else. A row that is not [enabled] dims, and closes its sheet if
  * open, so a pick cannot land in a draft that is already being saved.
  *
+ * The sheet's own options pass through: [sheetTitle] (the row's [title] by default), [subtitle], [caption], [suggested], [pinned],
+ * [filterPlaceholder] and [noMatchLabel] are those of [BingeChoiceSheet]. [iconTint] and [key] are the row's, as on [ListItem]. All default to
+ * the plain row and sheet.
+ *
  * [onOpen] runs when the sheet opens, by a tap or by being restored open after recreation: the point to start reading a list fetched on open. While [choices] is not
  * [BingeChoiceList.Ready] the detail is [selectedLabel], if given, so the row still names the saved value; then
  * [emptyLabel]. The row emits its sheet as it is composed, so build it in composition on each pass, not inside a
@@ -320,6 +324,15 @@ fun <T> bingeChoiceItem(
     enabled: Boolean = true,
     onOpen: () -> Unit = {},
     selectedLabel: String? = null,
+    sheetTitle: String = title,
+    subtitle: String? = null,
+    caption: String? = null,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
+    iconTint: Color? = null,
+    key: String? = null,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
@@ -327,21 +340,29 @@ fun <T> bingeChoiceItem(
     LaunchedEffect(open) { if (open) currentOnOpen() }
     if (open) {
         BingeChoiceSheet(
-            title = title,
+            title = sheetTitle,
             choices = choices,
             selected = selected,
             onSelect = onSelect,
             onDismissRequest = { open = false },
+            suggested = suggested,
+            pinned = pinned,
+            subtitle = subtitle,
+            caption = caption,
+            filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
         )
     }
     val chosen = (choices as? BingeChoiceList.Ready)?.choices?.firstOrNull { it.value == selected }
     val detail = if (choices is BingeChoiceList.Ready) chosen?.label ?: emptyLabel else selectedLabel ?: emptyLabel
     return ListItem(
         icon = icon,
+        iconTint = iconTint,
         label = title,
         detail = detail,
         enabled = enabled,
         onClick = { open = true },
+        key = key,
     )
 }
 
@@ -349,7 +370,8 @@ fun <T> bingeChoiceItem(
  * [bingeChoiceItem] for several values: the chosen labels, in list order, as the detail, and a [BingeMultiChoiceSheet]
  * on tap. [onOpen] and [selectedLabel] work as they do there; [selectedLabel] is the whole detail for the selection.
  * [draftSaver] keeps the sheet's ticks across a rotation, and [applyAsPicked] applies each tick at once, as on
- * [BingeMultiChoiceSheet].
+ * [BingeMultiChoiceSheet]. [sheetTitle], [subtitle], [caption], [suggested] and [pinned] are the sheet's, and [iconTint] and [key] the row's,
+ * as on [bingeChoiceItem]; all default to the plain row and sheet.
  */
 @Composable
 fun <T> bingeMultiChoiceItem(
@@ -368,6 +390,13 @@ fun <T> bingeMultiChoiceItem(
     selectedLabel: String? = null,
     draftSaver: Saver<Set<T>, out Any>? = null,
     applyAsPicked: Boolean = false,
+    sheetTitle: String = title,
+    subtitle: String? = null,
+    caption: String? = null,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    iconTint: Color? = null,
+    key: String? = null,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
@@ -375,7 +404,7 @@ fun <T> bingeMultiChoiceItem(
     LaunchedEffect(open) { if (open) currentOnOpen() }
     if (open) {
         BingeMultiChoiceSheet(
-            title = title,
+            title = sheetTitle,
             choices = choices,
             selected = selected,
             onDone = onDone,
@@ -384,8 +413,12 @@ fun <T> bingeMultiChoiceItem(
             clearLabel = clearLabel,
             filterPlaceholder = filterPlaceholder,
             noMatchLabel = noMatchLabel,
+            suggested = suggested,
+            pinned = pinned,
             draftSaver = draftSaver,
             applyAsPicked = applyAsPicked,
+            subtitle = subtitle,
+            caption = caption,
         )
     }
     val chosen =
@@ -398,10 +431,12 @@ fun <T> bingeMultiChoiceItem(
         }
     return ListItem(
         icon = icon,
+        iconTint = iconTint,
         label = title,
         detail = chosen.ifEmpty { emptyLabel },
         enabled = enabled,
         onClick = { open = true },
+        key = key,
     )
 }
 
