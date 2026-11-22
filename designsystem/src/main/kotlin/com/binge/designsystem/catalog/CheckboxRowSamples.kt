@@ -14,9 +14,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.state.ToggleableState
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeInitialsAvatar
 import com.binge.designsystem.component.CheckboxRow
+import com.binge.designsystem.component.TriStateCheckboxRow
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
@@ -141,6 +143,43 @@ fun CheckboxRowPeopleSample() {
                             modifier = Modifier.clearAndSetSemantics {},
                         )
                     },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * [TriStateCheckboxRow] heading three [CheckboxRow]s: two are ticked, so the group's box shows a dash. Tap the group to tick
+ * all (from Off or the dash) or clear all (from On), or tick the seasons one at a time and watch the group follow.
+ */
+@Composable
+fun TriStateCheckboxRowSample() {
+    val checked = remember { mutableStateListOf(true, true, false) }
+    val state =
+        when {
+            checked.all { it } -> ToggleableState.On
+            checked.none { it } -> ToggleableState.Off
+            else -> ToggleableState.Indeterminate
+        }
+    ScreenshotTheme {
+        Column {
+            TriStateCheckboxRow(
+                label = "All seasons",
+                supportingText = "${checked.count { it }} of ${checked.size} picked",
+                icon = Icons.Filled.Tv,
+                state = state,
+                onClick = {
+                    val next = state != ToggleableState.On
+                    checked.indices.forEach { checked[it] = next }
+                },
+                showDivider = true,
+            )
+            checked.indices.forEach { index ->
+                CheckboxRow(
+                    label = "Season ${index + 1}",
+                    checked = checked[index],
+                    onCheckedChange = { checked[index] = it },
                 )
             }
         }

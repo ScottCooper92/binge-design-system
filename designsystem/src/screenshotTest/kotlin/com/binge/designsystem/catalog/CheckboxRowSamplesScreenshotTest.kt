@@ -23,6 +23,13 @@ class CheckboxRowSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun triState() {
+        TriStateCheckboxRowSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun longLabel() {
         CheckboxRowLongLabelSample()
     }
