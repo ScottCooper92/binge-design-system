@@ -4,13 +4,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.IntrinsicMeasurable
@@ -32,6 +35,7 @@ import com.binge.designsystem.component.MediaTypeTagType
 import com.binge.designsystem.component.WrappingRow
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -101,10 +105,10 @@ class TextClippingTest {
     }
 
     /** The same row at eight widths, because the undercount shows only where the tags wrap onto a further line. */
-    private fun showAtManyWidths(fontScale: Float = FONT_SCALE, statusLine: @Composable () -> Unit) {
+    private fun showAtManyWidths(statusLine: @Composable () -> Unit) {
         rule.setContent {
             val density = LocalDensity.current
-            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = FONT_SCALE)) {
                 BingeExpressiveTheme {
                     Column {
                         ROW_WIDTHS.forEach { width -> Box(Modifier.width(width.dp)) { RealRow(statusLine) } }
@@ -120,7 +124,6 @@ class TextClippingTest {
         showAtManyWidths { WrappingRow(horizontalSpacing = CHIP_GAP, verticalSpacing = CHIP_GAP) { Tags() } }
 
         rule.assertNoTextClipped()
-        rule.assertNoBrokenWords()
     }
 
     @Composable
@@ -178,6 +181,70 @@ class TextClippingTest {
         assertEquals(0, rule.assertNoTextClipped())
     }
 
+    private fun assertFails(containing: String, check: () -> Unit) {
+        val failure = runCatching(check).exceptionOrNull()
+        assertTrue("expected a failure naming $containing, got $failure", failure is AssertionError)
+        assertTrue(failure?.message.orEmpty(), failure?.message.orEmpty().contains(containing))
+    }
+
+    @Test
+    fun `a word broken across two lines fails, and a break after a hyphen or between CJK characters does not`() {
+        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        assertFails("breaks a word across lines") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a break after a hyphen, a slash or a dash, or between two CJK characters, is not a broken word`() {
+        listOf('-', '/', '\u2013', '\u2014', '\u2010').forEach { assertFalse("after $it", isBrokenWord(it, 'x')) }
+        assertFalse(isBrokenWord('日', '本'))
+        assertFalse(isBrokenWord('の', 'ト'))
+        assertFalse(isBrokenWord('한', '글'))
+        assertFalse(isBrokenWord('a', ' '))
+        assertFalse(isBrokenWord(' ', 'a'))
+    }
+
+    @Test
+    fun `a break inside a word, or between a letter and a CJK character, is a broken word`() {
+        assertTrue(isBrokenWord('a', 'b'))
+        assertTrue(isBrokenWord('a', '日'))
+        assertTrue(isBrokenWord('日', 'a'))
+        assertTrue(isBrokenWord('.', 'e'))
+    }
+
+    @Test
+    fun `a word broken across lines passes when the caller allows it`() {
+        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        rule.assertNoTextClipped(allowBrokenWords = true)
+    }
+
+    @Test
+    fun `a one-line text wider than its node and not ellipsized fails`() {
+        show { Box(Modifier.width(NARROW)) { Text("A long single line", maxLines = 1, overflow = TextOverflow.Clip) } }
+        assertFails("of width on one line") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a text taller than its node fails`() {
+        show { Text("A text in a short box", Modifier.height(SHORT_BOX)) }
+        assertFails("of height") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a text that reaches past the window fails`() {
+        show { Text("Pushed off the left edge", Modifier.offset(x = (-OFFSET).dp)) }
+        assertFails("reaches past the window") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a text larger than its parent fails`() {
+        show {
+            Box(Modifier.size(width = NARROW, height = SHORT_BOX)) {
+                Text("Bigger than the box it sits in", Modifier.wrapContentSize(Alignment.TopStart, unbounded = true), maxLines = 1)
+            }
+        }
+        assertFails("larger than its parent") { rule.assertNoTextClipped() }
+    }
+
     /** A chip as a fixed box, so the stack's height is known and does not depend on font metrics. */
     @Composable
     private fun Chip() {
@@ -216,6 +283,9 @@ class TextClippingTest {
         val SHORT_BOX = 10.dp
         const val STACK_LINES = 3
         val ROW_WIDTHS = listOf(190, 210, 230, 250, 270, 290, 310, 330)
+        val NARROW = 40.dp
+        val HYPHEN_WIDTH = 120.dp
+        const val OFFSET = 40
         val CHIP_WIDTH = 60.dp
         val CHIP_HEIGHT = 24.dp
         val CHIP_GAP = 8.dp

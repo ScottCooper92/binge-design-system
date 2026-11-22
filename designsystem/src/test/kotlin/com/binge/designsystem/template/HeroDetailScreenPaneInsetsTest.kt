@@ -2,21 +2,17 @@ package com.binge.designsystem.template
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.Insets
-import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.testing.TestTheme
-import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.WithStartNavigationBar
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -84,10 +80,3 @@ class HeroDetailScreenPaneInsetsTest {
         )
     }
 }
-
-/** Gives the window a navigation bar [width] wide down the start side, answering every insets dispatch at the parent. */
-@Composable
-private fun WithStartNavigationBar(width: Dp, content: @Composable () -> Unit) =
-    WithWindowInsets({
-        WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(width.roundToPx(), 0, 0, 0)).build()
-    }, content)

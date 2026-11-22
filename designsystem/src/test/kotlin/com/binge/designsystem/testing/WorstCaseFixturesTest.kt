@@ -44,7 +44,7 @@ class WorstCaseFixturesTest {
 
     private fun check(
         fontScale: Float,
-        checkWords: Boolean = false,
+        allowBrokenWords: Boolean = false,
         sample: @Composable () -> Unit,
     ) {
         rule.setContent {
@@ -54,8 +54,7 @@ class WorstCaseFixturesTest {
             }
         }
         rule.waitForIdle()
-        val checked = rule.assertNoTextClipped()
-        if (checkWords) rule.assertNoBrokenWords()
+        val checked = rule.assertNoTextClipped(allowBrokenWords = allowBrokenWords)
         // A pass that checked nothing is no pass: scrolling content is skipped, and these rows must not hide in it.
         assertTrue("only $checked text nodes were checked", checked >= MIN_CHECKED)
     }
@@ -88,17 +87,17 @@ class WorstCaseFixturesTest {
 
     @Test fun `a checkbox row at 2_0`() = check(FONT_20) { CheckboxRowWorstCaseSample() }
 
-    @Test fun `a choice sheet at 1_3`() = check(FONT_13, checkWords = true) { BingeChoiceWorstCaseSample() }
+    @Test fun `a choice sheet at 1_3`() = check(FONT_13) { BingeChoiceWorstCaseSample() }
 
-    @Test fun `a choice sheet at 2_0`() = check(FONT_20, checkWords = true) { BingeChoiceWorstCaseSample() }
+    @Test fun `a choice sheet at 2_0`() = check(FONT_20) { BingeChoiceWorstCaseSample() }
 
     @Test fun `a confirm dialog at 1_3`() = check(FONT_13) { BingeConfirmDialogWorstCaseSample() }
 
     @Test fun `a confirm dialog at 2_0`() = check(FONT_20) { BingeConfirmDialogWorstCaseSample() }
 
-    @Test fun `a stop slider at 1_3`() = check(FONT_13, checkWords = true) { BingeStopSliderWorstCaseSample() }
+    @Test fun `a stop slider at 1_3`() = check(FONT_13) { BingeStopSliderWorstCaseSample() }
 
-    @Test fun `a stop slider at 2_0`() = check(FONT_20, checkWords = true) { BingeStopSliderWorstCaseSample() }
+    @Test fun `a stop slider at 2_0`() = check(FONT_20) { BingeStopSliderWorstCaseSample() }
 
     @Test fun `a confirm dialog with its switch on at 1_3`() = check(FONT_13) { BingeConfirmDialogSwitchWorstCaseSample() }
 

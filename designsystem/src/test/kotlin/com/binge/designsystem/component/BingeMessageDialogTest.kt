@@ -1,11 +1,11 @@
 package com.binge.designsystem.component
 
-import androidx.activity.ComponentDialog
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.binge.designsystem.testing.createTakeDownComposeRule
+import com.binge.designsystem.testing.pressBackInDialog
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -51,16 +51,11 @@ class BingeMessageDialogTest {
         rule.waitForIdle()
     }
 
-    private fun pressBack() {
-        rule.runOnIdle { (ShadowDialog.getLatestDialog() as ComponentDialog).onBackPressedDispatcher.onBackPressed() }
-        rule.waitForIdle()
-    }
-
     @Test
     fun `Back dismisses a dialog by default, and a tap outside is allowed to`() {
         showInWindow(dismissible = true)
 
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(1, dismissed)
         assertEquals(true, shadowOf(ShadowDialog.getLatestDialog()).isCancelableOnTouchOutside)
@@ -70,7 +65,7 @@ class BingeMessageDialogTest {
     fun `a dialog that is not dismissible ignores Back, and a tap outside cannot cancel it`() {
         showInWindow(dismissible = false)
 
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(0, dismissed)
         assertEquals(false, shadowOf(ShadowDialog.getLatestDialog()).isCancelableOnTouchOutside)
@@ -134,7 +129,7 @@ class BingeMessageDialogTest {
         rule.waitForIdle()
 
         rule.onNodeWithText("Copy").performClick()
-        pressBack()
+        rule.pressBackInDialog()
 
         assertEquals(1, copied)
         assertEquals(0, dismissed)

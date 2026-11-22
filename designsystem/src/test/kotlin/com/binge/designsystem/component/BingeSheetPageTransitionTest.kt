@@ -12,6 +12,7 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.testing.advanceFrames
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -70,8 +71,6 @@ class BingeSheetPageTransitionTest {
         Snapshot.sendApplyNotifications()
     }
 
-    private fun advanceFrames(count: Int = MIDWAY_FRAMES) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
-
     private fun settle() = rule.mainClock.advanceTimeBy(SETTLE_MS)
 
     private fun left(text: String): Dp = rule.onNodeWithText(text).getUnclippedBoundsInRoot().left
@@ -80,7 +79,7 @@ class BingeSheetPageTransitionTest {
     fun `a pushed page slides in over the old one, then only it is left`() {
         show()
         act { nav!!.push("detail") }
-        advanceFrames()
+        rule.advanceFrames(MIDWAY_FRAMES)
 
         rule.onAllNodesWithText(ROOT).assertCountEquals(1)
         rule.onAllNodesWithText(DETAIL).assertCountEquals(1)
@@ -101,7 +100,7 @@ class BingeSheetPageTransitionTest {
         settle()
 
         act { nav!!.pop() }
-        advanceFrames()
+        rule.advanceFrames(MIDWAY_FRAMES)
         rule.onAllNodesWithText(DETAIL).assertCountEquals(1)
         rule.onAllNodesWithText(ROOT).assertCountEquals(1)
         assertTrue("the leaving page should still be on screen, reported: $leftPages", leftPages.isEmpty())
@@ -122,7 +121,7 @@ class BingeSheetPageTransitionTest {
         settle()
 
         act { nav!!.pop() }
-        advanceFrames()
+        rule.advanceFrames(MIDWAY_FRAMES)
         act { nav!!.push("detail") }
         assertEquals("heard going back at the re-push, before it lands", listOf("detail"), leftPages)
 
@@ -154,7 +153,7 @@ class BingeSheetPageTransitionTest {
         act { nav!!.push("detail") }
         settle()
         act { nav!!.pop() }
-        advanceFrames()
+        rule.advanceFrames(MIDWAY_FRAMES)
         assertTrue(leftPages.isEmpty())
 
         act { open = false }

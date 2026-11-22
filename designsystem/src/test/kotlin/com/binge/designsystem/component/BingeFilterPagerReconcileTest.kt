@@ -12,6 +12,7 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.onNodeWithText
+import com.binge.designsystem.testing.advanceFrames
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -83,8 +84,6 @@ class BingeFilterPagerReconcileTest {
         Snapshot.sendApplyNotifications()
     }
 
-    private fun advanceFrames(count: Int) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
-
     private fun assertAgreeOnIdle() {
         rule.mainClock.advanceTimeBy(SETTLE_MS)
         val pager = checkNotNull(state)
@@ -98,7 +97,7 @@ class BingeFilterPagerReconcileTest {
         showChips()
         tap(PAGES - 1)
         // The move starts a frame after the tap (the effect that starts it runs after the first recomposition), and the chips follow on the next.
-        advanceFrames(2)
+        rule.advanceFrames(2)
 
         rule.onNodeWithText("Chip ${PAGES - 1}").assertIsSelected()
     }
@@ -107,7 +106,7 @@ class BingeFilterPagerReconcileTest {
     fun `a tap on the page the pager is passing leaves everything agreeing`() {
         showState()
         tap(PAGES - 1)
-        advanceFrames(MID_FRAMES)
+        rule.advanceFrames(MID_FRAMES)
         val passing = checkNotNull(state).currentPage
         tap(passing)
 
@@ -118,7 +117,7 @@ class BingeFilterPagerReconcileTest {
     fun `a tap back to the page the pager started from leaves everything agreeing`() {
         showState()
         tap(PAGES - 1)
-        advanceFrames(MID_FRAMES)
+        rule.advanceFrames(MID_FRAMES)
         tap(0)
 
         assertAgreeOnIdle()
@@ -128,7 +127,7 @@ class BingeFilterPagerReconcileTest {
     fun `a page count that grows mid-move leaves everything agreeing`() {
         showState()
         tap(PAGES - 1)
-        advanceFrames(MID_FRAMES)
+        rule.advanceFrames(MID_FRAMES)
         count = PAGES + 2
         Snapshot.sendApplyNotifications()
 
@@ -139,7 +138,7 @@ class BingeFilterPagerReconcileTest {
     fun `a page count that shrinks mid-move leaves everything agreeing`() {
         showState()
         tap(PAGES - 1)
-        advanceFrames(MID_FRAMES)
+        rule.advanceFrames(MID_FRAMES)
         count = PAGES - 2
         Snapshot.sendApplyNotifications()
 
