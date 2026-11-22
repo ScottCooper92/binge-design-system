@@ -33,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -75,6 +76,15 @@ enum class ScreenBar {
     /** No bar: the body reaches the top of the window and clears the status bar itself. */
     None,
 }
+
+/**
+ * The bar a screen template carries when its caller does not name one. [ScreenBar.Collapsing], so an app that passes nothing
+ * gets what it always has. An app whose screens all use another bar provides it once above them, as in
+ * `CompositionLocalProvider(LocalScreenBarDefault provides ScreenBar.Small) { ... }`, instead of passing `bar` on every call. A
+ * `bar` argument still wins. It sets the default of [BingeScreenScaffold], [FormScreen], [FilteredListScreen] and [PeopleGridScreen];
+ * [PagedGridScreen] and [SearchScreen] default to [ScreenBar.Large] and do not read it.
+ */
+val LocalScreenBarDefault = staticCompositionLocalOf { ScreenBar.Collapsing }
 
 /** How a [BingeScreenScaffold]'s bar draws itself and its controls. */
 enum class ScreenBarChrome {
@@ -139,7 +149,7 @@ fun BingeScreenScaffold(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    bar: ScreenBar = ScreenBar.Collapsing,
+    bar: ScreenBar = LocalScreenBarDefault.current,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     barScrim: Boolean = true,
     pinned: Boolean = false,
