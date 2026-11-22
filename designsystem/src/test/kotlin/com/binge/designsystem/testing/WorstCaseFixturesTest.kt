@@ -98,8 +98,7 @@ class WorstCaseFixturesTest {
 
     @Test fun `a stop slider at 1_3`() = check(FONT_13) { BingeStopSliderWorstCaseSample() }
 
-    // Words break inside a line here: tracked in #1539, which says when to drop allowBrokenWords.
-    @Test fun `a stop slider at 2_0`() = check(FONT_20, allowBrokenWords = true) { BingeStopSliderWorstCaseSample() }
+    @Test fun `a stop slider at 2_0`() = check(FONT_20) { BingeStopSliderWorstCaseSample() }
 
     @Test fun `a confirm dialog with its switch on at 1_3`() = check(FONT_13) { BingeConfirmDialogSwitchWorstCaseSample() }
 
