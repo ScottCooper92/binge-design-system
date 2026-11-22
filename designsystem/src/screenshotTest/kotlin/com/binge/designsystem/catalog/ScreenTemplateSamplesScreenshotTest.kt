@@ -318,6 +318,12 @@ class ScreenTemplateSamplesScreenshotTest {
     @Composable
     fun stepFlowTitled() = StepFlowScreenTitledSample()
 
+    /** The same titled flow on the small bar, which hides as the step scrolls. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowTitledSmallBar() = StepFlowScreenTitledSmallBarSample()
+
     /** A wide window's end pane is taller than wide, so the flow in it stacks rather than splitting. */
     @PreviewTest
     @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)

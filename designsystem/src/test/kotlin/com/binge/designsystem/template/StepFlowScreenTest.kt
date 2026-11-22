@@ -3,6 +3,7 @@ package com.binge.designsystem.template
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Text
@@ -13,11 +14,15 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalIsSinglePaneNav
 import com.binge.designsystem.testing.TestTheme
@@ -242,4 +247,45 @@ class StepFlowScreenTest {
 
         composeTestRule.onNodeWithContentDescription("Back").assertExists()
     }
+
+    private fun setTallTitledFlow(bar: ScreenBar?) {
+        composeTestRule.setContent {
+            TestTheme {
+                StepFlowScreen(
+                    stepCount = 1,
+                    currentStep = 0,
+                    title = "Edit connection",
+                    onExit = {},
+                    bar = bar,
+                ) { repeat(TALL_STEP_ROWS) { row -> Text("Row $row", modifier = Modifier.padding(vertical = ROW_PADDING.dp)) } }
+            }
+        }
+    }
+
+    private fun titleBounds() = composeTestRule.onNodeWithText("Edit connection").getUnclippedBoundsInRoot()
+
+    @Test
+    fun aTitledFlowOnTheSmallBarHidesItsBarAsTheStepScrollsDown() {
+        setTallTitledFlow(ScreenBar.Small)
+        assertTrue("the bar starts in the window", titleBounds().top >= 0.dp)
+
+        repeat(SWIPES) { composeTestRule.onRoot().performTouchInput { swipeUp() } }
+        composeTestRule.waitForIdle()
+
+        assertTrue("the bar slides out of the window with the scroll", titleBounds().top < 0.dp)
+    }
+
+    @Test
+    fun aTitledFlowKeepsTheCollapsingBarByDefault() {
+        setTallTitledFlow(bar = null)
+        composeTestRule.onNode(hasText("Edit connection") and isHeading()).assertExists()
+        repeat(SWIPES) { composeTestRule.onRoot().performTouchInput { swipeUp() } }
+        composeTestRule.waitForIdle()
+
+        assertTrue("the collapsing bar collapses to a bar that stays in the window", titleBounds().top >= 0.dp)
+    }
 }
+
+private const val TALL_STEP_ROWS = 60
+private const val ROW_PADDING = 12
+private const val SWIPES = 3
