@@ -64,7 +64,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 import com.binge.designsystem.badgeCountLabel
-import com.binge.designsystem.modifier.skeleton
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.tonalContainer
 import com.binge.designsystem.uppercaseLocalised
@@ -515,13 +514,14 @@ private fun listItemConnector(connector: ListItemConnector, verticalPadding: Dp)
 @Composable
 private fun DetailSkeletonLine() {
     val inProgress = stringResource(R.string.cd_list_item_loading)
-    Text(
-        text = NBSP,
+    BlankTextPlate(
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier
             .fillMaxWidth(DETAIL_SKELETON_FRACTION)
-            .skeleton(visible = true, shape = BingeShapes.ElementSmall)
             .clearAndSetSemantics { contentDescription = inProgress },
+        text = NBSP,
+        shape = BingeShapes.ElementSmall,
+        inset = dimensionResource(R.dimen.zero),
     )
 }
 
