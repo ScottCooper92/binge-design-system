@@ -66,7 +66,7 @@ class MediaResultRowSuffixClippingTest {
         assertTrue("the name keeps a usable width at $fontScale x: $nameWidth of $rowWidth", nameWidth >= rowWidth * MIN_NAME_SHARE)
         assertTrue("the suffix is not cropped to nothing at $fontScale x: $suffixWidth", suffixWidth >= MIN_SUFFIX_WIDTH)
         assertTrue("the suffix is inside the row at $fontScale x", suffix.right <= row.right && suffix.left >= name.right)
-        assertTrue("the suffix is not taller than the name's box allows at $fontScale x", suffix.bottom - suffix.top > 0.dp)
+        assertTrue("the suffix has a height at $fontScale x", suffix.bottom - suffix.top > 0.dp)
     }
 
     @Test
