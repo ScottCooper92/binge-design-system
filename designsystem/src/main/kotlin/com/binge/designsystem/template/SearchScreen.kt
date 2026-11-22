@@ -234,7 +234,6 @@ fun SearchScreen(
     fastScrollbar: FastScrollbarOptions? = null,
 ) {
     val scrollBehavior = rememberScreenBarScrollBehavior(bar, pinned)
-    // A small bar's title row never collapses, so nothing is ever handed over on it.
     val paged = state.pagedTypes()
     // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
     val answered = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query
