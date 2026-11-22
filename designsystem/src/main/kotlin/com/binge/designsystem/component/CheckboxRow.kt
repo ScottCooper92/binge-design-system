@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
@@ -65,12 +68,84 @@ fun CheckboxRow(
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
 ) {
+    CheckRowLayout(
+        label = label,
+        toggle = Modifier.toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange),
+        indicator = { Checkbox(checked = checked, onCheckedChange = null, enabled = enabled) },
+        modifier = modifier,
+        supportingText = supportingText,
+        enabled = enabled,
+        showDivider = showDivider,
+        icon = icon,
+        iconTint = iconTint,
+        supportingMaxLines = supportingMaxLines,
+        leadingContent = leadingContent,
+        trailingContent = trailingContent,
+    )
+}
+
+/**
+ * [CheckboxRow] for a row that stands for a group: [state] is On when every item under it is ticked, Off when none is, and
+ * Indeterminate when some are. A tap calls [onClick], and the caller decides what the next state is, usually all on from
+ * Off or Indeterminate and all off from On. Everything else is [CheckboxRow]'s: the same chrome, divider, icon and slots.
+ *
+ * @need let one row tick or clear a whole group of items, showing when only some are ticked
+ * @group inputs
+ * @replaces a hand-built row with a tri-state checkbox
+ */
+@Composable
+fun TriStateCheckboxRow(
+    label: String,
+    state: ToggleableState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    supportingText: String? = null,
+    enabled: Boolean = true,
+    showDivider: Boolean = false,
+    icon: ImageVector? = null,
+    iconTint: Color? = null,
+    supportingMaxLines: Int = 1,
+    leadingContent: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
+) {
+    CheckRowLayout(
+        label = label,
+        toggle = Modifier.triStateToggleable(state = state, enabled = enabled, role = Role.Checkbox, onClick = onClick),
+        indicator = { TriStateCheckbox(state = state, onClick = null, enabled = enabled) },
+        modifier = modifier,
+        supportingText = supportingText,
+        enabled = enabled,
+        showDivider = showDivider,
+        icon = icon,
+        iconTint = iconTint,
+        supportingMaxLines = supportingMaxLines,
+        leadingContent = leadingContent,
+        trailingContent = trailingContent,
+    )
+}
+
+/** The row both forms draw: [toggle] owns the semantics and the tap, [indicator] is only the box. */
+@Composable
+private fun CheckRowLayout(
+    label: String,
+    toggle: Modifier,
+    indicator: @Composable () -> Unit,
+    modifier: Modifier,
+    supportingText: String?,
+    enabled: Boolean,
+    showDivider: Boolean,
+    icon: ImageVector?,
+    iconTint: Color?,
+    supportingMaxLines: Int,
+    leadingContent: (@Composable () -> Unit)?,
+    trailingContent: (@Composable () -> Unit)?,
+) {
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = dimensionResource(R.dimen.min_touch_target))
-                .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
+                .then(toggle)
                 .padding(
                     horizontal = dimensionResource(R.dimen.checkbox_row_padding_h),
                     vertical = dimensionResource(R.dimen.checkbox_row_padding_v),
@@ -79,7 +154,7 @@ fun CheckboxRow(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.checkbox_row_gap)),
         ) {
             // The Row owns the toggle semantics; the checkbox is a visual indicator only.
-            Checkbox(checked = checked, onCheckedChange = null, enabled = enabled)
+            indicator()
             if (leadingContent != null) {
                 leadingContent()
             } else if (icon != null) {
