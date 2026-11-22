@@ -81,4 +81,10 @@ class MediaResultRowSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun skeletonSlots() = MediaResultRowSkeletonSlotsSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun footerAndPosterTap() = MediaResultRowFooterAndPosterTapSample()
 }

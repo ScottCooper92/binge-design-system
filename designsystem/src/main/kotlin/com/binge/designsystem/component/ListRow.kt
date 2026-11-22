@@ -157,7 +157,7 @@ fun ListRowHeader(
  * over a tonal placeholder. [aspectRatio] defaults to [CARD_ASPECT_RATIO] (a portrait poster); pass
  * a wider ratio for backdrop-style stills. Pass [onClick] to make the poster tappable on its own
  * (e.g. opening the title while the row body opens an actions sheet) — the ripple stays clipped to
- * the poster's rounded corners.
+ * the poster's rounded corners. [onClickLabel] is what a screen reader announces for that tap, such as "Open title".
  *
  * @need lead a list row with a poster image
  * @group rows
@@ -172,6 +172,7 @@ fun ListRowPoster(
     aspectRatio: Float = CARD_ASPECT_RATIO,
     onClick: (() -> Unit)? = null,
     dimmed: Boolean = false,
+    onClickLabel: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -180,7 +181,7 @@ fun ListRowPoster(
             .clip(BingeShapes.ListRowPoster)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .then(
-                if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier,
+                if (onClick != null) Modifier.clickable(onClickLabel = onClickLabel, role = Role.Button, onClick = onClick) else Modifier,
             ),
         contentAlignment = Alignment.Center,
     ) {
