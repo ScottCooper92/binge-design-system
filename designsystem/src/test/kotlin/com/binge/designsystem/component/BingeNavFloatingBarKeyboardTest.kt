@@ -1,12 +1,10 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.ime
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,11 +12,9 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.Insets
-import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.testing.TestTheme
-import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.WithKeyboard
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -100,24 +96,3 @@ class BingeNavFloatingBarKeyboardTest {
         assertEquals(closed, open)
     }
 }
-
-/** Opens a keyboard [height] tall over the window, answering every insets dispatch at the parent. */
-@Composable
-private fun WithKeyboard(
-    height: Dp,
-    navigationBar: Dp,
-    content: @Composable () -> Unit,
-) = WithWindowInsets(
-    {
-        val px = height.roundToPx()
-        val navPx = navigationBar.roundToPx()
-        WindowInsetsCompat
-            .Builder()
-            .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(0, 0, 0, navPx))
-            .setVisible(WindowInsetsCompat.Type.navigationBars(), navPx > 0)
-            .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, if (px > 0) maxOf(px, navPx) else 0))
-            .setVisible(WindowInsetsCompat.Type.ime(), px > 0)
-            .build()
-    },
-    content,
-)

@@ -1,6 +1,5 @@
 package com.binge.designsystem
 
-import android.graphics.Rect
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +17,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
-import androidx.window.layout.FoldingFeature
 import androidx.window.testing.layout.TestWindowLayoutInfo
 import androidx.window.testing.layout.WindowLayoutInfoPublisherRule
 import com.binge.designsystem.testing.createTakeDownComposeRule
+import com.binge.designsystem.testing.tabletopFold
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -30,7 +29,6 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import androidx.window.testing.layout.FoldingFeature as posedFold
 
 /**
  * That [avoidHorizontalFold] really moves a row off a posed tabletop crease, and leaves it alone without one.
@@ -169,22 +167,9 @@ class AvoidHorizontalFoldTest {
 
     private fun outerHeight() = compose.onNodeWithTag(OUTER).getUnclippedBoundsInRoot().height
 
-    private fun tabletopFold(): FoldingFeature =
-        posedFold(
-            windowBounds = Rect(0, 0, WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX),
-            center = CREASE_CENTRE_PX,
-            size = CREASE_SIZE_PX,
-            state = FoldingFeature.State.HALF_OPENED,
-            orientation = FoldingFeature.Orientation.HORIZONTAL,
-        )
-
     private companion object {
         const val ROW = "row"
         const val OUTER = "outer"
-        const val WINDOW_WIDTH_PX = 1600
-        const val WINDOW_HEIGHT_PX = 2000
-        const val CREASE_CENTRE_PX = 1000
-        const val CREASE_SIZE_PX = 40
 
         val CREASE_TOP = 490.dp
         val CREASE_BOTTOM = 510.dp

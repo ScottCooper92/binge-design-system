@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
+import com.binge.designsystem.testing.advanceFrames
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
@@ -60,13 +61,11 @@ class BingeFilterPagerSettleTest {
         Snapshot.sendApplyNotifications()
     }
 
-    private fun advanceFrames(count: Int) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
-
     @Test
     fun `a chip tapped while the pager is still moving to the last one is not overwritten by the page it was left on`() {
         show()
         tap(PAGES - 1)
-        advanceFrames(MID_FRAMES)
+        rule.advanceFrames(MID_FRAMES)
         tap(2)
         rule.mainClock.advanceTimeBy(SETTLE_MS)
 
@@ -80,7 +79,7 @@ class BingeFilterPagerSettleTest {
         show()
         listOf(3, 1, 4, 2, 5, 0).forEach {
             tap(it)
-            advanceFrames(2)
+            rule.advanceFrames(2)
         }
         rule.mainClock.advanceTimeBy(SETTLE_MS)
 
@@ -105,7 +104,7 @@ class BingeFilterPagerSettleTest {
     fun `a reader who takes the pager over mid-move is still reported`() {
         show()
         tap(PAGES - 1)
-        advanceFrames(MID_FRAMES)
+        rule.advanceFrames(MID_FRAMES)
         // A finger down and dragged back while the move to the last page is under way: the reader has the pager now.
         rule.onRoot().performTouchInput {
             down(center)

@@ -10,6 +10,7 @@ import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import com.binge.designsystem.testing.advanceFrames
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import kotlinx.coroutines.CompletableDeferred
@@ -61,8 +62,6 @@ class HeroCarouselBackdropHoldTest {
 
     private fun finishLoad(url: String) = loads.getOrPut(url) { CompletableDeferred() }.complete(true)
 
-    private fun advanceFrames(count: Int = FRAMES) = repeat(count) { rule.mainClock.advanceTimeByFrame() }
-
     /** The backdrop buttons on screen for a title: more than one is a crossfade in progress. */
     private fun backdrops(title: String) =
         rule.onAllNodes(
@@ -72,17 +71,17 @@ class HeroCarouselBackdropHoldTest {
     @Test
     fun `the previous backdrop stays while the next one is loading, then the next replaces it`() {
         show()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         backdrops("Alpha").assertCountEquals(1)
 
         rule.onNodeWithContentDescription("Show Beta").performClick()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         rule.onNodeWithContentDescription("Show Beta").assertIsSelected()
         backdrops("Alpha").assertCountEquals(1)
         backdrops("Beta").assertCountEquals(0)
 
         finishLoad("beta")
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         backdrops("Beta").assertCountEquals(1)
 
         rule.mainClock.advanceTimeBy(SETTLE_MS)
@@ -93,9 +92,9 @@ class HeroCarouselBackdropHoldTest {
     @Test
     fun `a tap on the held backdrop reports the position of the slide it routes to`() {
         show()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         rule.onNodeWithContentDescription("Show Beta").performClick()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         // The dots have moved to Beta; the art on screen is still Alpha's.
         rule.onNodeWithContentDescription("Show Beta").assertIsSelected()
 
@@ -112,34 +111,34 @@ class HeroCarouselBackdropHoldTest {
     @Test
     fun `a load that fails still swaps the slide`() {
         show()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         rule.onNodeWithContentDescription("Show Beta").performClick()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         backdrops("Beta").assertCountEquals(0)
 
         // A failed load returns as a finished one does: the slide swaps and shows its own placeholder.
         finishLoad("beta")
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         backdrops("Beta").assertCountEquals(1)
     }
 
     @Test
     fun `autoplay waits for the next backdrop before it advances`() {
         show()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         rule.mainClock.advanceTimeBy(AUTOPLAY_MS + SLACK_MS)
         rule.onNodeWithContentDescription("Show Alpha").assertIsSelected()
         backdrops("Alpha").assertCountEquals(1)
 
         finishLoad("beta")
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         rule.onNodeWithContentDescription("Show Beta").assertIsSelected()
     }
 
     @Test
     fun `the neighbours of the current slide are loaded while it dwells`() {
         show()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
 
         assertTrue("the next slide's image should be requested, requested: ${loads.keys}", "beta" in loads)
     }
@@ -147,14 +146,14 @@ class HeroCarouselBackdropHoldTest {
     @Test
     fun `reduced motion still waits for the load`() {
         show(reduceMotion = true)
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         rule.onNodeWithContentDescription("Show Beta").performClick()
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         backdrops("Alpha").assertCountEquals(1)
         backdrops("Beta").assertCountEquals(0)
 
         finishLoad("beta")
-        advanceFrames()
+        rule.advanceFrames(FRAMES)
         backdrops("Alpha").assertCountEquals(0)
         backdrops("Beta").assertCountEquals(1)
     }
