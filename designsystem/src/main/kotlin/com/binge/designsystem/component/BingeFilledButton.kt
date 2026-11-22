@@ -1,17 +1,11 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -71,29 +65,6 @@ fun BingeFilledButton(
         ),
         colors = colors,
     ) {
-        if (loading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                color = colors.contentColor,
-                strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
-            )
-        } else {
-            if (leading != null) {
-                leading()
-                Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
-            }
-            if (leadingIcon != null) {
-                Icon(
-                    imageVector = leadingIcon,
-                    contentDescription = null,
-                    modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                )
-                Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
-            }
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge,
-            )
-        }
+        ButtonContent(label = label, loading = loading, contentColor = colors.contentColor, leadingIcon = leadingIcon, leading = leading)
     }
 }

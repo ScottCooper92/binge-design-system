@@ -1,16 +1,11 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -71,29 +66,13 @@ fun BingeOutlinedButton(
         colors = colors,
         border = BorderStroke(dimensionResource(R.dimen.hairline_thickness), outlineColor(enabled, colors)),
     ) {
-        if (loading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                color = colors.contentColor,
-                strokeWidth = dimensionResource(R.dimen.progress_stroke_width),
-            )
-        } else {
-            if (leadingIcon != null) {
-                Icon(
-                    imageVector = leadingIcon,
-                    // The icon carries the accessible name itself once the label's Text isn't there to.
-                    contentDescription = if (showLabel) null else label,
-                    modifier = Modifier.size(dimensionResource(R.dimen.button_filled_icon_size)),
-                )
-                if (showLabel) Spacer(Modifier.width(dimensionResource(R.dimen.button_filled_icon_spacing)))
-            }
-            if (showLabel) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        }
+        ButtonContent(
+            label = label,
+            loading = loading,
+            contentColor = colors.contentColor,
+            leadingIcon = leadingIcon,
+            showLabel = showLabel,
+        )
     }
 }
 
