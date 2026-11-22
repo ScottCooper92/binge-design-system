@@ -86,8 +86,8 @@ private fun WholeWordLine(
 }
 
 /**
- * Whether any line of [layout] ends inside a word: a break that is not at a space, after a hyphen or dash, or between characters of
- * an unspaced script.
+ * Whether any line of [layout] ends inside a word: a break that is not at a space, after a hyphen or dash, or beside a character of an
+ * unspaced script. A break with such a character on either side is one the line breaker is allowed to make: no Latin word can be split by it.
  */
 private fun breaksAWord(layout: TextLayoutResult, text: String): Boolean =
     (0 until layout.lineCount - 1).any { line ->
@@ -98,8 +98,8 @@ private fun breaksAWord(layout: TextLayoutResult, text: String): Boolean =
 private fun isMidWord(before: Int, after: Int): Boolean =
     !Character.isWhitespace(before) &&
         !Character.isWhitespace(after) &&
-        before.toChar() !in BREAK_AFTER &&
-        !(before.isUnspaced() && after.isUnspaced())
+        before !in BREAK_AFTER &&
+        !(before.isUnspaced() || after.isUnspaced())
 
 /**
  * Whether a code point is in a script written without spaces: CJK, and Thai, Lao, Khmer and Myanmar, which the line breaker splits at
@@ -132,4 +132,4 @@ private val CJK_BLOCKS =
         Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
     )
 
-private val BREAK_AFTER = setOf('-', '/', '\u2013', '\u2014', '\u2010')
+private val BREAK_AFTER = setOf('-'.code, '/'.code, 0x2013, 0x2014, 0x2010)
