@@ -125,6 +125,20 @@ class ComponentIndexTest {
     }
 
     @Test
+    fun `an overload with a need of its own gets its own row`() {
+        val overload = tagged.trimIndent().replace("Pick one value from a list in a sheet", "Pick several values").replace(
+            "pick one value from a long list",
+            "pick several values from a long list",
+        )
+        val sources = listOf("A.kt" to (tagged.trimIndent() + "\n" + overload))
+
+        val index = ComponentIndex.render(sources, emptyList())
+
+        assertEquals(2, Regex("`BingeChoiceSheet`").findAll(index).count())
+        assertTrue("| pick several values from a long list | `BingeChoiceSheet` | Pick several values |" in index)
+    }
+
+    @Test
     fun `a sample in a screenshot-only file is still the sample to copy`() {
         val sources = listOf("A.kt" to tagged.trimIndent())
         val catalog = listOf(
