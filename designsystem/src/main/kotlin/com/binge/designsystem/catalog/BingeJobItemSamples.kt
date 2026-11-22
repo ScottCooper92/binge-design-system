@@ -25,10 +25,9 @@ private val SampleCopy = JobCopy(run = "Run now", stop = "Stop", running = "Runn
 private const val PERCENT_DONE = 42
 
 /**
- * [bingeJobItem] in a group, one row for each thing a job can be doing: waiting for its next run, running with nothing to report,
- * running with a percentage, busy with a tap in flight, finished, failed, and a job that cannot be stopped, which spins in its Run
- * button while it runs. The last row is the one open beside the list. Tap Run and it runs; tap Stop and it stops. The words are
- * the sample's own.
+ * [bingeJobItem] in a group, one row for each thing a job can be doing while it has not just finished: waiting for its next run, running
+ * with nothing to report, running with a percentage, busy with a tap in flight, and a job that cannot be stopped, which spins in its Run
+ * button while it runs. Tap Run and it runs; tap Stop and it stops. The words are the sample's own.
  */
 @Composable
 fun BingeJobItemSample() {
@@ -46,15 +45,6 @@ fun BingeJobItemSample() {
                         running = scanRunning,
                         onRun = { scanRunning = true },
                         onStop = { scanRunning = false },
-                    ),
-                    bingeJobItem(
-                        Icons.Filled.Sync,
-                        "Sync availability",
-                        "Next run tomorrow",
-                        SampleCopy,
-                        running = true,
-                        onRun = {},
-                        onStop = {},
                     ),
                     bingeJobItem(
                         icon = Icons.Filled.CloudDownload,
@@ -76,6 +66,31 @@ fun BingeJobItemSample() {
                         busy = true,
                     ),
                     bingeJobItem(
+                        Icons.Filled.Sync,
+                        "Rebuild index",
+                        "Next run never",
+                        SampleCopy,
+                        running = true,
+                        onRun = {},
+                        onStop = null,
+                    ),
+                ),
+        )
+    }
+}
+
+/**
+ * [bingeJobItem] for how a run ended, and for the job open beside the list: finished, with its check; failed, with its error glyph and
+ * the error colour; and a selected row. The words are the sample's own.
+ */
+@Composable
+fun BingeJobItemOutcomesSample() {
+    ScreenshotTheme {
+        ItemGroup(
+            title = "Jobs",
+            rows =
+                listOf(
+                    bingeJobItem(
                         Icons.Filled.Movie,
                         "Scan movies",
                         "Next run in 3 hours",
@@ -92,15 +107,6 @@ fun BingeJobItemSample() {
                         running = false,
                         onRun = {},
                         outcome = JobOutcome.Failed,
-                    ),
-                    bingeJobItem(
-                        Icons.Filled.Sync,
-                        "Rebuild index",
-                        "Next run never",
-                        SampleCopy,
-                        running = true,
-                        onRun = {},
-                        onStop = null,
                     ),
                     bingeJobItem(
                         icon = Icons.Filled.VideoLibrary,

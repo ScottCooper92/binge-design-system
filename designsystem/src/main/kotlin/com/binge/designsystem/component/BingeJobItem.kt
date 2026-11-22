@@ -112,8 +112,7 @@ private fun JobAction(
                     onClick = onRun,
                     icon = Icons.Filled.PlayArrow,
                     contentDescription = copy.run,
-                    loading =
-                        busy || running,
+                    loading = busy || running,
                 )
         }
     }
