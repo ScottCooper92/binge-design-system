@@ -3,10 +3,12 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.BugReport
@@ -77,6 +79,24 @@ fun BingeTagKindsSample() {
             BingeTag(label = "Owner", icon = Icons.Filled.Shield, tint = BingeTheme.colors.caution, uppercase = false)
             BingeTag(label = "Admin", icon = Icons.Filled.Shield, tint = BingeTheme.colors.info, uppercase = false)
             BingeTag(label = "User", icon = Icons.Filled.Person, uppercase = false)
+        }
+    }
+}
+
+/**
+ * A tag with less room than its label needs. Its label stays on one line and ends in an ellipsis, where it used to wrap and
+ * break a word in two. The first tag has room for its label at the default font (at 2x it ellipsizes too); the second has less width than one word. It is the worst case of
+ * a tag in a narrow pane or at a large font size.
+ */
+@Composable
+fun BingeTagNarrowSample() {
+    ScreenshotTheme {
+        Column(
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_s)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            BingeTag(label = "Partly available", modifier = Modifier.width(dimensionResource(R.dimen.tag_sample_wide_width)))
+            BingeTag(label = "Partly available", modifier = Modifier.width(dimensionResource(R.dimen.tag_sample_narrow_width)))
         }
     }
 }

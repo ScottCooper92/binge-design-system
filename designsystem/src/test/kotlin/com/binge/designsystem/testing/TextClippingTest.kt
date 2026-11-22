@@ -123,8 +123,7 @@ class TextClippingTest {
     fun `real tags in a WrappingRow under a ListRow pass at every width`() {
         showAtManyWidths { WrappingRow(horizontalSpacing = CHIP_GAP, verticalSpacing = CHIP_GAP) { Tags() } }
 
-        // The narrowest widths break a tag's word in two: tracked in #1539, which says when to drop allowBrokenWords.
-        rule.assertNoTextClipped(allowBrokenWords = true)
+        rule.assertNoTextClipped()
     }
 
     @Composable

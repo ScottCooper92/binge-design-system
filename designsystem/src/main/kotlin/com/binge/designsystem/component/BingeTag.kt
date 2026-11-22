@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.labelSmallEmphasis
@@ -30,7 +31,9 @@ import com.binge.designsystem.uppercaseLocalised
  * for [tint], and its `fill()` for [fill]); a null [tint] is neutral — a `surfaceContainerHigh`
  * wash with `onSurfaceVariant` text. [uppercase] (default) matches the design's type tags (MOVIE,
  * VIDEO…); pass `false` for cased labels such as roles (Owner / Admin). [compact] is the smaller form for a
- * row of many tags under a title (see [TagRow]): tighter padding and the regular small label, not the bold one.
+ * row of many tags under a title (see [TagRow]): tighter padding and the regular small label, not the bold one. The label is one
+ * line, ellipsized when the tag has less room than it needs: a tag names a short classification, and a narrow slot must not
+ * break its word in two.
  *
  * @need label an item with a short classification
  * @group cards
@@ -79,6 +82,8 @@ fun BingeTag(
             text = if (uppercase) label.uppercaseLocalised() else label,
             style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelSmallEmphasis,
             color = content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
