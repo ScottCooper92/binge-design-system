@@ -85,12 +85,35 @@ jobs:
           key: gradle-config-cache-check-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
           restore-keys: gradle-config-cache-check-${{ runner.os }}-
 
+      # Robolectric fetches its android-all jar from Maven Central itself, outside Gradle's cache,
+      # and an HTTP 429 there fails every unit test with initializationError (it kept turning
+      # main red). Every test in these modules runs at SDK 34, so one jar is all the build loads:
+      # with it in the cache the tests run offline, and without it the action fetches it from a
+      # mirror first. `offline` has no network fallback, so a Robolectric bump or a test at
+      # another SDK level means this list changes with it. The list is read from a local run,
+      # which left exactly this jar in ~/.m2 after all three modules' unit tests.
+      - id: robolectric
+        uses: ScottCooper92/binge-ci/.github/actions/robolectric-cache@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+        with:
+          jars: |
+            android-all-instrumented:14-robolectric-10818077-i7
+          offline: 'true'
+
       # --continue surfaces every failure in one run rather than stopping at the first,
       # which matters most to author-ci-fix: it gets exactly one repair attempt per
       # commit, and a log showing only the first of three failures spends that attempt
       # fixing a third of the problem.
       - name: Build, test and lint
         run: ./gradlew build --continue
+
+      # Saved after the tests, under a key that names the jars present, by this one job and only on
+      # the default branch after a green run: a pull request's entry would be restored by no one
+      # else, and the screenshot jobs run no Robolectric test.
+      - uses: ScottCooper92/binge-ci/.github/actions/robolectric-cache-save@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+        if: ${{ success() && github.ref_name == github.event.repository.default_branch }}
+        with:
+          versions: ${{ steps.robolectric.outputs.versions }}
+          restored-key: ${{ steps.robolectric.outputs.matched-key }}
 
       # Reports for triaging a red run. Listed explicitly rather than globbing
       # **/build/reports/ — the greedy glob is fail-OPEN, so every new report type
