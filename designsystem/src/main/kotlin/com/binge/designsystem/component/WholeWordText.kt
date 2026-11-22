@@ -1,0 +1,135 @@
+package com.binge.designsystem.component
+
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.getTextLayoutResult
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
+
+/**
+ * Text that wraps where the line breaker puts its breaks (at spaces, after a hyphen, between CJK characters) and never breaks
+ * a word in two. When laying [text] out in the room it is given would split a word, it stays on one line and ends in an
+ * ellipsis, where [Text] would break the word across lines. Use it for a name or a label that wraps freely at a normal size but
+ * may meet a narrow slot at the largest font.
+ *
+ * It is a plain `Layout`, so it can sit under `IntrinsicSize` and in a lazy list. It composes the text twice, wrapping and on one
+ * line, measures the wrapping one first and keeps it unless its layout broke a word, and then measures the one-line one. The
+ * unused text is never placed and carries no semantics, so the semantics tree holds the text once, on this node, with the layout
+ * of the one that shows. An intrinsic size is that of the wrapping text.
+ *
+ * @need show a name or label that wraps at its spaces but never breaks a word in two
+ * @group rows
+ * @replaces a Text that breaks a long word across lines at a large font
+ */
+@Composable
+internal fun WholeWordText(
+    text: String,
+    style: TextStyle,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    val layouts = remember { WholeWordLayouts() }
+    Layout(
+        content = {
+            WholeWordLine(text, style, color, oneLine = false, onLayout = { layouts.wrapping = it })
+            WholeWordLine(text, style, color, oneLine = true, onLayout = { layouts.oneLine = it })
+        },
+        modifier =
+            modifier.semantics {
+                this.text = AnnotatedString(text)
+                getTextLayoutResult { results -> layouts.shown?.let { results.add(it) } != null }
+            },
+    ) { measurables, constraints ->
+        val wrapping = measurables[0].measure(constraints)
+        val breaksAWord = constraints.hasBoundedWidth && layouts.wrapping?.let { breaksAWord(it, text) } == true
+        val shown = if (breaksAWord) measurables[1].measure(constraints) else wrapping
+        layouts.shown = if (breaksAWord) layouts.oneLine else layouts.wrapping
+        layout(shown.width, shown.height) { shown.place(0, 0) }
+    }
+}
+
+/** The text layouts the two lines of a [WholeWordText] last reported, and which of them showed. Written while measuring. */
+private class WholeWordLayouts {
+    var wrapping: TextLayoutResult? = null
+    var oneLine: TextLayoutResult? = null
+    var shown: TextLayoutResult? = null
+}
+
+@Composable
+private fun WholeWordLine(
+    text: String,
+    style: TextStyle,
+    color: Color,
+    oneLine: Boolean,
+    onLayout: (TextLayoutResult) -> Unit,
+) {
+    Text(
+        text = text,
+        style = style,
+        color = color,
+        maxLines = if (oneLine) 1 else Int.MAX_VALUE,
+        // Ellipsis only on the one-line text: on the wrapping one it would truncate a long unbroken run instead of letting the line
+        // breaker wrap it, which is what lets the check below see a word split.
+        overflow = if (oneLine) TextOverflow.Ellipsis else TextOverflow.Clip,
+        onTextLayout = onLayout,
+        modifier = Modifier.clearAndSetSemantics {},
+    )
+}
+
+/**
+ * Whether any line of [layout] ends inside a word: a break that is not at a space, after a hyphen or dash, or beside a character of an
+ * unspaced script. A break with such a character on either side is one the line breaker is allowed to make: no Latin word can be split by it.
+ */
+private fun breaksAWord(layout: TextLayoutResult, text: String): Boolean =
+    (0 until layout.lineCount - 1).any { line ->
+        val end = layout.getLineEnd(line)
+        end in 1 until text.length && isMidWord(text.codePointBefore(end), text.codePointAt(end))
+    }
+
+private fun isMidWord(before: Int, after: Int): Boolean =
+    !Character.isWhitespace(before) &&
+        !Character.isWhitespace(after) &&
+        before !in BREAK_AFTER &&
+        !(before.isUnspaced() || after.isUnspaced())
+
+/**
+ * Whether a code point is in a script written without spaces: CJK, and Thai, Lao, Khmer and Myanmar, which the line breaker splits at
+ * dictionary word boundaries. The script alone misses marks that belong to no script, such as the
+ * prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
+ */
+private fun Int.isUnspaced(): Boolean =
+    Character.UnicodeScript.of(this) in UNSPACED_SCRIPTS ||
+        Character.UnicodeBlock.of(this) in CJK_BLOCKS
+
+private val UNSPACED_SCRIPTS =
+    setOf(
+        Character.UnicodeScript.HAN,
+        Character.UnicodeScript.HIRAGANA,
+        Character.UnicodeScript.KATAKANA,
+        Character.UnicodeScript.HANGUL,
+        Character.UnicodeScript.THAI,
+        Character.UnicodeScript.LAO,
+        Character.UnicodeScript.KHMER,
+        Character.UnicodeScript.MYANMAR,
+    )
+
+private val CJK_BLOCKS =
+    setOf(
+        Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
+        Character.UnicodeBlock.HIRAGANA,
+        Character.UnicodeBlock.KATAKANA,
+        Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS,
+        Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
+        Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
+    )
+
+private val BREAK_AFTER = setOf('-'.code, '/'.code, 0x2013, 0x2014, 0x2010)
