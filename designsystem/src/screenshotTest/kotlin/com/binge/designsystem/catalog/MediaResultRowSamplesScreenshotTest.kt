@@ -87,4 +87,10 @@ class MediaResultRowSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun footerAndPosterTap() = MediaResultRowFooterAndPosterTapSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun longSuffix() = MediaResultRowLongSuffixSample()
 }

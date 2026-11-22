@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -208,7 +209,8 @@ fun MediaResultRow(
 
 /**
  * The name with a [suffix] after it in the primary colour. The suffix and the marks take their own width first, and the name, up to two lines, takes what is
- * left and ellipsizes, so the suffix is never the part that is cut.
+ * left and ellipsizes, so a short suffix is never the part that is cut. A long one is bounded: it takes at most half of the width it is offered and wraps to
+ * a second line, then ellipsizes, so the name always keeps the other half, at any font size. Taking its whole width first left the name none at all.
  */
 @Composable
 private fun NameWithSuffix(
@@ -230,8 +232,9 @@ private fun NameWithSuffix(
             text = suffix,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            maxLines = 1,
-            softWrap = false,
+            maxLines = SUFFIX_MAX_LINES,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.atMostHalfOfWhatIsLeft(),
         )
         if (marks != null) {
             Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
@@ -374,6 +377,27 @@ private fun SkeletonPicture(kind: MediaResultKind) {
 }
 
 private const val BLURB_MAX_LINES = 3
+
+/** How many lines a long name suffix wraps to before it ellipsizes. */
+private const val SUFFIX_MAX_LINES = 2
+
+/** The share of the width on offer a name suffix may take, so the name beside it keeps the rest. */
+private const val SUFFIX_MAX_SHARE = 0.5f
+
+/** Limits this element to [SUFFIX_MAX_SHARE] of the width it is offered; a narrower one keeps its own width. */
+private fun Modifier.atMostHalfOfWhatIsLeft(): Modifier =
+    layout { measurable, constraints ->
+        // An unbounded width is an intrinsic measure, which has no width on offer to take a share of.
+        val limited =
+            if (constraints.hasBoundedWidth) {
+                constraints.copy(maxWidth = (constraints.maxWidth * SUFFIX_MAX_SHARE).toInt().coerceAtLeast(constraints.minWidth))
+            } else {
+                constraints
+            }
+        val placeable = measurable.measure(limited)
+        layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+    }
+
 private const val NAME_PLATE_FRACTION = 0.6f
 private const val SUBTITLE_PLATE_FRACTION = 0.4f
 private const val STILL_ASPECT_RATIO = 16f / 9f
