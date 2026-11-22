@@ -50,6 +50,7 @@ import com.binge.designsystem.component.BingeLargeTopBar
 import com.binge.designsystem.component.BingePaneTopBar
 import com.binge.designsystem.component.BingeSnackbarHost
 import com.binge.designsystem.component.BingeTopBar
+import com.binge.designsystem.component.LocalPagerScrimProbe
 import com.binge.designsystem.component.LocalRowFocus
 import com.binge.designsystem.component.OverlaidHeaderContent
 import com.binge.designsystem.component.RowFocus
@@ -100,6 +101,9 @@ enum class ScreenBarChrome {
  * under it and the scrim still follows how far it has, but the bar never slides away. It is false by default, so a small bar slides as it
  * always has, and is ignored for the other bars.
  *
+ * [scrimFloor] is the least the scrim shows, for a body that has its own reason to scrim the header: a page scrolled under it while the
+ * bar's own collapse says it is still at its top, as after a swipe from a page that is. Zero, the default, leaves the scrim to the bar.
+ *
  * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state; it
  * is ignored for [ScreenBar.None]. [subtitle] and [titleTrailing] are [ScreenBar.Large]'s, and show while it is
  * expanded; a caller whose action takes over once it collapses hoists [scrollBehavior] to fade it.
@@ -139,6 +143,7 @@ fun BingeScreenScaffold(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     barScrim: Boolean = true,
     pinned: Boolean = false,
+    scrimFloor: Float = 0f,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     subtitle: String? = null,
     titleTrailing: (@Composable () -> Unit)? = null,
@@ -154,7 +159,8 @@ fun BingeScreenScaffold(
     val barColor = if (barChrome == ScreenBarChrome.Plain) Color.Unspecified else Color.Transparent
     val ownBehavior = rememberScreenBarScrollBehavior(bar, pinned)
     val behavior = if (bar == ScreenBar.None) null else scrollBehavior ?: ownBehavior
-    val scrim = screenBarScrim(bar, behavior)
+    val scrim = maxOf(screenBarScrim(bar, behavior), scrimFloor)
+    LocalPagerScrimProbe.current?.invoke(scrim)
     val bodyTouch = if (behavior != null && listState != null && bar.collapses()) {
         rememberCollapsedForScrolledList(behavior, listState)
     } else {

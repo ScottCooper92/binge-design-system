@@ -62,6 +62,8 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.binge.designsystem.DISABLED_ALPHA
+import com.binge.designsystem.component.DesignSystemInternalApi
+import com.binge.designsystem.component.rememberFieldCaret
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.TvArrivalFocus
 import com.binge.designsystem.tv.focus.tvArrivalTarget
@@ -183,6 +185,7 @@ fun TvSearchField(
  * at every field. [name] labels the frame and the input alike: while editing, a screen reader is on the input. While the
  * remote rests on the frame, a screen reader reads the name and then the value, as its state; a secret reads as hidden.
  */
+@OptIn(DesignSystemInternalApi::class)
 @Composable
 private fun TvFieldFrame(
     value: String,
@@ -208,12 +211,13 @@ private fun TvFieldFrame(
     val press = remember { SelectPress() }
     val hidden = stringResource(TvR.string.tv_text_field_hidden)
     // Owned here, not left to the String overload, so the caret can start at the end: re-opening a field that holds
-    // text must append, not insert at the start.
-    var edit by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+    // text must append, not insert at the start. The text is the field's own while the caller catches up, so a
+    // character typed before it has handed the last one back builds on it.
+    val caret = rememberFieldCaret(value, TextFieldValue(value, TextRange(value.length)))
     // Guarded as the TV focus lint asks: a requester with no node returns false, and focus stays where it is.
     LaunchedEffect(editing) {
         if (editing) {
-            edit = TextFieldValue(value, TextRange(value.length))
+            caret.reset(TextFieldValue(value, TextRange(value.length)))
             runCatching { input.requestFocus() }
         }
     }
@@ -246,11 +250,8 @@ private fun TvFieldFrame(
                 },
     ) {
         BasicTextField(
-            value = edit.copy(text = value),
-            onValueChange = { next ->
-                edit = next
-                if (next.text != value) onValueChange(next.text)
-            },
+            value = caret.shown(value),
+            onValueChange = { next -> if (caret.edit(next, value)) onValueChange(next.text) },
             enabled = enabled,
             singleLine = true,
             textStyle = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface),

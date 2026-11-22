@@ -5,9 +5,8 @@ import com.binge.designsystem.component.ExpandableOverview
 import com.binge.designsystem.preview.ScreenshotTheme
 
 /**
- * Copy longer than the collapsed three lines: collapsed, with the Show more toggle. Seeds
- * `initiallyOverflowing` so the screenshot frame holds the toggle; on a device the layout pass finds
- * the same overflow on its own.
+ * Copy longer than the collapsed three lines: collapsed, with the Show more toggle, which the overview finds by measuring the text in the same
+ * pass that places it.
  */
 @Composable
 fun ExpandableOverviewSample() {
@@ -17,7 +16,6 @@ fun ExpandableOverviewSample() {
                 "Gotham, Batman must accept one of the greatest psychological and physical tests of " +
                 "his ability to fight injustice. Gotham's new district attorney Harvey Dent joins " +
                 "the cause, but the trio soon find themselves prey to a reign of terror.",
-            initiallyOverflowing = true,
         )
     }
 }

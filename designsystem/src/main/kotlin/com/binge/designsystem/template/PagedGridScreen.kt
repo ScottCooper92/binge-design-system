@@ -20,12 +20,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -178,6 +180,9 @@ fun showsGridFooter(ready: PagedGridState.Ready): Boolean = ready.appending || r
  * @param loadingLabel what a screen reader says of the first loading plate; the app words it ("Loading titles").
  * @param firstVisibleIndex scrolls the grid to a cell, for a frame of the grid mid-list.
  * @param filterSheet the sheet the pill opens, given a dismiss callback; the screen keeps whether it is open.
+ * @param bar the top bar: the large collapsing one by default, or `Small`, which hides on scroll down and returns on scroll up. A small bar has no room under its
+ *   title for the pill, so the bar's filter action is always shown instead, and [titleTrailing] and [subtitle] are not drawn. Use the large bar for a
+ *   screen with a subtitle.
  * @param fastScrollbar draws a [com.binge.designsystem.component.BingeFastScrollbar] over the grid, at the end edge and inside the bar's and the
  *   navigation bar's room, with the options' bubble text. Null, the default, draws none.
  *
@@ -205,11 +210,15 @@ fun PagedGridScreen(
     failedContent: (@Composable (Modifier) -> Unit)? = null,
     filterSheet: (@Composable (onDismiss: () -> Unit) -> Unit)? = null,
     fastScrollbar: FastScrollbarOptions? = null,
+    bar: ScreenBar = ScreenBar.Large,
     overlays: @Composable () -> Unit = {},
 ) {
-    val scrollBehavior = rememberPaneTopBarScrollBehavior()
+    val small = bar == ScreenBar.Small
+    // A small bar's scrim ramps with the drag; a grid that is already part way down, as when it is restored, has no drag to ramp it.
+    var pastFirstRow by remember { mutableStateOf(state is PagedGridState.Ready && firstVisibleIndex > 0) }
+    val paneBehavior = rememberPaneTopBarScrollBehavior()
     var filtersOpen by rememberSaveable { mutableStateOf(false) }
-    val collapsed = scrollBehavior.state.collapsedFraction
+    val collapsed = if (small) 1f else paneBehavior.state.collapsedFraction
     val pillInteractive = collapsed < BAR_HANDOVER_COLLAPSE
     val openFilters = {
         filtersOpen = true
@@ -219,12 +228,13 @@ fun PagedGridScreen(
         title = title,
         modifier = modifier,
         onBack = callbacks.onBack,
-        bar = ScreenBar.Large,
+        bar = bar,
         snackbarHostState = snackbarHostState,
-        scrollBehavior = scrollBehavior,
+        scrollBehavior = paneBehavior.takeUnless { small },
+        scrimFloor = if (small && pastFirstRow) 1f else 0f,
         subtitle = subtitle,
         titleTrailing =
-            if (filterBar != null || titleTrailing != null) {
+            if (!small && (filterBar != null || titleTrailing != null)) {
                 {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -303,6 +313,7 @@ fun PagedGridScreen(
                         indicatorTopInset = body.calculateTopPadding(),
                         reselectKey = reselectKey,
                         firstVisibleIndex = firstVisibleIndex,
+                        onPastFirstRow = { pastFirstRow = it },
                         moreFailedLabel = moreFailedLabel,
                         fastScrollbar = fastScrollbar,
                     )
@@ -371,10 +382,14 @@ private fun ReadyGrid(
     indicatorTopInset: Dp,
     reselectKey: Any?,
     firstVisibleIndex: Int,
+    onPastFirstRow: (Boolean) -> Unit,
     moreFailedLabel: String,
     fastScrollbar: FastScrollbarOptions?,
 ) {
     val gridState = rememberLazyGridState(initialFirstVisibleItemIndex = firstVisibleIndex)
+    val latestOnPast by rememberUpdatedState(onPastFirstRow)
+    LaunchedEffect(gridState) { snapshotFlow { gridState.firstVisibleItemIndex > 0 }.collect { latestOnPast(it) } }
+    DisposableEffect(gridState) { onDispose { latestOnPast(false) } }
     if (reselectKey != null) ScrollToTopOnTabReselect(reselectKey, gridState)
     val nearEnd by remember {
         derivedStateOf {

@@ -64,13 +64,18 @@ fun BingePinField(
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
     if (autoFocus) LaunchedEffect(focus) { focus.requestFocus() }
+    // The boxes show what was typed until the caller hands the value back, so a digit typed before it has caught up builds on the last one.
+    // The cursor stays at the end, so only the text is the field's own to keep.
+    val caret = rememberFieldCaret(value, TextFieldValue(value, TextRange(value.length)))
+    val digits = caret.shown(value).text
     BasicTextField(
-        value = TextFieldValue(value, selection = TextRange(value.length)),
+        value = TextFieldValue(digits, selection = TextRange(digits.length)),
         onValueChange = { typed ->
-            val digits = typed.text.filter(Char::isDigit).take(length)
-            if (digits == value) return@BasicTextField
-            onValueChange(digits)
-            if (digits.length == length) onComplete(digits)
+            val entered = typed.text.filter(Char::isDigit).take(length)
+            if (caret.edit(TextFieldValue(entered, TextRange(entered.length)), value)) {
+                onValueChange(entered)
+                if (entered.length == length) onComplete(entered)
+            }
         },
         enabled = enabled,
         singleLine = true,
@@ -87,8 +92,8 @@ fun BingePinField(
             Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s))) {
                 repeat(length) { index ->
                     PinCell(
-                        digit = value.getOrNull(index),
-                        current = index == currentPinCell(focused = focused, enabled = enabled, filled = value.length, length = length),
+                        digit = digits.getOrNull(index),
+                        current = index == currentPinCell(focused = focused, enabled = enabled, filled = digits.length, length = length),
                         error = error != null,
                     )
                 }

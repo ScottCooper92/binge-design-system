@@ -60,4 +60,33 @@ class FieldCaretTest {
 
         assertEquals(typed("transcoding", 11), shown)
     }
+
+    @Test
+    fun `while the caller is behind and the wait has not run out the field keeps what was typed`() {
+        val shown = reconcileCaret(typed("abc", 3), "ab", PendingEdit(reported = "abc", against = "ab"), waiting = true)
+
+        assertEquals(typed("abc", 3), shown)
+    }
+
+    @Test
+    fun `a value that is one of the earlier texts of a burst is the caller still catching up`() {
+        val pending = PendingEdit(reported = "abc", against = "", earlier = setOf("a", "ab"))
+
+        assertEquals(typed("abc", 3), reconcileCaret(typed("abc", 3), "a", pending, waiting = true))
+        assertEquals(typed("abc", 3), reconcileCaret(typed("abc", 3), "ab", pending, waiting = true))
+    }
+
+    @Test
+    fun `a value the field never reported is not the caller catching up, even while it waits`() {
+        val pending = PendingEdit(reported = "abc", against = "", earlier = setOf("a", "ab"))
+
+        assertEquals(typed("transcoding", 11), reconcileCaret(typed("abx", 1), "transcoding", pending, waiting = true))
+    }
+
+    @Test
+    fun `once the wait has run out an unchanged value is the caller's answer to the edit`() {
+        val shown = reconcileCaret(typed("80x96", 3), "8096", PendingEdit(reported = "80x96", against = "8096"), waiting = false)
+
+        assertEquals(typed("8096", 2), shown)
+    }
 }

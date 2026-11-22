@@ -65,7 +65,12 @@ fun BackdropTile(
     description: String? = null,
     showTitle: Boolean = true,
 ) {
-    CategoryTileFrame(label = description ?: title, onClick = onClick, modifier = modifier) {
+    CategoryTileFrame(
+        label = description ?: title,
+        width = dimensionResource(R.dimen.backdrop_tile_width),
+        onClick = onClick,
+        modifier = modifier,
+    ) {
         if (imageUrl == null) {
             Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerHigh))
         } else {
@@ -109,7 +114,7 @@ fun BackdropTile(
 
 /**
  * A landscape tile with a logo centred on a neutral surface, for a row of studios or networks. It
- * shares [BackdropTile]'s size, corner shape and press feedback, so the two sit alike in a row.
+ * shares [BackdropTile]'s 16:9 shape, corner shape and press feedback, and is narrower ([R.dimen.category_tile_width]), so the two sit alike in a row.
  *
  * The logo is fitted inside the tile with padding and never cropped. It is monochrome artwork, so it
  * reads in both themes from the surface tokens. While it loads, if it fails, or with no [logoUrl], the
@@ -128,7 +133,12 @@ fun LogoTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    CategoryTileFrame(label = name, onClick = onClick, modifier = modifier) {
+    CategoryTileFrame(
+        label = name,
+        width = dimensionResource(R.dimen.category_tile_width),
+        onClick = onClick,
+        modifier = modifier,
+    ) {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer))
         if (logoUrl == null) {
             LogoTileName(name)
@@ -161,18 +171,23 @@ private fun LogoTileName(name: String) {
     }
 }
 
-/** The height of a [BackdropTile] or [LogoTile]: [R.dimen.category_tile_width] at 16:9. Pass it to [MediaCarousel]'s `endTileHeight` for a row of them. */
+/** The height of a [LogoTile]: [R.dimen.category_tile_width] at 16:9. Pass it to [MediaCarousel]'s `endTileHeight` for a row of them. A row of [BackdropTile]s passes [backdropTileHeight]. */
 @Composable
 fun categoryTileHeight(): Dp = dimensionResource(R.dimen.category_tile_width) / TILE_ASPECT_RATIO
 
+/** The height of a [BackdropTile]: [R.dimen.backdrop_tile_width] at 16:9. Pass it to [MediaCarousel]'s `endTileHeight` for a row of them. */
+@Composable
+fun backdropTileHeight(): Dp = dimensionResource(R.dimen.backdrop_tile_width) / TILE_ASPECT_RATIO
+
 /**
- * The frame both tiles share: the landscape size, the [BingeShapes.MediaCard] corner, the press scale
+ * The frame both tiles share: the 16:9 shape at the tile's own [width], the [BingeShapes.MediaCard] corner, the press scale
  * ([pressScale], shared with [MediaCard]) and a single click target that announces [label] as
  * one item. The children's own text and images are merged away so the tile reads once.
  */
 @Composable
 private fun CategoryTileFrame(
     label: String,
+    width: Dp,
     onClick: () -> Unit,
     modifier: Modifier,
     content: @Composable BoxScope.() -> Unit,
@@ -180,7 +195,7 @@ private fun CategoryTileFrame(
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
-            .width(dimensionResource(R.dimen.category_tile_width))
+            .width(width)
             .aspectRatio(TILE_ASPECT_RATIO)
             .pressScale(interactionSource)
             .clip(BingeShapes.MediaCard)
