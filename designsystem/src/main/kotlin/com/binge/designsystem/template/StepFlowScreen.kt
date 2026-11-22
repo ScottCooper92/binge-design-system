@@ -80,6 +80,8 @@ private const val STEP_SLIDE_MILLIS = 280
  * Each slot is handed the step it draws, and should branch on that rather than on [currentStep]: changing step
  * slides the whole step across, and the outgoing one must keep drawing itself while it leaves. A step whose
  * content scrolls itself, a lazy grid, returns false from [contentScrolls] and gets the remaining height instead.
+ * [bar] picks the bar, for a titled flow that wants the small bar that hides as the step scrolls down, as a screen without a subtitle
+ * should have. Null, the default, keeps the choice above.
  * [scrollBehavior] is [BingeScreenScaffold]'s, for a caller that owns the bar's state; an untitled flow's bar is
  * pinned by default. [barChrome] is [BingeScreenScaffold]'s, the plain bar for a flow with nothing under it. [actions] are
  * [BingeScreenScaffold]'s too: what sits at the end of the bar on every step, such as an overflow menu a user needs before they can reach any settings. Beside a list pane the first step's Back is dropped, as the scaffold does, but a step back always shows. The same shape as the TV step flow, so a flow ports between form factors by swapping the template.
@@ -105,8 +107,10 @@ fun StepFlowScreen(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     barChrome: ScreenBarChrome = ScreenBarChrome.Glass,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
+    bar: ScreenBar? = null,
     content: @Composable ColumnScope.(step: Int) -> Unit,
 ) {
+    val flowBar = bar ?: if (title != null) ScreenBar.Collapsing else ScreenBar.Small
     val back = if (currentStep > 0) onBack else onExit
     StepBackHandler(back)
     // Back to the previous step is not "pop this screen": the scaffold hides a Back where a list pane beside it already
@@ -114,7 +118,7 @@ fun StepFlowScreen(
     // own Back is kept by presenting the entry as past the first one.
     val paneDepth = if (currentStep > 0) maxOf(LocalPaneDepth.current, 2) else LocalPaneDepth.current
     // An untitled flow has a single-line bar that stays put, so Back and the read-out do not scroll away with the step.
-    val ownBehavior = if (title == null) TopAppBarDefaults.pinnedScrollBehavior() else null
+    val ownBehavior = if (title == null && flowBar == ScreenBar.Small) TopAppBarDefaults.pinnedScrollBehavior() else null
     CompositionLocalProvider(LocalPaneDepth provides paneDepth) {
         // The scaffold's bar is the chrome: a collapsing bar when the flow has a title, a single line when it has none, so
         // the bar does not change kind as Back comes and goes. The read-out sits under it as the scaffold's header, and a
@@ -124,7 +128,7 @@ fun StepFlowScreen(
             title = title.orEmpty(),
             modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
             onBack = back,
-            bar = if (title != null) ScreenBar.Collapsing else ScreenBar.Small,
+            bar = flowBar,
             scrollBehavior = scrollBehavior ?: ownBehavior,
             header = if (stepCount > 1) ({ StepReadOut(stepCount, currentStep) }) else null,
             barChrome = barChrome,

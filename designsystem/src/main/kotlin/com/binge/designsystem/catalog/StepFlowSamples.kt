@@ -30,6 +30,7 @@ import com.binge.designsystem.component.DecisionHero
 import com.binge.designsystem.component.DecisionPointsCard
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.template.DecisionHeading
+import com.binge.designsystem.template.ScreenBar
 import com.binge.designsystem.template.StepFlowScreen
 import com.binge.designsystem.template.StepHeading
 
@@ -42,6 +43,15 @@ fun StepFlowScreenTitledSample() {
     var step by remember { mutableIntStateOf(0) }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
         ConnectionFlow(step = step, onStep = { step = it }, onExit = LocalDemoBack.current)
+    }
+}
+
+/** The titled flow on the small bar, which hides as a step scrolls down: the bar a screen without a subtitle should have. */
+@Composable
+fun StepFlowScreenTitledSmallBarSample() {
+    var step by remember { mutableIntStateOf(0) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        ConnectionFlow(step = step, onStep = { step = it }, onExit = LocalDemoBack.current, bar = ScreenBar.Small)
     }
 }
 
@@ -109,6 +119,7 @@ private fun ConnectionFlow(
     step: Int,
     onStep: (Int) -> Unit,
     onExit: () -> Unit,
+    bar: ScreenBar? = null,
 ) {
     StepFlowScreen(
         stepCount = CONNECTION_STEPS,
@@ -116,6 +127,7 @@ private fun ConnectionFlow(
         onBack = { onStep(step - 1) },
         title = "Edit connection",
         onExit = onExit,
+        bar = bar,
         heading = { StepHeading(title = "Server address", subtitle = "Where the app finds your server.") },
         footer = {
             BingeFilledButton(
