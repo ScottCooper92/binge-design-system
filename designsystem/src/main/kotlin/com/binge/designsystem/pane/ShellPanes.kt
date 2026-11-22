@@ -111,6 +111,7 @@ private class ShellPanesScene(
  * changes; a page and what it opens replace only the panes beside it.
  *
  * @param itemPlaceholder what the third pane shows while its page has no item open, given that page's entry.
+ * @param modifier applied to the outermost node: the home alone, or the row of panes.
  *
  * @need draw a home beside the pages opened from it on a wide window, and alone on a narrow one
  * @group screens
@@ -121,12 +122,14 @@ fun ShellPanes(
     home: @Composable () -> Unit,
     defaultPage: @Composable () -> Unit,
     itemPlaceholder: @Composable (page: NavEntry<NavKey>) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val detail = LocalShellDetail.current
     when {
-        detail == null -> home()
+        detail == null -> Box(modifier) { home() }
         detail.opensItems && detail.page != null ->
             PaneRow(
+                modifier = modifier,
                 weights = listOf(1f, 1f, 1f),
                 panes =
                     listOf(
@@ -135,8 +138,18 @@ fun ShellPanes(
                         { detail.item?.Content() ?: itemPlaceholder(detail.page) },
                     ),
             )
-        detail.threePane -> PaneRow(weights = listOf(1f, 2f), panes = listOf(home, { detail.page?.Content() ?: defaultPage() }))
-        else -> PaneRow(weights = listOf(1f, 1f), panes = listOf(home, { detail.page?.Content() ?: defaultPage() }))
+        detail.threePane ->
+            PaneRow(
+                modifier = modifier,
+                weights = listOf(1f, 2f),
+                panes = listOf(home, { detail.page?.Content() ?: defaultPage() }),
+            )
+        else ->
+            PaneRow(
+                modifier = modifier,
+                weights = listOf(1f, 1f),
+                panes = listOf(home, { detail.page?.Content() ?: defaultPage() }),
+            )
     }
 }
 
