@@ -1,11 +1,21 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.assertNoTextClipped
@@ -78,6 +88,36 @@ class WholeWordTextTest {
     }
 
     @Test
+    fun `it answers a height intrinsic query, so it sits in a row sized to its tallest child`() {
+        rule.setContent {
+            TestTheme {
+                Row(Modifier.height(IntrinsicSize.Max).width(NARROW.dp)) {
+                    Words("Living room server name")
+                    Box(Modifier.testTag(TALL).width(10.dp).fillMaxHeight())
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(TALL).assertHeightIsAtLeast(20.dp)
+    }
+
+    @Test
+    fun `it answers a width intrinsic query, so it sits in a column sized to its widest child`() {
+        rule.setContent {
+            TestTheme {
+                Column(Modifier.width(IntrinsicSize.Max)) {
+                    Words("Living room")
+                    Box(Modifier.testTag(WIDE).fillMaxWidth().height(10.dp))
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onNodeWithTag(WIDE).assertWidthIsAtLeast(40.dp)
+    }
+
+    @Test
     fun `the text is in the semantics tree once`() {
         show(width = NARROW, text = "Fitzgerald-Montgomery Alexandria")
 
@@ -86,6 +126,8 @@ class WholeWordTextTest {
 
     private companion object {
         const val NARROW = 90
+        const val TALL = "tall"
+        const val WIDE = "wide"
         const val HYPHEN_ROOM = 130
     }
 }
