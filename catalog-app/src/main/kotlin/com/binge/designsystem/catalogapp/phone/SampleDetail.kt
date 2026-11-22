@@ -85,9 +85,10 @@ fun SampleDetail(
         Scaffold(
             containerColor = MaterialTheme.colorScheme.surface,
             floatingActionButton = { TweaksFab(tweaked, onClick = { showTweaks = true }) },
-        ) {
+        ) { outer ->
             // The design system's own screen frame draws the bar, as an app's screen does.
             BingeScreenScaffold(
+                modifier = Modifier.padding(outer),
                 title = if (onePerScreen && variants.size > 1) "${entry.groupName} · ${entry.name}" else entry.groupName,
                 onBack = onBack,
                 bar = ScreenBar.Small,
