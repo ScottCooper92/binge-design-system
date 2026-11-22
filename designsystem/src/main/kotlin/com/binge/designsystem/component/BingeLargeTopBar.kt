@@ -22,14 +22,10 @@ import com.binge.designsystem.R
  *
  * [onTitleLongClick] adds an optional title action, named for accessibility by [onTitleLongClickLabel].
  * Both default to absent, so existing titles keep their behaviour and appearance.
- *
- * @need give a screen a large collapsing top bar with a subtitle
- * @group bars
- * @replaces a raw LargeTopAppBar with a subtitle added by hand
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BingeLargeTopBar(
+internal fun BingeLargeTopBar(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
@@ -38,8 +34,6 @@ fun BingeLargeTopBar(
     containerColor: Color = Color.Transparent,
     scrimFraction: Float = scrollBehavior?.state?.collapsedFraction ?: 0f,
     foregroundScrimFraction: Float = scrimFraction,
-    scrimColor: Color = MaterialTheme.colorScheme.background,
-    scrimForegroundColor: Color = MaterialTheme.colorScheme.onBackground,
     titleTrailing: (@Composable () -> Unit)? = null,
     onTitleLongClick: (() -> Unit)? = null,
     onTitleLongClickLabel: String? = null,
@@ -55,8 +49,8 @@ fun BingeLargeTopBar(
         containerColor = containerColor,
         scrimFraction = scrimFraction,
         foregroundScrimFraction = foregroundScrimFraction,
-        scrimColor = scrimColor,
-        scrimForegroundColor = scrimForegroundColor,
+        scrimColor = MaterialTheme.colorScheme.background,
+        scrimForegroundColor = MaterialTheme.colorScheme.onBackground,
         actions = actions,
         expandedHeight = dimensionResource(R.dimen.large_top_bar_expanded_height),
         subtitle = subtitle,

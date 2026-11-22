@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,9 +43,11 @@ import com.binge.designsystem.catalogapp.overrides.SampleOverrides
 import com.binge.designsystem.catalogapp.overrides.WithOverrides
 import com.binge.designsystem.catalogapp.registry.CatalogComponent
 import com.binge.designsystem.catalogapp.registry.CatalogEntry
-import com.binge.designsystem.component.BingeTopBar
 import com.binge.designsystem.component.HintCard
 import com.binge.designsystem.component.SectionHeader
+import com.binge.designsystem.template.BingeScreenScaffold
+import com.binge.designsystem.template.ScreenBar
+import com.binge.designsystem.template.ScreenBarChrome
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import com.binge.designsystem.R as DesR
 
@@ -82,22 +85,27 @@ fun SampleDetail(
     } else {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.surface,
-            topBar = {
-                BingeTopBar(
-                    title = if (onePerScreen && variants.size > 1) "${entry.groupName} · ${entry.name}" else entry.groupName,
-                    onBack = onBack,
-                )
-            },
             floatingActionButton = { TweaksFab(tweaked, onClick = { showTweaks = true }) },
-        ) { padding ->
-            // Edge to edge: only the top bar's height pads the page. The variants draw under the
-            // navigation bar, and a list pads its own end clear of it.
-            val body = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding())
-            SampleStage(overrides, body) {
-                if (onePerScreen) {
-                    SingleVariant(entry, overrides, modifier = Modifier.fillMaxSize())
-                } else {
-                    VariantList(variants, selected = entry, overrides = overrides, modifier = Modifier.fillMaxSize())
+            // The page draws edge to edge, as it did: the frame inside reserves the bars itself, so this one reserves none.
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        ) { outer ->
+            // The design system's own screen frame draws the bar, as an app's screen does.
+            BingeScreenScaffold(
+                modifier = Modifier.padding(outer),
+                title = if (onePerScreen && variants.size > 1) "${entry.groupName} · ${entry.name}" else entry.groupName,
+                onBack = onBack,
+                bar = ScreenBar.Small,
+                barChrome = ScreenBarChrome.Plain,
+            ) { padding ->
+                // Edge to edge: only the top bar's height pads the page. The variants draw under the
+                // navigation bar, and a list pads its own end clear of it.
+                val body = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding())
+                SampleStage(overrides, body) {
+                    if (onePerScreen) {
+                        SingleVariant(entry, overrides, modifier = Modifier.fillMaxSize())
+                    } else {
+                        VariantList(variants, selected = entry, overrides = overrides, modifier = Modifier.fillMaxSize())
+                    }
                 }
             }
         }
