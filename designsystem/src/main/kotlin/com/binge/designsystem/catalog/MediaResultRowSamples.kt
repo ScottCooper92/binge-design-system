@@ -7,12 +7,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -255,6 +261,37 @@ fun MediaResultRowStatusInlineSample() =
             )
         }
     }
+
+/**
+ * A footer under the whole row (here a download's progress and a count of how often the poster was tapped) and a poster that is its own tap target: tap
+ * the poster and the count goes up, tap the rest of the row and it does not.
+ */
+@Composable
+fun MediaResultRowFooterAndPosterTapSample() {
+    var posterTaps by remember { mutableIntStateOf(0) }
+    ScreenshotTheme {
+        Column(Modifier.padding(dimensionResource(R.dimen.screen_content_inset))) {
+            MediaResultRow(
+                result = MediaResult("m9", MediaResultKind.Poster, null, "Past Lives", "Movie · 2023", rating = 7.8f),
+                onClick = {},
+                footer = {
+                    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xs))) {
+                        LinearProgressIndicator(progress = { SAMPLE_PROGRESS }, modifier = Modifier.fillMaxWidth())
+                        Text(
+                            text = "Downloading · 42% · poster taps: $posterTaps",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                },
+                onPosterClick = { posterTaps++ },
+                posterClickLabel = "Open title",
+            )
+        }
+    }
+}
+
+private const val SAMPLE_PROGRESS = 0.42f
 
 /** The loading stand-in for a row with a byline and one with its status inline, each over the row it becomes. */
 @Composable

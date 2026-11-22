@@ -80,6 +80,11 @@ class MediaResult(
  * @param trailing the result's status, drawn first in the wrapping row (an availability chip, a played or favourite mark).
  * @param byline a line drawn above the name, such as a person's avatar, name and time. Null, the default, draws none and takes no room.
  * @param end drawn at the row's end, after the text, in [ListRow]'s trailing slot. Null, the default, draws none.
+ * @param footer drawn under the whole row, below the picture and the text, in [ListRow]'s footer slot (a download's progress). Null, the default,
+ * draws none and takes no room.
+ * @param onPosterClick when set, a poster or still is its own tap target with its own ripple, apart from [onClick], which the rest of the row
+ * keeps. The picture is never smaller than the minimum touch target. An avatar or a logo is not tappable by itself, so this does not apply to them.
+ * @param posterClickLabel what a screen reader announces for the poster's tap, such as "Open title"; the row's own tap is announced as the row.
  *
  * @need list a search result with its picture, kind and status
  * @group rows
@@ -93,6 +98,9 @@ fun MediaResultRow(
     trailing: (@Composable () -> Unit)? = null,
     byline: (@Composable () -> Unit)? = null,
     end: (@Composable () -> Unit)? = null,
+    footer: (@Composable () -> Unit)? = null,
+    onPosterClick: (() -> Unit)? = null,
+    posterClickLabel: String? = null,
 ) {
     val topAligned = result.kind == MediaResultKind.Poster || result.kind == MediaResultKind.Still
     ListRow(
@@ -100,9 +108,16 @@ fun MediaResultRow(
         onClick = onClick,
         verticalAlignment = if (topAligned) Alignment.Top else Alignment.CenterVertically,
         trailingContent = end,
+        footer = footer,
         leading = {
             when (result.kind) {
-                MediaResultKind.Poster -> ListRowPoster(imageUrl = result.imageUrl, contentDescription = null)
+                MediaResultKind.Poster ->
+                    ListRowPoster(
+                        imageUrl = result.imageUrl,
+                        contentDescription = null,
+                        onClick = onPosterClick,
+                        onClickLabel = posterClickLabel,
+                    )
                 MediaResultKind.Avatar -> ListRowAvatar(imageUrl = result.imageUrl, name = result.name)
                 MediaResultKind.Logo -> ListRowLogo(logoUrl = result.imageUrl)
                 MediaResultKind.Still ->
@@ -111,6 +126,8 @@ fun MediaResultRow(
                         contentDescription = null,
                         width = dimensionResource(R.dimen.media_result_still_width),
                         aspectRatio = STILL_ASPECT_RATIO,
+                        onClick = onPosterClick,
+                        onClickLabel = posterClickLabel,
                     )
             }
         },
