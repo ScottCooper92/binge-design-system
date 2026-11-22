@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -21,7 +22,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
-import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
@@ -42,11 +42,9 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-private const val SHORT_DRAG_START = 300f
-
-/** How long a header gets to follow the page it settled on, far longer than the frame it takes. */
-private const val SETTLE_MILLIS = 3_000L
-private const val SHORT_DRAG_END = 700f
+private const val PAGE_MOVE_FRAMES = 40
+private const val FRAME_MILLIS = 16L
+private const val SWIPE_STEPS = 8
 
 private fun results(count: Int) =
     List(count) { MediaResult("k$it", MediaResultKind.Poster, null, "Result $it", "Movie · 2020", rating = 7f, meta = "Drama") }
@@ -773,92 +771,122 @@ class SearchScreenTest {
 
     private fun chipsBounds() = rule.onNodeWithText("Movies").getBoundsInRoot()
 
-    /**
-     * The large bar collapses as a page scrolls, and a page that arrives already scrolled (or at the top) moves nothing, so the header has to be
-     * set from the page it settles on. The chip row sits under the title, so where it is tells which state the header is in.
-     */
-    private fun assertHeaderFollowsPages(goTo: (String, String) -> Unit) {
-        val asked = mutableListOf<String>()
-        showLongPaged(asked)
-        val expanded = chipsBounds()
-        rule.onNodeWithText("Movies").performClick()
-        rule.waitForIdle()
-        assertEquals(expanded, chipsBounds())
-
-        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
-        rule.waitForIdle()
-        val collapsed = chipsBounds()
-        assertTrue("scrolling the page should collapse the header", collapsed.top < expanded.top)
-
-        goTo("All", "right")
-        rule.waitForIdle()
-        assertEquals("page 1 is at the top, so the header is expanded", expanded, chipsBounds())
-
-        goTo("Movies", "left")
-        rule.waitForIdle()
-        assertEquals("page 2 is scrolled, so the header is collapsed and no row sits behind an expanded one", collapsed, chipsBounds())
+    /** A move to the page whose chip is [chip], by a chip tap or a swipe towards [direction], which calls [sample] at each step the pager is part way. */
+    private fun interface PageMove {
+        fun go(
+            chip: String,
+            direction: String,
+            sample: () -> Unit,
+        )
     }
 
-    @Test
-    fun `a page that arrives scrolled or at the top sets the header, on a swipe`() =
-        assertHeaderFollowsPages { _, direction ->
-            rule.onRoot().performTouchInput { if (direction == "left") swipeLeft() else swipeRight() }
-        }
-
-    @Test
-    fun `a page that arrives scrolled or at the top sets the header, on a chip tap`() =
-        assertHeaderFollowsPages { chip, _ -> rule.onNodeWithText(chip).performClick() }
-
-    /**
-     * The small bar's header draws a scrim while the page under it is scrolled, driven by how far the content has passed under it, and a page that
-     * arrives already scrolled passes nothing, so it would show the scrim of the page before it. The scrim is the page's own colour at a high alpha,
-     * so a scrolled header looks much like a bare one and what tells them apart is a row showing through; each page's header is compared with how it
-     * looked when the page was left, by the region from the top edge to the chips.
-     */
-    private fun assertSmallHeaderFollowsPages(pinned: Boolean = false, goTo: (String, String) -> Unit) {
-        showLongPaged(mutableListOf(), bar = ScreenBar.Small, pinned = pinned)
-        rule.onNodeWithText("Movies").performClick()
-        rule.waitForIdle()
-
-        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
-        // A short drag back brings the bar back, which slides away as the page scrolls, with the page still well down.
-        rule.onRoot().performTouchInput { swipeDown(startY = SHORT_DRAG_START, endY = SHORT_DRAG_END) }
-        rule.waitForIdle()
-        val scrolled = scrim
-        assertTrue("page 2 is scrolled, so its scrim is up", scrolled > 0f)
-
-        goTo("All", "right")
-        rule.waitForIdle()
-        assertEquals("page 1 is at its top, so there is no scrim", 0f, scrim, 0f)
-
-        goTo("Movies", "left")
-        // The header is set once the page has settled, a frame after the pager reports it. The clock is driven by hand, past every animation the
-        // move starts, so what is read is where the scrim ends and not where it was on a frame that load made late. A header that never follows
-        // the page leaves the scrim at 0 and fails here.
+    private val chipTap = PageMove { chip, _, sample ->
+        rule.onNodeWithText(chip).performClick()
         rule.mainClock.autoAdvance = false
-        rule.mainClock.advanceTimeBy(SETTLE_MILLIS)
-        assertEquals("page 2 is scrolled, so its header draws the scrim it was left with", scrolled, scrim, 0f)
+        repeat(PAGE_MOVE_FRAMES) {
+            sample()
+            rule.mainClock.advanceTimeBy(FRAME_MILLIS)
+        }
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+    }
+
+    private val swipe = PageMove { _, direction, sample ->
+        val sign = if (direction == "left") -1f else 1f
+        rule.onRoot().performTouchInput { down(center) }
+        repeat(SWIPE_STEPS) {
+            rule.onRoot().performTouchInput { moveBy(Offset(sign * width / SWIPE_STEPS, 0f)) }
+            sample()
+        }
+        rule.onRoot().performTouchInput { up() }
+        repeat(PAGE_MOVE_FRAMES) {
+            rule.mainClock.advanceTimeBy(FRAME_MILLIS)
+            sample()
+        }
+        rule.waitForIdle()
+    }
+
+    /**
+     * Where the chip row sits under the title says what state the header is in, and it must not change while the pager moves: the header follows
+     * the scroll that is dragged, never the page the pager settles on, so a swipe or a chip tap between a page scrolled deep and a page at its top
+     * has no frame where the header jumps. The page that is shown asks for its own scrim, so the rows never show under it without one.
+     */
+    private fun assertHeaderStaysThroughMoves(
+        move: PageMove,
+        bar: ScreenBar = ScreenBar.Large,
+        pinned: Boolean = false,
+    ) {
+        showLongPaged(mutableListOf(), bar = bar, pinned = pinned)
+        rule.onNodeWithText("Movies").performClick()
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        val resting = chipsBounds().top
+        val tops = mutableListOf<Float>()
+        val sample = { tops += chipsBounds().top.value }
+
+        move.go("All", "right", sample)
+        move.go("Movies", "left", sample)
+
+        assertTrue("the move has frames to compare", tops.size > 2)
+        assertEquals(
+            "the header holds where the dragged scroll left it at every frame of both moves",
+            listOf(resting.value),
+            tops.distinct(),
+        )
+        assertTrue("page 2 is scrolled, so its scrim is up", scrim > 0f)
+    }
+
+    /** The scrim is the shown page's own: a deep page that arrives under an expanded header brings its scrim without the header moving. */
+    private fun assertDeepPageScrimsExpandedHeader(move: PageMove) {
+        showLongPaged(mutableListOf())
+        val expanded = chipsBounds().top
+        rule.onNodeWithText("Movies").performClick()
+        rule.waitForIdle()
+        repeat(3) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        rule.onNodeWithText("All").performClick()
+        rule.waitForIdle()
+        rule.onRoot().performTouchInput { swipeDown() }
+        rule.waitForIdle()
+        assertEquals("page 1 is at its top and the header is open", expanded, chipsBounds().top)
+        assertEquals("no scrim over an open header at a page's top", 0f, scrim, 0f)
+        val tops = mutableListOf<Float>()
+
+        move.go("Movies", "left") { tops += chipsBounds().top.value }
+
+        assertEquals("the header stays open for the deep page that arrives", listOf(expanded.value), tops.distinct())
+        assertTrue("page 2 is scrolled, so no row shows under the open header without a scrim", scrim > 0f)
     }
 
     @Test
-    fun `the small bar's header follows the page it settles on, on a swipe`() =
-        assertSmallHeaderFollowsPages { _, direction ->
-            rule.onRoot().performTouchInput { if (direction == "left") swipeLeft() else swipeRight() }
-        }
+    fun `the header does not move while a swipe takes the pager between a deep page and a top page`() = assertHeaderStaysThroughMoves(swipe)
 
     @Test
-    fun `the small bar's header follows the page it settles on, on a chip tap`() =
-        assertSmallHeaderFollowsPages { chip, _ -> rule.onNodeWithText(chip).performClick() }
+    fun `the header does not move while a chip tap takes the pager between a deep page and a top page`() =
+        assertHeaderStaysThroughMoves(chipTap)
 
     @Test
-    fun `the pinned small bar's header follows the page it settles on, on a swipe`() =
-        assertSmallHeaderFollowsPages(pinned = true) { _, direction ->
-            rule.onRoot().performTouchInput { if (direction == "left") swipeLeft() else swipeRight() }
-        }
+    fun `a deep page that arrives under an open header brings its scrim, on a swipe`() = assertDeepPageScrimsExpandedHeader(swipe)
 
     @Test
-    fun `the pinned small bar's header follows the page it settles on, on a chip tap`() =
-        assertSmallHeaderFollowsPages(pinned = true) { chip, _ -> rule.onNodeWithText(chip).performClick() }
+    fun `a deep page that arrives under an open header brings its scrim, on a chip tap`() = assertDeepPageScrimsExpandedHeader(chipTap)
+
+    @Test
+    fun `the small bar's header does not move between a deep page and a top page, on a swipe`() =
+        assertHeaderStaysThroughMoves(swipe, ScreenBar.Small)
+
+    @Test
+    fun `the small bar's header does not move between a deep page and a top page, on a chip tap`() =
+        assertHeaderStaysThroughMoves(chipTap, ScreenBar.Small)
+
+    @Test
+    fun `the pinned small bar's header does not move between a deep page and a top page, on a swipe`() =
+        assertHeaderStaysThroughMoves(swipe, ScreenBar.Small, pinned = true)
+
+    @Test
+    fun `the pinned small bar's header does not move between a deep page and a top page, on a chip tap`() =
+        assertHeaderStaysThroughMoves(chipTap, ScreenBar.Small, pinned = true)
 
     @Test
     fun `a pinned small bar keeps its title, field and chips in place while a page scrolls`() {

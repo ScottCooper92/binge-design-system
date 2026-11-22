@@ -109,13 +109,20 @@ fun OverlaidHeaderContent(
  */
 @Composable
 internal fun rememberPagerScrim(scrimFraction: Float?, scrolled: Boolean): Float {
-    val followed by animateFloatAsState(
-        targetValue = if (scrimFraction == null && scrolled) 1f else 0f,
+    val followed = rememberScrolledScrim(scrimFraction == null && scrolled)
+    val scrim = scrimFraction ?: followed
+    LocalPagerScrimProbe.current?.invoke(scrim)
+    return scrim
+}
+
+/** The scrim fade every header shares: up when [scrolled], down otherwise, over [PAGER_SCRIM_FADE_MILLIS]. */
+@Composable
+internal fun rememberScrolledScrim(scrolled: Boolean): Float {
+    val scrim by animateFloatAsState(
+        targetValue = if (scrolled) 1f else 0f,
         animationSpec = tween(durationMillis = PAGER_SCRIM_FADE_MILLIS),
         label = "pager scrim",
     )
-    val scrim = scrimFraction ?: followed
-    LocalPagerScrimProbe.current?.invoke(scrim)
     return scrim
 }
 
