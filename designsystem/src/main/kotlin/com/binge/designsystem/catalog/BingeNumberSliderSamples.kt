@@ -1,5 +1,7 @@
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
@@ -12,8 +14,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeNumberSheetContent
 import com.binge.designsystem.component.BingeNumberSlider
 import com.binge.designsystem.component.ItemGroup
+import com.binge.designsystem.component.NumberAuto
 import com.binge.designsystem.component.bingeNumberItem
 import com.binge.designsystem.preview.ScreenshotTheme
 
@@ -92,5 +96,39 @@ fun BingeNumberItemSample() {
                     ),
                 ),
         )
+    }
+}
+
+/**
+ * The sheet a number row opens, drawn directly, with the switch for a value the app chooses for itself: off, so the slider moves, and
+ * on, so it is dimmed and keeps the last number it showed. Flip a switch and drag the slider. The words are the sample's own.
+ */
+@Composable
+fun BingeNumberSheetContentSample() {
+    var manual by remember { mutableStateOf<Int?>(10) }
+    var automaticOn by remember { mutableStateOf(true) }
+    var automatic by remember { mutableStateOf<Int?>(null) }
+    ScreenshotTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_l))) {
+            BingeNumberSheetContent(
+                title = "Port",
+                value = manual,
+                onChange = { manual = it },
+                range = SAMPLE_RANGE,
+                format = { it.toString() },
+                auto = NumberAuto("Choose automatically", on = false, onChange = { _, number -> manual = number }),
+            )
+            BingeNumberSheetContent(
+                title = "Port",
+                value = automatic,
+                onChange = { automatic = it },
+                range = SAMPLE_RANGE,
+                format = { it.toString() },
+                auto = NumberAuto("Choose automatically", on = automaticOn, onChange = { on, number ->
+                    automaticOn = on
+                    automatic = number
+                }),
+            )
+        }
     }
 }

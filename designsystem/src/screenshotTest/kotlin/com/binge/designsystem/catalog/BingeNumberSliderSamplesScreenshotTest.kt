@@ -46,4 +46,9 @@ class BingeNumberSliderSamplesScreenshotTest {
     fun Item() {
         BingeNumberItemSample()
     }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun sheetWithAutoSwitch() = BingeNumberSheetContentSample()
 }
