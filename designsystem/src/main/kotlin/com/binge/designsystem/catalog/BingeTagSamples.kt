@@ -85,7 +85,7 @@ fun BingeTagKindsSample() {
 
 /**
  * A tag with less room than its label needs. Its label stays on one line and ends in an ellipsis, where it used to wrap and
- * break a word in two. The first tag has room for its label; the second has less width than one word. It is the worst case of
+ * break a word in two. The first tag has room for its label at the default font (at 2x it ellipsizes too); the second has less width than one word. It is the worst case of
  * a tag in a narrow pane or at a large font size.
  */
 @Composable

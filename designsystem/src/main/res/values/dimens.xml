@@ -232,9 +232,10 @@
     <dimen name="tag_icon_size">13dp</dimen>
     <!-- BingeTag compact form, for a TagRow of many tags -->
     <dimen name="tag_compact_padding_h">6dp</dimen>
+    <dimen name="tag_compact_padding_v">2dp</dimen>
+    <!-- The two widths of BingeTagNarrowSample: room for a label at the default font, and less than one word -->
     <dimen name="tag_sample_wide_width">160dp</dimen>
     <dimen name="tag_sample_narrow_width">44dp</dimen>
-    <dimen name="tag_compact_padding_v">2dp</dimen>
     <!-- FilterPill: the pill's horizontal padding (its vertical padding is padding_s), the gap between its parts, and the compass glyph -->
     <dimen name="filter_pill_padding_h">14dp</dimen>
     <dimen name="filter_pill_spacing">6dp</dimen>
