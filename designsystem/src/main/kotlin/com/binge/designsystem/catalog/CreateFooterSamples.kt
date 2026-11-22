@@ -43,6 +43,10 @@ fun CreateFooterSample() = CreateFooterPage(enabled = true, loading = false)
 @Composable
 fun CreateFooterDisabledSample() = CreateFooterPage(enabled = false, loading = false)
 
+/** [CreateFooter] with its create in flight: the button shows its busy state and takes no taps. */
+@Composable
+fun CreateFooterLoadingSample() = CreateFooterPage(enabled = true, loading = true)
+
 /** [CreateFooter] under a 48dp navigation bar, which a frame reports as zero tall unless it asks: the button must clear it. */
 @Composable
 fun CreateFooterUnderSystemBarsSample() {
