@@ -12,7 +12,6 @@ import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,7 +23,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
-import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.DISABLED_ALPHA
 import com.binge.designsystem.R
 
@@ -164,22 +162,7 @@ private fun CheckRowLayout(
                     modifier = Modifier.alpha(if (enabled) 1f else DISABLED_ALPHA),
                 )
             }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                if (!supportingText.isNullOrBlank()) {
-                    Text(
-                        text = supportingText,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = supportingMaxLines,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
+            ToggleRowLabel(label, supportingText, enabled, supportingMaxLines)
             trailingContent?.let { trailing ->
                 val gap = dimensionResource(R.dimen.row_trailing_control_gap) - dimensionResource(R.dimen.checkbox_row_gap)
                 Box(Modifier.padding(start = gap)) { trailing() }
