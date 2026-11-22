@@ -95,6 +95,19 @@ class BingeTextItemTest {
     }
 
     @Test
+    fun aBlankValueIsNotCheckedSoAnOptionalValueCanBeCleared() {
+        value = "media.local"
+        show(check = { "Not a host" })
+        openSheet()
+
+        rule.onNode(hasSetTextAction()).performTextClearance()
+        rule.onNodeWithText("Done").assertIsEnabled().performClick()
+        rule.waitForIdle()
+
+        assertEquals("", saved)
+    }
+
+    @Test
     fun aSecretKeepsItsEdgeSpaces() {
         show(secret = true)
         openSheet()

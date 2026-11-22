@@ -277,7 +277,7 @@ class BingeChoiceSheetTest {
                             emptyLabel = "Not set",
                             onSelect = {},
                             suggested = listOf(3),
-                            pinned = listOf(2),
+                            pinned = listOf(5),
                             subtitle = "Where titles are listed",
                             caption = "Changes the whole library",
                             filterPlaceholder = "Search regions",
@@ -293,6 +293,7 @@ class BingeChoiceSheetTest {
         rule.onNodeWithText("Changes the whole library").assertIsDisplayed()
         rule.onNodeWithText("Search regions").assertIsDisplayed()
         rule.onNodeWithText("Suggested").assertExists()
+        rule.onNodeWithText("Region 5").assertExists()
     }
 
     @Test

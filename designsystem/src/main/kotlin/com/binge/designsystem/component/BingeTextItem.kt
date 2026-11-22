@@ -22,7 +22,8 @@ private const val MULTILINE_MAX_LINES = 8
  * call, so a page lists its rows and nothing else. A row that is not [enabled] dims, and closes its sheet if open.
  *
  * The setting saves as it is made: Done calls [onChange] with the value and closes the sheet at once, and a failure is the page's to
- * report on its own status line, so the sheet has no spinner and no error of a server's. A value [check] refuses keeps Done off.
+ * report on its own status line, so the sheet has no spinner and no error of a server's. A value [check] refuses keeps Done off; a
+ * blank value is not checked, as in the row, so an optional value can be cleared.
  * The value is trimmed, unless it is a [secret], where a password's edge spaces are part of it.
  *
  * @param doneLabel the sheet's confirm button, "Done".
@@ -71,7 +72,7 @@ fun bingeTextItem(
                 secret = secret,
                 hint = hint,
                 placeholder = placeholder,
-                problem = check(submitted),
+                problem = submitted.takeIf { it.isNotBlank() }?.let(check),
                 multiline = multiline,
                 keyboard = keyboard,
             )
