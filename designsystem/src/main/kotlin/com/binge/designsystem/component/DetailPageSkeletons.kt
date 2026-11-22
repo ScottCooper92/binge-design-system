@@ -19,9 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
@@ -147,14 +149,31 @@ fun TextPlate(
     modifier: Modifier = Modifier,
     text: String? = null,
     maxLines: Int = Int.MAX_VALUE,
+) = BlankTextPlate(style = style, modifier = modifier, text = text, maxLines = maxLines)
+
+/**
+ * The one blank-text-and-shimmer plate behind [TextPlate] and the skeleton lines of a season row and a list item's detail: blank text of [style] sets the
+ * height, so the plate is the line's at any font size, and the shimmer, in [shape], is inset [inset] from the top and bottom of it. The default inset leaves
+ * lines stacked one on the next reading as separate bars; a plate that stands for a single line of its own passes zero and the shimmer fills it. [minLines]
+ * and [maxLines] hold it to that many lines of the blank text, and [text] stands in for words the loaded line will hold, as on [TextPlate].
+ */
+@Composable
+internal fun BlankTextPlate(
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    text: String? = null,
+    minLines: Int = 1,
+    maxLines: Int = Int.MAX_VALUE,
+    shape: Shape = BingeShapes.Tag,
+    inset: Dp = dimensionResource(R.dimen.detail_cast_avatar_label_spacing),
 ) {
     Box(modifier) {
-        Text(text = text ?: " ", style = style, maxLines = maxLines, modifier = Modifier.alpha(0f))
+        Text(text = text ?: " ", style = style, minLines = minLines, maxLines = maxLines, modifier = Modifier.alpha(0f))
         Box(
             Modifier
                 .matchParentSize()
-                .padding(vertical = dimensionResource(R.dimen.detail_cast_avatar_label_spacing))
-                .skeleton(visible = true, shape = BingeShapes.Tag),
+                .padding(vertical = inset)
+                .skeleton(visible = true, shape = shape),
         )
     }
 }

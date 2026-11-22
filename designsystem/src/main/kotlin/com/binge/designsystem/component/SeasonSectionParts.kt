@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import com.binge.designsystem.BACKDROP_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.modifier.skeleton
-import com.binge.designsystem.theme.BingeShapes
 
 private const val SKELETON_META_WIDTH_FRACTION = 0.35f
 
@@ -157,13 +156,11 @@ private fun SkeletonLine(
     widthFraction: Float,
     lines: Int,
 ) {
-    Text(
-        text = " ",
+    BlankTextPlate(
         style = style,
+        modifier = Modifier.fillMaxWidth(widthFraction),
         minLines = lines,
         maxLines = lines,
-        modifier = Modifier
-            .fillMaxWidth(widthFraction)
-            .skeleton(visible = true, shape = BingeShapes.Tag),
+        inset = dimensionResource(R.dimen.zero),
     )
 }
