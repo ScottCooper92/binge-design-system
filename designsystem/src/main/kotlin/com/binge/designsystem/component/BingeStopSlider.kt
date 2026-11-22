@@ -9,7 +9,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,15 +19,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import kotlin.math.roundToInt
 
@@ -130,28 +127,29 @@ private fun StopLabels(
     onPick: (Int) -> Unit,
 ) {
     val inset = dimensionResource(R.dimen.stop_slider_inset)
-    val nameStyle = MaterialTheme.typography.labelMedium
-    val measurer = rememberTextMeasurer()
-    SubcomposeLayout(modifier = Modifier.fillMaxWidth()) { constraints ->
+    Layout(
+        content = {
+            stops.forEachIndexed { index, stop ->
+                StopIcon(stop, index, selectedIndex, accent, enabled, onPick)
+                StopName(stop, index, selectedIndex, accent, enabled, onPick)
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+    ) { measurables, constraints ->
         val width = constraints.maxWidth
         val inner = inset.roundToPx()
         val loose = constraints.copy(minWidth = 0, minHeight = 0)
-        val count = stops.size
+        // `content` alternates an icon and its name, so even indexes are icons and odd ones are names.
+        val count = measurables.size / 2
         val step = (width - 2 * inner).toFloat() / (count - 1)
-        val icons =
-            stops.mapIndexed { index, stop ->
-                subcompose("icon$index") { StopIcon(stop, index, selectedIndex, accent, enabled, onPick) }.first().measure(loose)
-            }
+        val icons = measurables.filterIndexed { i, _ -> i % 2 == 0 }.map { it.measure(loose) }
         // A name may use only the room its stop owns, so a long one wraps under its icon instead of running into
         // the next: half a step either side of its tick, and at the ends from the row's edge. A name with a word wider
-        // than that room stays on one line and ends in an ellipsis, because Text would break the word in two.
+        // than that room stays on one line and ends in an ellipsis, as WholeWordText does, because Text would break the word in two.
         val labels =
-            stops.mapIndexed { index, stop ->
-                val room = (if (index == 0 || index == count - 1) inner + step / 2 else step).toInt().coerceAtMost(width)
-                val longestWord = stop.label.split(' ').maxOf { measurer.measure(it, nameStyle).size.width }
-                subcompose("name$index") {
-                    StopName(stop, index, selectedIndex, accent, enabled, onPick, oneLine = longestWord > room)
-                }.first().measure(loose.copy(maxWidth = room))
+            measurables.filterIndexed { i, _ -> i % 2 == 1 }.mapIndexed { i, measurable ->
+                val room = if (i == 0 || i == count - 1) inner + step / 2 else step
+                measurable.measure(loose.copy(maxWidth = room.toInt().coerceAtMost(width)))
             }
         val iconHeight = icons.maxOf { it.height }
         layout(width, iconHeight + labels.maxOf { it.height }) {
@@ -204,7 +202,7 @@ private fun StopIcon(
     )
 }
 
-/** A stop's name under its icon: wrapping at its spaces, or, when [oneLine], held to one line that ends in an ellipsis. */
+/** A stop's name under its icon: it wraps at its spaces, and ends in an ellipsis rather than break a word. */
 @Composable
 private fun StopName(
     stop: BingeStop,
@@ -213,15 +211,11 @@ private fun StopName(
     accent: Color,
     enabled: Boolean,
     onPick: (Int) -> Unit,
-    oneLine: Boolean,
 ) {
-    Text(
+    WholeWordText(
         text = stop.label,
-        style = MaterialTheme.typography.labelMedium,
+        style = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
         color = stopTint(index, selectedIndex, accent, enabled),
-        textAlign = TextAlign.Center,
-        maxLines = if (oneLine) 1 else Int.MAX_VALUE,
-        overflow = TextOverflow.Ellipsis,
         modifier = stopPick(index, enabled, onPick).padding(bottom = dimensionResource(R.dimen.padding_xs)),
     )
 }
