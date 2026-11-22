@@ -308,6 +308,9 @@ fun <T> BingeMultiChoiceSheet(
  * [BingeChoiceList.Ready] the detail is [selectedLabel], if given, so the row still names the saved value; then
  * [emptyLabel]. The row emits its sheet as it is composed, so build it in composition on each pass, not inside a
  * `remember`.
+ *
+ * [suggested], [pinned], [subtitle], [caption], [filterPlaceholder] and [noMatchLabel] are the sheet's own, passed through as
+ * [BingeChoiceSheet] takes them, so a row that needs a long list sectioned or searched is still one call.
  */
 @Composable
 fun <T> bingeChoiceItem(
@@ -320,6 +323,12 @@ fun <T> bingeChoiceItem(
     enabled: Boolean = true,
     onOpen: () -> Unit = {},
     selectedLabel: String? = null,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    subtitle: String? = null,
+    caption: String? = null,
+    filterPlaceholder: String? = null,
+    noMatchLabel: String? = null,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
@@ -332,6 +341,12 @@ fun <T> bingeChoiceItem(
             selected = selected,
             onSelect = onSelect,
             onDismissRequest = { open = false },
+            suggested = suggested,
+            pinned = pinned,
+            subtitle = subtitle,
+            caption = caption,
+            filterPlaceholder = filterPlaceholder,
+            noMatchLabel = noMatchLabel,
         )
     }
     val chosen = (choices as? BingeChoiceList.Ready)?.choices?.firstOrNull { it.value == selected }
@@ -349,7 +364,7 @@ fun <T> bingeChoiceItem(
  * [bingeChoiceItem] for several values: the chosen labels, in list order, as the detail, and a [BingeMultiChoiceSheet]
  * on tap. [onOpen] and [selectedLabel] work as they do there; [selectedLabel] is the whole detail for the selection.
  * [draftSaver] keeps the sheet's ticks across a rotation, and [applyAsPicked] applies each tick at once, as on
- * [BingeMultiChoiceSheet].
+ * [BingeMultiChoiceSheet]. [suggested], [pinned], [subtitle] and [caption] are the sheet's own, passed through.
  */
 @Composable
 fun <T> bingeMultiChoiceItem(
@@ -368,6 +383,10 @@ fun <T> bingeMultiChoiceItem(
     selectedLabel: String? = null,
     draftSaver: Saver<Set<T>, out Any>? = null,
     applyAsPicked: Boolean = false,
+    suggested: List<T> = emptyList(),
+    pinned: List<T> = emptyList(),
+    subtitle: String? = null,
+    caption: String? = null,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(enabled) { if (!enabled) open = false }
@@ -386,6 +405,10 @@ fun <T> bingeMultiChoiceItem(
             noMatchLabel = noMatchLabel,
             draftSaver = draftSaver,
             applyAsPicked = applyAsPicked,
+            suggested = suggested,
+            pinned = pinned,
+            subtitle = subtitle,
+            caption = caption,
         )
     }
     val chosen =
