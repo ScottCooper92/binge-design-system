@@ -49,7 +49,7 @@ fun FilteredListScreen(
     onFilterChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    bar: ScreenBar = ScreenBar.Collapsing,
+    bar: ScreenBar = LocalScreenBarDefault.current,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     headerBackground: Color = Color.Transparent,
     scrimFraction: Float? = null,

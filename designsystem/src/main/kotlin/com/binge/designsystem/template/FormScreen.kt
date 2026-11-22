@@ -113,7 +113,7 @@ fun FormScreen(
     secondaryAction: FormAction? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     scrolling: Boolean = true,
-    bar: ScreenBar = ScreenBar.Collapsing,
+    bar: ScreenBar = LocalScreenBarDefault.current,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     capWidth: Boolean = false,
     saveStatus: FormSaveStatus? = null,
