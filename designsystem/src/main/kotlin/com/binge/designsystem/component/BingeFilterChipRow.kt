@@ -76,6 +76,7 @@ fun BingeFilterChipRow(
  *
  * @need narrow a list by several filters at once with a row of chips
  * @group cards
+ * @sample BingeFilterChipRowMultiSample
  * @replaces a hand-built LazyRow of toggling filter chips
  */
 @Composable
