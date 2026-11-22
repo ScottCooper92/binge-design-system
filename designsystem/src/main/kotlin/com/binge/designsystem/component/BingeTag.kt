@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextOverflow
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.theme.labelSmallEmphasis
@@ -79,6 +80,9 @@ fun BingeTag(
             text = if (uppercase) label.uppercaseLocalised() else label,
             style = if (compact) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelSmallEmphasis,
             color = content,
+            // A tag in a slot narrower than its label ends in an ellipsis; its words never break across lines.
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

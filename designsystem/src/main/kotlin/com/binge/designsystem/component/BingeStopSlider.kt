@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.invisibleToUser
@@ -150,6 +152,15 @@ private fun StopLabels(
                     color = tint,
                     textAlign = TextAlign.Center,
                     modifier = pick.padding(bottom = dimensionResource(R.dimen.padding_xs)),
+                    maxLines = 1,
+                    // One line that shrinks to the room its stop owns, so a name never breaks inside a word the way a second line would let it.
+                    autoSize =
+                        with(LocalDensity.current) {
+                            TextAutoSize.StepBased(
+                                minFontSize = dimensionResource(R.dimen.stop_slider_label_min_size).toSp(),
+                                maxFontSize = MaterialTheme.typography.labelMedium.fontSize,
+                            )
+                        },
                 )
             }
         },

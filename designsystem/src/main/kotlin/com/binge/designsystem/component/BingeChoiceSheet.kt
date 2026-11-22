@@ -960,7 +960,13 @@ private fun <T> RadioChoiceRow(
     ) {
         if (markSlot) ChoiceMark(choice) else RadioButton(selected = selected, onClick = null)
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = choice.label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = CHOICE_LABEL_MAX_LINES,
+                overflow = TextOverflow.Ellipsis,
+            )
             choice.supportingText?.let {
                 Text(
                     text = it,
@@ -1132,7 +1138,13 @@ private fun <T> CheckChoiceRow(
     ) {
         if (markSlot) ChoiceMark(choice)
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = choice.label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = CHOICE_LABEL_MAX_LINES,
+                overflow = TextOverflow.Ellipsis,
+            )
             choice.supportingText?.let {
                 Text(
                     text = it,
@@ -1254,3 +1266,6 @@ internal fun <T> List<BingeChoice<T>>.pinnedFirst(pinned: List<T>): List<BingeCh
     val byValue = associateBy { it.value }
     return pinned.distinct().mapNotNull { byValue[it] } + filter { it.value !in pinned }
 }
+
+/** A choice's name wraps by word up to this many lines, then ends in an ellipsis, so a word wider than its room is cut short and never split across lines. */
+private const val CHOICE_LABEL_MAX_LINES = 2

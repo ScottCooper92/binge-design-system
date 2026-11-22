@@ -73,7 +73,7 @@ fun BingeStopSliderHeldSample() {
     StopSliderSampleFrame(sampleStops, selected = 1, holdIndex = 3)
 }
 
-/** The longest names a stop should carry, at large fonts: they wrap by word under their icons inside the room each stop owns. */
+/** The longest names a stop should carry, at large fonts: each shrinks to one line inside the room its stop owns. */
 @Composable
 fun BingeStopSliderWorstCaseSample() {
     StopSliderSampleFrame(longStops, selected = 1)

@@ -101,10 +101,10 @@ class TextClippingTest {
     }
 
     /** The same row at eight widths, because the undercount shows only where the tags wrap onto a further line. */
-    private fun showAtManyWidths(statusLine: @Composable () -> Unit) {
+    private fun showAtManyWidths(fontScale: Float = FONT_SCALE, statusLine: @Composable () -> Unit) {
         rule.setContent {
             val density = LocalDensity.current
-            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = FONT_SCALE)) {
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
                 BingeExpressiveTheme {
                     Column {
                         ROW_WIDTHS.forEach { width -> Box(Modifier.width(width.dp)) { RealRow(statusLine) } }
@@ -120,6 +120,7 @@ class TextClippingTest {
         showAtManyWidths { WrappingRow(horizontalSpacing = CHIP_GAP, verticalSpacing = CHIP_GAP) { Tags() } }
 
         rule.assertNoTextClipped()
+        rule.assertNoBrokenWords()
     }
 
     @Composable
