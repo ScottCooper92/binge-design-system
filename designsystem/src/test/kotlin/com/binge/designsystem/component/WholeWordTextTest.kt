@@ -106,6 +106,14 @@ class WholeWordTextTest {
     }
 
     @Test
+    fun `an unspaced Thai label wider than the room wraps rather than going to one line`() {
+        val label = "เซิร์ฟเวอร์ห้องนั่งเล่นของฉัน"
+        show(width = NARROW, text = label)
+
+        assertTrue("expected several lines, got ${lineCount(label)}", lineCount(label) > 1)
+    }
+
+    @Test
     fun `a hyphenated name the line breaker would split inside a part is held to one ellipsized line`() {
         val text = "Fitzgerald-Montgomery"
         show(width = HYPHEN_ROOM, text = text)
