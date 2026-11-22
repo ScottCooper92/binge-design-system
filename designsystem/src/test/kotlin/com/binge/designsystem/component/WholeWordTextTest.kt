@@ -69,6 +69,15 @@ class WholeWordTextTest {
     }
 
     @Test
+    fun `a hyphenated name the line breaker would split inside a part is held to one ellipsized line`() {
+        val text = "Fitzgerald-Montgomery"
+        show(width = HYPHEN_ROOM, text = text)
+
+        assertEquals(1, lineCount(text))
+        rule.assertNoTextClipped()
+    }
+
+    @Test
     fun `the text is in the semantics tree once`() {
         show(width = NARROW, text = "Fitzgerald-Montgomery Alexandria")
 
@@ -77,5 +86,6 @@ class WholeWordTextTest {
 
     private companion object {
         const val NARROW = 90
+        const val HYPHEN_ROOM = 130
     }
 }
