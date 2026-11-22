@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +27,6 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -183,8 +181,7 @@ class SearchCallbacks(
  * columns on wider windows.
  *
  * Nothing here is an app's type: results are [MediaResult]s with a text key, each result's status is the [resultTrailing] slot, and the
- * app owns the query, the history and the paging. [titleTrailing] and [barActions] are told how far the bar has collapsed (they
- * switch at [BAR_HANDOVER_COLLAPSE]). [idleExtras] adds items under the recents, [noResultsExtras] sits under the no-results plate, and
+ * app owns the query, the history and the paging. [idleExtras] adds items under the recents, [noResultsExtras] sits under the no-results plate, and
  * [failedContent] replaces the default failure plate.
  *
  * @param idleTitle the plate shown while idle with nothing to offer, which the app words; the defaults say "Search" and "Type a title or a name."
@@ -221,14 +218,11 @@ fun SearchScreen(
     idleMessage: String = stringResource(R.string.search_idle_message),
     loadingLabel: String = stringResource(R.string.search_loading),
     reselectKey: Any? = null,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     recentsTitle: String = stringResource(R.string.search_recents_title),
     clearLabel: String = stringResource(R.string.search_recents_clear),
     clearTitle: String = stringResource(R.string.search_recents_clear_title),
     clearMessage: String = stringResource(R.string.search_recents_clear_message),
     moreFailedLabel: String = stringResource(R.string.list_more_failed),
-    titleTrailing: (@Composable (pillInteractive: Boolean) -> Unit)? = null,
-    barActions: @Composable RowScope.(handedOver: Boolean, collapsedFraction: Float) -> Unit = { _, _ -> },
     resultTrailing: ((MediaResult) -> (@Composable () -> Unit)?)? = null,
     idleExtras: (LazyListScope.() -> Unit)? = null,
     noResultsExtras: (@Composable () -> Unit)? = null,
@@ -238,12 +232,8 @@ fun SearchScreen(
     reserveTypeChipsWhileLoading: Boolean = false,
     expectedResultName: String? = null,
     fastScrollbar: FastScrollbarOptions? = null,
-    overlays: @Composable () -> Unit = {},
 ) {
     val scrollBehavior = rememberScreenBarScrollBehavior(bar, pinned)
-    // A small bar's title row never collapses, so nothing is ever handed over on it.
-    val collapsed = if (bar == ScreenBar.Small) 0f else scrollBehavior?.state?.collapsedFraction ?: 0f
-    val titleRowShows = collapsed < BAR_HANDOVER_COLLAPSE
     val paged = state.pagedTypes()
     // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
     val answered = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query
@@ -268,11 +258,8 @@ fun SearchScreen(
         modifier = modifier,
         onBack = callbacks.onBack,
         bar = bar,
-        snackbarHostState = snackbarHostState,
         scrollBehavior = scrollBehavior,
         scrimFloor = pageScrim,
-        titleTrailing = titleTrailing?.let { { it(titleRowShows) } },
-        actions = { barActions(!titleRowShows, collapsed) },
         header = {
             SearchControls(text, state, callbacks, placeholder, reselectKey, pager.takeIf { paged != null }, reserveTypeChipsWhileLoading)
         },
@@ -305,7 +292,6 @@ fun SearchScreen(
             }
         }
     }
-    overlays()
 }
 
 /**
