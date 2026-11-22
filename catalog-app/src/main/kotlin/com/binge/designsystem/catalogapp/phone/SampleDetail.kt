@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -85,6 +86,8 @@ fun SampleDetail(
         Scaffold(
             containerColor = MaterialTheme.colorScheme.surface,
             floatingActionButton = { TweaksFab(tweaked, onClick = { showTweaks = true }) },
+            // The page draws edge to edge, as it did: the frame inside reserves the bars itself, so this one reserves none.
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
         ) { outer ->
             // The design system's own screen frame draws the bar, as an app's screen does.
             BingeScreenScaffold(
