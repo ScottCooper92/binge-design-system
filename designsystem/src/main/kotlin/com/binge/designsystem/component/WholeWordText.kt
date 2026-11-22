@@ -16,9 +16,13 @@ import androidx.compose.ui.text.style.TextOverflow
  *
  * It decides while measuring, so one pass is enough, and it composes one [Text] only, so the semantics tree holds the text
  * once. Like any `SubcomposeLayout` it cannot answer an intrinsic size query: do not put it under `IntrinsicSize`.
+ *
+ * @need show a name or label that wraps at its spaces but never breaks a word in two
+ * @group rows
+ * @replaces a Text that breaks a long word across lines at a large font
  */
 @Composable
-internal fun WholeWordText(
+fun WholeWordText(
     text: String,
     style: TextStyle,
     color: Color,
