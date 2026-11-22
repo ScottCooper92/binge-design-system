@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,8 +46,7 @@ fun BingeOverflowMenuSample() {
         Surface(
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
             shape = MaterialTheme.shapes.extraSmall,
-            tonalElevation = MenuDefaults.TonalElevation,
-            shadowElevation = MenuDefaults.ShadowElevation,
+            color = MaterialTheme.colorScheme.surfaceContainer,
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Max)) { OverflowMenuItems(sampleItems(), onDismissRequest = {}) }
         }
