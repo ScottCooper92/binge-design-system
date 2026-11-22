@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.exclude
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -281,33 +280,20 @@ fun BingeFilterChipPager(
     beyondViewportPageCount: Int = 0,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
-    val pager = rememberFilterPager(
+    HeaderPager(
+        pageCount = items.size,
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
-        pageCount = items.size,
-    )
-    val pagerState = pager.state
-    val scrim = rememberPagerScrim(scrimFraction, scrolled = pageScrolled(pager.shownIndex))
-    OverlaidHeaderContent(
         modifier = modifier,
+        header = header,
         headerBackground = headerBackground,
-        scrimFraction = scrim,
+        scrimFraction = scrimFraction,
+        pageScrolled = pageScrolled,
         scrimColor = scrimColor,
-        header = {
-            header?.invoke()
-            BingeFilterChipRow(
-                items = items,
-                selectedIndex = pager.shownIndex,
-                onSelect = onSelectedIndexChange,
-            )
+        beyondViewportPageCount = beyondViewportPageCount,
+        selector = { shown ->
+            BingeFilterChipRow(items = items, selectedIndex = shown, onSelect = onSelectedIndexChange)
         },
-    ) { contentPadding ->
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            beyondViewportPageCount = beyondViewportPageCount,
-        ) { page ->
-            pageContent(contentPadding, page)
-        }
-    }
+        pageContent = pageContent,
+    )
 }

@@ -1,7 +1,6 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -60,34 +59,20 @@ fun BingeTabbedPager(
     beyondViewportPageCount: Int = 0,
     pageContent: @Composable (contentPadding: PaddingValues, page: Int) -> Unit,
 ) {
-    val pager = rememberFilterPager(
+    HeaderPager(
+        pageCount = tabs.size,
         selectedIndex = selectedIndex,
         onSelectedIndexChange = onSelectedIndexChange,
-        pageCount = tabs.size,
-    )
-    val pagerState = pager.state
-    val scrim = rememberPagerScrim(scrimFraction, scrolled = pageScrolled(pager.shownIndex))
-    OverlaidHeaderContent(
         modifier = modifier,
+        header = header,
         headerBackground = headerBackground,
-        scrimFraction = scrim,
+        scrimFraction = scrimFraction,
+        pageScrolled = pageScrolled,
         scrimColor = scrimColor,
-        header = {
-            header?.invoke()
-            BingeTabRow(
-                tabs = tabs,
-                selectedIndex = pager.shownIndex,
-                onSelect = onSelectedIndexChange,
-                edgePadding = edgePadding,
-            )
+        beyondViewportPageCount = beyondViewportPageCount,
+        selector = { shown ->
+            BingeTabRow(tabs = tabs, selectedIndex = shown, onSelect = onSelectedIndexChange, edgePadding = edgePadding)
         },
-    ) { contentPadding ->
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            beyondViewportPageCount = beyondViewportPageCount,
-        ) { page ->
-            pageContent(contentPadding, page)
-        }
-    }
+        pageContent = pageContent,
+    )
 }
