@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -31,10 +32,10 @@ import com.binge.designsystem.component.FilterChipItem
  * swipe reaches them.
  *
  * [scrollBehavior] replaces the one the template picks from [bar], for a caller that owns the bar's state. The
- * default is [BingeScreenScaffold]'s look: a transparent collapsing bar and header with the rows visible behind
- * them, and one scrim over both that fades in as the bar collapses ([scrimFraction] null follows the bar; pass a
- * fraction to drive it yourself). Pass an opaque [headerBackground] and a [scrimFraction] of zero for a header
- * that is a solid ground, and [ScreenBar.Small] for a single-line bar.
+ * default header is a solid ground: the theme's background with no scrim over it ([headerBackground], [scrimFraction] zero). For
+ * [BingeScreenScaffold]'s own look, a transparent header with the rows visible behind it and one scrim over the bar and the header
+ * that fades in as the bar collapses, pass [Color.Transparent] and a [scrimFraction] of null, which follows the bar; or pass a
+ * fraction to drive it yourself. [ScreenBar.Small] gives a single-line bar.
  *
  * @need show a list split by filter chips, one page per filter
  * @group screens
@@ -51,8 +52,8 @@ fun FilteredListScreen(
     onBack: (() -> Unit)? = null,
     bar: ScreenBar = LocalScreenBarDefault.current,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    headerBackground: Color = Color.Transparent,
-    scrimFraction: Float? = null,
+    headerBackground: Color = MaterialTheme.colorScheme.background,
+    scrimFraction: Float? = 0f,
     ready: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     search: (@Composable () -> Unit)? = null,
