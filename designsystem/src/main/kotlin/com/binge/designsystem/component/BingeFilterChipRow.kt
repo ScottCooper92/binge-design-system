@@ -44,7 +44,8 @@ import kotlinx.coroutines.flow.first
  * A horizontally-scrolling row of [BingeFilterChip]s — the selected one filled in the primary accent,
  * the rest outlined, each carrying an optional leading icon and count ([FilterChipItem]). Stateless: the caller owns [selectedIndex] and
  * reacts to [onSelect]. The chip counterpart to [BingeTabRow], for filters that narrow a list (rather
- * than switch screens); pair it via [BingeFilterChipPager] for swipe-between-filters.
+ * than switch screens); pair it via [BingeFilterChipPager] for swipe-between-filters. A filter that takes several options at once uses the overload
+ * with a `selected` set.
  *
  * @need narrow a list with a row of filter chips
  * @group cards
@@ -57,13 +58,59 @@ fun BingeFilterChipRow(
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    FilterChipLazyRow(
+        items = items,
+        isSelected = { it == selectedIndex },
+        onClick = onSelect,
+        scrollTarget = selectedIndex,
+        modifier = modifier,
+    )
+}
+
+/**
+ * [BingeFilterChipRow] for a filter that takes any number of its options at once: every chip in [selected] is filled, and a tap
+ * calls [onToggle] with the chip's index, for the caller to add or drop. Stateless, and one scrolling line: it never wraps.
+ *
+ * It is for a handful of options. Past about eight, a row stops showing the choices at a glance and the caller uses a
+ * [BingeMultiChoiceSheet] instead, which lists them all and scrolls.
+ *
+ * @need narrow a list by several filters at once with a row of chips
+ * @group cards
+ * @replaces a hand-built LazyRow of toggling filter chips
+ */
+@Composable
+fun BingeFilterChipRow(
+    items: List<FilterChipItem>,
+    selected: Set<Int>,
+    onToggle: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    FilterChipLazyRow(
+        items = items,
+        isSelected = { it in selected },
+        onClick = onToggle,
+        scrollTarget = null,
+        modifier = modifier,
+    )
+}
+
+/** The row both forms draw. [scrollTarget] is the one chip to keep in view, or null for a row with no single current chip. */
+@Composable
+private fun FilterChipLazyRow(
+    items: List<FilterChipItem>,
+    isSelected: (Int) -> Boolean,
+    onClick: (Int) -> Unit,
+    scrollTarget: Int?,
+    modifier: Modifier,
+) {
     val listState = rememberLazyListState()
     var consumedInsets by remember { mutableStateOf(NoInsets) }
     // A LazyRow won't follow the selection on its own, so a swipe-driven change could leave the
     // active chip off-screen. Scroll it in — but only when not already fully visible, so tapping a
     // visible chip doesn't jump the row.
-    LaunchedEffect(selectedIndex, items.size) {
-        val target = selectedIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0))
+    LaunchedEffect(scrollTarget, items.size) {
+        if (scrollTarget == null) return@LaunchedEffect
+        val target = scrollTarget.coerceIn(0, (items.size - 1).coerceAtLeast(0))
         val info = listState.layoutInfo
         val visible = info.visibleItemsInfo.firstOrNull { it.index == target }
         val fullyVisible = visible != null &&
@@ -80,8 +127,8 @@ fun BingeFilterChipRow(
         itemsIndexed(items) { index, item ->
             BingeFilterChip(
                 label = item.label,
-                selected = index == selectedIndex,
-                onClick = { onSelect(index) },
+                selected = isSelected(index),
+                onClick = { onClick(index) },
                 count = item.count,
                 leadingIcon = item.icon,
                 contentDescription = item.contentDescription,

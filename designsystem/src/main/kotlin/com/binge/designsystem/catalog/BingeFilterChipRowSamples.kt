@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -49,6 +50,25 @@ fun BingeFilterChipRowSample() {
             ),
             selectedIndex = selected,
             onSelect = { selected = it },
+        )
+    }
+}
+
+/** [BingeFilterChipRow] with several chips on at once: tap a chip to add it to the filter or drop it again. */
+@Composable
+fun BingeFilterChipRowMultiSample() {
+    var selected by remember { mutableStateOf(setOf(0, 2)) }
+    ScreenshotTheme {
+        BingeFilterChipRow(
+            items = listOf(
+                FilterChipItem(label = "Action", count = 31),
+                FilterChipItem(label = "Comedy", count = 24),
+                FilterChipItem(label = "Drama", count = 52),
+                FilterChipItem(label = "Horror"),
+                FilterChipItem(label = "Sci-Fi", count = 9),
+            ),
+            selected = selected,
+            onToggle = { selected = if (it in selected) selected - it else selected + it },
         )
     }
 }
