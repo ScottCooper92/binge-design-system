@@ -7,7 +7,7 @@ run-name: >-
       || github.event.pull_request.number && format('#{0}', github.event.pull_request.number)
       || github.ref_name }}
 
-# Thin caller. The workflow itself lives in ScottCooper92/binge-ci.
+# Thin caller. The workflow itself lives in ScottCooper92/homelab-ci.
 #
 # All THREE events, because wiring only `issue_comment` is the usual mistake and it
 # misses every inline comment on the diff.
@@ -36,7 +36,7 @@ jobs:
     # all three events. On a public repo this gate is the control, not a formality - anyone
     # can comment, and the comment body becomes the agent's instructions.
     #
-    # A fork PR never reaches the bot. binge-ci refuses one too, and this keeps the guard in sight
+    # A fork PR never reaches the bot. homelab-ci refuses one too, and this keeps the guard in sight
     # here (#407). It checks the events that name a head repository and lets the others through.
     # Skip coordinator status notes (first line `<!-- to-coordinator`): posted under the maintainer's account, they would start a run with nothing to answer.
     if: >
@@ -63,7 +63,7 @@ jobs:
     concurrency:
       group: author-comments-${{ github.event.issue.number || github.event.pull_request.number }}
       cancel-in-progress: false
-    uses: ScottCooper92/binge-ci/.github/workflows/author-comments.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+    uses: ScottCooper92/homelab-ci/.github/workflows/author-comments.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
       author_bot_id: ${{ vars.AUTHOR_BOT_ID }}
       maintainer_handle: ScottCooper92

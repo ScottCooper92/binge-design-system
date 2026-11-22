@@ -8,7 +8,7 @@ run-name: >-
         && format('#{0} · {1}', github.event.pull_request.number, github.event.pull_request.head.ref)
       || github.ref_name }}
 
-# Thin caller. The workflow itself lives in ScottCooper92/binge-ci.
+# Thin caller. The workflow itself lives in ScottCooper92/homelab-ci.
 #
 # `pull_request_target`, NOT `pull_request`, and this is load-bearing: a
 # `pull_request` workflow is read from the PR's HEAD branch, so it could never run
@@ -30,12 +30,12 @@ on:
 
 jobs:
   catch-up:
-    # A fork PR never reaches the bot. binge-ci refuses one too, and this keeps the guard in sight
+    # A fork PR never reaches the bot. homelab-ci refuses one too, and this keeps the guard in sight
     # here (#407). It checks the events that name a head repository and lets the others through.
     if: >-
       (!github.event.pull_request || github.event.pull_request.head.repo.full_name == github.repository) &&
       (!github.event.workflow_run || github.event.workflow_run.head_repository.full_name == github.repository)
-    uses: ScottCooper92/binge-ci/.github/workflows/author-retarget.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+    uses: ScottCooper92/homelab-ci/.github/workflows/author-retarget.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
       author_bot_id: ${{ vars.AUTHOR_BOT_ID }}
     secrets:

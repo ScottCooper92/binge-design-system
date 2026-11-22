@@ -16,7 +16,7 @@ private fun providers(count: Int) = (1..count).map { WatchProviderUi(id = it, na
 
 /**
  * Guards the cap that keeps [ServicesSummary]'s logo row from overflowing its container with a large
- * selection (binge-design-system#98). A selection at or under the cap still renders one logo per
+ * selection (homelab-design-system#98). A selection at or under the cap still renders one logo per
  * provider — the pre-fix, still-correct case; past it, the row stops growing and folds the remainder
  * into a "+N" badge that carries its own accessible name rather than the raw provider count.
  */

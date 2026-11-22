@@ -11,7 +11,7 @@ run-name: >-
       || github.event.workflow_run.head_branch
       || github.ref_name }}
 
-# Thin caller. The workflow itself lives in ScottCooper92/binge-ci.
+# Thin caller. The workflow itself lives in ScottCooper92/homelab-ci.
 #
 # `CI` is matched by NAME - renaming ci.yml's `name:` silently unhooks this, bot-review
 # and author-conflicts all at once.
@@ -28,7 +28,7 @@ on:
 #
 # This is the one way a reusable workflow differs from the copy it replaced. An ordinary workflow
 # declaring `permissions: actions: read` simply gets it; a caller has to hold it first. Found by
-# running it (binge-seerr#1), not by actionlint, which has no way to see across the reference.
+# running it (homelab-seerr#1), not by actionlint, which has no way to see across the reference.
 permissions:
   contents: read
   actions: read
@@ -37,13 +37,13 @@ jobs:
   fix:
     # Skip the scheduled canary run of CI: it has no PR to review, fix or rebase.
     #
-    # A fork PR never reaches the bot. binge-ci refuses one too, and this keeps the guard in sight
+    # A fork PR never reaches the bot. homelab-ci refuses one too, and this keeps the guard in sight
     # here (#407). It checks the events that name a head repository and lets the others through.
     if: >-
       (github.event.workflow_run.event != 'schedule') &&
       (!github.event.pull_request || github.event.pull_request.head.repo.full_name == github.repository) &&
       (!github.event.workflow_run || github.event.workflow_run.head_repository.full_name == github.repository)
-    uses: ScottCooper92/binge-ci/.github/workflows/author-ci-fix.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+    uses: ScottCooper92/homelab-ci/.github/workflows/author-ci-fix.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
       author_bot_id: ${{ vars.AUTHOR_BOT_ID }}
       # jvm, not android: this repo's ci.yml is setup-java + setup-gradle and nothing
@@ -53,7 +53,7 @@ jobs:
       toolchain: jvm
       java_version: '21'
       # Scott, 2026-11-18: the bot may re-record frames of components its own PR changed, with
-      # before/after posted for review (binge-ci #376).
+      # before/after posted for review (homelab-ci #376).
       rerecord_screenshots: true
       verify_guidance: >
         Scope Gradle to the module rather than running the whole tree when you
@@ -62,8 +62,8 @@ jobs:
         when you push.
 
         You cannot compile the consumers from here. This build is included by Binge,
-        binge-seerr, binge-archive and ephyra, so a change that is green here can still break
-        theirs. CI compiles binge-seerr, binge-archive and ephyra informationally; Binge is
+        homelab-seerr, binge-archive and ephyra, so a change that is green here can still break
+        theirs. CI compiles homelab-seerr, binge-archive and ephyra informationally; Binge is
         not compiled. If a fix
         changes a public signature, say so rather than assuming green means safe.
       gate_rules: |

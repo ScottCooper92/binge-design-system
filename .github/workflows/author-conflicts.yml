@@ -8,7 +8,7 @@ run-name: >-
         && format('sweep after {0}', github.event.workflow_run.head_branch)
       || 'sweep · dispatched' }}
 
-# Thin caller. The workflow itself lives in ScottCooper92/binge-ci.
+# Thin caller. The workflow itself lives in ScottCooper92/homelab-ci.
 #
 # PUBLIC repository: the fork filter inside the scan is the control here, not a
 # formality. The `agent` label grants an agent code execution with this repository's
@@ -21,11 +21,11 @@ on:
 
 jobs:
   resolve:
-    # A fork PR never reaches the bot. binge-ci refuses one too, and this keeps the guard in sight
+    # A fork PR never reaches the bot. homelab-ci refuses one too, and this keeps the guard in sight
     # here (#407). It checks the events that name a head repository and lets the others through.
     #
     # Only a dispatch or CI on a push to the default branch is a sweep, which also leaves out the
-    # scheduled canary run of CI. binge-ci checks the same, but its group is joined first, and a
+    # scheduled canary run of CI. homelab-ci checks the same, but its group is joined first, and a
     # group holds one pending run: a PR's CI run finishing would cancel a queued sweep and then
     # skip. Filtered here, it never starts.
     if: >-
@@ -34,7 +34,7 @@ jobs:
       (github.event_name == 'workflow_dispatch' ||
        (github.event.workflow_run.event == 'push' &&
         github.event.workflow_run.head_branch == github.event.repository.default_branch))
-    uses: ScottCooper92/binge-ci/.github/workflows/author-conflicts.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+    uses: ScottCooper92/homelab-ci/.github/workflows/author-conflicts.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
       dispatched: ${{ github.event_name == 'workflow_dispatch' }}
       author_bot_id: ${{ vars.AUTHOR_BOT_ID }}
@@ -50,9 +50,9 @@ jobs:
         call. Leave it unresolved and say so in note.md rather than guessing.
 
         A conflict over a public signature of a component must be handed
-        back. This build is included by Binge, binge-seerr, binge-archive and
+        back. This build is included by Binge, homelab-seerr, binge-archive and
         ephyra, you cannot compile any of them from here, and CI compiles only
-        binge-seerr, binge-archive and ephyra, so
+        homelab-seerr, binge-archive and ephyra, so
         you cannot tell whether a resolution that compiles in this repository
         breaks a consumer. Leave
         it unresolved and say so in note.md.

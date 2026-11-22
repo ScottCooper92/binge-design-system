@@ -189,7 +189,7 @@ class BingeTvTopBarTabsFitTest {
     @Test
     fun `a start avatar and five tabs are whole at 2x font`() = assertHeaderAndFiveTabsAreWhole(2f)
 
-    /** binge-seerr's bar: an avatar and a gear at the end and no tabs. Both stay wholly inside the bar at every font scale. */
+    /** homelab-seerr's bar: an avatar and a gear at the end and no tabs. Both stay wholly inside the bar at every font scale. */
     private fun assertTrailingOnlyIsInsideTheBar(fontScale: Float) {
         setBar(fontScale = fontScale, tabLabels = emptyList(), withHeader = false)
         val root = composeTestRule.onRoot().getUnclippedBoundsInRoot()

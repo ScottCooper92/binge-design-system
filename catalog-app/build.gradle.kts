@@ -26,7 +26,7 @@ plugins {
  *
  * The package differs from the application id on purpose. `com.binge.designsystem.catalog` already
  * holds the samples, so the app's namespace keeps its generated `R` class out of that package, and
- * the id differs from Binge's, binge-seerr's, binge-archive's and ephyra's so it installs beside them.
+ * the id differs from Binge's, homelab-seerr's, binge-archive's and ephyra's so it installs beside them.
  */
 android {
     namespace = "com.binge.designsystem.catalogapp"

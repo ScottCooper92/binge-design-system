@@ -93,7 +93,7 @@ jobs:
       # another SDK level means this list changes with it. The list is read from a local run,
       # which left exactly this jar in ~/.m2 after all three modules' unit tests.
       - id: robolectric
-        uses: ScottCooper92/binge-ci/.github/actions/robolectric-cache@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+        uses: ScottCooper92/homelab-ci/.github/actions/robolectric-cache@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
         with:
           jars: |
             android-all-instrumented:14-robolectric-10818077-i7
@@ -109,7 +109,7 @@ jobs:
       # Saved after the tests, under a key that names the jars present, by this one job and only on
       # the default branch after a green run: a pull request's entry would be restored by no one
       # else, and the screenshot jobs run no Robolectric test.
-      - uses: ScottCooper92/binge-ci/.github/actions/robolectric-cache-save@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+      - uses: ScottCooper92/homelab-ci/.github/actions/robolectric-cache-save@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
         if: ${{ success() && github.ref_name == github.event.repository.default_branch }}
         with:
           versions: ${{ steps.robolectric.outputs.versions }}
@@ -237,9 +237,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # binge-ci's shared step: a pinned actionlint release verified against its published checksum,
+      # homelab-ci's shared step: a pinned actionlint release verified against its published checksum,
       # with shellcheck at warning severity.
-      - uses: ScottCooper92/binge-ci/.github/actions/actionlint@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+      - uses: ScottCooper92/homelab-ci/.github/actions/actionlint@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
 
   # A red nightly has no PR or push to carry it, so without this it is a red mark in the
   # Actions tab that nothing points at. One issue stays open while the canary is red and
@@ -254,7 +254,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: ScottCooper92/binge-ci/.github/actions/nightly-report@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+      - uses: ScottCooper92/homelab-ci/.github/actions/nightly-report@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
         with:
           result: ${{ needs.build.result }}
           title: Nightly CI is failing on main

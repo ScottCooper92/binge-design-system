@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Whole-repo (or module-scoped) sweep of binge-design-system for components that know too much about Binge, missing catalog samples and screenshot frames, resource-discipline violations, Material 3 / tv-material mixing, dead tokens and doc drift — the invariants CI does NOT gate, with the repo's exemption rules baked in so findings arrive pre-filtered, verified, and filed as issues. Use when asked to audit the design system, hunt for drift or dead tokens, or health-check a module. For a diff, use /code-review instead — this skill is not diff-scoped.
+description: Whole-repo (or module-scoped) sweep of homelab-design-system for components that know too much about Binge, missing catalog samples and screenshot frames, resource-discipline violations, Material 3 / tv-material mixing, dead tokens and doc drift — the invariants CI does NOT gate, with the repo's exemption rules baked in so findings arrive pre-filtered, verified, and filed as issues. Use when asked to audit the design system, hunt for drift or dead tokens, or health-check a module. For a diff, use /code-review instead — this skill is not diff-scoped.
 ---
 
 # Design system audit
@@ -10,7 +10,7 @@ and `checkTvMaterialSeparation` (wired into `designsystem-tv`'s `check`), plus s
 against the committed PNGs. There is **no** coverage floor, detekt, baseline or custom convention task
 here — do not look for one and do not report a finding as though one had caught it. The audit's value
 is what those don't decide: whether a component belongs here at all, whether every component has its
-catalog fixture and frame, and what the four consumers (Binge, binge-seerr, binge-archive, ephyra) will trip over.
+catalog fixture and frame, and what the four consumers (Binge, homelab-seerr, binge-archive, ephyra) will trip over.
 
 Scope to both modules or one: `designsystem/` (`com.binge.designsystem`) and `designsystem-tv/`
 (`com.binge.designsystem.tv`). Skip `build/`.
@@ -105,8 +105,8 @@ an absent one.
 
 ## Dimension 5 — consumer impact and API drift
 
-A green build here does not mean a green build in Binge, binge-seerr, binge-archive or ephyra. `consumer-check` compiles
-binge-seerr's, binge-archive's and ephyra's main and unit-test sources against a PR's head, informationally; Binge is private and is not compiled.
+A green build here does not mean a green build in Binge, homelab-seerr, binge-archive or ephyra. `consumer-check` compiles
+homelab-seerr's, binge-archive's and ephyra's main and unit-test sources against a PR's head, informationally; Binge is private and is not compiled.
 
 - Compare the public surface against what the consumers use: look in the sibling checkouts
   (`../Binge`, `../binge-seerr`, `../binge-archive`, `../ephyra`) for imports of `com.binge.designsystem` symbols that no longer exist,
@@ -115,7 +115,7 @@ binge-seerr's, binge-archive's and ephyra's main and unit-test sources against a
 - Resource names consumers reference via `DesR.dimen.*` / `DesR.string.*` that are missing or renamed.
 - `libs.versions.toml`: Compose BOM, AGP, Kotlin, JDK toolchain and compileSdk must agree with the
   consumers' catalogs (`CLAUDE.md`: the version catalog is not a local decision); flag divergence.
-- Theme surface: `BingeExpressiveTheme`/`BingeTvTheme` parameters (brand, dynamic colour) — binge-seerr
+- Theme surface: `BingeExpressiveTheme`/`BingeTvTheme` parameters (brand, dynamic colour) — homelab-seerr
   passes its own `BingeBrand`; confirm nothing hardcodes Binge's amber where the brand should flow.
 
 ## Dimension 6 — dead, unreachable & orphaned code
@@ -149,7 +149,7 @@ filesystem and `build.gradle.kts`. Report claim → reality → which side shoul
   (`search_issues`), using labels the repository already has, grouped by theme (a scattering of dead
   tokens is one issue). Scope, not severity, decides issue vs fix-in-this-PR (`CLAUDE.md` > Follow-ups).
   Micro-nits → a short list in chat. Never a `// TODO` comment.
-- A finding that needs a change in Binge or binge-seerr is filed **there**, linked from here.
+- A finding that needs a change in Binge or homelab-seerr is filed **there**, linked from here.
 - State what was **not** audited. A silent partial audit reads as a clean bill; "checked, clean" per
   dimension is a valid result.
 

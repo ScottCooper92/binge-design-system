@@ -1,9 +1,9 @@
 name: Consumer check
 
-# Informational. Compiles binge-seerr, binge-archive and ephyra, the consumers of this repository that CI can reach,
+# Informational. Compiles homelab-seerr, binge-archive and ephyra, the consumers of this repository that CI can reach,
 # against this PR's head commit, because a green build here says nothing about a consumer: a changed
 # public signature is otherwise noticed only by the bump PR that arrives after it merged. Each job is
-# binge-ci's consumer-check workflow; this file owns the triggers and says what to compile.
+# homelab-ci's consumer-check workflow; this file owns the triggers and says what to compile.
 #
 # Deliberately NOT named `CI`. bot-review, author-ci-fix and author-conflicts match that name,
 # and this check can go red for a reason that has nothing to do with the diff being reviewed,
@@ -22,7 +22,7 @@ name: Consumer check
 # credentials, so the workflow can check the consumer out, submodules included. Without them that checkout
 # fails before any Gradle task runs.
 #
-# The three jobs run side by side: binge-ci's concurrency group includes the consumer.
+# The three jobs run side by side: homelab-ci's concurrency group includes the consumer.
 #
 # Each job compiles its consumer's main and unit-test sources and nothing else: that is what catches a
 # changed public signature. It also runs on pushes to main, which is what writes the Gradle cache:
@@ -61,9 +61,9 @@ permissions:
 
 jobs:
   seerr:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+    uses: ScottCooper92/homelab-ci/.github/workflows/consumer-check.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
-      consumer: ScottCooper92/binge-seerr
+      consumer: ScottCooper92/homelab-seerr
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
       private_consumer: true
     secrets:
@@ -71,13 +71,13 @@ jobs:
       REVIEWER_APP_PRIVATE_KEY: ${{ secrets.REVIEWER_APP_PRIVATE_KEY }}
 
   archive:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+    uses: ScottCooper92/homelab-ci/.github/workflows/consumer-check.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
       consumer: ScottCooper92/binge-archive
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'
 
   jellyfin:
-    uses: ScottCooper92/binge-ci/.github/workflows/consumer-check.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
+    uses: ScottCooper92/homelab-ci/.github/workflows/consumer-check.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
       consumer: ScottCooper92/ephyra
       tasks: ':app:compileDebugKotlin :app:compileDebugUnitTestKotlin'

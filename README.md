@@ -1,4 +1,4 @@
-# binge-design-system
+# homelab-design-system
 
 The shared design system for [Binge](https://github.com/ScottCooper92) and the companion apps that
 talk to it through [binge-companions](https://github.com/ScottCooper92/binge-companions).
@@ -185,7 +185,7 @@ its `tv/` package.
 
 ## Status
 
-**Pre-alpha, and consumed.** Binge, binge-seerr, binge-archive and ephyra all include this build; Binge's
+**Pre-alpha, and consumed.** Binge, homelab-seerr, binge-archive and ephyra all include this build; Binge's
 own `core/designsystem` keeps only the components that still name one of its types.
 
 Four slices have landed: the theme, the preview scaffolding and the components that named nothing
@@ -209,7 +209,7 @@ Compose or AGP disagreement here is a disagreement in *their* build.
 In the consumer, once as a submodule:
 
 ```bash
-git submodule add https://github.com/ScottCooper92/binge-design-system.git design-system
+git submodule add https://github.com/ScottCooper92/homelab-design-system.git design-system
 ```
 
 and in its `settings.gradle.kts`:
