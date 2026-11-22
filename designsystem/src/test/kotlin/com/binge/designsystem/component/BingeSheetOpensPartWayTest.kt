@@ -34,6 +34,7 @@ class BingeSheetOpensPartWayTest {
             TestTheme {
                 BingeBottomSheet(onDismissRequest = {}, opensPartWay = opensPartWay) {
                     BingeSheetDockingHeader(header = { Text("Header") }, dockedTopBar = { Text("Docked") })
+                    Text(if (LocalBingeSheetDock.current != null) DOCKING else NOT_DOCKING)
                     Box(Modifier.height(FLOATING_CONTENT))
                 }
             }
@@ -42,10 +43,10 @@ class BingeSheetOpensPartWayTest {
     }
 
     @Test
-    fun `a sheet that opens part way has a handle that can expand it`() {
+    fun `a sheet that opens part way docks and has a handle that can expand it`() {
         show(opensPartWay = true)
 
-        rule.onNodeWithText("Header").assertExists()
+        rule.onNodeWithText(DOCKING).assertExists()
         rule.onAllNodes(hasExpand).assertCountEquals(1)
     }
 
@@ -53,10 +54,13 @@ class BingeSheetOpensPartWayTest {
     fun `a sheet that does not open part way has no handle that expands or collapses it`() {
         show(opensPartWay = false)
 
+        rule.onNodeWithText(NOT_DOCKING).assertExists()
         rule.onAllNodes(hasExpand or hasCollapse).assertCountEquals(0)
     }
 
     private companion object {
+        const val DOCKING = "docking"
+        const val NOT_DOCKING = "not docking"
         val FLOATING_CONTENT = 420.dp
     }
 }
