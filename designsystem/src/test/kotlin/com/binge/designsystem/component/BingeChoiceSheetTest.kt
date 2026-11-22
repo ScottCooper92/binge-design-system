@@ -261,6 +261,73 @@ class BingeChoiceSheetTest {
         assertEquals(1, opened)
     }
 
+    @Test
+    fun `a choice row passes the sheet's own context, filter and sections through`() {
+        val regions = BingeChoiceList.Ready((1..LONG_LIST_THRESHOLD).map { BingeChoice(it, "Region $it") })
+        rule.setContent {
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Region",
+                            choices = regions,
+                            selected = 1,
+                            emptyLabel = "Not set",
+                            onSelect = {},
+                            suggested = listOf(3),
+                            pinned = listOf(2),
+                            subtitle = "Where titles are listed",
+                            caption = "Changes the whole library",
+                            filterPlaceholder = "Search regions",
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Region").performClick()
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Where titles are listed").assertIsDisplayed()
+        rule.onNodeWithText("Changes the whole library").assertIsDisplayed()
+        rule.onNodeWithText("Search regions").assertIsDisplayed()
+        rule.onNodeWithText("Suggested").assertExists()
+    }
+
+    @Test
+    fun `a multi-choice row passes the sheet's own context and sections through`() {
+        val regions = BingeChoiceList.Ready((1..LONG_LIST_THRESHOLD).map { BingeChoice(it, "Region $it") })
+        rule.setContent {
+            ItemGroup(
+                title = "Group",
+                rows =
+                    listOf(
+                        bingeMultiChoiceItem(
+                            icon = Icons.Filled.Public,
+                            title = "Regions",
+                            choices = regions,
+                            selected = setOf(1),
+                            emptyLabel = "None",
+                            doneLabel = "Done",
+                            clearLabel = "Clear",
+                            onDone = {},
+                            suggested = listOf(3),
+                            subtitle = "Where titles are listed",
+                            caption = "Changes the whole library",
+                        ),
+                    ),
+            )
+        }
+
+        rule.onNodeWithText("Regions").performClick()
+        rule.waitForIdle()
+
+        rule.onNodeWithText("Where titles are listed").assertIsDisplayed()
+        rule.onNodeWithText("Changes the whole library").assertIsDisplayed()
+        rule.onNodeWithText("Suggested").assertExists()
+    }
+
     /** The restored sheet state was saved under the decision it opened with, so a recreation keeps it. */
     @Test
     fun `the part-way decision survives a recreation after the list changes length`() {
