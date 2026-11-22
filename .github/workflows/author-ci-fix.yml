@@ -43,7 +43,7 @@ jobs:
       (github.event.workflow_run.event != 'schedule') &&
       (!github.event.pull_request || github.event.pull_request.head.repo.full_name == github.repository) &&
       (!github.event.workflow_run || github.event.workflow_run.head_repository.full_name == github.repository)
-    uses: ScottCooper92/binge-ci/.github/workflows/author-ci-fix.yml@de44a7c780434385c40ecf599b7f3ebd10e7fb76 # v1.0.59
+    uses: ScottCooper92/binge-ci/.github/workflows/author-ci-fix.yml@bd0ca952ab5ea6c5d6d6f4eda140848438d89cb4 # v1.0.60
     with:
       author_bot_id: ${{ vars.AUTHOR_BOT_ID }}
       # jvm, not android: this repo's ci.yml is setup-java + setup-gradle and nothing
