@@ -79,6 +79,25 @@ class WholeWordTextTest {
     }
 
     @Test
+    fun `a katakana label with a prolonged sound mark wraps at every width and is never cut to one line`() {
+        val text = "サーバーサーバーサーバーサーバーサーバー"
+        rule.setContent {
+            TestTheme {
+                Column {
+                    KATAKANA_WIDTHS.forEach { width -> Box(Modifier.width(width.dp)) { Words(text) } }
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        rule.onAllNodesWithText(text).fetchSemanticsNodes().forEach { node ->
+            val results = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            node.config[androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult].action?.invoke(results)
+            assertTrue("a width cut the label to ${results.first().lineCount} line", results.first().lineCount > 1)
+        }
+    }
+
+    @Test
     fun `a hyphenated name the line breaker would split inside a part is held to one ellipsized line`() {
         val text = "Fitzgerald-Montgomery"
         show(width = HYPHEN_ROOM, text = text)
@@ -126,6 +145,7 @@ class WholeWordTextTest {
 
     private companion object {
         const val NARROW = 90
+        val KATAKANA_WIDTHS = listOf(64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116)
         const val TALL = "tall"
         const val WIDE = "wide"
         const val HYPHEN_ROOM = 130
