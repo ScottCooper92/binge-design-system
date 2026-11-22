@@ -85,28 +85,41 @@ private fun WholeWordLine(
     )
 }
 
-/** Whether any line of [layout] ends inside a word: a break that is not at a space, after a hyphen or dash, or between CJK characters. */
+/**
+ * Whether any line of [layout] ends inside a word: a break that is not at a space, after a hyphen or dash, or beside a character of an
+ * unspaced script. A break with such a character on either side is one the line breaker is allowed to make: no Latin word can be split by it.
+ */
 private fun breaksAWord(layout: TextLayoutResult, text: String): Boolean =
     (0 until layout.lineCount - 1).any { line ->
         val end = layout.getLineEnd(line)
-        end in 1 until text.length && isMidWord(text[end - 1], text[end])
+        end in 1 until text.length && isMidWord(text.codePointBefore(end), text.codePointAt(end))
     }
 
-private fun isMidWord(before: Char, after: Char): Boolean =
-    !before.isWhitespace() && !after.isWhitespace() && before !in BREAK_AFTER && !(before.isCjk() && after.isCjk())
+private fun isMidWord(before: Int, after: Int): Boolean =
+    !Character.isWhitespace(before) &&
+        !Character.isWhitespace(after) &&
+        before !in BREAK_AFTER &&
+        !(before.isUnspaced() || after.isUnspaced())
 
 /**
- * Whether a character is one of the scripts written without spaces. The script alone misses marks that belong to no script, such as the
+ * Whether a code point is in a script written without spaces: CJK, and Thai, Lao, Khmer and Myanmar, which the line breaker splits at
+ * dictionary word boundaries. The script alone misses marks that belong to no script, such as the
  * prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
  */
-private fun Char.isCjk(): Boolean = Character.UnicodeScript.of(code) in CJK_SCRIPTS || Character.UnicodeBlock.of(this) in CJK_BLOCKS
+private fun Int.isUnspaced(): Boolean =
+    Character.UnicodeScript.of(this) in UNSPACED_SCRIPTS ||
+        Character.UnicodeBlock.of(this) in CJK_BLOCKS
 
-private val CJK_SCRIPTS =
+private val UNSPACED_SCRIPTS =
     setOf(
         Character.UnicodeScript.HAN,
         Character.UnicodeScript.HIRAGANA,
         Character.UnicodeScript.KATAKANA,
         Character.UnicodeScript.HANGUL,
+        Character.UnicodeScript.THAI,
+        Character.UnicodeScript.LAO,
+        Character.UnicodeScript.KHMER,
+        Character.UnicodeScript.MYANMAR,
     )
 
 private val CJK_BLOCKS =
@@ -119,4 +132,4 @@ private val CJK_BLOCKS =
         Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
     )
 
-private val BREAK_AFTER = setOf('-', '/', '\u2013', '\u2014', '\u2010')
+private val BREAK_AFTER = setOf('-'.code, '/'.code, 0x2013, 0x2014, 0x2010)
