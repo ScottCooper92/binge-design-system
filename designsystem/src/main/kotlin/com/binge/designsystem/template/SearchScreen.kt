@@ -33,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -44,7 +43,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -76,8 +74,6 @@ import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.navOverlayPadding
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.searchResultColumns
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 
 /** The lazy key of the append footer. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
 private const val FOOTER_KEY = "binge:search-footer"
@@ -703,21 +699,22 @@ private fun ResultsList(
     fastScrollbar: FastScrollbarOptions?,
     gridState: LazyGridState = rememberLazyGridState(),
 ) {
-    val nearEnd by remember {
-        derivedStateOf {
-            val info = gridState.layoutInfo
-            isNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount, ahead = SEARCH_LOAD_MORE_AHEAD)
-        }
-    }
-    // Keyed on the paging flags too, so a page that added nothing still asks again while the app says there is more; see PagedGridScreen.
-    LaunchedEffect(gridState, state.hasMore, state.loaded, state.appending, state.appendFailed) {
-        if (state.hasMore &&
-            !state.appending &&
-            !state.appendFailed
-        ) {
-            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { callbacks.onLoadMore() }
-        }
-    }
+    // Keyed on the paging flags too, so a page that added nothing still asks again while the app says there is more; see LoadMoreEffect.
+    LoadMoreEffect(
+        key = gridState,
+        itemCount = state.loaded,
+        hasMore = state.hasMore,
+        appending = state.appending,
+        appendFailed = state.appendFailed,
+        ahead = SEARCH_LOAD_MORE_AHEAD,
+        lastVisibleIndex = {
+            gridState.layoutInfo.visibleItemsInfo
+                .lastOrNull()
+                ?.index ?: 0
+        },
+        totalCount = { gridState.layoutInfo.totalItemsCount },
+        onLoadMore = callbacks.onLoadMore,
+    )
     val empty = results.isEmpty()
     val settled = !state.hasMore && !state.appending && !state.appendFailed
     if (empty && settled) {

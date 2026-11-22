@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,8 +52,6 @@ import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.mediaGridColumns
 import com.binge.designsystem.navOverlayPadding
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 
 /** How many cells from the end the grid asks for the next page. */
 const val PAGED_GRID_LOAD_MORE_AHEAD: Int = 6
@@ -391,23 +388,21 @@ private fun ReadyGrid(
     LaunchedEffect(gridState) { snapshotFlow { gridState.firstVisibleItemIndex > 0 }.collect { latestOnPast(it) } }
     DisposableEffect(gridState) { onDispose { latestOnPast(false) } }
     if (reselectKey != null) ScrollToTopOnTabReselect(reselectKey, gridState)
-    val nearEnd by remember {
-        derivedStateOf {
-            val info = gridState.layoutInfo
-            isNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount)
-        }
-    }
-    // Keyed on the paging flags as well as the size: a page that added nothing leaves the size as it was, and only the flags' fall from
-    // appending back to idle restarts the watch so the grid asks again while the app says there is more. No ask while a page is in flight
-    // or after one failed (Retry asks then).
-    LaunchedEffect(gridState, state.hasMore, state.items.size, state.appending, state.appendFailed) {
-        if (state.hasMore &&
-            !state.appending &&
-            !state.appendFailed
-        ) {
-            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { callbacks.onLoadMore() }
-        }
-    }
+    LoadMoreEffect(
+        key = gridState,
+        itemCount = state.items.size,
+        hasMore = state.hasMore,
+        appending = state.appending,
+        appendFailed = state.appendFailed,
+        ahead = PAGED_GRID_LOAD_MORE_AHEAD,
+        lastVisibleIndex = {
+            gridState.layoutInfo.visibleItemsInfo
+                .lastOrNull()
+                ?.index ?: 0
+        },
+        totalCount = { gridState.layoutInfo.totalItemsCount },
+        onLoadMore = callbacks.onLoadMore,
+    )
     val grid: @Composable () -> Unit = {
         FastScrollbarOverlay(fastScrollbar, gridState, contentPadding) {
             GridFrame(contentPadding, gridState) {

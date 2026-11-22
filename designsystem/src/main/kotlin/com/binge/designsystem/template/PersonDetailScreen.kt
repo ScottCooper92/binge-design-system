@@ -26,12 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -53,8 +49,6 @@ import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.navOverlayEnd
 import com.binge.designsystem.resolvedContentInset
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 
 /** How many cards from the end of a credits row the next page is asked for. */
 const val PERSON_CREDITS_LOAD_MORE_AHEAD: Int = 3
@@ -372,23 +366,21 @@ private fun CreditRail(
 ) {
     val inset = readingInset()
     val listState = rememberLazyListState()
-    val currentOnLoadMore by rememberUpdatedState(onLoadMore)
-    val nearEnd by remember(listState) {
-        derivedStateOf {
-            val info = listState.layoutInfo
-            isNearEnd(info.visibleItemsInfo.lastOrNull()?.index ?: 0, info.totalItemsCount, PERSON_CREDITS_LOAD_MORE_AHEAD)
-        }
-    }
-    // Keyed on the paging flags as well as the size: a page that added nothing to this row leaves its size as it was, and only the
-    // flags' fall from appending back to idle restarts the watch so the row asks again while the app says there is more.
-    LaunchedEffect(listState, section.hasMore, section.items.size, section.appending, section.appendFailed) {
-        if (section.hasMore &&
-            !section.appending &&
-            !section.appendFailed
-        ) {
-            snapshotFlow { nearEnd }.distinctUntilChanged().filter { it }.collect { currentOnLoadMore() }
-        }
-    }
+    LoadMoreEffect(
+        key = listState,
+        itemCount = section.items.size,
+        hasMore = section.hasMore,
+        appending = section.appending,
+        appendFailed = section.appendFailed,
+        ahead = PERSON_CREDITS_LOAD_MORE_AHEAD,
+        lastVisibleIndex = {
+            listState.layoutInfo.visibleItemsInfo
+                .lastOrNull()
+                ?.index ?: 0
+        },
+        totalCount = { listState.layoutInfo.totalItemsCount },
+        onLoadMore = onLoadMore,
+    )
     Column(Modifier.fillMaxWidth()) {
         SectionHeader(
             title = section.title,
