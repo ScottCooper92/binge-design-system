@@ -521,7 +521,7 @@ private fun DetailSkeletonLine() {
             .clearAndSetSemantics { contentDescription = inProgress },
         text = NBSP,
         shape = BingeShapes.ElementSmall,
-        
+        inset = dimensionResource(R.dimen.zero),
     )
 }
 
