@@ -2,6 +2,7 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.ScreenStatePreview
 import com.binge.designsystem.preview.ScreenWidthPreviews
 import com.binge.designsystem.preview.WorstCaseFontPreviews
 
@@ -48,4 +49,14 @@ class PagedGridScreenSamplesScreenshotTest {
     @ScreenWidthPreviews
     @Composable
     fun plain() = PagedGridPlainSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun smallBar() = PagedGridSmallBarSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun smallBarScrolled() = PagedGridSmallBarScrolledSample()
 }

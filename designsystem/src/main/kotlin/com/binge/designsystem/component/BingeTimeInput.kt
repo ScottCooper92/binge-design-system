@@ -11,11 +11,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
@@ -146,27 +145,28 @@ private fun TimeField(
     imeAction: ImeAction,
     modifier: Modifier,
 ) {
-    var editing by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
+    // The text and caret are the field's own, so a digit typed before the caller has handed the last one back builds on it and does not undo it.
+    val caret = rememberFieldCaret(text, TextFieldValue(text, TextRange(text.length)))
     var focused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
-    SideEffect { if (editing.text != text) editing = TextFieldValue(text, TextRange(text.length)) }
+    val latest by rememberUpdatedState(text)
     LaunchedEffect(focused) {
         if (focused) {
             // A tap first positions the caret; move it after that event has been applied, only on the focus transition.
             withFrameNanos { }
-            editing = editing.copy(selection = TextRange(editing.text.length))
+            caret.reset(TextFieldValue(latest, TextRange(latest.length)))
         }
     }
     OutlinedTextField(
-        value = editing,
+        value = caret.shown(text),
         onValueChange = { next ->
             val digits = next.text.filter(Char::isDigit).take(FIELD_DIGITS)
-            editing =
+            val edited =
                 next.copy(
                     text = digits,
                     selection = TextRange(next.selection.start.coerceAtMost(digits.length), next.selection.end.coerceAtMost(digits.length)),
                 )
-            onText(digits)
+            if (caret.edit(edited, text)) onText(digits)
         },
         label = { Text(label) },
         enabled = enabled,

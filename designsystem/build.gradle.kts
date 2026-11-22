@@ -47,6 +47,7 @@ android {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
             freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs.add("-opt-in=com.binge.designsystem.component.DesignSystemInternalApi")
         }
     }
 

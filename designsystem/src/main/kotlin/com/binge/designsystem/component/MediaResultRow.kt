@@ -51,6 +51,10 @@ enum class MediaResultKind {
  * [watched] draw a heart and a tick beside the name, the same marks a poster card draws, so an app words a mark one way across the grid and
  * the search; the `trailing` slot of the row stays for anything else. [blurb] is a short passage (an overview), drawn last in up to three lines
  * and ellipsized; a result with none takes no room for it.
+ *
+ * [nameSuffix] is drawn after the name in the primary colour (a count, a handle), and a long name ellipsizes before the suffix does, so the suffix
+ * stays visible. [statusInline] moves the subtitle off its own line: the row then has no subtitle line, and one wrapping row reads the status first,
+ * then the subtitle text, the rating and the [meta]. Both are off by default, so a result that sets neither draws as it always has.
  */
 @Immutable
 class MediaResult(
@@ -64,6 +68,8 @@ class MediaResult(
     val favourite: Boolean = false,
     val watched: Boolean = false,
     val blurb: String? = null,
+    val nameSuffix: String? = null,
+    val statusInline: Boolean = false,
 )
 
 /**
@@ -72,6 +78,8 @@ class MediaResult(
  * absent, so a result with only a name stays as short as it is.
  *
  * @param trailing the result's status, drawn first in the wrapping row (an availability chip, a played or favourite mark).
+ * @param byline a line drawn above the name, such as a person's avatar, name and time. Null, the default, draws none and takes no room.
+ * @param end drawn at the row's end, after the text, in [ListRow]'s trailing slot. Null, the default, draws none.
  *
  * @need list a search result with its picture, kind and status
  * @group rows
@@ -83,12 +91,15 @@ fun MediaResultRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     trailing: (@Composable () -> Unit)? = null,
+    byline: (@Composable () -> Unit)? = null,
+    end: (@Composable () -> Unit)? = null,
 ) {
     val topAligned = result.kind == MediaResultKind.Poster || result.kind == MediaResultKind.Still
     ListRow(
         modifier = modifier,
         onClick = onClick,
         verticalAlignment = if (topAligned) Alignment.Top else Alignment.CenterVertically,
+        trailingContent = end,
         leading = {
             when (result.kind) {
                 MediaResultKind.Poster -> ListRowPoster(imageUrl = result.imageUrl, contentDescription = null)
@@ -106,26 +117,52 @@ fun MediaResultRow(
     ) { contentModifier ->
         val gap = dimensionResource(R.dimen.detail_cast_avatar_label_spacing)
         val top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero)
-        val hasStatusLine = trailing != null || result.rating != null || result.meta != null
+        val inline = result.statusInline
+        val hasStatusLine = trailing != null || result.rating != null || result.meta != null || (inline && result.subtitle != null)
+        val marks: (@Composable () -> Unit)? = if (result.favourite ||
+            result.watched
+        ) {
+            ({ ResultMarks(result.favourite, result.watched) })
+        } else {
+            null
+        }
         Column(modifier = contentModifier.padding(top = top)) {
-            ListRowHeader(
-                title = result.name,
-                trailingContent = if (result.favourite || result.watched) ({ ResultMarks(result.favourite, result.watched) }) else null,
-            )
-            result.subtitle?.let {
+            byline?.let {
+                it()
                 Spacer(Modifier.height(gap))
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            }
+            if (result.nameSuffix == null) {
+                ListRowHeader(title = result.name, trailingContent = marks)
+            } else {
+                NameWithSuffix(name = result.name, suffix = result.nameSuffix, marks = marks)
+            }
+            if (!inline) {
+                result.subtitle?.let {
+                    Spacer(Modifier.height(gap))
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
             if (hasStatusLine) {
                 Spacer(Modifier.height(gap))
                 WrappingRow(horizontalSpacing = gap, verticalSpacing = gap) {
                     trailing?.invoke()
+                    if (inline) {
+                        result.subtitle?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
                     result.rating?.let { RatingChip(rating = it, tone = RatingChipTone.Surface) }
                     result.meta?.let {
                         Text(
@@ -148,6 +185,40 @@ fun MediaResultRow(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+        }
+    }
+}
+
+/**
+ * The name with a [suffix] after it in the primary colour. The suffix and the marks take their own width first, and the name, up to two lines, takes what is
+ * left and ellipsizes, so the suffix is never the part that is cut.
+ */
+@Composable
+private fun NameWithSuffix(
+    name: String,
+    suffix: String,
+    marks: (@Composable () -> Unit)?,
+) {
+    Row(verticalAlignment = Alignment.Top) {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        Spacer(Modifier.width(dimensionResource(R.dimen.padding_xs)))
+        Text(
+            text = suffix,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+            softWrap = false,
+        )
+        if (marks != null) {
+            Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
+            marks()
         }
     }
 }
@@ -190,6 +261,9 @@ private fun ResultMarks(favourite: Boolean, watched: Boolean) {
  * The hint applies to a [blurbLines] row too, as its name plate; on a row with no blurb it also reserves the subtitle line. The status chips are the app's own, so how many lines they wrap to, and how tall they are, is
  * not something a plate can measure: a row whose status wraps still moves.
  *
+ * [byline] adds a line above the name for a row that has a byline, in the label style and the row's gap, and [statusInline] drops the subtitle line a hinted
+ * row reserves, since an inline-status row has none. A byline is the app's own slot, so its height is a line of text, which is what the plate holds.
+ *
  * @need show a loading placeholder for a search result row
  * @group feedback
  */
@@ -200,6 +274,8 @@ fun MediaResultRowSkeleton(
     description: String? = null,
     blurbLines: Int = 0,
     expectedName: String? = null,
+    byline: Boolean = false,
+    statusInline: Boolean = false,
 ) {
     val topAligned = kind == MediaResultKind.Poster || kind == MediaResultKind.Still
     ListRow(
@@ -211,7 +287,7 @@ fun MediaResultRowSkeleton(
         val top = if (topAligned) dimensionResource(R.dimen.detail_meta_spacing) else dimensionResource(R.dimen.zero)
         // The row's own text at its own font sizes, whether or not it carries a blurb: fixed-height plates stayed as they were at a large font
         // while the loaded row's text grew, and the rows below shifted down when the list loaded.
-        BlurbRowPlates(blurbLines, contentModifier.padding(top = top), expectedName)
+        BlurbRowPlates(blurbLines, contentModifier.padding(top = top), expectedName, byline, statusInline)
     }
 }
 
@@ -225,9 +301,15 @@ private fun BlurbRowPlates(
     lines: Int,
     modifier: Modifier,
     expectedName: String? = null,
+    byline: Boolean = false,
+    statusInline: Boolean = false,
 ) {
     val gap = dimensionResource(R.dimen.detail_cast_avatar_label_spacing)
     Column(modifier = modifier) {
+        if (byline) {
+            TextPlate(MaterialTheme.typography.labelMedium, Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION))
+            Spacer(Modifier.height(gap))
+        }
         TextPlate(
             MaterialTheme.typography.titleMedium,
             Modifier.fillMaxWidth(if (expectedName == null) NAME_PLATE_FRACTION else 1f),
@@ -236,7 +318,7 @@ private fun BlurbRowPlates(
         )
         Spacer(Modifier.height(gap))
         // A hinted row with no blurb is a title that has a subtitle line too, as the hint's own row does, so the plates reserve it.
-        if (expectedName != null && lines == 0) {
+        if (expectedName != null && lines == 0 && !statusInline) {
             TextPlate(MaterialTheme.typography.labelMedium, Modifier.fillMaxWidth(SUBTITLE_PLATE_FRACTION))
             Spacer(Modifier.height(gap))
         }

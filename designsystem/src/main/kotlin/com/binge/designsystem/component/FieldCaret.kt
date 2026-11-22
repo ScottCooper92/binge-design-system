@@ -77,10 +77,22 @@ private fun TextFieldValue.answeredWith(value: String): TextFieldValue {
 }
 
 /**
- * The text, caret and pending edit a text field owns so it keeps what the user typed while its caller catches up, and keeps the caret where the
- * user left it when the caller rewrites what was typed. Shared by [BingeTextField] and [BingeSearchField], so the two cannot disagree about it.
+ * Marks what the design system's own modules share and an app must not build on: it can change with no notice to the four builds that include
+ * this one. The design system's modules opt in to it; nothing else should.
  */
-internal class FieldCaret(
+@RequiresOptIn(
+    message = "Shared between the design system's own modules; an app should use the field components instead.",
+    level = RequiresOptIn.Level.ERROR,
+)
+@Retention(AnnotationRetention.BINARY)
+annotation class DesignSystemInternalApi
+
+/**
+ * The text, caret and pending edit a text field owns so it keeps what the user typed while its caller catches up, and keeps the caret where the
+ * user left it when the caller rewrites what was typed. Shared by the text, search, PIN and time fields and the television text field, so they cannot disagree about it.
+ */
+@DesignSystemInternalApi
+class FieldCaret internal constructor(
     initial: TextFieldValue,
 ) {
     var field by mutableStateOf(initial)
@@ -93,11 +105,11 @@ internal class FieldCaret(
     private var lastEarlier: String? = null
 
     /** Bumped by each edit and each step of the caller toward it, so the wait for an answer starts again. */
-    var progress by mutableStateOf(0)
+    internal var progress by mutableStateOf(0)
         private set
 
     /** Whether the field is waiting for its caller to take an edit it reported. */
-    val isWaiting: Boolean get() = pending != null
+    internal val isWaiting: Boolean get() = pending != null
 
     /** What to show for the caller's [value]; see [reconcileCaret]. */
     fun shown(value: String): TextFieldValue =
@@ -138,7 +150,7 @@ internal class FieldCaret(
      * nothing is pending any more. One of the earlier texts is it still catching up, and the wait starts again once, when it arrives there. Any other value is its answer to the
      * edit, or a change from outside, and the field takes what it showed for that.
      */
-    fun settle(value: String) {
+    internal fun settle(value: String) {
         late?.let {
             if (value == it.reported) field = TextFieldValue(value, it.selection)
             if (value != field.text || value == it.reported) late = null
@@ -160,7 +172,7 @@ internal class FieldCaret(
     }
 
     /** The wait is over and the caller's [value] is still behind: it has answered by not changing, so the field shows that. */
-    fun giveUp(value: String) {
+    internal fun giveUp(value: String) {
         val edit = pending ?: return
         late = LateEdit(edit.reported, field.selection)
         field = reconcileCaret(field, value, edit, waiting = false)
@@ -170,7 +182,8 @@ internal class FieldCaret(
 
 /** A [FieldCaret] for a field showing [value], settled after each composition. */
 @Composable
-internal fun rememberFieldCaret(value: String, initial: TextFieldValue): FieldCaret {
+@DesignSystemInternalApi
+fun rememberFieldCaret(value: String, initial: TextFieldValue): FieldCaret {
     val caret = remember { FieldCaret(initial) }
     SideEffect { caret.settle(value) }
     val latest by rememberUpdatedState(value)

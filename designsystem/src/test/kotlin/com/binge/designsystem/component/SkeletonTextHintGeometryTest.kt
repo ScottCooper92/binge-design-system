@@ -2,6 +2,8 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -123,4 +125,47 @@ class SkeletonTextHintGeometryTest {
 
     @Test
     fun `a hinted name is honoured in a row with a blurb at 2_0`() = blurbRow(FONT_20)
+
+    private fun bylineRow(fontScale: Float) {
+        rule.assertSkeletonReservesGeometry(anchors = listOf(rowAnchor), checkSize = true) { resolved ->
+            scaled(fontScale) {
+                val result = MediaResult("k", MediaResultKind.Poster, null, title, "Movie · 2001", rating = 8.4f)
+                if (resolved) {
+                    MediaResultRow(
+                        result,
+                        onClick = {},
+                        modifier = Modifier.layoutAnchor(rowAnchor),
+                        byline = { Text("Greta Lee · 2h", style = MaterialTheme.typography.labelMedium) },
+                    )
+                } else {
+                    MediaResultRowSkeleton(modifier = Modifier.layoutAnchor(rowAnchor), expectedName = title, byline = true)
+                }
+            }
+        }
+    }
+
+    private fun inlineRow(fontScale: Float) {
+        rule.assertSkeletonReservesGeometry(anchors = listOf(rowAnchor), checkSize = true) { resolved ->
+            scaled(fontScale) {
+                val result = MediaResult("k", MediaResultKind.Poster, null, title, "Movie · 2001", rating = 8.4f, statusInline = true)
+                if (resolved) {
+                    MediaResultRow(result, onClick = {}, modifier = Modifier.layoutAnchor(rowAnchor))
+                } else {
+                    MediaResultRowSkeleton(modifier = Modifier.layoutAnchor(rowAnchor), expectedName = title, statusInline = true)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `a result row skeleton with a byline reserves the row at the default font`() = bylineRow(1f)
+
+    @Test
+    fun `a result row skeleton with a byline reserves the row at 2_0`() = bylineRow(FONT_20)
+
+    @Test
+    fun `a result row skeleton with the status inline reserves the row at the default font`() = inlineRow(1f)
+
+    @Test
+    fun `a result row skeleton with the status inline reserves the row at 2_0`() = inlineRow(FONT_20)
 }
