@@ -6,10 +6,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.layout.LayoutAnchors
@@ -27,6 +36,10 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 private const val ITEMS = 12
+
+private const val SWIPES = 3
+private const val SHORT_DRAG_START = 300f
+private const val SHORT_DRAG_END = 700f
 
 /** A first page far longer than the window, so the end of the list is nowhere near the screen. */
 private const val LONG = 60
@@ -56,6 +69,7 @@ class PagedGridScreenTest {
         callbacks: PagedGridCallbacks = PagedGridCallbacks(onOpenItem = {}, onLoadMore = {}, onRetry = {}),
         filterBar: GridFilterBar? = bar,
         fontScale: Float = 1f,
+        screenBar: ScreenBar = ScreenBar.Large,
         failedContent: (@androidx.compose.runtime.Composable (androidx.compose.ui.Modifier) -> Unit)? = null,
     ) {
         rule.setContent {
@@ -67,6 +81,7 @@ class PagedGridScreenTest {
                         state = state,
                         callbacks = callbacks,
                         filterBar = filterBar,
+                        bar = screenBar,
                         failedContent = failedContent,
                     )
                 }
@@ -216,5 +231,38 @@ class PagedGridScreenTest {
         val odd = GridItem(key = "paged-grid-footer", posterUrl = null, title = "Odd key", rating = 7f)
         show(PagedGridState.Ready(listOf(odd) + items(SHORT), hasMore = true, appending = true))
         rule.onNodeWithText("Odd key").assertIsDisplayed()
+    }
+
+    private fun titleTop() = rule.onNodeWithText("Discover").getUnclippedBoundsInRoot().top
+
+    @Test
+    fun `the small bar hides as the grid scrolls down and returns as it scrolls up`() {
+        show(PagedGridState.Ready(items(LONG), hasMore = true), screenBar = ScreenBar.Small)
+        val shown = titleTop()
+
+        repeat(SWIPES) { rule.onRoot().performTouchInput { swipeUp() } }
+        rule.waitForIdle()
+        assertTrue("scrolling down slides the bar away", titleTop() < shown)
+
+        rule.onRoot().performTouchInput { swipeDown(startY = SHORT_DRAG_START, endY = SHORT_DRAG_END) }
+        rule.waitForIdle()
+        assertEquals("scrolling up brings the bar back", shown, titleTop())
+    }
+
+    @Test
+    fun `the small bar shows the filter action in place of the pill, and it opens the filters`() {
+        var opened = 0
+        show(
+            PagedGridState.Ready(items(), hasMore = false),
+            PagedGridCallbacks(onOpenItem = {}, onLoadMore = {}, onRetry = {}, onOpenFilters = { opened++ }),
+            screenBar = ScreenBar.Small,
+        )
+        rule.onAllNodesWithContentDescription("Filters, 2 applied").assertCountEquals(1)
+        rule
+            .onNodeWithContentDescription("Filters, 2 applied")
+            .assertIsDisplayed()
+            .assertIsEnabled()
+            .performClick()
+        assertEquals(1, opened)
     }
 }
