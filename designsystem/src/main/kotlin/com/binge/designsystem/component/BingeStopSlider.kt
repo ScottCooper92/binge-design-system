@@ -9,7 +9,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,8 +55,8 @@ data class BingeStop(
  * caller must accept a commit by setting [selectedIndex] to it: a caller that declines and changes nothing leaves the thumb
  * on the stop it was dragged to. Tapping the stop already selected commits that index again. [description]
  * names the slider for a screen reader, which hears the shown stop's [BingeStop.contentDescription], else its label, as its state. Needs at least two [stops]. Keep a
- * stop's name to a short word or two: it wraps inside the room its stop owns, and at the largest font a single long word breaks
- * across lines there rather than clipping.
+ * stop's name to a short word or two: it wraps at its spaces inside the room its stop owns, and a name with a word wider than that
+ * room, at a large font, stays on one line and ends in an ellipsis rather than breaking the word in two.
  *
  * @need choose one of a few ordered levels with labelled stops
  * @group inputs
@@ -131,26 +130,8 @@ private fun StopLabels(
     Layout(
         content = {
             stops.forEachIndexed { index, stop ->
-                val base = if (index == selectedIndex) accent else MaterialTheme.colorScheme.onSurfaceVariant
-                val tint = if (enabled) base else base.copy(alpha = DISABLED_LABEL_ALPHA)
-                // The slider above announces the stop and is the one control for a screen reader, so the labels stay out of its way.
-                val pick = Modifier.clickable(enabled = enabled) { onPick(index) }.semantics { invisibleToUser() }
-                Icon(
-                    stop.icon,
-                    contentDescription = null,
-                    tint = tint,
-                    modifier =
-                        pick
-                            .padding(top = dimensionResource(R.dimen.padding_xs))
-                            .size(dimensionResource(R.dimen.icon_size_l)),
-                )
-                Text(
-                    text = stop.label,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = tint,
-                    textAlign = TextAlign.Center,
-                    modifier = pick.padding(bottom = dimensionResource(R.dimen.padding_xs)),
-                )
+                StopIcon(stop, index, selectedIndex, accent, enabled, onPick)
+                StopName(stop, index, selectedIndex, accent, enabled, onPick)
             }
         },
         modifier = Modifier.fillMaxWidth(),
@@ -163,7 +144,8 @@ private fun StopLabels(
         val step = (width - 2 * inner).toFloat() / (count - 1)
         val icons = measurables.filterIndexed { i, _ -> i % 2 == 0 }.map { it.measure(loose) }
         // A name may use only the room its stop owns, so a long one wraps under its icon instead of running into
-        // the next: half a step either side of its tick, and at the ends from the row's edge.
+        // the next: half a step either side of its tick, and at the ends from the row's edge. A name with a word wider
+        // than that room stays on one line and ends in an ellipsis, as WholeWordText does, because Text would break the word in two.
         val labels =
             measurables.filterIndexed { i, _ -> i % 2 == 1 }.mapIndexed { i, measurable ->
                 val room = if (i == 0 || i == count - 1) inner + step / 2 else step
@@ -179,6 +161,63 @@ private fun StopLabels(
             }
         }
     }
+}
+
+/** The slider above announces the stop and is the one control for a screen reader, so a stop's label stays out of its way. */
+@OptIn(ExperimentalComposeUiApi::class)
+private fun stopPick(
+    index: Int,
+    enabled: Boolean,
+    onPick: (Int) -> Unit,
+): Modifier = Modifier.clickable(enabled = enabled) { onPick(index) }.semantics { invisibleToUser() }
+
+@Composable
+private fun stopTint(
+    index: Int,
+    selectedIndex: Int,
+    accent: Color,
+    enabled: Boolean,
+): Color {
+    val base = if (index == selectedIndex) accent else MaterialTheme.colorScheme.onSurfaceVariant
+    return if (enabled) base else base.copy(alpha = DISABLED_LABEL_ALPHA)
+}
+
+@Composable
+private fun StopIcon(
+    stop: BingeStop,
+    index: Int,
+    selectedIndex: Int,
+    accent: Color,
+    enabled: Boolean,
+    onPick: (Int) -> Unit,
+) {
+    Icon(
+        stop.icon,
+        contentDescription = null,
+        tint = stopTint(index, selectedIndex, accent, enabled),
+        modifier =
+            stopPick(index, enabled, onPick)
+                .padding(top = dimensionResource(R.dimen.padding_xs))
+                .size(dimensionResource(R.dimen.icon_size_l)),
+    )
+}
+
+/** A stop's name under its icon: it wraps at its spaces, and ends in an ellipsis rather than break a word. */
+@Composable
+private fun StopName(
+    stop: BingeStop,
+    index: Int,
+    selectedIndex: Int,
+    accent: Color,
+    enabled: Boolean,
+    onPick: (Int) -> Unit,
+) {
+    WholeWordText(
+        text = stop.label,
+        style = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
+        color = stopTint(index, selectedIndex, accent, enabled),
+        modifier = stopPick(index, enabled, onPick).padding(bottom = dimensionResource(R.dimen.padding_xs)),
+    )
 }
 
 /** The unfilled part of the track, a tint of the filled part as Material draws it. */
