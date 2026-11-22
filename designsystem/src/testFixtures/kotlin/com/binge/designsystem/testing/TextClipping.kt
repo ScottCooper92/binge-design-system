@@ -209,13 +209,29 @@ fun isBrokenWord(before: Char, after: Char): Boolean {
     return !(before.isCjk() && after.isCjk())
 }
 
-private fun Char.isCjk(): Boolean {
-    val script = Character.UnicodeScript.of(code)
-    return script == Character.UnicodeScript.HAN ||
-        script == Character.UnicodeScript.HIRAGANA ||
-        script == Character.UnicodeScript.KATAKANA ||
-        script == Character.UnicodeScript.HANGUL
-}
+/**
+ * Whether a character is one of the scripts written without spaces. The script alone misses marks that belong to no script, such as
+ * the prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
+ */
+private fun Char.isCjk(): Boolean = Character.UnicodeScript.of(code) in CJK_SCRIPTS || Character.UnicodeBlock.of(this) in CJK_BLOCKS
+
+private val CJK_SCRIPTS =
+    setOf(
+        Character.UnicodeScript.HAN,
+        Character.UnicodeScript.HIRAGANA,
+        Character.UnicodeScript.KATAKANA,
+        Character.UnicodeScript.HANGUL,
+    )
+
+private val CJK_BLOCKS =
+    setOf(
+        Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
+        Character.UnicodeBlock.HIRAGANA,
+        Character.UnicodeBlock.KATAKANA,
+        Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS,
+        Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
+        Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
+    )
 
 /** A hyphen, a slash, an en dash, an em dash and the Unicode hyphen: a line may end after one without breaking a word. */
 private val BREAK_WELCOME_AFTER = setOf('-', '/', '\u2013', '\u2014', '\u2010')

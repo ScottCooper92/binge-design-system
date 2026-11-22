@@ -203,6 +203,9 @@ class TextClippingTest {
         assertFalse(isBrokenWord('日', '本'))
         assertFalse(isBrokenWord('の', 'ト'))
         assertFalse(isBrokenWord('한', '글'))
+        assertFalse(isBrokenWord('ー', 'サ'))
+        assertFalse(isBrokenWord('、', '日'))
+        assertFalse(isBrokenWord('。', 'ト'))
         assertFalse(isBrokenWord('a', ' '))
         assertFalse(isBrokenWord(' ', 'a'))
     }
