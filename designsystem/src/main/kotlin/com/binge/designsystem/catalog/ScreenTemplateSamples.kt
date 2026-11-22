@@ -49,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -333,8 +334,8 @@ fun FilteredListScreenSample() {
 
 /**
  * The same list scrolled past the title: the bar collapsed, and the one scrim over bar and chips faded in, with the
- * rows visible behind it. Nothing is passed for the chrome: the transparent collapsing bar and header are the
- * template's default, and the scrim follows the bar's own collapse.
+ * rows visible behind it. It passes a transparent header and a null scrim fraction to get the transparent look of
+ * `BingeScreenScaffold`: the scrim follows the bar's own collapse.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -345,6 +346,8 @@ fun FilteredListScreenScrimSample() {
             title = "Requests",
             onBack = LocalDemoBack.current,
             scrollBehavior = collapsedTopBarScrollBehavior(),
+            headerBackground = Color.Transparent,
+            scrimFraction = null,
             filters = listOf(FilterChipItem("All", 42), FilterChipItem("Pending", 3), FilterChipItem("Approved", 39)),
             selectedFilter = selected,
             onFilterChange = { selected = it },

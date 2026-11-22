@@ -76,8 +76,7 @@ class TvWorstCaseFixturesTest {
 
     @Test fun `a failed hub row at 1_3`() = check(FONT_13) { TvHubFailedRowWorstCaseSample() }
 
-    // A long host name breaks between two of its parts: tracked in #1539, which says when to drop allowBrokenWords.
-    @Test fun `an info card at 1_3`() = check(FONT_13, allowBrokenWords = true) { TvInfoCardWorstCaseSample() }
+    @Test fun `an info card at 1_3`() = check(FONT_13) { TvInfoCardWorstCaseSample() }
 
     @Test fun `a sheet row that opens a page at 1_3`() = check(FONT_13) { TvSideSheetRowOpensPageWorstCaseSample() }
 

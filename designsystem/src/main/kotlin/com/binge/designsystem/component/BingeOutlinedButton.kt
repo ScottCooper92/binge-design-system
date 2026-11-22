@@ -22,12 +22,11 @@ import com.binge.designsystem.theme.BingeShapes
 /**
  * Outlined counterpart of [BingeFilledButton], sharing its loading contract.
  *
- * [destructive] names what a caller otherwise says by passing error [colors]: this control
- * commits or opens something irreversible. Naming it keeps the colour in one place, and keeps the
- * next destructive button from quietly defaulting to `primary` — which is how a repository ends up
- * with an error-toned confirmation behind a neutral trigger.
+ * [destructive] marks a control that commits or opens something irreversible: the label and the outline take the error colour. Naming
+ * it keeps the colour in one place, and keeps the next destructive button from quietly defaulting to `primary` — which is how a
+ * repository ends up with an error-toned confirmation behind a neutral trigger.
  *
- * Disabled, the label takes `colors`' disabled content colour and the outline is Material 3's disabled outline (`onSurface`
+ * Disabled, the label takes Material 3's disabled content colour and the outline is Material 3's disabled outline (`onSurface`
  * at 12%), so both grey together; enabled, the outline is the content colour.
  *
  * [showLabel] collapses the button to icon-only, keeping the same pill shape and tap target. It
@@ -49,10 +48,10 @@ fun BingeOutlinedButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     destructive: Boolean = false,
-    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(
-        contentColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-    ),
 ) {
+    val colors = ButtonDefaults.outlinedButtonColors(
+        contentColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+    )
     require(showLabel || leadingIcon != null) {
         "BingeOutlinedButton needs a leadingIcon to carry the accessible name when showLabel is false"
     }

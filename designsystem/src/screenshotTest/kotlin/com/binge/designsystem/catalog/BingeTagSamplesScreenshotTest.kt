@@ -48,6 +48,15 @@ class BingeTagSamplesScreenshotTest {
         TagRowSample()
     }
 
+    /** A tag with room for its label, and one too narrow for a word, which ellipsizes rather than break it. */
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun NarrowTag() {
+        BingeTagNarrowSample()
+    }
+
     /** The keywords block: even 8dp gaps between tags of any length, and the heading's gap to the first row as elsewhere. */
     @PreviewTest
     @ComponentPreviews

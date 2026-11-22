@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -24,6 +25,8 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -123,8 +126,7 @@ class TextClippingTest {
     fun `real tags in a WrappingRow under a ListRow pass at every width`() {
         showAtManyWidths { WrappingRow(horizontalSpacing = CHIP_GAP, verticalSpacing = CHIP_GAP) { Tags() } }
 
-        // The narrowest widths break a tag's word in two: tracked in #1539, which says when to drop allowBrokenWords.
-        rule.assertNoTextClipped(allowBrokenWords = true)
+        rule.assertNoTextClipped()
     }
 
     @Composable
@@ -189,7 +191,7 @@ class TextClippingTest {
     }
 
     @Test
-    fun `a word broken across two lines fails, and a break after a hyphen or between CJK characters does not`() {
+    fun `a word broken across two lines fails`() {
         show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
         assertFails("breaks a word across lines") { rule.assertNoTextClipped() }
     }
@@ -200,6 +202,9 @@ class TextClippingTest {
         assertFalse(isBrokenWord('日', '本'))
         assertFalse(isBrokenWord('の', 'ト'))
         assertFalse(isBrokenWord('한', '글'))
+        assertFalse(isBrokenWord('ー', 'サ'))
+        assertFalse(isBrokenWord('、', '日'))
+        assertFalse(isBrokenWord('。', 'ト'))
         assertFalse(isBrokenWord('a', ' '))
         assertFalse(isBrokenWord(' ', 'a'))
     }
@@ -234,6 +239,13 @@ class TextClippingTest {
     fun `a text that reaches past the window fails`() {
         show { Text("Pushed off the left edge", Modifier.offset(x = (-OFFSET).dp)) }
         assertFails("reaches past the window") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a subtree that does not start at the window's left edge is held to its own bounds`() {
+        show { Box(Modifier.padding(start = OFFSET.dp).testTag("subtree")) { Text("Inside the subtree") } }
+
+        assertEquals(1, rule.assertNoTextClipped(rule.onNodeWithTag("subtree", useUnmergedTree = true)))
     }
 
     @Test
@@ -285,7 +297,6 @@ class TextClippingTest {
         const val STACK_LINES = 3
         val ROW_WIDTHS = listOf(190, 210, 230, 250, 270, 290, 310, 330)
         val NARROW = 40.dp
-        val HYPHEN_WIDTH = 120.dp
         const val OFFSET = 40
         val CHIP_WIDTH = 60.dp
         val CHIP_HEIGHT = 24.dp

@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
  * @replaces a Text that breaks a long word across lines at a large font
  */
 @Composable
-internal fun WholeWordText(
+fun WholeWordText(
     text: String,
     style: TextStyle,
     color: Color,

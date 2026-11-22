@@ -143,7 +143,7 @@ fun PeopleGridScreen(
     onRetry: (tab: Int) -> Unit,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    bar: ScreenBar = ScreenBar.Collapsing,
+    bar: ScreenBar = LocalScreenBarDefault.current,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     loadingLabel: String = stringResource(R.string.paged_grid_loading),

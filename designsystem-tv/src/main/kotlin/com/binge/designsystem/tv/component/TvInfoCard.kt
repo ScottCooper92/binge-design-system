@@ -20,7 +20,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.semantics
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
+import com.binge.designsystem.component.WholeWordText
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.tv.focus.tvFocusIndicator
 import com.binge.designsystem.tv.focus.tvFocusTarget
@@ -35,7 +35,8 @@ import com.binge.designsystem.tv.R as TvR
  * button does, never a fill. [leading] replaces the icon with a mark of its own, such as an app's logo, and
  * is sized by the caller. A screen reader reads the title and lines together, as one item. Under [TvStyle.Monochrome] the card's
  * fill matches the sheet's panel, so at rest it carries a faint outline; the accent styles draw none. [initiallyFocused] draws the
- * focused state, for a frame.
+ * focused state, for a frame. A title or line wraps at its spaces; one with a word wider than the card, such as a URL, stays on
+ * one line and ends in an ellipsis rather than breaking the word in two.
  *
  * @need show a titled group of facts as a tile on a TV
  * @group tv
@@ -75,9 +76,9 @@ fun TvInfoCard(
                 )
         }
         Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(DesR.dimen.padding_xs))) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+            WholeWordText(text = title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             lines.forEach { line ->
-                Text(text = line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                WholeWordText(text = line, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
