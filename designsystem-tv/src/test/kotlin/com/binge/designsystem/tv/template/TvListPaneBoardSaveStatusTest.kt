@@ -29,7 +29,7 @@ private const val ROW_PLAYBACK = "Playback"
 private const val FIRST_OPTION = "Direct play"
 private const val LAST_OPTION = "Transcode"
 private const val FAILED = "Couldn't save your change"
-private const val RETRY = "Retry"
+private const val RETRY = "Try again"
 private const val REASON = "Changing this needs the administrator"
 
 /**

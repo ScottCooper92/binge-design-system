@@ -33,7 +33,7 @@ class SaveStatusLineTest {
 
         rule.onNodeWithText("Saving…").assertDoesNotExist()
         rule.onNodeWithText("Saved").assertDoesNotExist()
-        rule.onNodeWithText("Retry").assertDoesNotExist()
+        rule.onNodeWithText("Try again").assertDoesNotExist()
     }
 
     @Test
@@ -53,7 +53,7 @@ class SaveStatusLineTest {
 
         status = FormSaveStatus.Failed(onRetry = { retries++ })
         rule.onNodeWithText("Couldn't save your change").assertIsDisplayed()
-        rule.onNodeWithText("Retry").performClick()
+        rule.onNodeWithText("Try again").performClick()
 
         assertEquals(1, retries)
     }

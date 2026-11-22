@@ -68,7 +68,7 @@ class TvTemplateDemosTest {
         composeTestRule.mainClock.advanceTimeBy(DEMO_WAIT_MILLIS)
         composeTestRule.onNodeWithText("Couldn't save your change").assertExists()
         row("Notification 2").assertIsOn()
-        row("Retry").assertExists()
+        row("Try again").assertExists()
     }
 
     private fun row(label: String) = composeTestRule.onNode(hasText(label) and isFocusable())

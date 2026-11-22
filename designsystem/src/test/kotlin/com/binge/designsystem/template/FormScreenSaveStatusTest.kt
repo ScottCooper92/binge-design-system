@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config
 private const val SAVING = "Saving…"
 private const val SAVED = "Saved"
 private const val FAILED = "Couldn't save your change"
-private const val RETRY = "Retry"
+private const val RETRY = "Try again"
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class, qualifiers = "w400dp-h800dp")

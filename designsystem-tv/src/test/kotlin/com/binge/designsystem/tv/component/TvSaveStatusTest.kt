@@ -34,7 +34,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 private const val LINE = "line"
-private const val RETRY = "Retry"
+private const val RETRY = "Try again"
 private const val FIELD = "Field"
 
 /**
