@@ -17,6 +17,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -161,11 +162,96 @@ internal fun SliderBound(text: String, modifier: Modifier = Modifier) =
     Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = modifier)
 
 /**
+ * A switch above a number slider for a value that is not a number, such as the server choosing for itself: [label] names it, [on] says it
+ * is set, and [onChange] is called as the switch is flipped, which saves at once. While it is on the slider is dimmed and keeps the
+ * last number it showed. Turning it on hands [onChange] `null`; turning it off hands it that number, which the caller saves. A sheet opened with it already on, and no number to keep, hands the range's first.
+ * [onDetail] is what the row says while it is on.
+ */
+@Immutable
+class NumberAuto(
+    val label: String,
+    val on: Boolean,
+    val onChange: (on: Boolean, number: Int?) -> Unit,
+    val onDetail: String = label,
+)
+
+/**
+ * A number setting in a sheet's body, drawn without its window: the [title] over a [BingeNumberSlider], and over that the [auto] switch where
+ * there is one. [onChange] fires as the slider moves, and [onValueChangeFinished] once with the value it landed on, so a setting that saves
+ * as it is made saves there. Use it to frame the sheet in a `@PreviewTest`, where a modal window does not capture, or inside a sheet of
+ * the caller's own.
+ *
+ * @need frame a number setting's sheet in a preview or inside your own sheet
+ * @group sheets
+ */
+@Composable
+fun BingeNumberSheetContent(
+    title: String,
+    value: Int?,
+    onChange: (Int?) -> Unit,
+    range: IntRange,
+    format: (Int) -> String,
+    modifier: Modifier = Modifier,
+    openEndLabel: String? = null,
+    onValueChangeFinished: (Int?) -> Unit = {},
+    auto: NumberAuto? = null,
+    step: Int = 1,
+) {
+    // The last value the control picked, which a stepper tap finishes on before the caller's own value has recomposed.
+    var landed by remember { mutableStateOf(value) }
+    SideEffect { landed = value }
+    // The last number the slider showed, kept while auto is on (the caller's value is none then) so turning auto off restores it.
+    // A sheet that opens with auto on has no number from the caller, so it starts on the range's first.
+    var kept by rememberSaveable { mutableStateOf(value ?: if (auto?.on == true) range.first else null) }
+    var isAuto by rememberSaveable(auto?.on) { mutableStateOf(auto?.on == true) }
+    // While auto is off the caller's value is the one to restore, wherever it was changed.
+    SideEffect { if (!isAuto) kept = value }
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.padding_m))
+                .padding(bottom = dimensionResource(R.dimen.padding_l)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+    ) {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        auto?.let { option ->
+            SwitchRow(
+                label = option.label,
+                checked = isAuto,
+                onCheckedChange = { on ->
+                    isAuto = on
+                    option.onChange(on, if (on) null else kept)
+                },
+            )
+        }
+        BingeNumberSlider(
+            value = if (isAuto) kept else value,
+            onValueChange = {
+                landed = it
+                kept = it
+                onChange(it)
+            },
+            range = range,
+            format = format,
+            description = title,
+            openEndLabel = openEndLabel,
+            onValueChangeFinished = { onValueChangeFinished(landed) },
+            enabled = !isAuto,
+            step = step,
+        )
+    }
+}
+
+/**
  * A number setting as a [ListItem] for an [ItemGroup]: its [title], and its value ([format] of it, or [openEndLabel]) as
  * the detail. A tap opens a sheet holding a [BingeNumberSlider] under the title; each change is handed to [onChange]
  * as it happens. [onValueChangeFinished] is called once with the value the control landed on, when a drag or keyboard change
  * finishes and after each stepper tap, so a setting that saves as it is made can save there, not on every step of a drag.
  * The default does nothing. A row that is not [enabled] dims, and closes its sheet if open.
+ *
+ * [auto] adds a switch above the slider for a value the app chooses for itself, and the row says its [NumberAuto.onDetail] while it is on.
+ * [step] spaces the values, as on [BingeNumberSlider].
  */
 @Composable
 fun bingeNumberItem(
@@ -178,42 +264,35 @@ fun bingeNumberItem(
     enabled: Boolean = true,
     openEndLabel: String? = null,
     onValueChangeFinished: (Int?) -> Unit = {},
+    auto: NumberAuto? = null,
+    step: Int = 1,
 ): ListItem {
     var open by rememberSaveable { mutableStateOf(false) }
-    // The last value the control picked, which a stepper tap finishes on before the caller's own value has recomposed.
-    var landed by remember { mutableStateOf(value) }
-    SideEffect { landed = value }
     LaunchedEffect(enabled) { if (!enabled) open = false }
     if (open) {
         BingeBottomSheet(onDismissRequest = { open = false }) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.padding_m))
-                        .padding(bottom = dimensionResource(R.dimen.padding_l)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
-            ) {
-                Text(title, style = MaterialTheme.typography.titleMedium)
-                BingeNumberSlider(
-                    value = value,
-                    onValueChange = {
-                        landed = it
-                        onChange(it)
-                    },
-                    range = range,
-                    format = format,
-                    description = title,
-                    openEndLabel = openEndLabel,
-                    onValueChangeFinished = { onValueChangeFinished(landed) },
-                )
-            }
+            BingeNumberSheetContent(
+                title = title,
+                value = value,
+                onChange = onChange,
+                range = range,
+                format = format,
+                openEndLabel = openEndLabel,
+                onValueChangeFinished = onValueChangeFinished,
+                auto = auto,
+                step = step,
+            )
         }
     }
     return ListItem(
         icon = icon,
         label = title,
-        detail = if (value == null && openEndLabel != null) openEndLabel else format(value ?: range.first),
+        detail =
+            when {
+                auto?.on == true -> auto.onDetail
+                value == null && openEndLabel != null -> openEndLabel
+                else -> format(value ?: range.first)
+            },
         enabled = enabled,
         onClick = { open = true },
     )

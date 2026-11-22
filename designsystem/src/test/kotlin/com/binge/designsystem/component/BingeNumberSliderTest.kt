@@ -326,4 +326,88 @@ class BingeNumberSliderTest {
         composeTestRule.onNodeWithContentDescription("Increase Movie requests").performClick()
         assertEquals(11, value)
     }
+
+    private var autoOn by mutableStateOf(false)
+    private val autoCalls = mutableListOf<Pair<Boolean, Int?>>()
+
+    private fun setAutoItem(start: Int?) {
+        value = start
+        composeTestRule.setContent {
+            TestTheme {
+                ItemGroup(
+                    title = null,
+                    rows =
+                        listOf(
+                            bingeNumberItem(
+                                icon = Icons.Filled.Movie,
+                                title = "Port",
+                                value = value,
+                                range = 1..100,
+                                format = { "$it" },
+                                onChange = { value = it },
+                                auto =
+                                    NumberAuto(
+                                        label = "Choose automatically",
+                                        on = autoOn,
+                                        onChange = { on, number ->
+                                            autoCalls += on to number
+                                            autoOn = on
+                                            value = number
+                                        },
+                                        onDetail = "Automatic",
+                                    ),
+                            ),
+                        ),
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `a row with the switch on says so in its detail instead of a number`() {
+        autoOn = true
+        setAutoItem(null)
+
+        composeTestRule.onNodeWithText("Automatic").assertExists()
+    }
+
+    @Test
+    fun `turning the switch on hands the caller null and dims the slider`() {
+        autoOn = false
+        setAutoItem(10)
+        composeTestRule.onNodeWithText("10").performClick()
+
+        composeTestRule.onNodeWithText("Choose automatically").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<Pair<Boolean, Int?>>(true to null), autoCalls)
+        composeTestRule.onNodeWithContentDescription("Increase Port").assertIsNotEnabled()
+    }
+
+    @Test
+    fun `turning the switch off hands back the number the slider last showed`() {
+        autoOn = false
+        setAutoItem(10)
+        composeTestRule.onNodeWithText("10").performClick()
+        composeTestRule.onNodeWithContentDescription("Increase Port").performClick()
+        composeTestRule.onNodeWithText("Choose automatically").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Choose automatically").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<Pair<Boolean, Int?>>(true to null, false to 11), autoCalls)
+    }
+
+    @Test
+    fun `a sheet opened with the switch on and no number hands a number back when it turns off`() {
+        autoOn = true
+        setAutoItem(null)
+        composeTestRule.onNodeWithText("Automatic").performClick()
+
+        composeTestRule.onNodeWithText("Choose automatically").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<Pair<Boolean, Int?>>(false to 1), autoCalls)
+    }
 }
