@@ -232,6 +232,26 @@ fun MediaResultRowNameSuffixSample() =
         }
     }
 
+/** A long suffix beside a long name: the suffix takes at most half of the width and wraps, and the name keeps the other half, at any font size. */
+@Composable
+fun MediaResultRowLongSuffixSample() =
+    ScreenshotTheme {
+        Column(Modifier.padding(dimensionResource(R.dimen.screen_content_inset))) {
+            MediaResultRow(
+                result =
+                    MediaResult(
+                        "m10",
+                        MediaResultKind.Poster,
+                        null,
+                        "The Lord of the Rings: The Fellowship of the Ring, Extended Edition",
+                        "Series",
+                        nameSuffix = "Seasons 1, 2, 4–6",
+                    ),
+                onClick = {},
+            )
+        }
+    }
+
 /** Status inline: no subtitle line, and one wrapping row that reads the status, the subtitle text, the rating and the meta. */
 @Composable
 fun MediaResultRowStatusInlineSample() =

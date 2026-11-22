@@ -21,9 +21,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import com.binge.designsystem.CARD_ASPECT_RATIO
 import com.binge.designsystem.R
 import com.binge.designsystem.modifier.describedAs
@@ -208,7 +215,8 @@ fun MediaResultRow(
 
 /**
  * The name with a [suffix] after it in the primary colour. The suffix and the marks take their own width first, and the name, up to two lines, takes what is
- * left and ellipsizes, so the suffix is never the part that is cut.
+ * left and ellipsizes, so a short suffix is never the part that is cut. A long one is bounded: it takes at most half of the width it is offered and wraps to
+ * a second line, then ellipsizes, so the name keeps roughly the other half (less the marks beside it), at any font size. Taking its whole width first left the name none at all.
  */
 @Composable
 private fun NameWithSuffix(
@@ -230,8 +238,9 @@ private fun NameWithSuffix(
             text = suffix,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
-            maxLines = 1,
-            softWrap = false,
+            maxLines = SUFFIX_MAX_LINES,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.atMostHalfOfWhatIsLeft(),
         )
         if (marks != null) {
             Spacer(Modifier.width(dimensionResource(R.dimen.padding_s)))
@@ -374,6 +383,48 @@ private fun SkeletonPicture(kind: MediaResultKind) {
 }
 
 private const val BLURB_MAX_LINES = 3
+
+/** How many lines a long name suffix wraps to before it ellipsizes. */
+private const val SUFFIX_MAX_LINES = 2
+
+/** The share of the width on offer a name suffix may take, so the name beside it keeps the rest. */
+private const val SUFFIX_MAX_SHARE = 0.5f
+
+/**
+ * Limits this element to [SUFFIX_MAX_SHARE] of the width it is offered; a narrower one keeps its own width and so its one line. The intrinsic
+ * measures are the element's own, uncapped: [ListRow] sizes its main line from them, and a row hands a child the width that child will have, not the
+ * width on offer, so halving it there made a short suffix measure as two lines and left empty space under the row.
+ */
+private fun Modifier.atMostHalfOfWhatIsLeft(): Modifier = this then HalfWidthCap
+
+private object HalfWidthCap : LayoutModifier {
+    private fun cap(width: Int): Int = if (width == Constraints.Infinity) width else (width * SUFFIX_MAX_SHARE).toInt()
+
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        // An unbounded width is an intrinsic measure, which has no width on offer to take a share of.
+        val limited =
+            if (constraints.hasBoundedWidth) {
+                constraints.copy(maxWidth = cap(constraints.maxWidth).coerceAtLeast(constraints.minWidth))
+            } else {
+                constraints
+            }
+        val placeable = measurable.measure(limited)
+        return layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int =
+        measurable.minIntrinsicHeight(width)
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int =
+        measurable.maxIntrinsicHeight(width)
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int =
+        measurable.minIntrinsicWidth(height)
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int =
+        measurable.maxIntrinsicWidth(height)
+}
+
 private const val NAME_PLATE_FRACTION = 0.6f
 private const val SUBTITLE_PLATE_FRACTION = 0.4f
 private const val STILL_ASPECT_RATIO = 16f / 9f
