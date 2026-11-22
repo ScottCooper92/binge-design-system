@@ -157,6 +157,34 @@ class KeyedViewModelStoresTest {
     }
 
     @Test
+    fun aConsumersHolderInTheSameParentIsNotTheScopesHolder() {
+        val parent = object : ViewModelStoreOwner {
+            override val viewModelStore = ViewModelStore()
+        }
+        var mine: KeyedViewModelStores<Int>? = null
+        var scoped: Probe? = null
+        rule.setContent {
+            CompositionLocalProvider(LocalViewModelStoreOwner provides parent) {
+                mine = viewModel<KeyedViewModelStores<Int>>(
+                    factory = object : ViewModelProvider.Factory {
+                        @Suppress("UNCHECKED_CAST")
+                        override fun <T : ViewModel> create(
+                            modelClass: kotlin.reflect.KClass<T>,
+                            extras: androidx.lifecycle.viewmodel.CreationExtras,
+                        ): T = KeyedViewModelStores<Int>() as T
+                    },
+                )
+                KeyedViewModelScope("a") { scoped = viewModel<Probe>(factory = probeFactory) }
+            }
+        }
+        rule.waitForIdle()
+
+        mine!!.retain(emptySet())
+
+        assertFalse(scoped!!.cleared)
+    }
+
+    @Test
     fun aParentWithNoFactoryStillGivesNoArgumentViewModels() {
         val plain = object : ViewModelStoreOwner {
             override val viewModelStore = ViewModelStore()

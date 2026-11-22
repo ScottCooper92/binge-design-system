@@ -67,7 +67,8 @@ class KeyedViewModelStores<K : Any> : ViewModel() {
  * The store is held by a [KeyedViewModelStores] in the parent's store, under [key]. A configuration change disposes the composition
  * without ending the scope, so the store is cleared only when [content] leaves for good, or the parent goes. The parent's factory
  * and creation extras are passed on, so Hilt and saved state work as they would there. A parent that has none, as a preview's has not,
- * gives view models made with their no-argument constructor.
+ * gives view models made with their no-argument constructor. Keep one key live in one place at a time: when either scope using it
+ * leaves, the store is cleared for both.
  *
  * @need scope the view models of a subtree to a key, so they do not outlive it
  * @group feedback
@@ -79,6 +80,7 @@ fun KeyedViewModelScope(key: String, content: @Composable () -> Unit) {
     val stores =
         viewModel<KeyedViewModelStores<String>>(
             viewModelStoreOwner = parent,
+            key = SCOPE_HOLDER_KEY,
             factory = viewModelFactory { initializer { KeyedViewModelStores<String>() } },
         )
     val owner = remember(parent, key) { ScopedStoreOwner(parent, stores.storeFor(key)) }
@@ -90,6 +92,9 @@ fun KeyedViewModelScope(key: String, content: @Composable () -> Unit) {
     }
     CompositionLocalProvider(LocalViewModelStoreOwner provides owner, content = content)
 }
+
+/** Not the default key, which a consumer's own `KeyedViewModelStores` in the same parent would share. */
+private const val SCOPE_HOLDER_KEY = "com.binge.designsystem.viewmodel.KeyedViewModelScope"
 
 private class ScopedStoreOwner(
     private val parent: ViewModelStoreOwner,
