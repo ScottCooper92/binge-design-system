@@ -99,7 +99,7 @@ class BingeChoiceItemOptionsTest {
     }
 
     @Test
-    fun `a pinned value leads the sheet's list`() {
+    fun `a pinned value leads the sheet's list even when it is last in the list's own order`() {
         rule.setContent {
             TestTheme {
                 ItemGroup(
@@ -113,7 +113,7 @@ class BingeChoiceItemOptionsTest {
                                 selected = "jp",
                                 emptyLabel = "Not set",
                                 onSelect = {},
-                                pinned = listOf("any"),
+                                pinned = listOf("nz"),
                             ),
                         ),
                 )
@@ -123,15 +123,15 @@ class BingeChoiceItemOptionsTest {
         rule.onNodeWithText("Region").performClick()
         rule.waitForIdle()
 
-        val any = rule
-            .onNodeWithText("Any region")
-            .fetchSemanticsNode()
-            .boundsInRoot.top
-        val other = rule
+        val pinned = rule
             .onNodeWithText("New Zealand")
             .fetchSemanticsNode()
             .boundsInRoot.top
-        assertTrue("the pinned value is above the rest", any <= other)
+        val other = rule
+            .onNodeWithText("Any region")
+            .fetchSemanticsNode()
+            .boundsInRoot.top
+        assertTrue("the pinned value, last in the list's own order, is drawn above the rest", pinned < other)
     }
 
     @Test
