@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.binge.designsystem.LocalIsSinglePaneNav
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownAndroidComposeRule
+import com.binge.designsystem.testing.pressBack
 import com.binge.designsystem.theme.LocalReduceMotion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -86,17 +87,12 @@ class StepFlowScreenTest {
         composeTestRule.mainClock.advanceTimeBy(MID_SLIDE_MILLIS)
     }
 
-    private fun pressBack() {
-        composeTestRule.runOnUiThread { composeTestRule.activity.onBackPressedDispatcher.onBackPressed() }
-        composeTestRule.waitForIdle()
-    }
-
     @Test
     fun backStepsBackFromTheSecondStep() {
         step = 1
         setFlow()
 
-        pressBack()
+        composeTestRule.pressBack(composeTestRule.activity)
 
         assertEquals(1, backs)
         composeTestRule.onNodeWithText("Step 0").assertExists()
@@ -106,7 +102,7 @@ class StepFlowScreenTest {
     fun backOnTheFirstStepFallsThroughToTheHost() {
         setFlow()
 
-        pressBack()
+        composeTestRule.pressBack(composeTestRule.activity)
 
         assertEquals(0, backs)
     }
@@ -171,7 +167,7 @@ class StepFlowScreenTest {
         setTitledFlow(onExit = { exits++ })
 
         composeTestRule.onNodeWithContentDescription("Back").performClick()
-        pressBack()
+        composeTestRule.pressBack(composeTestRule.activity)
 
         assertEquals(2, exits)
         assertEquals(0, backs)

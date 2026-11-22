@@ -148,4 +148,8 @@ dependencies {
     // this compiles the keyboard rule against the ui-test every test runs, which has ComposeUiTestConfig.
     testFixturesImplementation(libs.compose.material3)
     testFixturesImplementation(libs.robolectric)
+    testFixturesImplementation(libs.androidx.core.ktx)
+    testFixturesImplementation(libs.androidx.window)
+    testFixturesImplementation(libs.androidx.window.testing)
+    testFixturesImplementation(libs.androidx.activity.compose)
 }

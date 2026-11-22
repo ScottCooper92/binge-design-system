@@ -1,6 +1,5 @@
 package com.binge.designsystem.component
 
-import android.graphics.Rect
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,11 +9,11 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.window.layout.FoldingFeature
 import androidx.window.testing.layout.TestWindowLayoutInfo
 import androidx.window.testing.layout.WindowLayoutInfoPublisherRule
 import com.binge.designsystem.rememberFoldSafeBottomHeight
 import com.binge.designsystem.testing.createTakeDownComposeRule
+import com.binge.designsystem.testing.tabletopFold
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -26,7 +25,6 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import androidx.window.testing.layout.FoldingFeature as posedFold
 
 /**
  * That [BingeBottomSheet] really shrinks in the tabletop posture.
@@ -84,21 +82,8 @@ class BingeBottomSheetFoldTest {
         return bounds.bottom - bounds.top
     }
 
-    private fun tabletopFold(): FoldingFeature =
-        posedFold(
-            windowBounds = Rect(0, 0, WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX),
-            center = CREASE_CENTRE_PX,
-            size = CREASE_SIZE_PX,
-            state = FoldingFeature.State.HALF_OPENED,
-            orientation = FoldingFeature.Orientation.HORIZONTAL,
-        )
-
     private companion object {
         const val SHEET = "sheet"
-        const val WINDOW_WIDTH_PX = 1600
-        const val WINDOW_HEIGHT_PX = 2000
-        const val CREASE_CENTRE_PX = 1000
-        const val CREASE_SIZE_PX = 40
 
         val TALLER_THAN_ANY_WINDOW = 4000.dp
     }

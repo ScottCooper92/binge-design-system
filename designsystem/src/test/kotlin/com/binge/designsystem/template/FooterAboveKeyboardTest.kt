@@ -5,21 +5,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.Insets
-import androidx.core.view.WindowInsetsCompat
 import com.binge.designsystem.LocalNavOverlayInsets
 import com.binge.designsystem.testing.TestTheme
-import com.binge.designsystem.testing.WithWindowInsets
+import com.binge.designsystem.testing.WithKeyboard
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -137,17 +132,3 @@ class FooterAboveKeyboardTest {
         )
     }
 }
-
-/** Opens a keyboard [height] tall over the window, answering every insets dispatch at the parent. */
-@Composable
-private fun WithKeyboard(height: Dp, content: @Composable () -> Unit) =
-    WithWindowInsets(
-        {
-            WindowInsetsCompat
-                .Builder()
-                .setInsets(WindowInsetsCompat.Type.ime(), Insets.of(0, 0, 0, height.roundToPx()))
-                .setVisible(WindowInsetsCompat.Type.ime(), true)
-                .build()
-        },
-        content,
-    )
