@@ -65,6 +65,12 @@ fun BingeFilledButton(
         ),
         colors = colors,
     ) {
-        ButtonContent(label = label, loading = loading, contentColor = colors.contentColor, leadingIcon = leadingIcon, leading = leading)
+        ButtonContent(
+            label = label,
+            loading = loading,
+            contentColor = colors.contentColor,
+            leadingIcon = leadingIcon,
+            leading = leading,
+        )
     }
 }
