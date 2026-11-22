@@ -89,8 +89,7 @@ class WorstCaseFixturesTest {
 
     @Test fun `a choice sheet at 1_3`() = check(FONT_13) { BingeChoiceWorstCaseSample() }
 
-    // Words break inside a line here: tracked in #1539, which says when to drop allowBrokenWords.
-    @Test fun `a choice sheet at 2_0`() = check(FONT_20, allowBrokenWords = true) { BingeChoiceWorstCaseSample() }
+    @Test fun `a choice sheet at 2_0`() = check(FONT_20) { BingeChoiceWorstCaseSample() }
 
     @Test fun `a confirm dialog at 1_3`() = check(FONT_13) { BingeConfirmDialogWorstCaseSample() }
 

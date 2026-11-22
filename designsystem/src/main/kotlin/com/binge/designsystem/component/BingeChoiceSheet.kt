@@ -960,7 +960,7 @@ private fun <T> RadioChoiceRow(
     ) {
         if (markSlot) ChoiceMark(choice) else RadioButton(selected = selected, onClick = null)
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            WholeWordText(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
             choice.supportingText?.let {
                 Text(
                     text = it,
@@ -1132,7 +1132,7 @@ private fun <T> CheckChoiceRow(
     ) {
         if (markSlot) ChoiceMark(choice)
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            WholeWordText(text = choice.label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
             choice.supportingText?.let {
                 Text(
                     text = it,
