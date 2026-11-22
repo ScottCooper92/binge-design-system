@@ -113,6 +113,8 @@ dependencies {
     api(libs.kotlinx.coroutines.core)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    // The keyed view-model stores hand a consumer a ViewModelStoreOwner and a ViewModel, so the types are part of its signature.
+    api(libs.androidx.lifecycle.viewmodel.compose)
     // The step-flow template installs the system Back handler for the step it shows.
     implementation(libs.androidx.activity.compose)
     implementation(libs.material.color.utilities)
