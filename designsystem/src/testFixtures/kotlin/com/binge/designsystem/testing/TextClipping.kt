@@ -175,7 +175,7 @@ private fun SemanticsNode.layoutFaults(
         val text = layout.layoutInput.text.text
         for (line in 0 until if (allowBrokenWords) 0 else paragraph.lineCount - 1) {
             val end = paragraph.getLineEnd(line, visibleEnd = false)
-            if (end in 1 until text.length && isBrokenWord(text[end - 1], text[end])) {
+            if (end in 1 until text.length && isBrokenWord(text.codePointBefore(end), text.codePointAt(end))) {
                 faults += "breaks a word across lines after \"${text.substring(maxOf(0, end - WORD_CONTEXT), end)}\""
             }
         }
@@ -200,27 +200,37 @@ private fun SemanticsNode.layoutFaults(
 }
 
 /**
- * Whether a line that ends between [before] and [after] has split a word: neither is a space, and the break is not one a reader
- * expects. Public so a test can pin the rule on its own, without a line breaker deciding where the line ends.
+ * Whether a line that ends between the code points [before] and [after] has split a word: neither is a space, the break is not after a
+ * hyphen or dash, and neither side is a character of a script written without spaces (CJK, Thai, Lao, Khmer, Myanmar), beside which the
+ * line breaker may break and which no Latin word can be split by. Public so a test can pin the rule on its own, without a line breaker
+ * deciding where the line ends.
  */
-fun isBrokenWord(before: Char, after: Char): Boolean {
-    if (before.isWhitespace() || after.isWhitespace()) return false
-    if (before in BREAK_WELCOME_AFTER) return false
-    return !(before.isCjk() && after.isCjk())
-}
+fun isBrokenWord(before: Int, after: Int): Boolean =
+    !Character.isWhitespace(before) &&
+        !Character.isWhitespace(after) &&
+        before !in BREAK_WELCOME_AFTER &&
+        !(before.isUnspaced() || after.isUnspaced())
+
+/** [isBrokenWord] for two `Char`s. */
+fun isBrokenWord(before: Char, after: Char): Boolean = isBrokenWord(before.code, after.code)
 
 /**
- * Whether a character is one of the scripts written without spaces. The script alone misses marks that belong to no script, such as
- * the prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
+ * Whether a code point is in a script written without spaces. The script alone misses marks that belong to no script, such as the
+ * prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
  */
-private fun Char.isCjk(): Boolean = Character.UnicodeScript.of(code) in CJK_SCRIPTS || Character.UnicodeBlock.of(this) in CJK_BLOCKS
+private fun Int.isUnspaced(): Boolean =
+    Character.UnicodeScript.of(this) in UNSPACED_SCRIPTS || Character.UnicodeBlock.of(this) in CJK_BLOCKS
 
-private val CJK_SCRIPTS =
+private val UNSPACED_SCRIPTS =
     setOf(
         Character.UnicodeScript.HAN,
         Character.UnicodeScript.HIRAGANA,
         Character.UnicodeScript.KATAKANA,
         Character.UnicodeScript.HANGUL,
+        Character.UnicodeScript.THAI,
+        Character.UnicodeScript.LAO,
+        Character.UnicodeScript.KHMER,
+        Character.UnicodeScript.MYANMAR,
     )
 
 private val CJK_BLOCKS =
@@ -234,7 +244,7 @@ private val CJK_BLOCKS =
     )
 
 /** A hyphen, a slash, an en dash, an em dash and the Unicode hyphen: a line may end after one without breaking a word. */
-private val BREAK_WELCOME_AFTER = setOf('-', '/', '\u2013', '\u2014', '\u2010')
+private val BREAK_WELCOME_AFTER = setOf('-'.code, '/'.code, 0x2013, 0x2014, 0x2010)
 
 private const val WORD_CONTEXT = 12
 

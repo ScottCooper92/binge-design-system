@@ -210,10 +210,17 @@ class TextClippingTest {
     }
 
     @Test
-    fun `a break inside a word, or between a letter and a CJK character, is a broken word`() {
+    fun `a break beside a character of an unspaced script is not a broken word`() {
+        assertFalse(isBrokenWord('x', '映'))
+        assertFalse(isBrokenWord('映', 'x'))
+        assertFalse(isBrokenWord('4', 'ラ'))
+        assertFalse(isBrokenWord('เ', 'ซ'))
+        assertFalse(isBrokenWord(0x20000, 0x20001))
+    }
+
+    @Test
+    fun `a break inside a Latin word is a broken word`() {
         assertTrue(isBrokenWord('a', 'b'))
-        assertTrue(isBrokenWord('a', '日'))
-        assertTrue(isBrokenWord('日', 'a'))
         assertTrue(isBrokenWord('.', 'e'))
     }
 
