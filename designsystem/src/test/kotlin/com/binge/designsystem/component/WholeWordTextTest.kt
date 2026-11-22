@@ -53,9 +53,27 @@ class WholeWordTextTest {
 
     @Test
     fun `a word wider than the room keeps the text on one ellipsized line, with no broken word`() {
-        show(width = NARROW, text = "Fitzgerald-Montgomery Alexandria")
+        show(width = NARROW, text = "Fitzgeraldmontgomery Alexandria")
 
-        assertEquals(1, lineCount("Fitzgerald-Montgomery Alexandria"))
+        assertEquals(1, lineCount("Fitzgeraldmontgomery Alexandria"))
+        rule.assertNoTextClipped()
+    }
+
+    @Test
+    fun `an unspaced CJK label wider than the room still wraps between characters`() {
+        val label = "リビングルームのサーバーの名前です"
+        show(width = NARROW, text = label)
+
+        assertTrue("expected several lines, got ${lineCount(label)}", lineCount(label) > 1)
+        rule.assertNoTextClipped()
+    }
+
+    @Test
+    fun `a hyphenated name the line breaker would split inside a part is held to one ellipsized line`() {
+        val text = "Fitzgerald-Montgomery"
+        show(width = HYPHEN_ROOM, text = text)
+
+        assertEquals(1, lineCount(text))
         rule.assertNoTextClipped()
     }
 
@@ -68,5 +86,6 @@ class WholeWordTextTest {
 
     private companion object {
         const val NARROW = 90
+        const val HYPHEN_ROOM = 130
     }
 }
