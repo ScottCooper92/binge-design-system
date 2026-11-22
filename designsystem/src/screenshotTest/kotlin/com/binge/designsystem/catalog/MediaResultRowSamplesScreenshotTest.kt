@@ -57,4 +57,28 @@ class MediaResultRowSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun skeletonHinted() = MediaResultRowSkeletonHintedSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun bylineAndEnd() = MediaResultRowBylineAndEndSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun nameSuffix() = MediaResultRowNameSuffixSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun statusInline() = MediaResultRowStatusInlineSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun skeletonSlots() = MediaResultRowSkeletonSlotsSample()
 }
