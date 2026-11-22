@@ -23,6 +23,14 @@ import androidx.compose.ui.unit.IntSize
  * of the two, so a text squeezed to nothing by a parent that ran out of room is caught as well as one clipped away. A
  * shortfall of more than [tolerancePx] in width or height fails the test, naming the text and the shortfall.
  *
+ * Four further faults fail the same way, each found from the text's own layout and not from its parents:
+ * - the text needs more height than its node has, by more than [tolerancePx], so a line is cut off;
+ * - a one-line text needs more width than its node has, by more than [tolerancePx], and is not ellipsized, so the end of the line is cut off;
+ * - a word is broken across two lines: a line other than the last ends between two characters that are neither space nor a
+ *   place a break is welcome (after a hyphen, a slash or a dash, or between two CJK characters, which have no spaces);
+ * - the text's box reaches past the left or right edge of the window, which is [windowWidthPx] wide, the root's width by
+ *   default; or it is larger than its parent by more than [tolerancePx] on either axis, which a scroll container may be.
+ *
  * It does not use `TextLayoutResult.hasVisualOverflow`. That is true for every `maxLines` with an ellipsis, which
  * is deliberate and not a bug. The layout of an ellipsized text holds only the lines it shows, with the ellipsis
  * inside the width, so the text fits its box and passes here.
@@ -35,17 +43,26 @@ import androidx.compose.ui.unit.IntSize
  * - empty text, which has no glyph for a parent to cut. A bar that is given no title draws one, and it is no bigger than
  *   the nothing it holds.
  *
+ * [allowBrokenWords] switches the broken-word check off for a caller whose text has no good place to break, a URL for one, and
+ * says why where it does; each such caller names the issue that tracks it.
+ *
  * The unmerged semantics tree is searched, so a merged parent does not hide the text inside it.
  *
  * Returns how many text nodes it checked, so a test can tell a pass from a pass that skipped everything because the
  * content was in a scroll container or off screen.
  */
-fun ComposeTestRule.assertNoTextClipped(root: SemanticsNodeInteraction = onRoot(useUnmergedTree = true), tolerancePx: Int = 1): Int {
+fun ComposeTestRule.assertNoTextClipped(
+    root: SemanticsNodeInteraction = onRoot(useUnmergedTree = true),
+    tolerancePx: Int = 1,
+    windowWidthPx: Int? = null,
+    allowBrokenWords: Boolean = false,
+): Int {
     val rootNode = root.fetchSemanticsNode()
     val viewport = rootNode.boundsInRoot
+    val window = windowWidthPx ?: rootNode.size.width
     val clipped = mutableListOf<ClippedText>()
     val checked = intArrayOf(0)
-    collectClipped(rootNode, viewport, null, tolerancePx, clipped, checked)
+    collectClipped(rootNode, viewport, null, tolerancePx, window, allowBrokenWords, clipped, checked)
     if (clipped.isNotEmpty()) {
         throw AssertionError(
             "Text is clipped by a parent (own size vs. visible size, in px):\n" +
@@ -63,10 +80,15 @@ private data class ClippedText(
     val ownHeight: Int,
     val visibleWidth: Int,
     val visibleHeight: Int,
+    val fault: String? = null,
 ) {
     fun describe(): String =
-        "  \"$text\": ${ownWidth}x$ownHeight, visible ${visibleWidth}x$visibleHeight" +
-            " (short ${shortfallWidth}px wide, ${shortfallHeight}px high)"
+        if (fault != null) {
+            "  \"$text\": $fault"
+        } else {
+            "  \"$text\": ${ownWidth}x$ownHeight, visible ${visibleWidth}x$visibleHeight" +
+                " (short ${shortfallWidth}px wide, ${shortfallHeight}px high)"
+        }
 }
 
 private fun collectClipped(
@@ -74,6 +96,8 @@ private fun collectClipped(
     viewport: Rect,
     scrollViewport: Rect?,
     tolerancePx: Int,
+    windowWidthPx: Int,
+    allowBrokenWords: Boolean,
     out: MutableList<ClippedText>,
     checked: IntArray,
 ) {
@@ -108,8 +132,94 @@ private fun collectClipped(
             }
         }
     }
-    node.children.forEach { collectClipped(it, viewport, inScroll, tolerancePx, out, checked) }
+    if (!text.isNullOrEmpty() && node.isInside(viewport) && node.isFullyInside(inScroll, tolerancePx)) {
+        node.layoutFaults(windowWidthPx, tolerancePx, allowBrokenWords).forEach { fault ->
+            out +=
+                ClippedText(
+                    text.take(MAX_TEXT_IN_MESSAGE),
+                    0,
+                    0,
+                    node.size.width,
+                    node.size.height,
+                    node.size.width,
+                    node.size.height,
+                    fault,
+                )
+        }
+    }
+    node.children.forEach { collectClipped(it, viewport, inScroll, tolerancePx, windowWidthPx, allowBrokenWords, out, checked) }
 }
+
+/** What is wrong with how the node's text sits in its own box, apart from what a parent clips: see [assertNoTextClipped]. */
+private fun SemanticsNode.layoutFaults(
+    windowWidthPx: Int,
+    tolerancePx: Int,
+    allowBrokenWords: Boolean,
+): List<String> {
+    val faults = mutableListOf<String>()
+    val results = mutableListOf<TextLayoutResult>()
+    config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(results)
+    val layout = results.firstOrNull()
+    val paragraph = layout?.multiParagraph
+    if (paragraph != null) {
+        val needed = kotlin.math.ceil(paragraph.height).toInt()
+        if (needed > size.height + tolerancePx) faults += "needs ${needed}px of height, its box is ${size.height}px"
+        if (paragraph.lineCount == 1 && paragraph.maxIntrinsicWidth > size.width + tolerancePx && !paragraph.isLineEllipsized(0)) {
+            faults += "needs ${kotlin.math.ceil(paragraph.maxIntrinsicWidth).toInt()}px of width on one line, its box is ${size.width}px"
+        }
+        val text = layout.layoutInput.text.text
+        for (line in 0 until if (allowBrokenWords) 0 else paragraph.lineCount - 1) {
+            val end = paragraph.getLineEnd(line, visibleEnd = false)
+            if (end in 1 until text.length && isBrokenWord(text[end - 1], text[end])) {
+                faults += "breaks a word across lines after \"${text.substring(maxOf(0, end - WORD_CONTEXT), end)}\""
+            }
+        }
+    }
+    val left = positionInRoot.x
+    val right = left + size.width
+    if (left < -tolerancePx || right > windowWidthPx + tolerancePx) {
+        faults += "reaches past the window: ${left.toInt()}..${right.toInt()} in a window ${windowWidthPx}px wide"
+    }
+    val parentNode = parent
+    val parentScrolls =
+        parentNode?.config?.let {
+            it.contains(SemanticsProperties.VerticalScrollAxisRange) || it.contains(SemanticsProperties.HorizontalScrollAxisRange)
+        } ?: true
+    if (parentNode != null &&
+        !parentScrolls &&
+        (size.width > parentNode.size.width + tolerancePx || size.height > parentNode.size.height + tolerancePx)
+    ) {
+        faults += "is ${size.width}x${size.height}, larger than its parent, ${parentNode.size.width}x${parentNode.size.height}"
+    }
+    return faults
+}
+
+/**
+ * Whether a line that ends between [before] and [after] has split a word: neither is a space, and the break is not one a reader
+ * expects. Public so a test can pin the rule on its own, without a line breaker deciding where the line ends.
+ */
+fun isBrokenWord(before: Char, after: Char): Boolean {
+    if (before.isWhitespace() || after.isWhitespace()) return false
+    if (before in BREAK_WELCOME_AFTER) return false
+    return !(before.isCjk() && after.isCjk())
+}
+
+private fun Char.isCjk(): Boolean {
+    val block = Character.UnicodeBlock.of(this)
+    val script = Character.UnicodeScript.of(code)
+    return block != null &&
+        (
+            script == Character.UnicodeScript.HAN ||
+                script == Character.UnicodeScript.HIRAGANA ||
+                script == Character.UnicodeScript.KATAKANA ||
+                script == Character.UnicodeScript.HANGUL
+        )
+}
+
+/** A hyphen, a slash, an en dash, an em dash and the Unicode hyphen: a line may end after one without breaking a word. */
+private val BREAK_WELCOME_AFTER = setOf('-', '/', '\u2013', '\u2014', '\u2010')
+
+private const val WORD_CONTEXT = 12
 
 /**
  * Whether the node's own, unclipped position lies in the [viewport]. The clipped bounds cannot say, because a text
