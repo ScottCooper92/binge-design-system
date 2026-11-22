@@ -33,6 +33,13 @@ class BingeFilterChipRowSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun MultiChips() {
+        BingeFilterChipRowMultiSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun IconChips() {
         BingeFilterChipRowIconsSample()
     }
