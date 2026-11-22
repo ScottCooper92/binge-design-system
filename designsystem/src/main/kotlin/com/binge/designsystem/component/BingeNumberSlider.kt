@@ -164,7 +164,7 @@ internal fun SliderBound(text: String, modifier: Modifier = Modifier) =
 /**
  * A switch above a number slider for a value that is not a number, such as the server choosing for itself: [label] names it, [on] says it
  * is set, and [onChange] is called as the switch is flipped, which saves at once. While it is on the slider is dimmed and keeps the
- * last number it showed. Turning it on hands [onChange] `null`; turning it off hands it that number, which the caller saves.
+ * last number it showed. Turning it on hands [onChange] `null`; turning it off hands it that number, which the caller saves. A sheet opened with it already on, and no number to keep, hands the range's first.
  * [onDetail] is what the row says while it is on.
  */
 @Immutable
@@ -201,8 +201,11 @@ fun BingeNumberSheetContent(
     var landed by remember { mutableStateOf(value) }
     SideEffect { landed = value }
     // The last number the slider showed, kept while auto is on (the caller's value is none then) so turning auto off restores it.
-    var kept by rememberSaveable { mutableStateOf(value) }
+    // A sheet that opens with auto on has no number from the caller, so it starts on the range's first.
+    var kept by rememberSaveable { mutableStateOf(value ?: if (auto?.on == true) range.first else null) }
     var isAuto by rememberSaveable(auto?.on) { mutableStateOf(auto?.on == true) }
+    // While auto is off the caller's value is the one to restore, wherever it was changed.
+    SideEffect { if (!isAuto) kept = value }
     Column(
         modifier =
             modifier

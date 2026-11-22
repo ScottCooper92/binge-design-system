@@ -398,4 +398,16 @@ class BingeNumberSliderTest {
 
         assertEquals(listOf<Pair<Boolean, Int?>>(true to null, false to 11), autoCalls)
     }
+
+    @Test
+    fun `a sheet opened with the switch on and no number hands a number back when it turns off`() {
+        autoOn = true
+        setAutoItem(null)
+        composeTestRule.onNodeWithText("Automatic").performClick()
+
+        composeTestRule.onNodeWithText("Choose automatically").performClick()
+        composeTestRule.waitForIdle()
+
+        assertEquals(listOf<Pair<Boolean, Int?>>(false to 1), autoCalls)
+    }
 }
