@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.ComponentPreviews
-import com.binge.designsystem.preview.PreviewSystemBarInsets
 import com.binge.designsystem.preview.STANDARD_PHONE_WIDTH_DP
 import com.binge.designsystem.preview.WorstCaseFontPreviews
 
@@ -35,22 +34,6 @@ class BingeActionFooterSamplesScreenshotTest {
     @Composable
     fun FooterWithIcon() {
         BingeActionFooterWithIconSample()
-    }
-
-    /** The raised, rounded `bottomBar` shape — the third container beside [Footer] and [FooterOnPage]. */
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun FooterElevated() {
-        BingeActionFooterElevatedSample()
-    }
-
-    /** [FooterElevated] under a navigation bar: `clearsNavigationBar` lifts the button clear of it. */
-    @PreviewTest
-    @ComponentPreviews
-    @Composable
-    fun FooterElevatedUnderSystemBars() {
-        PreviewSystemBarInsets { BingeActionFooterElevatedSample() }
     }
 
     /** The `loading` variant: spinner in place of the label. */
