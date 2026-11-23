@@ -80,12 +80,11 @@ ktlint {
  * The library holds what draws or lays out and can be described without a server, an account or a store (see CLAUDE.md).
  * Main source of this module and of `designsystem-tv` may not import a dispatcher, a data store, a network client, a view
  * model base class or a work scheduler.
- * The two files below break that today and are named here, not skipped in a baseline, so the list cannot grow quietly:
- * the save-as-made engine (its future is #1171) and the keyed view-model stores Binge's navigation uses.
+ * The file below breaks that today and is named here, not skipped in a baseline, so the list cannot grow quietly:
+ * the keyed view-model stores Binge's navigation uses.
  */
 val libraryScopeExceptions =
     setOf(
-        "designsystem/src/main/kotlin/com/binge/designsystem/save/SaveAsMade.kt",
         "designsystem/src/main/kotlin/com/binge/designsystem/viewmodel/KeyedViewModelStores.kt",
     )
 
@@ -161,7 +160,7 @@ dependencies {
     api(libs.compose.material3.adaptive.navigation3)
     // The paged-list phase takes load states, so the paging types are part of its signature.
     api(libs.paging.common)
-    // The save-as-made engine takes the scopes and dispatcher it writes on, so the types are part of its signature.
+    // RefreshTracker's `isRefreshing` is a Flow, so the type is part of its signature.
     api(libs.kotlinx.coroutines.core)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)

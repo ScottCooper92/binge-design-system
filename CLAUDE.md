@@ -67,8 +67,7 @@ The rule above is about data. The one about code is wider:
 Reporting hooks stay: `ScrollDepthEffect`, `RowImpressionEffect`, `TvVisitDepth` and the `onVisitEnded`, `onRowVisible` and
 `onCellFocused` callbacks report layout facts through callbacks and do no reporting themselves.
 `checkLibraryScope` (wired into `check`) fails when a main file imports a dispatcher, a data store, a network client, a view
-model base class or a work scheduler. Its exceptions are named in `designsystem/build.gradle.kts`: `save/SaveAsMade.kt`
-(tracked in #1171) and `viewmodel/KeyedViewModelStores.kt`.
+model base class or a work scheduler. Its one exception is named in `designsystem/build.gradle.kts`: `viewmodel/KeyedViewModelStores.kt`.
 
 **House rules every app reads the same way.** Icons are Filled. On TV a disabled button is dimmed, not hidden and not left
 always enabled.
