@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
  * It is a plain `Layout`, so it can sit under `IntrinsicSize` and in a lazy list. It composes the text three times: wrapping, wrapping
  * with an ellipsis, and on one line. It measures the wrapping one first and keeps it unless its layout broke a word, and then measures the
  * one-line one. When a bounded height cuts the wrapping text, it shows the one with an ellipsis, so the last line ends in `…` and not
- * through its glyphs. The
+ * through its glyphs. [maxLines] caps the wrapping text the same way: past it the last line ends in `…`. The
  * unused text is never placed and carries no semantics, so the semantics tree holds the text once, on this node, with the layout
  * of the one that shows. An intrinsic size is that of the wrapping text.
  *
@@ -38,13 +38,14 @@ fun WholeWordText(
     style: TextStyle,
     color: Color,
     modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     val layouts = remember { WholeWordLayouts() }
     Layout(
         content = {
-            WholeWordLine(text, style, color, WholeWordMode.Wrapping, onLayout = { layouts.wrapping = it })
-            WholeWordLine(text, style, color, WholeWordMode.WrappingEllipsis, onLayout = { layouts.ellipsized = it })
-            WholeWordLine(text, style, color, WholeWordMode.OneLine, onLayout = { layouts.oneLine = it })
+            WholeWordLine(text, style, color, WholeWordMode.Wrapping, maxLines, onLayout = { layouts.wrapping = it })
+            WholeWordLine(text, style, color, WholeWordMode.WrappingEllipsis, maxLines, onLayout = { layouts.ellipsized = it })
+            WholeWordLine(text, style, color, WholeWordMode.OneLine, maxLines, onLayout = { layouts.oneLine = it })
         },
         modifier =
             modifier.semantics {
@@ -56,7 +57,9 @@ fun WholeWordText(
         val breaksAWord = constraints.hasBoundedWidth && layouts.wrapping?.let { breaksAWord(it, text) } == true
         // A height that cuts the wrapping text would cut its last line through the glyphs, so that case shows the wrapping text with an
         // ellipsis instead. It is not used otherwise: an ellipsis on a long unbroken run truncates it where the clipped one wraps it.
-        val cutByHeight = constraints.hasBoundedHeight && (layouts.wrapping?.multiParagraph?.height ?: 0f) > constraints.maxHeight
+        val cutByHeight =
+            (constraints.hasBoundedHeight && (layouts.wrapping?.multiParagraph?.height ?: 0f) > constraints.maxHeight) ||
+                layouts.wrapping?.didOverflowHeight == true
         val shown =
             when {
                 breaksAWord -> measurables[2].measure(constraints)
@@ -90,13 +93,14 @@ private fun WholeWordLine(
     style: TextStyle,
     color: Color,
     mode: WholeWordMode,
+    maxLines: Int,
     onLayout: (TextLayoutResult) -> Unit,
 ) {
     Text(
         text = text,
         style = style,
         color = color,
-        maxLines = if (mode == WholeWordMode.OneLine) 1 else Int.MAX_VALUE,
+        maxLines = if (mode == WholeWordMode.OneLine) 1 else maxLines,
         // The wrapping text clips: with an ellipsis it would truncate a long unbroken run instead of letting the line breaker wrap
         // it, which is what lets the check below see a word split.
         overflow = if (mode == WholeWordMode.Wrapping) TextOverflow.Clip else TextOverflow.Ellipsis,

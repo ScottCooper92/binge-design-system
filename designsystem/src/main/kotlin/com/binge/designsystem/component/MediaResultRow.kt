@@ -217,29 +217,35 @@ fun MediaResultRow(
  * The name with a [suffix] after it in the primary colour. The suffix and the marks take their own width first, and the name, up to two lines, takes what is
  * left and ellipsizes, so a short suffix is never the part that is cut. A long one is bounded: it takes at most half of the width it is offered and wraps to
  * a second line, then ellipsizes, so the name keeps roughly the other half (less the marks beside it), at any font size. Taking its whole width first left the name none at all.
+ *
+ * Neither the name nor the suffix breaks a word in two: where the room would split one, that text stays on one line and ends in an ellipsis, as
+ * [WholeWordText] does. [marks] is a slot after the suffix, such as a favourite heart or a watched tick.
+ *
+ * @need show a title with a suffix such as a year or the seasons asked for, where the title and the suffix never break a word
+ * @group rows
+ * @replaces a hand-built Row of a title and a coloured suffix
  */
 @Composable
-private fun NameWithSuffix(
+fun NameWithSuffix(
     name: String,
     suffix: String,
-    marks: (@Composable () -> Unit)?,
+    modifier: Modifier = Modifier,
+    marks: (@Composable () -> Unit)? = null,
 ) {
-    Row(verticalAlignment = Alignment.Top) {
-        Text(
+    Row(modifier = modifier, verticalAlignment = Alignment.Top) {
+        WholeWordText(
             text = name,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false),
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.padding_xs)))
-        Text(
+        WholeWordText(
             text = suffix,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
             maxLines = SUFFIX_MAX_LINES,
-            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.atMostHalfOfWhatIsLeft(),
         )
         if (marks != null) {
