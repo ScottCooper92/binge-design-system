@@ -10,7 +10,10 @@ own terms.
 
 ## Focus is a parameter, not a runtime state
 
-A component takes `isFocused: Boolean` and styles itself from it. Nothing here reads real focus.
+A component that only draws takes `isFocused: Boolean` and styles itself from it, and does not read real focus.
+A component that owns the control (a button, an option row, a stepper, a text field) keeps its own focus flag, fed by
+`tvClickable`'s real focus event, and takes `initiallyFocused` to seed that flag. `initiallyFocused` exists so a frame can
+show the focused look; an app does not pass it. The tv-material `ListItem` rows read real focus colours.
 
 That is an API decision, and it is about coverage. A preview renders one frame. A baseline that
 depended on a real `FocusRequester` having fired by the time that frame was captured would be
@@ -19,6 +22,13 @@ flaky, where a parameter is deterministic. So a focused appearance is testable b
 Acquiring focus is the caller's half. `Modifier.tvFocusTarget` for a plain element, or `tvClickable`
 for one that also takes OK, wires the real focus event and hoists the flag into the caller's own state.
 `tvClickable` is its own `onFocusChanged` plus `clickable`, so it is never combined with `tvFocusTarget`.
+
+### The standing focus rule
+
+Focus is placed by one request, made when the target is attached, or by a declared landing (`onEnter`). There are no
+delay-then-request timers and no per-frame offer loops: a request that has to wait for a node waits for the node to report
+it is placed, not for a clock. The one wall-clock window is `TvSwapFocus`'s three seconds, which only bounds how long an
+armed swap waits for its replacement control to attach. A new unit does not add another.
 
 The same trade shows up again in `TvLayoutAnchors`: a small, named affordance in production, so an
 invariant is checkable rather than reviewable.
@@ -29,7 +39,10 @@ A screen that appears while the user is somewhere else must not take focus, beca
 *moves* them. Declare where focus should land instead — `focusProperties { onEnter = … }` on a
 `focusGroup()` — so the redirect happens only when focus genuinely arrives. That is what the
 `tv*FocusGroup` units here are for, and why a component in this module never fires a requester it
-was handed.
+was handed, with one exception: a component that collapses to a message and a button
+(`TvGridCollapsedMessage`, the error state of `TvFilterResults`, `TvSideSheet` and `TvSideSheetConfirm`) is the only focusable
+content its destination has, so it takes focus there, once, with `TvOverlayArrivalFocusEffect`. Moving focus to the button of a
+failure or empty state is the rule for those states, not a destination asking for focus.
 
 A lazy row, column or grid is already its own focus group, so it takes `tvLazyFocusGroup` — the restorer alone,
 with an optional fallback for the first entry — rather than `tvFocusGroup`. `TvListPane` is the case: its first
@@ -40,10 +53,11 @@ A user-invoked overlay — a dialog, a filter panel, a setup step — is the opp
 precisely what they asked for. `TvOverlayArrivalFocusEffect` is that, packaged.
 
 The shell is the third case. Something must hold focus on a D-pad surface at startup and nothing
-else can yet, so the shell's navigation hands focus *out* to the content on first composition. It
-aims that request at the content group rather than at itself, so focus begins on the start
-destination's first item until the user navigates to the bar. The
-destination is still not the one asking.
+else can yet, so the shell arms a `TvShellArrival` on a cold start, a tab switch or a change of content depth. The first
+`tvShellArrivalTarget` the destination places after that claims it and makes one request, whenever its data lands, so focus
+begins on the destination's first item until the user navigates to the bar. A destination with nothing to focus (an empty
+plate) calls `TvShellArrivalNone` to settle it. A direction key or Back clears a pending arrival. The destination marks its
+target; the shell's claim is what requests.
 
 ## Move focus a frame after the thing holding it goes
 
@@ -63,8 +77,9 @@ arrives again without leaving the composition passes a new `arrivalKey`.
 A user's own direction press since the arrival composed cancels the request, so it never pulls focus
 back from the bar. That guard is opt-in. `TvUserMoves` is a counter: `note()` records one direction press,
 and `TvArrivalFocusEffect` reads the count when the arrival composes and again just before it would claim.
-If the count moved, or the arrival already holds focus, it makes no request. The design system never calls
-`note()` itself outside `TvUserMovesHost`, and `LocalTvUserMoves` has no provider by default, so without a host nothing is noted and the
+If the count moved, or the arrival already holds focus, it makes no request. The design system calls
+`note()` only in `TvUserMovesHost` and in `TvTopBarScaffold`'s `ShellUserChoices.noteChoice`, which records a choice the user
+made in the bar. `LocalTvUserMoves` has no provider by default, so without a host nothing is noted and the
 arrival always claims, even if the user has already moved on.
 
 A host switches the guard on by wrapping its shell root in `TvUserMovesHost`. It provides one `TvUserMoves` for its lifetime
@@ -80,10 +95,17 @@ A host that already owns the key handler that sees every press can do it by hand
 `TvOverlayArrivalFocusEffect` is the same single request for an overlay or a plate: it makes one request when it
 composes, so its target must be attached from the first frame. Focus returns after an overlay goes through
 `rememberTvOverlayCloser`, which makes one request in the frame an overlay that reports its disposal is gone. There is
-no retry helper. Bound any wait on the frame clock in wall-clock time where the thing waited on can stop drawing: `withFrameNanos`
-resumes only on frames the app actually draws, so a frame budget against a static screen never expires.
-The startup handoff to content counts frames instead, and stops early once focus is taken or the user moves up
-to the top bar.
+no retry helper. Where a wait has to be bounded and the thing waited on can stop drawing, bound it in wall-clock time: `withFrameNanos`
+resumes only on frames the app actually draws, so a frame budget against a static screen never expires. The shell's
+startup hand-off is not a wait at all: it is the `TvShellArrival` claim above.
+
+Three more units carry focus across a change that removes the node holding it, each with a held node that is never removed
+and a hand-on once the incoming target reports it is placed: `TvRetryHandoff` (a retry that removes the plate), `TvPaneSwap`
+(the filter pane swapping between its category list and a category's values) and `TvSwapFocus` (a press that swaps the
+focused subtree). `TvFocusSink` is the inert target for a pane with nothing focusable yet, kept mounted while it holds focus.
+`TvRowEntry` is the remembered-entry-cell contract for rows and grids: return to the cell that last held focus, open a fresh
+one on its first. `tvExitFocusGroup` traps focus inside a surface (a sheet, a dialog) until it is disposed.
+`TvPageHosting` says whether a page is an overlay or a shell destination, which decides who places its first focus.
 
 A `TvSideSheetStack` claims early in the same way when it changes pages. The panel carries a zero-size anchor beside its rows that holds focus while
 one page's rows replace another's, so none of the old rows is focused as it disposes and Compose has nothing to reassign. The
@@ -101,7 +123,7 @@ the white with the theme's `primary`.
 
 > Focus is a **solid `primary` fill**, with `onPrimary` for the content, wherever a fill works.
 > Where a fill would cover the content it sits on — a poster, a provider logo — focus is a
-> **border** in the same colour instead. Nothing scales: focus is colour, never geometry.
+> **border** in the same colour instead. Focus is colour, never the geometry of the content.
 > Selection is a **tick drawn inside the item**, never a container treatment.
 
 Three rules follow, and they are the whole model.
@@ -120,20 +142,22 @@ Three rules follow, and they are the whole model.
    focus. Giving an accent back to a resting state re-opens the collision the rule exists to
    prevent: while the accent means both "primary" and "focused", an unfocused primary button looks
    focused.
-   **A disabled control shows focus as an edge, not a fill.** It stays focusable so ↓ isn't a dead end, but a fill
+   **A disabled control shows focus as an edge, not a fill.** It stays focusable, in the focus order, so ↓ isn't a dead end, but a fill
    would promise a press that does nothing. So a focused disabled control draws an opaque edge, for every
    style including `Text` and `TextDestructive`: `border` with its alpha raised to 1 for the neutral styles (`border` itself is translucent, fainter than the dimmed resting edge), `error` for the red ones, so it still
-   reads as destructive. The container stays transparent and the label stays dimmed.
+   reads as destructive. The container stays transparent and the label stays dimmed. A disabled control is dimmed, never hidden and never
+   left always enabled. `TvSideSheetRow` does not follow the focus half yet: a disabled row leaves the focus order.
 3. **Selected and focused are independent, and both can be true.** A chosen tile keeps its tick
    whether or not focus is on it, so a grid never loses which tiles are picked while the user moves
    through it. The tick is also legible where colour alone is not — a mis-calibrated panel, or a
    viewer who cannot separate the accent hue from grey.
 
-### Nothing scales
+### Content does not scale
 
 A growing element pushes its focus outline into its neighbour, and on a row of wide cards a few
 percent is enough to overlap them. Dropping the scale means focus needs only the outline's own
-width and gap. That is why `tvFocusIndicator` draws *outside* the element's bounds, why overscan
+width and gap. Two things move for a reason that is not focus on a card: the top bar's tabs rest at 0.8 and reach full size
+(`TvTabTopBar`), and `TvIconButton` grows a label beside its icon on focus, where its neighbours make room. That is why `tvFocusIndicator` draws *outside* the element's bounds, why overscan
 margins are measured to the outline rather than the element, and why a lazy container has to carry
 `contentPadding` for it or clip it off the first and last cell of every row.
 
@@ -153,7 +177,8 @@ switch is black and white, and a sheet's panel is `surfaceVariant`. The rules do
 means focus.
 
 A component reads focus, switch and panel colours from the style's roles (`MaterialTheme.tvStyle`), never from
-`primary`. The accent keeps every job that is not focus, in both styles: a rating, a selection tick, a count badge,
+`primary`. A few components still read `onSurface` and `surface` directly, which is right under the monochrome style and not
+under the accent one; they move to the style roles as they are touched. The accent keeps every job that is not focus, in both styles: a rating, a selection tick, a count badge,
 the rail's current destination, the current row of a two-pane list. In the monochrome style that splits the two
 meanings cleanly. White is where you are, and the accent is what is chosen.
 
@@ -188,3 +213,6 @@ the change and can be sent again, is `SaveStatus.Failed` with Retry instead.
 | Keyed cells | A keyed mode, for a screen whose results re-order | Always positional |
 
 They are not merged: a template cell is the caller's own card, so a template built on `TvPosterGrid` would lose that slot, and the two differ in their gaps and in how they route entry. What they do share is one rule, in `TvPlateGrid.kt`: three rows of plates fill a loading grid, and the grid composes at least enough cells to reach the focused one, so focus stays on its node when the results end before it. Change that rule there and both grids follow.
+
+Two other loading grids draw two rows of plates, not three: `TvCardGrid`'s skeleton and `TvImmersiveGrid`'s loading cells in
+`TvSkeletonPages.kt`. They are placeholders that cannot know how many results are coming, and neither holds focus on a plate.
