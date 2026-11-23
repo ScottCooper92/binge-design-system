@@ -112,44 +112,5 @@ private fun WholeWordLine(
 private fun breaksAWord(layout: TextLayoutResult, text: String): Boolean =
     (0 until layout.lineCount - 1).any { line ->
         val end = layout.getLineEnd(line)
-        end in 1 until text.length && isMidWord(text.codePointBefore(end), text.codePointAt(end))
+        end in 1 until text.length && isBrokenWord(text.codePointBefore(end), text.codePointAt(end))
     }
-
-private fun isMidWord(before: Int, after: Int): Boolean =
-    !Character.isWhitespace(before) &&
-        !Character.isWhitespace(after) &&
-        before !in BREAK_AFTER &&
-        !(before.isUnspaced() || after.isUnspaced())
-
-/**
- * Whether a code point is in a script written without spaces: CJK, and Thai, Lao, Khmer and Myanmar, which the line breaker splits at
- * dictionary word boundaries. The script alone misses marks that belong to no script, such as the
- * prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
- */
-private fun Int.isUnspaced(): Boolean =
-    Character.UnicodeScript.of(this) in UNSPACED_SCRIPTS ||
-        Character.UnicodeBlock.of(this) in CJK_BLOCKS
-
-private val UNSPACED_SCRIPTS =
-    setOf(
-        Character.UnicodeScript.HAN,
-        Character.UnicodeScript.HIRAGANA,
-        Character.UnicodeScript.KATAKANA,
-        Character.UnicodeScript.HANGUL,
-        Character.UnicodeScript.THAI,
-        Character.UnicodeScript.LAO,
-        Character.UnicodeScript.KHMER,
-        Character.UnicodeScript.MYANMAR,
-    )
-
-private val CJK_BLOCKS =
-    setOf(
-        Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
-        Character.UnicodeBlock.HIRAGANA,
-        Character.UnicodeBlock.KATAKANA,
-        Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS,
-        Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
-        Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
-    )
-
-private val BREAK_AFTER = setOf('-'.code, '/'.code, 0x2013, 0x2014, 0x2010)
