@@ -12,12 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.bottomBarInsets
-import com.binge.designsystem.resolvedContentInset
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeShapes
 
 /**
  * The pinned bar under a screen: a raised surface with the top corners rounded, that clears the navigation bar
- * and a side cutout and keeps the content's side inset. Pass it as `BingeScreenScaffold`'s `bottomBar`; [content]
+ * and a side cutout and keeps the content's side inset, the smaller one on the edge it shares with another pane, as the body does. Pass it as `BingeScreenScaffold`'s `bottomBar`; [content]
  * is whatever the bar holds, a summary line or a row of buttons. [FormScreen]'s footer is built on it, so every
  * pinned bar sits the same over what scrolls under it.
  *
@@ -40,7 +40,7 @@ fun ScreenFooter(modifier: Modifier = Modifier, content: @Composable ColumnScope
                 Modifier
                     .fillMaxWidth()
                     .windowInsetsPadding(bottomBarInsets())
-                    .padding(horizontal = resolvedContentInset())
+                    .padding(resolvedContentPadding())
                     .padding(top = dimensionResource(R.dimen.padding_sm), bottom = dimensionResource(R.dimen.padding_m)),
             content = content,
         )

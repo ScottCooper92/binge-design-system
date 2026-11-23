@@ -1,11 +1,7 @@
 package com.binge.designsystem.component
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.MaterialTheme
@@ -14,32 +10,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
-import com.binge.designsystem.bottomBarInsets
-import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
-import com.binge.designsystem.theme.BingeShapes
 
 /**
- * A primary full-width CTA pinned below its host's content, in a band of the host's own colour.
+ * A primary full-width CTA pinned below a sheet's content, in a band of the sheet's own colour.
  *
- * The defaults are a [androidx.compose.material3.ModalBottomSheet]'s, which is what it was written
- * for: [containerColor] matches the sheet's container so the band reads flush against it, and
- * [shape]/[shadowElevation] stay off ([RectangleShape], none) since the sheet's own chrome already
- * carries the rounded top corner this footer sits inside. A page overrides [containerColor] to
- * `Color.Transparent` so its own surface shows through rather than a lighter band with a hard edge,
- * and [bottomPadding] to zero where its scaffold has already inset the content — or, for a page
- * whose primary action anchors in a `bottomBar` slot outside the scaffold's own body, reaches for
- * [BingeShapes.HeroTop] and [R.dimen.snackbar_elevation] instead, so it reads as a raised band of
- * its own rather than the page's background continuing under the button.
+ * The defaults are a [androidx.compose.material3.ModalBottomSheet]'s, which is what it was written for: [containerColor] matches the
+ * sheet's container so the band reads flush against it, and the band is square and flat since the sheet's own chrome already carries
+ * the rounded top corner this footer sits inside. A host that draws its own surface overrides [containerColor] to `Color.Transparent`
+ * so that surface shows through rather than a lighter band with a hard edge, and [bottomPadding] to zero where it has already inset
+ * the content.
+ *
+ * **For a page, use [com.binge.designsystem.template.ScreenFooter]**, as `ScreenFooter { BingeFilledButton(...) }`: it is the raised
+ * bar with rounded top corners that clears the navigation bar and a side cutout and keeps the content's side inset, and every pinned
+ * bar on a page sits the same. This footer is the sheet form and takes none of that.
  *
  * [destructive] gives the button the error tone, for a sheet whose one action removes or declines something.
  *
@@ -55,23 +46,14 @@ import com.binge.designsystem.theme.BingeShapes
  * [bottomPadding] is spacing, not a safe area. A sheet's own `contentWindowInsets` already applies
  * `safeDrawing` around its content — `BottomSheet` calls `windowInsetsPadding` with it — so this
  * never stood in for the gesture area, and a host that reads the inset itself is not reading it
- * twice. The KDoc used to say safe-area, which is what made a page stack three bottom paddings.
- *
- * [clearsNavigationBar] is the one case that does need the real inset: a `bottomBar` slot sits
- * outside a Scaffold's own body, so nothing insets it automatically. On, only the button clears the
- * gesture area and the side insets on its pane's outer edges — the [Surface] itself stays unpadded so its
- * background still extends full-bleed behind it, edge to edge like the rest of the window.
- *
- * [horizontalPadding] defaults to the fixed spacing a sheet's own content already uses. A page passes
- * [sidePadding] instead, edge by edge: `resolvedContentPadding()`, so the button lines up with a body that
- * pads the edge it shares with another pane less than the window's edge. Only its start and end are read.
+ * twice. [horizontalPadding] defaults to the fixed spacing a sheet's own content already uses.
  *
  * [leadingIcon] matches the same action rendered as a [BingeOutlinedButton]/[BingeTextButton] tile
  * elsewhere — a caller whose action promotes to this footer only once it is the sheet's sole primary
  * CTA (dropping out of a tiered pool of two-or-more) should pass the same icon, so the action doesn't
  * lose its icon purely because of how many peers it currently has.
  *
- * @need pin a primary action to the bottom of a screen or sheet
+ * @need pin a primary action to the bottom of a sheet
  * @group bars
  * @replaces a hand-built bottom Surface holding a full-width button
  */
@@ -84,21 +66,15 @@ fun BingeActionFooter(
     enabled: Boolean = true,
     loading: Boolean = false,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    shape: Shape = RectangleShape,
-    shadowElevation: Dp = dimensionResource(R.dimen.zero),
     bottomPadding: Dp = dimensionResource(R.dimen.padding_l),
     horizontalPadding: Dp = dimensionResource(R.dimen.padding_m),
-    clearsNavigationBar: Boolean = false,
-    sidePadding: PaddingValues = PaddingValues(horizontal = horizontalPadding),
     destructive: Boolean = false,
     failed: Boolean = false,
 ) {
-    val direction = LocalLayoutDirection.current
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = containerColor,
-        shape = shape,
-        shadowElevation = shadowElevation,
+        shape = RectangleShape,
     ) {
         BingeFilledButton(
             label = label,
@@ -111,8 +87,7 @@ fun BingeActionFooter(
                 Modifier
                     .fillMaxWidth()
                     .then(if (failed) Modifier.semantics { error(label) } else Modifier)
-                    .then(if (clearsNavigationBar) Modifier.windowInsetsPadding(bottomBarInsets()) else Modifier)
-                    .padding(start = sidePadding.calculateStartPadding(direction), end = sidePadding.calculateEndPadding(direction))
+                    .padding(horizontal = horizontalPadding)
                     .padding(top = dimensionResource(R.dimen.padding_sm), bottom = bottomPadding),
         )
     }
@@ -134,21 +109,6 @@ private fun PreviewBingeActionFooterWithIcon() {
             label = "Open on your server",
             onClick = {},
             leadingIcon = Icons.AutoMirrored.Filled.OpenInNew,
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PreviewBingeActionFooterElevated() {
-    BingeExpressiveTheme {
-        BingeActionFooter(
-            label = "Add a slider",
-            onClick = {},
-            shape = BingeShapes.HeroTop,
-            shadowElevation = dimensionResource(R.dimen.snackbar_elevation),
-            clearsNavigationBar = true,
-            sidePadding = resolvedContentPadding(),
         )
     }
 }

@@ -40,7 +40,8 @@ import kotlinx.coroutines.launch
  * onSurface content, expressive corner radius, and `skipPartiallyExpanded = true`. For
  * advanced callers that need a reference to the sheet state, use [ModalBottomSheet] directly.
  *
- * [dockable] opts the sheet into docking, usually with `skipPartiallyExpanded = false` so it opens part-way: as
+ * [opensPartWay] is the usual way to say that: it is `skipPartiallyExpanded = false` and `dockable = true` together, so the sheet opens
+ * part-way and docks. [dockable] opts the sheet into docking alone, and `skipPartiallyExpanded = false` alone opens it part-way with no dock. Docking: as
  * its top edge reaches the status bar its top corners square off and [BingeSheetDockingHeader] swaps the drag handle
  * and header for a [BingeSheetTopBar], and [bingeSheetPinnedFooter] keeps a footer on the window's bottom edge while
  * the sheet is part-way open. Both read [LocalBingeSheetDock], which only a dockable sheet provides. A dockable sheet
@@ -86,13 +87,14 @@ fun BingeBottomSheet(
     dismissOnClickOutside: Boolean = gesturesEnabled,
     dockable: Boolean = false,
     edgeToEdge: Boolean = false,
+    opensPartWay: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val foldSafeHeight = rememberFoldSafeBottomHeight()
-    val sheetState = rememberLockableSheetState(skipPartiallyExpanded, gesturesEnabled)
+    val sheetState = rememberLockableSheetState(skipPartiallyExpanded && !opensPartWay, gesturesEnabled)
     val scope = rememberCoroutineScope()
     val dock =
-        if (dockable) {
+        if (dockable || opensPartWay) {
             rememberBingeSheetDock(
                 sheetState = sheetState,
                 gesturesEnabled = gesturesEnabled,

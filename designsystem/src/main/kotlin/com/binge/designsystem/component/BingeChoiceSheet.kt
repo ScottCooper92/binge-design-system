@@ -184,8 +184,7 @@ fun <T> BingeChoiceSheet(
     BingeBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
-        skipPartiallyExpanded = !partWay,
-        dockable = partWay,
+        opensPartWay = partWay,
         // A long list runs under the navigation bar and pads its own end for it.
         edgeToEdge = partWay,
     ) {
@@ -266,8 +265,7 @@ fun <T> BingeMultiChoiceSheet(
     BingeBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
-        skipPartiallyExpanded = !partWay,
-        dockable = partWay,
+        opensPartWay = partWay,
         // A long list runs under the navigation bar and pads its own end for it.
         edgeToEdge = partWay,
     ) {

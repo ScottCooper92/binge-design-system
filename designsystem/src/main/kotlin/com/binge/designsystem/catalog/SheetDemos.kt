@@ -71,16 +71,14 @@ fun SheetsDemo() {
             OpenSheet.Docking ->
                 BingeBottomSheet(
                     onDismissRequest = { close("Dismissed by gesture, scrim, back or close") },
-                    skipPartiallyExpanded = false,
-                    dockable = true,
+                    opensPartWay = true,
                 ) {
                     DockingSheetBody { close("Dismissed by Done") }
                 }
             OpenSheet.DockingStep ->
                 BingeBottomSheet(
                     onDismissRequest = { close("Dismissed by gesture, scrim or back") },
-                    skipPartiallyExpanded = false,
-                    dockable = true,
+                    opensPartWay = true,
                 ) {
                     BingeSheetStepHandle(title = "Docked step")
                     SheetBody("A step with no header of its own: it still has the handle. Pull up to dock, or", "Done") {
