@@ -78,7 +78,8 @@ ktlint {
 
 /**
  * The library holds what draws or lays out and can be described without a server, an account or a store (see CLAUDE.md).
- * Main source may not import a dispatcher, a data store, a network client, a view model base class or a work scheduler.
+ * Main source of this module and of `designsystem-tv` may not import a dispatcher, a data store, a network client, a view
+ * model base class or a work scheduler.
  * The two files below break that today and are named here, not skipped in a baseline, so the list cannot grow quietly:
  * the save-as-made engine (its future is #1171) and the keyed view-model stores Binge's navigation uses.
  */
@@ -100,11 +101,13 @@ val checkLibraryScope = tasks.register("checkLibraryScope") {
         val forbidden =
             listOf(
                 "kotlinx.coroutines.CoroutineDispatcher",
+                "kotlinx.coroutines.Dispatchers",
                 "androidx.datastore.",
                 "okhttp3.",
                 "retrofit2.",
                 "io.ktor.",
                 "androidx.lifecycle.ViewModel",
+                "androidx.lifecycle.AndroidViewModel",
                 "androidx.work.",
             )
         val violations = mutableListOf<String>()
@@ -114,7 +117,7 @@ val checkLibraryScope = tasks.register("checkLibraryScope") {
             file.readLines().forEachIndexed { index, line ->
                 val trimmed = line.trim()
                 if (!trimmed.startsWith("import ")) return@forEachIndexed
-                val imported = trimmed.removePrefix("import ").trim()
+                val imported = trimmed.removePrefix("import ").substringBefore(" as ").trim()
                 // `androidx.lifecycle.ViewModel` is the base class; `ViewModelStore` and the rest are not.
                 if (forbidden.any { if (it.endsWith(".")) imported.startsWith(it) else imported == it }) {
                     violations += "$relative:${index + 1}: imports $imported"
