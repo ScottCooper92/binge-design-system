@@ -3,12 +3,12 @@ package com.binge.designsystem.tv.component
 import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Text
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
 import org.junit.Assert.assertTrue
