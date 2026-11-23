@@ -215,6 +215,19 @@ fun BingeScreenScaffoldBottomBarSample() {
     }
 }
 
+/**
+ * A [ScreenFooter] holding a filled button, for a page whose primary action anchors in a `bottomBar` slot outside the scaffold's own
+ * body. Rounded and raised so it reads as its own surface.
+ */
+@Composable
+fun ScreenFooterElevatedSample() {
+    ScreenshotTheme {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            ScreenFooter { BingeFilledButton(label = "Add a slider", onClick = {}, modifier = Modifier.fillMaxWidth()) }
+        }
+    }
+}
+
 /** A pinned bar of plain text on [ScreenFooter]: the chrome a form's buttons sit on, for content that is not a button. */
 @Composable
 fun ScreenFooterSample() {

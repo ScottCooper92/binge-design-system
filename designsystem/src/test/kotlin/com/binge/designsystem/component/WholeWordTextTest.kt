@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -83,7 +85,8 @@ class WholeWordTextTest {
         val text = "サーバーサーバーサーバーサーバーサーバー"
         rule.setContent {
             TestTheme {
-                Column {
+                // A scrolling column, so no label is given a bounded height and cut to fit it.
+                Column(Modifier.verticalScroll(rememberScrollState())) {
                     KATAKANA_WIDTHS.forEach { width -> Box(Modifier.width(width.dp)) { Words(text) } }
                 }
             }
@@ -118,7 +121,8 @@ class WholeWordTextTest {
         val text = "Plex映画ライブラリと4K映画コレクション"
         rule.setContent {
             TestTheme {
-                Column {
+                // A scrolling column, so no label is given a bounded height and cut to fit it.
+                Column(Modifier.verticalScroll(rememberScrollState())) {
                     MIXED_WIDTHS.forEach { width -> Box(Modifier.width(width.dp)) { Words(text) } }
                 }
             }
@@ -178,7 +182,40 @@ class WholeWordTextTest {
         assertEquals(1, rule.onAllNodesWithText("Fitzgerald-Montgomery Alexandria").fetchSemanticsNodes().size)
     }
 
+    private fun showBounded(fontScale: Float, text: String) {
+        rule.setContent {
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit
+                    .Density(density.density, fontScale = fontScale),
+            ) {
+                TestTheme { Box(Modifier.width(HYPHEN_ROOM.dp).height(BOUNDED_HEIGHT.dp)) { Words(text) } }
+            }
+        }
+        rule.waitForIdle()
+    }
+
+    private fun checkBounded(fontScale: Float) {
+        val text = "Signed in as the household's shared administrator account"
+        showBounded(fontScale, text)
+
+        val node = rule.onAllNodesWithText(text).fetchSemanticsNodes().single()
+        val results = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+        node.config[androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult].action?.invoke(results)
+        val layout = results.first()
+        assertTrue("the text should not fit the height", layout.didOverflowHeight)
+        assertTrue("the last visible line should end in an ellipsis", layout.isLineEllipsized(layout.lineCount - 1))
+        rule.assertNoTextClipped()
+    }
+
+    @Test
+    fun `a bounded height ends the last line in an ellipsis at 1x`() = checkBounded(1f)
+
+    @Test
+    fun `a bounded height ends the last line in an ellipsis at 2x`() = checkBounded(2f)
+
     private companion object {
+        const val BOUNDED_HEIGHT = 70
         const val NARROW = 90
         val MIXED_WIDTHS = listOf(44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108)
         val KATAKANA_WIDTHS = listOf(64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116)

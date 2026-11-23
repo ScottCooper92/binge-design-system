@@ -21,8 +21,10 @@ import androidx.compose.ui.text.style.TextOverflow
  * ellipsis, where [Text] would break the word across lines. Use it for a name or a label that wraps freely at a normal size but
  * may meet a narrow slot at the largest font.
  *
- * It is a plain `Layout`, so it can sit under `IntrinsicSize` and in a lazy list. It composes the text twice, wrapping and on one
- * line, measures the wrapping one first and keeps it unless its layout broke a word, and then measures the one-line one. The
+ * It is a plain `Layout`, so it can sit under `IntrinsicSize` and in a lazy list. It composes the text three times: wrapping, wrapping
+ * with an ellipsis, and on one line. It measures the wrapping one first and keeps it unless its layout broke a word, and then measures the
+ * one-line one. When a bounded height cuts the wrapping text, it shows the one with an ellipsis, so the last line ends in `…` and not
+ * through its glyphs. The
  * unused text is never placed and carries no semantics, so the semantics tree holds the text once, on this node, with the layout
  * of the one that shows. An intrinsic size is that of the wrapping text.
  *
@@ -40,8 +42,9 @@ fun WholeWordText(
     val layouts = remember { WholeWordLayouts() }
     Layout(
         content = {
-            WholeWordLine(text, style, color, oneLine = false, onLayout = { layouts.wrapping = it })
-            WholeWordLine(text, style, color, oneLine = true, onLayout = { layouts.oneLine = it })
+            WholeWordLine(text, style, color, WholeWordMode.Wrapping, onLayout = { layouts.wrapping = it })
+            WholeWordLine(text, style, color, WholeWordMode.WrappingEllipsis, onLayout = { layouts.ellipsized = it })
+            WholeWordLine(text, style, color, WholeWordMode.OneLine, onLayout = { layouts.oneLine = it })
         },
         modifier =
             modifier.semantics {
@@ -51,35 +54,52 @@ fun WholeWordText(
     ) { measurables, constraints ->
         val wrapping = measurables[0].measure(constraints)
         val breaksAWord = constraints.hasBoundedWidth && layouts.wrapping?.let { breaksAWord(it, text) } == true
-        val shown = if (breaksAWord) measurables[1].measure(constraints) else wrapping
-        layouts.shown = if (breaksAWord) layouts.oneLine else layouts.wrapping
+        // A height that cuts the wrapping text would cut its last line through the glyphs, so that case shows the wrapping text with an
+        // ellipsis instead. It is not used otherwise: an ellipsis on a long unbroken run truncates it where the clipped one wraps it.
+        val cutByHeight = constraints.hasBoundedHeight && (layouts.wrapping?.multiParagraph?.height ?: 0f) > constraints.maxHeight
+        val shown =
+            when {
+                breaksAWord -> measurables[2].measure(constraints)
+                cutByHeight -> measurables[1].measure(constraints)
+                else -> wrapping
+            }
+        layouts.shown =
+            when {
+                breaksAWord -> layouts.oneLine
+                cutByHeight -> layouts.ellipsized
+                else -> layouts.wrapping
+            }
         layout(shown.width, shown.height) { shown.place(0, 0) }
     }
 }
 
 /** The text layouts the two lines of a [WholeWordText] last reported, and which of them showed. Written while measuring. */
 private class WholeWordLayouts {
+    var ellipsized: TextLayoutResult? = null
     var wrapping: TextLayoutResult? = null
     var oneLine: TextLayoutResult? = null
     var shown: TextLayoutResult? = null
 }
+
+/** Which of a [WholeWordText]'s texts a line is: wrapping and clipped, wrapping with an ellipsis, or one line with an ellipsis. */
+private enum class WholeWordMode { Wrapping, WrappingEllipsis, OneLine }
 
 @Composable
 private fun WholeWordLine(
     text: String,
     style: TextStyle,
     color: Color,
-    oneLine: Boolean,
+    mode: WholeWordMode,
     onLayout: (TextLayoutResult) -> Unit,
 ) {
     Text(
         text = text,
         style = style,
         color = color,
-        maxLines = if (oneLine) 1 else Int.MAX_VALUE,
-        // Ellipsis only on the one-line text: on the wrapping one it would truncate a long unbroken run instead of letting the line
-        // breaker wrap it, which is what lets the check below see a word split.
-        overflow = if (oneLine) TextOverflow.Ellipsis else TextOverflow.Clip,
+        maxLines = if (mode == WholeWordMode.OneLine) 1 else Int.MAX_VALUE,
+        // The wrapping text clips: with an ellipsis it would truncate a long unbroken run instead of letting the line breaker wrap
+        // it, which is what lets the check below see a word split.
+        overflow = if (mode == WholeWordMode.Wrapping) TextOverflow.Clip else TextOverflow.Ellipsis,
         onTextLayout = onLayout,
         modifier = Modifier.clearAndSetSemantics {},
     )
@@ -92,44 +112,5 @@ private fun WholeWordLine(
 private fun breaksAWord(layout: TextLayoutResult, text: String): Boolean =
     (0 until layout.lineCount - 1).any { line ->
         val end = layout.getLineEnd(line)
-        end in 1 until text.length && isMidWord(text.codePointBefore(end), text.codePointAt(end))
+        end in 1 until text.length && isBrokenWord(text.codePointBefore(end), text.codePointAt(end))
     }
-
-private fun isMidWord(before: Int, after: Int): Boolean =
-    !Character.isWhitespace(before) &&
-        !Character.isWhitespace(after) &&
-        before !in BREAK_AFTER &&
-        !(before.isUnspaced() || after.isUnspaced())
-
-/**
- * Whether a code point is in a script written without spaces: CJK, and Thai, Lao, Khmer and Myanmar, which the line breaker splits at
- * dictionary word boundaries. The script alone misses marks that belong to no script, such as the
- * prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
- */
-private fun Int.isUnspaced(): Boolean =
-    Character.UnicodeScript.of(this) in UNSPACED_SCRIPTS ||
-        Character.UnicodeBlock.of(this) in CJK_BLOCKS
-
-private val UNSPACED_SCRIPTS =
-    setOf(
-        Character.UnicodeScript.HAN,
-        Character.UnicodeScript.HIRAGANA,
-        Character.UnicodeScript.KATAKANA,
-        Character.UnicodeScript.HANGUL,
-        Character.UnicodeScript.THAI,
-        Character.UnicodeScript.LAO,
-        Character.UnicodeScript.KHMER,
-        Character.UnicodeScript.MYANMAR,
-    )
-
-private val CJK_BLOCKS =
-    setOf(
-        Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
-        Character.UnicodeBlock.HIRAGANA,
-        Character.UnicodeBlock.KATAKANA,
-        Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS,
-        Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
-        Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
-    )
-
-private val BREAK_AFTER = setOf('-'.code, '/'.code, 0x2013, 0x2014, 0x2010)

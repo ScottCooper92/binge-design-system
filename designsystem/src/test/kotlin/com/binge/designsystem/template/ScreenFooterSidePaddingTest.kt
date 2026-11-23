@@ -1,4 +1,4 @@
-package com.binge.designsystem.component
+package com.binge.designsystem.template
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.CompositionLocalProvider
@@ -8,7 +8,7 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.LocalPaneInnerEdge
 import com.binge.designsystem.PaneEdge
-import com.binge.designsystem.template.ScreenFooter
+import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import org.junit.Assert.assertEquals
@@ -24,7 +24,7 @@ private const val TOLERANCE = 1f
 /** A page footer lines its button up with a body beside another pane: [ScreenFooter] reads the edge-aware inset. */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34], application = android.app.Application::class)
-class BingeActionFooterSidePaddingTest {
+class ScreenFooterSidePaddingTest {
     @get:Rule
     val rule = createTakeDownComposeRule()
 
