@@ -77,17 +77,6 @@ private fun TextFieldValue.answeredWith(value: String): TextFieldValue {
 }
 
 /**
- * Marks what the design system's own modules share and an app must not build on: it can change with no notice to the four builds that include
- * this one. The design system's modules opt in to it; nothing else should.
- */
-@RequiresOptIn(
-    message = "Shared between the design system's own modules; an app should use the field components instead.",
-    level = RequiresOptIn.Level.ERROR,
-)
-@Retention(AnnotationRetention.BINARY)
-annotation class DesignSystemInternalApi
-
-/**
  * The text, caret and pending edit a text field owns so it keeps what the user typed while its caller catches up, and keeps the caret where the
  * user left it when the caller rewrites what was typed. Shared by the text, search, PIN and time fields and the television text field, so they cannot disagree about it.
  */

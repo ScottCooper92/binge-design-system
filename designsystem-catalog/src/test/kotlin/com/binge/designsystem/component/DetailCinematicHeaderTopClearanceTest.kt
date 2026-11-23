@@ -6,12 +6,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.R
 import com.binge.designsystem.catalog.DetailCinematicHeaderLongCopySample
 import com.binge.designsystem.testing.ShadowMeshSpecification
 import com.binge.designsystem.testing.createTakeDownComposeRule
@@ -44,7 +42,7 @@ class DetailCinematicHeaderTopClearanceTest {
         rule.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
-                bar.value = dimensionResource(R.dimen.top_bar_icon_size) + dimensionResource(R.dimen.padding_s) * 2
+                bar.value = detailOverlayBarHeight()
                 Box(Modifier.width(840.dp)) { DetailCinematicHeaderLongCopySample() }
             }
         }

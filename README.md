@@ -55,7 +55,7 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state, the shared aspect ratios, the error
 │                kinds, the save status, a decision screen's copy and locale-aware text
-├── catalog/     only the catalog's file annotations (`@file:CatalogGroup` and `@file:SelfDescribing`); the samples
+├── catalog/     only the catalog's file annotations (`@file:CatalogGroup`, `@file:ScreenshotOnly` and `@file:SelfDescribing`); the samples
 │                moved to the `designsystem-catalog` module (below)
 ├── modifier/    skeleton shimmer, selection lift, a content description
 ├── save/        the save-as-made engine: a change writes itself a moment after the last one

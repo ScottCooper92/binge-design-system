@@ -20,9 +20,9 @@ import com.binge.designsystem.component.LocalTopBarActionTone
 import com.binge.designsystem.theme.BingeTheme
 
 /**
- * A transparent [BingeTopBar] over a sample coloured background, with [IconButtonTone.Glass]
- * nav/action buttons — the hero-screen treatment. the bar's nav button derives its Glass tone from the transparent container. [scrimFraction]
- * exercises [scrimmedTitleColor]'s ramp on the title this sample renders.
+ * A transparent `BingeTopBar` over a sample coloured background, with `IconButtonTone.Glass`
+ * nav/action buttons — the hero-screen treatment. The bar's nav button derives its Glass tone from the transparent container. `scrimFraction`
+ * exercises `scrimmedTitleColor`'s ramp on the title this sample renders.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,9 +54,9 @@ internal fun TransparentBingeTopBarWithScrim(scrimFraction: Float = 0f) {
 }
 
 /**
- * A transparent [BingeMediumTopBar] over a sample coloured background, with [IconButtonTone.Glass]
- * nav/action buttons — mirrors [TransparentBingeTopBarWithScrim]. [scrimFraction] exercises both the [TopBarScrim] this bar draws behind itself and
- * the title's [scrimmedTitleColor] ramp, since it also drives [BingeMediumTopBar]'s
+ * A transparent `BingeMediumTopBar` over a sample coloured background, with `IconButtonTone.Glass`
+ * nav/action buttons — mirrors `TransparentBingeTopBarWithScrim`. `scrimFraction` exercises both the `TopBarScrim` this bar draws behind itself and
+ * the title's `scrimmedTitleColor` ramp, since it also drives `BingeMediumTopBar`'s
  * `foregroundScrimFraction` default.
  */
 @OptIn(ExperimentalMaterial3Api::class)
