@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.PreviewSystemBarInsets
 
 private const val CINEMATIC_PREVIEW_WIDTH_DP = 900
 private const val FOLDABLE_PREVIEW_WIDTH_DP = 840
@@ -70,5 +71,16 @@ class DetailCinematicHeaderSamplesScreenshotTest {
     @Composable
     fun HeaderLongCopy() {
         DetailCinematicHeaderLongCopySample()
+    }
+
+    /**
+     * The most copy at 2x with the system bars reserved: the poster and title start below the status bar and the overlay bar,
+     * not under them. A default frame reports every inset as 0dp, so this one would not change if the reservation went.
+     */
+    @PreviewTest
+    @Preview(name = "fold-bars-font20", widthDp = FOLDABLE_PREVIEW_WIDTH_DP, fontScale = 2.0f, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun HeaderLongCopyUnderSystemBars() {
+        PreviewSystemBarInsets { DetailCinematicHeaderLongCopySample() }
     }
 }
