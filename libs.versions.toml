@@ -29,7 +29,7 @@ androidxWindow = "1.5.1"
 coreKtx = "1.19.1"
 activityCompose = "1.13.0"
 # Matches binge-seerr and ephyra, which both pin 2.11.0; a bump here is a bump in both.
-lifecycle = "2.11.0"
+lifecycle = "2.11.1"
 # Only the paged-list phase reads it, from load states; the version agrees with Binge's and binge-seerr's.
 # binge-archive declares no paging version of its own.
 paging = "3.5.3"
