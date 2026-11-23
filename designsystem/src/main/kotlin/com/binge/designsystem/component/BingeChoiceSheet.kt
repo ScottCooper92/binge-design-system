@@ -721,7 +721,8 @@ private fun <T> SingleChoiceListContent(
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun <T> MultiChoiceList(
+@DesignSystemInternalApi
+fun <T> MultiChoiceList(
     choices: BingeChoiceList<T>,
     chosen: Set<T>,
     leading: Set<T>,

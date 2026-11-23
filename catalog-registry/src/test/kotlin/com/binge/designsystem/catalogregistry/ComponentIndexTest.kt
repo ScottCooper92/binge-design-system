@@ -81,6 +81,23 @@ class ComponentIndexTest {
     }
 
     @Test
+    fun `a composable marked as the design system's internal API is not a component`() {
+        val result = scan(
+            """
+            @Composable
+            @DesignSystemInternalApi
+            fun Shared() {}
+            @DesignSystemInternalApi
+            @Composable
+            fun AlsoShared() {}
+            """,
+        )
+
+        assertTrue(result.entries.isEmpty())
+        assertTrue(result.problems.isEmpty())
+    }
+
+    @Test
     fun `a scoped composable counts`() {
         val result = scan("/**\n * A bar.\n *\n * @need a bar\n * @group bars\n */\n@Composable\nfun BoxScope.OverlayBar() {}")
 

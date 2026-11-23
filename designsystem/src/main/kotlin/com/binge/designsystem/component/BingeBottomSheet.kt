@@ -157,7 +157,8 @@ fun BingeBottomSheet(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gesturesEnabled: Boolean): SheetState {
+@DesignSystemInternalApi
+fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gesturesEnabled: Boolean): SheetState {
     val locked by rememberUpdatedState(!gesturesEnabled)
     val confirmValueChange = remember { { target: SheetValue -> !locked || target == SheetValue.Expanded } }
     // rememberBottomSheetState replaced the skipPartiallyExpanded flag with an explicit reachable-states
@@ -182,7 +183,8 @@ internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gestures
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
+@DesignSystemInternalApi
+fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
     val vertical =
         if (edgeToEdge) {
             BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top).union(WindowInsets.ime)

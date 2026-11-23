@@ -27,7 +27,8 @@ import com.binge.designsystem.template.FormSaveStatus
  * reader announces each change of status without cutting in on what it is reading.
  */
 @Composable
-internal fun SaveStatusLine(status: FormSaveStatus, modifier: Modifier = Modifier) {
+@DesignSystemInternalApi
+fun SaveStatusLine(status: FormSaveStatus, modifier: Modifier = Modifier) {
     if (status == FormSaveStatus.Idle) return
     // Wraps, so the failure and its Retry stack at a large font size rather than clip.
     WrappingRow(

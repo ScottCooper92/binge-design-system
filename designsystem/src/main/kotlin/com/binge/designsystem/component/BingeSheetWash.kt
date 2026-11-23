@@ -25,7 +25,8 @@ import com.binge.designsystem.R
 
 /** Where a page of a sheet asks its container to wash the top: the colour, and how far down the header reaches. */
 @Stable
-internal class BingeSheetWash {
+@DesignSystemInternalApi
+class BingeSheetWash {
     var tint by mutableStateOf<Color?>(null)
     var headerBottom by mutableFloatStateOf(0f)
     var containerTop by mutableFloatStateOf(0f)

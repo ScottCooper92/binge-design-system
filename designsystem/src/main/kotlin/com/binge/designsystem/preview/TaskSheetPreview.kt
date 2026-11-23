@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewWrapper
 import com.binge.designsystem.component.BingeTaskSheetPanel
+import com.binge.designsystem.component.DesignSystemInternalApi
 import com.binge.designsystem.component.LocalBingeSheetWash
 import com.binge.designsystem.component.ROOT_PAGE
 import com.binge.designsystem.component.TaskSheetTopClearance
@@ -79,7 +80,8 @@ fun TaskSheetPreviewFrame(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BoxScope.TaskSheetBottomChrome(content: @Composable ColumnScope.() -> Unit) {
+@DesignSystemInternalApi
+fun BoxScope.TaskSheetBottomChrome(content: @Composable ColumnScope.() -> Unit) {
     val wash = rememberBingeSheetWash()
     CompositionLocalProvider(LocalBingeSheetWash provides wash) {
         Column(

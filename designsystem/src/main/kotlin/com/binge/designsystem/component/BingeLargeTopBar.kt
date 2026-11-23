@@ -25,7 +25,8 @@ import com.binge.designsystem.R
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BingeLargeTopBar(
+@DesignSystemInternalApi
+fun BingeLargeTopBar(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,

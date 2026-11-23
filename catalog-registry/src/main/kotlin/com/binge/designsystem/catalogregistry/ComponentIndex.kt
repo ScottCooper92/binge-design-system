@@ -43,7 +43,7 @@ data class IndexScan(
  * the catalog registry is: no Kotlin parser, so the same three tags and one regex port to another repository.
  *
  * A public component is a top-level `fun` with a capitalised name under `@Composable`, not `private` or
- * `internal`, and not named `…Preview`, `…Sample` or `…Demo`. Its KDoc carries, one per line:
+ * `internal`, not marked `@DesignSystemInternalApi`, and not named `…Preview`, `…Sample` or `…Demo`. Its KDoc carries, one per line:
  *
  * - `@need` the need in the reader's words ("pick one value from a long list");
  * - `@group` one of [IndexGroup]'s keys;
@@ -69,6 +69,8 @@ object ComponentIndex {
             val name = match.groupValues[4]
             if (excludedSuffixes.any { name.endsWith(it) }) continue
             val above = SampleScanner.annotationsAbove(lines, index)
+            // Shared between the design system's own modules, not offered to an app: not a component to look up by need.
+            if (above.any { it.startsWith("@DesignSystemInternalApi") } || "@DesignSystemInternalApi" in match.groupValues[1]) continue
             if (above.none { it.startsWith("@Composable") } && "@Composable" !in match.groupValues[1]) continue
             val where = "$fileName:${index + 1}"
             val kdoc = SampleScanner.kdocAbove(lines, index - above.size)

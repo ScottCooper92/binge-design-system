@@ -37,7 +37,7 @@ dependencies {
 val indexSources = listOf(
     "src=${rootProject.file("designsystem/src/main/kotlin")}",
     "src=${rootProject.file("designsystem-tv/src/main/kotlin")}",
-    "catalog=${rootProject.file("designsystem/src/main/kotlin/com/binge/designsystem/catalog")}",
+    "catalog=${rootProject.file("designsystem-catalog/src/main/kotlin/com/binge/designsystem/catalog")}",
     "catalog=${rootProject.file("designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/catalog")}",
 )
 val indexFile = rootProject.file("docs/components.md")
@@ -54,6 +54,7 @@ fun indexTask(
     args(listOf(mode, indexFile.absolutePath) + indexSources)
     inputs.files(
         fileTree(rootProject.file("designsystem/src/main/kotlin")),
+        fileTree(rootProject.file("designsystem-catalog/src/main/kotlin")),
         fileTree(rootProject.file("designsystem-tv/src/main/kotlin")),
     )
 }
