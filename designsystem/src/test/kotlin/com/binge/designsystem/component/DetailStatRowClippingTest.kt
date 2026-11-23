@@ -30,7 +30,7 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * No label of a [DetailStatRow] is cropped at 1.3x or 2x font, on a phone and a foldable width: the label's text is as
  * tall as its laid-out box, and the box sits inside the row. Compares bounds and the text layout, never
- * `hasVisualOverflow`. The same holds for the row inside [DetailCinematicHeader], whose copy column is a fixed height.
+ * `hasVisualOverflow`. The same holds for the row inside [DetailCinematicHeader], whose copy column grows with its copy at a large font.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(
