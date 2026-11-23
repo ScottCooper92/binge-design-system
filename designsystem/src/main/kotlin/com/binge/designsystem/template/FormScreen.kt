@@ -1,6 +1,5 @@
 package com.binge.designsystem.template
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,8 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,17 +25,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -263,56 +255,4 @@ internal fun FormFooter(
             )
         }
     }
-}
-
-/**
- * The fields of one form a failed submit can take the user to. Tag each with [formField]; [bringIntoView]
- * scrolls the named field into view and, for one that can take it, moves focus there.
- */
-@OptIn(ExperimentalFoundationApi::class)
-@Stable
-internal class FormFields {
-    private val fields = mutableStateMapOf<String, FormFieldHandle>()
-
-    /** Brings field [id] into view, or [fallback] (its section's header, say) when [id] is not on screen. */
-    suspend fun bringIntoView(id: String, fallback: String? = null): Boolean {
-        val handle = fields[id] ?: fallback?.let { fields[it] } ?: return false
-        handle.bringIntoView.bringIntoView()
-        handle.focus?.requestFocus()
-        return true
-    }
-
-    internal fun register(id: String, handle: FormFieldHandle) {
-        fields[id] = handle
-    }
-
-    internal fun unregister(id: String, handle: FormFieldHandle) {
-        if (fields[id] === handle) fields.remove(id)
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-internal class FormFieldHandle(
-    val bringIntoView: BringIntoViewRequester,
-    val focus: FocusRequester?,
-)
-
-/** The [FormFields] for one form, stable across recomposition. */
-@Composable
-internal fun rememberFormFields(): FormFields = remember { FormFields() }
-
-/** Tags this field as [id] in [fields]. [takesFocus] is for a text field; a picker row is only scrolled to. */
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-internal fun Modifier.formField(
-    fields: FormFields,
-    id: String,
-    takesFocus: Boolean = true,
-): Modifier {
-    val handle = remember(fields, id) { FormFieldHandle(BringIntoViewRequester(), if (takesFocus) FocusRequester() else null) }
-    DisposableEffect(fields, id, handle) {
-        fields.register(id, handle)
-        onDispose { fields.unregister(id, handle) }
-    }
-    return bringIntoViewRequester(handle.bringIntoView).let { tagged -> handle.focus?.let { tagged.focusRequester(it) } ?: tagged }
 }
