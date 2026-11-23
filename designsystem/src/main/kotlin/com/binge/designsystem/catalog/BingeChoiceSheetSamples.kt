@@ -21,6 +21,10 @@ import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
@@ -30,6 +34,7 @@ import com.binge.designsystem.component.BingeChoiceList
 import com.binge.designsystem.component.BingeChoiceSheetContent
 import com.binge.designsystem.component.BingeMultiChoiceSheetContent
 import com.binge.designsystem.component.BingeSheetHeader
+import com.binge.designsystem.component.BingeSheetPageHeader
 import com.binge.designsystem.component.BingeSheetTopBar
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.DockingHeaderLayout
@@ -153,6 +158,50 @@ fun BingeChoiceSheetSample() {
     ScreenshotTheme {
         SheetSurface {
             BingeChoiceSheetContent(title = REGION_TITLE, choices = BingeChoiceList.Ready(SampleRegions), selected = "Japan", onSelect = {})
+        }
+    }
+}
+
+/**
+ * A choice list under a header of the caller's own: a [BingeSheetPageHeader] names the pick, and the content takes a null title so
+ * it draws the list alone. Picking a row marks it.
+ */
+@Composable
+fun BingeChoiceSheetNoHeaderSample() {
+    ScreenshotTheme {
+        var selected by remember { mutableStateOf<String?>("Japan") }
+        SheetSurface {
+            Column {
+                BingeSheetPageHeader(onBack = {}, title = REGION_TITLE)
+                BingeChoiceSheetContent(
+                    title = null,
+                    choices = BingeChoiceList.Ready(SampleRegions),
+                    selected = selected,
+                    onSelect = { selected = it },
+                )
+            }
+        }
+    }
+}
+
+/** The multi-choice list under a header of the caller's own: a null title draws the rows alone. Ticking a row toggles it. */
+@Composable
+fun BingeMultiChoiceSheetNoHeaderSample() {
+    ScreenshotTheme {
+        var chosen by remember { mutableStateOf(setOf("ja", "es")) }
+        SheetSurface {
+            Column {
+                BingeSheetPageHeader(onBack = {}, title = LANGUAGES_TITLE)
+                BingeMultiChoiceSheetContent(
+                    title = null,
+                    choices = BingeChoiceList.Ready(SampleLanguages),
+                    chosen = chosen,
+                    leading = setOf("ja", "es"),
+                    onCheckedChange = { value, checked -> chosen = if (checked) chosen + value else chosen - value },
+                    clearLabel = "Clear",
+                    onClear = { chosen = emptySet() },
+                )
+            }
         }
     }
 }
