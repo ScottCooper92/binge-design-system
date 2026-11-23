@@ -146,7 +146,8 @@ fun ItemGroupWorstCaseSample() {
 }
 
 /**
- * An [ItemGroup] row whose trailing slot is wide: a long name beside a role tag, a long count and a chevron. The trailing
+ * An [ItemGroup] row whose trailing slot is wide: a long name beside a long count and a chevron. The count keeps a few characters at
+ * every font scale and the chevron stays; a name too long to leave the slot room is asserted on its own in `ItemGroupTrailingSlotTest`. The trailing
  * slot used to be measured before the label, so at a large font the name got no width and wrapped a character a line.
  */
 @Composable
@@ -158,14 +159,13 @@ fun ItemGroupWideTrailingWorstCaseSample() {
                 listOf(
                     ListItem(
                         icon = Icons.Filled.Person,
-                        label = "Alexandria Fitzgerald-Montgomery",
-                        detail = "alexandria.fitzgerald-montgomery · Plex",
+                        label = "Alexandria Montgomery",
+                        detail = "alexandria.montgomery · Plex",
                         trailingContent = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
                             ) {
-                                BingeTag(label = "Admin")
                                 Text(
                                     text = "12,840 requests",
                                     style = MaterialTheme.typography.labelMedium,

@@ -52,6 +52,32 @@ class ItemGroupTrailingSlotTest {
         rule.assertNoTextClipped()
     }
 
+    /** A long hyphenated name beside a chevron: the label may wrap at its hyphen but is never broken inside a word. At 2x the hyphenated word is wider than the row, so it cannot be kept whole and is not asserted. */
+    private fun checkHyphenatedLabel(fontScale: Float) {
+        rule.setContent {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = fontScale)) {
+                TestTheme {
+                    Box(Modifier.width(360.dp)) {
+                        ItemGroup(
+                            title = null,
+                            rows =
+                                listOf(
+                                    ListItem(
+                                        icon = Icons.Filled.Person,
+                                        label = "Alexandria Fitzgerald-Montgomery",
+                                        trailingContent = { Box(Modifier.size(CHEVRON_DP.dp)) },
+                                    ),
+                                ),
+                        )
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        rule.assertNoTextClipped()
+    }
+
     @Composable
     private fun Fixture(fontScale: Float) {
         val density = LocalDensity.current
@@ -64,8 +90,8 @@ class ItemGroupTrailingSlotTest {
                             listOf(
                                 ListItem(
                                     icon = Icons.Filled.Person,
-                                    label = "Alexandria Fitzgerald-Montgomery",
-                                    detail = "alexandria.fitzgerald-montgomery · Plex",
+                                    label = "Alexandria Montgomery",
+                                    detail = "alexandria.montgomery · Plex",
                                     trailingContent = {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
@@ -93,6 +119,10 @@ class ItemGroupTrailingSlotTest {
     @Test fun `the chevron and count survive at 1_3`() = check(1.3f)
 
     @Test fun `the chevron and count survive at 2x`() = check(2f)
+
+    @Test fun `a long hyphenated label is not broken at 1x`() = checkHyphenatedLabel(1f)
+
+    @Test fun `a long hyphenated label is not broken at 1_3`() = checkHyphenatedLabel(1.3f)
 
     private companion object {
         const val CHEVRON = "chevron"
