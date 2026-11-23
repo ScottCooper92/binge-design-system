@@ -46,8 +46,10 @@ import androidx.compose.ui.unit.IntSize
  * - empty text, which has no glyph for a parent to cut. A bar that is given no title draws one, and it is no bigger than
  *   the nothing it holds.
  *
- * [allowBrokenWords] switches the broken-word check off for a caller whose text has no good place to break, a URL for one, and
- * says why where it does; each such caller names the issue that tracks it.
+ * A text with no place to break at all (one unspaced token, such as a URL or a long identifier) cannot split a word, so the
+ * broken-word check skips it: a line breaker has no other choice there. A text with any space, hyphen, slash, dash or unspaced-script
+ * character is still held to it. [allowBrokenWords] switches the check off for a caller whose text has a place to break and still
+ * should not be held to it, and says why where it does; each such caller names the issue that tracks it.
  *
  * The unmerged semantics tree is searched, so a merged parent does not hide the text inside it.
  *
@@ -179,7 +181,8 @@ private fun SemanticsNode.layoutFaults(
             }
         }
         val text = layout.layoutInput.text.text
-        for (line in 0 until if (allowBrokenWords) 0 else paragraph.lineCount - 1) {
+        val checkWords = !allowBrokenWords && hasBreakOpportunity(text)
+        for (line in 0 until if (checkWords) paragraph.lineCount - 1 else 0) {
             val end = paragraph.getLineEnd(line, visibleEnd = false)
             if (end in 1 until text.length && isBrokenWord(text.codePointBefore(end), text.codePointAt(end))) {
                 faults += "breaks a word across lines after \"${text.substring(maxOf(0, end - WORD_CONTEXT), end)}\""
@@ -218,6 +221,22 @@ fun isBrokenWord(before: Int, after: Int): Boolean =
 
 /** [isBrokenWord] for two `Char`s. */
 fun isBrokenWord(before: Char, after: Char): Boolean = isBrokenWord(before.code, after.code)
+
+/**
+ * Whether [text] has a place a line may break without splitting a word: two neighbouring code points for which [isBrokenWord] is
+ * false, such as a space, or a hyphen and the letter after it. A text without one is a single unbreakable token.
+ */
+internal fun hasBreakOpportunity(text: String): Boolean {
+    var index = 0
+    while (index < text.length) {
+        val before = text.codePointAt(index)
+        val next = index + Character.charCount(before)
+        if (next >= text.length) return false
+        if (!isBrokenWord(before, text.codePointAt(next))) return true
+        index = next
+    }
+    return false
+}
 
 private const val WORD_CONTEXT = 12
 

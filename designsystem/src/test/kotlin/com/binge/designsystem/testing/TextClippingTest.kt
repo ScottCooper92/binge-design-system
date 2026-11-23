@@ -192,8 +192,25 @@ class TextClippingTest {
 
     @Test
     fun `a word broken across two lines fails`() {
-        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        show { Box(Modifier.width(NARROW)) { Text("Two Unbreakable") } }
         assertFails("breaks a word across lines") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a single unbreakable token has no break opportunity and passes`() {
+        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        rule.assertNoTextClipped()
+    }
+
+    @Test
+    fun `a text has a break opportunity where a space, a hyphen or an unspaced script offers one`() {
+        assertFalse(hasBreakOpportunity("Unbreakable"))
+        assertFalse(hasBreakOpportunity(""))
+        assertFalse(hasBreakOpportunity("a"))
+        assertTrue(hasBreakOpportunity("two words"))
+        assertTrue(hasBreakOpportunity("well-known"))
+        assertTrue(hasBreakOpportunity("日本"))
+        assertTrue(hasBreakOpportunity("a\uD840\uDC00"))
     }
 
     @Test
@@ -226,7 +243,7 @@ class TextClippingTest {
 
     @Test
     fun `a word broken across lines passes when the caller allows it`() {
-        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        show { Box(Modifier.width(NARROW)) { Text("Two Unbreakable") } }
         rule.assertNoTextClipped(allowBrokenWords = true)
     }
 
