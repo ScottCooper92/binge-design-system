@@ -237,6 +237,12 @@ class TextClippingTest {
     }
 
     @Test
+    fun `a text ellipsized down to the ellipsis alone fails`() {
+        show { Box(Modifier.width(SLIVER)) { Text("12,840 requests", maxLines = 1, overflow = TextOverflow.Ellipsis) } }
+        assertFails("draws only an ellipsis") { rule.assertNoTextClipped() }
+    }
+
+    @Test
     fun `a text taller than its node fails`() {
         show { Text("A text in a short box", Modifier.height(SHORT_BOX)) }
         assertFails("of height") { rule.assertNoTextClipped() }
@@ -304,6 +310,7 @@ class TextClippingTest {
         const val STACK_LINES = 3
         val ROW_WIDTHS = listOf(190, 210, 230, 250, 270, 290, 310, 330)
         val NARROW = 40.dp
+        val SLIVER = 4.dp
         const val OFFSET = 40
         val CHIP_WIDTH = 60.dp
         val CHIP_HEIGHT = 24.dp

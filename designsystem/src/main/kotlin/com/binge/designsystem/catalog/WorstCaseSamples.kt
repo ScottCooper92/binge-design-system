@@ -172,6 +172,8 @@ fun ItemGroupWideTrailingWorstCaseSample() {
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
+                                    // Weighted, so the chevron after it is measured first and keeps its width.
+                                    modifier = Modifier.weight(1f, fill = false),
                                 )
                                 Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
                             }
