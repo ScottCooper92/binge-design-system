@@ -46,9 +46,10 @@ import androidx.compose.ui.unit.IntSize
  * - empty text, which has no glyph for a parent to cut. A bar that is given no title draws one, and it is no bigger than
  *   the nothing it holds.
  *
- * A text with no place to break at all (one unspaced token, such as a URL or a long identifier) cannot split a word, so the
- * broken-word check skips it: a line breaker has no other choice there. A text with any space, hyphen, slash, dash or unspaced-script
- * character is still held to it. [allowBrokenWords] switches the check off for a caller whose text has a place to break and still
+ * A text with no place to break at all (one unspaced token, such as a bare hostname, an ID, a hash or a long single word) cannot
+ * split a word, so the broken-word check skips it: a line breaker has no other choice there. A text with any space, hyphen, slash,
+ * dash or unspaced-script character is still held to it, so a URL with a scheme or a path, which holds slashes, is still checked
+ * and still needs [allowBrokenWords]. [allowBrokenWords] switches the check off for a caller whose text has a place to break and still
  * should not be held to it, and says why where it does; each such caller names the issue that tracks it.
  *
  * The unmerged semantics tree is searched, so a merged parent does not hide the text inside it.

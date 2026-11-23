@@ -209,6 +209,8 @@ class TextClippingTest {
         assertFalse(hasBreakOpportunity("a"))
         assertTrue(hasBreakOpportunity("two words"))
         assertTrue(hasBreakOpportunity("well-known"))
+        assertTrue(hasBreakOpportunity("https://example.com"))
+        assertFalse(hasBreakOpportunity("example.com"))
         assertTrue(hasBreakOpportunity("日本"))
         assertTrue(hasBreakOpportunity("a\uD840\uDC00"))
     }
