@@ -4,7 +4,6 @@ package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.MaterialTheme
@@ -13,9 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.binge.designsystem.component.BingeActionFooter
-import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.preview.ScreenshotTheme
-import com.binge.designsystem.template.ScreenFooter
 
 /**
  * Public catalog samples for the containers / chrome group — sheets, dialogs, top bars, scaffolding.
@@ -64,19 +61,6 @@ fun BingeActionFooterWithIconSample() {
             onClick = {},
             leadingIcon = Icons.AutoMirrored.Filled.OpenInNew,
         )
-    }
-}
-
-/**
- * The page form: a page whose primary action anchors in a `bottomBar` slot outside the scaffold's own body is a
- * [ScreenFooter] holding a filled button, not a [BingeActionFooter]. Rounded and raised so it reads as its own surface.
- */
-@Composable
-fun BingeActionFooterElevatedSample() {
-    ScreenshotTheme {
-        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-            ScreenFooter { BingeFilledButton(label = "Add a slider", onClick = {}, modifier = Modifier.fillMaxWidth()) }
-        }
     }
 }
 

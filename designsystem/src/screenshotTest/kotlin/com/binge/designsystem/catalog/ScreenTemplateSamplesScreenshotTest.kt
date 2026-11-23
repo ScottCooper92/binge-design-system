@@ -4,6 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.ComponentPreviews
 import com.binge.designsystem.preview.PreviewCutout
 import com.binge.designsystem.preview.PreviewEdge
 import com.binge.designsystem.preview.PreviewSystemBarInsets
@@ -253,6 +254,22 @@ class ScreenTemplateSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun formSaveFailed() = FormScreenSaveFailedSample()
+
+    /** The raised, rounded `bottomBar` shape of [ScreenFooter]. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun screenFooterElevated() {
+        ScreenFooterElevatedSample()
+    }
+
+    /** [screenFooterElevated] under a navigation bar: `clearsNavigationBar` lifts the button clear of it. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun screenFooterElevatedUnderSystemBars() {
+        PreviewSystemBarInsets { ScreenFooterElevatedSample() }
+    }
 
     @PreviewTest
     @ScreenStatePreview
