@@ -23,7 +23,6 @@ import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeMediumTopBar
 import com.binge.designsystem.component.ExpressiveIconButton
 import com.binge.designsystem.component.LocalTopBarActionTone
-import com.binge.designsystem.component.TransparentBingeMediumTopBarSample
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
 
@@ -101,7 +100,7 @@ internal fun TopBarShareAction(glassBackgroundAlpha: Float) {
 @Composable
 fun BingeMediumTopBarTransparentSample() {
     ScreenshotTheme {
-        TransparentBingeMediumTopBarSample()
+        TransparentBingeMediumTopBarWithScrim()
     }
 }
 
@@ -141,7 +140,7 @@ fun BingeMediumTopBarTitleOnlySample() {
 @Composable
 fun BingeMediumTopBarScrimmedSample() {
     ScreenshotTheme {
-        TransparentBingeMediumTopBarSample(scrimFraction = 1f)
+        TransparentBingeMediumTopBarWithScrim(scrimFraction = 1f)
     }
 }
 
@@ -155,7 +154,7 @@ fun BingeMediumTopBarScrimmedSample() {
 @Composable
 fun BingeMediumTopBarTitleBeforeScrimSwitchSample() {
     ScreenshotTheme {
-        TransparentBingeMediumTopBarSample(scrimFraction = BEFORE_SCRIM_SWITCH_FRACTION)
+        TransparentBingeMediumTopBarWithScrim(scrimFraction = BEFORE_SCRIM_SWITCH_FRACTION)
     }
 }
 
@@ -164,7 +163,7 @@ fun BingeMediumTopBarTitleBeforeScrimSwitchSample() {
 @Composable
 fun BingeMediumTopBarTitleAfterScrimSwitchSample() {
     ScreenshotTheme {
-        TransparentBingeMediumTopBarSample(scrimFraction = AFTER_SCRIM_SWITCH_FRACTION)
+        TransparentBingeMediumTopBarWithScrim(scrimFraction = AFTER_SCRIM_SWITCH_FRACTION)
     }
 }
 

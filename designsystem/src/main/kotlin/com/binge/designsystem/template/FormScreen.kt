@@ -46,6 +46,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeOutlinedButton
 import com.binge.designsystem.component.BingeTextButton
+import com.binge.designsystem.component.DesignSystemInternalApi
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.uppercaseLocalised
@@ -233,7 +234,8 @@ fun FormSection(
  * beside the primary, both full-width halves, or the primary alone across the bar.
  */
 @Composable
-internal fun FormFooter(
+@DesignSystemInternalApi
+fun FormFooter(
     primary: FormAction,
     modifier: Modifier = Modifier,
     secondary: FormAction? = null,

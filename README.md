@@ -55,8 +55,8 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state, the shared aspect ratios, the error
 │                kinds, the save status, a decision screen's copy and locale-aware text
-├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders,
-│                and the …Demo()s the catalog app runs live
+├── catalog/     only the catalog's file annotations (`@file:CatalogGroup` and `@file:SelfDescribing`); the samples
+│                moved to the `designsystem-catalog` module (below)
 ├── modifier/    skeleton shimmer, selection lift, a content description
 ├── save/        the save-as-made engine: a change writes itself a moment after the last one
 ├── layout/      layout anchors
@@ -64,6 +64,10 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 │                screens, the filtered list, the hero detail page, the form, the step flow, the
 │                decision screen and the paged phase
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
+
+designsystem-catalog/src/   the phone catalog: every …Sample() and …Demo(), the @PreviewTest frames that render
+                            them, the frames' baselines, and the tests that render a sample. Only catalog-app
+                            depends on it, so a consumer compiles none of it
 
 designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── theme/       the tv-material theme, projected from the same tokens
@@ -128,9 +132,9 @@ for Android TV.
 
 **An entry appears with nothing to register.** The app is generated from the sources:
 
-- A public, no-parameter `@Composable fun …Sample()` in `designsystem/…/catalog/` or
+- A public, no-parameter `@Composable fun …Sample()` in `designsystem-catalog/…/catalog/` or
   `designsystem-tv/…/tv/catalog/` is listed as a sample.
-- A public, no-parameter `@Composable fun …Demo()` in `designsystem/…/catalog/` or
+- A public, no-parameter `@Composable fun …Demo()` in `designsystem-catalog/…/catalog/` or
   `designsystem-tv/…/tv/catalog/` is listed as a demo. It runs the real component with real state. Demos are never screenshot fixtures.
 - The first sentence of its KDoc is its description, and the app's search reads it.
 - A public `…Sample` or `…Demo` that takes parameters, or is not composable, fails the build with its

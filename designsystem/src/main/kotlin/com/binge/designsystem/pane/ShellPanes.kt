@@ -18,6 +18,7 @@ import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.scene.SceneStrategyScope
 import com.binge.designsystem.R
+import com.binge.designsystem.component.DesignSystemInternalApi
 
 private const val SHELL_ROLE = "binge.designsystem.shell"
 private const val PAGE_ROLE = "binge.designsystem.page"
@@ -45,7 +46,7 @@ object ShellPaneRole {
  * page), and on a [threePane] window the newest [item] of a page that [opensItems].
  */
 @Immutable
-class ShellDetail internal constructor(
+class ShellDetail @DesignSystemInternalApi constructor(
     val page: NavEntry<NavKey>?,
     val item: NavEntry<NavKey>?,
     val opensItems: Boolean,

@@ -51,7 +51,8 @@ fun BingeOverflowMenu(
 }
 
 @Composable
-internal fun ColumnScope.OverflowMenuItems(items: List<OverflowItem>, onDismissRequest: () -> Unit) {
+@DesignSystemInternalApi
+fun ColumnScope.OverflowMenuItems(items: List<OverflowItem>, onDismissRequest: () -> Unit) {
     val (destructive, plain) = items.partition { it.destructive }
     (plain + destructive).forEach { item ->
         val colour = if (item.destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface

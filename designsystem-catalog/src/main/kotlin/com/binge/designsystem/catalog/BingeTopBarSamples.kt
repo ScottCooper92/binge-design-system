@@ -18,7 +18,6 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeTopBar
-import com.binge.designsystem.component.TransparentBingeTopBarSample
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeTheme
 
@@ -72,7 +71,7 @@ fun BingeTopBarDefaultsOverlappedSample() {
 @Composable
 fun BingeTopBarTransparentSample() {
     ScreenshotTheme {
-        TransparentBingeTopBarSample()
+        TransparentBingeTopBarWithScrim()
     }
 }
 
@@ -81,7 +80,7 @@ fun BingeTopBarTransparentSample() {
 @Composable
 fun BingeTopBarScrimmedSample() {
     ScreenshotTheme {
-        TransparentBingeTopBarSample(scrimFraction = 1f)
+        TransparentBingeTopBarWithScrim(scrimFraction = 1f)
     }
 }
 
@@ -95,7 +94,7 @@ fun BingeTopBarScrimmedSample() {
 @Composable
 fun BingeTopBarTitleBeforeScrimSwitchSample() {
     ScreenshotTheme {
-        TransparentBingeTopBarSample(scrimFraction = BEFORE_SCRIM_SWITCH_FRACTION)
+        TransparentBingeTopBarWithScrim(scrimFraction = BEFORE_SCRIM_SWITCH_FRACTION)
     }
 }
 
@@ -104,7 +103,7 @@ fun BingeTopBarTitleBeforeScrimSwitchSample() {
 @Composable
 fun BingeTopBarTitleAfterScrimSwitchSample() {
     ScreenshotTheme {
-        TransparentBingeTopBarSample(scrimFraction = AFTER_SCRIM_SWITCH_FRACTION)
+        TransparentBingeTopBarWithScrim(scrimFraction = AFTER_SCRIM_SWITCH_FRACTION)
     }
 }
 

@@ -67,7 +67,8 @@ fun CreateListDialog(
 
 /** Stateless body of [CreateListDialog], split out so screenshot tests can render it directly. */
 @Composable
-internal fun CreateListDialogContent(
+@DesignSystemInternalApi
+fun CreateListDialogContent(
     name: String,
     onNameChange: (String) -> Unit,
     onConfirm: (String) -> Unit,

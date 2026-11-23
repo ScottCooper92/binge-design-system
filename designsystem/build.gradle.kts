@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.screenshot)
     alias(libs.plugins.android.junit5)
 }
 
@@ -36,7 +35,6 @@ android {
     }
 
     buildFeatures { compose = true }
-    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -79,20 +77,14 @@ ktlint {
 }
 
 tasks.withType<Test>().configureEach {
-    // The screenshot tasks are Test tasks too. An empty screenshotTest source set would otherwise
-    // fail on discovering no tests, and the plugin warns unless maxParallelForks is 1.
-    if (name.contains("ScreenshotTest")) {
-        failOnNoDiscoveredTests = false
-        doFirst { maxParallelForks = 1 }
-    }
-    // validate*ScreenshotTest's cache key does not track the rendered output it compares against,
-    // so a cached run can validate a stale render. Always re-render live, as Binge does.
-    if (name.startsWith("validate") && name.contains("ScreenshotTest")) {
-        doNotTrackState("Renders against live sources; a cached render gives a false pass or fail")
-    }
     // ComposeRuleGuardTest reads the other modules' test sources, which Gradle would not otherwise see as inputs.
     if (name == "testDebugUnitTest") {
-        inputs.files(fileTree("../designsystem-tv/src/test"), fileTree("../catalog-app/src/test")).withPropertyName("guardedTestSources")
+        inputs
+            .files(
+                fileTree("../designsystem-tv/src/test"),
+                fileTree("../catalog-app/src/test"),
+                fileTree("../designsystem-catalog/src/test"),
+            ).withPropertyName("guardedTestSources")
     }
 }
 
@@ -123,10 +115,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     debugImplementation(libs.compose.ui.tooling)
-
-    screenshotTestImplementation(composeBom)
-    screenshotTestImplementation(libs.compose.ui.tooling)
-    screenshotTestImplementation(libs.screenshot.validation.api)
 
     // JUnit 5 for the plain tests; the vintage engine runs the JUnit4-style Robolectric tests on the
     // same platform, exactly as Binge's core:designsystem arranges it.

@@ -75,7 +75,8 @@ and `check` fails if it is stale or a public composable is untagged.
   parameter is usually the better shape here, because the consumer owns the words.
 - A component takes a `Modifier` parameter, defaulted, and applies it to its outermost node.
 - Previews are `@Preview`-annotated and render without a network or an injected dependency.
-- Every component has a `…Sample()` in `catalog/` and a `@PreviewTest` frame that renders it, and a
+- Every component has a `…Sample()` in `catalog/` (in the `designsystem-catalog` module, which only the catalog app
+  depends on, so a consumer compiles none of the samples) and a `@PreviewTest` frame that renders it, and a
   new visual variant gets its frame in the same PR. The catalog sample is the one public fixture for
   a component, so the screenshot test renders the sample rather than hand-rolling the same state.
   The debug-only catalog app picks a new public `…Sample()` up on the next build with nothing to

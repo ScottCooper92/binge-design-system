@@ -104,7 +104,8 @@ fun MonthYearPickerDialog(
  * the mode asks for both; the year-only mode always shows the year grid.
  */
 @Composable
-internal fun MonthYearPickerContent(
+@DesignSystemInternalApi
+fun MonthYearPickerContent(
     title: String,
     mode: MonthYearPickerMode,
     selection: MonthYearSelection,

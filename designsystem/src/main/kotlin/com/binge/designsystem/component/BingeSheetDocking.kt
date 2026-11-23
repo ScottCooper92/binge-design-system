@@ -128,7 +128,8 @@ internal fun pinnedFooterLift(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun rememberBingeSheetDock(
+@DesignSystemInternalApi
+fun rememberBingeSheetDock(
     sheetState: SheetState,
     gesturesEnabled: Boolean,
     close: () -> Unit,
@@ -155,7 +156,8 @@ internal fun rememberBingeSheetDock(
 }
 
 /** A docking sheet's outline: [BingeShapes.HeroTop]'s top corners, squared off as [fraction] reaches 1. */
-internal data class DockingSheetShape(
+@DesignSystemInternalApi
+data class DockingSheetShape(
     private val fraction: Float,
 ) : Shape {
     override fun createOutline(
@@ -244,7 +246,8 @@ private fun dockHandleModifier(dock: BingeSheetDock): Modifier {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun DockingHeaderLayout(
+@DesignSystemInternalApi
+fun DockingHeaderLayout(
     fraction: () -> Float,
     header: @Composable () -> Unit,
     dockedTopBar: @Composable () -> Unit,

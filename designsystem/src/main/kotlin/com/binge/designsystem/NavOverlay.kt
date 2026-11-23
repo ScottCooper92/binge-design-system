@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.component.DesignSystemInternalApi
 
 /**
  * How much of the window the navigation overlays rather than reserves.
@@ -78,4 +79,5 @@ fun navOverlayEnd(): Dp = LocalNavOverlayInsets.current.calculateEndPadding(Loca
  * bar short of the rail by a cutout's width. Zero where no rail is mounted. Beside a pane the bar offsets its own title.
  */
 @Composable
-internal fun Modifier.clearNavRail(): Modifier = if (hasPaneBeside()) this else padding(start = navOverlayStart())
+@DesignSystemInternalApi
+fun Modifier.clearNavRail(): Modifier = if (hasPaneBeside()) this else padding(start = navOverlayStart())
