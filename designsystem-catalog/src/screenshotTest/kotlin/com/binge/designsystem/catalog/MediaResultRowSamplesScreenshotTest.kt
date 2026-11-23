@@ -93,4 +93,10 @@ class MediaResultRowSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun longSuffix() = MediaResultRowLongSuffixSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun nameWithSuffix() = NameWithSuffixSample()
 }

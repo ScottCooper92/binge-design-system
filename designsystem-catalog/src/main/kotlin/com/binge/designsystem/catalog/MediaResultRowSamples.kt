@@ -27,6 +27,7 @@ import com.binge.designsystem.component.MediaResult
 import com.binge.designsystem.component.MediaResultKind
 import com.binge.designsystem.component.MediaResultRow
 import com.binge.designsystem.component.MediaResultRowSkeleton
+import com.binge.designsystem.component.NameWithSuffix
 import com.binge.designsystem.component.StatusChip
 import com.binge.designsystem.preview.ScreenshotTheme
 import com.binge.designsystem.theme.BingeSentiment
@@ -333,5 +334,18 @@ fun MediaResultRowSkeletonSlotsSample() =
                 result = MediaResult("k2", MediaResultKind.Poster, null, title, "Movie · 2001", rating = 8.4f, statusInline = true),
                 onClick = {},
             )
+        }
+    }
+
+/** A title with a suffix after it, as a requests screen shows the seasons asked for: neither the title nor the suffix breaks a word, at any font size. */
+@Composable
+fun NameWithSuffixSample() =
+    ScreenshotTheme {
+        Column(
+            Modifier.padding(dimensionResource(R.dimen.screen_content_inset)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            NameWithSuffix(name = "Peaky Blinders", suffix = "Seasons 1, 2, 4–6")
+            NameWithSuffix(name = "Past Lives", suffix = "(2023)")
         }
     }
