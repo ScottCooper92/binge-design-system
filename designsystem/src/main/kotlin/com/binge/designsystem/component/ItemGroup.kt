@@ -294,6 +294,7 @@ private fun ListItemView(
                                 )
                             }
                             external -> {
+                                // Not ExternalLinkIcon: a row's trailing icon is the row's 24dp, as its chevron is, where that glyph is the chip's 18dp.
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                                     contentDescription = null,

@@ -24,7 +24,8 @@ import com.binge.designsystem.R
  * The glyph that ends a control that leaves the app: the open-in-new arrow, at the size of a chip's own icon and in the content colour
  * unless [tint] says otherwise. It is decoration, so it has no description of its own: the control it sits in says it opens outside the
  * app (see [BingeLinkChip]), once, for the whole control. Use it on any chip, tile or button that opens a browser, the media server or
- * another app, so they all look the same.
+ * another app, so they all look the same. A list row's trailing arrow is the exception: it stays at the row's own 24dp icon size, as the row's
+ * chevron does, so a row that opens outside the app lines up with one that opens inside it (see [ListItemDestination.External]).
  *
  * @need mark a control as one that opens outside the app
  * @group inputs
