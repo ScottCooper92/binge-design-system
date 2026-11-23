@@ -55,9 +55,10 @@ class CatalogAppTest {
         search("filled button")
 
         rule.onNodeWithText("Buttons").performClick()
-        // The filled button's list leads the page: its heading, and its buttons named by their state.
+        // The page holds the group's components in file order, so scroll to the filled button's heading rather than rely on it leading.
+        rule.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Filled button"))
         rule.onNodeWithText("Filled button").assertIsDisplayed()
-        rule.onAllNodesWithText("Leading icon").onFirst().assertIsDisplayed()
+        rule.onAllNodesWithText("Leading icon").onFirst().assertExists()
 
         rule.onNodeWithContentDescription(NAVIGATE_BACK).performClick()
         rule.onNode(hasSetTextAction()).assertIsDisplayed()

@@ -116,8 +116,9 @@ re-record with `./gradlew updateDebugScreenshotTest`, look at the regenerated PN
 in the same commit as the code. Committing that output is the only way to accept a change; there is
 no override flag.
 
-There is no coverage floor in this repository, and the one custom check is `checkTvMaterialSeparation`
-(wired into `check`). The catalog app's `generate<Variant>CatalogRegistry` is a generator, not a check,
+There is no coverage floor in this repository, and the two custom checks are `checkTvMaterialSeparation` and
+`checkComponentIndex` (both wired into `check`; the second fails when `docs/components.md` is stale or a public
+composable lacks `@need` or `@group`). The catalog app's `generate<Variant>CatalogRegistry` is a generator, not a check,
 but it fails the build on a malformed `…Sample` or `…Demo`. Do not look for any other, and do not report
 a finding as though one had caught it.
 

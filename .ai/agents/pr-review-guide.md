@@ -62,7 +62,8 @@ Defer to documented intent. A trade-off the author flagged and explained is not 
 ## 5. Do not report a finding as though a gate caught it
 
 The gates are `./gradlew build` and `validateDebugScreenshotTest`. There is no coverage floor, and the
-only custom check is `checkTvMaterialSeparation`. The catalog app's `generate<Variant>CatalogRegistry`
+only custom checks are `checkTvMaterialSeparation` and `checkComponentIndex` (a stale `docs/components.md`, or a public composable
+without `@need` or `@group`). The catalog app's `generate<Variant>CatalogRegistry`
 is a generator, but it fails the build on a malformed `…Sample` or `…Demo`. Do not write that any other
 failed, and do not ask for one to be added as a
 condition of merging — that is an issue, if it is anything. A screenshot failure is a real finding
