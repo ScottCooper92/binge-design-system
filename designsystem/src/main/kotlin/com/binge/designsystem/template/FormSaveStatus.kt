@@ -19,7 +19,6 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import com.binge.designsystem.R
 import com.binge.designsystem.SaveStatus
-import com.binge.designsystem.save.SaveAsMade
 
 /**
  * Where a save-as-made form stands: an edit screen applies each change as it is made, with no Save button, and
@@ -47,9 +46,9 @@ sealed interface FormSaveStatus {
 }
 
 /**
- * The [SaveAsMade] engine's output as a [FormSaveStatus]: the engine reports a failure through its `failed` flag, never
+ * A save-as-made engine's output as a [FormSaveStatus]: such an engine reports a failure through a `failed` flag, never
  * through [SaveStatus], so [failed] is checked first and the status is only Idle, Saving or Saved. [onRetry] is what the
- * snackbar's Retry sends, usually the engine's `now`.
+ * snackbar's Retry sends.
  */
 fun formSaveStatus(
     status: SaveStatus,

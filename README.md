@@ -58,8 +58,6 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── catalog/     only the catalog's file annotations (`@file:CatalogGroup`, `@file:ScreenshotOnly` and `@file:SelfDescribing`); the samples
 │                moved to the `designsystem-catalog` module (below)
 ├── modifier/    skeleton shimmer, selection lift, a content description
-├── save/        the save-as-made engine: a change writes itself a moment after the last one (a named
-│                exception to the scope rule in CLAUDE.md; see #1171)
 ├── motion/      the navigation motion specs
 ├── refresh/     the pull-to-refresh tracker
 ├── pane/        the shell's pane state
