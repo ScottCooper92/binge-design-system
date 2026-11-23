@@ -8,7 +8,8 @@ import androidx.navigation3.runtime.NavKey
  *
  * Leaving [hostTab] parks the chain above [appStack]'s root on [hostTab]'s own stack, when its first entry
  * [opensBeside] the tabs. Showing [hostTab] restores it, with entries made anew, once [appStack] holds nothing or only a
- * stand-in ([isStandIn]). A stash belongs to the server it was opened on.
+ * stand-in ([isStandIn]). The stash is not tied to any context: the caller clears it, with [settleOn] or [restart], when the
+ * context it was opened in changes.
  *
  * @need keep a page opened beside the tabs while another tab is showing
  * @group bars

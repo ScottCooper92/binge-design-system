@@ -77,4 +77,11 @@ class TabShellStateTest {
             TabShellState(tabs, mutableIntStateOf(0), mapOf("home" to stackOf("home")))
         }
     }
+
+    @Test
+    fun `a start tab that is not one of the tabs is refused`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            TabShellState(tabs, mutableIntStateOf(0), tabs.associateWith { stackOf(it) }, startTab = "missing")
+        }
+    }
 }

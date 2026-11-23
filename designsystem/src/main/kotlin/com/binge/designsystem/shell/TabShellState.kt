@@ -33,6 +33,7 @@ class TabShellState<T : Any>(
 ) {
     init {
         require(tabs.isNotEmpty() && tabs.all { it in stacks }) { "every tab needs a stack" }
+        require(startTab in tabs) { "the start tab must be one of the tabs" }
     }
 
     /** The tab showing now. */
