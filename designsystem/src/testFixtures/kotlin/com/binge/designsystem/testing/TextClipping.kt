@@ -23,9 +23,10 @@ import androidx.compose.ui.unit.IntSize
  * of the two, so a text squeezed to nothing by a parent that ran out of room is caught as well as one clipped away. A
  * shortfall of more than [tolerancePx] in width or height fails the test, naming the text and the shortfall.
  *
- * Four further faults fail the same way, each found from the text's own layout and not from its parents:
+ * Five further faults fail the same way, each found from the text's own layout and not from its parents:
  * - the text needs more height than its node has, by more than [tolerancePx], so a line is cut off;
  * - a one-line text needs more width than its node has, by more than [tolerancePx], and is not ellipsized, so the end of the line is cut off;
+ * - a line is ellipsized down to the ellipsis alone, with none of its text left, which tells the reader nothing;
  * - a word is broken across two lines: a line other than the last ends between two characters that are neither space nor a
  *   place a break is welcome (after a hyphen, a slash or a dash, or between two CJK characters, which have no spaces);
  * - the text's box reaches past the left or right edge of the window. The window is [windowWidthPx] wide from the left edge
@@ -171,6 +172,11 @@ private fun SemanticsNode.layoutFaults(
         if (needed > size.height + tolerancePx) faults += "needs ${needed}px of height, its box is ${size.height}px"
         if (paragraph.lineCount == 1 && paragraph.maxIntrinsicWidth > size.width + tolerancePx && !paragraph.isLineEllipsized(0)) {
             faults += "needs ${kotlin.math.ceil(paragraph.maxIntrinsicWidth).toInt()}px of width on one line, its box is ${size.width}px"
+        }
+        for (line in 0 until paragraph.lineCount) {
+            if (paragraph.isLineEllipsized(line) && paragraph.getLineStart(line) == paragraph.getLineEnd(line, visibleEnd = true)) {
+                faults += "draws only an ellipsis on line ${line + 1}, its box is ${size.width}px wide"
+            }
         }
         val text = layout.layoutInput.text.text
         for (line in 0 until if (allowBrokenWords) 0 else paragraph.lineCount - 1) {
