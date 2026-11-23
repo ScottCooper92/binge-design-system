@@ -16,6 +16,20 @@ class BingeChoiceSheetSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun NoHeader() {
+        BingeChoiceSheetNoHeaderSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiNoHeader() {
+        BingeMultiChoiceSheetNoHeaderSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun Subtitled() {
         BingeChoiceSheetSubtitledSample()
     }

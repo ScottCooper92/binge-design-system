@@ -432,14 +432,15 @@ fun <T> bingeMultiChoiceItem(
  * modal window does not capture, or to show the list inside a sheet of the caller's own. It draws no surface of its own,
  * so it takes the colour of whatever holds it, and its header does not dock. Pass `dragHandle = false` when the
  * sheet holding it draws its own handle, as [BingeBottomSheet] does. It does not clear the navigation bar; a caller
- * in an edge-to-edge sheet does that itself. [subtitle] and [caption] are the sheet's.
+ * in an edge-to-edge sheet does that itself. [subtitle] and [caption] are the sheet's. A null [title] draws the list alone, with
+ * no drag handle or header, for a caller that put the title in its own header, such as a [BingeSheetPageHeader].
  *
  * @need frame a single-choice sheet body in a preview or inside your own sheet
  * @group sheets
  */
 @Composable
 fun <T> BingeChoiceSheetContent(
-    title: String,
+    title: String?,
     choices: BingeChoiceList<T>,
     selected: T?,
     onSelect: (T) -> Unit,
@@ -453,7 +454,7 @@ fun <T> BingeChoiceSheetContent(
     noMatchLabel: String? = null,
 ) {
     Column(modifier) {
-        RestingSheetTop(dragHandle) { BingeSheetHeader(title, subtitle = subtitle, caption = caption) }
+        if (title != null) RestingSheetTop(dragHandle) { BingeSheetHeader(title, subtitle = subtitle, caption = caption) }
         SingleChoiceList(
             choices = choices,
             selected = selected,
@@ -473,14 +474,15 @@ fun <T> BingeChoiceSheetContent(
  * [leading] is the selection that comes first, as on the sheet; it defaults to [chosen], which suits a frame. A live
  * caller passes the selection the content opened with, so a row does not jump when ticked. Like
  * [BingeChoiceSheetContent], it draws no surface, its header does not dock, and `dragHandle = false` drops the handle
- * for a sheet that draws its own. [subtitle] and [caption] are the sheet's.
+ * for a sheet that draws its own. [subtitle] and [caption] are the sheet's. A null [title] draws the list alone: no drag handle
+ * or header, so [clearLabel], [doneLabel], [actions] and [onClear] are the caller's own header's to carry.
  *
  * @need frame a multi-choice sheet body in a preview or inside your own sheet
  * @group sheets
  */
 @Composable
 fun <T> BingeMultiChoiceSheetContent(
-    title: String,
+    title: String?,
     choices: BingeChoiceList<T>,
     chosen: Set<T>,
     onCheckedChange: (value: T, checked: Boolean) -> Unit,
@@ -500,11 +502,13 @@ fun <T> BingeMultiChoiceSheetContent(
     caption: String? = null,
 ) {
     Column(modifier) {
-        RestingSheetTop(dragHandle) {
-            BingeSheetHeader(title, subtitle = subtitle, caption = caption) {
-                actions()
-                BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
-                doneLabel?.let { BingeTextButton(label = it, onClick = onDone) }
+        if (title != null) {
+            RestingSheetTop(dragHandle) {
+                BingeSheetHeader(title, subtitle = subtitle, caption = caption) {
+                    actions()
+                    BingeTextButton(label = clearLabel, onClick = onClear, enabled = chosen.isNotEmpty())
+                    doneLabel?.let { BingeTextButton(label = it, onClick = onDone) }
+                }
             }
         }
         MultiChoiceList(
