@@ -270,6 +270,8 @@ private fun HeroSlot(
  * A row's [TvHubRow.onSeeAll], [TvHubRow.seeAllLabel] and [TvHubRow.seeAllPeek] are not read here: this hub draws no See-all card.
  * For one, use [TvExpandingSingleRow].
  *
+ * [onRowVisible] and [onItemTapped] report the hero as `binge:tv-expanding-hero`; an app's own row keys must not use it.
+ *
  * @sample TvExpandingHubWithHeroSample
  * @need show titles as rows that expand under focus into a backdrop slot, with a hero above, on a tv screen
  * @group tv

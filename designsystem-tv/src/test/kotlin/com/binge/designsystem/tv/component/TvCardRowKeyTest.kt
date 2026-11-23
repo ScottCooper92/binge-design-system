@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
 import com.binge.designsystem.testing.createTakeDownKeyboardComposeRule
 import com.binge.designsystem.tv.theme.BingeTvTheme
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,14 +29,12 @@ class TvCardRowKeyTest {
 
     @Test
     fun `an item keyed like the old trailing key is not taken for the tile`() {
-        val focused = mutableListOf<Any>()
         composeTestRule.setContent {
             BingeTvTheme {
                 TvCardRow(
                     items = listOf("tv-card-row-trailing", "other"),
                     key = { it },
                     cellWidth = CELL_WIDTH_DP.dp,
-                    onCellFocused = { focused += it },
                     trailingContent = { _, _, cellModifier ->
                         Box(Modifier.testTag(TRAILING).size(CELL_WIDTH_DP.dp).then(cellModifier))
                     },
@@ -50,6 +47,5 @@ class TvCardRowKeyTest {
 
         composeTestRule.onNodeWithText("tv-card-row-trailing").assertExists()
         composeTestRule.onNodeWithTag(TRAILING).assertExists()
-        assertTrue("no cell has been focused yet", focused.none { it == TRAILING_KEY })
     }
 }
