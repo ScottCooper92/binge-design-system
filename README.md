@@ -58,11 +58,18 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── catalog/     only the catalog's file annotations (`@file:CatalogGroup`, `@file:ScreenshotOnly` and `@file:SelfDescribing`); the samples
 │                moved to the `designsystem-catalog` module (below)
 ├── modifier/    skeleton shimmer, selection lift, a content description
-├── save/        the save-as-made engine: a change writes itself a moment after the last one
+├── save/        the save-as-made engine: a change writes itself a moment after the last one (a named
+│                exception to the scope rule in CLAUDE.md; see #1171)
+├── motion/      the navigation motion specs
+├── refresh/     the pull-to-refresh tracker
+├── pane/        the shell's pane state
+├── viewmodel/   keyed view-model stores, for pages that share state
 ├── layout/      layout anchors
 ├── template/    the whole-screen frames: the scaffold, the message screen, the error and empty
 │                screens, the filtered list, the hero detail page, the form, the step flow, the
-│                decision screen and the paged phase
+│                decision screen and the paged phase, and the media screens built on the library's own
+│                models: the movie, series, collection and person detail screens, the people and
+│                paged grids, the search screen, the media hero detail page and the filter sheets
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
 
 designsystem-catalog/src/   the phone catalog: every …Sample() and …Demo(), the @PreviewTest frames that render
@@ -101,6 +108,12 @@ user-visible string is in `values/strings.xml` with its Spanish translation alon
 components take their copy as parameters, so `designsystem-tv` holds only a few strings of its own,
 such as a badge's count and a hidden field's announcement. The baselines are the ones Binge
 recorded; each slice validated byte-identical against them before it landed.
+
+## The scope rule
+
+The library holds what draws or lays out and can be described without a server, an account or a store. It holds no class
+that takes a dispatcher, a data store, a network client, a view model base class or a work scheduler. The full rule and its
+named exceptions are in `CLAUDE.md`; `checkLibraryScope` runs in `check`.
 
 ## The component index
 

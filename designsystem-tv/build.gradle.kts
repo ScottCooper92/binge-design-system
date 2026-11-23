@@ -36,8 +36,8 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
 
-    // Publishes the adverse-schedule focus harness to this module's own test source set — the target
-    // arriving frames late is a property of the retry loops that live here, so the fixture belongs beside them
+    // Publishes the adverse-schedule focus harness to this module's own test source set — a target that
+    // arrives frames late is a property of the arrival claims that live here, so the fixture belongs beside them
     // rather than being hand-rolled per test.
     testFixtures {
         enable = true
