@@ -1,4 +1,6 @@
+@file:OnePerScreen
 @file:SelfDescribing
+@file:CatalogGroup("Navigation bars")
 
 package com.binge.designsystem.catalog
 
