@@ -99,6 +99,8 @@ fun showsLogReaderFooter(ready: LogReaderState.Ready): Boolean = ready.appending
  * @param query the search text; [callbacks]' `onQueryChange` gets every edit, and the clear button calls it with an empty string.
  * @param searchPlaceholder the field's hint.
  * @param loadingLabel what a screen reader says of the loading plates.
+ * @param moreFailedLabel the footer's Try again label, shown when the last page failed to load.
+ * @param snackbarHostState the host for the app's own snackbars, shown over the list.
  *
  * @need read logs: level filter chips, a search field and log rows in a paged list
  * @group screens

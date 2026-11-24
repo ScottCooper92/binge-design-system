@@ -25,9 +25,13 @@ import kotlinx.coroutines.delay
 
 private const val PAGE_ROWS = 12
 private const val LOAD_MILLIS = 900L
-private const val SCROLLED_ROWS = 40
+
+/** Few enough that the footer is on screen without a scroll. */
+private const val SHORT_LIST_ROWS = 3
 
 private val SampleLevels = listOf(FilterChipItem("All"), FilterChipItem("Error"), FilterChipItem("Warning"), FilterChipItem("Info"))
+
+private val SampleFilters = listOf(null, LogRowLevel.Error, LogRowLevel.Warn, LogRowLevel.Info)
 
 private val SampleMessages =
     listOf(
@@ -102,13 +106,13 @@ fun LogReaderEmptySample() =
 @Composable
 fun LogReaderFailedSample() = SampleReader(LogReaderState.Failed(ErrorKind.Network))
 
-/** The next page loading: the list scrolled to its end, with a spinner under the last row. */
+/** The next page loading: a short list with a spinner under the last row. */
 @Composable
-fun LogReaderAppendingSample() = SampleReader(LogReaderState.Ready(sampleRows(SCROLLED_ROWS), hasMore = true, appending = true))
+fun LogReaderAppendingSample() = SampleReader(LogReaderState.Ready(sampleRows(SHORT_LIST_ROWS), hasMore = true, appending = true))
 
-/** The next page failed: the footer is a Retry button. */
+/** The next page failed: a short list whose footer is a Retry button. */
 @Composable
-fun LogReaderAppendFailedSample() = SampleReader(LogReaderState.Ready(sampleRows(SCROLLED_ROWS), hasMore = true, appendFailed = true))
+fun LogReaderAppendFailedSample() = SampleReader(LogReaderState.Ready(sampleRows(SHORT_LIST_ROWS), hasMore = true, appendFailed = true))
 
 /** The reader live: pick a level, type to narrow the lines, and scroll to page in more. */
 @Composable
@@ -126,7 +130,7 @@ fun LogReaderDemo() {
         }
     }
     val shown = rows.filter {
-        (level == 0 || it.level.ordinal == SampleLevels.size - 1 - level) &&
+        (SampleFilters[level] == null || SampleFilters[level] == it.level) &&
             it.message.contains(query, ignoreCase = true)
     }
     ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
