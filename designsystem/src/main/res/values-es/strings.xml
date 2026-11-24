@@ -139,6 +139,8 @@
     <string name="save_status_saved">Guardado</string>
     <string name="save_status_failed">No se ha podido guardar el cambio</string>
     <string name="save_status_retry">Reintentar</string>
+    <string name="log_reader_search_placeholder">Buscar en los registros</string>
+    <string name="log_reader_loading">Cargando registros</string>
     <string name="log_row_copy">Copiar la línea</string>
     <string name="log_row_expand">Mostrar detalles</string>
     <string name="log_row_collapse">Ocultar detalles</string>
