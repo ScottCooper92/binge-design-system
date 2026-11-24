@@ -79,11 +79,18 @@ jobs:
       # pays to write an entry nothing reads back. The key is what invalidates an entry (the
       # wrapper, build scripts, catalog and properties); Gradle still validates whatever it
       # restores, so a near-miss from restore-keys is discarded rather than trusted.
+      #
+      # The generated gradle-api jar is saved with it. A module that applies java-gradle-plugin (the
+      # component-index plugin) compiles against that jar, which Gradle writes into the Gradle User Home
+      # while it configures the build; setup-gradle leaves it out. A reused entry skips configuring, so
+      # the compile then fails with "Unresolved reference 'api'" on every org.gradle.api import.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .gradle/configuration-cache
-          key: gradle-config-cache-check-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
-          restore-keys: gradle-config-cache-check-${{ runner.os }}-
+          path: |
+            .gradle/configuration-cache
+            ~/.gradle/caches/*/generated-gradle-jars
+          key: gradle-config-cache-v2-check-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
+          restore-keys: gradle-config-cache-v2-check-${{ runner.os }}-
 
       # Robolectric fetches its android-all jar from Maven Central itself, outside Gradle's cache,
       # and an HTTP 429 there fails every unit test with initializationError (it kept turning
@@ -160,9 +167,11 @@ jobs:
       # different ones, so sharing one key would have three jobs racing to save different entries.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .gradle/configuration-cache
-          key: gradle-config-cache-screenshots-${{ matrix.shard }}-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
-          restore-keys: gradle-config-cache-screenshots-${{ matrix.shard }}-${{ runner.os }}-
+          path: |
+            .gradle/configuration-cache
+            ~/.gradle/caches/*/generated-gradle-jars
+          key: gradle-config-cache-v2-screenshots-${{ matrix.shard }}-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts', 'libs.versions.toml', 'gradle.properties') }}
+          restore-keys: gradle-config-cache-v2-screenshots-${{ matrix.shard }}-${{ runner.os }}-
 
       - name: Validate screenshots (shard ${{ matrix.shard }} of 3)
         run: |
