@@ -155,6 +155,8 @@
     <string name="save_status_saved">Saved</string>
     <string name="save_status_failed">Couldn\'t save your change</string>
     <string name="save_status_retry">Try again</string>
+    <string name="log_reader_search_placeholder">Search logs</string>
+    <string name="log_reader_loading">Loading logs</string>
     <string name="log_row_copy">Copy line</string>
     <string name="log_row_expand">Show details</string>
     <string name="log_row_collapse">Hide details</string>

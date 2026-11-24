@@ -200,6 +200,9 @@
     <dimen name="list_row_logo_padding">10dp</dimen>
     <dimen name="list_row_spacing">10dp</dimen>
     <dimen name="list_row_skeleton_height">128dp</dimen>
+    <!-- A collapsed log row with a one-line message, measured at font scales 1 and 2 (LogReaderScreenTest holds the skeleton to them). -->
+    <dimen name="log_reader_skeleton_row_height">76dp</dimen>
+    <dimen name="log_reader_skeleton_row_height_2x">110dp</dimen>
     <!-- Discover screen + filter sheet -->
     <dimen name="discover_entry_icon_size">44dp</dimen>
     <dimen name="discover_entry_icon_glyph">22dp</dimen>
