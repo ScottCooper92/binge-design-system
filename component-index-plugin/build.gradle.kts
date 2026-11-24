@@ -32,7 +32,7 @@ gradlePlugin {
 tasks.test { useJUnitPlatform() }
 
 dependencies {
-    implementation(project(":catalog-registry"))
+    api(project(":catalog-registry"))
     testImplementation(gradleTestKit())
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

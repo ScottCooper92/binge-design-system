@@ -302,6 +302,8 @@ pluginManagement {
 In the module that holds the index:
 
 ```kotlin
+import com.binge.designsystem.catalogregistry.SampleKind
+
 plugins {
     base
     id("com.binge.designsystem.component-index")
