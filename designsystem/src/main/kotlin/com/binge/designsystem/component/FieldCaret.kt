@@ -11,6 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
 
 /**
  * How many frames a field waits for its caller to hand back a value that reflects an edit it reported. A caller that keeps its value in a view model
@@ -169,16 +171,26 @@ class FieldCaret internal constructor(
     }
 }
 
-/** A [FieldCaret] for a field showing [value], settled after each composition. */
+/**
+ * A [FieldCaret] for a field showing [value], settled after each composition.
+ *
+ * [answerGrace] is how long the field waits for the caller's value to catch up with an edit. Null, the default, waits [ANSWER_GRACE_FRAMES]
+ * frames, so a caller that rejects an edit by leaving its value as it was sees the field revert at once. A caller whose echo lags by
+ * seconds passes a time instead, and the field keeps what was typed for that long.
+ */
 @Composable
 @DesignSystemInternalApi
-fun rememberFieldCaret(value: String, initial: TextFieldValue): FieldCaret {
+fun rememberFieldCaret(
+    value: String,
+    initial: TextFieldValue,
+    answerGrace: Duration? = null,
+): FieldCaret {
     val caret = remember { FieldCaret(initial) }
     SideEffect { caret.settle(value) }
     val latest by rememberUpdatedState(value)
     LaunchedEffect(caret.progress) {
         if (caret.isWaiting) {
-            repeat(ANSWER_GRACE_FRAMES) { withFrameNanos { } }
+            if (answerGrace == null) repeat(ANSWER_GRACE_FRAMES) { withFrameNanos { } } else delay(answerGrace)
             caret.giveUp(latest)
         }
     }
