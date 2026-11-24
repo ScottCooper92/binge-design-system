@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.binge.designsystem.R
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import kotlin.time.Duration
 
 /**
  * Pill-shaped search field with leading magnifier, optional placeholder, and a
@@ -55,6 +56,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * Pass [focusRequester] to focus the field from outside — a caller cannot add its own
  * `Modifier.focusRequester` for this, because two of them on one node do not both bind and the
  * caller's is the one dropped. Omit it and the field keeps a private one for its own tap handling.
+ *
+ * @param answerGrace how long the field keeps what was typed while the caller's query has not caught up. Null, the default, is
+ *   [ANSWER_GRACE_FRAMES] (4) frames, a few dozen milliseconds. Pass a few seconds, such as 3.seconds, for a caller whose echo
+ *   lags (a query that round-trips through a server or a store), so it needs no helper of its own to hold the typed text.
  *
  * @need type a search query with a clear button
  * @group inputs
@@ -72,6 +77,7 @@ fun BingeSearchField(
     imeAction: ImeAction = ImeAction.Search,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     focusRequester: FocusRequester? = null,
+    answerGrace: Duration? = null,
 ) {
     val internalFocusRequester = remember { FocusRequester() }
     val fieldFocus = focusRequester ?: internalFocusRequester
@@ -79,7 +85,7 @@ fun BingeSearchField(
     // would put the caret before it. Own the selection: it starts at the end, follows the user once they move it, and goes back to the
     // end when the query is changed from outside (a clear, a restore). A query the caller rewrites from what was typed keeps the caret
     // where it was.
-    val caret = rememberFieldCaret(query, TextFieldValue(query, TextRange(query.length)))
+    val caret = rememberFieldCaret(query, TextFieldValue(query, TextRange(query.length)), answerGrace)
     val shown = caret.shown(query)
     SearchFieldPill(
         modifier = modifier,

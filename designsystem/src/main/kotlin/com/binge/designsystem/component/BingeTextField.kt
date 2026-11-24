@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import com.binge.designsystem.R
+import kotlin.time.Duration
 
 private const val DISABLED_ICON_ALPHA = 0.38f
 
@@ -56,6 +57,12 @@ private const val DISABLED_ICON_ALPHA = 0.38f
  * @param imeAction [ImeAction.Next] moves focus on, so the last field of a form passes [ImeAction.Done]. Done, and Go for a
  *   field that connects or signs in, drop the keyboard and then run [onDone]. A multi-line field keeps the keyboard's Enter,
  *   whatever this says.
+ *
+ * @param answerGrace how long the field keeps what was typed while the caller's value has not caught up. Null, the default, is
+ *   [ANSWER_GRACE_FRAMES] (4) frames, a few dozen milliseconds, so a caller that rejects an edit by leaving its value unchanged
+ *   sees the field revert at once. Pass a few seconds, such as 3.seconds, when the caller's echo lags (a value that round-trips
+ *   through a server or a store): the field then shows the typed text for that long, and the caller needs no helper of its own
+ *   to hold it. A value that differs from the typed text still replaces it as soon as it arrives.
  *
  * @need enter a line of text in a settings form
  * @group inputs
@@ -87,6 +94,7 @@ fun BingeTextField(
     onToggleReveal: (() -> Unit)? = null,
     imeAction: ImeAction = ImeAction.Next,
     onDone: (() -> Unit)? = null,
+    answerGrace: Duration? = null,
 ) {
     val focusManager = LocalFocusManager.current
     var focused by remember { mutableStateOf(false) }
@@ -110,7 +118,7 @@ fun BingeTextField(
     // changed from outside while focused. A value the caller rewrites from what was typed (a filter) keeps the caret where it was, moved
     // by what was removed, rather than counting as a change from outside. An unfocused field keeps the selection at 0, because a
     // text field scrolls to its caret, and a long saved value (a URL) should show its start while nobody is editing it.
-    val caret = rememberFieldCaret(value, TextFieldValue(value))
+    val caret = rememberFieldCaret(value, TextFieldValue(value), answerGrace)
     val fieldValue = if (focused) caret.shown(value) else TextFieldValue(value)
     val submit = {
         focusManager.clearFocus()
