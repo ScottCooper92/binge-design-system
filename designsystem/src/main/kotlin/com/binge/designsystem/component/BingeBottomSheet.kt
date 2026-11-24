@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import com.binge.designsystem.rememberFoldSafeBottomHeight
@@ -205,13 +206,18 @@ internal fun sheetSideMargin(windowWidth: Int, sheetMaxWidth: Int): Int = ((wind
  * A sheet's content in a column that animates its own height, so the sheet, which is as tall as its content, follows a change on the
  * theme's spatial spring instead of jumping to it. Under reduced motion there is no animation modifier at all and the height changes
  * at once. The column is the width of the sheet and lays its children out as the sheet's own column did, so a sheet whose height
- * holds still is unchanged.
+ * holds still is unchanged. Scrolls inside it pass through [SheetScrollHandoff], so a swipe that scrolls a list never also closes the sheet.
  */
 @Composable
 internal fun SheetAnimatedColumn(content: @Composable ColumnScope.() -> Unit) {
     val motion = rememberSheetMotion()
+    val handoff = remember { SheetScrollHandoff() }
     Column(
-        modifier = Modifier.fillMaxWidth().then(if (motion.reduceMotion) Modifier else Modifier.animateContentSize(motion.spatial())),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .nestedScroll(handoff)
+                .then(if (motion.reduceMotion) Modifier else Modifier.animateContentSize(motion.spatial())),
         content = content,
     )
 }
