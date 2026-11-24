@@ -89,7 +89,8 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 └── preview/     @TvPreviews and the TV screenshot theme
 
 catalog-app/        the debug-only catalog app, with a phone activity and a TV one
-catalog-registry/   the generator that lists the catalog's samples and demos for that app
+catalog-registry/   the generator that lists the catalog's samples and demos for that app, and builds the component index
+component-index-plugin/   the Gradle plugin that gives another repository the same component index
 
 docs/
 ├── components.md        every public component by the need it meets, generated from its KDoc tags
@@ -283,3 +284,43 @@ scripts and the dependencies keep their own licences.
 
 The contracts and SDK in `binge-companions` stay under Apache 2.0, so anyone can write a companion
 without taking on the GPL.
+
+## Using the component index in an app
+
+`docs/components.md` is built from the `@need`, `@group`, `@replaces` and `@sample` tags in KDoc, by `:catalog-registry`. An app that
+keeps its own tagged components does not need its own generator: it applies this repository's plugin. The tag grammar is the same
+here and there.
+
+In the app's `settings.gradle.kts`, include this build for its plugins as well as for its libraries:
+
+```kotlin
+pluginManagement {
+    includeBuild("../binge-design-system")
+}
+```
+
+In the module that holds the index:
+
+```kotlin
+import com.binge.designsystem.catalogregistry.SampleKind
+
+plugins {
+    base
+    id("com.binge.designsystem.component-index")
+}
+
+componentIndex {
+    output.set(layout.projectDirectory.file("docs/components.md"))
+    sources.from("app/src/main/kotlin")           // where the tagged declarations are
+    sampleSources.from("app/src/test/kotlin")     // where `@sample` names are declared; leave out for none
+    sampleKind.set(SampleKind.Classes)            // `…Sample` composable functions by default
+    group("screens", "Screens")                   // the `@group` keys, in listing order, with their headings
+    group("feedback", "Feedback and state")
+    includeHelpers.set(true)                      // also list a class, object or plain function whose KDoc has `@need`
+    moduleColumn.set(true)                        // a Module column: the first path segment of each file
+}
+```
+
+`./gradlew generateComponentIndex` writes the file. `checkComponentIndex` fails when it is stale, when a public composable has no
+`@need` or `@group`, when a `@group` is not one you declared, or when a `@sample` names nothing; it runs with `check`. The title, the
+paragraph under it and the comment above it can be replaced with `title`, `intro` and `generatedNote`.

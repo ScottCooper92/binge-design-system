@@ -175,3 +175,117 @@ class ComponentIndexTest {
         assertTrue("public Thing has no @need" in result.problems.single())
     }
 }
+
+class ComponentIndexConfigTest {
+    private val config =
+        IndexConfig(
+            groups = listOf(IndexGroup("screens", "Screens"), IndexGroup("glue", "Glue")),
+            includeHelpers = true,
+            moduleColumn = true,
+            sampleKind = SampleKind.Classes,
+        )
+
+    private val source =
+        """
+        /**
+         * A page.
+         *
+         * @need show a page
+         * @group screens
+         * @sample PageSample
+         */
+        @Composable
+        fun Page() {}
+
+        /**
+         * Holds a thing.
+         *
+         * @need hold a thing between two screens
+         * @group glue
+         */
+        class ThingHolder
+
+        /**
+         * A lowercase composable helper.
+         *
+         * @need remember a thing
+         * @group glue
+         */
+        @Composable
+        fun rememberThing() {}
+
+        /** A helper that chose not to be listed. */
+        fun quietHelper() {}
+
+        /** An object with no tags. */
+        object Plain
+        """.trimIndent()
+
+    @Test
+    fun `a config lists its own groups, helpers with a need, and the module of each file`() {
+        val result = ComponentIndex.scan("feature/Page.kt", source, config)
+
+        assertTrue(result.problems.isEmpty(), result.problems.toString())
+        assertEquals(listOf("Page", "ThingHolder", "rememberThing"), result.entries.map { it.name })
+        assertEquals(listOf("feature", "feature", "feature"), result.entries.map { it.module })
+    }
+
+    @Test
+    fun `a capitalised plain function with a need is a helper, and one without is left out`() {
+        val tagged =
+            "/**\n * Makes one.\n *\n * @need make a thing\n * @group glue\n */\nfun ThingFactory(): Int = 1\n\n" +
+                "/** No tags. */\nfun OtherFactory(): Int = 2"
+        val result = ComponentIndex.scan("feature/Factories.kt", tagged, config)
+
+        assertTrue(result.problems.isEmpty(), result.problems.toString())
+        assertEquals(listOf("ThingFactory"), result.entries.map { it.name })
+        assertTrue(ComponentIndex.scan("feature/Factories.kt", tagged, IndexConfig(groups = config.groups)).entries.isEmpty())
+    }
+
+    @Test
+    fun `helpers are left out unless the config asks for them`() {
+        val names = ComponentIndex.scan("feature/Page.kt", source, IndexConfig(groups = config.groups)).entries.map { it.name }
+
+        assertEquals(listOf("Page"), names)
+    }
+
+    @Test
+    fun `a public composable without a need is still a problem when helpers are on`() {
+        val result = ComponentIndex.scan("Page.kt", "@Composable\nfun Bare() {}", config)
+
+        assertEquals(1, result.problems.size)
+    }
+
+    @Test
+    fun `a group the config does not know is a problem that names the ones it does`() {
+        val result = ComponentIndex.scan("Page.kt", source.replace("@group screens", "@group sheets"), config)
+
+        assertTrue("use one of screens, glue" in result.problems.single())
+    }
+
+    @Test
+    fun `a sample class in the sample sources satisfies a sample tag, and a missing one is a problem`() {
+        val samples = listOf("catalog/Samples.kt" to "class PageSample {\n}")
+
+        assertTrue(ComponentIndex.problems(listOf("feature/Page.kt" to source), samples, config).isEmpty())
+        assertEquals(
+            listOf("Page: @sample PageSample is not a catalog sample"),
+            ComponentIndex.problems(listOf("feature/Page.kt" to source), emptyList(), config),
+        )
+    }
+
+    @Test
+    fun `the index lists a module column and the config's own headings`() {
+        val index =
+            ComponentIndex.render(
+                listOf("feature/Page.kt" to source),
+                listOf("catalog/Samples.kt" to "class PageSample"),
+                config.copy(title = "Index", generatedNote = listOf("<!-- Generated -->"), intro = listOf("Look here.")),
+            )
+
+        assertTrue(index.startsWith("<!-- Generated -->\n\n# Index\n\nLook here.\n"))
+        assertTrue("## Screens" in index && "## Glue" in index)
+        assertTrue("| Need | Component | What it is | Sample | Replaces | Module |" in index)
+        assertTrue("| show a page | `Page` | A page | `PageSample` | — | feature |" in index)
+    }
+}
