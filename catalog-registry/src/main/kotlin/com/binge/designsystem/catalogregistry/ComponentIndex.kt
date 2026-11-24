@@ -96,7 +96,7 @@ object ComponentIndex {
     private val tag = Regex("""^@(need|group|replaces|sample)\s+(\S.*)$""")
     private val excludedSuffixes = listOf("Preview", "Sample", "Demo")
 
-    /** A helper: a class, object or interface, or a function that is not a capitalised composable. Group 1 is its name. */
+    /** A helper: a class, object or interface, or a function that is not a capitalised composable. Group 1 is its annotations and group 2 its name. */
     private val helperType =
         Regex(
             """^((?:@\w+(?:\([^)]*\))?\s+)*)(?:public\s+)?(?:(?:data|sealed|enum|abstract|open|value|fun|annotation)\s+)*(?:class|object|interface)\s+(\w+)""",
@@ -114,28 +114,26 @@ object ComponentIndex {
         val problems = mutableListOf<String>()
         for ((index, line) in lines.withIndex()) {
             if (hidden.containsMatchIn(line)) continue
-            val component = declaration.find(line)
-            val helper = if (component == null && config.includeHelpers) helperMatch(line) else null
-            if (component == null && helper == null) continue
-            val name = component?.groupValues?.get(4) ?: helper!!.second
-            val inline = component?.groupValues?.get(1) ?: helper!!.first
-            if (component != null) {
-                if (excludedSuffixes.any { name.endsWith(it) }) continue
-                // A public component must be tagged. A helper is listed only when it chooses to be.
-            }
+            val declared = declaration.find(line)
+            val helperLine = if (config.includeHelpers) helperMatch(line) else null
+            if (declared == null && helperLine == null) continue
             val above = SampleScanner.annotationsAbove(lines, index)
+            val inline = declared?.groupValues?.get(1) ?: helperLine!!.first
             // Shared between the design system's own modules, not offered to an app: not a component to look up by need.
             if (above.any { it.startsWith("@DesignSystemInternalApi") } || "@DesignSystemInternalApi" in inline) continue
             val composable = above.any { it.startsWith("@Composable") } || "@Composable" in inline
-            if (component != null && !composable) continue
-            if (helper != null && composable && name.first().isUpperCase()) continue
+            // A capitalised composable is a component and must be tagged; anything else is a helper, listed only when it chooses to be.
+            val component = declared != null && composable
+            if (component && excludedSuffixes.any { declared!!.groupValues[4].endsWith(it) }) continue
+            if (!component && helperLine == null) continue
+            val name = if (component) declared!!.groupValues[4] else helperLine!!.second
             val where = "$fileName:${index + 1}"
             val kdoc = SampleScanner.kdocAbove(lines, index - above.size)
             val tags = kdoc.mapNotNull { tag.find(it) }.associate { it.groupValues[1] to it.groupValues[2].trim() }
             val need = tags["need"]
             val groupKey = tags["group"]
             // A helper with no @need is not in the index, and is no problem.
-            if (helper != null && need == null) continue
+            if (!component && need == null) continue
             val group = config.groups.firstOrNull { it.key == groupKey }
             when {
                 need == null || groupKey == null ->

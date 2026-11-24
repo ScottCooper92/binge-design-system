@@ -40,7 +40,7 @@ abstract class ComponentIndexExtension {
     /** The file `generateComponentIndex` writes and `checkComponentIndex` compares against. */
     abstract val output: RegularFileProperty
 
-    /** Directories of Kotlin sources scanned for tagged declarations. The first path segment under each root names an entry's module. */
+    /** Directories of Kotlin sources scanned for tagged declarations. The first segment of a file's path from the project directory names its module (`app/src/main/kotlin/…` is `app`). */
     abstract val sources: ConfigurableFileCollection
 
     /** Directories of Kotlin sources that declare the samples a `@sample` tag names. Empty means no sample is checked or listed. */
@@ -87,6 +87,11 @@ abstract class GenerateComponentIndexTask : DefaultTask() {
 
     @get:Internal
     abstract val projectDir: DirectoryProperty
+
+    /** The roots' paths from the project, which name each entry's module, so a moved root is a different input for the build cache. */
+    @get:Input
+    val rootPaths: List<String>
+        get() = (sources.files + sampleSources.files).map { it.relativeToOrSelf(projectDir.get().asFile).invariantSeparatorsPath }.sorted()
 
     /** The index file: the generate task's output, and the check task's input. Declared on the task in [ComponentIndexPlugin]. */
     @get:Internal

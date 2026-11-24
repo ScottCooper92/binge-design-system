@@ -231,6 +231,18 @@ class ComponentIndexConfigTest {
     }
 
     @Test
+    fun `a capitalised plain function with a need is a helper, and one without is left out`() {
+        val tagged =
+            "/**\n * Makes one.\n *\n * @need make a thing\n * @group glue\n */\nfun ThingFactory(): Int = 1\n\n" +
+                "/** No tags. */\nfun OtherFactory(): Int = 2"
+        val result = ComponentIndex.scan("feature/Factories.kt", tagged, config)
+
+        assertTrue(result.problems.isEmpty(), result.problems.toString())
+        assertEquals(listOf("ThingFactory"), result.entries.map { it.name })
+        assertTrue(ComponentIndex.scan("feature/Factories.kt", tagged, IndexConfig(groups = config.groups)).entries.isEmpty())
+    }
+
+    @Test
     fun `helpers are left out unless the config asks for them`() {
         val names = ComponentIndex.scan("feature/Page.kt", source, IndexConfig(groups = config.groups)).entries.map { it.name }
 
