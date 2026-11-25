@@ -214,8 +214,15 @@ private fun SearchFieldPill(
             .defaultMinSize(minHeight = dimensionResource(R.dimen.search_bar_height))
             .clip(MaterialTheme.shapes.extraLarge)
             .background(containerColor)
-            .then(if (outline != null) Modifier.border(dimensionResource(R.dimen.hairline_thickness), outline, MaterialTheme.shapes.extraLarge) else Modifier)
-            .clickable(
+            .then(
+                if (outline !=
+                    null
+                ) {
+                    Modifier.border(dimensionResource(R.dimen.hairline_thickness), outline, MaterialTheme.shapes.extraLarge)
+                } else {
+                    Modifier
+                },
+            ).clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClickLabel = null,
