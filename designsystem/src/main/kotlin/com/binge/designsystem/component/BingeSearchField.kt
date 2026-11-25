@@ -44,7 +44,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
 import kotlin.time.Duration
 
@@ -155,9 +157,12 @@ fun BingeSearchFieldButton(
 }
 
 /**
- * The room the Search screen gives its field: the screen's content inset on each side, a gap below, and the search content's maximum
- * width, centred. Put [BingeSearchField] or [BingeSearchFieldButton] inside it for a screen that hosts the field the way the Search
- * screen does.
+ * The room the Search screen gives its field: the page's own side insets, a gap below, and the search content's maximum width,
+ * centred. The sides are [resolvedContentPadding], so beside another pane the field keeps the edge the page's cards keep, and alone in
+ * the window it is the screen's content inset on each side. Put [BingeSearchField] or [BingeSearchFieldButton] inside it for a screen that
+ * hosts the field the way the Search screen does.
+ *
+ * @param bottomPadding the gap below the field. A screen whose header slot adds its own fade under the header passes zero.
  *
  * @need place a search field or its tap-to-search entry the way the Search screen places its field
  * @group inputs
@@ -165,14 +170,18 @@ fun BingeSearchFieldButton(
  * @replaces hand-built insets around a search field
  */
 @Composable
-fun BingeSearchFieldHeader(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun BingeSearchFieldHeader(
+    modifier: Modifier = Modifier,
+    bottomPadding: Dp = dimensionResource(R.dimen.padding_m),
+    content: @Composable () -> Unit,
+) {
     Box(modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
         Box(
             Modifier
                 .widthIn(max = dimensionResource(R.dimen.search_content_max_width))
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.screen_content_inset))
-                .padding(bottom = dimensionResource(R.dimen.padding_m)),
+                .padding(resolvedContentPadding())
+                .padding(bottom = bottomPadding),
         ) {
             content()
         }
