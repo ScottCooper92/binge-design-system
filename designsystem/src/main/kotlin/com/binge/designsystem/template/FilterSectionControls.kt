@@ -57,6 +57,8 @@ internal fun FilterSectionControlWithSearch(
             onQueryChange = search.onQueryChange,
             onClear = { search.onQueryChange("") },
             placeholder = search.placeholder,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            outlined = true,
         )
         if (shown.hasNoOptions()) {
             Text(
