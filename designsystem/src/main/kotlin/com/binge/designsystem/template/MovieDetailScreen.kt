@@ -187,7 +187,11 @@ private fun DetailPageBody(
         }
         detail.tags?.takeIf { it.tags.isNotEmpty() }?.let { section ->
             Column {
-                SectionHeader(section.title, horizontalPadding = readingInset())
+                SectionHeader(
+                    section.title,
+                    horizontalPadding = readingInset(),
+                    bottomPadding = dimensionResource(R.dimen.section_header_padding_bottom_tight),
+                )
                 TagRow(
                     tags = section.tags.map { it.label },
                     modifier = Modifier.padding(horizontal = readingInset()),

@@ -13,6 +13,7 @@
     <dimen name="card_width">144dp</dimen>
     <!-- Carousels (MediaCarousel + CarouselSkeleton) -->
     <dimen name="section_header_padding_v">12dp</dimen>
+    <dimen name="section_header_padding_bottom_tight">4dp</dimen>
     <!-- Carousel end tile (Discover more / See all) -->
     <dimen name="see_all_tile_width">120dp</dimen>
     <dimen name="see_all_tile_corner">18dp</dimen>

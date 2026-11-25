@@ -43,6 +43,9 @@ import com.binge.designsystem.theme.BingeShapes
  * [horizontalPadding] defaults to the screen's content inset, which widens with the window (16, 24, then 32dp), so the title lines up with
  * the rest of the page on a tablet or a foldable.
  *
+ * [bottomPadding] defaults to the same gap as the top. A caller lowers it when a short row, such as a tag row, sits directly
+ * below the header.
+ *
  * @need title a section with an optional see-more action
  * @group rows
  * @replaces a hand-built Row of a title and a text button
@@ -56,6 +59,7 @@ fun SectionHeader(
     horizontalPadding: Dp = resolvedContentInset(),
     startPadding: Dp = horizontalPadding + navOverlayStart(),
     endPadding: Dp = horizontalPadding + navOverlayEnd(),
+    bottomPadding: Dp = dimensionResource(R.dimen.section_header_padding_v),
 ) {
     Row(
         modifier = modifier
@@ -64,7 +68,7 @@ fun SectionHeader(
                 start = startPadding,
                 end = endPadding,
                 top = dimensionResource(R.dimen.section_header_padding_v),
-                bottom = dimensionResource(R.dimen.section_header_padding_v),
+                bottom = bottomPadding,
             )
             // Floored at the touch target, not just any height: M3 already expands the "More" TextButton to it, so
             // without the floor the same header renders 16dp shorter with no trailing action — adjacent rails on different
