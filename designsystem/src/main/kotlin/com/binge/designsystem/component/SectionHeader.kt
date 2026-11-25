@@ -43,6 +43,9 @@ import com.binge.designsystem.theme.BingeShapes
  * [horizontalPadding] defaults to the screen's content inset, which widens with the window (16, 24, then 32dp), so the title lines up with
  * the rest of the page on a tablet or a foldable.
  *
+ * [bottomPadding] defaults to the same gap as the top. A caller lowers it when a short row, such as a tag row, sits directly
+ * below the header.
+ *
  * @need title a section with an optional see-more action
  * @group rows
  * @replaces a hand-built Row of a title and a text button

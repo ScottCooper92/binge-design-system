@@ -20,7 +20,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.CarouselSkeleton
 import com.binge.designsystem.component.DetailActions
@@ -188,7 +187,11 @@ private fun DetailPageBody(
         }
         detail.tags?.takeIf { it.tags.isNotEmpty() }?.let { section ->
             Column {
-                SectionHeader(section.title, horizontalPadding = readingInset(), bottomPadding = 4.dp)
+                SectionHeader(
+                    section.title,
+                    horizontalPadding = readingInset(),
+                    bottomPadding = dimensionResource(R.dimen.section_header_padding_bottom_tight),
+                )
                 TagRow(
                     tags = section.tags.map { it.label },
                     modifier = Modifier.padding(horizontal = readingInset()),
