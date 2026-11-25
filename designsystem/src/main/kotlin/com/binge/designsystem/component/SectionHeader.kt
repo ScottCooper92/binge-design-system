@@ -56,6 +56,7 @@ fun SectionHeader(
     horizontalPadding: Dp = resolvedContentInset(),
     startPadding: Dp = horizontalPadding + navOverlayStart(),
     endPadding: Dp = horizontalPadding + navOverlayEnd(),
+    bottomPadding: Dp = dimensionResource(R.dimen.section_header_padding_v),
 ) {
     Row(
         modifier = modifier
@@ -64,7 +65,7 @@ fun SectionHeader(
                 start = startPadding,
                 end = endPadding,
                 top = dimensionResource(R.dimen.section_header_padding_v),
-                bottom = dimensionResource(R.dimen.section_header_padding_v),
+                bottom = bottomPadding,
             )
             // Floored at the touch target, not just any height: M3 already expands the "More" TextButton to it, so
             // without the floor the same header renders 16dp shorter with no trailing action — adjacent rails on different
