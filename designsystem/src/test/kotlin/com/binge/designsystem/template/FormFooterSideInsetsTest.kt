@@ -9,7 +9,7 @@ import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
-import com.binge.designsystem.component.BingeActionFooter
+import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.WithStartCutout
 import com.binge.designsystem.testing.createTakeDownComposeRule
@@ -24,6 +24,9 @@ private const val FIELD = "field"
 private const val CANCEL = "Cancel"
 private const val SAVE = "Save"
 private const val TOLERANCE = 1f
+
+/** The side inset a page keeps for its content, on top of the cutout the bar clears. */
+private const val CONTENT_INSET = 24f
 
 /** A camera cutout down the start side, as a phone held in landscape has. */
 private val Cutout = 40.dp
@@ -67,18 +70,18 @@ class FormFooterSideInsetsTest {
     }
 
     @Test
-    fun `an action footer that clears the navigation bar clears a side cutout too`() {
+    fun `a screen footer clears a side cutout too`() {
         rule.setContent {
             TestTheme {
                 WithStartCutout(Cutout) {
-                    BingeActionFooter(label = SAVE, onClick = {}, horizontalPadding = 0.dp, clearsNavigationBar = true)
+                    ScreenFooter { BingeFilledButton(label = SAVE, onClick = {}) }
                 }
             }
         }
         rule.waitForIdle()
 
         assertEquals(
-            Cutout.value,
+            Cutout.value + CONTENT_INSET,
             rule
                 .onNodeWithText(SAVE)
                 .getBoundsInRoot()

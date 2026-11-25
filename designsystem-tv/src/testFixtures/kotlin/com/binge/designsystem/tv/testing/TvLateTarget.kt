@@ -23,14 +23,12 @@ const val TV_LATE_TARGET_SIBLING_TAG = "tv-late-target-sibling"
 /**
  * The adverse-schedule fixture: a focusable sibling stand-in ([siblingTag]) — modelling the outgoing
  * screen/overlay a handoff waits on — that composes until [dispose] flips true, at which point [content] — the real
- * target a handoff's retry loop is aimed at — is composed only after [delayFrames] `withFrameNanos` ticks have passed.
+ * target a handoff is aimed at — is composed only after [delayFrames] `withFrameNanos` ticks have passed.
  *
- * A fixture, not a parameterised test per screen: every handoff under test (`offerFocusToContent`,
- * `contentHandoffInFlight`) already retries every frame against whatever the target
- * requester resolves to, so delaying *composition* of [content] — rather than merely its focus attachment —
- * is the most adverse schedule that retry loop can be asked to survive: the requester has nothing to attach to
- * at all until the delay elapses. [delayFrames] is a frame count, not a duration, matching the production
- * loops it exercises.
+ * A fixture, not a parameterised test per screen: delaying *composition* of [content] — rather than merely its focus
+ * attachment — is the most adverse schedule an arrival can be asked to survive: the requester has nothing to attach to
+ * at all until the delay elapses, so the claim must wait for the target to be placed rather than for a clock.
+ * [delayFrames] is a frame count, not a duration.
  *
  * `dispose` is a caller-driven `Boolean` rather than an internal timer so a test can hold it with
  * `mainClock.autoAdvance = false` and step frames between the flip and the delayed composition — the ordering

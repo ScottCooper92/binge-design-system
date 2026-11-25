@@ -17,8 +17,8 @@ fun Context.logTvHandoffMiss(what: String) {
 
 /**
  * A debug-build trace of the shell's hand-off: when an arrival is armed, cleared or claimed, when a direction key arrives and
- * whether an arrival was pending, and when the old hand-off loop starts and ends. Read together under this tag they say which
- * of them moved focus; nothing is logged in a release build.
+ * whether an arrival was pending. Read together under this tag they say what
+ * moved focus; nothing is logged in a release build.
  */
 fun Context.logTvHandoffTrace(what: String) {
     if ((applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0) Log.d(TAG, what)

@@ -32,7 +32,8 @@ private const val SNACKBAR_MAX_LINES = 2
  * only drives duration upstream.
  */
 @Composable
-internal fun BingeSnackbar(
+@DesignSystemInternalApi
+fun BingeSnackbar(
     message: String,
     actionLabel: String?,
     onActionClick: () -> Unit,

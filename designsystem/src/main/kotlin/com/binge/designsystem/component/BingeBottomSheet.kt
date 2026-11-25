@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import com.binge.designsystem.rememberFoldSafeBottomHeight
@@ -40,7 +41,8 @@ import kotlinx.coroutines.launch
  * onSurface content, expressive corner radius, and `skipPartiallyExpanded = true`. For
  * advanced callers that need a reference to the sheet state, use [ModalBottomSheet] directly.
  *
- * [dockable] opts the sheet into docking, usually with `skipPartiallyExpanded = false` so it opens part-way: as
+ * [opensPartWay] is the usual way to say that: it is `skipPartiallyExpanded = false` and `dockable = true` together, so the sheet opens
+ * part-way and docks. [dockable] opts the sheet into docking alone, and `skipPartiallyExpanded = false` alone opens it part-way with no dock. Docking: as
  * its top edge reaches the status bar its top corners square off and [BingeSheetDockingHeader] swaps the drag handle
  * and header for a [BingeSheetTopBar], and [bingeSheetPinnedFooter] keeps a footer on the window's bottom edge while
  * the sheet is part-way open. Both read [LocalBingeSheetDock], which only a dockable sheet provides. A dockable sheet
@@ -86,13 +88,14 @@ fun BingeBottomSheet(
     dismissOnClickOutside: Boolean = gesturesEnabled,
     dockable: Boolean = false,
     edgeToEdge: Boolean = false,
+    opensPartWay: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val foldSafeHeight = rememberFoldSafeBottomHeight()
-    val sheetState = rememberLockableSheetState(skipPartiallyExpanded, gesturesEnabled)
+    val sheetState = rememberLockableSheetState(skipPartiallyExpanded && !opensPartWay, gesturesEnabled)
     val scope = rememberCoroutineScope()
     val dock =
-        if (dockable) {
+        if (dockable || opensPartWay) {
             rememberBingeSheetDock(
                 sheetState = sheetState,
                 gesturesEnabled = gesturesEnabled,
@@ -155,7 +158,8 @@ fun BingeBottomSheet(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gesturesEnabled: Boolean): SheetState {
+@DesignSystemInternalApi
+fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gesturesEnabled: Boolean): SheetState {
     val locked by rememberUpdatedState(!gesturesEnabled)
     val confirmValueChange = remember { { target: SheetValue -> !locked || target == SheetValue.Expanded } }
     // rememberBottomSheetState replaced the skipPartiallyExpanded flag with an explicit reachable-states
@@ -180,7 +184,8 @@ internal fun rememberLockableSheetState(skipPartiallyExpanded: Boolean, gestures
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
+@DesignSystemInternalApi
+fun bingeSheetContentInsets(edgeToEdge: Boolean): WindowInsets {
     val vertical =
         if (edgeToEdge) {
             BottomSheetDefaults.modalWindowInsets.only(WindowInsetsSides.Top).union(WindowInsets.ime)
@@ -201,13 +206,18 @@ internal fun sheetSideMargin(windowWidth: Int, sheetMaxWidth: Int): Int = ((wind
  * A sheet's content in a column that animates its own height, so the sheet, which is as tall as its content, follows a change on the
  * theme's spatial spring instead of jumping to it. Under reduced motion there is no animation modifier at all and the height changes
  * at once. The column is the width of the sheet and lays its children out as the sheet's own column did, so a sheet whose height
- * holds still is unchanged.
+ * holds still is unchanged. Scrolls inside it pass through [SheetScrollHandoff], so a swipe that scrolls a list never also closes the sheet.
  */
 @Composable
 internal fun SheetAnimatedColumn(content: @Composable ColumnScope.() -> Unit) {
     val motion = rememberSheetMotion()
+    val handoff = remember { SheetScrollHandoff() }
     Column(
-        modifier = Modifier.fillMaxWidth().then(if (motion.reduceMotion) Modifier else Modifier.animateContentSize(motion.spatial())),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .nestedScroll(handoff)
+                .then(if (motion.reduceMotion) Modifier else Modifier.animateContentSize(motion.spatial())),
         content = content,
     )
 }

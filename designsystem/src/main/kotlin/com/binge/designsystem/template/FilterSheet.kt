@@ -81,8 +81,7 @@ fun FilterSheet(
         onDismissRequest = onDismiss,
         modifier = modifier,
         onPageBack = { page -> if (page.startsWith(DETAIL_PAGE_PREFIX)) onDetailBack(page.removePrefix(DETAIL_PAGE_PREFIX)) },
-        skipPartiallyExpanded = false,
-        dockable = true,
+        opensPartWay = true,
         // Only a sheet that has a second level stacks pages on a phone; without one it is exactly as it was.
         stackPagesWhenCompact = detail != null,
     ) { nav ->

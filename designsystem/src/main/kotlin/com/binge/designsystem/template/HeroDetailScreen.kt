@@ -319,7 +319,8 @@ private fun MeasuredHero(measured: MeasuredHeroHeight, hero: @Composable () -> U
     Box(modifier = Modifier.measuredHeroHeight(measured)) { hero() }
 }
 
-private const val HERO_ITEM_KEY = "hero-detail-hero"
+/** The lazy key of the hero item. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
+private const val HERO_ITEM_KEY = "binge:hero-detail-hero"
 
 /**
  * The extent, in px, of the items under the hero (the list's items less the hero), from the first of them to the last, which takes

@@ -23,9 +23,10 @@ import androidx.compose.ui.unit.IntSize
  * of the two, so a text squeezed to nothing by a parent that ran out of room is caught as well as one clipped away. A
  * shortfall of more than [tolerancePx] in width or height fails the test, naming the text and the shortfall.
  *
- * Four further faults fail the same way, each found from the text's own layout and not from its parents:
+ * Five further faults fail the same way, each found from the text's own layout and not from its parents:
  * - the text needs more height than its node has, by more than [tolerancePx], so a line is cut off;
  * - a one-line text needs more width than its node has, by more than [tolerancePx], and is not ellipsized, so the end of the line is cut off;
+ * - a line is ellipsized down to the ellipsis alone, with none of its text left, which tells the reader nothing;
  * - a word is broken across two lines: a line other than the last ends between two characters that are neither space nor a
  *   place a break is welcome (after a hyphen, a slash or a dash, or between two CJK characters, which have no spaces);
  * - the text's box reaches past the left or right edge of the window. The window is [windowWidthPx] wide from the left edge
@@ -45,8 +46,11 @@ import androidx.compose.ui.unit.IntSize
  * - empty text, which has no glyph for a parent to cut. A bar that is given no title draws one, and it is no bigger than
  *   the nothing it holds.
  *
- * [allowBrokenWords] switches the broken-word check off for a caller whose text has no good place to break, a URL for one, and
- * says why where it does; each such caller names the issue that tracks it.
+ * A text with no place to break at all (one unspaced token, such as a bare hostname, an ID, a hash or a long single word) cannot
+ * split a word, so the broken-word check skips it: a line breaker has no other choice there. A text with any space, hyphen, slash,
+ * dash or unspaced-script character is still held to it, so a URL with a scheme or a path, which holds slashes, is still checked
+ * and still needs [allowBrokenWords]. [allowBrokenWords] switches the check off for a caller whose text has a place to break and still
+ * should not be held to it, and says why where it does; each such caller names the issue that tracks it.
  *
  * The unmerged semantics tree is searched, so a merged parent does not hide the text inside it.
  *
@@ -172,8 +176,14 @@ private fun SemanticsNode.layoutFaults(
         if (paragraph.lineCount == 1 && paragraph.maxIntrinsicWidth > size.width + tolerancePx && !paragraph.isLineEllipsized(0)) {
             faults += "needs ${kotlin.math.ceil(paragraph.maxIntrinsicWidth).toInt()}px of width on one line, its box is ${size.width}px"
         }
+        for (line in 0 until paragraph.lineCount) {
+            if (paragraph.isLineEllipsized(line) && paragraph.getLineStart(line) == paragraph.getLineEnd(line, visibleEnd = true)) {
+                faults += "draws only an ellipsis on line ${line + 1}, its box is ${size.width}px wide"
+            }
+        }
         val text = layout.layoutInput.text.text
-        for (line in 0 until if (allowBrokenWords) 0 else paragraph.lineCount - 1) {
+        val checkWords = !allowBrokenWords && hasBreakOpportunity(text)
+        for (line in 0 until if (checkWords) paragraph.lineCount - 1 else 0) {
             val end = paragraph.getLineEnd(line, visibleEnd = false)
             if (end in 1 until text.length && isBrokenWord(text.codePointBefore(end), text.codePointAt(end))) {
                 faults += "breaks a word across lines after \"${text.substring(maxOf(0, end - WORD_CONTEXT), end)}\""
@@ -202,49 +212,32 @@ private fun SemanticsNode.layoutFaults(
 /**
  * Whether a line that ends between the code points [before] and [after] has split a word: neither is a space, the break is not after a
  * hyphen or dash, and neither side is a character of a script written without spaces (CJK, Thai, Lao, Khmer, Myanmar), beside which the
- * line breaker may break and which no Latin word can be split by. Public so a test can pin the rule on its own, without a line breaker
- * deciding where the line ends.
+ * line breaker may break and which no Latin word can be split by. It is the rule `WholeWordText` uses to decide when to stop wrapping,
+ * so what that component wraps passes here. Public so a test can pin the rule on its own, without a line breaker deciding where the
+ * line ends.
  */
 fun isBrokenWord(before: Int, after: Int): Boolean =
-    !Character.isWhitespace(before) &&
-        !Character.isWhitespace(after) &&
-        before !in BREAK_WELCOME_AFTER &&
-        !(before.isUnspaced() || after.isUnspaced())
+    com.binge.designsystem.component
+        .isBrokenWord(before, after)
 
 /** [isBrokenWord] for two `Char`s. */
 fun isBrokenWord(before: Char, after: Char): Boolean = isBrokenWord(before.code, after.code)
 
 /**
- * Whether a code point is in a script written without spaces. The script alone misses marks that belong to no script, such as the
- * prolonged sound mark `ー` and the ideographic comma and full stop, which a line may end after, so the Unicode blocks count too.
+ * Whether [text] has a place a line may break without splitting a word: two neighbouring code points for which [isBrokenWord] is
+ * false, such as a space, or a hyphen and the letter after it. A text without one is a single unbreakable token.
  */
-private fun Int.isUnspaced(): Boolean =
-    Character.UnicodeScript.of(this) in UNSPACED_SCRIPTS || Character.UnicodeBlock.of(this) in CJK_BLOCKS
-
-private val UNSPACED_SCRIPTS =
-    setOf(
-        Character.UnicodeScript.HAN,
-        Character.UnicodeScript.HIRAGANA,
-        Character.UnicodeScript.KATAKANA,
-        Character.UnicodeScript.HANGUL,
-        Character.UnicodeScript.THAI,
-        Character.UnicodeScript.LAO,
-        Character.UnicodeScript.KHMER,
-        Character.UnicodeScript.MYANMAR,
-    )
-
-private val CJK_BLOCKS =
-    setOf(
-        Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION,
-        Character.UnicodeBlock.HIRAGANA,
-        Character.UnicodeBlock.KATAKANA,
-        Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS,
-        Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS,
-        Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS,
-    )
-
-/** A hyphen, a slash, an en dash, an em dash and the Unicode hyphen: a line may end after one without breaking a word. */
-private val BREAK_WELCOME_AFTER = setOf('-'.code, '/'.code, 0x2013, 0x2014, 0x2010)
+internal fun hasBreakOpportunity(text: String): Boolean {
+    var index = 0
+    while (index < text.length) {
+        val before = text.codePointAt(index)
+        val next = index + Character.charCount(before)
+        if (next >= text.length) return false
+        if (!isBrokenWord(before, text.codePointAt(next))) return true
+        index = next
+    }
+    return false
+}
 
 private const val WORD_CONTEXT = 12
 

@@ -11,7 +11,8 @@ import java.io.File
  * some other test falls over.
  */
 class ComposeRuleGuardTest {
-    private val sourceRoots = listOf("designsystem/src/test", "designsystem-tv/src/test", "catalog-app/src/test")
+    private val sourceRoots =
+        listOf("designsystem/src/test", "designsystem-tv/src/test", "designsystem-catalog/src/test", "catalog-app/src/test")
 
     /**
      * By path from the repository root: the one test that asserts a throw from composition itself, which leaves nothing

@@ -13,8 +13,10 @@ carve from Binge are here: the theme, the preview and screenshot scaffolding and
 none of Binge's types; the display formatters (`DisplayFormatters.kt`) and the components they
 unlocked — the nav shell, the poster card and carousel, the hero, the chips, the skeletons; and the
 settings group with the relative-date formatter, for the companion's own settings screens. Binge
-still holds the components that name its media-item model, its error model or the integration
-contract.
+still holds what names a TMDB type, its account, its routes or the integration contract. The media models here
+(`MediaCard`, `MediaResult`, `MediaDetail`, `HeroItem`, `EpisodeBrowseUi` and the rest) are library-owned: a plain
+description of what a media screen draws, with no TMDB or Binge type in it. An app maps its own data onto them, and the
+screens built on them live here.
 
 The fourth slice is a second module, `designsystem-tv`: the tv-material theme, the focus units, the
 top-bar shell, the button, the card row, the section title and the message plate — the TV
@@ -26,7 +28,9 @@ Both modules also hold the screen templates, in a `template` package each: whole
 that Binge and the companion build their pages from, so a screen of the same kind is laid out the
 same way in both apps. On the phone (`com.binge.designsystem.template`) they are the scaffold, the
 message screen, the error and empty screens, the filtered list, the hero detail page, the form, the
-step flow, the decision screen and the paged phase. On the TV (`com.binge.designsystem.tv.template`)
+step flow, the decision screen and the paged phase, and the media screens built on the library's own models: the movie,
+series, collection and person detail screens, the people and paged grids, the search screen, the media hero detail page and
+the filter sheets. On the TV (`com.binge.designsystem.tv.template`)
 they are the page hosting, the board, the two-pane page, the step flow, the message page, the error page, the detail
 page, the decision page, the list-and-pane board, the immersive hub and grid, the full-screen reader, and the skeleton pages that stand in for them
 while they load. `TvImmersiveScroll.kt` there is the scroll the hub and
@@ -40,7 +44,8 @@ The Binge app uses it under a separate grant. New code and new dependencies must
 
 **A component here may not know what Binge's data looks like.**
 
-No TMDB types, no account model, no navigation routes, no provider names. A component takes what it
+No TMDB types, no account model, no navigation routes, no provider names of a service the user signs in to. (One exception: `ExternalScoreKind` names a review score's source, such as critics, audience or an IMDb-style rating, because it
+picks a glyph. The value and the words are the caller's.) A component takes what it
 renders as parameters and gives back callbacks. The display formatting a component applies to a
 plain value — a score to one decimal, a count to `1.5k`, a name to its initials — lives here too, in
 `DisplayFormatters.kt`, so that every app rendering the component formats it the same way. If it needs to name one of Binge's concepts to do
@@ -48,6 +53,24 @@ its job, it is not a shared component and it stays in Binge.
 
 The test is not "does it compile here" — almost anything can be made to. It is whether a companion
 author with no knowledge of Binge could use it and have it mean something.
+
+### What kind of code belongs here
+
+The rule above is about data. The one about code is wider:
+
+> This library holds anything that draws or lays out and can be described without a server, an account or a store:
+> components, templates, theme, navigation shells, the render-state types those take, preview helpers and Compose test
+> fixtures. It holds no class that takes a dispatcher, a scope it writes on, or a store, and no loading, analytics or business
+> rule. A file here with no Compose import that a view model calls belongs in the app or in an app-side shared library, unless
+> Binge uses it, in which case it stays and is listed here as an exception.
+
+Reporting hooks stay: `ScrollDepthEffect`, `RowImpressionEffect`, `TvVisitDepth` and the `onVisitEnded`, `onRowVisible` and
+`onCellFocused` callbacks report layout facts through callbacks and do no reporting themselves.
+`checkLibraryScope` (wired into `check`) fails when a main file imports a dispatcher, a data store, a network client, a view
+model base class or a work scheduler. Its one exception is named in `designsystem/build.gradle.kts`: `viewmodel/KeyedViewModelStores.kt`.
+
+**House rules every app reads the same way.** Icons are Filled. On TV a disabled button is dimmed, not hidden and not left
+always enabled.
 
 ## Consumers, and what that costs
 
@@ -75,7 +98,8 @@ and `check` fails if it is stale or a public composable is untagged.
   parameter is usually the better shape here, because the consumer owns the words.
 - A component takes a `Modifier` parameter, defaulted, and applies it to its outermost node.
 - Previews are `@Preview`-annotated and render without a network or an injected dependency.
-- Every component has a `…Sample()` in `catalog/` and a `@PreviewTest` frame that renders it, and a
+- Every component has a `…Sample()` in `catalog/` (in the `designsystem-catalog` module, which only the catalog app
+  depends on, so a consumer compiles none of the samples) and a `@PreviewTest` frame that renders it, and a
   new visual variant gets its frame in the same PR. The catalog sample is the one public fixture for
   a component, so the screenshot test renders the sample rather than hand-rolling the same state.
   The debug-only catalog app picks a new public `…Sample()` up on the next build with nothing to
@@ -116,8 +140,9 @@ re-record with `./gradlew updateDebugScreenshotTest`, look at the regenerated PN
 in the same commit as the code. Committing that output is the only way to accept a change; there is
 no override flag.
 
-There is no coverage floor in this repository, and the one custom check is `checkTvMaterialSeparation`
-(wired into `check`). The catalog app's `generate<Variant>CatalogRegistry` is a generator, not a check,
+There is no coverage floor in this repository, and the three custom checks are `checkTvMaterialSeparation`,
+`checkComponentIndex` and `checkLibraryScope` (all wired into `check`; the second fails when `docs/components.md` is stale or a
+public composable lacks `@need` or `@group`, the third when a main file imports what the scope rule above rules out). The catalog app's `generate<Variant>CatalogRegistry` is a generator, not a check,
 but it fails the build on a malformed `…Sample` or `…Demo`. Do not look for any other, and do not report
 a finding as though one had caught it.
 

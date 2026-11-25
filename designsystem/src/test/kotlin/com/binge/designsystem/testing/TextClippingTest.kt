@@ -192,8 +192,27 @@ class TextClippingTest {
 
     @Test
     fun `a word broken across two lines fails`() {
-        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        show { Box(Modifier.width(NARROW)) { Text("Two Unbreakable") } }
         assertFails("breaks a word across lines") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a single unbreakable token has no break opportunity and passes`() {
+        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        rule.assertNoTextClipped()
+    }
+
+    @Test
+    fun `a text has a break opportunity where a space, a hyphen or an unspaced script offers one`() {
+        assertFalse(hasBreakOpportunity("Unbreakable"))
+        assertFalse(hasBreakOpportunity(""))
+        assertFalse(hasBreakOpportunity("a"))
+        assertTrue(hasBreakOpportunity("two words"))
+        assertTrue(hasBreakOpportunity("well-known"))
+        assertTrue(hasBreakOpportunity("https://example.com"))
+        assertFalse(hasBreakOpportunity("example.com"))
+        assertTrue(hasBreakOpportunity("日本"))
+        assertTrue(hasBreakOpportunity("a\uD840\uDC00"))
     }
 
     @Test
@@ -226,7 +245,7 @@ class TextClippingTest {
 
     @Test
     fun `a word broken across lines passes when the caller allows it`() {
-        show { Box(Modifier.width(NARROW)) { Text("Unbreakable") } }
+        show { Box(Modifier.width(NARROW)) { Text("Two Unbreakable") } }
         rule.assertNoTextClipped(allowBrokenWords = true)
     }
 
@@ -234,6 +253,12 @@ class TextClippingTest {
     fun `a one-line text wider than its node and not ellipsized fails`() {
         show { Box(Modifier.width(NARROW)) { Text("A long single line", maxLines = 1, overflow = TextOverflow.Clip) } }
         assertFails("of width on one line") { rule.assertNoTextClipped() }
+    }
+
+    @Test
+    fun `a text ellipsized down to the ellipsis alone fails`() {
+        show { Box(Modifier.width(SLIVER)) { Text("12,840 requests", maxLines = 1, overflow = TextOverflow.Ellipsis) } }
+        assertFails("draws only an ellipsis") { rule.assertNoTextClipped() }
     }
 
     @Test
@@ -304,6 +329,7 @@ class TextClippingTest {
         const val STACK_LINES = 3
         val ROW_WIDTHS = listOf(190, 210, 230, 250, 270, 290, 310, 330)
         val NARROW = 40.dp
+        val SLIVER = 4.dp
         const val OFFSET = 40
         val CHIP_WIDTH = 60.dp
         val CHIP_HEIGHT = 24.dp

@@ -11,6 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
 
 /**
  * How many frames a field waits for its caller to hand back a value that reflects an edit it reported. A caller that keeps its value in a view model
@@ -75,17 +77,6 @@ private fun TextFieldValue.answeredWith(value: String): TextFieldValue {
     fun moved(index: Int) = (index - shift).coerceIn(0, value.length)
     return TextFieldValue(value, TextRange(moved(selection.start), moved(selection.end)))
 }
-
-/**
- * Marks what the design system's own modules share and an app must not build on: it can change with no notice to the four builds that include
- * this one. The design system's modules opt in to it; nothing else should.
- */
-@RequiresOptIn(
-    message = "Shared between the design system's own modules; an app should use the field components instead.",
-    level = RequiresOptIn.Level.ERROR,
-)
-@Retention(AnnotationRetention.BINARY)
-annotation class DesignSystemInternalApi
 
 /**
  * The text, caret and pending edit a text field owns so it keeps what the user typed while its caller catches up, and keeps the caret where the
@@ -180,16 +171,26 @@ class FieldCaret internal constructor(
     }
 }
 
-/** A [FieldCaret] for a field showing [value], settled after each composition. */
+/**
+ * A [FieldCaret] for a field showing [value], settled after each composition.
+ *
+ * [answerGrace] is how long the field waits for the caller's value to catch up with an edit. Null, the default, waits [ANSWER_GRACE_FRAMES]
+ * frames, so a caller that rejects an edit by leaving its value as it was sees the field revert at once. A caller whose echo lags by
+ * seconds passes a time instead, and the field keeps what was typed for that long.
+ */
 @Composable
 @DesignSystemInternalApi
-fun rememberFieldCaret(value: String, initial: TextFieldValue): FieldCaret {
+fun rememberFieldCaret(
+    value: String,
+    initial: TextFieldValue,
+    answerGrace: Duration? = null,
+): FieldCaret {
     val caret = remember { FieldCaret(initial) }
     SideEffect { caret.settle(value) }
     val latest by rememberUpdatedState(value)
     LaunchedEffect(caret.progress) {
         if (caret.isWaiting) {
-            repeat(ANSWER_GRACE_FRAMES) { withFrameNanos { } }
+            if (answerGrace == null) repeat(ANSWER_GRACE_FRAMES) { withFrameNanos { } } else delay(answerGrace)
             caret.giveUp(latest)
         }
     }

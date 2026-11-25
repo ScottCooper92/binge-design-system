@@ -75,7 +75,7 @@ class BingeSheetNav internal constructor(
  *
  * [content] draws the page named by [BingeSheetNav.page]; what a page shows is the caller's to read from its own state,
  * and no page opens another of the same name. [skipPartiallyExpanded], [gesturesEnabled], [dismissOnClickOutside],
- * [dockable] and [edgeToEdge] are [BingeBottomSheet]'s and apply to its form; the side sheet has no drag, so they do not
+ * [dockable], [opensPartWay] and [edgeToEdge] are [BingeBottomSheet]'s and apply to its form; the side sheet has no drag, so they do not
  * reach it, except that [dismissOnClickOutside] false also stops a scrim tap from closing it, and [gesturesEnabled] false
  * locks it like the bottom sheet: system Back and the Back bar do nothing, so a write in flight is not walked away from.
  *
@@ -117,6 +117,7 @@ fun BingeAdaptiveSheet(
     dismissOnClickOutside: Boolean = gesturesEnabled,
     dockable: Boolean = false,
     edgeToEdge: Boolean = false,
+    opensPartWay: Boolean = false,
     stackPagesWhenCompact: Boolean = false,
     backLabel: (page: String) -> String? = { null },
     content: @Composable ColumnScope.(nav: BingeSheetNav) -> Unit,
@@ -187,6 +188,7 @@ fun BingeAdaptiveSheet(
             gesturesEnabled = gesturesEnabled,
             dismissOnClickOutside = dismissOnClickOutside,
             dockable = dockable,
+            opensPartWay = opensPartWay,
             edgeToEdge = edgeToEdge,
         ) {
             // The same reading as HideImeOnBack, so exactly one of the two handles Back.

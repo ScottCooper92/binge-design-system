@@ -1,0 +1,172 @@
+@file:ScreenshotOnly
+
+package com.binge.designsystem.catalog
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import com.binge.designsystem.R
+import com.binge.designsystem.component.BingeBarIconAction
+import com.binge.designsystem.component.BingeTopBar
+import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.theme.BingeTheme
+
+/** Standard top bar, opaque on the app background (the explicit `Color.Unspecified`): a back button, title, and a trailing plain search action. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarSample() {
+    ScreenshotTheme {
+        BingeTopBar(
+            title = "Popular Movies",
+            onBack = {},
+            containerColor = Color.Unspecified,
+            actions = {
+                BingeBarIconAction(icon = Icons.Filled.Search, contentDescription = "Search", onClick = {})
+            },
+        )
+    }
+}
+
+/**
+ * The bar with nothing but a title and a behaviour: transparent over the content, at rest, so no scrim yet. This is
+ * the gallery chrome by default; see [BingeTopBarDefaultsOverlappedSample] for content scrolled under it.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarDefaultsSample() {
+    ScreenshotTheme {
+        TopBarOverContent {
+            BingeTopBar(title = "Popular Movies", onBack = {}, scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()) {
+                TopBarShareAction(it)
+            }
+        }
+    }
+}
+
+/** [BingeTopBarDefaultsSample] with content scrolled under it: the scrim has faded in with the bar's overlap. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarDefaultsOverlappedSample() {
+    ScreenshotTheme {
+        TopBarOverContent {
+            BingeTopBar(title = "Popular Movies", onBack = {}, scrollBehavior = overlappedTopBarScrollBehavior()) {
+                TopBarShareAction(it)
+            }
+        }
+    }
+}
+
+/** Hero treatment — a transparent bar with Glass nav/action buttons over imagery. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarTransparentSample() {
+    ScreenshotTheme {
+        TransparentBingeTopBarWithScrim()
+    }
+}
+
+/** The hero treatment with its scrim fully in: the always-black scrim behind the bar and the title stepped to its scrimmed colour. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarScrimmedSample() {
+    ScreenshotTheme {
+        TransparentBingeTopBarWithScrim(scrimFraction = 1f)
+    }
+}
+
+/**
+ * Just below `scrimmedTitleColor`'s 0.75 switch fraction: the title stays `onSurface`. Paired with
+ * [BingeTopBarTitleAfterScrimSwitchSample] to straddle the step (#93) — 0 and 1 alone give the same
+ * title colour under the old blend and the new step, by construction, so neither proves the switch
+ * actually lands at 0.75.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarTitleBeforeScrimSwitchSample() {
+    ScreenshotTheme {
+        TransparentBingeTopBarWithScrim(scrimFraction = BEFORE_SCRIM_SWITCH_FRACTION)
+    }
+}
+
+/** Just past `scrimmedTitleColor`'s 0.75 switch fraction: the title has stepped to the scrimmed colour. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarTitleAfterScrimSwitchSample() {
+    ScreenshotTheme {
+        TransparentBingeTopBarWithScrim(scrimFraction = AFTER_SCRIM_SWITCH_FRACTION)
+    }
+}
+
+/**
+ * A fully scrimmed bar over a fixed-height, distinctly coloured frame with room below its own bottom
+ * edge — proving `TopBarScrim`'s tail fades gradually into that room instead of cutting off at the
+ * bar's boundary (#94).
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarScrimTailFadeSample() {
+    ScreenshotTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.top_bar_scrim_tail_preview_height))
+                .background(MaterialTheme.colorScheme.tertiaryContainer),
+        ) {
+            BingeTopBar(
+                title = "Popular Movies",
+                onBack = {},
+                containerColor = Color.Transparent,
+                scrimFraction = 1f,
+                scrimColor = BingeTheme.colors.scrim,
+                scrimForegroundColor = BingeTheme.colors.onScrim,
+            )
+        }
+    }
+}
+
+/**
+ * The default scrim, fully in — a transparent bar over a plain surface (a grid or list on the app's
+ * own background), left at its default [BingeTopBar.scrimColor]/`scrimForegroundColor` rather than
+ * overridden to the always-black pair the hero sample above uses. Proves the pair this PR's whole
+ * default-flip is about actually renders legibly in both themes, since every other transparent
+ * fixture in this catalog explicitly opts back into black-always.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BingeTopBarThemeFollowingScrimSample() {
+    ScreenshotTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background),
+        ) {
+            BingeTopBar(
+                title = "Popular Movies",
+                onBack = {},
+                containerColor = Color.Transparent,
+                scrimFraction = 1f,
+                actions = { glassBackgroundAlpha ->
+                    BingeBarIconAction(
+                        icon = Icons.Filled.Search,
+                        contentDescription = "Search",
+                        onClick = {},
+                        glassBackgroundAlpha = glassBackgroundAlpha,
+                    )
+                },
+            )
+        }
+    }
+}
+
+private const val BEFORE_SCRIM_SWITCH_FRACTION = 0.5f
+private const val AFTER_SCRIM_SWITCH_FRACTION = 0.9f

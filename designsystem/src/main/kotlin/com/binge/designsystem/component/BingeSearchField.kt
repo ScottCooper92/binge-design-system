@@ -44,8 +44,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
+import com.binge.designsystem.resolvedContentPadding
 import com.binge.designsystem.theme.BingeExpressiveTheme
+import kotlin.time.Duration
 
 /**
  * Pill-shaped search field with leading magnifier, optional placeholder, and a
@@ -55,6 +58,10 @@ import com.binge.designsystem.theme.BingeExpressiveTheme
  * Pass [focusRequester] to focus the field from outside — a caller cannot add its own
  * `Modifier.focusRequester` for this, because two of them on one node do not both bind and the
  * caller's is the one dropped. Omit it and the field keeps a private one for its own tap handling.
+ *
+ * @param answerGrace how long the field keeps what was typed while the caller's query has not caught up. Null, the default, is
+ *   [ANSWER_GRACE_FRAMES] (4) frames, a few dozen milliseconds. Pass a few seconds, such as 3.seconds, for a caller whose echo
+ *   lags (a query that round-trips through a server or a store), so it needs no helper of its own to hold the typed text.
  *
  * @need type a search query with a clear button
  * @group inputs
@@ -72,6 +79,7 @@ fun BingeSearchField(
     imeAction: ImeAction = ImeAction.Search,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     focusRequester: FocusRequester? = null,
+    answerGrace: Duration? = null,
 ) {
     val internalFocusRequester = remember { FocusRequester() }
     val fieldFocus = focusRequester ?: internalFocusRequester
@@ -79,7 +87,7 @@ fun BingeSearchField(
     // would put the caret before it. Own the selection: it starts at the end, follows the user once they move it, and goes back to the
     // end when the query is changed from outside (a clear, a restore). A query the caller rewrites from what was typed keeps the caret
     // where it was.
-    val caret = rememberFieldCaret(query, TextFieldValue(query, TextRange(query.length)))
+    val caret = rememberFieldCaret(query, TextFieldValue(query, TextRange(query.length)), answerGrace)
     val shown = caret.shown(query)
     SearchFieldPill(
         modifier = modifier,
@@ -149,9 +157,12 @@ fun BingeSearchFieldButton(
 }
 
 /**
- * The room the Search screen gives its field: the screen's content inset on each side, a gap below, and the search content's maximum
- * width, centred. Put [BingeSearchField] or [BingeSearchFieldButton] inside it for a screen that hosts the field the way the Search
- * screen does.
+ * The room the Search screen gives its field: the page's own side insets, a gap below, and the search content's maximum width,
+ * centred. The sides are [resolvedContentPadding], so beside another pane the field keeps the edge the page's cards keep, and alone in
+ * the window it is the screen's content inset on each side. Put [BingeSearchField] or [BingeSearchFieldButton] inside it for a screen that
+ * hosts the field the way the Search screen does.
+ *
+ * @param bottomPadding the gap below the field. A screen whose header slot adds its own fade under the header passes zero.
  *
  * @need place a search field or its tap-to-search entry the way the Search screen places its field
  * @group inputs
@@ -159,14 +170,18 @@ fun BingeSearchFieldButton(
  * @replaces hand-built insets around a search field
  */
 @Composable
-fun BingeSearchFieldHeader(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun BingeSearchFieldHeader(
+    modifier: Modifier = Modifier,
+    bottomPadding: Dp = dimensionResource(R.dimen.padding_m),
+    content: @Composable () -> Unit,
+) {
     Box(modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
         Box(
             Modifier
                 .widthIn(max = dimensionResource(R.dimen.search_content_max_width))
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.screen_content_inset))
-                .padding(bottom = dimensionResource(R.dimen.padding_m)),
+                .padding(resolvedContentPadding())
+                .padding(bottom = bottomPadding),
         ) {
             content()
         }

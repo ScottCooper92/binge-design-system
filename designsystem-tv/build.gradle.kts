@@ -36,8 +36,8 @@ android {
         unitTests.isIncludeAndroidResources = true
     }
 
-    // Publishes the adverse-schedule focus harness to this module's own test source set — the target
-    // arriving frames late is a property of the retry loops that live here, so the fixture belongs beside them
+    // Publishes the adverse-schedule focus harness to this module's own test source set — a target that
+    // arrives frames late is a property of the arrival claims that live here, so the fixture belongs beside them
     // rather than being hand-rolled per test.
     testFixtures {
         enable = true
@@ -96,7 +96,9 @@ val checkTvMaterialSeparation = tasks.register("checkTvMaterialSeparation") {
     description = "Checks that Material 3 and tv-material stay on their own sides of the TV seam."
     val root = rootProject.layout.projectDirectory.asFile
     val tvSources = fileTree(layout.projectDirectory.dir("src")) { include("**/*.kt") }
-    val phoneSources = fileTree(rootProject.layout.projectDirectory.dir("designsystem/src")) { include("**/*.kt") }
+    val phoneSources =
+        fileTree(rootProject.layout.projectDirectory.dir("designsystem/src")) { include("**/*.kt") } +
+            fileTree(rootProject.layout.projectDirectory.dir("designsystem-catalog/src")) { include("**/*.kt") }
     // The catalog app holds both sides in one module, split by package: `tv/` is TV source, everything
     // else is phone or shared source, and the shared `registry/` and `overrides/` packages import neither.
     val catalogAppSources = fileTree(rootProject.layout.projectDirectory.dir("catalog-app/src")) { include("**/*.kt") }

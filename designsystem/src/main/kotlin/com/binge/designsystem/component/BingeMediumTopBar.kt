@@ -1,15 +1,11 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
@@ -152,41 +148,5 @@ fun BingeMediumTopBar(
                 },
             scrollBehavior = scrollBehavior,
         )
-    }
-}
-
-/**
- * A transparent [BingeMediumTopBar] over a sample coloured background, with [IconButtonTone.Glass]
- * nav/action buttons — mirrors [TransparentBingeTopBarSample]. Lives in main so the screenshot test
- * can render it. [scrimFraction] exercises both the [TopBarScrim] this bar draws behind itself and
- * the title's [scrimmedTitleColor] ramp, since it also drives [BingeMediumTopBar]'s
- * `foregroundScrimFraction` default.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun TransparentBingeMediumTopBarSample(scrimFraction: Float = 0f) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer),
-    ) {
-        BingeMediumTopBar(
-            title = "Popular Movies",
-            onBack = {},
-            containerColor = Color.Transparent,
-            scrimFraction = scrimFraction,
-            scrimColor = BingeTheme.colors.scrim,
-            scrimForegroundColor = BingeTheme.colors.onScrim,
-        ) { glassBackgroundAlpha ->
-            ExpressiveIconButton(
-                onClick = {},
-                icon = Icons.Filled.Share,
-                contentDescription = null,
-                tint = LocalTopBarActionTint.current,
-                tone = LocalTopBarActionTone.current,
-                size = dimensionResource(R.dimen.top_bar_icon_size),
-                glassBackgroundAlpha = glassBackgroundAlpha,
-            )
-        }
     }
 }

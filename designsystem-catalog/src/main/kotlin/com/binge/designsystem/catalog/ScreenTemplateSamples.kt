@@ -1,0 +1,1114 @@
+@file:OnePerScreen(fullScreen = true)
+
+package com.binge.designsystem.catalog
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
+import com.binge.designsystem.DecisionCopy
+import com.binge.designsystem.ErrorKind
+import com.binge.designsystem.R
+import com.binge.designsystem.bottomBarInsets
+import com.binge.designsystem.component.BingeFilledButton
+import com.binge.designsystem.component.BingeFilterChip
+import com.binge.designsystem.component.BingeOutlinedButton
+import com.binge.designsystem.component.BingeSnackbar
+import com.binge.designsystem.component.BingeTextButton
+import com.binge.designsystem.component.BingeTextField
+import com.binge.designsystem.component.DetailHero
+import com.binge.designsystem.component.FilterChipItem
+import com.binge.designsystem.component.ListRow
+import com.binge.designsystem.component.ListRowSkeletonColumn
+import com.binge.designsystem.component.MediaCardSkeleton
+import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.template.BingeScreenScaffold
+import com.binge.designsystem.template.DecisionBody
+import com.binge.designsystem.template.DecisionScreen
+import com.binge.designsystem.template.EmptyScreen
+import com.binge.designsystem.template.ErrorScreen
+import com.binge.designsystem.template.FilteredListScreen
+import com.binge.designsystem.template.FormAction
+import com.binge.designsystem.template.FormActionPlacement
+import com.binge.designsystem.template.FormSaveStatus
+import com.binge.designsystem.template.FormScreen
+import com.binge.designsystem.template.FormSection
+import com.binge.designsystem.template.HeroDetailLazyScreen
+import com.binge.designsystem.template.HeroDetailScreen
+import com.binge.designsystem.template.HeroDetailStateScreen
+import com.binge.designsystem.template.LoadingMessageScreen
+import com.binge.designsystem.template.LocalHeroReadingMargin
+import com.binge.designsystem.template.MessageScreen
+import com.binge.designsystem.template.ScreenAction
+import com.binge.designsystem.template.ScreenBar
+import com.binge.designsystem.template.ScreenBarChrome
+import com.binge.designsystem.template.ScreenBody
+import com.binge.designsystem.template.ScreenFooter
+import com.binge.designsystem.template.StepFlowScreen
+import com.binge.designsystem.template.StepHeading
+import com.binge.designsystem.template.screenListPadding
+import com.binge.designsystem.theme.BingeShapes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+/*
+ * The screen templates, each at the size it ships: a whole window. Every sample fills its slots with plain
+ * rows and copy, so the frame shows the template's own chrome and insets rather than any one screen's content.
+ */
+
+private const val SAMPLE_ROWS = 14
+private const val SAMPLE_STEPS = 3
+private const val SAMPLE_GRID_COLUMNS = 3
+private const val SAMPLE_GRID_TILES = 24
+private const val SAMPLE_SCROLLED_ROWS = 6
+private const val BLEED_RAIL_CARDS = 10
+
+/** A collapsing-bar screen over a list: the bar scrims in as rows pass under it. */
+@Composable
+fun BingeScreenScaffoldSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "Episodes", onBack = LocalDemoBack.current) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/** The small bar, which slides away as the list scrolls down and comes back as it scrolls up. */
+@Composable
+fun BingeScreenScaffoldSmallBarSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "Users", onBack = LocalDemoBack.current, bar = ScreenBar.Small) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/**
+ * The small bar pinned: it stays where it is while the list scrolls under it, and its scrim fades in behind it as rows pass. A frame cannot show the
+ * bar not moving, so the demo runs live and no screenshot renders it.
+ */
+@Composable
+fun BingeScreenScaffoldPinnedSmallBarDemo() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "Users", onBack = LocalDemoBack.current, bar = ScreenBar.Small, pinned = true) { padding ->
+            SampleRows(padding, rows = PINNED_DEMO_ROWS)
+        }
+    }
+}
+
+private const val PINNED_DEMO_ROWS = 40
+
+/**
+ * No bar at all: the scaffold switches off the top bar and its scroll behaviour, and the body reserves the status
+ * bar's inset itself so its first row does not sit under the clock.
+ */
+@Composable
+fun BingeScreenScaffoldNoBarSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "No bar", bar = ScreenBar.None) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/** The large bar: a subtitle summarising what the screen shows, and a control at the end of the title row. */
+@Composable
+fun BingeScreenScaffoldLargeBarSample() {
+    var filtered by remember { mutableStateOf(true) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(
+            title = "Discover",
+            bar = ScreenBar.Large,
+            subtitle = "Movies · Popular · 2 filters",
+            titleTrailing = {
+                BingeFilterChip(
+                    label = "Filters",
+                    selected = filtered,
+                    onClick = { filtered = !filtered },
+                    count = 2,
+                )
+            },
+        ) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/** A pinned bottom bar: the list's last row comes to rest above it rather than under it. */
+@Composable
+fun BingeScreenScaffoldBottomBarSample() {
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(
+            title = "Sliders",
+            onBack = LocalDemoBack.current,
+            bar = ScreenBar.Small,
+            snackbarHostState = snackbar,
+            bottomBar = {
+                Box(
+                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                ) {
+                    BingeFilledButton(
+                        label = "Add slider",
+                        onClick = { scope.launch { snackbar.showSnackbar("Slider added") } },
+                        modifier = Modifier
+                            .windowInsetsPadding(bottomBarInsets())
+                            .fillMaxWidth()
+                            .padding(dimensionResource(R.dimen.padding_m)),
+                    )
+                }
+            },
+        ) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/**
+ * A [ScreenFooter] holding a filled button, for a page whose primary action anchors in a `bottomBar` slot outside the scaffold's own
+ * body. Rounded and raised so it reads as its own surface.
+ */
+@Composable
+fun ScreenFooterElevatedSample() {
+    ScreenshotTheme {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            ScreenFooter { BingeFilledButton(label = "Add a slider", onClick = {}, modifier = Modifier.fillMaxWidth()) }
+        }
+    }
+}
+
+/** A pinned bar of plain text on [ScreenFooter]: the chrome a form's buttons sit on, for content that is not a button. */
+@Composable
+fun ScreenFooterSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(
+            title = "Sliders",
+            onBack = LocalDemoBack.current,
+            bar = ScreenBar.Small,
+            bottomBar = {
+                ScreenFooter {
+                    Text(
+                        text = "3 of 8 sliders in use",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            },
+        ) { padding ->
+            SampleRows(padding)
+        }
+    }
+}
+
+/** A failure that replaced the screen's content: the reason and two ways out. */
+@Composable
+fun MessageScreenSample() {
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "Requests", onBack = leave) { padding ->
+            ScreenBody(padding) { inner ->
+                RetryDemo(Modifier.padding(inner)) { retry ->
+                    MessageScreen(
+                        headline = "Can't reach the server",
+                        body = "Check your connection, then try again.",
+                        icon = Icons.Filled.CloudOff,
+                        primary = ScreenAction("Try again", onClick = retry, leadingIcon = Icons.Filled.Refresh),
+                        secondary = ScreenAction("Settings", onClick = leave),
+                        announce = true,
+                        modifier = Modifier.padding(inner),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** A message with three ways out, one of them destructive: the stacked actions slot, full width. */
+@Composable
+fun MessageScreenStackedActionsSample() {
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        BingeScreenScaffold(title = "Requests", onBack = leave) { padding ->
+            ScreenBody(padding) { inner ->
+                RetryDemo(Modifier.padding(inner)) { retry ->
+                    MessageScreen(
+                        headline = "Can't reach the server",
+                        body = "Check your connection, then try again.",
+                        icon = Icons.Filled.CloudOff,
+                        announce = true,
+                        modifier = Modifier.padding(inner),
+                        actions = {
+                            BingeFilledButton(
+                                label = "Try again",
+                                onClick = retry,
+                                leadingIcon = Icons.Filled.Refresh,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            BingeOutlinedButton(label = "Edit connection", onClick = leave, modifier = Modifier.fillMaxWidth())
+                            BingeOutlinedButton(
+                                label = "Disconnect",
+                                onClick = leave,
+                                destructive = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** An empty list: one sentence under its icon, and nothing to press. */
+@Composable
+fun MessageScreenEmptySample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        MessageScreen(headline = "Nothing here", body = "Requests you make show up here.", icon = Icons.Filled.Inbox)
+    }
+}
+
+/** The frame while a screen loads. */
+@Composable
+fun LoadingMessageScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        LoadingMessageScreen()
+    }
+}
+
+/** A list split by filters, each page its own list, with a sort action in the bar. */
+@Composable
+fun FilteredListScreenSample() {
+    var selected by remember { mutableIntStateOf(0) }
+    var descending by remember { mutableStateOf(false) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FilteredListScreen(
+            title = "Requests",
+            onBack = LocalDemoBack.current,
+            filters = listOf(FilterChipItem("All", 42), FilterChipItem("Pending", 3), FilterChipItem("Approved", 39)),
+            selectedFilter = selected,
+            onFilterChange = { selected = it },
+            actions = { BingeTextButton(label = "Sort", onClick = { descending = !descending }) },
+        ) { _, contentPadding ->
+            SampleRows(contentPadding, descending)
+        }
+    }
+}
+
+/**
+ * The same list scrolled past the title: the bar collapsed, and the one scrim over bar and chips faded in, with the
+ * rows visible behind it. It passes a transparent header and a null scrim fraction to get the transparent look of
+ * `BingeScreenScaffold`: the scrim follows the bar's own collapse.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilteredListScreenScrimSample() {
+    var selected by remember { mutableIntStateOf(0) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FilteredListScreen(
+            title = "Requests",
+            onBack = LocalDemoBack.current,
+            scrollBehavior = collapsedTopBarScrollBehavior(),
+            headerBackground = Color.Transparent,
+            scrimFraction = null,
+            filters = listOf(FilterChipItem("All", 42), FilterChipItem("Pending", 3), FilterChipItem("Approved", 39)),
+            selectedFilter = selected,
+            onFilterChange = { selected = it },
+        ) { _, contentPadding ->
+            SampleRows(contentPadding)
+        }
+    }
+}
+
+/** A filtered list before its counts arrive: no chips yet, and the bar scrims itself. */
+@Composable
+fun FilteredListScreenNotReadySample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FilteredListScreen(
+            title = "Requests",
+            onBack = LocalDemoBack.current,
+            filters = emptyList(),
+            selectedFilter = 0,
+            onFilterChange = {},
+            ready = false,
+            notReady = { padding ->
+                ListRowSkeletonColumn(contentPadding = padding.screenListPadding())
+            },
+        ) { _, _ -> }
+    }
+}
+
+/** A detail page under its hero, with the copy following in the same scroll. */
+@Composable
+fun HeroDetailScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailScreen(
+            title = "A title",
+            onBack = LocalDemoBack.current,
+            hero = {
+                DetailHero(
+                    title = "A title",
+                    backdropUrl = null,
+                    tagline = "The line a poster would carry.",
+                    metaText = "2026 · 1h 52m",
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            SampleCopy()
+        }
+    }
+}
+
+/**
+ * A detail page whose hero carries every line of copy at its longest. At a large font scale on a landscape phone the
+ * hero grows past its fixed height, and the copy stays below the overlay bar while the bar's fade follows the hero.
+ */
+@Composable
+fun HeroDetailScreenFullCopySample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailScreen(
+            title = "The Lord of the Rings: The Return of the King, Extended Edition",
+            onBack = LocalDemoBack.current,
+            hero = {
+                DetailHero(
+                    title = "The Lord of the Rings: The Return of the King, Extended Edition",
+                    backdropUrl = null,
+                    tagline = "There can be no triumph without loss. No victory without suffering. No freedom without sacrifice.",
+                    metaText = "8.9 · 2003 · 4h 23m",
+                    genres = listOf("Adventure", "Fantasy", "Action"),
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            SampleCopy()
+        }
+    }
+}
+
+/**
+ * A page whose rail bleeds to the window's edge: unbounded content, the copy padded by the reading margin so it lines
+ * up with a bounded page's, and the rail starting at the same margin and running out past the window's end.
+ */
+@Composable
+fun HeroDetailScreenBleedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailScreen(
+            title = "A title",
+            onBack = LocalDemoBack.current,
+            contentMaxWidth = Dp.Infinity,
+            hero = {
+                DetailHero(
+                    title = "A title",
+                    backdropUrl = null,
+                    tagline = "The line a poster would carry.",
+                    metaText = "2026 · 1h 52m",
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            val margin = LocalHeroReadingMargin.current
+            Box(modifier = Modifier.padding(horizontal = margin)) { SampleCopy() }
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = margin + dimensionResource(R.dimen.padding_m)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
+                userScrollEnabled = false,
+            ) {
+                items(BLEED_RAIL_CARDS) { MediaCardSkeleton(Modifier.width(dimensionResource(R.dimen.card_width))) }
+            }
+        }
+    }
+}
+
+/** A lazy page under the hero: its rows spaced, capped and centred on a wide window, with a gap under the last. */
+@Composable
+fun HeroDetailLazyScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailLazyScreen(
+            title = "A collection",
+            onBack = LocalDemoBack.current,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(bottom = dimensionResource(R.dimen.padding_l)),
+            hero = {
+                DetailHero(
+                    title = "A collection",
+                    backdropUrl = null,
+                    tagline = null,
+                    metaText = "6 films",
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            items(SAMPLE_ROWS) { index ->
+                ListRow(modifier = Modifier.widthIn(max = dimensionResource(R.dimen.content_max_width))) { textModifier ->
+                    Text(text = "Part ${index + 1}", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
+                }
+            }
+        }
+    }
+}
+
+/** A detail page whose load failed: the message under the page's back control, so the way out stays where it was. */
+@Composable
+fun HeroDetailStateScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailStateScreen(onBack = LocalDemoBack.current) {
+            RetryDemo { retry ->
+                MessageScreen(
+                    headline = "Can't load this title",
+                    body = "Check your connection, then try again.",
+                    icon = Icons.Filled.CloudOff,
+                    primary = ScreenAction("Try again", onClick = retry, leadingIcon = Icons.Filled.Refresh),
+                    announce = true,
+                )
+            }
+        }
+    }
+}
+
+/** The same frame while the page loads. */
+@Composable
+fun HeroDetailStateScreenLoadingSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailStateScreen(onBack = LocalDemoBack.current) { LoadingMessageScreen() }
+    }
+}
+
+/** The same page with its one action pinned below the scroll. */
+@Composable
+fun HeroDetailScreenFooterSample() {
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        HeroDetailScreen(
+            title = "A title",
+            onBack = LocalDemoBack.current,
+            snackbarHostState = snackbar,
+            footer = {
+                Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerHigh)) {
+                    BingeFilledButton(
+                        label = "Approve",
+                        onClick = { scope.launch { snackbar.showSnackbar("Request approved") } },
+                        modifier = Modifier
+                            .windowInsetsPadding(bottomBarInsets())
+                            .fillMaxWidth()
+                            .padding(dimensionResource(R.dimen.padding_m)),
+                    )
+                }
+            },
+            hero = {
+                DetailHero(
+                    title = "A title",
+                    backdropUrl = null,
+                    tagline = null,
+                    metaText = "Requested today",
+                    onBack = LocalDemoBack.current,
+                    showChrome = false,
+                )
+            },
+        ) {
+            SampleCopy()
+        }
+    }
+}
+
+/** A short editor that saves each change as it is made: "Saved" in the bar, and no Save button. */
+@Composable
+fun FormScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "General",
+            onBack = LocalDemoBack.current,
+            saveStatus = FormSaveStatus.Saved,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/** A form scrolled past the title: the default collapsing bar collapsed, its scrim faded in over the fields. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FormScreenScrolledSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "General",
+            onBack = LocalDemoBack.current,
+            scrollBehavior = collapsedTopBarScrollBehavior(),
+            saveStatus = FormSaveStatus.Saved,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/** [FormScreenSample] while a change is on its way: "Saving…" in the bar. */
+@Composable
+fun FormScreenSavingSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "General",
+            onBack = LocalDemoBack.current,
+            saveStatus = FormSaveStatus.Saving,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/**
+ * [FormScreenSample] after a write failed: the change stays on screen, and a snackbar offers Retry until a save
+ * succeeds. A snackbar host is empty at frame 0 (see [BingeSnackbarSample]), so the frame draws the pill directly, under
+ * `LocalInspectionMode`; the live catalog app shows the template's own, once, as [FormScreenSaveAsMadeDemo] does.
+ */
+@Composable
+fun FormScreenSaveFailedSample() {
+    var status by remember { mutableStateOf<FormSaveStatus>(FormSaveStatus.Idle) }
+    // Retry saves again: Saving, then Saved, so the failure and its pill give way once a save succeeds.
+    val retry: () -> Unit = { status = FormSaveStatus.Saving }
+    LaunchedEffect(status) {
+        if (status == FormSaveStatus.Saving) {
+            delay(RETRY_DEMO_MILLIS)
+            status = FormSaveStatus.Saved
+        }
+    }
+    val shown = if (status == FormSaveStatus.Idle) FormSaveStatus.Failed(onRetry = retry) else status
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize()) {
+            FormScreen(
+                title = "General",
+                onBack = LocalDemoBack.current,
+                saveStatus = shown,
+            ) {
+                SampleForm()
+            }
+            if (shown is FormSaveStatus.Failed && LocalInspectionMode.current) {
+                BingeSnackbar(
+                    message = stringResource(R.string.form_save_failed),
+                    actionLabel = stringResource(R.string.form_save_retry),
+                    onActionClick = retry,
+                    showDismissAction = false,
+                    onDismissRequest = {},
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = dimensionResource(R.dimen.padding_m), vertical = dimensionResource(R.dimen.padding_s)),
+                )
+            }
+        }
+    }
+}
+
+/** A long create form with Cancel and Create pinned below it: a create flow commits, so it keeps its button. */
+@Composable
+fun FormScreenFooterSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "New network",
+            onBack = LocalDemoBack.current,
+            placement = FormActionPlacement.Footer,
+            primaryAction = FormAction("Create", onClick = LocalDemoBack.current),
+            secondaryAction = FormAction("Cancel", onClick = LocalDemoBack.current),
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/**
+ * A multi-field edit that must apply together, with Save in the top bar. The address has changed, so Save is on;
+ * saving takes the fields as the new saved values and turns it off until the next change.
+ */
+@Composable
+fun FormScreenTopBarSample() {
+    TopBarSaveForm(savedAddress = "media.example.com", address = "media.example.org")
+}
+
+/** [FormScreenTopBarSample] before anything has changed: Save stays off until a field differs from what is saved. */
+@Composable
+fun FormScreenTopBarUnchangedSample() {
+    TopBarSaveForm(savedAddress = "media.example.com", address = "media.example.com")
+}
+
+@Composable
+private fun TopBarSaveForm(savedAddress: String, address: String) {
+    var saved by remember { mutableStateOf(savedAddress to "5055") }
+    var addressField by remember { mutableStateOf(address) }
+    var portField by remember { mutableStateOf(saved.second) }
+    val current = addressField to portField
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "Server",
+            onBack = LocalDemoBack.current,
+            placement = FormActionPlacement.TopBar,
+            primaryAction = FormAction("Save", onClick = { saved = current }, enabled = current != saved),
+        ) {
+            FormSection(title = "Server") {
+                BingeTextField(value = addressField, onValueChange = { addressField = it }, label = "Address")
+                BingeTextField(
+                    value = portField,
+                    onValueChange = { portField = it },
+                    label = "Port",
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                )
+            }
+        }
+    }
+}
+
+/** An editor under a large collapsing bar that saves as it goes, its fields held to a reading column on a wide window. */
+@Composable
+fun FormScreenCappedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        FormScreen(
+            title = "Profile",
+            onBack = LocalDemoBack.current,
+            bar = ScreenBar.Large,
+            capWidth = true,
+            saveStatus = FormSaveStatus.Saved,
+        ) {
+            SampleForm()
+        }
+    }
+}
+
+/** The middle step of a flow: portrait stacks the art, heading and choices; a wide window splits them. */
+@Composable
+fun StepFlowScreenSample() {
+    SampleStepFlow(ScreenBarChrome.Glass)
+}
+
+/** The same step on the plain bar, a first-run flow's: an opaque bar and a Back with no circle behind it. */
+@Composable
+fun StepFlowScreenPlainChromeSample() {
+    SampleStepFlow(ScreenBarChrome.Plain)
+}
+
+/** The same step with an action at the end of its bar, the three-dot menu a first-run flow offers before any settings are in reach. */
+@Composable
+fun StepFlowScreenActionsSample() {
+    SampleStepFlow(ScreenBarChrome.Plain) {
+        IconButton(onClick = {}) { Icon(Icons.Filled.MoreVert, contentDescription = "More options") }
+    }
+}
+
+@Composable
+private fun SampleStepFlow(barChrome: ScreenBarChrome, actions: @Composable RowScope.() -> Unit = {}) {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
+            barChrome = barChrome,
+            actions = { actions() },
+            aside = {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.state_icon_container_size))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                )
+            },
+            heading = {
+                StepHeading(kicker = "Privacy", title = "Share usage data?", subtitle = "Counts of which screens are opened. Nothing more.")
+            },
+            footer = {
+                BingeFilledButton(label = "Share", onClick = advance, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Don't share", onClick = advance, modifier = Modifier.fillMaxWidth())
+            },
+        ) {
+            MessageScreen(
+                body = "Each point the step makes sits here.",
+                icon = Icons.Filled.Shield,
+                modifier = Modifier.height(dimensionResource(R.dimen.detail_hero_height)),
+            )
+        }
+    }
+}
+
+/**
+ * A step long enough to scroll, with the bar collapsed and the step passing under it: the transparent bar scrims in
+ * as the step scrolls, and the read-out stays pinned under it. The collapsed bar is forced through
+ * [collapsedTopBarScrollBehavior], since a frame cannot scroll.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StepFlowScreenScrolledSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
+            title = "Edit connection",
+            scrollBehavior = collapsedTopBarScrollBehavior(),
+            heading = { StepHeading(kicker = "Privacy", title = "Share usage data?", subtitle = "Counts of which screens are opened.") },
+            footer = { BingeFilledButton(label = "Share", onClick = advance, modifier = Modifier.fillMaxWidth()) },
+        ) {
+            repeat(SAMPLE_SCROLLED_ROWS) { index ->
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.state_icon_container_size))
+                            .clip(BingeShapes.Medium)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                ) { Text("Point ${index + 1}", modifier = Modifier.padding(dimensionResource(R.dimen.padding_m))) }
+            }
+        }
+    }
+}
+
+/** A step still loading what it shows. */
+@Composable
+fun StepFlowScreenLoadingSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(stepCount = SAMPLE_STEPS, currentStep = 0, loading = true) {}
+    }
+}
+
+/** A step whose content scrolls itself: a lazy grid takes the height left under the heading, above the commit. */
+@Composable
+fun StepFlowScreenLazyStepSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
+            contentScrolls = { false },
+            heading = { StepHeading(kicker = "Services", title = "Where do you watch?", subtitle = "Pick as many as you like.") },
+            footer = {
+                BingeFilledButton(
+                    label = "Continue",
+                    onClick = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(SAMPLE_GRID_COLUMNS),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                items(SAMPLE_GRID_TILES) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .aspectRatio(1f)
+                                .clip(BingeShapes.Medium)
+                                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+                    )
+                }
+            }
+        }
+    }
+}
+
+private const val RETRY_DEMO_MILLIS = 800L
+
+/**
+ * A failed screen's Try again, for a sample: the failure gives way to the loading screen for a moment and comes back,
+ * so the button visibly acts and the frame, which shows the failure, does not change.
+ */
+@Composable
+private fun RetryDemo(modifier: Modifier = Modifier, failure: @Composable (retry: () -> Unit) -> Unit) {
+    var retrying by remember { mutableStateOf(false) }
+    if (retrying) {
+        LoadingMessageScreen(modifier)
+        LaunchedEffect(Unit) {
+            delay(RETRY_DEMO_MILLIS)
+            retrying = false
+        }
+    } else {
+        failure { retrying = true }
+    }
+}
+
+@Composable
+internal fun SampleRows(
+    padding: PaddingValues,
+    descending: Boolean = false,
+    listState: LazyListState = rememberLazyListState(),
+    rows: Int = SAMPLE_ROWS,
+) {
+    // Through ScreenBody, as a screen's own list goes: the side insets stay outside the scroll, so the rows clear a
+    // side cutout or navigation bar.
+    ScreenBody(padding) { inner ->
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = inner.screenListPadding(),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
+        ) {
+            items(rows) { index ->
+                val row = if (descending) rows - index else index + 1
+                ListRow { textModifier ->
+                    Text(text = "Row $row", style = MaterialTheme.typography.titleMedium, modifier = textModifier)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun SampleCopy() {
+    Column(
+        modifier = Modifier.padding(dimensionResource(R.dimen.padding_m)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m)),
+    ) {
+        repeat(SAMPLE_STEPS) {
+            Text(
+                text = "The page's own sections follow the hero in one scroll, so the bar fades in as the hero leaves.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SampleForm() {
+    var address by remember { mutableStateOf("media.example.com") }
+    var port by remember { mutableStateOf("5055") }
+    var proxy by remember { mutableStateOf("") }
+    FormSection(title = "Server") {
+        BingeTextField(value = address, onValueChange = { address = it }, label = "Address")
+        BingeTextField(value = port, onValueChange = { port = it }, label = "Port", keyboardType = KeyboardType.Number)
+    }
+    FormSection(title = "Proxy") {
+        BingeTextField(value = proxy, onValueChange = { proxy = it }, label = "Proxy address", imeAction = ImeAction.Done)
+    }
+}
+
+/** A question asked once before the app goes on: the hero, the copy, three points, and accept under decline. */
+@Composable
+fun DecisionScreenSample() {
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        DecisionScreen(
+            copy =
+                DecisionCopy(
+                    kicker = "Usage data",
+                    title = "Help make the app better",
+                    subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                ),
+            points = SampleDecisionPoints,
+            accept = ScreenAction("Share usage data", onClick = leave),
+            decline = ScreenAction("Not now", onClick = leave),
+            hero = Icons.Filled.BarChart,
+            heroBadge = Icons.Filled.Lock,
+        )
+    }
+}
+
+/** The decision as one page of a step flow: the flow's bar and step read-out above it, its own footer pinned below. */
+@Composable
+fun DecisionBodyInStepFlowSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
+            footer = {
+                BingeFilledButton(label = "Share usage data", onClick = advance, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Not now", onClick = advance, modifier = Modifier.fillMaxWidth())
+            },
+        ) {
+            DecisionBody(
+                copy =
+                    DecisionCopy(
+                        kicker = "Usage data",
+                        title = "Help make the app better",
+                        subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                    ),
+                points = SampleDecisionPoints,
+            )
+        }
+    }
+}
+
+/** The step-flow body with a note in two paragraphs through the note slot: the second reads quieter, in the variant colour. */
+@Composable
+fun DecisionBodyNoteContentSample() {
+    var step by remember { mutableIntStateOf(1) }
+    val leave = LocalDemoBack.current
+    val advance = { step = (step + 1).coerceAtMost(SAMPLE_STEPS - 1) }
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        StepFlowScreen(
+            stepCount = SAMPLE_STEPS,
+            currentStep = step,
+            onBack = { if (step > 0) step-- else leave() },
+            footer = {
+                BingeFilledButton(label = "Share usage data", onClick = advance, modifier = Modifier.fillMaxWidth())
+                BingeTextButton(label = "Not now", onClick = advance, modifier = Modifier.fillMaxWidth())
+            },
+        ) {
+            DecisionBody(
+                copy =
+                    DecisionCopy(
+                        kicker = "Usage data",
+                        title = "Help make the app better",
+                        subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                    ),
+                points = SampleDecisionPoints,
+                noteContent = {
+                    Text(text = "You can change this at any time in Settings.")
+                    Text(
+                        text = "Nothing is sent until you say yes, and nothing is kept for longer than ninety days.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+            )
+        }
+    }
+}
+
+/** The same question in the end pane of a wide window: the pane is taller than wide, so it keeps the portrait layout. */
+@Composable
+fun DecisionScreenInPaneSample() {
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainer))
+            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                DecisionScreen(
+                    copy =
+                        DecisionCopy(
+                            kicker = "Usage data",
+                            title = "Help make the app better",
+                            subtitle = "Share anonymous usage data, so problems are found and fixed sooner.",
+                        ),
+                    points = SampleDecisionPoints,
+                    accept = ScreenAction("Share usage data", onClick = leave),
+                    decline = ScreenAction("Not now", onClick = leave),
+                    hero = Icons.Filled.BarChart,
+                    heroBadge = Icons.Filled.Lock,
+                )
+            }
+        }
+    }
+}
+
+/** A failure drawn from its kind: the shared glyph and copy for no connection, and Try again. */
+@Composable
+fun ErrorScreenSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        RetryDemo { retry -> ErrorScreen(kind = ErrorKind.Network, onRetry = retry) }
+    }
+}
+
+/** A missing or refused key: the configuration kind's glyph and copy, with nothing to retry. */
+@Composable
+fun ErrorScreenConfigurationSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        ErrorScreen(kind = ErrorKind.Configuration, onRetry = null)
+    }
+}
+
+/** Something that is not there: the not-found kind's glyph and copy, with nothing to retry. */
+@Composable
+fun ErrorScreenNotFoundSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        ErrorScreen(kind = ErrorKind.NotFound, onRetry = null)
+    }
+}
+
+/** Too many requests: the rate-limited kind's glyph and copy, and Try again for when the wait is over. */
+@Composable
+fun ErrorScreenRateLimitedSample() {
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        RetryDemo { retry -> ErrorScreen(kind = ErrorKind.RateLimited, onRetry = retry) }
+    }
+}
+
+/** A refused sign-in with two ways out: Try again, and the settings page where the user fixes it. */
+@Composable
+fun ErrorScreenSecondarySample() {
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        RetryDemo { retry ->
+            ErrorScreen(kind = ErrorKind.Auth, onRetry = retry, secondary = ScreenAction("Open settings", leave))
+        }
+    }
+}
+
+/** An empty list with something to do about it: the default headline, and one action. */
+@Composable
+fun EmptyScreenActionSample() {
+    val leave = LocalDemoBack.current
+    ScreenshotTheme(modifier = Modifier.fillMaxSize()) {
+        EmptyScreen(
+            message = "Requests you make show up here.",
+            icon = Icons.Filled.Inbox,
+            action = ScreenAction("Find something", onClick = leave),
+        )
+    }
+}

@@ -55,15 +55,24 @@ designsystem/src/main/kotlin/com/binge/designsystem/
 ├── (root files) adaptive layout and fold posture, list-detail pane, nav overlay, pane insets,
 │                icons, brushes, collapsing-title state, the shared aspect ratios, the error
 │                kinds, the save status, a decision screen's copy and locale-aware text
-├── catalog/     one public …Sample() per component, the fixture every screenshot frame renders,
-│                and the …Demo()s the catalog app runs live
+├── catalog/     only the catalog's file annotations (`@file:CatalogGroup`, `@file:ScreenshotOnly` and `@file:SelfDescribing`); the samples
+│                moved to the `designsystem-catalog` module (below)
 ├── modifier/    skeleton shimmer, selection lift, a content description
-├── save/        the save-as-made engine: a change writes itself a moment after the last one
+├── motion/      the navigation motion specs
+├── refresh/     the pull-to-refresh tracker
+├── pane/        the shell's pane state
+├── viewmodel/   keyed view-model stores, for pages that share state
 ├── layout/      layout anchors
 ├── template/    the whole-screen frames: the scaffold, the message screen, the error and empty
 │                screens, the filtered list, the hero detail page, the form, the step flow, the
-│                decision screen and the paged phase
+│                decision screen and the paged phase, and the media screens built on the library's own
+│                models: the movie, series, collection and person detail screens, the people and
+│                paged grids, the search screen, the media hero detail page and the filter sheets
 └── preview/     @ComponentPreviews and the other device matrices, ScreenshotTheme
+
+designsystem-catalog/src/   the phone catalog: every …Sample() and …Demo(), the @PreviewTest frames that render
+                            them, the frames' baselines, and the tests that render a sample. Only catalog-app
+                            depends on it, so a consumer compiles none of it
 
 designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 ├── theme/       the tv-material theme, projected from the same tokens
@@ -80,7 +89,8 @@ designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/
 └── preview/     @TvPreviews and the TV screenshot theme
 
 catalog-app/        the debug-only catalog app, with a phone activity and a TV one
-catalog-registry/   the generator that lists the catalog's samples and demos for that app
+catalog-registry/   the generator that lists the catalog's samples and demos for that app, and builds the component index
+component-index-plugin/   the Gradle plugin that gives another repository the same component index
 
 docs/
 ├── components.md        every public component by the need it meets, generated from its KDoc tags
@@ -97,6 +107,12 @@ user-visible string is in `values/strings.xml` with its Spanish translation alon
 components take their copy as parameters, so `designsystem-tv` holds only a few strings of its own,
 such as a badge's count and a hidden field's announcement. The baselines are the ones Binge
 recorded; each slice validated byte-identical against them before it landed.
+
+## The scope rule
+
+The library holds what draws or lays out and can be described without a server, an account or a store. It holds no class
+that takes a dispatcher, a data store, a network client, a view model base class or a work scheduler. The full rule and its
+named exceptions are in `CLAUDE.md`; `checkLibraryScope` runs in `check`.
 
 ## The component index
 
@@ -128,9 +144,9 @@ for Android TV.
 
 **An entry appears with nothing to register.** The app is generated from the sources:
 
-- A public, no-parameter `@Composable fun …Sample()` in `designsystem/…/catalog/` or
+- A public, no-parameter `@Composable fun …Sample()` in `designsystem-catalog/…/catalog/` or
   `designsystem-tv/…/tv/catalog/` is listed as a sample.
-- A public, no-parameter `@Composable fun …Demo()` in `designsystem/…/catalog/` or
+- A public, no-parameter `@Composable fun …Demo()` in `designsystem-catalog/…/catalog/` or
   `designsystem-tv/…/tv/catalog/` is listed as a demo. It runs the real component with real state. Demos are never screenshot fixtures.
 - The first sentence of its KDoc is its description, and the app's search reads it.
 - A public `…Sample` or `…Demo` that takes parameters, or is not composable, fails the build with its
@@ -268,3 +284,43 @@ scripts and the dependencies keep their own licences.
 
 The contracts and SDK in `binge-companions` stay under Apache 2.0, so anyone can write a companion
 without taking on the GPL.
+
+## Using the component index in an app
+
+`docs/components.md` is built from the `@need`, `@group`, `@replaces` and `@sample` tags in KDoc, by `:catalog-registry`. An app that
+keeps its own tagged components does not need its own generator: it applies this repository's plugin. The tag grammar is the same
+here and there.
+
+In the app's `settings.gradle.kts`, include this build for its plugins as well as for its libraries:
+
+```kotlin
+pluginManagement {
+    includeBuild("../binge-design-system")
+}
+```
+
+In the module that holds the index:
+
+```kotlin
+import com.binge.designsystem.catalogregistry.SampleKind
+
+plugins {
+    base
+    id("com.binge.designsystem.component-index")
+}
+
+componentIndex {
+    output.set(layout.projectDirectory.file("docs/components.md"))
+    sources.from("app/src/main/kotlin")           // where the tagged declarations are
+    sampleSources.from("app/src/test/kotlin")     // where `@sample` names are declared; leave out for none
+    sampleKind.set(SampleKind.Classes)            // `…Sample` composable functions by default
+    group("screens", "Screens")                   // the `@group` keys, in listing order, with their headings
+    group("feedback", "Feedback and state")
+    includeHelpers.set(true)                      // also list a class, object or plain function whose KDoc has `@need`
+    moduleColumn.set(true)                        // a Module column: the first path segment of each file
+}
+```
+
+`./gradlew generateComponentIndex` writes the file. `checkComponentIndex` fails when it is stale, when a public composable has no
+`@need` or `@group`, when a `@group` is not one you declared, or when a `@sample` names nothing; it runs with `check`. The title, the
+paragraph under it and the comment above it can be replaced with `title`, `intro` and `generatedNote`.

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,7 +24,8 @@ import com.binge.designsystem.theme.BingeShapes
 import com.binge.designsystem.uppercaseLocalised
 
 /**
- * A row of equal-width stat tiles, each a value over a caption.
+ * A row of equal-width stat tiles, each a value over a caption. From a font scale of 1.5 the tiles stack one to a line, where a
+ * caption such as "FAVOURITES" would break mid-word in a third of the width.
  *
  * @need show a few headline numbers side by side
  * @group cards
@@ -31,15 +33,20 @@ import com.binge.designsystem.uppercaseLocalised
  */
 @Composable
 fun AccountStatsRow(stats: List<AccountStat>, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.chip_spacing)),
-    ) {
-        stats.forEach { stat ->
-            AccountStatTile(stat = stat, modifier = Modifier.weight(1f))
+    val spacing = Arrangement.spacedBy(dimensionResource(R.dimen.chip_spacing))
+    if (LocalDensity.current.fontScale >= STACKED_FONT_SCALE) {
+        Column(modifier = modifier.fillMaxWidth(), verticalArrangement = spacing) {
+            stats.forEach { stat -> AccountStatTile(stat = stat, modifier = Modifier.fillMaxWidth()) }
+        }
+    } else {
+        Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = spacing) {
+            stats.forEach { stat -> AccountStatTile(stat = stat, modifier = Modifier.weight(1f)) }
         }
     }
 }
+
+/** From this font scale a third of a phone's width is too narrow for a caption, so the tiles stack. */
+private const val STACKED_FONT_SCALE = 1.5f
 
 @Composable
 private fun AccountStatTile(stat: AccountStat, modifier: Modifier = Modifier) {

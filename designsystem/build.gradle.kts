@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.screenshot)
     alias(libs.plugins.android.junit5)
 }
 
@@ -36,7 +35,6 @@ android {
     }
 
     buildFeatures { compose = true }
-    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -78,21 +76,74 @@ ktlint {
     }
 }
 
+/**
+ * The library holds what draws or lays out and can be described without a server, an account or a store (see CLAUDE.md).
+ * Main source of this module and of `designsystem-tv` may not import a dispatcher, a data store, a network client, a view
+ * model base class or a work scheduler.
+ * The file below breaks that today and is named here, not skipped in a baseline, so the list cannot grow quietly:
+ * the keyed view-model stores Binge's navigation uses.
+ */
+val libraryScopeExceptions =
+    setOf(
+        "designsystem/src/main/kotlin/com/binge/designsystem/viewmodel/KeyedViewModelStores.kt",
+    )
+
+val checkLibraryScope = tasks.register("checkLibraryScope") {
+    group = "verification"
+    description = "Checks that main source takes no dispatcher, data store, network client, view model or work scheduler."
+    val root = rootProject.layout.projectDirectory.asFile
+    val sources = fileTree(layout.projectDirectory.dir("src/main")) { include("**/*.kt") }
+    val tvSources = fileTree(rootProject.layout.projectDirectory.dir("designsystem-tv/src/main")) { include("**/*.kt") }
+    inputs.files(sources, tvSources)
+    val exceptions = libraryScopeExceptions
+    doLast {
+        val forbidden =
+            listOf(
+                "kotlinx.coroutines.CoroutineDispatcher",
+                "kotlinx.coroutines.Dispatchers",
+                "androidx.datastore.",
+                "okhttp3.",
+                "retrofit2.",
+                "io.ktor.",
+                "androidx.lifecycle.ViewModel",
+                "androidx.lifecycle.AndroidViewModel",
+                "androidx.work.",
+            )
+        val violations = mutableListOf<String>()
+        (sources.files + tvSources.files).forEach { file ->
+            val relative = file.relativeTo(root).invariantSeparatorsPath
+            if (relative in exceptions) return@forEach
+            file.readLines().forEachIndexed { index, line ->
+                val trimmed = line.trim()
+                if (!trimmed.startsWith("import ")) return@forEachIndexed
+                val imported = trimmed.removePrefix("import ").substringBefore(" as ").trim()
+                // `androidx.lifecycle.ViewModel` is the base class; `ViewModelStore` and the rest are not.
+                if (forbidden.any { if (it.endsWith(".")) imported.startsWith(it) else imported == it }) {
+                    violations += "$relative:${index + 1}: imports $imported"
+                }
+            }
+        }
+        if (violations.isNotEmpty()) {
+            throw GradleException(
+                "This library holds no class that takes a dispatcher, a data store, a network client, a view model or a " +
+                    "scheduler. Move the code to the app or an app-side shared library, or name it in libraryScopeExceptions " +
+                    "with the reason.\n\nViolations:\n" + violations.joinToString("\n") { "  $it" },
+            )
+        }
+    }
+}
+
+tasks.named("check") { dependsOn(checkLibraryScope) }
+
 tasks.withType<Test>().configureEach {
-    // The screenshot tasks are Test tasks too. An empty screenshotTest source set would otherwise
-    // fail on discovering no tests, and the plugin warns unless maxParallelForks is 1.
-    if (name.contains("ScreenshotTest")) {
-        failOnNoDiscoveredTests = false
-        doFirst { maxParallelForks = 1 }
-    }
-    // validate*ScreenshotTest's cache key does not track the rendered output it compares against,
-    // so a cached run can validate a stale render. Always re-render live, as Binge does.
-    if (name.startsWith("validate") && name.contains("ScreenshotTest")) {
-        doNotTrackState("Renders against live sources; a cached render gives a false pass or fail")
-    }
     // ComposeRuleGuardTest reads the other modules' test sources, which Gradle would not otherwise see as inputs.
     if (name == "testDebugUnitTest") {
-        inputs.files(fileTree("../designsystem-tv/src/test"), fileTree("../catalog-app/src/test")).withPropertyName("guardedTestSources")
+        inputs
+            .files(
+                fileTree("../designsystem-tv/src/test"),
+                fileTree("../catalog-app/src/test"),
+                fileTree("../designsystem-catalog/src/test"),
+            ).withPropertyName("guardedTestSources")
     }
 }
 
@@ -109,7 +160,7 @@ dependencies {
     api(libs.compose.material3.adaptive.navigation3)
     // The paged-list phase takes load states, so the paging types are part of its signature.
     api(libs.paging.common)
-    // The save-as-made engine takes the scopes and dispatcher it writes on, so the types are part of its signature.
+    // RefreshTracker's `isRefreshing` is a Flow, so the type is part of its signature.
     api(libs.kotlinx.coroutines.core)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
@@ -123,10 +174,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     debugImplementation(libs.compose.ui.tooling)
-
-    screenshotTestImplementation(composeBom)
-    screenshotTestImplementation(libs.compose.ui.tooling)
-    screenshotTestImplementation(libs.screenshot.validation.api)
 
     // JUnit 5 for the plain tests; the vintage engine runs the JUnit4-style Robolectric tests on the
     // same platform, exactly as Binge's core:designsystem arranges it.

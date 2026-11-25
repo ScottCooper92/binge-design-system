@@ -1,0 +1,156 @@
+package com.binge.designsystem.catalog
+
+import androidx.compose.runtime.Composable
+import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.WorstCaseFontPreviews
+
+class BingeChoiceSheetSamplesScreenshotTest {
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun SingleChoice() {
+        BingeChoiceSheetSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun NoHeader() {
+        BingeChoiceSheetNoHeaderSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiNoHeader() {
+        BingeMultiChoiceSheetNoHeaderSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Subtitled() {
+        BingeChoiceSheetSubtitledSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun SingleChoiceDocked() {
+        BingeChoiceSheetDockedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun SingleChoiceFiltered() {
+        BingeChoiceSheetFilteredSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiChoiceFiltered() {
+        BingeMultiChoiceSheetSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun NoMatch() {
+        BingeChoiceSheetNoMatchSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiChoiceApplied() {
+        BingeMultiChoiceSheetAppliedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun LoadingAndFailed() {
+        BingeChoiceSheetStatesSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Rows() {
+        BingeChoiceItemSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Lettered() {
+        BingeChoiceSheetLetteredSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Sectioned() {
+        BingeChoiceSheetSectionedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiSectioned() {
+        BingeMultiChoiceSheetSectionedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiMarked() {
+        BingeMultiChoiceSheetMarkedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiPeople() {
+        BingeMultiChoiceSheetPeopleSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Pinned() {
+        BingeChoiceSheetPinnedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun LongLabel() {
+        BingeChoiceSheetLongLabelSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun SupportingLines() {
+        BingeChoiceSheetSupportingLinesSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun Counts() {
+        BingeChoiceSheetCountsSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun MultiCounts() {
+        BingeMultiChoiceSheetCountsSample()
+    }
+}

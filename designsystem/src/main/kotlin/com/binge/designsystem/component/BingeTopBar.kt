@@ -1,17 +1,13 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -89,7 +85,8 @@ import com.binge.designsystem.theme.BingeTheme
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BingeTopBar(
+@DesignSystemInternalApi
+fun BingeTopBar(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
@@ -152,39 +149,4 @@ internal fun bingeTopBarColors(containerColor: Color): TopAppBarColors {
         containerColor = resolved,
         scrolledContainerColor = resolved,
     )
-}
-
-/**
- * A transparent [BingeTopBar] over a sample coloured background, with [IconButtonTone.Glass]
- * nav/action buttons — the hero-screen treatment. Lives in main so the screenshot test can render
- * it; the bar's nav button derives its Glass tone from the transparent container. [scrimFraction]
- * exercises [scrimmedTitleColor]'s ramp on the title this sample renders.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun TransparentBingeTopBarSample(scrimFraction: Float = 0f) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer),
-    ) {
-        BingeTopBar(
-            title = "Popular Movies",
-            onBack = {},
-            containerColor = Color.Transparent,
-            scrimFraction = scrimFraction,
-            scrimColor = BingeTheme.colors.scrim,
-            scrimForegroundColor = BingeTheme.colors.onScrim,
-        ) { glassBackgroundAlpha ->
-            ExpressiveIconButton(
-                onClick = {},
-                icon = Icons.Filled.Share,
-                contentDescription = null,
-                tint = LocalTopBarActionTint.current,
-                tone = LocalTopBarActionTone.current,
-                size = dimensionResource(R.dimen.top_bar_icon_size),
-                glassBackgroundAlpha = glassBackgroundAlpha,
-            )
-        }
-    }
 }

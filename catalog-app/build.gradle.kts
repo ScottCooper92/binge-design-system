@@ -111,6 +111,7 @@ val generator = configurations.create("generator") {
 dependencies {
     generator(project(":catalog-registry"))
     implementation(project(":designsystem"))
+    implementation(project(":designsystem-catalog"))
     implementation(project(":designsystem-tv"))
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.compose.ui.tooling)
@@ -128,7 +129,7 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
 }
 
-val phoneCatalogSources = layout.projectDirectory.dir("../designsystem/src/main/kotlin/com/binge/designsystem/catalog")
+val phoneCatalogSources = layout.projectDirectory.dir("../designsystem-catalog/src/main/kotlin/com/binge/designsystem/catalog")
 val tvCatalogSources = layout.projectDirectory.dir("../designsystem-tv/src/main/kotlin/com/binge/designsystem/tv/catalog")
 
 androidComponents {

@@ -188,7 +188,8 @@ internal fun FastScrollbar(
  * drag.
  */
 @Composable
-internal fun FastScrollbarBar(
+@DesignSystemInternalApi
+fun FastScrollbarBar(
     fraction: Float,
     thumbShare: Float,
     revealed: Boolean,

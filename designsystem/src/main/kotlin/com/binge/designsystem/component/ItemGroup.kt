@@ -27,6 +27,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,6 +46,7 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -57,6 +59,8 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -230,14 +234,16 @@ private fun ListItemView(
                 row.expanded != null ||
                 external ||
                 chevron
+        val labelStyle = MaterialTheme.typography.titleMedium
         LabelAndTrailing(
             gap = dimensionResource(R.dimen.row_trailing_control_gap),
+            longestWord = longestWordWidth(row.label, labelStyle),
             modifier = Modifier.weight(1f),
             label = {
                 Column {
                     Text(
                         text = row.label,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = labelStyle,
                         color = if (row.destination == ListItemDestination.Action && row.enabled) {
                             row.iconTint ?: MaterialTheme.colorScheme.primary
                         } else {
@@ -288,6 +294,7 @@ private fun ListItemView(
                                 )
                             }
                             external -> {
+                                // Not ExternalLinkIcon: a row's trailing icon is the row's 24dp, as its chevron is, where that glyph is the chip's 18dp.
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                                     contentDescription = null,
@@ -321,6 +328,7 @@ private fun ListItemView(
 @Composable
 private fun LabelAndTrailing(
     gap: Dp,
+    longestWord: Int,
     label: @Composable () -> Unit,
     trailing: (@Composable () -> Unit)?,
     modifier: Modifier = Modifier,
@@ -332,8 +340,28 @@ private fun LabelAndTrailing(
             if (trailing != null) Box { trailing() }
         },
         modifier = modifier,
-        measurePolicy = LabelAndTrailingPolicy(gap),
+        measurePolicy = LabelAndTrailingPolicy(gap, longestWord),
     )
+}
+
+/**
+ * The width in pixels of the longest run of a label between spaces, hyphens included, on one line. A hyphenated word is
+ * one unit here, so a label is never narrowed to where it breaks inside such a word.
+ */
+@Composable
+private fun longestWordWidth(label: String, style: TextStyle): Int {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val direction = LocalLayoutDirection.current
+    return remember(label, style, density, direction) {
+        label.split(' ', '\n').maxOf { word ->
+            if (word.isEmpty()) {
+                0
+            } else {
+                measurer.measure(word, style, softWrap = false, density = density, layoutDirection = direction).size.width
+            }
+        }
+    }
 }
 
 /** The share of the row a label is held to at least, when its natural width is more than that. */
@@ -341,6 +369,7 @@ private const val LABEL_FLOOR_FRACTION = 0.34f
 
 private class LabelAndTrailingPolicy(
     private val gap: Dp,
+    private val longestWord: Int,
 ) : MeasurePolicy {
     override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
         val label = measurables.first()
@@ -369,8 +398,10 @@ private class LabelAndTrailingPolicy(
     /** What the trailing content may take: the room left once the label has its floor. */
     private fun trailingBudget(label: IntrinsicMeasurable, available: Int): Int {
         val natural = label.maxIntrinsicWidth(0)
-        val longestWord = label.minIntrinsicWidth(0)
-        val floor = minOf(natural, maxOf(longestWord, (available * LABEL_FLOOR_FRACTION).toInt())).coerceAtMost(available)
+        // A text's own minimum intrinsic width ends a word at a hyphen, but a line does not always break there, so a word that
+        // fits the row is measured whole. One wider than the row cannot be kept whole, and keeps the text's own minimum.
+        val word = if (longestWord <= available) maxOf(label.minIntrinsicWidth(0), longestWord) else label.minIntrinsicWidth(0)
+        val floor = minOf(natural, maxOf(word, (available * LABEL_FLOOR_FRACTION).toInt())).coerceAtMost(available)
         return (available - floor).coerceAtLeast(0)
     }
 

@@ -145,7 +145,8 @@ internal fun rememberSideSheetShown(): MutableState<Boolean> = rememberSaveable 
  * window around it, so a catalog frame can render it (a modal window does not capture).
  */
 @Composable
-internal fun BingeSideSheetPanel(
+@DesignSystemInternalApi
+fun BingeSideSheetPanel(
     modifier: Modifier = Modifier,
     width: Dp = dimensionResource(R.dimen.side_sheet_width),
     wash: BingeSheetWash? = null,

@@ -17,5 +17,5 @@ object TvExpandingAnchors {
     fun heading(rowIndex: Int): String = TvLayoutAnchors.entry("expanding-heading-$rowIndex")
 }
 
-/** The hub list's key for its hero, which a saved focus position names; an app's own row keys must not use it. */
-internal const val TV_EXPANDING_HERO_KEY = "hero"
+/** The hub list's key for its hero, which a saved focus position names. An app's own row keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
+internal const val TV_EXPANDING_HERO_KEY = "binge:tv-expanding-hero"

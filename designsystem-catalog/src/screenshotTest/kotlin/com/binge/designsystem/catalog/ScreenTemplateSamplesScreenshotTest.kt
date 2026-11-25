@@ -1,0 +1,379 @@
+package com.binge.designsystem.catalog
+
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.android.tools.screenshot.PreviewTest
+import com.binge.designsystem.preview.ComponentPreviews
+import com.binge.designsystem.preview.PreviewCutout
+import com.binge.designsystem.preview.PreviewEdge
+import com.binge.designsystem.preview.PreviewSystemBarInsets
+import com.binge.designsystem.preview.SOURCE_LOCALE
+import com.binge.designsystem.preview.ScreenPreviews
+import com.binge.designsystem.preview.ScreenStatePreview
+import com.binge.designsystem.preview.ScreenWidthPreviews
+
+/** [com.binge.designsystem.preview.ScreenPreviews]' `phone-land` cell, for a frame that adds side insets to it. */
+private const val PHONE_LANDSCAPE = "spec:width=411dp,height=891dp,orientation=landscape"
+
+/** [com.binge.designsystem.preview.ScreenPreviews]' `tablet` cell, for a frame that splits it into panes. */
+private const val TABLET = "spec:width=800dp,height=1280dp,orientation=landscape"
+
+/**
+ * Screenshot coverage for the screen templates. Each template's layout frame takes the device matrix; its
+ * other states take the single phone cell, since they change content within a layout the matrix settled.
+ */
+class ScreenTemplateSamplesScreenshotTest {
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun screenScaffold() = BingeScreenScaffoldSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldSmallBar() = BingeScreenScaffoldSmallBarSample()
+
+    /** With no bar the body reads the status bar inset directly, which a default frame renders as zero. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldNoBarUnderSystemBars() = PreviewSystemBarInsets { BingeScreenScaffoldNoBarSample() }
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldScrolledUnder() = BingeScreenScaffoldScrolledUnderSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldShownOverContent() = BingeScreenScaffoldShownOverContentSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldNoBack() = BingeScreenScaffoldNoBackSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldSmallScrolledUnder() = BingeScreenScaffoldSmallBarScrolledUnderSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldSmallShownOverContent() = BingeScreenScaffoldSmallBarShownOverContentSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldSmallNoBack() = BingeScreenScaffoldSmallBarNoBackSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun message() = MessageScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun messageStackedActions() = MessageScreenStackedActionsSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun messageEmpty() = MessageScreenEmptySample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun messageLoading() = LoadingMessageScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun errorKind() = ErrorScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun errorKindConfiguration() = ErrorScreenConfigurationSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun errorSecondary() = ErrorScreenSecondarySample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun errorKindNotFound() = ErrorScreenNotFoundSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun errorKindRateLimited() = ErrorScreenRateLimitedSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun emptyAction() = EmptyScreenActionSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun decision() = DecisionScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun decisionBodyInStepFlow() = DecisionBodyInStepFlowSample()
+
+    /** A note in two paragraphs, the second in the variant colour. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun decisionBodyNoteContent() = DecisionBodyNoteContentSample()
+
+    /** The decision's hero and heading in the flow's aside, so the landscape cells split it beside the points. */
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
+    fun decisionInStepFlowSplit() = DecisionInStepFlowSplitSample()
+
+    /** A long step with the bar collapsed: the bar scrims in over the step and the read-out stays under it. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowScrolled() = StepFlowScreenScrolledSample()
+
+    /** A wide window's end pane is taller than wide, so the decision in it keeps its portrait layout. */
+    @PreviewTest
+    @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun decisionInPane() = DecisionScreenInPaneSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun filteredList() = FilteredListScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun filteredListNotReady() = FilteredListScreenNotReadySample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun filteredListScrim() = FilteredListScreenScrimSample()
+
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
+    fun heroDetail() = HeroDetailScreenSample()
+
+    /** Font scale 2.0 on a landscape phone: the hero grows to hold its copy, which sits below the overlay bar. */
+    @PreviewTest
+    @Preview(
+        name = "land-font20",
+        device = PHONE_LANDSCAPE,
+        fontScale = 2.0f,
+        uiMode = UI_MODE_NIGHT_YES,
+        locale = SOURCE_LOCALE,
+    )
+    @Composable
+    fun heroDetailFullCopyUnderSystemBars() = PreviewSystemBarInsets { HeroDetailScreenFullCopySample() }
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailFooter() = HeroDetailScreenFooterSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailRefreshing() = HeroDetailScreenRefreshingSample()
+
+    /** The spinner clears the status bar the page reserves: with the inset gone it would sit behind the bar. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailRefreshingUnderSystemBars() = PreviewSystemBarInsets { HeroDetailScreenRefreshingSample() }
+
+    /** A page with no image under the bar: the resting spinner in the bar's row, clear of the eyebrow and the name. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailNoImageRefreshing() = PreviewSystemBarInsets { HeroDetailScreenNoImageRefreshingSample() }
+
+    /** The same page with no status-bar inset, where the spinner's lift runs past zero: it must still clear the eyebrow. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailNoImageRefreshingNoInset() = HeroDetailScreenNoImageRefreshingSample()
+
+    /** Wide enough that the reading margin is not zero: the copy sits at it and the rail runs past the window's end. */
+    @PreviewTest
+    @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun heroDetailBleed() = HeroDetailScreenBleedSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun heroDetailLazy() = HeroDetailLazyScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailState() = HeroDetailStateScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun heroDetailStateLoading() = HeroDetailStateScreenLoadingSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun form() = FormScreenSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun formScrolled() = FormScreenScrolledSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun formSaving() = FormScreenSavingSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun formSaveFailed() = FormScreenSaveFailedSample()
+
+    /** The raised, rounded `bottomBar` shape of [ScreenFooter]. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun screenFooterElevated() {
+        ScreenFooterElevatedSample()
+    }
+
+    /** [screenFooterElevated] under a navigation bar: `clearsNavigationBar` lifts the button clear of it. */
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
+    fun screenFooterElevatedUnderSystemBars() {
+        PreviewSystemBarInsets { ScreenFooterElevatedSample() }
+    }
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenFooter() = ScreenFooterSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun formFooter() = FormScreenFooterSample()
+
+    /** The pinned footer clears the navigation bar itself, which a default frame renders as zero. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun formFooterUnderSystemBars() = PreviewSystemBarInsets { FormScreenFooterSample() }
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun formTopBar() = FormScreenTopBarSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun formTopBarUnchanged() = FormScreenTopBarUnchangedSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun formCapped() = FormScreenCappedSample()
+
+    @PreviewTest
+    @ScreenPreviews
+    @Composable
+    fun stepFlow() = StepFlowScreenSample()
+
+    /** The plain bar: no circle behind Back, and an opaque bar where the glass one is transparent. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowPlainChrome() = StepFlowScreenPlainChromeSample()
+
+    /** The plain bar with an action at its end: the overflow menu a flow offers before any settings are in reach. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowActions() = StepFlowScreenActionsSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowLoading() = StepFlowScreenLoadingSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowLazyStep() = StepFlowScreenLazyStepSample()
+
+    /** A flow opened from inside the app: one bar, with a title and a Back on the first step. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowTitled() = StepFlowScreenTitledSample()
+
+    /** The same titled flow on the small bar, which hides as the step scrolls. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun stepFlowTitledSmallBar() = StepFlowScreenTitledSmallBarSample()
+
+    /** A wide window's end pane is taller than wide, so the flow in it stacks rather than splitting. */
+    @PreviewTest
+    @Preview(name = "tablet", device = TABLET, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun stepFlowInPane() = StepFlowScreenInPaneSample()
+
+    /** The insets a default frame cannot see: the bottom bar clears the nav bar, the rows clear the bar. */
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun screenScaffoldBottomBarUnderSystemBars() = PreviewSystemBarInsets { BingeScreenScaffoldBottomBarSample() }
+
+    /** The pinned bottom bar's button clears a side cutout as the rows above it do, not only the navigation bar. */
+    @PreviewTest
+    @Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun screenScaffoldBottomBarUnderSideCutout() =
+        PreviewSystemBarInsets(cutout = PreviewCutout(PreviewEdge.Left)) { BingeScreenScaffoldBottomBarSample() }
+
+    /**
+     * A landscape phone with three-button navigation: the camera cutout on the left, the navigation bar on the right.
+     * The bar and the rows clear both, so neither edge's content sits under the hardware.
+     */
+    @PreviewTest
+    @Preview(name = "phone-land", device = PHONE_LANDSCAPE, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun screenScaffoldUnderSideInsets() =
+        PreviewSystemBarInsets(navigationBarEdge = PreviewEdge.Right, cutout = PreviewCutout(PreviewEdge.Left)) {
+            BingeScreenScaffoldSample()
+        }
+
+    @PreviewTest
+    @ScreenWidthPreviews
+    @Composable
+    fun screenScaffoldLargeBar() = BingeScreenScaffoldLargeBarSample()
+}

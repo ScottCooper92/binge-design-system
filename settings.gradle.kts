@@ -44,9 +44,12 @@ dependencyResolutionManagement {
 rootProject.name = "binge-design-system"
 
 include(":designsystem")
+include(":designsystem-catalog")
 include(":designsystem-tv")
 
 // The debug-only catalog app and the generator behind its registry (see the epic, #200). Neither
 // is published, and neither is substituted by a consumer, so a consumer never configures them.
 include(":catalog-registry")
+// The Gradle plugin that lends the component index to a consumer: it includes this build for its plugins (README).
+include(":component-index-plugin")
 include(":catalog-app")

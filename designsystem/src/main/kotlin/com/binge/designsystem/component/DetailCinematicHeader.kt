@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -130,8 +131,8 @@ fun DetailCinematicHeader(
                 modifier = Modifier.matchParentSize(),
                 // The copy column below stretches up to the poster's height, reaching well past the
                 // backdrop's vertical centre - ImagePlaceholder's default centred icon would land on
-                // top of the synopsis. Top-aligned keeps it in the band above the copy row, which the
-                // fixed header height and the row's bottom alignment guarantee stays clear of text.
+                // top of the synopsis. Top-aligned keeps it in the band above the copy row: the row starts below the
+                // status bar and the overlay bar, so that band is never under text, at a large font too.
                 loading = { ImagePlaceholder(Modifier.fillMaxSize(), iconAlignment = Alignment.TopCenter) },
                 error = { ImagePlaceholder(Modifier.fillMaxSize(), iconAlignment = Alignment.TopCenter) },
             )
@@ -176,7 +177,11 @@ private fun CinematicCopyRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            // The header runs full-bleed under the status bar and the overlay bar, and grows with its copy at a large font,
+            // so the poster and title keep clear of both, as DetailHero's copy does.
+            .statusBarsPadding()
             .padding(
+                top = detailOverlayBarHeight(),
                 start = dimensionResource(R.dimen.detail_cinematic_header_padding),
                 end = dimensionResource(R.dimen.detail_cinematic_header_padding),
             ),

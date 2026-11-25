@@ -19,15 +19,16 @@ import com.binge.designsystem.template.FormSaveStatus
  * touched has no line at all.
  *
  * It belongs to a single switch or a short group, where the status of the one change should sit by the change. A whole
- * form shows its status in its bar through [FormScreen] instead. Both read [FormSaveStatus], and the engine that drives
- * them is [com.binge.designsystem.save.SaveAsMade].
+ * form shows its status in its bar through [FormScreen] instead. Both read [FormSaveStatus], which the app's own save
+ * logic drives.
  *
  * A failure does not undo the change on screen: the caller decides whether to put the saved value back, which is right
  * for a refusal and wrong for a lost connection, where Retry will send it. It is a polite live region, so a screen
  * reader announces each change of status without cutting in on what it is reading.
  */
 @Composable
-internal fun SaveStatusLine(status: FormSaveStatus, modifier: Modifier = Modifier) {
+@DesignSystemInternalApi
+fun SaveStatusLine(status: FormSaveStatus, modifier: Modifier = Modifier) {
     if (status == FormSaveStatus.Idle) return
     // Wraps, so the failure and its Retry stack at a large font size rather than clip.
     WrappingRow(
