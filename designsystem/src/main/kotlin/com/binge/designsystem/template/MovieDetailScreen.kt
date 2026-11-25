@@ -16,11 +16,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.binge.designsystem.R
 import com.binge.designsystem.component.CarouselSkeleton
 import com.binge.designsystem.component.DetailActions
