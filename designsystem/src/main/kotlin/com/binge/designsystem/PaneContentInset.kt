@@ -50,6 +50,22 @@ val LocalPaneInnerEdge = staticCompositionLocalOf<PaneEdge?> { null }
 fun hasPaneBeside(): Boolean = LocalPaneInnerEdge.current != null
 
 /**
+ * Whether the space this screen is laid out in is in the expanded tier (>=840dp): the window's, for a screen alone in it, and the pane's own
+ * width for one beside another pane ([LocalPaneWidth] when a scene provides it, else false, since two panes share a window that is only just
+ * expanded). [isExpandedLayout] answers for the window, which is wrong for a pane that is a fraction of it: the cinematic detail header and
+ * the unstacked action row want room the pane does not have.
+ */
+@Composable
+fun isExpandedPane(): Boolean {
+    val paneWidth = LocalPaneWidth.current
+    return if (paneWidth != null) {
+        paneWidth >= dimensionResource(R.dimen.content_inset_expanded_breakpoint)
+    } else {
+        isExpandedLayout() && !hasPaneBeside()
+    }
+}
+
+/**
  * A screen's own side padding, resolved against the width it is actually rendered at rather than
  * the window's. [R.dimen.screen_content_inset] ramps with the window through resource qualifiers —
  * 16 / 24 / 32dp at 0 / 600 / 840dp — which is right for a screen alone in the window and wrong for

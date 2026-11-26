@@ -35,7 +35,7 @@ import com.binge.designsystem.component.MediaResultRow
 import com.binge.designsystem.component.MediaResultRowSkeleton
 import com.binge.designsystem.component.SectionHeader
 import com.binge.designsystem.component.SkeletonPlate
-import com.binge.designsystem.isExpandedLayout
+import com.binge.designsystem.isExpandedPane
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 import com.binge.designsystem.navOverlayEnd
@@ -171,7 +171,7 @@ fun CollectionDetailScreen(
                 footer = footer,
                 hero = {
                     // The expanded header is the one with a poster beside the title; a collection with no poster keeps the plain hero.
-                    val wide = isExpandedLayout()
+                    val wide = isExpandedPane()
                     if (collection == null) {
                         val hasPoster = (state as? CollectionDetailState.Loading)?.hasPoster == true
                         DetailHeroSkeleton(cinematic = wide && hasPoster, tagline = null, genres = emptyList(), metaText = " ")
