@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.R
-import com.binge.designsystem.isExpandedLayout
+import com.binge.designsystem.isExpandedPane
 import com.binge.designsystem.resolvedContentInset
 import com.binge.designsystem.theme.BingeShapes
 
@@ -75,7 +75,7 @@ fun DetailActions(
         Row(modifier = edge, horizontalArrangement = Arrangement.spacedBy(cellSpacing), verticalAlignment = Alignment.Top) {
             RoundActionCells(roundActions)
         }
-    } else if (roundActions.size >= STACK_FROM && !isExpandedLayout()) {
+    } else if (roundActions.size >= STACK_FROM && !isExpandedPane()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             primary(Modifier.fillMaxWidth())
             Row(
@@ -145,7 +145,7 @@ fun DetailActionsSkeleton(
                 buttons,
             ) { Box(Modifier.weight(1f).testTag(DETAIL_ACTION_CELL_TAG), contentAlignment = Alignment.TopCenter) { RoundPlate() } }
         }
-    } else if (buttons >= STACK_FROM && !isExpandedLayout()) {
+    } else if (buttons >= STACK_FROM && !isExpandedPane()) {
         Column(modifier = edge, verticalArrangement = Arrangement.spacedBy(gap)) {
             SkeletonPlate(plate.fillMaxWidth())
             Row(

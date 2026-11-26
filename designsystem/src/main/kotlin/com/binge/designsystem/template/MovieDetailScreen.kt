@@ -35,7 +35,7 @@ import com.binge.designsystem.component.DetailStatsRows
 import com.binge.designsystem.component.DetailStatsRowsSkeleton
 import com.binge.designsystem.component.SectionHeader
 import com.binge.designsystem.component.TagRow
-import com.binge.designsystem.isExpandedLayout
+import com.binge.designsystem.isExpandedPane
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 
@@ -150,7 +150,7 @@ private fun DetailPageBody(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_m))) {
         // The expanded header already shows the stats and the synopsis.
-        val expanded = isExpandedLayout()
+        val expanded = isExpandedPane()
         if (!expanded && detail.stats.isNotEmpty()) DetailStatsRows(detail.stats)
         if (primary != null || roundActions.isNotEmpty()) {
             DetailActions(
@@ -218,7 +218,7 @@ private fun DetailPageSkeleton(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier,
 ) {
-    val cinematic = isExpandedLayout()
+    val cinematic = isExpandedPane()
     HeroDetailScreen(
         title = "",
         onBack = onBack,
@@ -266,7 +266,7 @@ private fun DetailPageFailure(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier,
 ) {
-    val cinematic = isExpandedLayout()
+    val cinematic = isExpandedPane()
     HeroDetailStateScreen(
         onBack = callbacks.onBack,
         modifier = modifier,

@@ -3,6 +3,10 @@
 
 package com.binge.designsystem.catalog
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -22,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.binge.designsystem.ErrorKind
+import com.binge.designsystem.PaneContent
+import com.binge.designsystem.PaneEdge
 import com.binge.designsystem.component.BingeBarIconAction
 import com.binge.designsystem.component.BingeStatusButton
 import com.binge.designsystem.component.BingeStatusButtonEmphasis
@@ -137,6 +143,18 @@ fun MovieDetailScreenSample() {
                 },
             )
         }
+    }
+}
+
+/**
+ * The same page in the right pane of two side by side, in a window at the expanded width: it lays out for the pane's width, with the hero and
+ * the stacked stats and actions of a phone, not the cinematic header and the row of actions the whole window has room for.
+ */
+@Composable
+fun MovieDetailScreenInPaneSample() {
+    Row(Modifier.fillMaxSize()) {
+        Spacer(Modifier.weight(1f).fillMaxHeight())
+        Box(Modifier.weight(1f).fillMaxHeight()) { PaneContent(innerEdge = PaneEdge.Start) { MovieDetailScreenSample() } }
     }
 }
 

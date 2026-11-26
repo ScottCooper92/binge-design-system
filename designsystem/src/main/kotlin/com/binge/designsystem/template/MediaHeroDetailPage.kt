@@ -15,7 +15,7 @@ import com.binge.designsystem.component.DetailCinematicHeader
 import com.binge.designsystem.component.DetailHero
 import com.binge.designsystem.component.DetailStat
 import com.binge.designsystem.component.ExternalScore
-import com.binge.designsystem.isExpandedLayout
+import com.binge.designsystem.isExpandedPane
 import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchor
 
@@ -67,7 +67,7 @@ fun MediaHeroDetailPage(
     body: @Composable ColumnScope.() -> Unit,
 ) {
     // At the expanded width the cinematic header takes the place of the hero, as Binge's detail pages do.
-    val cinematic = wideHeader != null && isExpandedLayout()
+    val cinematic = wideHeader != null && isExpandedPane()
     HeroDetailScreen(
         title = title,
         onBack = onBack,
