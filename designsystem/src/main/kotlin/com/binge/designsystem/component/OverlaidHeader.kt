@@ -75,7 +75,7 @@ fun OverlaidHeaderContent(
         val headerPlaceables =
             subcompose(OverlaidHeaderSlot.Header) {
                 Box {
-                    TopBarScrim(scrimFraction, scrimColor = scrimColor, solidFadeHeight = scrimHeight)
+                    TopBarScrim(scrimFraction, scrimColor = scrimColor, solidSurface = false)
                     Column {
                         Column(modifier = Modifier.fillMaxWidth().background(background)) { header() }
                         Spacer(
