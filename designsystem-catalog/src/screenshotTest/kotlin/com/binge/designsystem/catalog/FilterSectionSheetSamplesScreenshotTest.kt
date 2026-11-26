@@ -7,6 +7,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.binge.designsystem.preview.STANDARD_PHONE_WIDTH_DP
 
 private const val TABLET_WIDTH_DP = 840
+private const val SIDE_SHEET_HEIGHT_DP = 720
 
 /** Screenshot coverage for a filter's own sheet: the date range, a range slider, and a footer accessory. */
 class FilterSectionSheetSamplesScreenshotTest {
@@ -89,5 +90,13 @@ class FilterSectionSheetSamplesScreenshotTest {
     @Composable
     fun IncludeOnlySheet() {
         FilterSheetIncludeOnlySample()
+    }
+
+    @PreviewTest
+    @Preview(name = "tablet", widthDp = TABLET_WIDTH_DP, heightDp = SIDE_SHEET_HEIGHT_DP)
+    @Preview(name = "tablet-dark", widthDp = TABLET_WIDTH_DP, heightDp = SIDE_SHEET_HEIGHT_DP, uiMode = UI_MODE_NIGHT_YES)
+    @Composable
+    fun SideSheet() {
+        FilterSectionSideSheetSample()
     }
 }

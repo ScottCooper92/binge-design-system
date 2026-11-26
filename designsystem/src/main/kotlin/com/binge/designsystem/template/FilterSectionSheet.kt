@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
@@ -24,8 +22,11 @@ import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeBottomSheet
 import com.binge.designsystem.component.BingeFilledButton
+import com.binge.designsystem.component.BingeSheetFooter
 import com.binge.designsystem.component.BingeTextButton
 import com.binge.designsystem.component.HintCard
+import com.binge.designsystem.component.LocalSheetFooterHost
+import com.binge.designsystem.component.bingeSheetScroll
 
 /**
  * One filter in a sheet of its own, stacked over a [FilterSheet]: its title with a Clear of its own, a [hint] where the
@@ -97,7 +98,7 @@ fun ColumnScope.FilterSectionContent(
         modifier =
             Modifier
                 .weight(1f, fill = false)
-                .verticalScroll(rememberScrollState())
+                .bingeSheetScroll()
                 .padding(
                     start = dimensionResource(R.dimen.filter_sheet_padding_h),
                     end = dimensionResource(R.dimen.filter_sheet_padding_h),
@@ -109,18 +110,21 @@ fun ColumnScope.FilterSectionContent(
         }
         FilterSectionControlWithSearch(section = section, callbacks = handlers, search = search)
     }
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.padding_m))
-                .padding(top = dimensionResource(R.dimen.padding_sm), bottom = dimensionResource(R.dimen.padding_l)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
-    ) {
-        BingeFilledButton(label = doneLabel, onClick = onDone, modifier = Modifier.weight(1f))
-        footerAccessory?.invoke(this)
+    // Where the host pins the footer it draws the divider above it, so the divider is drawn here only for a footer left in place.
+    if (LocalSheetFooterHost.current == null) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+    BingeSheetFooter {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(R.dimen.padding_m))
+                    .padding(top = dimensionResource(R.dimen.padding_sm), bottom = dimensionResource(R.dimen.padding_l)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_sm)),
+        ) {
+            BingeFilledButton(label = doneLabel, onClick = onDone, modifier = Modifier.weight(1f))
+            footerAccessory?.invoke(this)
+        }
     }
 }
 

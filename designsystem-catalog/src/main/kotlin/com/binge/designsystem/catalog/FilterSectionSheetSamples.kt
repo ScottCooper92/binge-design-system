@@ -16,6 +16,7 @@ import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilledButton
 import com.binge.designsystem.component.BingeFilterChip
 import com.binge.designsystem.preview.ScreenshotTheme
+import com.binge.designsystem.preview.TaskSheetPreviewFrame
 import com.binge.designsystem.template.FilterControlHandlers
 import com.binge.designsystem.template.FilterControlUi
 import com.binge.designsystem.template.FilterDateBoundsUi
@@ -135,6 +136,41 @@ fun FilterSectionRangeSample() {
                 onClear = { values = 0f..RATING_MAX },
                 onDone = {},
                 onBack = {},
+                handlers = FilterControlHandlers(onRangeChange = { _, range -> values = range }),
+            )
+        }
+    }
+}
+
+/**
+ * A filter in the side sheet, where the footer is pinned to the foot of the sheet and the control stays at the top, so the button is
+ * in the same place whatever the filter holds. A sheet that wraps its content draws the footer under the control, as the others here do.
+ */
+@Composable
+fun FilterSectionSideSheetSample() {
+    var values by remember { mutableStateOf(7f..RATING_MAX) }
+    ScreenshotTheme {
+        TaskSheetPreviewFrame {
+            FilterSectionContent(
+                section =
+                    FilterSectionUi(
+                        id = RATING_ID,
+                        title = "Rating",
+                        control =
+                            FilterControlUi.Range(
+                                values = values,
+                                valueRange = 0f..RATING_MAX,
+                                steps = RATING_STEPS,
+                                valueLabel = { String.format(Locale.ROOT, "%.1f", it) },
+                                startThumbDescription = "Minimum rating",
+                                endThumbDescription = "Maximum rating",
+                            ),
+                    ),
+                clearLabel = "Clear",
+                clearEnabled = values != 0f..RATING_MAX,
+                doneLabel = "Apply",
+                onClear = { values = 0f..RATING_MAX },
+                onDone = {},
                 handlers = FilterControlHandlers(onRangeChange = { _, range -> values = range }),
             )
         }
