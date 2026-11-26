@@ -44,4 +44,9 @@ class LogReaderScreenSamplesScreenshotTest {
     @ScreenStatePreview
     @Composable
     fun appendFailed() = LogReaderAppendFailedSample()
+
+    @PreviewTest
+    @ScreenStatePreview
+    @Composable
+    fun refreshing() = LogReaderRefreshingSample()
 }

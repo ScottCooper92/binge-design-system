@@ -10,9 +10,15 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -22,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
 import com.binge.designsystem.component.BingeFilterChipRow
+import com.binge.designsystem.component.BingePullToRefresh
 import com.binge.designsystem.component.BingeSearchField
 import com.binge.designsystem.component.BingeSearchFieldHeader
 import com.binge.designsystem.component.FilterChipItem
@@ -45,12 +52,17 @@ sealed interface LogReaderState {
     /** The first page of the selected level is on its way. */
     data object Loading : LogReaderState
 
-    /** [rows] of the selected level that match the query. The footer shows while [appending] a page, or when the last page [appendFailed]. */
+    /**
+     * [rows] of the selected level that match the query. The footer shows while [appending] a page, or when the last page [appendFailed].
+     * [refreshing] is the app's own re-read of the list, which the pull's spinner shows while it is true; it has no effect unless
+     * [LogReaderCallbacks.onRefresh] is set.
+     */
     class Ready(
         val rows: List<LogRowEntry>,
         val hasMore: Boolean,
         val appending: Boolean = false,
         val appendFailed: Boolean = false,
+        val refreshing: Boolean = false,
     ) : LogReaderState
 
     /** Nothing to list, said under its [icon] with an optional [action]. [title] null says "Nothing here yet". */
@@ -73,6 +85,10 @@ sealed interface LogReaderState {
 /**
  * What the screen reports. [onSelectLevel] gets the chip's index in `levels`; [onCopy] gets the row to put on the clipboard (a long press, or the
  * row's Copy line button). [onBack] null draws no back control.
+ *
+ * [onRefresh], when set, lets a pull down on the rows re-read the list (the spinner follows [LogReaderState.Ready.refreshing]). [onAtTopChange],
+ * when set, is told whether the list is scrolled to its first row, so an app can re-read the newest lines on its own interval only while the
+ * reader is at the top; it is told `true` while there are no rows to scroll.
  */
 @Immutable
 class LogReaderCallbacks(
@@ -82,6 +98,8 @@ class LogReaderCallbacks(
     val onRetry: () -> Unit,
     val onCopy: (LogRowEntry) -> Unit,
     val onBack: (() -> Unit)? = null,
+    val onRefresh: (() -> Unit)? = null,
+    val onAtTopChange: ((Boolean) -> Unit)? = null,
 )
 
 /** Whether the list's footer (a spinner, or Retry) is drawn. */
@@ -101,12 +119,14 @@ fun showsLogReaderFooter(ready: LogReaderState.Ready): Boolean = ready.appending
  * @param loadingLabel what a screen reader says of the loading plates.
  * @param moreFailedLabel the footer's Try again label, shown when the last page failed to load.
  * @param snackbarHostState the host for the app's own snackbars, shown over the list.
+ * @param pullState the pull's own state, for a still frame that must show the spinner; null leaves it to the default.
  *
  * @need read logs: level filter chips, a search field and log rows in a paged list
  * @group screens
  * @replaces a hand-built pager of level chips, a search field and log rows over a paged flow
  * @sample LogReaderReadySample
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogReaderScreen(
     title: String,
@@ -120,6 +140,7 @@ fun LogReaderScreen(
     loadingLabel: String = stringResource(R.string.log_reader_loading),
     moreFailedLabel: String = stringResource(R.string.list_more_failed),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    pullState: PullToRefreshState? = null,
     actions: @Composable RowScope.(glassBackgroundAlpha: Float) -> Unit = {},
 ) {
     BingeScreenScaffold(
@@ -155,6 +176,9 @@ fun LogReaderScreen(
                     bottom = padding.calculateBottomPadding() + dimensionResource(R.dimen.padding_m),
                 ),
             )
+        // Not at a list's top when there is no list, so an app that follows the newest lines keeps following an empty or loading reader.
+        val notReady = state !is LogReaderState.Ready
+        LaunchedEffect(notReady) { if (notReady) callbacks.onAtTopChange?.invoke(true) }
         when (state) {
             LogReaderState.Loading ->
                 ListRowSkeletonColumn(
@@ -185,7 +209,20 @@ fun LogReaderScreen(
                 )
             is LogReaderState.Ready ->
                 // Keyed on the level, so each level opens at its own top rather than where the last one was scrolled.
-                key(selected) { ReadyLogRows(state, inner, callbacks, moreFailedLabel) }
+                key(selected) {
+                    val onRefresh = callbacks.onRefresh
+                    if (onRefresh != null) {
+                        BingePullToRefresh(
+                            isRefreshing = state.refreshing,
+                            onRefresh = onRefresh,
+                            modifier = Modifier.fillMaxSize(),
+                            indicatorTopInset = padding.calculateTopPadding(),
+                            state = pullState ?: rememberPullToRefreshState(),
+                        ) { ReadyLogRows(state, inner, callbacks, moreFailedLabel) }
+                    } else {
+                        ReadyLogRows(state, inner, callbacks, moreFailedLabel)
+                    }
+                }
         }
     }
 }
@@ -198,6 +235,8 @@ private fun ReadyLogRows(
     moreFailedLabel: String,
 ) {
     val listState = rememberLazyListState()
+    val atTop by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0 } }
+    LaunchedEffect(atTop) { callbacks.onAtTopChange?.invoke(atTop) }
     LoadMoreEffect(
         key = listState,
         itemCount = state.rows.size,
