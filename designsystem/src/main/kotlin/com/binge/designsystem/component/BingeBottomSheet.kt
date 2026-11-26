@@ -1,7 +1,6 @@
 package com.binge.designsystem.component
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
@@ -204,8 +203,9 @@ internal fun sheetSideMargin(windowWidth: Int, sheetMaxWidth: Int): Int = ((wind
 
 /**
  * A sheet's content in a column that animates its own height, so the sheet, which is as tall as its content, follows a change on the
- * theme's spatial spring instead of jumping to it. Under reduced motion there is no animation modifier at all and the height changes
- * at once. The column is the width of the sheet and lays its children out as the sheet's own column did, so a sheet whose height
+ * theme's spatial spring instead of jumping to it. A column that already fills the height it is offered follows that height at once
+ * ([animateSheetHeight]), so dragging the sheet is not fought by a spring. Under reduced motion there is no animation modifier at all
+ * and the height changes at once. The column is the width of the sheet and lays its children out as the sheet's own column did, so a sheet whose height
  * holds still is unchanged. Scrolls inside it pass through [SheetScrollHandoff], so a swipe that scrolls a list never also closes the sheet.
  */
 @Composable
@@ -217,7 +217,7 @@ internal fun SheetAnimatedColumn(content: @Composable ColumnScope.() -> Unit) {
             Modifier
                 .fillMaxWidth()
                 .nestedScroll(handoff)
-                .then(if (motion.reduceMotion) Modifier else Modifier.animateContentSize(motion.spatial())),
+                .then(if (motion.reduceMotion) Modifier else Modifier.animateSheetHeight(motion.spatial())),
         content = content,
     )
 }
