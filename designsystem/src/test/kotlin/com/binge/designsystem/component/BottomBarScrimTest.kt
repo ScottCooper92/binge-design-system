@@ -103,6 +103,12 @@ class BottomBarScrimTest {
     }
 
     @Test
+    fun `it eases in, so a tenth of the way down it has barely started`() {
+        val (early) = pixels(1f, TOP_EDGE_Y + (PAGE_HEIGHT.value - TOP_EDGE_Y) * 0.1f)
+        assertTrue("the first tenth is still almost the page untouched, not a band", near(Color.Red.toArgb(), early))
+    }
+
+    @Test
     fun `a fraction of zero draws nothing`() {
         val (none) = pixels(0f, PAGE_HEIGHT.value)
         assertTrue("nothing drawn at 0", near(Color.Red.toArgb(), none))
