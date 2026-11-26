@@ -2,7 +2,9 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -102,10 +104,47 @@ class SheetAnimatedColumnTest {
         assertTrue("the height should not have arrived, was $midway", midway > SHORT)
     }
 
+    @Test
+    fun `a column that fills the space it is offered follows the space at once, with no spring after it`() {
+        var offered by mutableStateOf(400.dp)
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false, reduceMotion = false) {
+                Box(Modifier.testTag(HOST).heightIn(max = offered)) { SheetAnimatedColumn { Spacer(Modifier.fillMaxHeight()) } }
+            }
+        }
+        rule.mainClock.advanceTimeByFrame()
+        assertEquals(400f, hostHeight().value, 0.5f)
+
+        // A sheet being dragged is offered a little more height each frame; the column must be exactly that tall in the same frame.
+        listOf(405.dp, 410.dp, 415.dp).forEach { dp ->
+            offered = dp
+            Snapshot.sendApplyNotifications()
+            rule.mainClock.advanceTimeByFrame()
+            assertEquals(dp.value, hostHeight().value, 0.5f)
+        }
+    }
+
+    @Test
+    fun `a content that grows to fill the space still animates there`() {
+        show(reduceMotion = false)
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+        rule.mainClock.autoAdvance = false
+
+        changeContentHeightTo(SCREEN)
+        rule.advanceFrames(MIDWAY_FRAMES)
+        val midway = hostHeight()
+
+        assertTrue("the height should have started to move, was $midway", midway > SHORT)
+        assertTrue("the height should not have arrived, was $midway", midway < SCREEN)
+    }
+
     private companion object {
         const val HOST = "host"
         const val MIDWAY_FRAMES = 4
         val SHORT = 100.dp
         val TALL = 300.dp
+        val SCREEN = 5000.dp
     }
 }
