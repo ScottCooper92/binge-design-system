@@ -102,7 +102,10 @@ class BingeScreenScaffoldPinnedBarTest {
         show(pinned = true)
         assertEquals("nothing under the bar at rest, so it shows the page", page.toArgb(), barPixel())
         scroll()
-        assertEquals("rows pass under the bar and the scrim hides them, so it still shows the page", page.toArgb(), barPixel())
+        assertTrue(
+            "rows pass under the bar and the scrim lifts a red row most of the way to the page",
+            Color(barPixel()).green > LIFTED_GREEN,
+        )
     }
 
     @Test
@@ -117,5 +120,8 @@ class BingeScreenScaffoldPinnedBarTest {
         val ROW_HEIGHT = 64.dp
         const val PIXEL_INSET_PX = 4
         const val BAR_PIXEL_Y_PX = 30
+
+        /** A red row has no green, and the page has plenty; the ramp is over half opaque where the pixel is read, so it lifts it past this. */
+        const val LIFTED_GREEN = 0.5f
     }
 }
