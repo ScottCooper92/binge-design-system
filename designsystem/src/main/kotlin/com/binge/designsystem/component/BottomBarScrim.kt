@@ -14,10 +14,19 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.R
 
+/** The strongest alpha, at the bottom edge: the same as the top ramp's strongest stop. */
+private const val SCRIM_BOTTOM_ALPHA = 0.92f
+
+/** Stops sampled along the easing; enough that the gradient's own linear pieces cannot be seen. */
+private const val EASE_STEPS = 16
+
+/** 0 at 0 and 1 at 1 with no slope at either end, so a fade built on it neither starts with an edge nor ends in a step. */
+private fun smootherStep(t: Float): Float = t * t * t * (t * (t * 6f - 15f) + 10f)
+
 /**
  * The fade that lets content scrolling under a floating bottom element (a comment composer, a floating action bar) dissolve instead of running
- * sharp to the screen's edge. It is [TopBarScrim]'s ramp mirrored, drawn from the same stops: transparent at its top, rising to the same strong
- * stop at the bottom edge, in [scrimColor] (the theme's background by default, so it reads as the page fading out).
+ * sharp to the screen's edge. It rises on an ease from transparent at its top to the top ramp's strongest alpha
+ * at the bottom edge, in [scrimColor] (the theme's background by default, so it reads as the page fading out).
  *
  * Call it as the first child of the [Box] the floating element sits in, so it fills that box and the element draws over it. The box is the
  * element and the room below it down to the screen's bottom, **navigation-bar inset included**: put the inset's padding on the element inside
@@ -47,9 +56,11 @@ fun BoxScope.BottomBarScrim(
             .drawBehind {
                 val tailPx = tailHeight.toPx()
                 val paintHeight = size.height + tailPx
-                val barFraction = size.height / paintHeight
-                // The top ramp's stops mirrored: its first stop (strongest) is this one's last.
-                val stops = scrimRamp(scrimColor, fraction, barFraction).asReversed().map { (1f - it.first) to it.second }
+                // Eased from nothing to the ramp's strongest stop, so the fade has no visible onset or plateau where it starts.
+                val stops = List(EASE_STEPS + 1) { i ->
+                    val t = i / EASE_STEPS.toFloat()
+                    t to scrimColor.copy(alpha = SCRIM_BOTTOM_ALPHA * fraction * smootherStep(t))
+                }
                 drawRect(
                     brush = Brush.verticalGradient(*stops.toTypedArray(), startY = -tailPx, endY = size.height),
                     topLeft = Offset(0f, -tailPx),
