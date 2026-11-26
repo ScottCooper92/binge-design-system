@@ -18,7 +18,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -53,10 +52,6 @@ import com.binge.designsystem.theme.BingeTheme
  * needs the same lerp — `lerp(BingeTheme.colors.onScrim, MaterialTheme.colorScheme.onBackground, 1f -
  * glassBackgroundAlpha)` — rather than a tint fixed at `onScrim`, or it goes illegible in light theme
  * once the bar's own scrim has taken over.
- *
- * Behind the scrim sits a solid theme-background surface, as tall as the bar row plus the status bar, fading in
- * with the same progress. The scrim alone thins towards the bar's lower edge, which lets the page's content show
- * through once the hero has gone; at full progress nothing does.
  *
  * The status bar icons ride the same hand-off. Over the hero they are light, as
  * [DarkStatusBarEffect] sets them. Once the scrim is past halfway they follow the theme, or a light
@@ -141,15 +136,10 @@ fun BoxScope.DetailOverlayTopBar(
     // onBackground to match it, or a light theme leaves a white icon on a light bar.
     val iconTint = lerp(BingeTheme.colors.onScrim, MaterialTheme.colorScheme.onBackground, progress)
     DetailBarStatusBarEffect(progress)
-    val surface = MaterialTheme.colorScheme.background
     Box(
         modifier = modifier
             .align(Alignment.TopStart)
-            .fillMaxWidth()
-            // The scrim thins towards the bar's lower edge, so by itself it lets scrolled content show through
-            // behind the back button and title. A solid surface the height of the status bar and the bar row
-            // fades in on the same progress; at 0 it draws nothing, so the bar over the hero is unchanged.
-            .drawBehind { if (progress > 0f) drawRect(surface, alpha = progress) },
+            .fillMaxWidth(),
     ) {
         TopBarScrim(progress, scrimColor = MaterialTheme.colorScheme.background)
         Row(
