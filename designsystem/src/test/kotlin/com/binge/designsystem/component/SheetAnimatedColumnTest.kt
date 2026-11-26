@@ -127,7 +127,14 @@ class SheetAnimatedColumnTest {
 
     @Test
     fun `a content that grows to fill the space still animates there`() {
-        show(reduceMotion = false)
+        contentHeight = SHORT
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            BingeExpressiveTheme(dynamicColor = false, reduceMotion = false) {
+                Box(Modifier.testTag(HOST).heightIn(max = OFFERED)) { SheetAnimatedColumn { Spacer(Modifier.height(contentHeight)) } }
+            }
+        }
+        rule.mainClock.advanceTimeByFrame()
         rule.mainClock.autoAdvance = true
         rule.waitForIdle()
         rule.mainClock.autoAdvance = false
@@ -137,7 +144,11 @@ class SheetAnimatedColumnTest {
         val midway = hostHeight()
 
         assertTrue("the height should have started to move, was $midway", midway > SHORT)
-        assertTrue("the height should not have arrived, was $midway", midway < SCREEN)
+        assertTrue("the height should not have arrived, was $midway", midway < OFFERED)
+
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+        assertEquals(OFFERED.value, hostHeight().value, 0.5f)
     }
 
     private companion object {
@@ -146,5 +157,6 @@ class SheetAnimatedColumnTest {
         val SHORT = 100.dp
         val TALL = 300.dp
         val SCREEN = 5000.dp
+        val OFFERED = 400.dp
     }
 }

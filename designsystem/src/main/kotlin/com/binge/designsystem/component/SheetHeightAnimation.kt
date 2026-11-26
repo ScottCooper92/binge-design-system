@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
  * Animates the height of what it wraps when its content changes the height, and only then. A node that fills all the height it is
  * offered, as a sheet does when a list inside it is long, is not changing height for its content: the space it is offered moves with
  * the sheet while the sheet is dragged, and a spring chasing that moves the sheet's own anchors, which pulls the sheet back under
- * the finger. So while it fills the space on two measures running, its height follows the space at once. A change from not filling
+ * the finger. So while it fills the space on two measures running, and has arrived at that height,, its height follows the space at once. A change from not filling
  * to filling, a list that has loaded and grown to the edge, still animates.
  */
 @Composable
@@ -37,7 +37,7 @@ internal fun Modifier.animateSheetHeight(spec: FiniteAnimationSpec<Int>): Modifi
                 height.value.coerceIn(0, constraints.maxHeight)
             }
         last.measured = true
-        last.filling = filling
+        last.filling = filling && shown == target
         layout(placeable.width, shown) { placeable.place(0, 0) }
     }
 }
