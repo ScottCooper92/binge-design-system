@@ -250,7 +250,7 @@ fun MovieDetailScreenRoundActionsOnlySample() {
 
 /**
  * A page with little under its hero (the stats, one poster rail and the facts: no cast and no overview), scrolled to its end. The page is
- * kept at least a window tall, so it can scroll the whole hero away and the bar's hand-over finishes: the bar has its solid surface and its
+ * kept at least a window tall, so it can scroll the whole hero away and the bar's hand-over finishes: the bar has its scrim and its
  * title, the hero's own title is gone, and nothing is drawn over the content. Scroll it in the catalog to see the hand-over.
  */
 @Composable

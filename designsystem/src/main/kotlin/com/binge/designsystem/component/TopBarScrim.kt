@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -24,10 +23,6 @@ private const val SCRIM_LATE_STOP = 0.90f
 // Picked so the scrim's own alpha at the title's position is already dark enough for the scrimmed
 // colour above this fraction, and still light enough below it for onSurface — see #93.
 private const val TITLE_SCRIM_SWITCH_FRACTION = 0.75f
-
-// The solid surface behind the bar's own height starts where the title's colour has already switched, so nothing
-// above this fraction changes, and reaches full opacity at a fraction of 1.
-private const val SCRIM_SOLID_START_FRACTION = TITLE_SCRIM_SWITCH_FRACTION
 
 /**
  * The ramp's stops, top to bottom, over a paint area whose first [barFraction] is the bar's own height: [SCRIM_TOP_ALPHA] at the top,
@@ -81,15 +76,6 @@ internal fun scrimRamp(
  * the default stays black-always for a bar scrimming unpredictable content, where only a
  * guaranteed-dark tone keeps contrast regardless of what scrolls under it.
  *
- * The gradient alone is 50 to 60% opaque in the bar's lower half, where the title and actions sit, so a row scrolled
- * under a fully collapsed bar would still read through it. From [SCRIM_SOLID_START_FRACTION] the scrim therefore also
- * lays a solid surface in [scrimColor] over the bar's own height, reaching full opacity at a [fraction] of 1. Below it
- * nothing changes, and the tail past the bar keeps tapering as before.
- *
- * [solidSurface] turns that solid off. [solidFadeHeight] is for a box that ends in a fade band, as [OverlaidHeaderContent]'s
- * does: the solid covers the box above that band and ramps to nothing across it, so it meets the band's own taper at
- * full strength instead of ending in a hard edge.
- *
  * Call it as the first child of the [Box] the bar sits in, so it fills the bar's own bounds. A
  * non-zero [tailHeight] paints past those bounds too, so it needs to sit over content the bar has no
  * other claim on (a screen transparent-bars scroll over, never a [Box] sized to the bar alone).
@@ -100,11 +86,8 @@ internal fun BoxScope.TopBarScrim(
     modifier: Modifier = Modifier,
     scrimColor: Color = BingeTheme.colors.scrim,
     tailHeight: Dp = dimensionResource(R.dimen.zero),
-    solidSurface: Boolean = true,
-    solidFadeHeight: Dp = dimensionResource(R.dimen.zero),
 ) {
     if (fraction <= 0f) return
-    val fade = solidFadeHeight
     val scrim = scrimColor
     val tail = tailHeight
     Box(
@@ -112,24 +95,6 @@ internal fun BoxScope.TopBarScrim(
             modifier
                 .matchParentSize()
                 .drawBehind {
-                    val solid = ((fraction - SCRIM_SOLID_START_FRACTION) / (1f - SCRIM_SOLID_START_FRACTION)).coerceIn(0f, 1f)
-                    if (solidSurface && solid > 0f) {
-                        val fadePx = fade.toPx().coerceIn(0f, size.height)
-                        drawRect(scrim, alpha = solid, size = Size(size.width, size.height - fadePx))
-                        if (fadePx > 0f) {
-                            // The solid ramps out over the last fadePx instead of ending at an edge, so it meets the
-                            // taper below it at full strength and leaves no step.
-                            drawRect(
-                                brush = Brush.verticalGradient(
-                                    listOf(scrim.copy(alpha = solid), Color.Transparent),
-                                    startY = size.height - fadePx,
-                                    endY = size.height,
-                                ),
-                                topLeft = Offset(0f, size.height - fadePx),
-                                size = Size(size.width, fadePx),
-                            )
-                        }
-                    }
                     val paintHeight = size.height + tail.toPx()
                     // The caller's own height as a fraction of the taller paint area, so SCRIM_MID_STOP/
                     // SCRIM_LATE_STOP land at the same absolute position within it as a zero tailHeight

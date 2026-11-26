@@ -175,17 +175,7 @@ fun BingeFilterChipPagerSample() {
  * [BingeFilterChipPagerSample].
  */
 @Composable
-fun BingeFilterChipPagerScrimmedSample() = ScrimmedPagerSample(scrimFraction = 1f)
-
-/**
- * [BingeFilterChipPager]'s scrim half in: the bar's solid surface has not started yet, so the chip row still reads through to the
- * content and the band below it tapers as before.
- */
-@Composable
-fun BingeFilterChipPagerScrimmedHalfSample() = ScrimmedPagerSample(scrimFraction = 0.5f)
-
-@Composable
-private fun ScrimmedPagerSample(scrimFraction: Float) {
+fun BingeFilterChipPagerScrimmedSample() {
     var selected by remember { mutableIntStateOf(0) }
     ScreenshotTheme {
         Box(
@@ -202,7 +192,7 @@ private fun ScrimmedPagerSample(scrimFraction: Float) {
                 selectedIndex = selected,
                 onSelectedIndexChange = { selected = it },
                 headerBackground = Color.Transparent,
-                scrimFraction = scrimFraction,
+                scrimFraction = 1f,
                 modifier = Modifier.fillMaxSize(),
             ) { _, _ ->
                 Box(
