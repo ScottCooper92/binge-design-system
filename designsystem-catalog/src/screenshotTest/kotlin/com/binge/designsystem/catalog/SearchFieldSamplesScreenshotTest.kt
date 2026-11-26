@@ -33,6 +33,13 @@ class SearchFieldSamplesScreenshotTest {
     @PreviewTest
     @ComponentPreviews
     @Composable
+    fun Outlined() {
+        SearchFieldOutlinedSample()
+    }
+
+    @PreviewTest
+    @ComponentPreviews
+    @Composable
     fun Button() {
         SearchFieldButtonSample()
     }

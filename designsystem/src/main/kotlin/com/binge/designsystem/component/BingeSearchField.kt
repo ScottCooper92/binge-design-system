@@ -1,6 +1,7 @@
 package com.binge.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -59,6 +62,8 @@ import kotlin.time.Duration
  * `Modifier.focusRequester` for this, because two of them on one node do not both bind and the
  * caller's is the one dropped. Omit it and the field keeps a private one for its own tap handling.
  *
+ * @param outlined draws a hairline outline round the pill, in the primary colour while it has focus, as an outlined text field has. Use it in a sheet,
+ *   where the pill's fill is too close to the sheet's own to tell the field's edge.
  * @param answerGrace how long the field keeps what was typed while the caller's query has not caught up. Null, the default, is
  *   [ANSWER_GRACE_FRAMES] (4) frames, a few dozen milliseconds. Pass a few seconds, such as 3.seconds, for a caller whose echo
  *   lags (a query that round-trips through a server or a store), so it needs no helper of its own to hold the typed text.
@@ -80,7 +85,9 @@ fun BingeSearchField(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     focusRequester: FocusRequester? = null,
     answerGrace: Duration? = null,
+    outlined: Boolean = false,
 ) {
+    var focused by remember { mutableStateOf(false) }
     val internalFocusRequester = remember { FocusRequester() }
     val fieldFocus = focusRequester ?: internalFocusRequester
     // The String overload of BasicTextField starts its selection at 0, so a field that opens with a query (a screen restored on Back)
@@ -92,6 +99,7 @@ fun BingeSearchField(
     SearchFieldPill(
         modifier = modifier,
         containerColor = containerColor,
+        outline = if (outlined) (if (focused) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline) else null,
         // Tapping anywhere on the pill — icon, padding, the empty area to the right —
         // focuses the field and opens the keyboard, not just the text itself.
         onClick = { fieldFocus.requestFocus() },
@@ -111,6 +119,7 @@ fun BingeSearchField(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
+                .onFocusChanged { focused = it.isFocused }
                 .focusRequester(fieldFocus),
             textStyle = LocalTextStyle.current.merge(
                 TextStyle(
@@ -194,6 +203,7 @@ private fun SearchFieldPill(
     modifier: Modifier,
     containerColor: Color,
     onClick: () -> Unit,
+    outline: Color? = null,
     role: Role? = null,
     trailing: @Composable () -> Unit = {},
     middle: @Composable BoxScope.() -> Unit,
@@ -204,7 +214,15 @@ private fun SearchFieldPill(
             .defaultMinSize(minHeight = dimensionResource(R.dimen.search_bar_height))
             .clip(MaterialTheme.shapes.extraLarge)
             .background(containerColor)
-            .clickable(
+            .then(
+                if (outline !=
+                    null
+                ) {
+                    Modifier.border(dimensionResource(R.dimen.hairline_thickness), outline, MaterialTheme.shapes.extraLarge)
+                } else {
+                    Modifier
+                },
+            ).clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClickLabel = null,

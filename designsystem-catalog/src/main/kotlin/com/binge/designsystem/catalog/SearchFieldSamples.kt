@@ -2,6 +2,7 @@
 
 package com.binge.designsystem.catalog
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -61,6 +62,22 @@ fun SearchFieldTransparentContainerSample() {
             onClear = { query = "" },
             placeholder = SEARCH_PLACEHOLDER,
             containerColor = Color.Transparent,
+        )
+    }
+}
+
+/** Outlined: a hairline edge round the pill, for a field in a sheet whose own colour is too close to the pill's fill to show its edge. */
+@Composable
+fun SearchFieldOutlinedSample() {
+    var query by remember { mutableStateOf("") }
+    ScreenshotTheme {
+        BingeSearchField(
+            query = query,
+            onQueryChange = { query = it },
+            onClear = { query = "" },
+            placeholder = SEARCH_PLACEHOLDER,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            outlined = true,
         )
     }
 }

@@ -682,6 +682,7 @@ private fun <T> SingleChoiceListContent(
                 onClear = { onQueryChange("") },
                 placeholder = filterPlaceholder,
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                outlined = true,
                 modifier =
                     Modifier.padding(
                         horizontal = dimensionResource(R.dimen.padding_m),
@@ -788,6 +789,7 @@ private fun <T> MultiChoiceListContent(
                 placeholder = filterPlaceholder,
                 // The field's own default is the sheet's colour, which would leave it invisible here.
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                outlined = true,
                 modifier =
                     Modifier.padding(
                         horizontal = dimensionResource(R.dimen.padding_m),
