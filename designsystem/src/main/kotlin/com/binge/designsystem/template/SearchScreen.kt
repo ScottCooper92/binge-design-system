@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -44,14 +45,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.CenteredContent
+import com.binge.designsystem.CollapsingTitleState
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
+import com.binge.designsystem.collapsingTitle
 import com.binge.designsystem.component.BingeConfirmDialog
 import com.binge.designsystem.component.BingeFilterChipRow
 import com.binge.designsystem.component.BingeSearchField
@@ -71,6 +75,7 @@ import com.binge.designsystem.layout.LayoutAnchors
 import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.navOverlayPadding
 import com.binge.designsystem.navOverlayStart
+import com.binge.designsystem.nestedScrollConnection
 import com.binge.designsystem.searchResultColumns
 
 /** The lazy key of the append footer. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
@@ -199,6 +204,9 @@ class SearchCallbacks(
  * @param bar the top bar: the large collapsing one by default, or `Small`, whose title row never collapses so nothing is handed over.
  * @param pinned keeps a `Small` bar, with the field and chips under it, in place while the results scroll under them, as the scaffold's `pinned`. False, the
  *   default, lets the small bar slide away as it always has; it has no effect on the other bars.
+ * @param titleCollapses draws the title above the field as a heading that scrolls away entirely as the results scroll, leaving the field and chips
+ *   pinned at the top, as Binge's Search does, instead of a top bar. [bar] and [pinned] are ignored, and so is [SearchCallbacks.onBack]: no back
+ *   control is drawn, so the option is for a tab-root Search. The heading comes back when a new query's results open. False, the default, keeps the bar.
  * @param fastScrollbar draws a [com.binge.designsystem.component.BingeFastScrollbar] over the results grid (over each page's own grid when the
  *   body pages), at the end edge and inside the bar's and the navigation bar's room, with the options' bubble text. Null, the default, draws none.
  *
@@ -232,8 +240,10 @@ fun SearchScreen(
     reserveTypeChipsWhileLoading: Boolean = false,
     expectedResultName: String? = null,
     fastScrollbar: FastScrollbarOptions? = null,
+    titleCollapses: Boolean = false,
 ) {
     val scrollBehavior = rememberScreenBarScrollBehavior(bar, pinned)
+    val titleState = remember { CollapsingTitleState() }
     val paged = state.pagedTypes()
     // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
     val answered = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query
@@ -247,21 +257,52 @@ fun SearchScreen(
     // of the same query after it is a new one and opens at the top.
     val shownQuery = answered ?: lastAnswered.value ?: text
     val pageStates = rememberSaveable(shownQuery, saver = SearchPageStates.Saver) { SearchPageStates() }
+    // A new query's results open at the top, so the heading comes back with them; a scroll-to-top does not dispatch the nested scroll that would.
+    LaunchedEffect(shownQuery) {
+        if (titleCollapses) titleState.expand()
+    }
     val pager = rememberFilterPager(
         selectedIndex = paged?.selectedIndex ?: 0,
         onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },
         pageCount = paged?.chips?.size ?: 0,
     )
     val pageScrim = rememberShownPageScrim(pager, paged, pageStates)
+    // The heading gone means the page has scrolled, so the pinned field gets its scrim even where no result page reports one (the idle rails).
+    val titleScrim by remember(titleState) {
+        derivedStateOf { if (titleCollapses && titleState.heightPx > 0) titleState.collapsedPx / titleState.heightPx else 0f }
+    }
     BingeScreenScaffold(
         title = title,
-        modifier = modifier,
+        modifier = if (titleCollapses) modifier.nestedScroll(remember(titleState) { titleState.nestedScrollConnection() }) else modifier,
         onBack = callbacks.onBack,
-        bar = bar,
+        bar = if (titleCollapses) ScreenBar.None else bar,
         scrollBehavior = scrollBehavior,
-        scrimFloor = pageScrim,
+        scrimFloor = maxOf(pageScrim, titleScrim),
         header = {
-            SearchControls(text, state, callbacks, placeholder, reselectKey, pager.takeIf { paged != null }, reserveTypeChipsWhileLoading)
+            Column {
+                if (titleCollapses) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.displaySmall,
+                        modifier = Modifier
+                            .padding(
+                                start = dimensionResource(R.dimen.screen_content_inset),
+                                top = dimensionResource(R.dimen.padding_s),
+                                end = dimensionResource(R.dimen.screen_content_inset),
+                                bottom = dimensionResource(R.dimen.padding_m),
+                            ).collapsingTitle(titleState),
+                    )
+                }
+                SearchControls(
+                    text,
+                    state,
+                    callbacks,
+                    placeholder,
+                    reselectKey,
+                    pager.takeIf { paged != null },
+                    reserveTypeChipsWhileLoading,
+                )
+            }
         },
     ) { padding ->
         ScreenBody(padding) { body ->

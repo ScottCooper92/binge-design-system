@@ -76,6 +76,11 @@ class SearchScreenSamplesScreenshotTest {
 
     @PreviewTest
     @ScreenWidthPreviews
+    @Composable
+    fun titleCollapses() = SearchScreenTitleCollapsesSample()
+
+    @PreviewTest
+    @ScreenWidthPreviews
     @WorstCaseFontPreviews
     @Composable
     fun people() = SearchScreenPeopleSample()

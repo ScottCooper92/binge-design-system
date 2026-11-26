@@ -83,6 +83,7 @@ private fun SampleSearch(
     idleExtras: (LazyListScope.() -> Unit)? = null,
     noResultsExtras: (@Composable () -> Unit)? = null,
     bar: ScreenBar = ScreenBar.Large,
+    titleCollapses: Boolean = false,
 ) {
     var text by remember { mutableStateOf(initialText) }
     var selected by remember { mutableStateOf(initialType) }
@@ -125,6 +126,7 @@ private fun SampleSearch(
             idleExtras = idleExtras,
             noResultsExtras = noResultsExtras,
             bar = bar,
+            titleCollapses = titleCollapses,
         )
         opened?.let { BingeMessageDialog(title = "Opened", message = it, onDismiss = { opened = null }) }
     }
@@ -170,6 +172,22 @@ fun SearchScreenReadySample() =
             )
         },
         initialText = "past",
+    )
+
+/** Results under a heading that scrolls away as they scroll, leaving the field and chips pinned, as Binge's Search does. */
+@Composable
+fun SearchScreenTitleCollapsesSample() =
+    SampleSearch(
+        { selected, _ ->
+            SearchState.Ready(
+                sampleResults(),
+                loaded = SAMPLE_RESULTS,
+                hasMore = true,
+                types = types(selected, counts = true),
+            )
+        },
+        initialText = "past",
+        titleCollapses = true,
     )
 
 /** Results of a type with no counts, as a client that has none: People, as portraits with no status. */
