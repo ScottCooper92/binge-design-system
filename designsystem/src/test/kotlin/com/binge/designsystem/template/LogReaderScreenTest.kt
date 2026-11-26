@@ -3,9 +3,11 @@ package com.binge.designsystem.template
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.Density
 import com.binge.designsystem.ErrorKind
@@ -117,6 +119,32 @@ class LogReaderScreenTest {
         var asked = 0
         show(LogReaderState.Ready(rows(3), hasMore = true), LogReaderCallbacks({}, {}, { asked++ }, {}, {}))
         assertEquals(1, asked)
+    }
+
+    @Test
+    fun `a list at its first row reports it is at the top, and scrolling away reports it is not`() {
+        val reports = mutableListOf<Boolean>()
+        show(
+            LogReaderState.Ready(rows(40), hasMore = false),
+            LogReaderCallbacks({}, {}, {}, {}, {}, onAtTopChange = { reports += it }),
+        )
+        assertEquals(listOf(true), reports)
+        rule.onAllNodes(hasScrollToIndexAction())[0].performScrollToIndex(30)
+        rule.waitForIdle()
+        assertEquals(listOf(true, false), reports)
+    }
+
+    @Test
+    fun `a reader with no rows to scroll reports it is at the top`() {
+        val reports = mutableListOf<Boolean>()
+        show(LogReaderState.Empty(message = "Nothing matches."), LogReaderCallbacks({}, {}, {}, {}, {}, onAtTopChange = { reports += it }))
+        assertEquals(listOf(true), reports)
+    }
+
+    @Test
+    fun `a screen without the hooks draws as before`() {
+        show(LogReaderState.Ready(rows(3), hasMore = false, refreshing = true))
+        rule.onNodeWithText("Error").assertIsDisplayed()
     }
 
     private fun skeletonReservesRow(fontScale: Float) {

@@ -4,6 +4,8 @@
 package com.binge.designsystem.catalog
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,11 +57,14 @@ private fun sampleRows(count: Int = PAGE_ROWS, from: Int = 0): List<LogRowEntry>
         )
     }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SampleReader(
     state: LogReaderState,
     initialQuery: String = "",
     selected: Int = 0,
+    refreshable: Boolean = false,
+    pullState: PullToRefreshState? = null,
 ) {
     var level by remember { mutableIntStateOf(selected) }
     var query by remember { mutableStateOf(initialQuery) }
@@ -79,7 +84,9 @@ private fun SampleReader(
                     onRetry = {},
                     onCopy = { info = it.message },
                     onBack = LocalDemoBack.current,
+                    onRefresh = if (refreshable) ({}) else null,
                 ),
+            pullState = pullState,
         )
         info?.let { BingeMessageDialog(title = "Copied", message = it, onDismiss = { info = null }) }
     }
@@ -114,7 +121,13 @@ fun LogReaderAppendingSample() = SampleReader(LogReaderState.Ready(sampleRows(SH
 @Composable
 fun LogReaderAppendFailedSample() = SampleReader(LogReaderState.Ready(sampleRows(SHORT_LIST_ROWS), hasMore = true, appendFailed = true))
 
-/** The reader live: pick a level, type to narrow the lines, and scroll to page in more. */
+/** A pull down on the rows re-reads the list: the spinner rests under the bar while the app's own re-read runs. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LogReaderRefreshingSample() =
+    SampleReader(LogReaderState.Ready(sampleRows(), hasMore = true, refreshing = true), refreshable = true, pullState = RestingAtThreshold)
+
+/** The reader live: pick a level, type to narrow the lines, scroll to page in more, and pull down to re-read. */
 @Composable
 fun LogReaderDemo() {
     var level by remember { mutableIntStateOf(0) }
@@ -122,6 +135,14 @@ fun LogReaderDemo() {
     var rows by remember { mutableStateOf(sampleRows()) }
     var appending by remember { mutableStateOf(false) }
     var copied by remember { mutableStateOf<String?>(null) }
+    var refreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            delay(LOAD_MILLIS)
+            rows = sampleRows()
+            refreshing = false
+        }
+    }
     LaunchedEffect(appending) {
         if (appending) {
             delay(LOAD_MILLIS)
@@ -143,7 +164,7 @@ fun LogReaderDemo() {
                 if (shown.isEmpty()) {
                     LogReaderState.Empty(message = "No lines match.")
                 } else {
-                    LogReaderState.Ready(shown, hasMore = rows.size < PAGE_ROWS * 4, appending = appending)
+                    LogReaderState.Ready(shown, hasMore = rows.size < PAGE_ROWS * 4, appending = appending, refreshing = refreshing)
                 },
             callbacks =
                 LogReaderCallbacks(
@@ -153,6 +174,7 @@ fun LogReaderDemo() {
                     onRetry = {},
                     onCopy = { copied = it.message },
                     onBack = LocalDemoBack.current,
+                    onRefresh = { refreshing = true },
                 ),
         )
         copied?.let { BingeMessageDialog(title = "Copied", message = it, onDismiss = { copied = null }) }
