@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -204,7 +205,8 @@ class SearchCallbacks(
  * @param pinned keeps a `Small` bar, with the field and chips under it, in place while the results scroll under them, as the scaffold's `pinned`. False, the
  *   default, lets the small bar slide away as it always has; it has no effect on the other bars.
  * @param titleCollapses draws the title above the field as a heading that scrolls away entirely as the results scroll, leaving the field and chips
- *   pinned at the top, as Binge's Search does, instead of a top bar. [bar] and [pinned] are ignored. False, the default, keeps the bar.
+ *   pinned at the top, as Binge's Search does, instead of a top bar. [bar] and [pinned] are ignored, and so is [SearchCallbacks.onBack]: no back
+ *   control is drawn, so the option is for a tab-root Search. The heading comes back when a new query's results open. False, the default, keeps the bar.
  * @param fastScrollbar draws a [com.binge.designsystem.component.BingeFastScrollbar] over the results grid (over each page's own grid when the
  *   body pages), at the end edge and inside the bar's and the navigation bar's room, with the options' bubble text. Null, the default, draws none.
  *
@@ -255,6 +257,10 @@ fun SearchScreen(
     // of the same query after it is a new one and opens at the top.
     val shownQuery = answered ?: lastAnswered.value ?: text
     val pageStates = rememberSaveable(shownQuery, saver = SearchPageStates.Saver) { SearchPageStates() }
+    // A new query's results open at the top, so the heading comes back with them; a scroll-to-top does not dispatch the nested scroll that would.
+    LaunchedEffect(shownQuery) {
+        if (titleCollapses) titleState.expand()
+    }
     val pager = rememberFilterPager(
         selectedIndex = paged?.selectedIndex ?: 0,
         onSelectedIndexChange = { index -> paged?.chips?.getOrNull(index)?.let { callbacks.onType(it.key) } },

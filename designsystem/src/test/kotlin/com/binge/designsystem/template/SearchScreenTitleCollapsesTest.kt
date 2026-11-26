@@ -1,5 +1,7 @@
 package com.binge.designsystem.template
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
@@ -35,17 +37,18 @@ class SearchScreenTitleCollapsesTest {
     @get:Rule
     val rule = createTakeDownComposeRule()
 
-    private fun show(titleCollapses: Boolean) {
+    private fun show(titleCollapses: Boolean, text: MutableState<String> = mutableStateOf("past")) {
         rule.setContent {
             TestTheme {
                 SearchScreen(
                     title = TITLE,
-                    text = "past",
+                    text = text.value,
                     state =
                         SearchState.Ready(
                             List(RESULTS) { MediaResult("r$it", MediaResultKind.Poster, null, "Result $it", "Movie · 2020", rating = 7f) },
                             loaded = RESULTS,
                             hasMore = false,
+                            query = text.value,
                         ),
                     callbacks = SearchCallbacks(onQueryChange = {}, onClear = {}, onOpenResult = {}, onLoadMore = {}, onRetry = {}),
                     placeholder = "Find a title",
@@ -71,6 +74,19 @@ class SearchScreenTitleCollapsesTest {
         scrollResults()
 
         rule.onNodeWithText(TITLE).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `the heading comes back when a new query's results open`() {
+        val text = mutableStateOf("past")
+        show(titleCollapses = true, text = text)
+        scrollResults()
+        rule.onNodeWithText(TITLE).assertIsNotDisplayed()
+
+        text.value = "heat"
+        rule.waitForIdle()
+
+        rule.onNodeWithText(TITLE).assertIsDisplayed()
     }
 
     @Test
