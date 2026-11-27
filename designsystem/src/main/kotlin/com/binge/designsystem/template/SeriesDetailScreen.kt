@@ -62,6 +62,7 @@ class SeriesDetail(
     val viewAllLabel: String? = null,
     val selectedSeasonKey: String? = null,
     val shown: Int? = null,
+    val viewAllAlways: Boolean = false,
 )
 
 /**
@@ -157,6 +158,7 @@ private fun SeriesEpisodes(
         onSeasonClick = onPick.takeIf { series.seasons.size > 1 },
         viewAllLabel = series.viewAllLabel,
         shown = series.shown ?: EPISODES_SHOWN,
+        viewAllAlways = series.viewAllAlways,
         onViewAll = callbacks.onViewAllEpisodes,
         onOpenEpisode = callbacks.onOpenEpisode,
         stateContent = when (val episodes = series.episodes) {

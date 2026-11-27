@@ -53,6 +53,35 @@ fun SeasonPickerContentSample() {
     }
 }
 
+private val richSeasons = listOf(
+    SeasonRow(0, "Specials", "3 episodes", overview = "Behind-the-scenes shorts and the two holiday episodes."),
+    SeasonRow(
+        1,
+        "Season 1",
+        "10 episodes · 2011 · Available",
+        overview = "A quiet town's first winter, and the stranger who arrives with the thaw.",
+    ),
+    SeasonRow(
+        2,
+        "Season 2",
+        "10 episodes · 2012 · Available",
+        overview = "Old debts come due, and the town learns what the stranger left behind when the snow melted.",
+    ),
+    SeasonRow(3, "Season 3", "10 episodes · 2013"),
+)
+
+/**
+ * The season picker's rows when the seasons carry a synopsis (and, in an app, a poster): the shown season is bold with a check,
+ * a long overview ends after two lines.
+ */
+@Composable
+fun SeasonPickerRichContentSample() {
+    ScreenshotTheme {
+        var selected by remember { mutableIntStateOf(2) }
+        SeasonPickerContent(rows = richSeasons, selected = selected, onSelect = { selected = it })
+    }
+}
+
 /** The season picker opened for real, over a button: it stacks over the page as a task sheet, and choosing a season closes it. */
 @Composable
 fun SeasonPickerSheetDemo() {

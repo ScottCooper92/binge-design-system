@@ -95,3 +95,21 @@ fun DetailEpisodesSectionOpenableSample() {
         )
     }
 }
+
+/** A season short enough to list in full still ends in the view-all button when the app asks for it, as the way into the season's screen. */
+@Composable
+fun DetailEpisodesSectionViewAllAlwaysSample() {
+    ScreenshotTheme {
+        DetailEpisodesSection(
+            title = "Episodes",
+            episodes = listOf(
+                EpisodeRow(1, "Pilot", null, rating = 8.5f, airDate = "Jan 20, 2008"),
+                EpisodeRow(2, "Cat's in the Bag", null, rating = 8.4f, airDate = "Jan 27, 2008"),
+            ),
+            subtitle = "Season 1 · 2 episodes · 2008",
+            viewAllLabel = "View all episodes",
+            onViewAll = {},
+            viewAllAlways = true,
+        )
+    }
+}

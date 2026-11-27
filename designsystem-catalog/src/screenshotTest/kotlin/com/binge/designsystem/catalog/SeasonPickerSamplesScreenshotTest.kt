@@ -29,6 +29,12 @@ class SeasonPickerSamplesScreenshotTest {
     @ComponentPreviews
     @WorstCaseFontPreviews
     @Composable
+    fun pickerRich() = SeasonPickerRichContentSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
     fun episodes() = DetailEpisodesSectionSample()
 
     @PreviewTest
@@ -42,4 +48,10 @@ class SeasonPickerSamplesScreenshotTest {
     @WorstCaseFontPreviews
     @Composable
     fun episodesOpenable() = DetailEpisodesSectionOpenableSample()
+
+    @PreviewTest
+    @ComponentPreviews
+    @WorstCaseFontPreviews
+    @Composable
+    fun episodesViewAllAlways() = DetailEpisodesSectionViewAllAlwaysSample()
 }
