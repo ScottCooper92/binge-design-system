@@ -19,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.CenteredContent
 import com.binge.designsystem.R
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 
 /**
  * Every episode of a show, grouped by season: a [SeasonHeader] then that season's rows, one section after
@@ -76,10 +77,15 @@ fun SeasonSectionsList(
             }
     }
 
-    LaunchedEffect(listState, headerIndices) {
-        snapshotFlow { headerIndices.indexOfLast { it <= listState.firstVisibleItemIndex } }
+    val currentHeaderIndices by rememberUpdatedState(headerIndices)
+    LaunchedEffect(listState) {
+        val currentKey = snapshotFlow {
+            currentSections.getOrNull(currentHeaderIndices.indexOfLast { it <= listState.firstVisibleItemIndex })?.key
+        }
+        currentKey
+            .filterNotNull()
             .distinctUntilChanged()
-            .collect { index -> currentSections.getOrNull(index)?.key?.let { currentOnSectionChanged?.invoke(it) } }
+            .collect { key -> currentOnSectionChanged?.invoke(key) }
     }
 
     CenteredContent(modifier = modifier) { contentModifier ->

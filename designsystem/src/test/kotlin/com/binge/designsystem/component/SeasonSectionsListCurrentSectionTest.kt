@@ -2,6 +2,9 @@ package com.binge.designsystem.component
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.binge.designsystem.testing.TestTheme
 import com.binge.designsystem.testing.createTakeDownComposeRule
 import kotlinx.coroutines.runBlocking
@@ -46,5 +49,31 @@ class SeasonSectionsListCurrentSectionTest {
         rule.runOnIdle { runBlocking { listState.scrollToItem(7) } }
         rule.waitForIdle()
         assertEquals(listOf("1", "2"), reported)
+    }
+
+    @Test
+    fun `an earlier section loading with another row count reports nothing new`() {
+        val reported = mutableListOf<String>()
+        var current by mutableStateOf(
+            listOf(
+                SeasonSectionUi("1", "Season 1", "3 episodes", SeasonSectionState.Loading(3)),
+                sections[1],
+            ),
+        )
+        rule.setContent {
+            TestTheme {
+                SeasonSectionsList(
+                    sections = current,
+                    listState = rememberLazyListState(),
+                    openAt = "1",
+                    onSeasonNeeded = {},
+                    onCurrentSectionChanged = { reported += it },
+                )
+            }
+        }
+        rule.waitForIdle()
+        rule.runOnIdle { current = sections }
+        rule.waitForIdle()
+        assertEquals(listOf("1"), reported)
     }
 }
