@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.binge.designsystem.CenteredContent
 import com.binge.designsystem.R
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 
 /**
  * Every episode of a show, grouped by season: a [SeasonHeader] then that season's rows, one section after
@@ -30,6 +32,9 @@ import com.binge.designsystem.R
  *
  * The first time headers are known the list scrolls once to the section whose key is [openAt] (the first
  * section when null or unknown), and never again, across recomposition and rotation.
+ *
+ * [onCurrentSectionChanged] is called with the key of the section at the top of the list, on opening and again each time scrolling
+ * moves into another, so an app can name that season in its top bar.
  *
  * [contentPadding] carries a transparent bar's height, so rows travel under it: only its top and bottom are used, and the rows keep
  * the standard screen inset at the sides. A null [onEpisodeClick] makes
@@ -49,12 +54,14 @@ fun SeasonSectionsList(
     modifier: Modifier = Modifier,
     onEpisodeClick: ((sectionKey: String, episodeNumber: Int) -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(),
+    onCurrentSectionChanged: ((key: String) -> Unit)? = null,
 ) {
     var didInitialScroll by rememberSaveable { mutableStateOf(false) }
     val headerIndices = remember(sections) { sections.headerIndices() }
     val currentSections by rememberUpdatedState(sections)
     val currentOpenAt by rememberUpdatedState(openAt)
     val currentOnSeasonNeeded by rememberUpdatedState(onSeasonNeeded)
+    val currentOnSectionChanged by rememberUpdatedState(onCurrentSectionChanged)
 
     LaunchedEffect(headerIndices) {
         if (!didInitialScroll && headerIndices.isNotEmpty()) {
@@ -68,6 +75,17 @@ fun SeasonSectionsList(
             .collect { visible ->
                 currentSections.sectionsNeeded(headerIndices, visible).forEach(currentOnSeasonNeeded)
             }
+    }
+
+    val currentHeaderIndices by rememberUpdatedState(headerIndices)
+    LaunchedEffect(listState) {
+        val currentKey = snapshotFlow {
+            currentSections.getOrNull(currentHeaderIndices.indexOfLast { it <= listState.firstVisibleItemIndex })?.key
+        }
+        currentKey
+            .filterNotNull()
+            .distinctUntilChanged()
+            .collect { key -> currentOnSectionChanged?.invoke(key) }
     }
 
     CenteredContent(modifier = modifier) { contentModifier ->
