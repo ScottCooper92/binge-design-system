@@ -49,7 +49,8 @@ class EpisodeRow(
  * The episodes of one season on a series page: the [title] header with the season dropdown ([seasonLabel] names the season shown and
  * [onSeasonClick] opens the picker; with either null there is no dropdown, as a show with one season has nothing to choose), a [subtitle]
  * line ("Season 1 · 9 episodes · 2022"), then the first [shown] of [episodes] as [EpisodeListRow]s (display-only unless [onOpenEpisode] is given and the episode has a key) and, when there are more
- * and [onViewAll] is given, a button labelled [viewAllLabel] for the rest. While the season loads or has failed, [stateContent] is drawn in
+ * and [onViewAll] is given, a button labelled [viewAllLabel] for the rest. [viewAllAlways] keeps the button when every episode is already listed, for an app whose
+ * all-episodes page is the way into a season's own screen. While the season loads or has failed, [stateContent] is drawn in
  * place of the rows, so the caller's own loading and error views stay in place, drawn inside the same inset as the rows. The header, the subtitle and the rows start at the page's
  * reading inset, so they line up with the sections around them.
  *
@@ -70,6 +71,7 @@ fun DetailEpisodesSection(
     onViewAll: (() -> Unit)? = null,
     onOpenEpisode: ((key: String) -> Unit)? = null,
     shown: Int = EPISODES_SHOWN,
+    viewAllAlways: Boolean = false,
     stateContent: (@Composable () -> Unit)? = null,
 ) {
     val inset = readingInset()
@@ -113,7 +115,7 @@ fun DetailEpisodesSection(
                     },
                 )
             }
-            if (episodes.size > shown.coerceAtLeast(0) && onViewAll != null && viewAllLabel != null) {
+            if ((viewAllAlways || episodes.size > shown.coerceAtLeast(0)) && onViewAll != null && viewAllLabel != null) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     TextButton(onClick = onViewAll) {
                         Text(viewAllLabel, color = MaterialTheme.colorScheme.primary)
