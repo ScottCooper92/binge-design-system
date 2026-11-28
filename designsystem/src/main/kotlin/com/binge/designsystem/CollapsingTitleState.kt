@@ -1,10 +1,13 @@
 package com.binge.designsystem
 
 import androidx.compose.animation.core.animate
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -50,7 +53,33 @@ class CollapsingTitleState {
     suspend fun expand() {
         animate(initialValue = collapsedPx, targetValue = 0f) { value, _ -> collapsedPx = value }
     }
+
+    companion object {
+        /**
+         * Keeps the collapse across a recomposition that leaves and re-enters the screen, as a
+         * [androidx.compose.foundation.lazy.LazyListState] or scroll state does. The body's scroll
+         * position is restored on return, so the collapse has to be restored with it; a plain `remember`
+         * would reopen the title over a body that is still scrolled, and the pinned controls would
+         * sit over the content with no scrim.
+         *
+         * [heightPx] is not saved: the layout pass writes it again before anything reads it.
+         */
+        val Saver: Saver<CollapsingTitleState, Float> =
+            Saver(
+                save = { it.collapsedPx },
+                restore = { collapsed -> CollapsingTitleState().apply { collapsedPx = collapsed } },
+            )
+    }
 }
+
+/**
+ * [CollapsingTitleState] that survives leaving and re-entering its screen; see [CollapsingTitleState.Saver].
+ *
+ * @need keep a collapsing screen title's place when the screen is left and re-entered
+ * @group screens
+ */
+@Composable
+fun rememberCollapsingTitleState(): CollapsingTitleState = rememberSaveable(saver = CollapsingTitleState.Saver) { CollapsingTitleState() }
 
 /**
  * Collapse driven by the content's scroll: the title gives way on the way down, and comes back only once

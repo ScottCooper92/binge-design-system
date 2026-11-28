@@ -1,6 +1,7 @@
 package com.binge.designsystem
 
 import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.saveable.SaverScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -57,4 +58,16 @@ class CollapsingTitleStateTest {
 
             assertEquals(0f, state.collapsedPx)
         }
+
+    @Test
+    fun `the saver keeps the collapse and not the height`() {
+        val state = CollapsingTitleState().apply { heightPx = TITLE_HEIGHT_PX }
+        state.consume(-40f)
+
+        val saved = with(CollapsingTitleState.Saver) { SaverScope { true }.save(state) }
+        val restored = CollapsingTitleState.Saver.restore(saved!!)!!
+
+        assertEquals(40f, restored.collapsedPx)
+        assertEquals(0, restored.heightPx)
+    }
 }
