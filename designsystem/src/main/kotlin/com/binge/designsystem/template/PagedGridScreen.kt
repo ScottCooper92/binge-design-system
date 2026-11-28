@@ -86,6 +86,8 @@ class GridItem(
 class GridFilterChip(
     val key: String,
     val label: String,
+    /** The chip's tone: [QuickClearTone.Exclude] for a filter that leaves titles out. */
+    val tone: QuickClearTone = QuickClearTone.Include,
 )
 
 /**
@@ -330,7 +332,7 @@ private fun ActiveFilterChips(chips: List<GridFilterChip>, onClear: (String) -> 
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_s)),
     ) {
         items(chips, key = { it.key }) { chip ->
-            DiscoverQuickClearChip(label = chip.label, tone = QuickClearTone.Include, onClick = { onClear(chip.key) })
+            DiscoverQuickClearChip(label = chip.label, tone = chip.tone, onClick = { onClear(chip.key) })
         }
     }
 }
