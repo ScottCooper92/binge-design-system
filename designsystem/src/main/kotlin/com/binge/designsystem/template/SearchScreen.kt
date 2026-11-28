@@ -52,7 +52,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.binge.designsystem.CenteredContent
-import com.binge.designsystem.CollapsingTitleState
 import com.binge.designsystem.ErrorKind
 import com.binge.designsystem.R
 import com.binge.designsystem.collapsingTitle
@@ -76,6 +75,7 @@ import com.binge.designsystem.layout.layoutAnchorIf
 import com.binge.designsystem.navOverlayPadding
 import com.binge.designsystem.navOverlayStart
 import com.binge.designsystem.nestedScrollConnection
+import com.binge.designsystem.rememberCollapsingTitleState
 import com.binge.designsystem.searchResultColumns
 
 /** The lazy key of the append footer. An app's own keys are text too, so it carries the reserved `binge:` prefix and cannot collide with them. */
@@ -243,7 +243,7 @@ fun SearchScreen(
     titleCollapses: Boolean = false,
 ) {
     val scrollBehavior = rememberScreenBarScrollBehavior(bar, pinned)
-    val titleState = remember { CollapsingTitleState() }
+    val titleState = rememberCollapsingTitleState()
     val paged = state.pagedTypes()
     // Keyed on the query the shown results answer: they open at the top of every page when a new query's arrive, while a type tap keeps each page's place.
     val answered = (state as? SearchState.Ready)?.query ?: (state as? SearchState.NoResults)?.query
